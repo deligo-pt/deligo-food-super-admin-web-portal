@@ -1,13 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { TResponse } from "@/types";
+import { setCookie } from "@/utils/cookies";
+import { postData } from "@/utils/requests";
+import { loginValidation } from "@/validations/auth/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 type LoginForm = {
   email: string;
@@ -15,21 +31,50 @@ type LoginForm = {
 };
 
 export default function SuperAdminLoginPage() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginForm>();
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(loginValidation),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+  const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = (data: LoginForm) => {
-    console.log("Super Admin Login Data:", data);
-    // TODO: handle login API call
+  const onSubmit = async (data: LoginForm) => {
+    const toastId = toast.loading("Logging in...");
+    try {
+      const result = (await postData(
+        "/auth/login",
+        data
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      )) as unknown as TResponse<any>;
+
+      if (result?.success) {
+        const decoded = jwtDecode(result.data.accessToken) as { role: string };
+        if (decoded.role === "SUPER_ADMIN") {
+          setCookie("accessToken", result.data.accessToken, 7);
+          setCookie("refreshToken", result.data.refreshToken, 365);
+          toast.success("Login successful!", { id: toastId });
+          router.push("/admin");
+          return;
+        }
+        toast.error("You are not a super admin", { id: toastId });
+        return;
+      }
+      toast.error(result.message, { id: toastId });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Login failed", {
+        id: toastId,
+      });
+      console.error("Error logging in:", error);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-950 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,7 +89,7 @@ export default function SuperAdminLoginPage() {
               transition={{ duration: 0.5 }}
               className="flex flex-col items-center"
             >
-              <div className="w-16 h-16 flex items-center justify-center bg-gradient-to-tr from-[#DC3173] to-[#5C2BFF] rounded-full shadow-lg mb-3">
+              <div className="w-16 h-16 flex items-center justify-center bg-linear-to-tr from-[#DC3173] to-[#5C2BFF] rounded-full shadow-lg mb-3">
                 <Lock className="w-8 h-8 text-white" />
               </div>
               <CardTitle className="text-2xl font-bold text-white">
@@ -57,76 +102,87 @@ export default function SuperAdminLoginPage() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              {/* Email Field */}
-              <div>
-                <Label
-                  htmlFor="email"
-                  className="text-gray-300 flex items-center gap-2"
-                >
-                  <User className="w-4 h-4" /> Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@deligo.com"
-                  className="mt-1 bg-gray-800/70 border-gray-700 text-white placeholder-gray-500 focus:ring-[#DC3173] focus:border-[#DC3173]"
-                  {...register("email", { required: "Email is required" })}
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-5"
+              >
+                {/* Email Field */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300 flex items-center gap-2">
+                        <User className="w-4 h-4" /> Email
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="admin@deligo.com"
+                          className="mt-1 bg-gray-800/70 border-gray-700 text-white placeholder-gray-500 focus:ring-[#DC3173] focus:border-[#DC3173]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {errors.email && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
 
-              {/* Password Field */}
-              <div>
-                <Label
-                  htmlFor="password"
-                  className="text-gray-300 flex items-center gap-2"
+                {/* Password Field */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300 flex items-center gap-2">
+                        <Lock className="w-4 h-4" /> Password
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative mt-1">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className={cn(
+                              "bg-gray-800/70 text-white placeholder-gray-500 focus:ring-[#DC3173] focus:border-[#DC3173]",
+                              fieldState.invalid
+                                ? "border-destructive"
+                                : "border-gray-700"
+                            )}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-3 top-2.5 text-gray-400 hover:text-[#DC3173] transition"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="w-5 h-5" />
+                            ) : (
+                              <Eye className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Submit Button */}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Lock className="w-4 h-4" /> Password
-                </Label>
-                <div className="relative mt-1">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    className="bg-gray-800/70 border-gray-700 text-white placeholder-gray-500 focus:ring-[#DC3173] focus:border-[#DC3173]"
-                    {...register("password", {
-                      required: "Password is required",
-                    })}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-[#DC3173] transition"
-                    onClick={() => setShowPassword(!showPassword)}
+                  <Button
+                    type="submit"
+                    className="w-full bg-linear-to-r from-[#DC3173] to-[#5C2BFF] hover:opacity-90 text-white font-semibold py-2 rounded-xl shadow-lg"
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-[#DC3173] to-[#5C2BFF] hover:opacity-90 text-white font-semibold py-2 rounded-xl shadow-lg"
-                >
-                  Login
-                </Button>
-              </motion.div>
-            </form>
+                    Login
+                  </Button>
+                </motion.div>
+              </form>
+            </Form>
 
             <motion.p
               initial={{ opacity: 0 }}

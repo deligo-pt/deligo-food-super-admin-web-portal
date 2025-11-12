@@ -1,3 +1,4 @@
+import SonnerToaster from "@/components/SonnerToaster/SonnerToaster";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -26,7 +27,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://deligo.pt"),
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,10 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
+      <body className={`antialiased`}>
         {children}
+        <SonnerToaster />
       </body>
     </html>
   );
