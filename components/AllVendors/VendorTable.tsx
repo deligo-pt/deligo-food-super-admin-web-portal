@@ -33,9 +33,11 @@ import { getCookie } from "@/utils/cookies";
 import { fetchData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import { MoreVertical } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function VendorTable() {
+  const router = useRouter();
   const [vendorsResult, setVendorsResult] = useState<TResponse<
     TVendor[]
   > | null>(null);
@@ -165,6 +167,14 @@ export default function VendorTable() {
                         <MoreVertical className="h-4 w-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
+                        <DropdownMenuItem
+                          className=""
+                          onClick={() =>
+                            router.push("/admin/vendor/" + vendor.userId)
+                          }
+                        >
+                          View
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           className=""
                           onClick={() =>

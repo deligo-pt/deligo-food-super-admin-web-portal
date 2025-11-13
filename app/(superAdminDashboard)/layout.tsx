@@ -3,11 +3,11 @@ import Topbar from "@/components/adminTopbar/Topbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vendor Dashboard",
-  description: "Deligo vendor dashboard",
+  title: "Admin Dashboard",
+  description: "Deligo admin dashboard",
 };
 
-export default function VendorLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
