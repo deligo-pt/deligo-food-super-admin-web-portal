@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TResponse } from "@/types";
+import { TBusinessCategory } from "@/types/category.type";
 import { TUserQueryParams, TVendor } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
 import { fetchData, updateData } from "@/utils/requests";
@@ -43,11 +44,10 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function VendorTable() {
+export default function CategoryTable() {
   const router = useRouter();
-  const [vendorsResult, setVendorsResult] = useState<TResponse<
-    TVendor[]
-  > | null>(null);
+  const [businessCategoriesResult, setBusinessCategoriesResult] =
+    useState<TResponse<TVendor[]> | null>(null);
   const [statusInfo, setStatusInfo] = useState({
     vendorId: "",
     status: "",
@@ -75,7 +75,7 @@ export default function VendorTable() {
         }
       )) as unknown as TResponse<TVendor[]>;
       if (result?.success) {
-        // fetchVendors();
+        // fetchCategories();
         setStatusInfo({
           vendorId: "",
           status: "",
@@ -89,7 +89,7 @@ export default function VendorTable() {
     }
   };
 
-  const fetchVendors = async (queries: TUserQueryParams = queryParams) => {
+  const fetchCategories = async (queries: TUserQueryParams = queryParams) => {
     let params: Partial<TUserQueryParams> = {};
 
     if (queries) {
@@ -105,13 +105,13 @@ export default function VendorTable() {
     setIsLoading(true);
 
     try {
-      const data = (await fetchData("/vendors", {
+      const data = (await fetchData("/categories/businessCategory", {
         params: params || queryParams,
         headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<TVendor[]>;
+      })) as unknown as TResponse<TBusinessCategory[]>;
 
       if (data?.success) {
-        setVendorsResult(data);
+        setBusinessCategoriesResult(data);
       }
     } catch (error) {
       console.log(error);
@@ -121,7 +121,7 @@ export default function VendorTable() {
   };
 
   useEffect(() => {
-    (() => fetchVendors())();
+    (() => fetchCategories())();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -172,9 +172,9 @@ export default function VendorTable() {
               </TableRow>
             )}
             {!isLoading &&
-              vendorsResult &&
-              vendorsResult?.data?.length > 0 &&
-              vendorsResult?.data?.map((vendor) => (
+              businessCategoriesResult &&
+              businessCategoriesResult?.data?.length > 0 &&
+              businessCategoriesResult?.data?.map((vendor) => (
                 <TableRow key={vendor._id}>
                   <TableCell>
                     {vendor.name?.firstName} {vendor.name?.lastName}
@@ -227,7 +227,7 @@ export default function VendorTable() {
                   </TableCell>
                 </TableRow>
               ))}
-            {!isLoading && vendorsResult?.data?.length === 0 && (
+            {!isLoading && businessCategoriesResult?.data?.length === 0 && (
               <TableRow>
                 <TableCell>No vendors found</TableCell>
               </TableRow>
@@ -235,16 +235,16 @@ export default function VendorTable() {
           </TableBody>
         </Table>
       </motion.div>
-      {vendorsResult?.meta?.page && (
+      {businessCategoriesResult?.meta?.page && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="px-4 md:px-6"
         >
           <PaginationCard
-            currentPage={vendorsResult?.meta?.page as number}
-            totalPages={vendorsResult?.meta?.totalPage as number}
-            paginationItemsToDisplay={vendorsResult?.meta?.limit}
+            currentPage={businessCategoriesResult?.meta?.page as number}
+            totalPages={businessCategoriesResult?.meta?.totalPage as number}
+            paginationItemsToDisplay={businessCategoriesResult?.meta?.limit}
             setQueryParams={setQueryParams}
           />
         </motion.div>
