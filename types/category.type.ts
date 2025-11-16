@@ -1,5 +1,5 @@
 export type TBusinessCategory = {
-  _id?: string;
+  _id: string;
   name: string;
   slug: string;
   description?: string;
@@ -12,7 +12,7 @@ export type TBusinessCategory = {
 };
 
 export type TProductCategory = {
-  _id?: string;
+  _id: string;
   name: string;
   slug: string;
   description?: string;
@@ -25,6 +25,14 @@ export type TProductCategory = {
 };
 
 export type TBusinessCategoryQueryParams = {
+  limit?: number;
+  page?: number;
+  searchTerm?: string;
+  sortBy?: string;
+  status?: string;
+};
+
+export type TProductCategoryQueryParams = {
   limit?: number;
   page?: number;
   searchTerm?: string;

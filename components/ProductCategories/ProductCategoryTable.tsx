@@ -27,8 +27,8 @@ import {
 } from "@/components/ui/table";
 import { TMeta, TResponse } from "@/types";
 import {
-  TBusinessCategory,
-  TBusinessCategoryQueryParams,
+  TProductCategory,
+  TProductCategoryQueryParams,
 } from "@/types/category.type";
 import { getCookie } from "@/utils/cookies";
 import { deleteData, fetchData, updateData } from "@/utils/requests";
@@ -47,8 +47,8 @@ import { toast } from "sonner";
 
 export default function CategoryTable() {
   const router = useRouter();
-  const [businessCategoriesResult, setBusinessCategoriesResult] = useState<{
-    data: TBusinessCategory[];
+  const [productCategoriesResult, setProductCategoriesResult] = useState<{
+    data: TProductCategory[];
     meta: TMeta;
   } | null>(null);
   const [statusInfo, setStatusInfo] = useState<{
@@ -62,7 +62,7 @@ export default function CategoryTable() {
     isDeleted: false,
     field: "",
   });
-  const [queryParams, setQueryParams] = useState<TBusinessCategoryQueryParams>({
+  const [queryParams, setQueryParams] = useState<TProductCategoryQueryParams>({
     limit: 10,
     page: 1,
   });
@@ -73,14 +73,14 @@ export default function CategoryTable() {
     setIsLoading(true);
     try {
       const result = (await updateData(
-        `/categories/businessCategory/${statusInfo.categoryId}`,
+        `/categories/productCategory/${statusInfo.categoryId}`,
         {
           isActive: statusInfo.isActive,
         },
         {
           headers: { authorization: getCookie("accessToken") },
         }
-      )) as unknown as TResponse<TBusinessCategory[]>;
+      )) as unknown as TResponse<TProductCategory[]>;
       if (result?.success) {
         toast.success("Active Status updated successfully!", { id: toastId });
         fetchCategories();
@@ -108,11 +108,11 @@ export default function CategoryTable() {
     setIsLoading(true);
     try {
       const result = (await deleteData(
-        `/categories/businessCategory/soft-delete/${statusInfo.categoryId}`,
+        `/categories/productCategory/soft-delete/${statusInfo.categoryId}`,
         {
           headers: { authorization: getCookie("accessToken") },
         }
-      )) as unknown as TResponse<TBusinessCategory[]>;
+      )) as unknown as TResponse<TProductCategory[]>;
       if (result?.success) {
         toast.success("Category deleted successfully!", { id: toastId });
         fetchCategories();
@@ -135,9 +135,9 @@ export default function CategoryTable() {
   };
 
   const fetchCategories = async (
-    queries: TBusinessCategoryQueryParams = queryParams
+    queries: TProductCategoryQueryParams = queryParams
   ) => {
-    let params: Partial<TBusinessCategoryQueryParams> = {};
+    let params: Partial<TProductCategoryQueryParams> = {};
 
     if (queries) {
       queries = Object.fromEntries(
@@ -152,13 +152,13 @@ export default function CategoryTable() {
     setIsLoading(true);
 
     try {
-      const data = (await fetchData("/categories/businessCategory", {
+      const data = (await fetchData("/categories/productCategory", {
         params: params || queryParams,
         headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<{ data: TBusinessCategory[]; meta: TMeta }>;
+      })) as unknown as TResponse<{ data: TProductCategory[]; meta: TMeta }>;
 
       if (data?.success) {
-        setBusinessCategoriesResult(data?.data);
+        setProductCategoriesResult(data?.data);
       }
     } catch (error) {
       console.log(error);
@@ -224,13 +224,13 @@ export default function CategoryTable() {
               </TableRow>
             )}
             {!isLoading &&
-              businessCategoriesResult &&
-              businessCategoriesResult?.data?.length > 0 &&
-              businessCategoriesResult?.data?.map((category) => (
+              productCategoriesResult &&
+              productCategoriesResult?.data?.length > 0 &&
+              productCategoriesResult?.data?.map((category) => (
                 <TableRow key={category._id}>
                   <TableCell>{category.name}</TableCell>
                   <TableCell>{category.description}</TableCell>
-                  <TableCell>{category.icon}</TableCell>
+                  <TableCell>{category.image}</TableCell>
                   <TableCell>
                     {category.isActive && !category.isDeleted
                       ? "Active"
@@ -246,7 +246,7 @@ export default function CategoryTable() {
                           className=""
                           onClick={() =>
                             router.push(
-                              "/admin/business-categories/" + category._id
+                              "/admin/product-categories/" + category._id
                             )
                           }
                         >
@@ -289,7 +289,7 @@ export default function CategoryTable() {
                   </TableCell>
                 </TableRow>
               ))}
-            {!isLoading && businessCategoriesResult?.data?.length === 0 && (
+            {!isLoading && productCategoriesResult?.data?.length === 0 && (
               <TableRow>
                 <TableCell
                   className="text-center text-lg text-[#DC3173]"
@@ -302,17 +302,17 @@ export default function CategoryTable() {
           </TableBody>
         </Table>
       </motion.div>
-      {businessCategoriesResult?.data &&
-        businessCategoriesResult?.data?.length > 0 && (
+      {productCategoriesResult?.data &&
+        productCategoriesResult?.data?.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="px-4 md:px-6"
           >
             <PaginationCard
-              currentPage={businessCategoriesResult?.meta?.page as number}
-              totalPages={businessCategoriesResult?.meta?.totalPage as number}
-              paginationItemsToDisplay={businessCategoriesResult?.meta?.limit}
+              currentPage={productCategoriesResult?.meta?.page as number}
+              totalPages={productCategoriesResult?.meta?.totalPage as number}
+              paginationItemsToDisplay={productCategoriesResult?.meta?.limit}
               setQueryParams={setQueryParams}
             />
           </motion.div>
@@ -342,11 +342,10 @@ export default function CategoryTable() {
                 <DialogDescription>
                   Are you sure you want to{" "}
                   {statusInfo.field === "isDeleted"
-                    ? "selete"
+                    ? "delete"
                     : statusInfo.isActive
                     ? "inactive"
-                    : "active"}{" "}
-                  this category?
+                    : "active"} this category?
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>

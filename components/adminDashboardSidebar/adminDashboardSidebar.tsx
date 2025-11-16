@@ -5,11 +5,14 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Grid,
   Home,
   LayoutDashboard,
+  LayoutList,
   Menu,
   MessageCircle,
   Settings,
+  SquareChartGantt,
   Users,
   X,
 } from "lucide-react";
@@ -61,6 +64,44 @@ export default function Sidebar() {
       title: "Vendors",
       icon: <Users size={18} />,
       items: [{ name: "All vendors", path: "/admin/all-vendors" }],
+    },
+    {
+      id: "business-categories",
+      title: "Business Categories",
+      icon: <Grid size={18} />,
+      items: [
+        {
+          name: "Add Business Categories",
+          path: "/admin/business-categories/add",
+        },
+        { name: "All Business Categories", path: "/admin/business-categories" },
+      ],
+    },
+    {
+      id: "product-categories",
+      title: "Product Categories",
+      icon: <SquareChartGantt size={18} />,
+      items: [
+        {
+          name: "Add Product Categories",
+          path: "/admin/product-categories/add",
+        },
+        { name: "All Product Categories", path: "/admin/product-categories" },
+      ],
+    },
+    {
+      id: "products",
+      title: "All Products",
+      icon: <LayoutList size={18} />,
+      items: [{ name: "All Products", path: "/admin/all-products" }],
+    },
+    {
+      id: "delivery-partners",
+      title: "Delivery Partners",
+      icon: <Users size={18} />,
+      items: [
+        { name: "All Delivery Partners", path: "/admin/all-delivery-partners" },
+      ],
     },
     {
       id: "settings",
@@ -115,7 +156,7 @@ export default function Sidebar() {
       <motion.aside
         animate={{ width: open ? 280 : 80 }}
         transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="hidden md:flex h-screen bg-gradient-to-b from-pink-50 via-white to-pink-100 shadow-xl flex-col border-r border-pink-200 overflow-hidden fixed left-0 top-0 z-40"
+        className="hidden md:flex h-screen bg-linear-to-b from-pink-50 via-white to-pink-100 shadow-xl flex-col border-r border-pink-200 overflow-hidden fixed left-0 top-0 z-40"
       >
         <div className="flex items-center justify-between px-4 py-4 border-b border-pink-200">
           <div className="flex items-center gap-2">
@@ -162,7 +203,7 @@ export default function Sidebar() {
                   href={menu.path}
                   className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${
                     pathname === menu.path
-                      ? "bg-gradient-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                      ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
                       : "hover:bg-pink-100"
                   }`}
                 >
@@ -212,7 +253,7 @@ export default function Sidebar() {
                             href={sub.path}
                             className={`text-sm px-2 py-1 rounded-md transition-all duration-300 ${
                               pathname === sub.path
-                                ? "bg-gradient-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                                ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
                                 : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
                             }`}
                           >
