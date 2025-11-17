@@ -20,17 +20,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { getCookie } from "@/utils/cookies";
-import { fetchData, postData } from "@/utils/requests";
+import { postData } from "@/utils/requests";
 import { productCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import {
-  FileTextIcon,
-  Image as ImageIcon,
-  LoaderIcon,
-  PlusCircle,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+import { FileTextIcon, LoaderIcon, PlusCircle } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -44,16 +39,16 @@ export type TProductCategory = {
 
 type FormData = z.infer<typeof productCategoryValidation>;
 
-export default function AddProductCategory() {
-  const [businessCategories, setBusinessCategories] = useState<
-    TBusinessCategory[]
-  >([]);
+export default function AddProductCategory({
+  businessCategories,
+}: {
+  businessCategories: TBusinessCategory[];
+}) {
   const form = useForm<FormData>({
     resolver: zodResolver(productCategoryValidation),
     defaultValues: {
       name: "",
       description: "",
-      image: "",
       businessCategoryId: "",
     },
   });
@@ -84,23 +79,6 @@ export default function AddProductCategory() {
       setIsSubmitting(false);
     }
   };
-
-  const getBusinessCategories = async () => {
-    try {
-      const result = (await fetchData("/categories/businessCategory", {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<{ data: TBusinessCategory[] }>;
-      if (result?.success) {
-        setBusinessCategories(result?.data?.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    (() => getBusinessCategories())();
-  }, []);
 
   return (
     <motion.div
@@ -229,27 +207,6 @@ export default function AddProductCategory() {
                         ))}
                       </SelectContent>
                     </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <FormItem className="content-start">
-                  <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                    <div className="flex items-center">
-                      <ImageIcon className="w-5 h-5 text-[#DC3173]" />
-                      <span className="ml-2">Image Url</span>
-                    </div>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

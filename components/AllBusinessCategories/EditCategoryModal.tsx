@@ -1,10 +1,7 @@
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -25,7 +22,8 @@ import { updateData } from "@/utils/requests";
 import { updateBusinessCategoryValidation } from "@/validations/category/business-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { FileTextIcon, ImageIcon, PlusCircleIcon } from "lucide-react";
+import { FileTextIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -43,15 +41,19 @@ export default function EditBusinessCategoryModal({
   onClose,
   category,
 }: IProps) {
+  const router = useRouter();
   const form = useForm<FormData>({
     resolver: zodResolver(updateBusinessCategoryValidation),
     defaultValues: {
       name: category?.name || "",
       description: category?.description || "",
-      image: category?.image || "",
-      icon: category?.icon || "",
     },
   });
+
+  const onDialogClose = () => {
+    form.reset();
+    onClose();
+  };
 
   const onSubmit = async (data: FormData) => {
     const toastId = toast.loading("Updating category...");
@@ -70,6 +72,7 @@ export default function EditBusinessCategoryModal({
         });
         form.reset();
         onClose();
+        router.refresh();
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -107,9 +110,9 @@ export default function EditBusinessCategoryModal({
           }}
           className="bg-white rounded-lg shadow-xl w-full max-w-md z-10 max-h-[90vh] overflow-y-auto"
         >
-          <Dialog open={isOpen} onOpenChange={onClose}>
+          <Dialog open={isOpen} onOpenChange={onDialogClose}>
             <form>
-              <DialogContent className="sm:max-w-[425px]">
+              <DialogContent className="">
                 {" "}
                 <DialogHeader>
                   <DialogTitle>Edit Business Category</DialogTitle>{" "}
@@ -118,7 +121,7 @@ export default function EditBusinessCategoryModal({
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="p-6 space-y-6"
+                    className="space-y-6"
                   >
                     <div className="space-y-4">
                       <FormField
@@ -164,48 +167,6 @@ export default function EditBusinessCategoryModal({
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={form.control}
-                        name="icon"
-                        render={({ field }) => (
-                          <FormItem className="content-start">
-                            <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                              <div className="flex items-center">
-                                <PlusCircleIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">Icon</span>
-                              </div>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field }) => (
-                          <FormItem className="content-start">
-                            <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                              <div className="flex items-center">
-                                <ImageIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">Image Url</span>
-                              </div>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                     </div>
                     <div className="pt-4">
                       <motion.button
@@ -223,11 +184,6 @@ export default function EditBusinessCategoryModal({
                     </div>
                   </form>
                 </Form>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                </DialogFooter>
               </DialogContent>
             </form>
           </Dialog>

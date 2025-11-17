@@ -2,10 +2,11 @@
 
 import DeleteProductDialog from "@/components/AllProducts/DeleteProductDialog";
 import ProductCard from "@/components/AllProducts/ProductCard";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import SearchFilter from "@/components/Filtering/SearchFilter";
+import SelectFilter from "@/components/Filtering/SelectFilter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Pagination } from "@/components/ui/pagination";
 import {
   Select,
   SelectContent,
@@ -23,16 +24,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const sortOptions = {
-  "-createdAt": "Newest First",
-  createdAt: "Oldest First",
-  name: "Name (A-Z)",
-  "-name": "Name (Z-A)",
-  "-pricing.finalPrice": "Price (High to Low)",
-  "pricing.finalPrice": "Price (Low to High)",
-  "-rating.average": "Highest Rated",
-  "rating.average": "Lowest Rated",
-};
+const sortOptions = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Oldest First", value: "createdAt" },
+  { label: "Name (A-Z)", value: "name" },
+  { label: "Name (Z-A)", value: "-name" },
+  { label: "Price (High to Low)", value: "-pricing.finalPrice" },
+  { label: "Price (low to High)", value: "pricing.finalPrice" },
+  { label: "Highest Rated", value: "-rating.average" },
+  { label: "lowest Rated", value: "rating.average" },
+];
 
 export default function Products({
   initialData,
@@ -41,11 +42,7 @@ export default function Products({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [queryParams, setQueryParams] = useState<TProductsQueryParams>({
-    limit: Number(searchParams?.get("limit") || 10),
-    page: Number(searchParams?.get("page") || 1),
-    searchTerm: searchParams?.get("searchTerm") || "",
-    sortBy: searchParams?.get("sortBy") || "-createdAt",
+  const [prevFilters, setPrevFilters] = useState<TProductsQueryParams>({
     status: searchParams?.get("status") || "",
   });
   const [showFilters, setShowFilters] = useState(false);
@@ -58,20 +55,9 @@ export default function Products({
     product?: TProduct | null;
   }>({ id: null, action: null });
 
-  const handleSearch = (value: string) => {
-    setQueryParams((prevQuery) => ({ ...prevQuery, searchTerm: value }));
-  };
-
-  const handleSort = (value: string) => {
-    setQueryParams((prevQuery) => ({ ...prevQuery, sortBy: value }));
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("sortBy", value);
-    router.push(`?${params.toString()}`);
-  };
-
   const handleAddFilter = () => {
     if (activeFilters?.status?.length > 0) {
-      setQueryParams((prevQuery) => ({
+      setPrevFilters((prevQuery) => ({
         ...prevQuery,
         status: activeFilters.status,
       }));
@@ -87,7 +73,7 @@ export default function Products({
       ...prevFilters,
       [key]: "",
     }));
-    setQueryParams((prevQuery) => ({
+    setPrevFilters((prevQuery) => ({
       ...prevQuery,
       [key]: "",
     }));
@@ -100,7 +86,7 @@ export default function Products({
     setActiveFilters({
       status: "",
     });
-    setQueryParams((prevQuery) => ({
+    setPrevFilters((prevQuery) => ({
       ...prevQuery,
       status: "",
     }));
@@ -158,32 +144,14 @@ export default function Products({
       </div>
       <div className="mb-6">
         <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="relative w-full lg:w-72">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search..."
-              value={queryParams.searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10 w-full"
-            />
-          </div>
+          <SearchFilter paramName="searchTerm" placeholder="Searching..." />
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <div className="w-full lg:w-48">
-              <Select
-                value={queryParams.sortBy}
-                onValueChange={(value) => handleSort(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a fruit" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(sortOptions).map(([key, option]) => (
-                    <SelectItem key={key} value={key}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SelectFilter
+                paramName="sortBy"
+                options={sortOptions}
+                placeholder="Sort By"
+              />
             </div>
             <Button
               variant="outline"
@@ -258,7 +226,7 @@ export default function Products({
                       Availability Status
                     </label>
                     <Select
-                      value={queryParams["status"]}
+                      value={prevFilters.status}
                       onValueChange={(value) =>
                         setActiveFilters((prevFilters) => ({
                           ...prevFilters,
@@ -277,31 +245,6 @@ export default function Products({
                             </SelectItem>
                           )
                         )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Category
-                    </label>
-                    <Select
-                      value={queryParams.category}
-                      onValueChange={(value) =>
-                        setActiveFilters((prevFilters) => ({
-                          ...prevFilters,
-                          isEmailVerified: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select an option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
-                        <SelectItem value="verified">Verified</SelectItem>
-                        <SelectItem value="not-verified">
-                          Not Verified
-                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -365,8 +308,8 @@ export default function Products({
           </div>
           <h3 className="text-xl font-medium mb-2">No items found</h3>
           <p className="text-gray-500 max-w-md">
-            No delivery items match your current filters. Try adjusting your
-            search or filters to find what you&lsquo;re looking for.
+            No items match your current filters. Try adjusting your search or
+            filters to find what you&lsquo;re looking for.
           </p>
           <Button variant="outline" className="mt-4" onClick={clearAllFilters}>
             Clear All Filters
@@ -375,8 +318,11 @@ export default function Products({
       )}
       {/* Pagination */}
       {initialData?.data?.length > 0 && (
-        <div className="mt-8 flex justify-center">
-          <Pagination />
+        <div className="mt-8">
+          <PaginationComponent
+            totalPages={initialData.meta?.totalPage || 1}
+            itemsNoArray={[10, 20, 50, 100]}
+          />
         </div>
       )}
 

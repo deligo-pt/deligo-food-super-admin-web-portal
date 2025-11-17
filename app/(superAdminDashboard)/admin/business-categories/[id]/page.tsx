@@ -1,5 +1,7 @@
 import BusinessCategoryDetails from "@/components/AllBusinessCategories/BusinessCategoryDetails";
-import { cookies } from "next/headers";
+import { serverRequest } from "@/lib/serverFetch";
+import { TResponse } from "@/types";
+import { TBusinessCategory } from "@/types/category.type";
 
 export default async function BusinessCategoryDetailsPage({
   params,
@@ -7,14 +9,21 @@ export default async function BusinessCategoryDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const accessToken = (await cookies()).get("accessToken")?.value || "";
 
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/businessCategory/${id}`,
-    { headers: { authorization: accessToken } }
-  );
-  const result = await response.json();
-  const data = result.data;
+  let initialData: TBusinessCategory = {} as TBusinessCategory;
 
-  return <BusinessCategoryDetails category={data} />;
+  try {
+    const result = (await serverRequest.get(
+      `/categories/businessCategory/${id}`,
+      {}
+    )) as unknown as TResponse<TBusinessCategory>;
+
+    if (result?.success) {
+      initialData = result?.data || {};
+    }
+  } catch (err) {
+    console.error("Server fetch error:", err);
+  }
+
+  return <BusinessCategoryDetails category={initialData} />;
 }

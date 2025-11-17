@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -40,6 +41,7 @@ export default function BusinessCategoryDetails({
 }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [updateField, setUpdateField] = useState("");
+  const router = useRouter();
 
   const onEditModalClose = () => {
     setShowEditModal(false);
@@ -61,8 +63,8 @@ export default function BusinessCategoryDetails({
       )) as unknown as TResponse<TBusinessCategory[]>;
       if (result?.success) {
         toast.success("Active Status updated successfully!", { id: toastId });
-        // fetchCategories();
         setUpdateField("");
+        router.refresh();
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -89,6 +91,7 @@ export default function BusinessCategoryDetails({
         toast.success("Category deleted successfully!", { id: toastId });
         // fetchCategories();
         setUpdateField("");
+        router.refresh();
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
