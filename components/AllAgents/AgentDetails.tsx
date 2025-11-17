@@ -4,8 +4,12 @@ import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionB
 import Section from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
 import AgentDetailsDoc from "@/components/AllAgents/AgentDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
+import DeleteModal from "@/components/Modals/DeleteModal";
 import { USER_STATUS } from "@/consts/user.const";
+import { TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
+import { getCookie } from "@/utils/cookies";
+import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
@@ -20,6 +24,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   agent: TAgent;
@@ -27,11 +32,42 @@ interface IProps {
 
 export const AgentDetails = ({ agent }: IProps) => {
   const router = useRouter();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
       setApproveStatus("");
+    }
+  };
+
+  const closeDeleteModal = (open: boolean) => {
+    if (!open) {
+      setShowDeleteModal(false);
+    }
+  };
+
+  const deleteVendor = async () => {
+    const toastId = toast.loading("Deleting vendor...");
+    try {
+      const result = (await deleteData(
+        `/auth/soft-delete/${agent.userId}/approved-rejected-user`,
+
+        {
+          headers: { authorization: getCookie("accessToken") },
+        }
+      )) as unknown as TResponse<null>;
+      if (result?.success) {
+        setShowDeleteModal(false);
+        toast.success("Vendor deleted successfully!", { id: toastId });
+        router.refresh();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Vendor delete failed", {
+        id: toastId,
+      });
     }
   };
 
@@ -269,6 +305,11 @@ export const AgentDetails = ({ agent }: IProps) => {
         status={approveStatus as "APPROVED" | "REJECTED"}
         userId={agent.userId}
         userName={`${agent?.name?.firstName} ${agent?.name?.lastName}`}
+      />
+      <DeleteModal
+        open={showDeleteModal}
+        onOpenChange={closeDeleteModal}
+        onConfirm={deleteVendor}
       />
     </div>
   );

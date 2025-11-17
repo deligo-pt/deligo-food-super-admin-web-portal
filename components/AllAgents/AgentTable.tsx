@@ -1,5 +1,6 @@
 "use client";
 
+import DeleteModal from "@/components/Modals/DeleteModal";
 import PaginationCard from "@/components/PaginationCard/PaginationCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +31,7 @@ import {
 import { TResponse } from "@/types";
 import { TAgent, TUserQueryParams } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
-import { fetchData, updateData } from "@/utils/requests";
+import { deleteData, fetchData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -42,6 +43,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function AgentTable() {
   const router = useRouter();
@@ -58,6 +60,7 @@ export default function AgentTable() {
     page: 1,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
 
   const approveOrReject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +89,36 @@ export default function AgentTable() {
       console.log(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const closeDeleteModal = (open: boolean) => {
+    if (!open) {
+      setDeleteId("");
+    }
+  };
+
+  const deleteVendor = async () => {
+    const toastId = toast.loading("Deleting vendor...");
+    try {
+      const result = (await deleteData(
+        `/auth/soft-delete/${deleteId}`,
+
+        {
+          headers: { authorization: getCookie("accessToken") },
+        }
+      )) as unknown as TResponse<null>;
+      if (result?.success) {
+        fetchAgents();
+        setDeleteId("");
+        toast.success("Vendor deleted successfully!", { id: toastId });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Vendor delete failed", {
+        id: toastId,
+      });
     }
   };
 
@@ -265,6 +298,11 @@ export default function AgentTable() {
           />
         </motion.div>
       )}
+      <DeleteModal
+        open={!!deleteId}
+        onOpenChange={closeDeleteModal}
+        onConfirm={deleteVendor}
+      />
       {
         <Dialog
           open={statusInfo?.agentId?.length > 0}

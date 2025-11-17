@@ -4,8 +4,12 @@ import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionB
 import AgentOrVendorSection from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
 import VendorDetailsDoc from "@/components/AllVendors/VendorDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
+import DeleteModal from "@/components/Modals/DeleteModal";
 import { USER_STATUS } from "@/consts/user.const";
+import { TResponse } from "@/types";
 import { TVendor } from "@/types/user.type";
+import { getCookie } from "@/utils/cookies";
+import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
@@ -14,12 +18,14 @@ import {
   CheckIcon,
   FileTextIcon,
   MapPinIcon,
+  TrashIcon,
   UserIcon,
   XIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   vendor: TVendor;
@@ -27,11 +33,42 @@ interface IProps {
 
 export const VendorDetails = ({ vendor }: IProps) => {
   const router = useRouter();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
       setApproveStatus("");
+    }
+  };
+
+  const closeDeleteModal = (open: boolean) => {
+    if (!open) {
+      setShowDeleteModal(false);
+    }
+  };
+
+  const deleteVendor = async () => {
+    const toastId = toast.loading("Deleting vendor...");
+    try {
+      const result = (await deleteData(
+        `/auth/soft-delete/${vendor.userId}/approved-rejected-user`,
+
+        {
+          headers: { authorization: getCookie("accessToken") },
+        }
+      )) as unknown as TResponse<null>;
+      if (result?.success) {
+        setShowDeleteModal(false);
+        toast.success("Vendor deleted successfully!", { id: toastId });
+        router.refresh();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Vendor delete failed", {
+        id: toastId,
+      });
     }
   };
 
@@ -119,7 +156,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
         <div className="p-6">
           <div className="mb-6 border-gray-200">
             <div className="flex flex-wrap justify-end gap-4">
-              {vendor?.status !== "APPROVED" && (
+              {vendor.status === "SUBMITTED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("APPROVED")}
                   label="Approve"
@@ -127,7 +164,8 @@ export const VendorDetails = ({ vendor }: IProps) => {
                   variant="success"
                 />
               )}
-              {vendor?.status !== "REJECTED" && (
+              {(vendor.status === "PENDING" ||
+                vendor.status === "SUBMITTED") && (
                 <ActionButton
                   onClick={() => setApproveStatus("REJECTED")}
                   label="Reject"
@@ -135,13 +173,13 @@ export const VendorDetails = ({ vendor }: IProps) => {
                   variant="danger"
                 />
               )}
-              {/* <ActionButton
-                onClick={handleDelete}
+              <ActionButton
+                onClick={() => setShowDeleteModal(true)}
                 label="Delete"
                 icon={<TrashIcon size={18} />}
                 variant="danger"
               />
-              <ActionButton
+              {/* <ActionButton
                 onClick={handleBlock}
                 label="Block"
                 icon={<BanIcon size={18} />}
@@ -281,6 +319,11 @@ export const VendorDetails = ({ vendor }: IProps) => {
         status={approveStatus as "APPROVED" | "REJECTED"}
         userId={vendor.userId}
         userName={`${vendor?.name?.firstName} ${vendor?.name?.lastName}`}
+      />
+      <DeleteModal
+        open={showDeleteModal}
+        onOpenChange={closeDeleteModal}
+        onConfirm={deleteVendor}
       />
     </div>
   );

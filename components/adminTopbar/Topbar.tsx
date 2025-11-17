@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { removeCookie } from "@/utils/cookies";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Globe,
   AlertTriangle,
   Bell,
-  MessageSquare,
   ChevronDown,
+  Globe,
   LogOut,
+  MessageSquare,
   User,
 } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const PRIMARY = "#DC3173";
 
@@ -22,6 +24,13 @@ type Props = {
 export default function Topbar({ sidebarWidth = 280 }: Props) {
   const [langOpen, setLangOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const router = useRouter();
+
+  const logOut = () => {
+    removeCookie("accessToken");
+    removeCookie("refreshToken");
+    router.push("/login");
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -44,7 +53,7 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
     <>
       {/* Fixed Topbar */}
       <header
-        className="fixed top-0 left-0 right-0 z-[1000] bg-white/70 backdrop-blur-lg border-b border-pink-100"
+        className="fixed top-0 left-0 right-0 z-1000 bg-white/70 backdrop-blur-lg border-b border-pink-100"
         style={{ height: 64 }}
       >
         <div
@@ -58,9 +67,9 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
           <div className="flex-1 h-full flex items-center"></div>
 
           {/* RIGHT ICONS */}
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0 relative z-[1001]">
+          <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0 relative z-1001">
             {/* Language */}
-            <div className="relative hidden sm:block z-[1002]">
+            <div className="relative hidden sm:block z-1002">
               <motion.button
                 onClick={() => {
                   setLangOpen((s) => !s);
@@ -85,7 +94,7 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -6, scale: 0.98 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-40 bg-white border border-pink-100 rounded-xl shadow-lg overflow-hidden z-[2000]"
+                    className="absolute right-0 mt-2 w-40 bg-white border border-pink-100 rounded-xl shadow-lg overflow-hidden z-2000"
                   >
                     {LANGS.map((l) => (
                       <button
@@ -104,7 +113,7 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
             {/* SOS */}
             <motion.button
               whileHover={{ scale: 1.03 }}
-              className="relative flex items-center justify-center w-10 h-10 rounded-lg text-white font-semibold shadow flex-shrink-0"
+              className="relative flex items-center justify-center w-10 h-10 rounded-lg text-white font-semibold shadow shrink-0"
               style={{
                 background: "linear-gradient(90deg,#ff3b30,#ff6b6b)",
                 boxShadow: `0 4px 18px ${PRIMARY}33`,
@@ -122,7 +131,7 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
             </motion.button>
 
             {/* Notification */}
-            <div className="relative flex-shrink-0">
+            <div className="relative shrink-0">
               <motion.button
                 whileHover={{ scale: 1.06 }}
                 className="p-2 rounded-lg hover:bg-pink-50 transition"
@@ -140,13 +149,13 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
             {/* Messages */}
             <motion.button
               whileHover={{ scale: 1.06 }}
-              className="p-2 rounded-lg hover:bg-pink-50 transition hidden sm:block flex-shrink-0"
+              className="p-2 rounded-lg hover:bg-pink-50 transition hidden sm:block shrink-0"
             >
               <MessageSquare size={18} className="text-gray-700" />
             </motion.button>
 
             {/* Profile */}
-            <div className="relative flex-shrink-0 z-[3000]">
+            <div className="relative shrink-0 z-3000">
               <button
                 onClick={() => {
                   setProfileOpen((s) => !s);
@@ -176,7 +185,7 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -8, scale: 0.98 }}
                     transition={{ duration: 0.14 }}
-                    className="absolute right-0 mt-2 w-44 bg-white border border-pink-100 rounded-xl shadow-xl overflow-hidden z-[4000]"
+                    className="absolute right-0 mt-2 w-44 bg-white border border-pink-100 rounded-xl shadow-xl overflow-hidden z-4000"
                   >
                     <button
                       className="w-full px-4 py-3 flex items-center gap-2 text-gray-700 hover:bg-pink-50"
@@ -191,7 +200,7 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
                       className="w-full px-4 py-3 flex items-center gap-2 text-red-600 hover:bg-red-50"
                       onClick={() => {
                         setProfileOpen(false);
-                        alert("Logged out (demo)");
+                        logOut();
                       }}
                     >
                       <LogOut size={16} /> Logout
