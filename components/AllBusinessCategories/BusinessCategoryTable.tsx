@@ -326,7 +326,7 @@ export default function CategoryTable() {
                 <DialogTitle>
                   {statusInfo.field === "isDeleted"
                     ? "Delete"
-                    : statusInfo.isActive
+                    : !statusInfo.isActive
                     ? "Inactive"
                     : "Active"}{" "}
                   category
@@ -335,7 +335,7 @@ export default function CategoryTable() {
                   Are you sure you want to{" "}
                   {statusInfo.field === "isDeleted"
                     ? "selete"
-                    : statusInfo.isActive
+                    : !statusInfo.isActive
                     ? "inactive"
                     : "active"}{" "}
                   this category?
@@ -350,7 +350,7 @@ export default function CategoryTable() {
                   <Button variant="destructive" onClick={softDeleteCategory}>
                     Delete
                   </Button>
-                ) : statusInfo.isActive ? (
+                ) : !statusInfo.isActive ? (
                   <Button
                     onClick={updateActiveStatus}
                     className="bg-yellow-600 hover:bg-yellow-500"

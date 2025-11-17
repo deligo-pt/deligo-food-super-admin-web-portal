@@ -304,7 +304,7 @@ export default function BusinessCategoryDetails({
                 <DialogTitle>
                   {updateField === "isDeleted"
                     ? "Delete"
-                    : category.isActive
+                    : !category.isActive
                     ? "Inactive"
                     : "Active"}{" "}
                   Category
@@ -313,7 +313,7 @@ export default function BusinessCategoryDetails({
                   Are you sure you want to{" "}
                   {updateField === "isDeleted"
                     ? "delete"
-                    : category.isActive
+                    : !category.isActive
                     ? "inactive"
                     : "active"}{" "}
                   this category?
@@ -328,7 +328,7 @@ export default function BusinessCategoryDetails({
                   <Button variant="destructive" onClick={softDeleteCategory}>
                     Delete
                   </Button>
-                ) : category.isActive ? (
+                ) : !category.isActive ? (
                   <Button
                     onClick={updateActiveStatus}
                     className="bg-yellow-500 hover:bg-opacity-90"
