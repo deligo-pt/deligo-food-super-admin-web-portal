@@ -2,6 +2,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
+  BadgeEuro,
+  Bike,
+  ChartNoAxesCombined,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -10,10 +13,17 @@ import {
   LayoutDashboard,
   LayoutList,
   Menu,
-  MessageCircle,
+  MessageCircleMore,
+  NotepadText,
+  Package,
   Settings,
+  ShieldUser,
+  ShoppingBag,
   SquareChartGantt,
+  Ticket,
+  ToolCase,
   Users,
+  Utensils,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -52,6 +62,20 @@ export default function Sidebar() {
       path: "/admin/dashboard",
     },
     {
+      id: "vendors",
+      title: "Vendors / Restaurants",
+      icon: <Utensils size={18} />,
+      items: [
+        { name: "All vendors", path: "/admin/all-vendors" },
+        { name: "Pending Approvals", path: "/admin/pending-approvals" },
+        { name: "Active Vendors", path: "/admin/active-vendors" },
+        { name: "Suspended Vendors", path: "/admin/suspended-vendors" },
+        { name: "Add New Vendor", path: "/admin/add-vendor" },
+        { name: "Vendor Payouts", path: "/admin/vendor-payouts" },
+        { name: "Vendor Analytics", path: "/admin/vendor-analytics" },
+      ],
+    },
+    {
       id: "agents",
       title: "Fleet Managers",
       icon: <Users size={18} />,
@@ -60,10 +84,33 @@ export default function Sidebar() {
       ],
     },
     {
-      id: "vendors",
-      title: "Vendors",
+      id: "customers",
+      title: "Customers",
       icon: <Users size={18} />,
-      items: [{ name: "All vendors", path: "/admin/all-vendors" }],
+      items: [
+        { name: "All Customers", path: "/admin/all-customers" },
+        { name: "Active Customers", path: "/admin/active-customers" },
+        { name: "Blocked Customers", path: "/admin/blocked-customers" },
+        { name: "Customer Feedback", path: "/admin/customer-feedback" },
+        { name: "Customer Orders", path: "/admin/customer-orders" },
+      ],
+    },
+    {
+      id: "riders",
+      title: "Riders /Delivery Partners",
+      icon: <Bike size={18} />,
+      items: [
+        { name: "All Riders", path: "/admin/all-delivery-partners" },
+        {
+          name: "Rider Onboarding Requests",
+          path: "/admin/rider-onboarding-requests",
+        },
+        { name: "Active Riders", path: "/admin/active-riders" },
+        { name: "Suspended Riders", path: "/admin/suspended-riders" },
+        { name: "Rider Performance", path: "/admin/rider-performance" },
+        { name: "Rider Payouts", path: "/admin/rider-payouts" },
+        { name: "Rider Analytics", path: "/admin/rider-analytics" },
+      ],
     },
     {
       id: "business-categories",
@@ -96,27 +143,149 @@ export default function Sidebar() {
       items: [{ name: "All Products", path: "/admin/all-products" }],
     },
     {
-      id: "delivery-partners",
-      title: "Delivery Partners",
-      icon: <Users size={18} />,
+      id: "orders",
+      title: "Orders Management",
+      icon: <ShoppingBag size={18} />,
       items: [
-        { name: "All Delivery Partners", path: "/admin/all-delivery-partners" },
+        { name: "All Orders", path: "/admin/all-orders" },
+        { name: "Pending Orders", path: "/admin/pending-orders" },
+        { name: "Preparing Orders", path: "/admin/preparing-orders" },
+        { name: "On the Way Orders", path: "/admin/on-the-way-orders" },
+        { name: "Delivered Orders", path: "/admin/delivered-orders" },
+        { name: "Cancelled Orders", path: "/admin/cancelled-orders" },
+        { name: "Refund Requests", path: "/admin/refund-requests" },
       ],
     },
+    {
+      id: "payments-earnings",
+      title: "Payments & Earnings",
+      icon: <BadgeEuro size={18} />,
+      items: [
+        { name: "Platform Earnings", path: "/admin/platform-earnings" },
+        { name: "Vendor Payouts", path: "/admin/vendor-payouts" },
+        { name: "Rider Payouts", path: "/admin/rider-payouts" },
+        { name: "Transaction History", path: "/admin/transaction-history" },
+        { name: "Payment Disputes", path: "/admin/payment-disputes" },
+        { name: "Tax Management", path: "/admin/tax-management" },
+      ],
+    },
+    {
+      id: "inventory-control",
+      title: "Inventory & Menu Control",
+      icon: <Package size={18} />,
+      items: [
+        { name: "All Items", path: "/admin/all-items" },
+        { name: "Category Management", path: "/admin/category-management" },
+        { name: "Out-of-Stock Alerts", path: "/admin/out-of-stock-alerts" },
+        { name: "Restricted Items", path: "/admin/restricted-items" },
+      ],
+    },
+    {
+      id: "promotions-and-coupons",
+      title: "Promotions & Coupons",
+      icon: <Ticket size={18} />,
+      items: [
+        { name: "Active Campaigns", path: "/admin/active-campaigns" },
+        { name: "Create New Offer", path: "/admin/create-new-offer" },
+        { name: "Coupon Analytics", path: "/admin/coupon-analytics" },
+        {
+          name: "Loyalty Point Settings",
+          path: "/admin/loyalty-point-settings",
+        },
+      ],
+    },
+    {
+      id: "analytics-and-insights",
+      title: "Analytics & Insights",
+      icon: <ChartNoAxesCombined size={18} />,
+      items: [
+        { name: "Sales Analytics", path: "/admin/sales-analytics" },
+        { name: "Delivery Insights", path: "/admin/delivery-insights" },
+        { name: "Customer Insights", path: "/admin/customer-insights" },
+        { name: "Top Vendors", path: "/admin/top-vendors" },
+        { name: "Peak Hours Analysis", path: "/admin/peak-hours-analysis" },
+      ],
+    },
+    {
+      id: "system-management",
+      title: "System Management",
+      icon: <ToolCase size={18} />,
+      items: [
+        { name: "API Integrations", path: "/admin/api-integrations" },
+        {
+          name: "Payment Gateway Settings",
+          path: "/admin/payment-gateway-settings",
+        },
+        {
+          name: "Map & Delivery Zone Settings",
+          path: "/admin/map-delivery-zone-settings",
+        },
+        {
+          name: "Email & Notification Settings",
+          path: "/admin/email-notification-settings",
+        },
+        { name: "Maintenance Mode", path: "/admin/maintenance-mode" },
+        { name: "App Version Control", path: "/admin/app-version-control" },
+      ],
+    },
+    {
+      id: "admin-management",
+      title: "Admin Management",
+      icon: <ShieldUser size={18} />,
+      items: [
+        { name: "All Admins", path: "/admin/all-admins" },
+        { name: "Roles & Permissions", path: "/admin/roles-permissions" },
+        { name: "Activity Logs", path: "/admin/activity-logs" },
+        { name: "Login History", path: "/admin/login-history" },
+      ],
+    },
+    {
+      id: "support-communication",
+      title: "Admin Management",
+      icon: <MessageCircleMore size={18} />,
+      items: [
+        { name: "Support Tickets", path: "/admin/support-tickets" },
+        { name: "Chat With Vendors", path: "/admin/chat-with-vendors" },
+        { name: "Chat With Riders", path: "/admin/chat-with-riders" },
+        { name: "Chat With Customers", path: "/admin/chat-with-customers" },
+        { name: "FAQs & Help Center", path: "/admin/faqs-help-center" },
+      ],
+    },
+    {
+      id: "reports",
+      title: "Reports",
+      icon: <NotepadText size={18} />,
+      items: [
+        { name: "Sales Report", path: "/admin/sales-report" },
+        { name: "Order Report", path: "/admin/order-report" },
+        {
+          name: "Rider Performance Report",
+          path: "/admin/rider-performance-report",
+        },
+        { name: "Vendor Report", path: "/admin/vendor-report" },
+        { name: "Custom Report Builder", path: "/admin/custom-report-builder" },
+      ],
+    },
+
     {
       id: "settings",
       title: "Settings",
       icon: <Settings size={18} />,
-      items: [{ name: "Notifications", path: "/admin/notifications" }],
-    },
-    {
-      id: "support",
-      title: "Support Center",
-      icon: <MessageCircle size={18} />,
       items: [
-        { name: "Chat with Support", path: "/admin/chat-support" },
-        { name: "Help Articles", path: "/admin/help" },
-        { name: "Report an Issue", path: "/admin/report" },
+        { name: "Business Info", path: "/admin/business-info" },
+        { name: "Branding & Theme", path: "/admin/branding-theme" },
+        {
+          name: "Localization (Language & Currency)",
+          path: "/admin/localization",
+        },
+        {
+          name: "Notification Preferences",
+          path: "/admin/notification-preferences",
+        },
+        {
+          name: "Legal Documents (Terms, Privacy)",
+          path: "/admin/legal-documents",
+        },
       ],
     },
     {
@@ -124,8 +293,9 @@ export default function Sidebar() {
       title: "SOS / Emergency",
       icon: <AlertCircle size={18} />,
       items: [
-        { name: "Contact Support", path: "/admin/contact-support" },
-        { name: "Safety Guidelines", path: "/admin/safety" },
+        { name: "Critical Alerts", path: "/admin/critical-alerts" },
+        { name: "Contact Support Team", path: "/admin/contact-support-team" },
+        { name: "System Health Status", path: "/admin/system-health-status" },
       ],
     },
   ];
