@@ -6,14 +6,12 @@ import {
   AlertCircleIcon,
   CheckCircleIcon,
   ClockIcon,
-  DollarSignIcon,
   InfoIcon,
   PackageIcon,
   ShieldIcon,
   ShoppingBagIcon,
   StarIcon,
   TagIcon,
-  Trash2Icon,
   TruckIcon,
   XCircleIcon,
 } from "lucide-react";
@@ -125,7 +123,7 @@ export default function ProductDetails({ product }: IProps) {
         >
           Product Details
         </motion.h1>
-        <motion.div
+        {/* <motion.div
           variants={itemVariants as Variants}
           whileHover={{
             scale: 1.05,
@@ -141,7 +139,7 @@ export default function ProductDetails({ product }: IProps) {
             <Trash2Icon className="w-5 h-5" />
             <span>Delete</span>
           </button>
-        </motion.div>
+        </motion.div> */}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
         {/* Product Images */}
@@ -225,16 +223,16 @@ export default function ProductDetails({ product }: IProps) {
             className="bg-gray-50 p-4 rounded-lg"
             variants={itemVariants as Variants}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSignIcon className="w-5 h-5 text-[#DC3173]" />
-              <h2 className="text-lg font-semibold text-gray-900">Pricing</h2>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              Pricing
+            </h2>
+            <div className="flex items-center gap-2 mb-2"></div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-[#DC3173]">
                 {product.pricing.currency}{" "}
                 {product.pricing.finalPrice.toFixed(2)}
               </span>
-              {product.pricing.discount && (
+              {product?.pricing?.discount ? (
                 <>
                   <span className="text-lg text-gray-500 line-through">
                     {product.pricing.currency}{" "}
@@ -247,12 +245,16 @@ export default function ProductDetails({ product }: IProps) {
                     % off
                   </span>
                 </>
+              ) : (
+                ""
               )}
             </div>
-            {product.pricing.tax && (
+            {product.pricing.tax ? (
               <p className="text-sm text-gray-500 mt-1">
                 Includes {product.pricing.tax}% tax
               </p>
+            ) : (
+              ""
             )}
           </motion.div>
           {/* Stock */}
@@ -328,13 +330,15 @@ export default function ProductDetails({ product }: IProps) {
                   {product.vendor.vendorType}
                 </p>
               </div>
-              {product.vendor.rating && (
+              {product.vendor.rating ? (
                 <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded">
                   <StarIcon className="w-4 h-4 text-amber-500 fill-amber-500" />
                   <span className="text-sm font-medium text-amber-700">
                     {product.vendor.rating}
                   </span>
                 </div>
+              ) : (
+                ""
               )}
             </div>
           </motion.div>
@@ -478,7 +482,7 @@ export default function ProductDetails({ product }: IProps) {
             </div>
           </motion.div>
           {/* Action Button */}
-          <motion.div
+          {/* <motion.div
             className="pt-4"
             variants={itemVariants as Variants}
             whileHover={{
@@ -492,7 +496,7 @@ export default function ProductDetails({ product }: IProps) {
               <Trash2Icon className="w-5 h-5" />
               <span>Delete Product</span>
             </button>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
       {/* <DeleteProductDialog

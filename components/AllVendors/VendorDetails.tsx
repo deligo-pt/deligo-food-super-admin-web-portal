@@ -1,0 +1,287 @@
+"use client";
+
+import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
+import AgentOrVendorSection from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
+import VendorDetailsDoc from "@/components/AllVendors/VendorDetailsDoc";
+import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
+import { USER_STATUS } from "@/consts/user.const";
+import { TVendor } from "@/types/user.type";
+import { motion } from "framer-motion";
+import {
+  ArrowLeftCircle,
+  BriefcaseIcon,
+  BuildingIcon,
+  CheckIcon,
+  FileTextIcon,
+  MapPinIcon,
+  UserIcon,
+  XIcon,
+} from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+interface IProps {
+  vendor: TVendor;
+}
+
+export const VendorDetails = ({ vendor }: IProps) => {
+  const router = useRouter();
+  const [approveStatus, setApproveStatus] = useState("");
+
+  const closeApproveOrRejectModal = (open: boolean) => {
+    if (!open) {
+      setApproveStatus("");
+    }
+  };
+
+  const getStatusColor = (status: keyof typeof USER_STATUS) => {
+    switch (status) {
+      case "APPROVED":
+        return "bg-green-100 text-green-800";
+      case "REJECTED":
+        return "bg-red-100 text-red-800";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800";
+      case "SUBMITTED":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <div className="p-8">
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 0.5,
+        }}
+        className="w-full mx-auto bg-gray-50 rounded-xl overflow-hidden shadow-lg"
+      >
+        <div className="relative bg-linear-to-r from-[#DC3173] to-[#e95b92] p-6 text-white">
+          <motion.div
+            initial={{
+              scale: 0.9,
+              opacity: 0,
+            }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+            }}
+            transition={{
+              delay: 0.2,
+              duration: 0.5,
+            }}
+            className="absolute top-4 right-4"
+          >
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                vendor?.status
+              )}`}
+            >
+              {vendor?.status}
+            </span>
+          </motion.div>
+          <div className="flex items-center gap-4">
+            {vendor?.profilePhoto ? (
+              <Image
+                src={vendor?.profilePhoto}
+                alt={`${vendor?.name?.firstName || "Fleet Manager"}`}
+                className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+                width={500}
+                height={500}
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-white">
+                <UserIcon size={40} />
+              </div>
+            )}
+            <div>
+              <h1 className="text-2xl font-bold">
+                {vendor?.name?.firstName} {vendor?.name?.lastName}
+              </h1>
+              <p className="opacity-90">{vendor?.email}</p>
+              {vendor?.contactNumber && (
+                <p className="opacity-90">{vendor?.contactNumber}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="mb-6 border-gray-200">
+            <div className="flex flex-wrap justify-end gap-4">
+              {vendor?.status !== "APPROVED" && (
+                <ActionButton
+                  onClick={() => setApproveStatus("APPROVED")}
+                  label="Approve"
+                  icon={<CheckIcon size={18} />}
+                  variant="success"
+                />
+              )}
+              {vendor?.status !== "REJECTED" && (
+                <ActionButton
+                  onClick={() => setApproveStatus("REJECTED")}
+                  label="Reject"
+                  icon={<XIcon size={18} />}
+                  variant="danger"
+                />
+              )}
+              {/* <ActionButton
+                onClick={handleDelete}
+                label="Delete"
+                icon={<TrashIcon size={18} />}
+                variant="danger"
+              />
+              <ActionButton
+                onClick={handleBlock}
+                label="Block"
+                icon={<BanIcon size={18} />}
+                variant="warning"
+              /> */}
+            </div>
+          </div>
+          <AgentOrVendorSection
+            title="Personal Details"
+            icon={<UserIcon size={20} />}
+            defaultOpen={true}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Full Name</p>
+                <p className="font-medium">
+                  {vendor?.name?.firstName || "N/A"}{" "}
+                  {vendor?.name?.lastName || ""}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Email</p>
+                <p className="font-medium">{vendor?.email}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Contact Number</p>
+                <p className="font-medium">{vendor?.contactNumber || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Email Verified</p>
+                <p className="font-medium">
+                  {vendor?.isEmailVerified ? "Yes" : "No"}
+                </p>
+              </div>
+            </div>
+          </AgentOrVendorSection>
+          <AgentOrVendorSection
+            title="Business Details"
+            icon={<BuildingIcon size={20} />}
+            defaultOpen={true}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Business Name</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.businessName || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">License Number</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.businessLicenseNumber || "N/A"}
+                </p>
+              </div>
+            </div>
+          </AgentOrVendorSection>
+          <AgentOrVendorSection
+            title="Business Location"
+            icon={<MapPinIcon size={20} />}
+            defaultOpen={true}
+          >
+            {vendor?.businessLocation ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Street Address</p>
+                  <p className="font-medium">
+                    {vendor?.businessLocation.streetAddress},{" "}
+                    {vendor?.businessLocation.streetNumber}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">City & Postal Code</p>
+                  <p className="font-medium">
+                    {vendor?.businessLocation.city},{" "}
+                    {vendor?.businessLocation.postalCode}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">
+                No business location provided
+              </p>
+            )}
+          </AgentOrVendorSection>
+          <AgentOrVendorSection
+            title="Bank Details"
+            icon={<BriefcaseIcon size={20} />}
+            defaultOpen={true}
+          >
+            {vendor?.bankDetails ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Bank Name</p>
+                  <p className="font-medium">{vendor?.bankDetails.bankName}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Account Holder</p>
+                  <p className="font-medium">
+                    {vendor?.bankDetails.accountHolderName}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">IBAN</p>
+                  <p className="font-medium">{vendor?.bankDetails.iban}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">SWIFT Code</p>
+                  <p className="font-medium">{vendor?.bankDetails.swiftCode}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">No bank details provided</p>
+            )}
+          </AgentOrVendorSection>
+          <AgentOrVendorSection
+            title="Documents"
+            icon={<FileTextIcon size={20} />}
+            defaultOpen={true}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-6">
+              <VendorDetailsDoc documents={vendor?.documents} />
+            </div>
+          </AgentOrVendorSection>
+          <div className="mt-8 border-t pt-6 border-gray-200">
+            <ActionButton
+              onClick={() => router.push("/admin/all-vendors")}
+              label="Go Back"
+              icon={<ArrowLeftCircle />}
+              variant="primary"
+            />
+          </div>
+        </div>
+      </motion.div>
+      <ApproveOrRejectModal
+        open={!!approveStatus}
+        onOpenChange={closeApproveOrRejectModal}
+        status={approveStatus as "APPROVED" | "REJECTED"}
+        userId={vendor.userId}
+        userName={`${vendor?.name?.firstName} ${vendor?.name?.lastName}`}
+      />
+    </div>
+  );
+};

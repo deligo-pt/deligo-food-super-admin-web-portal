@@ -75,7 +75,7 @@ export default function VendorTable() {
         }
       )) as unknown as TResponse<TVendor[]>;
       if (result?.success) {
-        // fetchVendors();
+        fetchVendors();
         setStatusInfo({
           vendorId: "",
           status: "",
@@ -168,7 +168,12 @@ export default function VendorTable() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell>Loading...</TableCell>
+                <TableCell
+                  className="text-[#DC3173] text-lg text-center"
+                  colSpan={5}
+                >
+                  Loading...
+                </TableCell>
               </TableRow>
             )}
             {!isLoading &&
@@ -196,32 +201,38 @@ export default function VendorTable() {
                         >
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            setStatusInfo({
-                              vendorId: vendor.userId as string,
-                              status: "APPROVED",
-                              remarks: "",
-                            })
-                          }
-                        >
-                          {vendor.status === "APPROVED"
-                            ? "Approved"
-                            : "Approve"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            setStatusInfo({
-                              vendorId: vendor.userId as string,
-                              status: "REJECTED",
-                              remarks: "",
-                            })
-                          }
-                        >
-                          {vendor.status === "REJECTED" ? "Rejected" : "Reject"}
-                        </DropdownMenuItem>
+                        {(vendor.status === "PENDING" ||
+                          vendor.status === "SUBMITTED" ||
+                          vendor.status === "REJECTED") && (
+                          <DropdownMenuItem
+                            className=""
+                            onClick={() =>
+                              setStatusInfo({
+                                vendorId: vendor.userId as string,
+                                status: "APPROVED",
+                                remarks: "",
+                              })
+                            }
+                          >
+                            Approve
+                          </DropdownMenuItem>
+                        )}
+                        {(vendor.status === "PENDING" ||
+                          vendor.status === "SUBMITTED" ||
+                          vendor.status === "APPROVED") && (
+                          <DropdownMenuItem
+                            className=""
+                            onClick={() =>
+                              setStatusInfo({
+                                vendorId: vendor.userId as string,
+                                status: "REJECTED",
+                                remarks: "",
+                              })
+                            }
+                          >
+                            Reject
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -229,7 +240,12 @@ export default function VendorTable() {
               ))}
             {!isLoading && vendorsResult?.data?.length === 0 && (
               <TableRow>
-                <TableCell>No vendors found</TableCell>
+                <TableCell
+                  className="text-[#DC3173] text-lg text-center"
+                  colSpan={5}
+                >
+                  No vendors found
+                </TableCell>
               </TableRow>
             )}
           </TableBody>

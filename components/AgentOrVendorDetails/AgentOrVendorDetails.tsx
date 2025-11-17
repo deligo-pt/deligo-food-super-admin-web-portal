@@ -191,50 +191,51 @@ export const AgentOrVendorDetails: React.FC<IProps> = ({
             </div>
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Company Details"
+            title="Business Details"
             icon={<BuildingIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Company Name</p>
+                <p className="text-sm text-gray-500">Business Name</p>
                 <p className="font-medium">
-                  {fleetManager?.companyDetails?.companyName || "N/A"}
+                  {fleetManager?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">License Number</p>
                 <p className="font-medium">
-                  {fleetManager?.companyDetails?.companyLicenseNumber || "N/A"}
+                  {fleetManager?.businessDetails?.businessLicenseNumber ||
+                    "N/A"}
                 </p>
               </div>
             </div>
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Company Location"
+            title="Business Location"
             icon={<MapPinIcon size={20} />}
             defaultOpen={true}
           >
-            {fleetManager?.companyLocation ? (
+            {fleetManager?.businessLocation ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Street Address</p>
                   <p className="font-medium">
-                    {fleetManager?.companyLocation.streetAddress},{" "}
-                    {fleetManager?.companyLocation.streetNumber}
+                    {fleetManager?.businessLocation.streetAddress},{" "}
+                    {fleetManager?.businessLocation.streetNumber}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">City & Postal Code</p>
                   <p className="font-medium">
-                    {fleetManager?.companyLocation.city},{" "}
-                    {fleetManager?.companyLocation.postalCode}
+                    {fleetManager?.businessLocation.city},{" "}
+                    {fleetManager?.businessLocation.postalCode}
                   </p>
                 </div>
               </div>
             ) : (
               <p className="text-gray-500 italic">
-                No company location provided
+                No business location provided
               </p>
             )}
           </AgentOrVendorSection>
@@ -300,18 +301,18 @@ export const AgentOrVendorDetails: React.FC<IProps> = ({
                   </a>
                 </div>
               )}
-              {fleetManager?.documents?.companyLicense && (
+              {fleetManager?.documents?.businessLicense && (
                 <div>
-                  <p className="text-sm text-gray-500 mb-2">Company License</p>
+                  <p className="text-sm text-gray-500 mb-2">Business License</p>
                   <Image
-                    src={fleetManager?.documents.companyLicense}
-                    alt="Company License"
+                    src={fleetManager?.documents.businessLicense}
+                    alt="Business License"
                     className="w-full h-40 object-cover rounded-lg border border-gray-200"
                     width={500}
                     height={500}
                   />
                   <a
-                    href={fleetManager?.documents.companyLicense}
+                    href={fleetManager?.documents.businessLicense}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-2 text-sm text-[#DC3173] hover:underline inline-block"
@@ -321,7 +322,7 @@ export const AgentOrVendorDetails: React.FC<IProps> = ({
                 </div>
               )}
               {!fleetManager?.documents?.idProof &&
-                !fleetManager?.documents?.companyLicense && (
+                !fleetManager?.documents?.businessLicense && (
                   <p className="text-gray-500 italic col-span-2">
                     No documents uploaded
                   </p>

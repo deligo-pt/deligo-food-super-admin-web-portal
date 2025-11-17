@@ -32,10 +32,19 @@ import { TAgent, TUserQueryParams } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
 import { fetchData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
-import { MoreVertical } from "lucide-react";
+import {
+  CircleCheckBig,
+  Cog,
+  IdCard,
+  Mail,
+  MoreVertical,
+  Phone,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AgentTable() {
+  const router = useRouter();
   const [agentsResult, setAgentsResult] = useState<TResponse<TAgent[]> | null>(
     null
   );
@@ -49,25 +58,6 @@ export default function AgentTable() {
     page: 1,
   });
   const [isLoading, setIsLoading] = useState(false);
-
-  console.log(agentsResult);
-
-  const fetchAgents = async () => {
-    setIsLoading(true);
-    try {
-      const data = (await fetchData("/fleet-managers", {
-        params: queryParams,
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<TAgent[]>;
-      if (data?.success) {
-        setAgentsResult(data);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const approveOrReject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,12 +89,41 @@ export default function AgentTable() {
     }
   };
 
-  useEffect(() => {
-    if (queryParams) {
-      fetchAgents();
+  const fetchAgents = async (queries: TUserQueryParams = queryParams) => {
+    let params: Partial<TUserQueryParams> = {};
+
+    if (queries) {
+      queries = Object.fromEntries(
+        Object.entries(queries).filter((q) => !!q?.[1])
+      );
+    } else {
+      params = Object.fromEntries(
+        Object.entries(queryParams).filter((q) => !!q?.[1])
+      );
     }
+
+    setIsLoading(true);
+
+    try {
+      const data = (await fetchData("/fleet-managers", {
+        params: params || queryParams,
+        headers: { authorization: getCookie("accessToken") },
+      })) as unknown as TResponse<TAgent[]>;
+
+      if (data?.success) {
+        setAgentsResult(data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    (() => fetchAgents())();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryParams]);
+  }, []);
 
   return (
     <>
@@ -113,21 +132,51 @@ export default function AgentTable() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2"
       >
-        <Table>
+        <Table className="max-w-full">
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                  <IdCard className="w-4" />
+                  Name
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                  <Mail className="w-4" />
+                  Email
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                  <Phone className="w-4" />
+                  Phone
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                  <CircleCheckBig className="w-4" />
+                  Status
+                </div>
+              </TableHead>
+              <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
+                <Cog className="w-4" />
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell>Loading...</TableCell>
+                <TableCell
+                  className="text-[#DC3173] text-lg text-center"
+                  colSpan={5}
+                >
+                  Loading...
+                </TableCell>
               </TableRow>
             )}
-            {!isLoading ? (
+            {!isLoading &&
               agentsResult &&
               agentsResult?.data?.length > 0 &&
               agentsResult?.data?.map((agent) => (
@@ -135,6 +184,8 @@ export default function AgentTable() {
                   <TableCell>
                     {agent.name?.firstName} {agent.name?.lastName}
                   </TableCell>
+                  <TableCell>{agent.email}</TableCell>
+                  <TableCell>{agent.contactNumber}</TableCell>
                   <TableCell>{agent.status}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -143,38 +194,57 @@ export default function AgentTable() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem
-                          className="text-green-600"
+                          className=""
                           onClick={() =>
-                            setStatusInfo({
-                              agentId: agent.userId as string,
-                              status: "APPROVED",
-                              remarks: "",
-                            })
+                            router.push("/admin/agent/" + agent.userId)
                           }
                         >
-                          {agent.status === "APPROVED" ? "Approved" : "Approve"}
+                          View
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() =>
-                            setStatusInfo({
-                              agentId: agent.userId as string,
-                              status: "REJECTED",
-                              remarks: "",
-                            })
-                          }
-                        >
-                          {agent.status === "REJECTED" ? "Rejected" : "Reject"}
-                        </DropdownMenuItem>
+                        {(agent.status === "PENDING" ||
+                          agent.status === "SUBMITTED" ||
+                          agent.status === "REJECTED") && (
+                          <DropdownMenuItem
+                            className=""
+                            onClick={() =>
+                              setStatusInfo({
+                                agentId: agent.userId as string,
+                                status: "APPROVED",
+                                remarks: "",
+                              })
+                            }
+                          >
+                            Approve
+                          </DropdownMenuItem>
+                        )}
+                        {(agent.status === "PENDING" ||
+                          agent.status === "SUBMITTED" ||
+                          agent.status === "APPROVED") && (
+                          <DropdownMenuItem
+                            className=""
+                            onClick={() =>
+                              setStatusInfo({
+                                agentId: agent.userId as string,
+                                status: "REJECTED",
+                                remarks: "",
+                              })
+                            }
+                          >
+                            Reject
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
+              ))}
+            {!isLoading && agentsResult?.data?.length === 0 && (
               <TableRow>
-                <TableCell className="text-center text-[#DC3173]">
-                  No agents found
+                <TableCell
+                  className="text-[#DC3173] text-lg text-center"
+                  colSpan={5}
+                >
+                  No Fleet Manager found
                 </TableCell>
               </TableRow>
             )}
@@ -197,7 +267,7 @@ export default function AgentTable() {
       )}
       {
         <Dialog
-          open={!!statusInfo.agentId}
+          open={statusInfo?.agentId?.length > 0}
           onOpenChange={() =>
             setStatusInfo({ agentId: "", status: "", remarks: "" })
           }
@@ -207,6 +277,7 @@ export default function AgentTable() {
               <DialogHeader>
                 <DialogTitle>
                   {statusInfo.status === "APPROVED" ? "Approve" : "Reject"}{" "}
+                  {statusInfo?.agentId}
                   Agent
                 </DialogTitle>
                 <DialogDescription>

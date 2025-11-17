@@ -172,7 +172,12 @@ export default function DeliveryPartnerTable() {
           <TableBody>
             {isLoading && (
               <TableRow>
-                <TableCell>Loading...</TableCell>
+                <TableCell
+                  className="text-[#DC3173] text-lg text-center"
+                  colSpan={5}
+                >
+                  Loading...
+                </TableCell>
               </TableRow>
             )}
             {!isLoading &&
@@ -243,7 +248,12 @@ export default function DeliveryPartnerTable() {
               ))}
             {!isLoading && deliveryPartnersResult?.data?.length === 0 && (
               <TableRow>
-                <TableCell>No deliveryPartners found</TableCell>
+                <TableCell
+                  className="text-[#DC3173] text-lg text-center"
+                  colSpan={5}
+                >
+                  No deliveryPartners found
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
