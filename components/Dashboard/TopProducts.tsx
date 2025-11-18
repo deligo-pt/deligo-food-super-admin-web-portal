@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { StarIcon } from "lucide-react";
 import Image from "next/image";

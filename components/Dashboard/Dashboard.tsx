@@ -17,10 +17,10 @@ import {
   XCircleIcon,
 } from "lucide-react";
 
-const Dashboard = ({ vendorName }: { vendorName: string }) => {
+const Dashboard = () => {
   return (
     <div className="max-w-7xl mx-auto">
-      <DashboardHeader vendorName={vendorName} />
+      <DashboardHeader />
       <motion.div
         className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6"
         initial={{
