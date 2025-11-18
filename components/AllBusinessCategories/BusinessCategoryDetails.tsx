@@ -47,8 +47,6 @@ export default function BusinessCategoryDetails({
     setShowEditModal(false);
   };
 
-  const handleToggleStatus = () => {};
-
   const updateActiveStatus = async () => {
     const toastId = toast.loading("Updating active status...");
     try {
@@ -217,7 +215,7 @@ export default function BusinessCategoryDetails({
           duration: 0.5,
           delay: 0.1,
         }}
-        className="bg-white rounded-xl shadow-lg overflow-hidden"
+        className="bg-white rounded-xl shadow-lg overflow-hidden relative"
       >
         {category.image && (
           <motion.div
@@ -230,7 +228,7 @@ export default function BusinessCategoryDetails({
             transition={{
               duration: 0.8,
             }}
-            className="w-full h-64 relative"
+            className="w-full h-64"
           >
             <Image
               src={category.image}
@@ -240,14 +238,12 @@ export default function BusinessCategoryDetails({
               height={500}
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <BusinessCategoryStatusBadge
-                isActive={category.isActive}
-                onClick={handleToggleStatus}
-              />
-            </div>
           </motion.div>
         )}
+
+        <div className="absolute top-4 right-4">
+          <BusinessCategoryStatusBadge isActive={category.isActive} />
+        </div>
         <div className="p-6">
           <div className="mb-6">
             <h2 className="text-2xl font-bold mb-1">{category.name}</h2>

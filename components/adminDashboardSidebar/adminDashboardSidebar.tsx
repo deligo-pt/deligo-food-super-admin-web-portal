@@ -101,7 +101,7 @@ export default function Sidebar() {
     },
     {
       id: "riders",
-      title: "Riders /Delivery Partners",
+      title: "Riders / Delivery Partners",
       icon: <Bike size={18} />,
       items: [
         { name: "All Riders", path: "/admin/all-delivery-partners" },
@@ -178,7 +178,7 @@ export default function Sidebar() {
       title: "Inventory & Menu Control",
       icon: <Package size={18} />,
       items: [
-        { name: "All Items", path: "/admin/all-items" },
+        { name: "All Items", path: "/admin/all-products" },
         { name: "Category Management", path: "/admin/category-management" },
         { name: "Out-of-Stock Alerts", path: "/admin/out-of-stock-alerts" },
         { name: "Restricted Items", path: "/admin/restricted-items" },
@@ -399,7 +399,7 @@ export default function Sidebar() {
                     <div className="flex items-center gap-3">
                       <div className="text-pink-600">{menu.icon}</div>
                       {open && (
-                        <span className="font-medium text-gray-700">
+                        <span className="font-medium text-gray-700 text-left">
                           {menu.title}
                         </span>
                       )}

@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -40,6 +41,7 @@ export default function ProductCategoryDetails({
 }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [updateField, setUpdateField] = useState("");
+  const router = useRouter();
 
   const onEditModalClose = () => {
     setShowEditModal(false);
@@ -59,7 +61,7 @@ export default function ProductCategoryDetails({
       )) as unknown as TResponse<TProductCategory[]>;
       if (result?.success) {
         toast.success("Active Status updated successfully!", { id: toastId });
-        // fetchCategories();
+        router.refresh();
         setUpdateField("");
       }
 
@@ -85,7 +87,7 @@ export default function ProductCategoryDetails({
       )) as unknown as TResponse<TProductCategory[]>;
       if (result?.success) {
         toast.success("Category deleted successfully!", { id: toastId });
-        // fetchCategories();
+        router.refresh();
         setUpdateField("");
       }
 
@@ -188,7 +190,7 @@ export default function ProductCategoryDetails({
                   whileTap={{
                     scale: 0.95,
                   }}
-                  onClick={() => setUpdateField("isDelete")}
+                  onClick={() => setUpdateField("isDeleted")}
                   className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-600/90"
                 >
                   <TrashIcon size={16} />
@@ -212,7 +214,7 @@ export default function ProductCategoryDetails({
           duration: 0.5,
           delay: 0.1,
         }}
-        className="bg-white rounded-xl shadow-lg overflow-hidden"
+        className="bg-white rounded-xl shadow-lg overflow-hidden relative"
       >
         {category.image && (
           <motion.div
@@ -235,11 +237,11 @@ export default function ProductCategoryDetails({
               height={500}
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-            <div className="absolute bottom-4 left-4">
-              <ProductCategoryStatusBadge isActive={category.isActive} />
-            </div>
           </motion.div>
         )}
+        <div className="absolute top-4 right-4">
+          <ProductCategoryStatusBadge isActive={category.isActive} />
+        </div>
         <div className="p-6">
           <div className="mb-6">
             <h2 className="text-2xl font-bold mb-1">{category.name}</h2>
@@ -296,7 +298,7 @@ export default function ProductCategoryDetails({
                 <DialogTitle>
                   {updateField === "isDeleted"
                     ? "Delete"
-                    : !category.isActive
+                    : category.isActive
                     ? "Inactive"
                     : "Active"}{" "}
                   Category
@@ -305,7 +307,7 @@ export default function ProductCategoryDetails({
                   Are you sure you want to{" "}
                   {updateField === "isDeleted"
                     ? "delete"
-                    : !category.isActive
+                    : category.isActive
                     ? "inactive"
                     : "active"}{" "}
                   this category?
@@ -320,7 +322,7 @@ export default function ProductCategoryDetails({
                   <Button variant="destructive" onClick={softDeleteCategory}>
                     Delete
                   </Button>
-                ) : !category.isActive ? (
+                ) : category.isActive ? (
                   <Button
                     onClick={updateActiveStatus}
                     className="bg-yellow-500 hover:bg-opacity-90"
