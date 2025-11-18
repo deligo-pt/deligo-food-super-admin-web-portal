@@ -54,7 +54,7 @@ export default function SuperAdminLoginPage() {
 
       if (result?.success) {
         const decoded = jwtDecode(result.data.accessToken) as { role: string };
-        if (decoded.role === "SUPER_ADMIN") {
+        if (decoded.role === "SUPER_ADMIN" || decoded.role === "ADMIN") {
           setCookie("accessToken", result.data.accessToken, 7);
           setCookie("refreshToken", result.data.refreshToken, 365);
           toast.success("Login successful!", { id: toastId });

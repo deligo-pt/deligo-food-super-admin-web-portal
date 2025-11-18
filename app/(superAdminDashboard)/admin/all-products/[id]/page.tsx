@@ -23,5 +23,6 @@ export default async function ProductDetailsPage({
   } catch (err) {
     console.error("Server fetchProducts error:", err);
   }
+  
   return <ProductDetails product={initialData} />;
 }
