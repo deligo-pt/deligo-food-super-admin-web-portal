@@ -1,17 +1,36 @@
 import Sidebar from "@/components/adminDashboardSidebar/adminDashboardSidebar";
 import Topbar from "@/components/adminTopbar/Topbar";
+import { serverRequest } from "@/lib/serverFetch";
+import { TAdmin } from "@/types/admin.type";
+import { jwtDecode } from "jwt-decode";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
   description: "Deligo admin dashboard",
 };
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const accessToken = (await cookies()).get("accessToken")?.value || "";
+  const decoded = jwtDecode(accessToken) as { id: string };
+
+  let adminData: TAdmin = {} as TAdmin;
+
+  try {
+    const result = await serverRequest.get(`/admins/${decoded.id}`);
+
+    if (result?.success) {
+      adminData = result?.data;
+    }
+  } catch (err) {
+    console.error("Server fetch error:", err);
+  }
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
       {/* Mobile view: Sidebar on top, Topbar below */}
@@ -36,7 +55,7 @@ export default function AdminLayout({
         <div className="flex-1 flex flex-col md:ml-[280px] overflow-x-hidden max-w-full">
           {/* Topbar sticky */}
           <div className="w-full sticky top-0 z-40">
-            <Topbar />
+            <Topbar admin={adminData} />
           </div>
           {/* Page content */}
           <main className="flex-1 p-4 overflow-y-auto">{children}</main>

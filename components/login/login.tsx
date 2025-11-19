@@ -63,7 +63,7 @@ export default function SuperAdminLoginPage() {
             router.push(redirect);
             return;
           }
-          router.push("/admin");
+          router.push("/admin/dashboard");
           return;
         }
         toast.error("You are not a super admin", { id: toastId });

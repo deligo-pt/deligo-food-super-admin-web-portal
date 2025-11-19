@@ -1,5 +1,6 @@
 "use client";
 
+import { TAdmin } from "@/types/admin.type";
 import { removeCookie } from "@/utils/cookies";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -10,6 +11,7 @@ import {
   LogOut,
   MessageSquare,
   User,
+  UserIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -19,9 +21,10 @@ const PRIMARY = "#DC3173";
 
 type Props = {
   sidebarWidth?: number;
+  admin?: TAdmin;
 };
 
-export default function Topbar({ sidebarWidth = 280 }: Props) {
+export default function Topbar({ sidebarWidth = 280, admin }: Props) {
   const [langOpen, setLangOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const router = useRouter();
@@ -163,13 +166,20 @@ export default function Topbar({ sidebarWidth = 280 }: Props) {
                 }}
                 className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-pink-50 transition"
               >
-                <Image
-                  src="/profile.jpg"
-                  alt="avatar"
-                  width={36}
-                  height={36}
-                  className="rounded-full border-2 border-pink-200 object-cover"
-                />
+                {admin?.profilePhoto &&
+                admin?.profilePhoto !== "<admin_profile_photo_url>" ? (
+                  <Image
+                    src={admin?.profilePhoto}
+                    alt="avatar"
+                    width={36}
+                    height={36}
+                    className="rounded-full border-2 border-pink-200 object-cover w-9 h-9"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center rounded-full border-2 border-pink-200 object-cover w-8 h-8">
+                    <UserIcon size={18} className="text-[#DC3173]" />
+                  </div>
+                )}
                 <ChevronDown
                   size={16}
                   className={`text-gray-700 transition-transform ${
