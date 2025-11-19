@@ -28,7 +28,7 @@ export async function proxy(req: NextRequest) {
         decoded &&
         (decoded?.role === "SUPER_ADMIN" || decoded?.role === "ADMIN")
       ) {
-        return NextResponse.redirect(new URL("/admin", req.url));
+        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
       }
     }
     return NextResponse.next();

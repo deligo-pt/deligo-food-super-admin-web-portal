@@ -101,13 +101,9 @@ export default function AgentTable() {
   const deleteVendor = async () => {
     const toastId = toast.loading("Deleting vendor...");
     try {
-      const result = (await deleteData(
-        `/auth/soft-delete/${deleteId}`,
-
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<null>;
+      const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
+        headers: { authorization: getCookie("accessToken") },
+      })) as unknown as TResponse<null>;
       if (result?.success) {
         fetchAgents();
         setDeleteId("");
