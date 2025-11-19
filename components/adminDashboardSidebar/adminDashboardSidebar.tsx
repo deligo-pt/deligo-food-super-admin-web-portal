@@ -59,7 +59,7 @@ export default function Sidebar() {
       id: "dashboard",
       title: "Dashboard",
       icon: <LayoutDashboard size={18} />,
-      path: "/",
+      path: "/admin/dashboard",
     },
     {
       id: "vendors",
