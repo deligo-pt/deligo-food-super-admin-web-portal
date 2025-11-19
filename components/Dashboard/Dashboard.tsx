@@ -9,9 +9,9 @@ import TopProducts from "@/components/Dashboard/TopProducts";
 import { TAnalytics } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 import {
-  ChartLine,
+  BadgeEuro,
+  ChartBar,
   CheckCircleIcon,
-  Receipt,
   ShoppingBagIcon,
   StoreIcon,
   TrendingUpIcon,
@@ -80,14 +80,14 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
           title="Total Revenue"
           value={analyticsData?.totalRevenue?.toLocaleString() || "0"}
           description="Gross sales receipts"
-          icon={<ChartLine />}
+          icon={<BadgeEuro />}
           color="#DC3173"
         />
         <StatCard
           title="Todays Revenue"
           value={analyticsData?.todaysRevenue?.toLocaleString() || "0"}
           description="Dailsy sales total"
-          icon={<Receipt />}
+          icon={<ChartBar />}
           color="#DC3173"
         />
       </motion.div>

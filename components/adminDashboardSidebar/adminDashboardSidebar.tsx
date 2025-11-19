@@ -59,11 +59,7 @@ export default function Sidebar() {
       id: "dashboard",
       title: "Dashboard",
       icon: <LayoutDashboard size={18} />,
-      items: [
-        { name: "Overview", path: "/admin/dashboard" },
-        { name: "Live Activity", path: "/admin/live-activity" },
-        { name: "Growth Metrics", path: "/admin/growth-metrics" },
-      ],
+      path: "/",
     },
     {
       id: "vendors",
@@ -101,19 +97,34 @@ export default function Sidebar() {
     },
     {
       id: "riders",
-      title: "Riders / Delivery Partners",
+      title: "Delivery Partners",
       icon: <Bike size={18} />,
       items: [
-        { name: "All Riders", path: "/admin/all-delivery-partners" },
+        { name: "All Delivery Partners", path: "/admin/all-delivery-partners" },
         {
-          name: "Rider Onboarding Requests",
-          path: "/admin/rider-onboarding-requests",
+          name: "Delivery Partner Onboarding Requests",
+          path: "/admin/delivery-partner-onboarding-requests",
         },
-        { name: "Active Riders", path: "/admin/active-riders" },
-        { name: "Suspended Riders", path: "/admin/suspended-riders" },
-        { name: "Rider Performance", path: "/admin/rider-performance" },
-        { name: "Rider Payouts", path: "/admin/rider-payouts" },
-        { name: "Rider Analytics", path: "/admin/rider-analytics" },
+        {
+          name: "Active Delivery Partners",
+          path: "/admin/active-delivery-partners",
+        },
+        {
+          name: "Suspended Delivery Partners",
+          path: "/admin/suspended-delivery-partners",
+        },
+        {
+          name: "Delivery Partner Performance",
+          path: "/admin/delivery-partner-performance",
+        },
+        {
+          name: "Delivery Partner Payouts",
+          path: "/admin/delivery-partner-payouts",
+        },
+        {
+          name: "Delivery Partner Analytics",
+          path: "/admin/delivery-partner-analytics",
+        },
       ],
     },
     {
