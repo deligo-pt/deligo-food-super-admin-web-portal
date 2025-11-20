@@ -50,12 +50,6 @@ export default function Sidebar() {
 
   const MENU = [
     {
-      id: "home",
-      title: "Home",
-      icon: <Home size={18} />,
-      path: "/",
-    },
-    {
       id: "dashboard",
       title: "Dashboard",
       icon: <LayoutDashboard size={18} />,
@@ -63,7 +57,7 @@ export default function Sidebar() {
     },
     {
       id: "vendors",
-      title: "Vendors / Restaurants",
+      title: "Vendors",
       icon: <Utensils size={18} />,
       items: [
         { name: "All vendors", path: "/admin/all-vendors" },
@@ -76,11 +70,19 @@ export default function Sidebar() {
       ],
     },
     {
-      id: "agents",
+      id: "fleets",
       title: "Fleet Managers",
       icon: <Users size={18} />,
       items: [
         { name: "All Fleet Managers", path: "/admin/all-fleet-managers" },
+        { name: "Add New Fleet Manager", path: "/admin/add-fleet-manager" },
+        { name: "Fleet Manager Wallet", path: "/admin/fleet-manager-wallet" },
+        { name: "Payout Requests", path: "/admin/fleet-manager-withdrawals" },
+        { name: "Zones & Coverage Areas", path: "/admin/fleet-zones" },
+        { name: "Fleet Performance Analytics", path: "/admin/fleet-performance" },
+        { name: "Activity Logs", path: "/admin/fleet-activity-logs" },
+        { name: "In-App Notifications", path: "/admin/send-notification-fleet" },
+        { name: "Suspended / Blocked Fleet Managers", path: "/admin/blocked-fleet-managers" },
       ],
     },
     {
