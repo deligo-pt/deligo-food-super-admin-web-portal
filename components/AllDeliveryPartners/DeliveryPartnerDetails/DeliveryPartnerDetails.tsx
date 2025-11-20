@@ -4,9 +4,11 @@ import ImagePreview from "@/components/AllDeliveryPartners/DeliveryPartnerDetail
 import InfoRow from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/InfoRow";
 import Section from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/Section";
 import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/StatusBadge";
+import { Button } from "@/components/ui/button";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import {
+  ArrowLeftCircle,
   Bike,
   Briefcase,
   CalendarClock,
@@ -26,6 +28,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   partner: TDeliveryPartner;
@@ -37,6 +40,7 @@ const formatDate = (date: Date | undefined) => {
 };
 
 export const DeliveryPartnerDetails = ({ partner }: IProps) => {
+  const router = useRouter();
   const fullName =
     `${partner.personalInfo?.Name?.firstName || ""} ${
       partner.personalInfo?.Name?.lastName || ""
@@ -56,7 +60,16 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   };
 
   return (
-    <div className="o">
+    <div>
+      <div className="mb-4">
+        <Button
+          onClick={() => router.push("/admin/all-delivery-partners")}
+          variant="link"
+          className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
+        >
+          <ArrowLeftCircle /> Go Home
+        </Button>
+      </div>
       <motion.div
         initial={{
           opacity: 0,

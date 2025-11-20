@@ -5,6 +5,7 @@ import Section from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
 import AgentDetailsDoc from "@/components/AllAgents/AgentDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import { Button } from "@/components/ui/button";
 import { USER_STATUS } from "@/consts/user.const";
 import { TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
@@ -87,7 +88,16 @@ export const AgentDetails = ({ agent }: IProps) => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md;px-6">
+      <div className="mb-4">
+        <Button
+          onClick={() => router.push("/admin/all-fleet-managers")}
+          variant="link"
+          className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
+        >
+          <ArrowLeftCircle /> Go Home
+        </Button>
+      </div>
       <motion.div
         initial={{
           opacity: 0,
