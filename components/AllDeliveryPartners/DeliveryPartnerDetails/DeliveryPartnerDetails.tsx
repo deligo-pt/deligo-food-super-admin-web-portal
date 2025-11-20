@@ -13,7 +13,6 @@ import {
   Car,
   Check,
   CreditCard,
-  Edit,
   FileText,
   Gavel,
   Mail,
@@ -57,7 +56,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="o">
       <motion.div
         initial={{
           opacity: 0,
@@ -151,7 +150,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
       </motion.div>
       <div className="bg-gray-50 p-6 rounded-b-lg">
         <Section title="Personal Details" icon={<User />} defaultOpen={true}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow label="Full Name" value={fullName} />
               <InfoRow label="Email" value={partner.email} />
@@ -195,7 +194,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <Section title="Address" icon={<MapPin />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
                 label="Street"
@@ -223,7 +222,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <Section title="Vehicle Information" icon={getVehicleIcon()}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
                 label="Vehicle Type"
@@ -263,7 +262,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <Section title="Bank Details" icon={<CreditCard />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
                 label="Bank Name"
@@ -287,7 +286,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <Section title="Legal Status" icon={<Gavel />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
                 label="Residence Permit Type"
@@ -323,7 +322,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <Section title="Documents" icon={<FileText />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             {partner.personalInfo?.idDocumentFront && (
               <div>
                 <div className="mb-2 text-gray-500 text-sm">
@@ -417,7 +416,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               <h4 className="text-sm font-medium text-gray-700 mb-2">
                 Earnings
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="text-gray-500 text-xs mb-1">
                     Total Earnings
@@ -439,7 +438,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           )}
         </Section>
         <Section title="Work Preferences" icon={<Briefcase />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
                 label="Preferred Zones"
@@ -513,7 +512,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <Section title="Account Information" icon={<CalendarClock />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
                 label="Account Created"
@@ -554,7 +553,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <div className="mt-8 flex flex-wrap justify-end gap-3">
-          {partner.status !== "SUBMITTED" && (
+          {/* {partner.status !== "SUBMITTED" && (
             <motion.button
               whileHover={{
                 scale: 1.05,
@@ -562,11 +561,39 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               whileTap={{
                 scale: 0.95,
               }}
-              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] bg-opacity-10 text-[#DC3173] rounded-lg transition-all hover:bg-opacity-20"
+              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] bg-opacity-10 text-white rounded-lg transition-all hover:bg-opacity-20"
             >
               <Edit className="w-4 h-4" />
               <span>Edit</span>
             </motion.button>
+          )} */}
+          {partner.status === "SUBMITTED" && (
+            <>
+              <motion.button
+                whileHover={{
+                  scale: 1.05,
+                }}
+                whileTap={{
+                  scale: 0.95,
+                }}
+                className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+              >
+                <Check className="w-4 h-4" />
+                <span>Approve</span>
+              </motion.button>
+              <motion.button
+                whileHover={{
+                  scale: 1.05,
+                }}
+                whileTap={{
+                  scale: 0.95,
+                }}
+                className="flex items-center space-x-1 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-sm hover:bg-yellow-600"
+              >
+                <X className="w-4 h-4" />
+                <span>Reject</span>
+              </motion.button>
+            </>
           )}
           <motion.button
             whileHover={{
@@ -575,34 +602,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             whileTap={{
               scale: 0.95,
             }}
-            className="flex items-center space-x-1 px-4 py-2 bg-red-500 bg-opacity-10 text-red-500 rounded-lg transition-all hover:bg-opacity-20"
+            className="flex items-center space-x-1 px-4 py-2 bg-red-500 bg-opacity-10 text-white rounded-lg transition-all hover:bg-opacity-20"
           >
             <Trash2 className="w-4 h-4" />
             <span>Delete</span>
-          </motion.button>
-          <motion.button
-            whileHover={{
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-            className="flex items-center space-x-1 px-4 py-2 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600"
-          >
-            <Check className="w-4 h-4" />
-            <span>Approve</span>
-          </motion.button>
-          <motion.button
-            whileHover={{
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-            className="flex items-center space-x-1 px-4 py-2 bg-red-500 text-white rounded-lg shadow-sm hover:bg-red-600"
-          >
-            <X className="w-4 h-4" />
-            <span>Reject</span>
           </motion.button>
         </div>
       </div>
