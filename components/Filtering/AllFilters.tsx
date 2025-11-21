@@ -29,44 +29,21 @@ interface IProps {
 
 export default function AllFilters({ sortOptions, filterOptions }: IProps) {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<Record<string, string>>(
-    {}
-  );
-
-  const paramFilters = filterOptions.reduce((acc, option) => {
+  const oldFilters = filterOptions.reduce((acc, option) => {
     acc[option.key] = searchParams.get(option.key) || "";
     return acc;
   }, {} as Record<string, string>);
-
-  const removeFilter = (key: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    setActiveFilters((prevFilters) => ({
-      ...prevFilters,
-      [key]: "",
-    }));
-    params.delete(key);
-    router.push(`?${params.toString()}`);
-  };
-
-  const clearAllFilters = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    filterOptions.forEach((option) => {
-      setActiveFilters((prevFilters) => ({
-        ...prevFilters,
-        [option.key]: "",
-      }));
-      params.delete(option.key);
-    });
-    router.push(`?${params.toString()}`);
-  };
+  const router = useRouter();
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] =
+    useState<Record<string, string>>(oldFilters);
+  const [paramFilters, setParamFilters] = useState(oldFilters);
 
   const handleAddFilter = () => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(activeFilters).forEach(([key, value]) => {
       if (value) {
-        setActiveFilters((prevFilters) => ({
+        setParamFilters((prevFilters) => ({
           ...prevFilters,
           [key]: value,
         }));
@@ -77,8 +54,34 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
     setShowFilters(false);
   };
 
+  const removeFilter = (key: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    setParamFilters((prevFilters) => ({
+      ...prevFilters,
+      [key]: "",
+    }));
+    params.delete(key);
+    router.push(`?${params.toString()}`);
+  };
+
+  const clearAllFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    filterOptions.forEach((option) => {
+      setParamFilters((prevFilters) => ({
+        ...prevFilters,
+        [option.key]: "",
+      }));
+      params.delete(option.key);
+    });
+    router.push(`?${params.toString()}`);
+  };
+
   return (
-    <div className="mb-1">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-1"
+    >
       <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
         <SearchFilter paramName="searchTerm" placeholder="Searching..." />
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
@@ -167,7 +170,7 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
                       {options.label}
                     </label>
                     <Select
-                      value={paramFilters[options.key]}
+                      value={activeFilters[options.key]}
                       onValueChange={(value) =>
                         setActiveFilters((prevFilters) => ({
                           ...prevFilters,
@@ -208,6 +211,6 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

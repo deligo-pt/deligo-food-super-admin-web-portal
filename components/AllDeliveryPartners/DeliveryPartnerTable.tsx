@@ -1,6 +1,8 @@
 "use client";
 
-import PaginationCard from "@/components/PaginationCard/PaginationCard";
+import AllFilters from "@/components/Filtering/AllFilters";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,13 +29,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TResponse } from "@/types";
-import {
-  TDeliveryPartner,
-  TDeliveryPartnersQueryParams,
-} from "@/types/delivery-partner.type";
+import { TMeta, TResponse } from "@/types";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { getCookie } from "@/utils/cookies";
-import { fetchData, updateData } from "@/utils/requests";
+import { deleteData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -44,22 +43,58 @@ import {
   Phone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-export default function DeliveryPartnerTable() {
+interface IProps {
+  deliveryPartnersResult: { data: TDeliveryPartner[]; meta?: TMeta };
+}
+
+const sortOptions = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Oldest First", value: "createdAt" },
+  { label: "Name (A-Z)", value: "name.firstName" },
+  { label: "Name (Z-A)", value: "-name.lastName" },
+];
+
+const filterOptions = [
+  {
+    label: "Status",
+    key: "status",
+    placeholder: "Select Status",
+    type: "select",
+    items: [
+      {
+        label: "Pending",
+        value: "PENDING",
+      },
+      {
+        label: "Submitted",
+        value: "SUBMITTED",
+      },
+      {
+        label: "Approved",
+        value: "APPROVED",
+      },
+      {
+        label: "Rejected",
+        value: "REJECTED",
+      },
+    ],
+  },
+];
+
+export default function DeliveryPartnerTable({
+  deliveryPartnersResult,
+}: IProps) {
   const router = useRouter();
-  const [deliveryPartnersResult, setDeliveryPartnersResult] =
-    useState<TResponse<TDeliveryPartner[]> | null>(null);
   const [statusInfo, setStatusInfo] = useState({
     deliveryPartnerId: "",
     status: "",
     remarks: "",
   });
-  const [queryParams, setQueryParams] = useState<TDeliveryPartnersQueryParams>({
-    limit: 10,
-    page: 1,
-  });
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
 
   const approveOrReject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,9 +110,9 @@ export default function DeliveryPartnerTable() {
         {
           headers: { authorization: getCookie("accessToken") },
         }
-      )) as unknown as TResponse<TDeliveryPartner[]>;
+      )) as unknown as TResponse<TDeliveryPartner>;
       if (result?.success) {
-        // fetchDeliveryPartners();
+        router.refresh();
         setStatusInfo({
           deliveryPartnerId: "",
           status: "",
@@ -91,46 +126,45 @@ export default function DeliveryPartnerTable() {
     }
   };
 
-  const fetchDeliveryPartners = async (
-    queries: TDeliveryPartnersQueryParams = queryParams
-  ) => {
-    let params: Partial<TDeliveryPartnersQueryParams> = {};
-
-    if (queries) {
-      queries = Object.fromEntries(
-        Object.entries(queries).filter((q) => !!q?.[1])
-      );
-    } else {
-      params = Object.fromEntries(
-        Object.entries(queryParams).filter((q) => !!q?.[1])
-      );
-    }
-
-    setIsLoading(true);
-
-    try {
-      const data = (await fetchData("/delivery-partners", {
-        params: params || queryParams,
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<TDeliveryPartner[]>;
-
-      if (data?.success) {
-        setDeliveryPartnersResult(data);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
+  const closeDeleteModal = (open: boolean) => {
+    if (!open) {
+      setDeleteId("");
     }
   };
 
-  useEffect(() => {
-    (() => fetchDeliveryPartners())();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const deleteDeliveryPartner = async () => {
+    const toastId = toast.loading("Deleting Delivery Partner...");
+
+    try {
+      const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
+        headers: { authorization: getCookie("accessToken") },
+      })) as unknown as TResponse<null>;
+
+      if (result?.success) {
+        router.refresh();
+        setDeleteId("");
+        toast.success(
+          result.message || "Delivery Partner deleted successfully!",
+          {
+            id: toastId,
+          }
+        );
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message || "Delivery Partner delete failed",
+        {
+          id: toastId,
+        }
+      );
+    }
+  };
 
   return (
     <>
+      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -193,56 +227,75 @@ export default function DeliveryPartnerTable() {
                   <TableCell>
                     {deliveryPartner?.personalInfo?.contactNumber}
                   </TableCell>
-                  <TableCell>{deliveryPartner?.status}</TableCell>
+                  <TableCell>
+                    {deliveryPartner?.isDeleted
+                      ? "DELETED"
+                      : deliveryPartner?.status}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreVertical className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            router.push(
-                              "/admin/all-delivery-partners/" +
-                                deliveryPartner?.userId
-                            )
-                          }
-                        >
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            setStatusInfo({
-                              deliveryPartnerId:
-                                deliveryPartner?.userId as string,
-                              status: "APPROVED",
-                              remarks: "",
-                            })
-                          }
-                        >
-                          {deliveryPartner?.status === "APPROVED"
-                            ? "Approved"
-                            : "Approve"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            setStatusInfo({
-                              deliveryPartnerId:
-                                deliveryPartner?.userId as string,
-                              status: "REJECTED",
-                              remarks: "",
-                            })
-                          }
-                        >
-                          {deliveryPartner?.status === "REJECTED"
-                            ? "Rejected"
-                            : "Reject"}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    {!deliveryPartner?.isDeleted && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            className=""
+                            onClick={() =>
+                              router.push(
+                                "/admin/all-delivery-partners/" +
+                                  deliveryPartner.userId
+                              )
+                            }
+                          >
+                            View
+                          </DropdownMenuItem>
+                          {deliveryPartner.status === "SUBMITTED" && (
+                            <DropdownMenuItem
+                              className=""
+                              onClick={() =>
+                                setStatusInfo({
+                                  deliveryPartnerId:
+                                    deliveryPartner.userId as string,
+                                  status: "APPROVED",
+                                  remarks: "",
+                                })
+                              }
+                            >
+                              Approve
+                            </DropdownMenuItem>
+                          )}
+                          {deliveryPartner.status === "SUBMITTED" && (
+                            <DropdownMenuItem
+                              className=""
+                              onClick={() =>
+                                setStatusInfo({
+                                  deliveryPartnerId:
+                                    deliveryPartner.userId as string,
+                                  status: "REJECTED",
+                                  remarks: "",
+                                })
+                              }
+                            >
+                              Reject
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            className=""
+                            onClick={() =>
+                              setStatusInfo({
+                                deliveryPartnerId:
+                                  deliveryPartner.userId as string,
+                                status: "REJECTED",
+                                remarks: "",
+                              })
+                            }
+                          >
+                            Reject
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -259,20 +312,22 @@ export default function DeliveryPartnerTable() {
           </TableBody>
         </Table>
       </motion.div>
-      {deliveryPartnersResult?.meta?.page && (
+      {!!deliveryPartnersResult?.meta?.totalPage && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="px-4 md:px-6"
         >
-          <PaginationCard
-            currentPage={deliveryPartnersResult?.meta?.page as number}
+          <PaginationComponent
             totalPages={deliveryPartnersResult?.meta?.totalPage as number}
-            paginationItemsToDisplay={deliveryPartnersResult?.meta?.limit}
-            setQueryParams={setQueryParams}
           />
         </motion.div>
       )}
+      <DeleteModal
+        open={!!deleteId}
+        onOpenChange={closeDeleteModal}
+        onConfirm={deleteDeliveryPartner}
+      />
       {
         <Dialog
           open={statusInfo?.deliveryPartnerId?.length > 0}
