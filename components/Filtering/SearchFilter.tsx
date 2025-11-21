@@ -37,7 +37,8 @@ export default function SearchFilter({
     startTransition(() => {
       router.push(`?${params.toString()}`);
     });
-  }, [debouncedValue, paramName, router, searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue]);
 
   return (
     <div className="relative w-full lg:w-72">

@@ -1,7 +1,8 @@
 "use client";
 
+import AllFilters from "@/components/Filtering/AllFilters";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
-import PaginationCard from "@/components/PaginationCard/PaginationCard";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,10 +29,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TResponse } from "@/types";
-import { TAgent, TUserQueryParams } from "@/types/user.type";
+import { TMeta, TResponse } from "@/types";
+import { TAgent } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
-import { deleteData, fetchData, updateData } from "@/utils/requests";
+import { deleteData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -42,22 +43,53 @@ import {
   Phone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-export default function AgentTable() {
+interface IProps {
+  agentsResult: { data: TAgent[]; meta?: TMeta };
+}
+
+const sortOptions = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Oldest First", value: "createdAt" },
+  { label: "Name (A-Z)", value: "name.firstName" },
+  { label: "Name (Z-A)", value: "-name.lastName" },
+];
+
+const filterOptions = [
+  {
+    label: "Status",
+    key: "status",
+    placeholder: "Select Status",
+    type: "select",
+    items: [
+      {
+        label: "Pending",
+        value: "PENDING",
+      },
+      {
+        label: "Submitted",
+        value: "SUBMITTED",
+      },
+      {
+        label: "Approved",
+        value: "APPROVED",
+      },
+      {
+        label: "Rejected",
+        value: "REJECTED",
+      },
+    ],
+  },
+];
+
+export default function AgentTable({ agentsResult }: IProps) {
   const router = useRouter();
-  const [agentsResult, setAgentsResult] = useState<TResponse<TAgent[]> | null>(
-    null
-  );
   const [statusInfo, setStatusInfo] = useState({
     agentId: "",
     status: "",
     remarks: "",
-  });
-  const [queryParams, setQueryParams] = useState<TUserQueryParams>({
-    limit: 10,
-    page: 1,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [deleteId, setDeleteId] = useState("");
@@ -76,9 +108,9 @@ export default function AgentTable() {
         {
           headers: { authorization: getCookie("accessToken") },
         }
-      )) as unknown as TResponse<TAgent[]>;
+      )) as unknown as TResponse<TAgent>;
       if (result?.success) {
-        fetchAgents();
+        router.refresh();
         setStatusInfo({
           agentId: "",
           status: "",
@@ -98,64 +130,36 @@ export default function AgentTable() {
     }
   };
 
-  const deleteVendor = async () => {
-    const toastId = toast.loading("Deleting vendor...");
+  const deleteAgent = async () => {
+    const toastId = toast.loading("Deleting Fleet Manager...");
+
     try {
       const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
         headers: { authorization: getCookie("accessToken") },
       })) as unknown as TResponse<null>;
+
       if (result?.success) {
-        fetchAgents();
+        router.refresh();
         setDeleteId("");
-        toast.success("Vendor deleted successfully!", { id: toastId });
+        toast.success(result.message || "Fleet Manager deleted successfully!", {
+          id: toastId,
+        });
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
-      toast.error(error?.response?.data?.message || "Vendor delete failed", {
-        id: toastId,
-      });
-    }
-  };
-
-  const fetchAgents = async (queries: TUserQueryParams = queryParams) => {
-    let params: Partial<TUserQueryParams> = {};
-
-    if (queries) {
-      queries = Object.fromEntries(
-        Object.entries(queries).filter((q) => !!q?.[1])
-      );
-    } else {
-      params = Object.fromEntries(
-        Object.entries(queryParams).filter((q) => !!q?.[1])
+      toast.error(
+        error?.response?.data?.message || "Fleet Manager delete failed",
+        {
+          id: toastId,
+        }
       );
     }
-
-    setIsLoading(true);
-
-    try {
-      const data = (await fetchData("/fleet-managers", {
-        params: params || queryParams,
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<TAgent[]>;
-
-      if (data?.success) {
-        setAgentsResult(data);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
   };
-
-  useEffect(() => {
-    (() => fetchAgents())();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <>
+      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -206,7 +210,7 @@ export default function AgentTable() {
               </TableRow>
             )}
             {!isLoading &&
-              agentsResult &&
+              agentsResult?.data &&
               agentsResult?.data?.length > 0 &&
               agentsResult?.data?.map((agent) => (
                 <TableRow key={agent._id}>
@@ -215,55 +219,59 @@ export default function AgentTable() {
                   </TableCell>
                   <TableCell>{agent.email}</TableCell>
                   <TableCell>{agent.contactNumber}</TableCell>
-                  <TableCell>{agent.status}</TableCell>
+                  <TableCell className={agent.isDeleted ? "text-red-500" : ""}>
+                    {agent.isDeleted ? "Deleted" : agent.status}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreVertical className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            router.push("/admin/agent/" + agent.userId)
-                          }
-                        >
-                          View
-                        </DropdownMenuItem>
-                        {(agent.status === "PENDING" ||
-                          agent.status === "SUBMITTED" ||
-                          agent.status === "REJECTED") && (
+                    {!agent.isDeleted && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
                           <DropdownMenuItem
                             className=""
                             onClick={() =>
-                              setStatusInfo({
-                                agentId: agent.userId as string,
-                                status: "APPROVED",
-                                remarks: "",
-                              })
+                              router.push("/admin/agent/" + agent.userId)
                             }
                           >
-                            Approve
+                            View
                           </DropdownMenuItem>
-                        )}
-                        {(agent.status === "PENDING" ||
-                          agent.status === "SUBMITTED" ||
-                          agent.status === "APPROVED") && (
+                          {agent.status === "SUBMITTED" && (
+                            <>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  setStatusInfo({
+                                    agentId: agent.userId as string,
+                                    status: "APPROVED",
+                                    remarks: "",
+                                  })
+                                }
+                              >
+                                Approve
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  setStatusInfo({
+                                    agentId: agent.userId as string,
+                                    status: "REJECTED",
+                                    remarks: "",
+                                  })
+                                }
+                              >
+                                Reject
+                              </DropdownMenuItem>
+                            </>
+                          )}
                           <DropdownMenuItem
-                            className=""
-                            onClick={() =>
-                              setStatusInfo({
-                                agentId: agent.userId as string,
-                                status: "REJECTED",
-                                remarks: "",
-                              })
-                            }
+                            onClick={() => setDeleteId(agent.userId as string)}
                           >
-                            Reject
+                            Delete
                           </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -280,24 +288,21 @@ export default function AgentTable() {
           </TableBody>
         </Table>
       </motion.div>
-      {agentsResult?.meta?.page && (
+      {!!agentsResult?.meta?.totalPage && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="px-4 md:px-6"
         >
-          <PaginationCard
-            currentPage={agentsResult?.meta?.page as number}
+          <PaginationComponent
             totalPages={agentsResult?.meta?.totalPage as number}
-            paginationItemsToDisplay={agentsResult?.meta?.limit}
-            setQueryParams={setQueryParams}
           />
         </motion.div>
       )}
       <DeleteModal
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
-        onConfirm={deleteVendor}
+        onConfirm={deleteAgent}
       />
       {
         <Dialog

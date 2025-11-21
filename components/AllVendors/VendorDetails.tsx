@@ -53,7 +53,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
     const toastId = toast.loading("Deleting vendor...");
     try {
       const result = (await deleteData(
-        `/auth/soft-delete/${vendor.userId}/approved-rejected-user`,
+        `/auth/soft-delete/${vendor.userId}`,
 
         {
           headers: { authorization: getCookie("accessToken") },
@@ -62,7 +62,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
       if (result?.success) {
         setShowDeleteModal(false);
         toast.success("Vendor deleted successfully!", { id: toastId });
-        router.refresh();
+        router.push("/admin/all-vendors");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -92,11 +92,11 @@ export const VendorDetails = ({ vendor }: IProps) => {
     <div className="p-4 md;px-6">
       <div className="mb-4">
         <Button
-          onClick={() => router.push("/admin/all-fleet-managers")}
+          onClick={() => router.push("/admin/all-vandors")}
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle /> Go Home
+          <ArrowLeftCircle /> Go Back
         </Button>
       </div>
       <motion.div
@@ -174,8 +174,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
                   variant="success"
                 />
               )}
-              {(vendor.status === "PENDING" ||
-                vendor.status === "SUBMITTED") && (
+              {vendor.status === "SUBMITTED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("REJECTED")}
                   label="Reject"
@@ -189,12 +188,6 @@ export const VendorDetails = ({ vendor }: IProps) => {
                 icon={<TrashIcon size={18} />}
                 variant="danger"
               />
-              {/* <ActionButton
-                onClick={handleBlock}
-                label="Block"
-                icon={<BanIcon size={18} />}
-                variant="warning"
-              /> */}
             </div>
           </div>
           <AgentOrVendorSection

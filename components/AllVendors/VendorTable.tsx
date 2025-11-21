@@ -1,7 +1,8 @@
 "use client";
 
+import AllFilters from "@/components/Filtering/AllFilters";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
-import PaginationCard from "@/components/PaginationCard/PaginationCard";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,10 +29,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TResponse } from "@/types";
-import { TUserQueryParams, TVendor } from "@/types/user.type";
+import { TMeta, TResponse } from "@/types";
+import { TVendor } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
-import { deleteData, fetchData, updateData } from "@/utils/requests";
+import { deleteData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -42,22 +43,53 @@ import {
   Phone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-export default function VendorTable() {
+interface IProps {
+  vendorsResult: { data: TVendor[]; meta?: TMeta };
+}
+
+const sortOptions = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Oldest First", value: "createdAt" },
+  { label: "Name (A-Z)", value: "name.firstName" },
+  { label: "Name (Z-A)", value: "-name.lastName" },
+];
+
+const filterOptions = [
+  {
+    label: "Status",
+    key: "status",
+    placeholder: "Select Status",
+    type: "select",
+    items: [
+      {
+        label: "Pending",
+        value: "PENDING",
+      },
+      {
+        label: "Submitted",
+        value: "SUBMITTED",
+      },
+      {
+        label: "Approved",
+        value: "APPROVED",
+      },
+      {
+        label: "Rejected",
+        value: "REJECTED",
+      },
+    ],
+  },
+];
+
+export default function VendorTable({ vendorsResult }: IProps) {
   const router = useRouter();
-  const [vendorsResult, setVendorsResult] = useState<TResponse<
-    TVendor[]
-  > | null>(null);
   const [statusInfo, setStatusInfo] = useState({
     vendorId: "",
     status: "",
     remarks: "",
-  });
-  const [queryParams, setQueryParams] = useState<TUserQueryParams>({
-    limit: 10,
-    page: 1,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [deleteId, setDeleteId] = useState("");
@@ -76,9 +108,9 @@ export default function VendorTable() {
         {
           headers: { authorization: getCookie("accessToken") },
         }
-      )) as unknown as TResponse<TVendor[]>;
+      )) as unknown as TResponse<TVendor>;
       if (result?.success) {
-        fetchVendors();
+        router.refresh();
         setStatusInfo({
           vendorId: "",
           status: "",
@@ -99,19 +131,19 @@ export default function VendorTable() {
   };
 
   const deleteVendor = async () => {
-    const toastId = toast.loading("Deleting vendor...");
-    try {
-      const result = (await deleteData(
-        `/auth/soft-delete/${deleteId}`,
+    const toastId = toast.loading("Deleting Vendor...");
 
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<null>;
+    try {
+      const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
+        headers: { authorization: getCookie("accessToken") },
+      })) as unknown as TResponse<null>;
+
       if (result?.success) {
-        fetchVendors();
+        router.refresh();
         setDeleteId("");
-        toast.success("Vendor deleted successfully!", { id: toastId });
+        toast.success(result.message || "Vendor deleted successfully!", {
+          id: toastId,
+        });
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -122,44 +154,9 @@ export default function VendorTable() {
     }
   };
 
-  const fetchVendors = async (queries: TUserQueryParams = queryParams) => {
-    let params: Partial<TUserQueryParams> = {};
-
-    if (queries) {
-      queries = Object.fromEntries(
-        Object.entries(queries).filter((q) => !!q?.[1])
-      );
-    } else {
-      params = Object.fromEntries(
-        Object.entries(queryParams).filter((q) => !!q?.[1])
-      );
-    }
-
-    setIsLoading(true);
-
-    try {
-      const data = (await fetchData("/vendors", {
-        params: params || queryParams,
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<TVendor[]>;
-
-      if (data?.success) {
-        setVendorsResult(data);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    (() => fetchVendors())();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <>
+      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -219,37 +216,53 @@ export default function VendorTable() {
                   </TableCell>
                   <TableCell>{vendor.email}</TableCell>
                   <TableCell>{vendor.contactNumber}</TableCell>
-                  <TableCell>{vendor.status}</TableCell>
+                  <TableCell>
+                    {vendor.isDeleted ? "Deleted" : vendor.status}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreVertical className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            router.push("/admin/vendor/" + vendor.userId)
-                          }
-                        >
-                          View
-                        </DropdownMenuItem>
-                        {vendor.status === "SUBMITTED" && (
+                    {!vendor.isDeleted && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
                           <DropdownMenuItem
                             className=""
                             onClick={() =>
-                              setStatusInfo({
-                                vendorId: vendor.userId as string,
-                                status: "APPROVED",
-                                remarks: "",
-                              })
+                              router.push("/admin/vendor/" + vendor.userId)
                             }
                           >
-                            Approve
+                            View
                           </DropdownMenuItem>
-                        )}
-                        {(vendor.status === "PENDING" ||
-                          vendor.status === "SUBMITTED") && (
+                          {vendor.status === "SUBMITTED" && (
+                            <DropdownMenuItem
+                              className=""
+                              onClick={() =>
+                                setStatusInfo({
+                                  vendorId: vendor.userId as string,
+                                  status: "APPROVED",
+                                  remarks: "",
+                                })
+                              }
+                            >
+                              Approve
+                            </DropdownMenuItem>
+                          )}
+                          {(vendor.status === "PENDING" ||
+                            vendor.status === "SUBMITTED") && (
+                            <DropdownMenuItem
+                              className=""
+                              onClick={() =>
+                                setStatusInfo({
+                                  vendorId: vendor.userId as string,
+                                  status: "REJECTED",
+                                  remarks: "",
+                                })
+                              }
+                            >
+                              Reject
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             className=""
                             onClick={() =>
@@ -262,21 +275,9 @@ export default function VendorTable() {
                           >
                             Reject
                           </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            setStatusInfo({
-                              vendorId: vendor.userId as string,
-                              status: "REJECTED",
-                              remarks: "",
-                            })
-                          }
-                        >
-                          Reject
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -293,17 +294,14 @@ export default function VendorTable() {
           </TableBody>
         </Table>
       </motion.div>
-      {vendorsResult?.meta?.page && (
+      {!!vendorsResult?.meta?.totalPage && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="px-4 md:px-6"
         >
-          <PaginationCard
-            currentPage={vendorsResult?.meta?.page as number}
+          <PaginationComponent
             totalPages={vendorsResult?.meta?.totalPage as number}
-            paginationItemsToDisplay={vendorsResult?.meta?.limit}
-            setQueryParams={setQueryParams}
           />
         </motion.div>
       )}

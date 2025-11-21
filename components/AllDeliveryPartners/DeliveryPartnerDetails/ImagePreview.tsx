@@ -10,13 +10,21 @@ export default function ImagePreview({
 }) {
   return (
     <div className="relative">
-      <Image
-        src={url}
-        alt={alt}
-        className="w-full h-48 object-cover rounded-lg"
-        width={500}
-        height={500}
-      />
+      {url?.toLowerCase()?.endsWith(".pdf") ? (
+        <iframe
+          src={url || ""}
+          className="w-full h-48 rounded-lg  border border-gray-200"
+          allow="fullscreen"
+        />
+      ) : (
+        <Image
+          src={url}
+          alt={alt}
+          className="w-full h-48 object-cover rounded-lg"
+          width={500}
+          height={500}
+        />
+      )}
       <div className="absolute bottom-2 left-2">
         <motion.button
           whileHover={{

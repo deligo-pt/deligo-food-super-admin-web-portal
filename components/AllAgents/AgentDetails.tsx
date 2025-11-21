@@ -19,6 +19,7 @@ import {
   CheckIcon,
   FileTextIcon,
   MapPinIcon,
+  TrashIcon,
   UserIcon,
   XIcon,
 } from "lucide-react";
@@ -48,11 +49,11 @@ export const AgentDetails = ({ agent }: IProps) => {
     }
   };
 
-  const deleteVendor = async () => {
-    const toastId = toast.loading("Deleting vendor...");
+  const deleteAgent = async () => {
+    const toastId = toast.loading("Deleting Fleet Manager...");
     try {
       const result = (await deleteData(
-        `/auth/soft-delete/${agent.userId}/approved-rejected-user`,
+        `/auth/soft-delete/${agent.userId}`,
 
         {
           headers: { authorization: getCookie("accessToken") },
@@ -60,15 +61,18 @@ export const AgentDetails = ({ agent }: IProps) => {
       )) as unknown as TResponse<null>;
       if (result?.success) {
         setShowDeleteModal(false);
-        toast.success("Vendor deleted successfully!", { id: toastId });
-        router.refresh();
+        toast.success("Fleet Manager deleted successfully!", { id: toastId });
+        router.push("/admin/all-fleet-managers");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
-      toast.error(error?.response?.data?.message || "Vendor delete failed", {
-        id: toastId,
-      });
+      toast.error(
+        error?.response?.data?.message || "Fleet Manager delete failed",
+        {
+          id: toastId,
+        }
+      );
     }
   };
 
@@ -95,7 +99,7 @@ export const AgentDetails = ({ agent }: IProps) => {
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle /> Go Home
+          <ArrowLeftCircle /> Go Back
         </Button>
       </div>
       <motion.div
@@ -165,19 +169,27 @@ export const AgentDetails = ({ agent }: IProps) => {
         <div className="p-6">
           <div className="mb-6 border-gray-200">
             <div className="flex flex-wrap justify-end gap-4">
-              {agent?.status !== "APPROVED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("APPROVED")}
-                  label="Approve"
-                  icon={<CheckIcon size={18} />}
-                  variant="success"
-                />
+              {agent?.status === "SUBMITTED" && (
+                <>
+                  <ActionButton
+                    onClick={() => setApproveStatus("APPROVED")}
+                    label="Approve"
+                    icon={<CheckIcon size={18} />}
+                    variant="success"
+                  />
+                  <ActionButton
+                    onClick={() => setApproveStatus("REJECTED")}
+                    label="Reject"
+                    icon={<XIcon size={18} />}
+                    variant="danger"
+                  />
+                </>
               )}
-              {agent?.status !== "REJECTED" && (
+              {!agent?.isDeleted && (
                 <ActionButton
-                  onClick={() => setApproveStatus("REJECTED")}
-                  label="Reject"
-                  icon={<XIcon size={18} />}
+                  onClick={() => setShowDeleteModal(true)}
+                  label="Delete"
+                  icon={<TrashIcon size={18} />}
                   variant="danger"
                 />
               )}
@@ -313,13 +325,13 @@ export const AgentDetails = ({ agent }: IProps) => {
         open={!!approveStatus}
         onOpenChange={closeApproveOrRejectModal}
         status={approveStatus as "APPROVED" | "REJECTED"}
-        userId={agent.userId}
+        userId={agent?.userId}
         userName={`${agent?.name?.firstName} ${agent?.name?.lastName}`}
       />
       <DeleteModal
         open={showDeleteModal}
         onOpenChange={closeDeleteModal}
-        onConfirm={deleteVendor}
+        onConfirm={deleteAgent}
       />
     </div>
   );

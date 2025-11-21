@@ -4,7 +4,11 @@ import ImagePreview from "@/components/AllDeliveryPartners/DeliveryPartnerDetail
 import InfoRow from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/InfoRow";
 import Section from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/Section";
 import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/StatusBadge";
+import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
+import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
+import { deleteDeliveryPartner } from "@/services/dashboard/deliveryPartner/deliveryPartner";
+import { TResponse } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import {
@@ -29,6 +33,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   partner: TDeliveryPartner;
@@ -40,6 +46,8 @@ const formatDate = (date: Date | undefined) => {
 };
 
 export const DeliveryPartnerDetails = ({ partner }: IProps) => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [approveStatus, setApproveStatus] = useState("");
   const router = useRouter();
   const fullName =
     `${partner.personalInfo?.Name?.firstName || ""} ${
@@ -59,6 +67,35 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
     }
   };
 
+  const closeApproveOrRejectModal = (open: boolean) => {
+    if (!open) {
+      setApproveStatus("");
+    }
+  };
+
+  const handleDeletePartner = async () => {
+    const toastId = toast.loading("Deleting Delivery Partner...");
+
+    try {
+      const result = (await deleteDeliveryPartner(
+        partner.userId
+      )) as TResponse<null>;
+
+      if (result.success) {
+        toast.success("Delivery Partner deleted successfully", { id: toastId });
+        setShowDeleteModal(false);
+        router.refresh();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message || "Delivery Partner deletion failed",
+        { id: toastId }
+      );
+    }
+  };
+
   return (
     <div>
       <div className="mb-4">
@@ -67,7 +104,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle /> Go Home
+          <ArrowLeftCircle /> Go Back
         </Button>
       </div>
       <motion.div
@@ -157,7 +194,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             )}
           </div>
           <div>
-            <StatusBadge status={partner.status} />
+            <StatusBadge
+              status={partner?.isDeleted ? "DELETED" : partner.status}
+            />
           </div>
         </div>
       </motion.div>
@@ -335,27 +374,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <Section title="Documents" icon={<FileText />}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
-            {partner.personalInfo?.idDocumentFront && (
+          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6">
+            {partner.documents?.idProof && (
               <div>
-                <div className="mb-2 text-gray-500 text-sm">
-                  ID Document Front
-                </div>
-                <ImagePreview
-                  url={partner.personalInfo.idDocumentFront}
-                  alt="ID Front"
-                />
-              </div>
-            )}
-            {partner.personalInfo?.idDocumentBack && (
-              <div>
-                <div className="mb-2 text-gray-500 text-sm">
-                  ID Document Back
-                </div>
-                <ImagePreview
-                  url={partner.personalInfo.idDocumentBack}
-                  alt="ID Back"
-                />
+                <div className="mb-2 text-gray-500 text-sm">ID Proof</div>
+                <ImagePreview url={partner.documents.idProof} alt="ID Proof" />
               </div>
             )}
             {partner.documents?.drivingLicense && (
@@ -494,7 +517,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                   <div
                     className={`w-4 h-4 rounded-full ${
                       partner.workPreferences?.hasEquipment?.isothermalBag
-                        ? "bg-green-500"
+                        ? "bg-[#DC3173]"
                         : "bg-gray-300"
                     }`}
                   ></div>
@@ -504,7 +527,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                   <div
                     className={`w-4 h-4 rounded-full ${
                       partner.workPreferences?.hasEquipment?.helmet
-                        ? "bg-green-500"
+                        ? "bg-[#DC3173]"
                         : "bg-gray-300"
                     }`}
                   ></div>
@@ -514,7 +537,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                   <div
                     className={`w-4 h-4 rounded-full ${
                       partner.workPreferences?.hasEquipment?.powerBank
-                        ? "bg-green-500"
+                        ? "bg-[#DC3173]"
                         : "bg-gray-300"
                     }`}
                   ></div>
@@ -566,23 +589,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <div className="mt-8 flex flex-wrap justify-end gap-3">
-          {/* {partner.status !== "SUBMITTED" && (
-            <motion.button
-              whileHover={{
-                scale: 1.05,
-              }}
-              whileTap={{
-                scale: 0.95,
-              }}
-              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] bg-opacity-10 text-white rounded-lg transition-all hover:bg-opacity-20"
-            >
-              <Edit className="w-4 h-4" />
-              <span>Edit</span>
-            </motion.button>
-          )} */}
           {partner.status === "SUBMITTED" && (
             <>
               <motion.button
+                onClick={() => setApproveStatus("APPROVED")}
                 whileHover={{
                   scale: 1.05,
                 }}
@@ -595,6 +605,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 <span>Approve</span>
               </motion.button>
               <motion.button
+                onClick={() => setApproveStatus("REJECTED")}
                 whileHover={{
                   scale: 1.05,
                 }}
@@ -608,20 +619,35 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               </motion.button>
             </>
           )}
-          <motion.button
-            whileHover={{
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-            className="flex items-center space-x-1 px-4 py-2 bg-red-500 bg-opacity-10 text-white rounded-lg transition-all hover:bg-opacity-20"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete</span>
-          </motion.button>
+          {!partner.isDeleted && (
+            <motion.button
+              onClick={() => setShowDeleteModal(true)}
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              className="flex items-center space-x-1 px-4 py-2 bg-red-500 bg-opacity-10 text-white rounded-lg transition-all hover:bg-opacity-20"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
+            </motion.button>
+          )}
         </div>
       </div>
+      <DeleteModal
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        onConfirm={handleDeletePartner}
+      />
+      <ApproveOrRejectModal
+        open={!!approveStatus}
+        onOpenChange={closeApproveOrRejectModal}
+        status={approveStatus as "APPROVED" | "REJECTED"}
+        userId={partner.userId}
+        userName={`${partner?.personalInfo?.Name?.firstName} ${partner?.personalInfo?.Name?.lastName}`}
+      />
     </div>
   );
 };

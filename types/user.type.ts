@@ -194,6 +194,5 @@ export type TUserQueryParams = {
   page?: number;
   limit?: number;
   searchTerm?: string;
-  // status?: string;
   sortBy?: string;
 };
