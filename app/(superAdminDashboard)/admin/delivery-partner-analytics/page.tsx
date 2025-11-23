@@ -258,7 +258,7 @@ export default function DeliveryPartnerAnalyticsPage() {
               const hours = new Array(24).fill(0);
               filtered.forEach(p => p.hourlyHeat.forEach((v,i)=> hours[i]+=v));
               return hours;
-            })()} heatColor={(v)=> heatColor(v, heatScale)} onCellClick={(hour, total) => {
+            })()} heatColor={(v)=> heatColor(v)} onCellClick={(hour, total) => {
               // open modal showing peak hour details (mock)
               if (!filtered.length) return;
               const best = filtered.sort((a,b)=> (b.hourlyHeat[hour]||0) - (a.hourlyHeat[hour]||0)).slice(0,6);

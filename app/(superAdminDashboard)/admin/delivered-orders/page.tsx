@@ -1,17 +1,10 @@
+
 "use client";
 
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Download, ChevronLeft, ChevronRight, X, Filter } from "lucide-react";
 
-// -----------------------------------------------------------------------------
-// Super Admin — Delivered Orders Page
-// Single-file React + TypeScript component for Next.js + TailwindCSS
-// - Responsive (table on wide screens, cards on mobile)
-// - Animated (Framer Motion) transitions
-// - Search, filter, pagination, CSV export, order details modal
-// - Mock data included — replace with real API fetch
-// -----------------------------------------------------------------------------
 
 type Order = {
   id: string;
@@ -103,7 +96,7 @@ export default function DeliveredOrdersPage() {
 
           <div className="flex items-center gap-2">
             <div className="relative hidden sm:flex items-center bg-white border rounded-lg px-3 py-1 shadow-sm">
-              <Search className="text-[#DC3173]" className="text-slate-400 mr-2" />
+              <Search  className="text-[#DC3173] text-slate-400 mr-2" />
               <input
                 value={query}
                 onChange={(e) => {

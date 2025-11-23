@@ -31,6 +31,7 @@ type LoginRecord = {
   timestamp: string; // ISO
   durationSec?: number; // session duration in seconds
   sessionId?: string;
+  action?: string;
 };
 
 const mock: LoginRecord[] = [

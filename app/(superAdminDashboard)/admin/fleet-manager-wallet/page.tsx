@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Optimized Fleet Manager Wallet Page — Glovo Level
-// File: app/admin/fleet-manager/fleet-manager-wallet/page.tsx
+
 
 'use client';
 
@@ -18,8 +17,6 @@ import {
   Search,
   Filter,
   Download,
-  ChevronDown,
-  User,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -33,7 +30,7 @@ type Transaction = {
   date: string;
   fleetManager: string;
   reason: string;
-  status: 'completed' | 'pending' | 'failed';
+  status: "pending" | "completed" | "failed" | "success" | "rejected";
   method: 'bank_transfer' | 'wallet_adjustment' | 'bonus' | 'deduction';
 };
 
@@ -44,8 +41,11 @@ export default function FleetManagerWalletPage() {
   const [filterType, setFilterType] = useState('all');
 
   useEffect(() => {
+  Promise.resolve().then(() => {
     setTransactions(mockWallet());
-  }, []);
+  });
+}, []);
+
 
   const filtered = transactions.filter((t) => {
     const matchesQuery = [t.fleetManager, t.id, t.reason].join(' ').toLowerCase().includes(query.toLowerCase());
@@ -162,14 +162,19 @@ function badgeVariant(status: string) {
 
 // ---------------------- Mock Wallet Data ----------------------
 function mockWallet(): Transaction[] {
+  const statuses = ['completed', 'pending', 'failed'] as const;
+  const managers = ['João Silva', 'Maria Fernandes', 'Rui Costa', 'Ana Pereira'] as const;
+  const reasons = ['Weekly Bonus', 'Penalty Deduction', 'Fuel Compensation', 'Payout Adjustment'] as const;
+  const methods = ['bank_transfer', 'wallet_adjustment', 'bonus', 'deduction'] as const;
+
   return Array.from({ length: 20 }).map((_, i) => ({
     id: `TRX-${2000 + i}`,
-    type: i % 2 === 0 ? 'credit' : 'debit',
+    type: i % 2 === 0 ? "credit" : "debit",
     amount: Math.floor(Math.random() * 500) + 50,
     date: new Date(Date.now() - i * 3600 * 1000 * 6).toISOString(),
-    fleetManager: ['João Silva', 'Maria Fernandes', 'Rui Costa', 'Ana Pereira'][i % 4],
-    reason: ['Weekly Bonus', 'Penalty Deduction', 'Fuel Compensation', 'Payout Adjustment'][i % 4],
-    status: ['completed', 'pending', 'failed'][i % 3],
-    method: ['bank_transfer', 'wallet_adjustment', 'bonus', 'deduction'][i % 4],
+    fleetManager: managers[i % 4],
+    reason: reasons[i % 4],
+    status: statuses[i % 3],
+    method: methods[i % 4],
   }));
 }

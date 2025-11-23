@@ -74,17 +74,17 @@ export default function CustomerFeedbackPremium() {
     a.href = url; a.download = `feedback_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
   }
 
-  function deleteFeedback(id: string) {
-    setData((p) => p.filter((x) => x.id !== id));
-    setConfirmDelete(null);
-    setSelected(null);
-  }
+  // function deleteFeedback(id: string) {
+  //   setData((p) => p.filter((x) => x.id !== id));
+  //   setConfirmDelete(null);
+  //   setSelected(null);
+  // }
 
-  function replyToFeedback(id: string, reply: string) {
-    // mock: mark replied
-    setData((p) => p.map((x) => (x.id === id ? { ...x, replied: true } : x)));
-    alert('Reply saved (mock): ' + reply);
-  }
+  // function replyToFeedback(id: string, reply: string) {
+  //   // mock: mark replied
+  //   setData((p) => p.map((x) => (x.id === id ? { ...x, replied: true } : x)));
+  //   alert('Reply saved (mock): ' + reply);
+  // }
 
   return (
     <div className="min-h-screen p-6 bg-slate-50">

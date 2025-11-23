@@ -32,6 +32,8 @@ type DisputeRow = {
 };
 
 // ---------------------- Sample Data (client-only placeholder) ----------------------
+const statuses = ["Open", "Resolved", "Pending Vendor", "Pending Customer"] as const;
+
 const sampleRows: DisputeRow[] = Array.from({ length: 42 }).map((_, i) => ({
   id: `DP-${4000 + i}`,
   date: `2025-11-${((i % 28) + 1).toString().padStart(2, "0")}`,
@@ -42,8 +44,9 @@ const sampleRows: DisputeRow[] = Array.from({ length: 42 }).map((_, i) => ({
   details: "Customer reported wrong item. Vendor claims packed correctly. Photos attached.",
   attachments: [],
   amount: Math.round((Math.random() * 50 + 5) * 100) / 100,
-  status: ["Open", "Resolved", "Pending Vendor", "Pending Customer"][i % 4],
+  status: statuses[i % 4],   // ← NOW it's literal union, NOT string
 }));
+
 
 // ---------------------- Helpers ----------------------
 const formatCurrency = (v: number) => `€${v.toFixed(2)}`;
@@ -280,8 +283,26 @@ export default function PaymentDisputesPage() {
                       <button onClick={() => openDetail(r)} className="px-3 py-1 rounded-md border text-sm">View</button>
                       {r.status !== 'Resolved' && (
                         <>
-                          <button onClick={() => setConfirmAction({ open: true, action: 'resolve' }) || setSelected(r)} className="px-3 py-1 rounded-md bg-green-50 text-green-800 text-sm">Resolve</button>
-                          <button onClick={() => setConfirmAction({ open: true, action: 'reject' }) || setSelected(r)} className="px-3 py-1 rounded-md bg-red-50 text-red-800 text-sm">Reject</button>
+                          <button 
+  onClick={() => {
+    setConfirmAction({ open: true, action: 'resolve' });
+    setSelected(r);
+  }}
+  className="px-3 py-1 rounded-md bg-green-50 text-green-800 text-sm"
+>
+  Resolve
+</button>
+
+<button 
+  onClick={() => {
+    setConfirmAction({ open: true, action: 'reject' });
+    setSelected(r);
+  }}
+  className="px-3 py-1 rounded-md bg-red-50 text-red-800 text-sm"
+>
+  Reject
+</button>
+
                         </>
                       )}
                     </div>

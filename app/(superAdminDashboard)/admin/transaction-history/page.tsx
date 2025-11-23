@@ -12,7 +12,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, JSX } from "react";
 import {
   Search,
   Calendar,
@@ -73,21 +73,19 @@ export default function TransactionHistoryPage(): JSX.Element {
 
   // Derived: apply preset to from/to when preset changes
   useEffect(() => {
-    const now = new Date();
+  const now = new Date();
+
+  Promise.resolve().then(() => {
     if (preset === "Last 7 days") {
       setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)));
       setTo(toISO(now));
     } else if (preset === "Last 30 days") {
       setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30)));
       setTo(toISO(now));
-    } else if (preset === "Last 90 days") {
-      setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 90)));
-      setTo(toISO(now));
-    } else if (preset === "Year to date") {
-      setFrom(`${now.getFullYear()}-01-01`);
-      setTo(toISO(now));
     }
-  }, [preset]);
+  });
+}, [preset]);
+
 
   // Filtered + sorted
   const filtered = useMemo(() => {
@@ -122,12 +120,19 @@ export default function TransactionHistoryPage(): JSX.Element {
   }, [rows, from, to, query, typeFilter, statusFilter, sortBy, sortDir]);
 
   // pagination
-  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-  useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages]);
-  const paginated = useMemo(() => {
-    const start = (page - 1) * perPage;
-    return filtered.slice(start, start + perPage);
-  }, [filtered, page, perPage]);
+const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+
+useEffect(() => {
+  Promise.resolve().then(() => {
+    if (page > totalPages) setPage(1);
+  });
+}, [totalPages, page]);
+
+const paginated = useMemo(() => {
+  const start = (page - 1) * perPage;
+  return filtered.slice(start, start + perPage);
+}, [filtered, page, perPage]);
+
 
   // summary values
   const inflow = filtered.filter(r => r.amount > 0 && r.type !== 'Payout').reduce((s, r) => s + r.amount, 0);

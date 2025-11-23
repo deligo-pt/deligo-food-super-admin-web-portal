@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useMemo, useState, useCallback, useEffect } from "react";
+import React, { useMemo, useState, useCallback, useEffect, JSX } from "react";
 import { motion } from "framer-motion";
 import {
   Truck,
@@ -165,14 +165,13 @@ export default function DriversPerformanceReport(): JSX.Element {
   // charts: zone and revenue-by-day like data
   const zoneChart = useMemo(() => zones.map((z) => ({ name: z, value: filtered.filter((o) => o.zone === z).length })), [zones, filtered]);
 
-  const revenueByDay = useMemo(() => {
+ /*  const revenueByDay = useMemo(() => {
     const map: Record<string, number> = {};
-    for (const o of filtered) map[o.date] = (map[o.date] || 0) + (o as any).amount || 0; // amount may be undefined for drivers example
-    // produce sorted list with safe values
+    for (const o of filtered) map[o.date] = (map[o.date] || 0) + (o as any).amount || 0; 
     return Object.keys(map)
       .sort()
       .map((d) => ({ date: d, revenue: +map[d].toFixed ? map[d].toFixed(2) : map[d] }));
-  }, [filtered]);
+  }, [filtered]); */
 
   // CSV export
   const exportCSV = useCallback(() => {
@@ -188,13 +187,16 @@ export default function DriversPerformanceReport(): JSX.Element {
   }, []);
 
   // reset page on filter changes
-  useEffect(() => setPage(1), [query, zoneFilter]);
+  useEffect(() => {
+  Promise.resolve().then(() => setPage(1));
+}, [query, zoneFilter]);
+
 
   // animation variants (framer-motion)
-  const barVariants = {
+/*   const barVariants = {
     hidden: { width: 0 },
     show: (w: number) => ({ width: `${w}%`, transition: { duration: 0.8, ease: "easeOut" } }),
-  };
+  }; */
 
   return (
     <div className="min-h-screen p-6 md:p-10 bg-gray-50 text-gray-900">

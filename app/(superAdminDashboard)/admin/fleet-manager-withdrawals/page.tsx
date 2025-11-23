@@ -66,8 +66,11 @@ export default function FleetManagerWithdrawalsPage() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   useEffect(() => {
+  Promise.resolve().then(() => {
     setWithdrawals(mockData());
-  }, []);
+  });
+}, []);
+
 
   // ---------- sort & filter ----------
   const sorted = [...withdrawals].sort((a, b) => {
@@ -200,11 +203,7 @@ export default function FleetManagerWithdrawalsPage() {
         </div>
       </Card>
 
-      {/* ---------------- DRAWER (DETAILS) ----------------
-          IMPORTANT:
-          - Drawer content is scrollable: `overflow-y-auto max-h-[100vh]`
-          - Padding at bottom to avoid clipped content
-      -------------------------------------------------- */}
+     
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <SheetContent className="w-full sm:max-w-md p-4 overflow-y-auto max-h-[100vh]">
           <SheetHeader>
@@ -348,14 +347,21 @@ function badgeVariant(status: Withdrawal['status']) {
 
 // ---------- mock data ----------
 function mockData(): Withdrawal[] {
+  const statuses = ['pending', 'approved', 'rejected'] as const;
+  const methods = ['bank_transfer', 'mbway', 'wallet_cashout'] as const;
+  const managers = ['João Silva', 'Maria Fernandes', 'Rui Costa', 'Ana Pereira'] as const;
+
   return Array.from({ length: 18 }).map((_, i) => ({
     id: `WD-${3000 + i}`,
-    fleetManager: ['João Silva', 'Maria Fernandes', 'Rui Costa', 'Ana Pereira'][i % 4],
+    fleetManager: managers[i % 4],
     amount: Math.floor(Math.random() * 800) + 50,
     requestedAt: new Date(Date.now() - i * 3600 * 1000 * 12).toISOString(),
-    status: ['pending', 'approved', 'rejected'][i % 3],
-    method: ['bank_transfer', 'mbway', 'wallet_cashout'][i % 3] as Withdrawal['method'],
+    status: statuses[i % 3],                 // ✔ now literal union
+    method: methods[i % 3],                  // ✔ safe union type
     iban: 'PT50 1234 5678 9101 2345 6',
-    documents: i % 3 === 0 ? [{ name: 'Bank Proof.pdf', url: undefined }] : [],
+    documents: i % 3 === 0
+      ? [{ name: 'Bank Proof.pdf', url: undefined }]
+      : [],
   }));
 }
+

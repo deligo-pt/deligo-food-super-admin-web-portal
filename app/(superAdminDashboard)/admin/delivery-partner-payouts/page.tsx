@@ -340,7 +340,8 @@ export default function DeliveryPartnerPayoutsPremium() {
                     <Checkbox
                       id="select-all-page"
                       checked={selectAllOnPage}
-                      onChange={(e) => setSelectAllOnPage(e)}
+                      onChange={(e) => setSelectAllOnPage((e.target as HTMLInputElement).checked)}
+
                       aria-label="Select all on page"
                     />
                   </th>
