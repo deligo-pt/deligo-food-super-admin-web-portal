@@ -17,7 +17,7 @@ import { resetPasswordValidation } from "@/validations/forgot-reset-password/for
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { CheckCircleIcon, Eye, EyeOff, LockIcon, Mail } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,9 +25,8 @@ import z from "zod";
 
 type ResetPasswordForm = z.infer<typeof resetPasswordValidation>;
 
-const ResetPasswordForm = () => {
+const ResetPasswordForm = ({ token }: { token: string }) => {
   const router = useRouter();
-  const token = useSearchParams()?.get("token") || "";
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const form = useForm<ResetPasswordForm>({

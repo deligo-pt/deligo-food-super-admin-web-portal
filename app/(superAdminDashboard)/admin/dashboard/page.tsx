@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Dashboard from "@/components/Dashboard/Dashboard";
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import AddProductCategory from "@/components/ProductCategories/AddProductCategory";
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";

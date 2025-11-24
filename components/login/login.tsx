@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -30,8 +30,11 @@ type LoginForm = {
   password: string;
 };
 
-export default function SuperAdminLoginPage() {
-  const redirect = useSearchParams()?.get("redirect");
+export default function SuperAdminLoginPage({
+  redirect,
+}: {
+  redirect?: string;
+}) {
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginValidation),
     defaultValues: {
