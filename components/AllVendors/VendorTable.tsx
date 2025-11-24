@@ -248,8 +248,7 @@ export default function VendorTable({ vendorsResult }: IProps) {
                               Approve
                             </DropdownMenuItem>
                           )}
-                          {(vendor.status === "PENDING" ||
-                            vendor.status === "SUBMITTED") && (
+                          {vendor.status === "SUBMITTED" && (
                             <DropdownMenuItem
                               className=""
                               onClick={() =>
@@ -263,18 +262,6 @@ export default function VendorTable({ vendorsResult }: IProps) {
                               Reject
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem
-                            className=""
-                            onClick={() =>
-                              setStatusInfo({
-                                vendorId: vendor.userId as string,
-                                status: "REJECTED",
-                                remarks: "",
-                              })
-                            }
-                          >
-                            Reject
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}

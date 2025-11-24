@@ -43,6 +43,8 @@ export const VendorDetails = ({ vendor }: IProps) => {
     }
   };
 
+  console.log(vendor);
+
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
       setShowDeleteModal(false);
@@ -92,7 +94,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
     <div className="p-4 md;px-6">
       <div className="mb-4">
         <Button
-          onClick={() => router.push("/admin/all-vandors")}
+          onClick={() => router.push("/admin/all-vendors")}
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
@@ -249,15 +251,15 @@ export const VendorDetails = ({ vendor }: IProps) => {
                 <div>
                   <p className="text-sm text-gray-500">Street Address</p>
                   <p className="font-medium">
-                    {vendor?.businessLocation.streetAddress},{" "}
-                    {vendor?.businessLocation.streetNumber}
+                    {vendor?.businessLocation.streetAddress || "N/A"},{" "}
+                    {vendor?.businessLocation.streetNumber || "N/A"}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">City & Postal Code</p>
                   <p className="font-medium">
-                    {vendor?.businessLocation.city},{" "}
-                    {vendor?.businessLocation.postalCode}
+                    {vendor?.businessLocation.city || "N/A"},{" "}
+                    {vendor?.businessLocation.postalCode || "N/A"}
                   </p>
                 </div>
               </div>
