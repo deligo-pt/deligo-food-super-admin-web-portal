@@ -32,7 +32,7 @@ export default function Topbar({ sidebarWidth = 280, admin }: Props) {
   const logOut = () => {
     removeCookie("accessToken");
     removeCookie("refreshToken");
-    router.push("/login");
+    router.push("/");
   };
 
   useEffect(() => {
