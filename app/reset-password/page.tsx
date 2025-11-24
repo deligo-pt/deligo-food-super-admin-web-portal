@@ -1,9 +1,9 @@
 import ResetPasswordForm from "@/components/FogotResetPassword/ResetPassword";
 
-export default function ResetPasswordPage({
+export default async function ResetPasswordPage({
   searchParams,
 }: {
-  searchParams: { token: string };
+  searchParams: Promise<{ token: string }>;
 }) {
-  return <ResetPasswordForm token={searchParams.token} />;
+  return <ResetPasswordForm token={(await searchParams).token} />;
 }

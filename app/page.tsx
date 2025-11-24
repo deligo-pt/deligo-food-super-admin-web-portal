@@ -1,13 +1,13 @@
 import SuperAdminLoginPage from "@/components/login/login";
 
-export default function Home({
+export default async function Home({
   searchParams,
 }: {
-  searchParams: { redirect: string };
+  searchParams: Promise<{ redirect: string }>;
 }) {
   return (
     <div className="min-h-screen">
-      <SuperAdminLoginPage redirect={searchParams?.redirect} />
+      <SuperAdminLoginPage redirect={(await searchParams)?.redirect} />
     </div>
   );
 }
