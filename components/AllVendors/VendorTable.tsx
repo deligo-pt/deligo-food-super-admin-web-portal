@@ -309,8 +309,7 @@ export default function VendorTable({ vendorsResult }: IProps) {
               <DialogHeader>
                 <DialogTitle>
                   {statusInfo.status === "APPROVED" ? "Approve" : "Reject"}{" "}
-                  {statusInfo?.vendorId}
-                  Vendor
+                  {statusInfo?.vendorId} Vendor
                 </DialogTitle>
                 <DialogDescription>
                   Let them know why you are{" "}

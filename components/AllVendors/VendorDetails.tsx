@@ -37,13 +37,13 @@ export const VendorDetails = ({ vendor }: IProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
 
+  console.log(vendor);
+
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
       setApproveStatus("");
     }
   };
-
-  console.log(vendor);
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -94,7 +94,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
     <div className="p-4 md;px-6">
       <div className="mb-4">
         <Button
-          onClick={() => router.push("/admin/all-vendors")}
+          onClick={() => router.back()}
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
@@ -310,7 +310,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
           </AgentOrVendorSection>
           <div className="mt-8 border-t pt-6 border-gray-200">
             <ActionButton
-              onClick={() => router.push("/admin/all-vendors")}
+              onClick={() => router.back()}
               label="Go Back"
               icon={<ArrowLeftCircle />}
               variant="primary"
