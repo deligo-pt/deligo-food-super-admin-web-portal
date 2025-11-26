@@ -19,7 +19,7 @@ export default async function PendingApprovalsPage({ searchParams }: IProps) {
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    status: "PENDING",
+    status: "SUBMITTED",
   };
 
   const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };
