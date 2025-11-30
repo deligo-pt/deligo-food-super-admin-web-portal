@@ -220,13 +220,11 @@ export default function DeliveryPartnerTable({
               deliveryPartnersResult?.data?.map((deliveryPartner) => (
                 <TableRow key={deliveryPartner?._id}>
                   <TableCell>
-                    {deliveryPartner?.personalInfo?.Name?.firstName}{" "}
-                    {deliveryPartner?.personalInfo?.Name?.lastName}
+                    {deliveryPartner?.name?.firstName}{" "}
+                    {deliveryPartner?.name?.lastName}
                   </TableCell>
                   <TableCell>{deliveryPartner?.email}</TableCell>
-                  <TableCell>
-                    {deliveryPartner?.personalInfo?.contactNumber}
-                  </TableCell>
+                  <TableCell>{deliveryPartner?.contactNumber}</TableCell>
                   <TableCell>
                     {deliveryPartner?.isDeleted
                       ? "DELETED"

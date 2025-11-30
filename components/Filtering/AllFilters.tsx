@@ -18,7 +18,7 @@ import { useState } from "react";
 
 interface IProps {
   sortOptions: { label: string; value: string }[];
-  filterOptions: {
+  filterOptions?: {
     label: string;
     key: string;
     placeholder: string;
@@ -29,10 +29,11 @@ interface IProps {
 
 export default function AllFilters({ sortOptions, filterOptions }: IProps) {
   const searchParams = useSearchParams();
-  const oldFilters = filterOptions.reduce((acc, option) => {
-    acc[option.key] = searchParams.get(option.key) || "";
-    return acc;
-  }, {} as Record<string, string>);
+  const oldFilters =
+    filterOptions?.reduce((acc, option) => {
+      acc[option.key] = searchParams.get(option.key) || "";
+      return acc;
+    }, {} as Record<string, string>) || {};
   const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] =
@@ -66,7 +67,7 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
 
   const clearAllFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
-    filterOptions.forEach((option) => {
+    filterOptions?.forEach((option) => {
       setParamFilters((prevFilters) => ({
         ...prevFilters,
         [option.key]: "",
@@ -92,27 +93,31 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
               placeholder="Sort By"
             />
           </div>
-          <Button
-            variant="outline"
-            className={`flex items-center ${
-              showFilters ||
-              Object.entries(paramFilters)?.filter((filter) => filter[1] !== "")
-                ?.length > 0
-                ? "border-[#DC3173] text-[#DC3173]"
-                : ""
-            }`}
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <SlidersHorizontal className="mr-2 h-4 w-4" />
-            Filters{" "}
-            {Object.entries(paramFilters)?.filter((filter) => filter[1] !== "")
-              ?.length || ""}
-          </Button>
+          {filterOptions && (
+            <Button
+              variant="outline"
+              className={`flex items-center ${
+                showFilters ||
+                Object.entries(paramFilters)?.filter(
+                  (filter) => filter[1] !== ""
+                )?.length > 0
+                  ? "border-[#DC3173] text-[#DC3173]"
+                  : ""
+              }`}
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <SlidersHorizontal className="mr-2 h-4 w-4" />
+              Filters{" "}
+              {Object.entries(paramFilters)?.filter(
+                (filter) => filter[1] !== ""
+              )?.length || ""}
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        {filterOptions.map((option, i) =>
+        {filterOptions?.map((option, i) =>
           paramFilters[option.key].length > 0 ? (
             <Badge
               key={i}
@@ -120,10 +125,12 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
               className="text-[#DC3173] border-[#DC3173]"
             >
               {paramFilters[option.key]}
-              <X
-                className="ml-2 h-4 w-4"
-                onClick={() => removeFilter(option.key)}
-              />
+              <span>
+                <X
+                  className="ml-2 h-4 w-4"
+                  onClick={() => removeFilter(option.key)}
+                />
+              </span>
             </Badge>
           ) : (
             ""

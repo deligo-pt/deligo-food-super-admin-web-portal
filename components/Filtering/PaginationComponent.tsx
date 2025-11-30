@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Pagination,
   PaginationContent,
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { usePagination } from "@/hooks/use-pagination";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
@@ -73,7 +74,11 @@ export default function PaginationComponent({
   };
 
   return (
-    <div className="lg:flex items-center justify-between gap-3 py-4 lg:py-0">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="lg:flex items-center justify-between gap-3 py-4 lg:py-0"
+    >
       <p
         className="text-muted-foreground flex-1 text-sm whitespace-nowrap text-center lg:text-left"
         aria-live="polite"
@@ -155,6 +160,6 @@ export default function PaginationComponent({
           </SelectContent>
         </Select>
       </div>
-    </div>
+    </motion.div>
   );
 }

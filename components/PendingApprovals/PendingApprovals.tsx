@@ -1,5 +1,6 @@
 "use client";
 
+import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,7 +13,6 @@ import { Card } from "@/components/ui/card";
 //   DialogHeader,
 //   DialogTitle,
 // } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 // import { Separator } from "@/components/ui/separator";
 import {
   Table,
@@ -30,7 +30,6 @@ import {
   Eye,
   FileText,
   MapPin,
-  Search,
   Store,
   User,
   XCircle,
@@ -56,9 +55,16 @@ interface IProps {
   vendorsResult: { data: TVendor[]; meta?: TMeta };
 }
 
+const sortOptions = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Oldest First", value: "createdAt" },
+  { label: "Name (A-Z)", value: "name.firstName" },
+  { label: "Name (Z-A)", value: "-name.lastName" },
+];
+
 export default function PendingApprovals({ vendorsResult }: IProps) {
   //   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [query, setQuery] = useState("");
+  // const [query, setQuery] = useState("");
   //   const [selected, setSelected] = useState<Vendor | null>(null);
   //   const [loading, setLoading] = useState(false);
   //   const [page, setPage] = useState(1);
@@ -125,7 +131,7 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          {/* <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="relative w-full max-w-md">
               <Input
                 value={query}
@@ -161,8 +167,10 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
             >
               Reset
             </Button>
-          </div>
+          </div> */}
         </div>
+
+        <AllFilters sortOptions={sortOptions} />
 
         {/* Summary Cards */}
         <motion.div
@@ -202,7 +210,7 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
               </div> */}
               <h2 className="font-medium text-lg flex items-center gap-2 mb-4">
                 <Clock className="w-4 h-4" />
-                {vendorsResult?.meta?.total || 0} Pending Approvals
+                Pending Approvals: {vendorsResult?.meta?.total || 0}
               </h2>
 
               <div className="overflow-auto rounded-md border">

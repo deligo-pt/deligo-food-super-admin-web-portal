@@ -50,9 +50,8 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   const [approveStatus, setApproveStatus] = useState("");
   const router = useRouter();
   const fullName =
-    `${partner.personalInfo?.Name?.firstName || ""} ${
-      partner.personalInfo?.Name?.lastName || ""
-    }`.trim() || "No Name Provided";
+    `${partner.name?.firstName || ""} ${partner.name?.lastName || ""}`.trim() ||
+    "No Name Provided";
 
   const getVehicleIcon = () => {
     switch (partner.vehicleInfo?.vehicleType) {
@@ -100,7 +99,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
     <div>
       <div className="mb-4">
         <Button
-          onClick={() => router.push("/admin/all-delivery-partners")}
+          onClick={() => router.back()}
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
@@ -171,7 +170,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               <Mail className="w-4 h-4" />
               <span className="text-sm">{partner.email}</span>
             </motion.div>
-            {partner.personalInfo?.contactNumber && (
+            {partner?.contactNumber && (
               <motion.div
                 initial={{
                   opacity: 0,
@@ -187,9 +186,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 className="flex items-center space-x-1 text-white/80"
               >
                 <Phone className="w-4 h-4" />
-                <span className="text-sm">
-                  {partner.personalInfo.contactNumber}
-                </span>
+                <span className="text-sm">{partner.contactNumber}</span>
               </motion.div>
             )}
           </div>
@@ -208,7 +205,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               <InfoRow label="Email" value={partner.email} />
               <InfoRow
                 label="Contact Number"
-                value={partner.personalInfo?.contactNumber || "N/A"}
+                value={partner?.contactNumber || "N/A"}
               />
               <InfoRow
                 label="Gender"
@@ -250,25 +247,19 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             <div>
               <InfoRow
                 label="Street"
-                value={partner.personalInfo?.address?.street || "N/A"}
+                value={partner.address?.street || "N/A"}
               />
-              <InfoRow
-                label="City"
-                value={partner.personalInfo?.address?.city || "N/A"}
-              />
+              <InfoRow label="City" value={partner.address?.city || "N/A"} />
             </div>
             <div>
-              <InfoRow
-                label="State"
-                value={partner.personalInfo?.address?.state || "N/A"}
-              />
+              <InfoRow label="State" value={partner.address?.state || "N/A"} />
               <InfoRow
                 label="Country"
-                value={partner.personalInfo?.address?.country || "N/A"}
+                value={partner.address?.country || "N/A"}
               />
               <InfoRow
                 label="Zip Code"
-                value={partner.personalInfo?.address?.zipCode || "N/A"}
+                value={partner.address?.postalCode || "N/A"}
               />
             </div>
           </div>
@@ -375,10 +366,22 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         </Section>
         <Section title="Documents" icon={<FileText />}>
           <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6">
-            {partner.documents?.idProof && (
+            {partner.documents?.idDocumentFront && (
               <div>
-                <div className="mb-2 text-gray-500 text-sm">ID Proof</div>
-                <ImagePreview url={partner.documents.idProof} alt="ID Proof" />
+                <div className="mb-2 text-gray-500 text-sm">ID Proof Front</div>
+                <ImagePreview
+                  url={partner.documents.idDocumentFront}
+                  alt="ID Proof Front"
+                />
+              </div>
+            )}
+            {partner.documents?.idDocumentBack && (
+              <div>
+                <div className="mb-2 text-gray-500 text-sm">ID Proof Back</div>
+                <ImagePreview
+                  url={partner.documents.idDocumentBack}
+                  alt="ID Proof Back"
+                />
               </div>
             )}
             {partner.documents?.drivingLicense && (
@@ -571,20 +574,6 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               {partner.remarks && (
                 <InfoRow label="Remarks" value={partner.remarks} />
               )}
-              <InfoRow
-                label="Two Factor Authentication"
-                value={
-                  <span
-                    className={`px-2 py-0.5 rounded text-xs ${
-                      partner.twoFactorEnabled
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {partner.twoFactorEnabled ? "Enabled" : "Disabled"}
-                  </span>
-                }
-              />
             </div>
           </div>
         </Section>
@@ -646,7 +635,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         onOpenChange={closeApproveOrRejectModal}
         status={approveStatus as "APPROVED" | "REJECTED"}
         userId={partner.userId}
-        userName={`${partner?.personalInfo?.Name?.firstName} ${partner?.personalInfo?.Name?.lastName}`}
+        userName={`${partner?.name?.firstName} ${partner?.name?.lastName}`}
       />
     </div>
   );
