@@ -22,7 +22,7 @@ import { toast } from "sonner";
 interface IProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  status: "APPROVED" | "REJECTED";
+  status: "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED";
   userName: string;
   userId: string;
 }
@@ -40,11 +40,17 @@ export default function ApproveOrRejectModal({
   const approveOrReject = async (e: React.FormEvent) => {
     e.preventDefault();
     const toastId = toast.loading(
-      status === "APPROVED" ? "Approving..." : "Rejecting..."
+      status === "APPROVED"
+        ? "Approving..."
+        : status === "REJECTED"
+        ? "Rejecting..."
+        : status === "BLOCKED"
+        ? "Blocking..."
+        : "Unblocking..."
     );
     try {
       const updateStatus = {
-        status,
+        status: status === "UNBLOCKED" ? "APPROVED" : status,
         remarks,
       };
       const result = (await updateData(
@@ -61,7 +67,11 @@ export default function ApproveOrRejectModal({
         toast.success(
           status === "APPROVED"
             ? "Approved successfully!"
-            : "Rejected successfully!",
+            : status === "REJECTED"
+            ? "Rejected successfully!"
+            : status === "BLOCKED"
+            ? "Blocked successfully!"
+            : "Unblocked successfully!",
           { id: toastId }
         );
         router.refresh();
@@ -71,7 +81,13 @@ export default function ApproveOrRejectModal({
       console.log(error);
       toast.error(
         error?.response?.data?.message ||
-          (status === "APPROVED" ? "Approving failed" : "Rejecting failed"),
+          (status === "APPROVED"
+            ? "Approving failed"
+            : status === "REJECTED"
+            ? "Rejecting failed"
+            : status === "BLOCKED"
+            ? "Blocking failed"
+            : "Unblocking failed"),
         { id: toastId }
       );
     }
@@ -83,11 +99,16 @@ export default function ApproveOrRejectModal({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {status === "APPROVED" ? "Approve" : "Reject"} {userName}
+              {status === "APPROVED" && "Approve"}
+              {status === "REJECTED" && "Reject"}
+              {status === "BLOCKED" && "Block"}
+              {status === "UNBLOCKED" && "Unblock"} {userName}
             </DialogTitle>
             <DialogDescription>
-              Let them know why you are{" "}
-              {status === "APPROVED" ? "approving" : "rejecting"}
+              Let them know why you are {status === "APPROVED" && "approving"}
+              {status === "REJECTED" && "rejecting"}
+              {status === "BLOCKED" && "blocking"}
+              {status === "UNBLOCKED" && "unblocking"}
             </DialogDescription>
           </DialogHeader>
           <form
@@ -108,7 +129,7 @@ export default function ApproveOrRejectModal({
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            {status === "APPROVED" ? (
+            {status === "APPROVED" && (
               <Button
                 form="remarksForm"
                 type="submit"
@@ -116,9 +137,28 @@ export default function ApproveOrRejectModal({
               >
                 Approve
               </Button>
-            ) : (
+            )}
+            {status === "REJECTED" && (
               <Button form="remarksForm" type="submit" variant="destructive">
                 Reject
+              </Button>
+            )}
+            {status === "BLOCKED" && (
+              <Button
+                form="remarksForm"
+                type="submit"
+                className="bg-yellow-500 hover:bg-yellow-600"
+              >
+                Block
+              </Button>
+            )}
+            {status === "UNBLOCKED" && (
+              <Button
+                form="remarksForm"
+                type="submit"
+                className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+              >
+                Unblock
               </Button>
             )}
           </DialogFooter>

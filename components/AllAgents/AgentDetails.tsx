@@ -14,6 +14,7 @@ import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
+  BanIcon,
   BriefcaseIcon,
   BuildingIcon,
   CheckIcon,
@@ -95,7 +96,7 @@ export const AgentDetails = ({ agent }: IProps) => {
     <div className="p-4 md;px-6">
       <div className="mb-4">
         <Button
-          onClick={() => router.push("/admin/all-fleet-managers")}
+          onClick={() => router.back()}
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
@@ -185,6 +186,22 @@ export const AgentDetails = ({ agent }: IProps) => {
                   />
                 </>
               )}
+              {agent?.status === "APPROVED" && (
+                <ActionButton
+                  onClick={() => setApproveStatus("BLOCKED")}
+                  label="Block"
+                  icon={<BanIcon size={18} />}
+                  variant="warning"
+                />
+              )}
+              {agent?.status === "BLOCKED" && (
+                <ActionButton
+                  onClick={() => setApproveStatus("UNBLOCKED")}
+                  label="Unblock"
+                  icon={<CheckIcon size={18} />}
+                  variant="primary"
+                />
+              )}
               {!agent?.isDeleted && (
                 <ActionButton
                   onClick={() => setShowDeleteModal(true)}
@@ -254,15 +271,31 @@ export const AgentDetails = ({ agent }: IProps) => {
                 <div>
                   <p className="text-sm text-gray-500">Street Address</p>
                   <p className="font-medium">
-                    {agent?.businessLocation.streetAddress},{" "}
-                    {agent?.businessLocation.streetNumber}
+                    {agent?.businessLocation.street || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">City & Postal Code</p>
+                  <p className="text-sm text-gray-500">Postal Code</p>
                   <p className="font-medium">
-                    {agent?.businessLocation.city},{" "}
-                    {agent?.businessLocation.postalCode}
+                    {agent?.businessLocation.postalCode || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">City</p>
+                  <p className="font-medium">
+                    {agent?.businessLocation.city || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">State</p>
+                  <p className="font-medium">
+                    {agent?.businessLocation.state || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Country</p>
+                  <p className="font-medium">
+                    {agent?.businessLocation.country || "N/A"}
                   </p>
                 </div>
               </div>

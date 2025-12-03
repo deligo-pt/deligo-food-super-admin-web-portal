@@ -20,6 +20,7 @@ export default async function ActiveVendorsPage({ searchParams }: IProps) {
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
     status: "APPROVED",
+    isDeleted: false,
   };
 
   const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };

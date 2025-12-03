@@ -13,6 +13,7 @@ import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
+  Ban,
   Bike,
   Briefcase,
   CalendarClock,
@@ -608,6 +609,36 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               </motion.button>
             </>
           )}
+          {partner.status === "APPROVED" && (
+            <motion.button
+              onClick={() => setApproveStatus("BLOCKED")}
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              className="flex items-center space-x-1 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-sm hover:bg-yellow-600"
+            >
+              <Ban className="w-4 h-4" />
+              <span>Block</span>
+            </motion.button>
+          )}
+          {partner.status === "BLOCKED" && (
+            <motion.button
+              onClick={() => setApproveStatus("UNBLOCKED")}
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+            >
+              <Check className="w-4 h-4" />
+              <span>Unblock</span>
+            </motion.button>
+          )}
           {!partner.isDeleted && (
             <motion.button
               onClick={() => setShowDeleteModal(true)}
@@ -625,15 +656,19 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           )}
         </div>
       </div>
+
       <DeleteModal
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
         onConfirm={handleDeletePartner}
       />
+
       <ApproveOrRejectModal
         open={!!approveStatus}
         onOpenChange={closeApproveOrRejectModal}
-        status={approveStatus as "APPROVED" | "REJECTED"}
+        status={
+          approveStatus as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
         userId={partner.userId}
         userName={`${partner?.name?.firstName} ${partner?.name?.lastName}`}
       />

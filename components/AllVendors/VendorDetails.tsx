@@ -14,6 +14,7 @@ import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
+  BanIcon,
   BriefcaseIcon,
   BuildingIcon,
   CheckIcon,
@@ -36,8 +37,6 @@ export const VendorDetails = ({ vendor }: IProps) => {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
-
-  console.log(vendor);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -181,7 +180,23 @@ export const VendorDetails = ({ vendor }: IProps) => {
                   onClick={() => setApproveStatus("REJECTED")}
                   label="Reject"
                   icon={<XIcon size={18} />}
-                  variant="danger"
+                  variant="warning"
+                />
+              )}
+              {vendor.status === "APPROVED" && (
+                <ActionButton
+                  onClick={() => setApproveStatus("BLOCKED")}
+                  label="Block"
+                  icon={<BanIcon size={18} />}
+                  variant="warning"
+                />
+              )}
+              {vendor.status === "BLOCKED" && (
+                <ActionButton
+                  onClick={() => setApproveStatus("UNBLOCKED")}
+                  label="Unblock"
+                  icon={<CheckIcon size={18} />}
+                  variant="primary"
                 />
               )}
               <ActionButton
@@ -239,6 +254,42 @@ export const VendorDetails = ({ vendor }: IProps) => {
                   {vendor?.businessDetails?.businessLicenseNumber || "N/A"}
                 </p>
               </div>
+              <div>
+                <p className="text-sm text-gray-500">NIF Number</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.NIF || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Business Type</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.businessType || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Total Branches</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.totalBranches || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Opening Hours</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.openingHours || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Closing Hours</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.closingHours || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Closing Days</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.closingDays || "N/A"}
+                </p>
+              </div>
             </div>
           </AgentOrVendorSection>
           <AgentOrVendorSection
@@ -251,15 +302,31 @@ export const VendorDetails = ({ vendor }: IProps) => {
                 <div>
                   <p className="text-sm text-gray-500">Street Address</p>
                   <p className="font-medium">
-                    {vendor?.businessLocation.streetAddress || "N/A"},{" "}
-                    {vendor?.businessLocation.streetNumber || "N/A"}
+                    {vendor?.businessLocation.street || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">City & Postal Code</p>
+                  <p className="text-sm text-gray-500">Postal Code</p>
                   <p className="font-medium">
-                    {vendor?.businessLocation.city || "N/A"},{" "}
                     {vendor?.businessLocation.postalCode || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">City</p>
+                  <p className="font-medium">
+                    {vendor?.businessLocation.city || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">State</p>
+                  <p className="font-medium">
+                    {vendor?.businessLocation.state || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Country</p>
+                  <p className="font-medium">
+                    {vendor?.businessLocation.country || "N/A"}
                   </p>
                 </div>
               </div>
@@ -308,20 +375,14 @@ export const VendorDetails = ({ vendor }: IProps) => {
               <VendorDetailsDoc documents={vendor?.documents} />
             </div>
           </AgentOrVendorSection>
-          <div className="mt-8 border-t pt-6 border-gray-200">
-            <ActionButton
-              onClick={() => router.back()}
-              label="Go Back"
-              icon={<ArrowLeftCircle />}
-              variant="primary"
-            />
-          </div>
         </div>
       </motion.div>
       <ApproveOrRejectModal
         open={!!approveStatus}
         onOpenChange={closeApproveOrRejectModal}
-        status={approveStatus as "APPROVED" | "REJECTED"}
+        status={
+          approveStatus as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
         userId={vendor.userId}
         userName={`${vendor?.name?.firstName} ${vendor?.name?.lastName}`}
       />

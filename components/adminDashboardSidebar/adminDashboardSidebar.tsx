@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Grid,
-  Home,
   LayoutDashboard,
   LayoutList,
   Menu,
@@ -34,11 +33,271 @@ import Image from "next/image";
 
 const PRIMARY = "#DC3173";
 
+const MENU = [
+  {
+    id: "dashboard",
+    title: "Dashboard",
+    icon: <LayoutDashboard size={18} />,
+    path: "/admin/dashboard",
+  },
+  {
+    id: "vendors",
+    title: "Vendors",
+    icon: <Utensils size={18} />,
+    items: [
+      { name: "All vendors", path: "/admin/all-vendors" },
+      { name: "Pending Approvals", path: "/admin/pending-approvals" },
+      { name: "Active Vendors", path: "/admin/active-vendors" },
+      { name: "Suspended Vendors", path: "/admin/suspended-vendors" },
+      { name: "Add New Vendor", path: "/admin/add-vendor" },
+      { name: "Vendor Payouts", path: "/admin/vendor-payouts" },
+    ],
+  },
+  {
+    id: "fleets",
+    title: "Fleet Managers",
+    icon: <Users size={18} />,
+    items: [
+      { name: "All Fleet Managers", path: "/admin/all-fleet-managers" },
+      { name: "Add New Fleet Manager", path: "/admin/add-fleet-manager" },
+      { name: "Fleet Manager Wallet", path: "/admin/fleet-manager-wallet" },
+      { name: "Payout Requests", path: "/admin/fleet-manager-withdrawals" },
+      { name: "Zones & Coverage Areas", path: "/admin/fleet-zones" },
+      { name: "Fleet Performance Analytics", path: "/admin/fleet-performance" },
+      { name: "Activity Logs", path: "/admin/fleet-activity-logs" },
+      { name: "In-App Notifications", path: "/admin/send-notification-fleet" },
+      {
+        name: "Suspended / Blocked Fleet Managers",
+        path: "/admin/blocked-fleet-managers",
+      },
+    ],
+  },
+  {
+    id: "customers",
+    title: "Customers",
+    icon: <Users size={18} />,
+    items: [
+      { name: "All Customers", path: "/admin/all-customers" },
+      { name: "Active Customers", path: "/admin/active-customers" },
+      { name: "Blocked Customers", path: "/admin/blocked-customers" },
+      { name: "Customer Feedback", path: "/admin/customer-feedback" },
+      { name: "Customer Orders", path: "/admin/customer-orders" },
+    ],
+  },
+  {
+    id: "driverss",
+    title: "Delivery Partners",
+    icon: <Bike size={18} />,
+    items: [
+      { name: "All Delivery Partners", path: "/admin/all-delivery-partners" },
+      {
+        name: "Delivery Partner Onboarding Requests",
+        path: "/admin/delivery-partner-onboarding-requests",
+      },
+      {
+        name: "Active Delivery Partners",
+        path: "/admin/active-delivery-partners",
+      },
+      {
+        name: "Suspended Delivery Partners",
+        path: "/admin/suspended-delivery-partners",
+      },
+      {
+        name: "Delivery Partner Performance",
+        path: "/admin/delivery-partner-performance",
+      },
+      {
+        name: "Delivery Partner Payouts",
+        path: "/admin/delivery-partner-payouts",
+      },
+      {
+        name: "Delivery Partner Analytics",
+        path: "/admin/delivery-partner-analytics",
+      },
+    ],
+  },
+  {
+    id: "business-categories",
+    title: "Business Categories",
+    icon: <Grid size={18} />,
+    items: [
+      {
+        name: "Add Business Categories",
+        path: "/admin/business-categories/add",
+      },
+      { name: "All Business Categories", path: "/admin/business-categories" },
+    ],
+  },
+  {
+    id: "product-categories",
+    title: "Product Categories",
+    icon: <SquareChartGantt size={18} />,
+    items: [
+      {
+        name: "Add Product Categories",
+        path: "/admin/product-categories/add",
+      },
+      { name: "All Product Categories", path: "/admin/product-categories" },
+    ],
+  },
+  {
+    id: "products",
+    title: "All Products",
+    icon: <LayoutList size={18} />,
+    items: [{ name: "All Products", path: "/admin/all-products" }],
+  },
+  {
+    id: "orders",
+    title: "Orders Management",
+    icon: <ShoppingBag size={18} />,
+    items: [
+      { name: "All Orders", path: "/admin/all-orders" },
+      { name: "Pending Orders", path: "/admin/pending-orders" },
+      { name: "Preparing Orders", path: "/admin/preparing-orders" },
+      { name: "On the Way Orders", path: "/admin/on-the-way-orders" },
+      { name: "Delivered Orders", path: "/admin/delivered-orders" },
+      { name: "Cancelled Orders", path: "/admin/cancelled-orders" },
+      { name: "Refund Requests", path: "/admin/refund-requests" },
+    ],
+  },
+  {
+    id: "payments-earnings",
+    title: "Payments & Earnings",
+    icon: <BadgeEuro size={18} />,
+    items: [
+      { name: "Platform Earnings", path: "/admin/platform-earnings" },
+      { name: "Vendor Payouts", path: "/admin/vendor-payouts" },
+      { name: "Driver Payouts", path: "/admin/driver-payouts" },
+      { name: "Transaction History", path: "/admin/transaction-history" },
+      { name: "Payment Disputes", path: "/admin/payment-disputes" },
+      { name: "Tax Management", path: "/admin/tax-management" },
+    ],
+  },
+  {
+    id: "inventory-control",
+    title: "Inventory & Menu Control",
+    icon: <Package size={18} />,
+    items: [
+      { name: "All Items", path: "/admin/all-products" },
+      { name: "Out-of-Stock Alerts", path: "/admin/out-of-stock-alerts" },
+      { name: "Restricted Items", path: "/admin/restricted-items" },
+    ],
+  },
+  {
+    id: "promotions-and-coupons",
+    title: "Promotions & Coupons",
+    icon: <Ticket size={18} />,
+    items: [
+      { name: "Active Campaigns", path: "/admin/active-campaigns" },
+      { name: "Create New Offer", path: "/admin/create-new-offer" },
+      { name: "Coupon Analytics", path: "/admin/coupon-analytics" },
+    ],
+  },
+  {
+    id: "analytics-and-insights",
+    title: "Analytics & Insights",
+    icon: <ChartNoAxesCombined size={18} />,
+    items: [
+      { name: "Sales Analytics", path: "/admin/sales-analytics" },
+      { name: "Delivery Insights", path: "/admin/delivery-insights" },
+      { name: "Customer Insights", path: "/admin/customer-insights" },
+      { name: "Top Vendors", path: "/admin/top-vendors" },
+      { name: "Peak Hours Analysis", path: "/admin/peak-hours-analysis" },
+    ],
+  },
+  {
+    id: "system-management",
+    title: "System Management",
+    icon: <ToolCase size={18} />,
+    items: [
+      {
+        name: "Email & Notification Settings",
+        path: "/admin/email-notification-settings",
+      },
+      { name: "Maintenance Mode", path: "/admin/maintenance-mode" },
+    ],
+  },
+  {
+    id: "admin-management",
+    title: "Admin Management",
+    icon: <ShieldUser size={18} />,
+    items: [
+      { name: "All Admins", path: "/admin/all-admins" },
+      { name: "Roles & Permissions", path: "/admin/roles-permissions" },
+      { name: "Activity Logs", path: "/admin/activity-logs" },
+      { name: "Login History", path: "/admin/login-history" },
+    ],
+  },
+  {
+    id: "support-communication",
+    title: "Support & Communication",
+    icon: <MessageCircleMore size={18} />,
+    items: [
+      { name: "Support Tickets", path: "/admin/support-tickets" },
+      { name: "Chat With Vendors", path: "/admin/chat-with-vendors" },
+      { name: "Chat With Drivers", path: "/admin/chat-with-drivers" },
+      { name: "Chat With Customers", path: "/admin/chat-with-customers" },
+    ],
+  },
+  {
+    id: "reports",
+    title: "Reports",
+    icon: <NotepadText size={18} />,
+    items: [
+      { name: "Sales Report", path: "/admin/sales-report" },
+      { name: "Order Report", path: "/admin/order-report" },
+      {
+        name: "Driver Performance Report",
+        path: "/admin/drivers-performance-report",
+      },
+      { name: "Vendor Report", path: "/admin/vendor-report" },
+    ],
+  },
+
+  {
+    id: "settings",
+    title: "Settings",
+    icon: <Settings size={18} />,
+    items: [
+      { name: "Business Info", path: "/admin/business-info" },
+      { name: "Branding & Theme", path: "/admin/branding-theme" },
+      {
+        name: "Localization (Language & Currency)",
+        path: "/admin/localization",
+      },
+      {
+        name: "Notification Preferences",
+        path: "/admin/notification-preferences",
+      },
+      {
+        name: "Legal Documents (Terms, Privacy)",
+        path: "/admin/legal-documents",
+      },
+    ],
+  },
+  {
+    id: "sos",
+    title: "SOS / Emergency",
+    icon: <AlertCircle size={18} />,
+    items: [
+      { name: "Critical Alerts", path: "/admin/critical-alerts" },
+      { name: "Contact Support Team", path: "/admin/contact-support-team" },
+      { name: "System Health Status", path: "/admin/system-health-status" },
+    ],
+  },
+];
+
 export default function Sidebar() {
+  const pathname = usePathname();
+  const currentMenuId = MENU.find((menu) =>
+    menu.items?.some((item) => item.path === pathname)
+  )?.id;
+
   const [open, setOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const pathname = usePathname();
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({
+    ...(currentMenuId ? { [currentMenuId]: true } : {}),
+  });
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -47,258 +306,6 @@ export default function Sidebar() {
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "auto";
   }, [mobileOpen]);
-
-  const MENU = [
-    {
-      id: "dashboard",
-      title: "Dashboard",
-      icon: <LayoutDashboard size={18} />,
-      path: "/admin/dashboard",
-    },
-    {
-      id: "vendors",
-      title: "Vendors",
-      icon: <Utensils size={18} />,
-      items: [
-        { name: "All vendors", path: "/admin/all-vendors" },
-        { name: "Pending Approvals", path: "/admin/pending-approvals" },
-        { name: "Active Vendors", path: "/admin/active-vendors" },
-        { name: "Suspended Vendors", path: "/admin/suspended-vendors" },
-        { name: "Add New Vendor", path: "/admin/add-vendor" },
-        { name: "Vendor Payouts", path: "/admin/vendor-payouts" },
-        
-      ],
-    },
-    {
-      id: "fleets",
-      title: "Fleet Managers",
-      icon: <Users size={18} />,
-      items: [
-        { name: "All Fleet Managers", path: "/admin/all-fleet-managers" },
-        { name: "Add New Fleet Manager", path: "/admin/add-fleet-manager" },
-        { name: "Fleet Manager Wallet", path: "/admin/fleet-manager-wallet" },
-        { name: "Payout Requests", path: "/admin/fleet-manager-withdrawals" },
-        { name: "Zones & Coverage Areas", path: "/admin/fleet-zones" },
-        { name: "Fleet Performance Analytics", path: "/admin/fleet-performance" },
-        { name: "Activity Logs", path: "/admin/fleet-activity-logs" },
-        { name: "In-App Notifications", path: "/admin/send-notification-fleet" },
-        { name: "Suspended / Blocked Fleet Managers", path: "/admin/blocked-fleet-managers" },
-      ],
-    },
-    {
-      id: "customers",
-      title: "Customers",
-      icon: <Users size={18} />,
-      items: [
-        { name: "All Customers", path: "/admin/all-customers" },
-        { name: "Active Customers", path: "/admin/active-customers" },
-        { name: "Blocked Customers", path: "/admin/blocked-customers" },
-        { name: "Customer Feedback", path: "/admin/customer-feedback" },
-        { name: "Customer Orders", path: "/admin/customer-orders" },
-      ],
-    },
-    {
-      id: "driverss",
-      title: "Delivery Partners",
-      icon: <Bike size={18} />,
-      items: [
-        { name: "All Delivery Partners", path: "/admin/all-delivery-partners" },
-        {
-          name: "Delivery Partner Onboarding Requests",
-          path: "/admin/delivery-partner-onboarding-requests",
-        },
-        {
-          name: "Active Delivery Partners",
-          path: "/admin/active-delivery-partners",
-        },
-        {
-          name: "Suspended Delivery Partners",
-          path: "/admin/suspended-delivery-partners",
-        },
-        {
-          name: "Delivery Partner Performance",
-          path: "/admin/delivery-partner-performance",
-        },
-        {
-          name: "Delivery Partner Payouts",
-          path: "/admin/delivery-partner-payouts",
-        },
-        {
-          name: "Delivery Partner Analytics",
-          path: "/admin/delivery-partner-analytics",
-        },
-      ],
-    },
-    {
-      id: "business-categories",
-      title: "Business Categories",
-      icon: <Grid size={18} />,
-      items: [
-        {
-          name: "Add Business Categories",
-          path: "/admin/business-categories/add",
-        },
-        { name: "All Business Categories", path: "/admin/business-categories" },
-      ],
-    },
-    {
-      id: "product-categories",
-      title: "Product Categories",
-      icon: <SquareChartGantt size={18} />,
-      items: [
-        {
-          name: "Add Product Categories",
-          path: "/admin/product-categories/add",
-        },
-        { name: "All Product Categories", path: "/admin/product-categories" },
-      ],
-    },
-    {
-      id: "products",
-      title: "All Products",
-      icon: <LayoutList size={18} />,
-      items: [{ name: "All Products", path: "/admin/all-products" }],
-    },
-    {
-      id: "orders",
-      title: "Orders Management",
-      icon: <ShoppingBag size={18} />,
-      items: [
-        { name: "All Orders", path: "/admin/all-orders" },
-        { name: "Pending Orders", path: "/admin/pending-orders" },
-        { name: "Preparing Orders", path: "/admin/preparing-orders" },
-        { name: "On the Way Orders", path: "/admin/on-the-way-orders" },
-        { name: "Delivered Orders", path: "/admin/delivered-orders" },
-        { name: "Cancelled Orders", path: "/admin/cancelled-orders" },
-        { name: "Refund Requests", path: "/admin/refund-requests" },
-      ],
-    },
-    {
-      id: "payments-earnings",
-      title: "Payments & Earnings",
-      icon: <BadgeEuro size={18} />,
-      items: [
-        { name: "Platform Earnings", path: "/admin/platform-earnings" },
-        { name: "Vendor Payouts", path: "/admin/vendor-payouts" },
-        { name: "Driver Payouts", path: "/admin/driver-payouts" },
-        { name: "Transaction History", path: "/admin/transaction-history" },
-        { name: "Payment Disputes", path: "/admin/payment-disputes" },
-        { name: "Tax Management", path: "/admin/tax-management" },
-      ],
-    },
-    {
-      id: "inventory-control",
-      title: "Inventory & Menu Control",
-      icon: <Package size={18} />,
-      items: [
-        { name: "All Items", path: "/admin/all-products" },
-        { name: "Out-of-Stock Alerts", path: "/admin/out-of-stock-alerts" },
-        { name: "Restricted Items", path: "/admin/restricted-items" },
-      ],
-    },
-    {
-      id: "promotions-and-coupons",
-      title: "Promotions & Coupons",
-      icon: <Ticket size={18} />,
-      items: [
-        { name: "Active Campaigns", path: "/admin/active-campaigns" },
-        { name: "Create New Offer", path: "/admin/create-new-offer" },
-        { name: "Coupon Analytics", path: "/admin/coupon-analytics" },
-      ],
-    },
-    {
-      id: "analytics-and-insights",
-      title: "Analytics & Insights",
-      icon: <ChartNoAxesCombined size={18} />,
-      items: [
-        { name: "Sales Analytics", path: "/admin/sales-analytics" },
-        { name: "Delivery Insights", path: "/admin/delivery-insights" },
-        { name: "Customer Insights", path: "/admin/customer-insights" },
-        { name: "Top Vendors", path: "/admin/top-vendors" },
-        { name: "Peak Hours Analysis", path: "/admin/peak-hours-analysis" },
-      ],
-    },
-    {
-      id: "system-management",
-      title: "System Management",
-      icon: <ToolCase size={18} />,
-      items: [
-        {
-          name: "Email & Notification Settings",
-          path: "/admin/email-notification-settings",
-        },
-        { name: "Maintenance Mode", path: "/admin/maintenance-mode" },
-      ],
-    },
-    {
-      id: "admin-management",
-      title: "Admin Management",
-      icon: <ShieldUser size={18} />,
-      items: [
-        { name: "All Admins", path: "/admin/all-admins" },
-        { name: "Roles & Permissions", path: "/admin/roles-permissions" },
-        { name: "Activity Logs", path: "/admin/activity-logs" },
-        { name: "Login History", path: "/admin/login-history" },
-      ],
-    },
-    {
-      id: "support-communication",
-      title: "Support & Communication",
-      icon: <MessageCircleMore size={18} />,
-      items: [
-        { name: "Support Tickets", path: "/admin/support-tickets" },
-        { name: "Chat With Vendors", path: "/admin/chat-with-vendors" },
-        { name: "Chat With Drivers", path: "/admin/chat-with-drivers" },
-        { name: "Chat With Customers", path: "/admin/chat-with-customers" },
-      ],
-    },
-    {
-      id: "reports",
-      title: "Reports",
-      icon: <NotepadText size={18} />,
-      items: [
-        { name: "Sales Report", path: "/admin/sales-report" },
-        { name: "Order Report", path: "/admin/order-report" },
-        {
-          name: "Driver Performance Report",
-          path: "/admin/drivers-performance-report",
-        },
-        { name: "Vendor Report", path: "/admin/vendor-report" },
-      ],
-    },
-
-    {
-      id: "settings",
-      title: "Settings",
-      icon: <Settings size={18} />,
-      items: [
-        { name: "Business Info", path: "/admin/business-info" },
-        { name: "Branding & Theme", path: "/admin/branding-theme" },
-        {
-          name: "Localization (Language & Currency)",
-          path: "/admin/localization",
-        },
-        {
-          name: "Notification Preferences",
-          path: "/admin/notification-preferences",
-        },
-        {
-          name: "Legal Documents (Terms, Privacy)",
-          path: "/admin/legal-documents",
-        },
-      ],
-    },
-    {
-      id: "sos",
-      title: "SOS / Emergency",
-      icon: <AlertCircle size={18} />,
-      items: [
-        { name: "Critical Alerts", path: "/admin/critical-alerts" },
-        { name: "Contact Support Team", path: "/admin/contact-support-team" },
-        { name: "System Health Status", path: "/admin/system-health-status" },
-      ],
-    },
-  ];
 
   return (
     <>

@@ -2,25 +2,14 @@
 
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -32,7 +21,7 @@ import {
 import { TMeta, TResponse } from "@/types";
 import { TVendor } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
-import { deleteData, updateData } from "@/utils/requests";
+import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -80,6 +69,10 @@ const filterOptions = [
         label: "Rejected",
         value: "REJECTED",
       },
+      {
+        label: "Blocked",
+        value: "BLOCKED",
+      },
     ],
   },
 ];
@@ -88,41 +81,10 @@ export default function VendorTable({ vendorsResult }: IProps) {
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     vendorId: "",
+    vendorName: "",
     status: "",
-    remarks: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [deleteId, setDeleteId] = useState("");
-
-  const approveOrReject = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const updateStatus = {
-        status: statusInfo.status,
-        remarks: statusInfo.remarks,
-      };
-      const result = (await updateData(
-        `/auth/${statusInfo.vendorId}/approved-rejected-user`,
-        updateStatus,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TVendor>;
-      if (result?.success) {
-        router.refresh();
-        setStatusInfo({
-          vendorId: "",
-          status: "",
-          remarks: "",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -196,18 +158,7 @@ export default function VendorTable({ vendorsResult }: IProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && (
-              <TableRow>
-                <TableCell
-                  className="text-[#DC3173] text-lg text-center"
-                  colSpan={5}
-                >
-                  Loading...
-                </TableCell>
-              </TableRow>
-            )}
-            {!isLoading &&
-              vendorsResult &&
+            {vendorsResult &&
               vendorsResult?.data?.length > 0 &&
               vendorsResult?.data?.map((vendor) => (
                 <TableRow key={vendor._id}>
@@ -236,12 +187,12 @@ export default function VendorTable({ vendorsResult }: IProps) {
                           </DropdownMenuItem>
                           {vendor.status === "SUBMITTED" && (
                             <DropdownMenuItem
-                              className=""
                               onClick={() =>
                                 setStatusInfo({
                                   vendorId: vendor.userId as string,
+                                  vendorName: vendor.businessDetails
+                                    ?.businessName as string,
                                   status: "APPROVED",
-                                  remarks: "",
                                 })
                               }
                             >
@@ -250,25 +201,59 @@ export default function VendorTable({ vendorsResult }: IProps) {
                           )}
                           {vendor.status === "SUBMITTED" && (
                             <DropdownMenuItem
-                              className=""
                               onClick={() =>
                                 setStatusInfo({
                                   vendorId: vendor.userId as string,
+                                  vendorName: vendor.businessDetails
+                                    ?.businessName as string,
                                   status: "REJECTED",
-                                  remarks: "",
                                 })
                               }
                             >
                               Reject
                             </DropdownMenuItem>
                           )}
+                          {vendor.status === "APPROVED" && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setStatusInfo({
+                                  vendorId: vendor.userId as string,
+                                  vendorName: vendor.businessDetails
+                                    ?.businessName as string,
+                                  status: "BLOCKED",
+                                })
+                              }
+                            >
+                              Block
+                            </DropdownMenuItem>
+                          )}
+                          {vendor.status === "BLOCKED" && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setStatusInfo({
+                                  vendorId: vendor.userId as string,
+                                  vendorName: vendor.businessDetails
+                                    ?.businessName as string,
+                                  status: "UNBLOCKED",
+                                })
+                              }
+                            >
+                              Unblock
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => setDeleteId(vendor.userId as string)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
                   </TableCell>
                 </TableRow>
               ))}
-            {!isLoading && vendorsResult?.data?.length === 0 && (
+            {vendorsResult?.data?.length === 0 && (
               <TableRow>
                 <TableCell
                   className="text-[#DC3173] text-lg text-center"
@@ -281,6 +266,7 @@ export default function VendorTable({ vendorsResult }: IProps) {
           </TableBody>
         </Table>
       </motion.div>
+
       {!!vendorsResult?.meta?.totalPage && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -292,72 +278,24 @@ export default function VendorTable({ vendorsResult }: IProps) {
           />
         </motion.div>
       )}
+
       <DeleteModal
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteVendor}
       />
-      {
-        <Dialog
-          open={statusInfo?.vendorId?.length > 0}
-          onOpenChange={() =>
-            setStatusInfo({ vendorId: "", status: "", remarks: "" })
-          }
-        >
-          <form>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {statusInfo.status === "APPROVED" ? "Approve" : "Reject"}{" "}
-                  {statusInfo?.vendorId} Vendor
-                </DialogTitle>
-                <DialogDescription>
-                  Let them know why you are{" "}
-                  {statusInfo.status === "APPROVED" ? "approving" : "rejecting"}
-                </DialogDescription>
-              </DialogHeader>
-              <form
-                onSubmit={approveOrReject}
-                id="remarksForm"
-                className="grid gap-4"
-              >
-                <div className="grid gap-3">
-                  <Label htmlFor="remarks">Remarks</Label>
-                  <Input
-                    id="remarks"
-                    name="remarks"
-                    onBlur={(e) =>
-                      setStatusInfo({ ...statusInfo, remarks: e.target.value })
-                    }
-                  />
-                </div>
-              </form>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                {statusInfo.status === "APPROVED" ? (
-                  <Button
-                    form="remarksForm"
-                    type="submit"
-                    className="bg-green-600 hover:bg-green-500"
-                  >
-                    Approve
-                  </Button>
-                ) : (
-                  <Button
-                    form="remarksForm"
-                    type="submit"
-                    variant="destructive"
-                  >
-                    Reject
-                  </Button>
-                )}
-              </DialogFooter>
-            </DialogContent>
-          </form>
-        </Dialog>
-      }
+
+      <ApproveOrRejectModal
+        open={statusInfo?.vendorId?.length > 0}
+        onOpenChange={() =>
+          setStatusInfo({ vendorId: "", status: "", vendorName: "" })
+        }
+        status={
+          statusInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
+        userId={statusInfo.vendorId}
+        userName={statusInfo.vendorName}
+      />
     </>
   );
 }

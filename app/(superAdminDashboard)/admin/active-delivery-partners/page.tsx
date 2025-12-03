@@ -21,7 +21,8 @@ export default async function ActiveDeliveryPartnersPage({
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    status: "SUBMITTED",
+    status: "APPROVED",
+    isDeleted: false,
   };
 
   const initialData: { data: TDeliveryPartner[]; meta?: TMeta } = { data: [] };

@@ -2,25 +2,14 @@
 
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -32,7 +21,7 @@ import {
 import { TMeta, TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
-import { deleteData, updateData } from "@/utils/requests";
+import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -80,6 +69,10 @@ const filterOptions = [
         label: "Rejected",
         value: "REJECTED",
       },
+      {
+        label: "Blocked",
+        value: "BLOCKED",
+      },
     ],
   },
 ];
@@ -88,41 +81,11 @@ export default function AgentTable({ agentsResult }: IProps) {
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     agentId: "",
+    agentName: "",
     status: "",
     remarks: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [deleteId, setDeleteId] = useState("");
-
-  const approveOrReject = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const updateStatus = {
-        status: statusInfo.status,
-        remarks: statusInfo.remarks,
-      };
-      const result = (await updateData(
-        `/auth/${statusInfo.agentId}/approved-rejected-user`,
-        updateStatus,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TAgent>;
-      if (result?.success) {
-        router.refresh();
-        setStatusInfo({
-          agentId: "",
-          status: "",
-          remarks: "",
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -199,18 +162,7 @@ export default function AgentTable({ agentsResult }: IProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && (
-              <TableRow>
-                <TableCell
-                  className="text-[#DC3173] text-lg text-center"
-                  colSpan={5}
-                >
-                  Loading...
-                </TableCell>
-              </TableRow>
-            )}
-            {!isLoading &&
-              agentsResult?.data &&
+            {agentsResult?.data &&
               agentsResult?.data?.length > 0 &&
               agentsResult?.data?.map((agent) => (
                 <TableRow key={agent._id}>
@@ -243,6 +195,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                                 onClick={() =>
                                   setStatusInfo({
                                     agentId: agent.userId as string,
+                                    agentName: `${agent.name?.firstName} ${agent.name?.lastName}`,
                                     status: "APPROVED",
                                     remarks: "",
                                   })
@@ -255,6 +208,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                                 onClick={() =>
                                   setStatusInfo({
                                     agentId: agent.userId as string,
+                                    agentName: `${agent.name?.firstName} ${agent.name?.lastName}`,
                                     status: "REJECTED",
                                     remarks: "",
                                   })
@@ -264,7 +218,36 @@ export default function AgentTable({ agentsResult }: IProps) {
                               </DropdownMenuItem>
                             </>
                           )}
+                          {agent.status === "APPROVED" && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setStatusInfo({
+                                  agentId: agent.userId as string,
+                                  agentName: `${agent.name?.firstName} ${agent.name?.lastName}`,
+                                  status: "BLOCKED",
+                                  remarks: "",
+                                })
+                              }
+                            >
+                              Block
+                            </DropdownMenuItem>
+                          )}
+                          {agent.status === "BLOCKED" && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setStatusInfo({
+                                  agentId: agent.userId as string,
+                                  agentName: `${agent.name?.firstName} ${agent.name?.lastName}`,
+                                  status: "UNBLOCKED",
+                                  remarks: "",
+                                })
+                              }
+                            >
+                              Unblock
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
+                            className="text-destructive"
                             onClick={() => setDeleteId(agent.userId as string)}
                           >
                             Delete
@@ -275,7 +258,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                   </TableCell>
                 </TableRow>
               ))}
-            {!isLoading && agentsResult?.data?.length === 0 && (
+            {agentsResult?.data?.length === 0 && (
               <TableRow>
                 <TableCell
                   className="text-[#DC3173] text-lg text-center"
@@ -304,68 +287,18 @@ export default function AgentTable({ agentsResult }: IProps) {
         onOpenChange={closeDeleteModal}
         onConfirm={deleteAgent}
       />
-      {
-        <Dialog
-          open={statusInfo?.agentId?.length > 0}
-          onOpenChange={() =>
-            setStatusInfo({ agentId: "", status: "", remarks: "" })
-          }
-        >
-          <form>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {statusInfo.status === "APPROVED" ? "Approve" : "Reject"}{" "}
-                  {statusInfo?.agentId}
-                  Agent
-                </DialogTitle>
-                <DialogDescription>
-                  Let them know why you are{" "}
-                  {statusInfo.status === "APPROVED" ? "approving" : "rejecting"}
-                </DialogDescription>
-              </DialogHeader>
-              <form
-                onSubmit={approveOrReject}
-                id="remarksForm"
-                className="grid gap-4"
-              >
-                <div className="grid gap-3">
-                  <Label htmlFor="remarks">Remarks</Label>
-                  <Input
-                    id="remarks"
-                    name="remarks"
-                    onBlur={(e) =>
-                      setStatusInfo({ ...statusInfo, remarks: e.target.value })
-                    }
-                  />
-                </div>
-              </form>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                {statusInfo.status === "APPROVED" ? (
-                  <Button
-                    form="remarksForm"
-                    type="submit"
-                    className="bg-green-600 hover:bg-green-500"
-                  >
-                    Approve
-                  </Button>
-                ) : (
-                  <Button
-                    form="remarksForm"
-                    type="submit"
-                    variant="destructive"
-                  >
-                    Reject
-                  </Button>
-                )}
-              </DialogFooter>
-            </DialogContent>
-          </form>
-        </Dialog>
-      }
+
+      <ApproveOrRejectModal
+        open={statusInfo.agentId?.length > 0}
+        onOpenChange={() =>
+          setStatusInfo({ agentId: "", agentName: "", status: "", remarks: "" })
+        }
+        status={
+          statusInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
+        userName={statusInfo.agentName}
+        userId={statusInfo.agentId}
+      />
     </>
   );
 }
