@@ -1,6 +1,6 @@
 "use client";
 
-import UploadVendorDocuments from "@/components/AddVendor/UploadVendorDocuments";
+import UploadFleetManagerDocuments from "@/components/AddFleetManager/UploadFleetManagerDocuments";
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,21 +15,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import {
-  registerVendorandSendOtpReq,
-  updateVendorDataReq,
+  registerFleetManagerandSendOtpReq,
+  updateFleetManagerDataReq,
   verifyOtpReq,
-} from "@/services/dashboard/add-vendor/add-vendor";
-import { TBusinessCategory } from "@/types/category.type";
-import { TVendor } from "@/types/user.type";
-import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
+} from "@/services/dashboard/add-fleet-manager/add-fleet-manager";
+import { TAgent } from "@/types/user.type";
+import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { Banknote, CheckCircle, FileText, Mail, Store } from "lucide-react";
@@ -41,17 +32,8 @@ import { toast } from "sonner";
 import z from "zod";
 
 const DELIGO = "#DC3173";
-const daysOfWeek = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
 
-type TVendorForm = z.infer<typeof addVendorValidation>;
+type TFleetManagerForm = z.infer<typeof addFleetManagerValidation>;
 
 function isValidEmail(email: string) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,37 +46,27 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
-export default function AddVendor({
-  businessCategories,
-}: {
-  businessCategories: TBusinessCategory[];
-}) {
+export default function AddFleetManager() {
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [vendorId, setVendorId] = useState("");
+  const [fleetManagerId, setFleetManagerId] = useState("");
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
     longitude: 0,
   });
 
-  const form = useForm<TVendorForm>({
-    resolver: zodResolver(addVendorValidation),
+  const form = useForm<TFleetManagerForm>({
+    resolver: zodResolver(addFleetManagerValidation),
     defaultValues: {
       firstName: "",
       lastName: "",
       prefixPhoneNumber: "",
       phoneNumber: "",
       businessName: "",
-      businessType: "",
       businessLicenseNumber: "",
-      NIF: "",
-      branches: "",
-      openingHours: "",
-      closingHours: "",
-      closingDays: [],
       street: "",
       city: "",
       postalCode: "",
@@ -123,7 +95,7 @@ export default function AddVendor({
       );
 
     try {
-      const result = await registerVendorandSendOtpReq({
+      const result = await registerFleetManagerandSendOtpReq({
         email,
         password,
       });
@@ -159,7 +131,7 @@ export default function AddVendor({
         toast.success(result.message || "OTP verified successfully!", {
           id: toastId,
         });
-        setVendorId(result.data as string);
+        setFleetManagerId(result.data as string);
         setEmailVerified(true);
         return;
       }
@@ -175,11 +147,11 @@ export default function AddVendor({
     }
   };
 
-  const onSubmit = async (data: TVendorForm) => {
-    const toastId = toast.loading("Adding vendor...");
+  const onSubmit = async (data: TFleetManagerForm) => {
+    const toastId = toast.loading("Adding fleet manager...");
 
     try {
-      const vendorData = {
+      const fleetManagerData = {
         name: {
           firstName: data.firstName,
           lastName: data.lastName,
@@ -187,13 +159,7 @@ export default function AddVendor({
         contactNumber: data.phoneNumber,
         businessDetails: {
           businessName: data.businessName,
-          businessType: data.businessType,
-          NIF: data.NIF?.toUpperCase(),
           businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
-          totalBranches: Number(data.branches),
-          openingHours: data.openingHours,
-          closingHours: data.closingHours,
-          closingDays: data.closingDays,
         },
         businessLocation: {
           street: data.street,
@@ -209,26 +175,34 @@ export default function AddVendor({
           iban: data.iban,
           swiftCode: data.swiftCode,
         },
-      } as Partial<TVendor>;
+      } as Partial<TAgent>;
 
-      const result = await updateVendorDataReq(vendorId, vendorData);
+      const result = await updateFleetManagerDataReq(
+        fleetManagerId,
+        fleetManagerData
+      );
 
       if (result.success) {
         form.reset();
-        toast.success(result.message || "Vendor added successfully!", {
+        toast.success(result.message || "Fleet manager added successfully!", {
           id: toastId,
         });
         return;
       }
 
-      toast.error(result.message || "Vendor add failed", { id: toastId });
+      toast.error(result.message || "Fleet manager add failed", {
+        id: toastId,
+      });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
-      toast.error(error?.response?.data?.message || "Failed to add vendor", {
-        id: toastId,
-      });
+      toast.error(
+        error?.response?.data?.message || "Failed to add fleet manager",
+        {
+          id: toastId,
+        }
+      );
     }
   };
 
@@ -243,7 +217,7 @@ export default function AddVendor({
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-extrabold mb-6 flex items-center gap-3"
         >
-          <Store className="w-8 h-8 text-slate-800" /> Add New Vendor
+          <Store className="w-8 h-8 text-slate-800" /> Add New Fleet Manager
         </motion.h1>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -300,7 +274,7 @@ export default function AddVendor({
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
-                        placeholder="Vendor Email"
+                        placeholder="FleetManager Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -409,7 +383,7 @@ export default function AddVendor({
               </Card>
             </motion.div>
             <AnimatePresence>
-              {vendorId && (
+              {fleetManagerId && (
                 <>
                   {/* Business Details */}
                   <motion.div
@@ -444,42 +418,6 @@ export default function AddVendor({
 
                         <FormField
                           control={form.control}
-                          name="businessType"
-                          render={({ field, fieldState }) => (
-                            <FormItem>
-                              <FormLabel>Business Type</FormLabel>
-                              <FormControl>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                >
-                                  <SelectTrigger
-                                    className={cn(
-                                      "w-full",
-                                      fieldState.invalid ? "border-red-500" : ""
-                                    )}
-                                  >
-                                    <SelectValue placeholder="Select Business Type" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {businessCategories?.map((category) => (
-                                      <SelectItem
-                                        key={category._id}
-                                        value={category.name}
-                                      >
-                                        {category.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
                           name="businessLicenseNumber"
                           render={({ field }) => (
                             <FormItem>
@@ -490,126 +428,6 @@ export default function AddVendor({
                                   {...field}
                                 />
                               </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="NIF"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>NIF</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Tax Identification Number"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="branches"
-                          render={({ field }) => (
-                            <FormItem className="col-span-2">
-                              <FormLabel>Total Branches</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder="Total Branches"
-                                  {...field}
-                                  min={0}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="openingHours"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="relative">
-                                <FormLabel className="mb-2">
-                                  Opening Hours
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="time"
-                                    placeholder="e.g. 09:00 AM"
-                                    {...field}
-                                  />
-                                </FormControl>
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="closingHours"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="relative">
-                                <FormLabel className="mb-2">
-                                  Closing Hours
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="time"
-                                    placeholder="e.g. 09:00 AM"
-                                    {...field}
-                                  />
-                                </FormControl>
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="closingDays"
-                          render={({ field }) => (
-                            <FormItem className="col-span-2">
-                              <div>
-                                <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                  Closing Days
-                                </FormLabel>
-                                <div className="flex flex-wrap gap-2">
-                                  {daysOfWeek.map((day) => (
-                                    <motion.button
-                                      key={day}
-                                      type="button"
-                                      onClick={() => {
-                                        field.onChange(
-                                          field.value?.includes(day)
-                                            ? field.value?.filter(
-                                                (d) => d !== day
-                                              )
-                                            : [...field.value, day]
-                                        );
-                                      }}
-                                      whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
-                                        field.value.includes(day)
-                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                      }`}
-                                    >
-                                      {day}
-                                    </motion.button>
-                                  ))}
-                                </div>
-                              </div>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -705,7 +523,7 @@ export default function AddVendor({
 
           {/* Right Section - Business Location + Documents */}
           <AnimatePresence>
-            {vendorId && (
+            {fleetManagerId && (
               <div className="space-y-8">
                 {/* Business Location */}
                 <motion.div
@@ -750,7 +568,9 @@ export default function AddVendor({
                       Verification
                     </h2>
 
-                    <UploadVendorDocuments vendorId={vendorId} />
+                    <UploadFleetManagerDocuments
+                      fleetManagerId={fleetManagerId}
+                    />
                   </Card>
                 </motion.div>
               </div>
@@ -759,13 +579,13 @@ export default function AddVendor({
         </div>
 
         {/* SUBMIT BUTTON */}
-        {vendorId && (
+        {fleetManagerId && (
           <div className="mt-10 flex justify-end">
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
             >
-              Submit Vendor
+              Submit FleetManager
             </Button>
           </div>
         )}

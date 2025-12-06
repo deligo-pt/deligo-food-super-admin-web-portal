@@ -2,17 +2,20 @@
 
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { TAgent } from "@/types/user.type";
 import { jwtDecode } from "jwt-decode";
 
-export const registerVendorandSendOtpReq = async (data: {
+export const registerFleetManagerandSendOtpReq = async (data: {
   email: string;
   password: string;
 }) => {
   try {
-    const result = (await serverRequest.post("/auth/register/create-vendor", {
-      data,
-    })) as TResponse<null>;
+    const result = (await serverRequest.post(
+      "/auth/register/create-fleet-manager",
+      {
+        data,
+      }
+    )) as TResponse<null>;
 
     if (result.success) {
       return { success: true, data: result.data, message: result.message };
@@ -26,7 +29,7 @@ export const registerVendorandSendOtpReq = async (data: {
     return {
       success: false,
       data: null,
-      message: error?.response?.data?.message || "Vendor addition failed",
+      message: error?.response?.data?.message || "FleetManager addition failed",
     };
   }
 };
@@ -56,7 +59,7 @@ export const verifyOtpReq = async (data: { email: string; otp: string }) => {
   }
 };
 
-export const uploadVendorDocumentsReq = async (
+export const uploadFleetManagerDocumentsReq = async (
   id: string,
   key: string,
   file: Blob
@@ -66,7 +69,7 @@ export const uploadVendorDocumentsReq = async (
     formData.append("file", file);
     formData.append("data", JSON.stringify({ docImageTitle: key }));
 
-    const result = await serverRequest.patch(`/vendors/${id}/docImage`, {
+    const result = await serverRequest.patch(`/fleet-managers/${id}/docImage`, {
       data: formData,
     });
 
@@ -86,12 +89,12 @@ export const uploadVendorDocumentsReq = async (
   }
 };
 
-export const updateVendorDataReq = async (
+export const updateFleetManagerDataReq = async (
   id: string,
-  data: Partial<TVendor>
+  data: Partial<TAgent>
 ) => {
   try {
-    const result = await serverRequest.patch(`/vendors/${id}`, {
+    const result = await serverRequest.patch(`/fleet-managers/${id}`, {
       data,
     });
 
@@ -116,7 +119,7 @@ export const updateVendorDataReq = async (
     return {
       success: false,
       data: null,
-      message: err?.response?.data?.message || "Vendor added failed",
+      message: err?.response?.data?.message || "Fleet manager added failed",
     };
   }
 };

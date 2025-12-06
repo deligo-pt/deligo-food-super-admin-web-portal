@@ -1,21 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { uploadFleetManagerDocumentsReq } from "@/services/dashboard/add-fleet-manager/add-fleet-manager";
+import { TResponse } from "@/types";
 import { motion } from "framer-motion";
 import { Eye, File, FileText, ImageIcon, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-
-import { uploadVendorDocumentsReq } from "@/services/dashboard/add-vendor/add-vendor";
-import { TResponse } from "@/types";
 import { toast } from "sonner";
 
-type DocKey =
-  | "businessLicenseDoc"
-  | "taxDoc"
-  | "idProof"
-  | "storePhoto"
-  | "menuUpload";
+type DocKey = "businessLicense" | "idProof";
 
 const DOCUMENTS: {
   key: DocKey;
@@ -23,14 +17,11 @@ const DOCUMENTS: {
   prefersImagePreview: boolean;
 }[] = [
   {
-    key: "businessLicenseDoc",
+    key: "businessLicense",
     label: "Business License",
     prefersImagePreview: false,
   },
-  { key: "taxDoc", label: "Tax Document", prefersImagePreview: false },
   { key: "idProof", label: "ID Proof", prefersImagePreview: true },
-  { key: "storePhoto", label: "Store Photo", prefersImagePreview: true },
-  { key: "menuUpload", label: "Menu / Brochure", prefersImagePreview: true },
 ];
 
 type FilePreview = {
@@ -39,17 +30,14 @@ type FilePreview = {
   isImage: boolean;
 };
 
-export default function UploadVendorDocuments({
-  vendorId,
+export default function UploadFleetManagerDocuments({
+  fleetManagerId,
 }: {
-  vendorId: string;
+  fleetManagerId: string;
 }) {
   const [previews, setPreviews] = useState<Record<DocKey, FilePreview | null>>({
-    businessLicenseDoc: null,
-    taxDoc: null,
+    businessLicense: null,
     idProof: null,
-    storePhoto: null,
-    menuUpload: null,
   });
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -65,8 +53,8 @@ export default function UploadVendorDocuments({
 
     const toastId = toast.loading("Uploading...");
     try {
-      const result = (await uploadVendorDocumentsReq(
-        vendorId,
+      const result = (await uploadFleetManagerDocumentsReq(
+        fleetManagerId,
         key,
         f
       )) as unknown as TResponse<any>;

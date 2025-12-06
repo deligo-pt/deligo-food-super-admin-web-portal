@@ -216,7 +216,7 @@ const BusinessLocationMap = ({
 
       <div ref={mapRef} className="w-full h-80 rounded-xl shadow-md border" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start">
         {formFields.map((field) => (
           <FormField
             key={field.name}
