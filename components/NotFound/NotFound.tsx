@@ -140,7 +140,7 @@ export function NotFound() {
 
           {/* Scooter Animation driving across the 404 */}
           <motion.div
-            className="absolute bottom-4 left-0"
+            className="absolute bottom-4 right-0"
             initial={{
               x: "0%",
               opacity: 0,
