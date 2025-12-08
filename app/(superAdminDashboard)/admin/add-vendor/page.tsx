@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import AddVendor from "@/components/AddVendor/AddVendor";
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";

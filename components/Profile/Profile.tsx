@@ -22,6 +22,8 @@ export default function Profile({ admin }: { admin: TAdmin }) {
       SUBMITTED: "bg-gray-100 text-gray-700 border-gray-200",
       REJECTED: "bg-red-100 text-red-700 border-red-200",
       PENDING: "bg-yellow-100 text-yellow-700 border-yellow-200",
+      BLOCKED: "bg-red-100 text-red-700 border-red-200",
+      DELETED: "bg-red-100 text-red-700 border-red-200",
     };
     return colors[status];
   };

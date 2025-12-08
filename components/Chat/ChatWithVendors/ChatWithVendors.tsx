@@ -1,9 +1,7 @@
 "use client";
 import SelectVendorModal from "@/components/Chat/ChatWithVendors/SelectVendorModal";
 import { Button } from "@/components/ui/button";
-import { getVendorPreviousChats } from "@/services/chat/chatWithVendor";
 import { TMeta } from "@/types";
-import { TMessage } from "@/types/chat.type";
 import { TVendor } from "@/types/user.type";
 import {
   Camera,
@@ -39,77 +37,77 @@ type Vendor = {
   messages: Message[];
 };
 
-const SAMPLE = "/mnt/data/Screenshot from 2025-11-22 23-47-09.png";
+// const SAMPLE = "/mnt/data/Screenshot from 2025-11-22 23-47-09.png";
 
-const INITIAL_VENDORS: Vendor[] = [
-  {
-    id: "v1",
-    name: "Padaria Lisboa",
-    store: "Padaria Lisboa — Lisbon",
-    avatar: SAMPLE,
-    lastSeen: new Date().toISOString(),
-    unread: 2,
-    pinned: true,
-    typing: false,
-    messages: [
-      {
-        id: "m1",
-        from: "vendor",
-        text: "Hi! Order #123 will be 10 min late.",
-        at: new Date().toISOString(),
-        status: "delivered",
-      },
-    ],
-  },
-  {
-    id: "v2",
-    name: "Mercearia Porto",
-    store: "Mercearia Porto — Porto",
-    avatar: undefined,
-    lastSeen: new Date().toISOString(),
-    typing: true,
-    messages: [
-      {
-        id: "m2",
-        from: "vendor",
-        text: "Uploaded the receipt.",
-        images: [SAMPLE],
-        at: new Date().toISOString(),
-        status: "read",
-      },
-    ],
-  },
-  {
-    id: "v3",
-    name: "Restaurante Gaia",
-    avatar: undefined,
-    lastSeen: new Date().toISOString(),
-    typing: false,
-    messages: [
-      {
-        id: "m3",
-        from: "vendor",
-        text: "Obrigado!",
-        at: new Date().toISOString(),
-        status: "read",
-      },
-    ],
-  },
-];
+// const INITIAL_VENDORS: Vendor[] = [
+//   {
+//     id: "v1",
+//     name: "Padaria Lisboa",
+//     store: "Padaria Lisboa — Lisbon",
+//     avatar: SAMPLE,
+//     lastSeen: new Date().toISOString(),
+//     unread: 2,
+//     pinned: true,
+//     typing: false,
+//     messages: [
+//       {
+//         id: "m1",
+//         from: "vendor",
+//         text: "Hi! Order #123 will be 10 min late.",
+//         at: new Date().toISOString(),
+//         status: "delivered",
+//       },
+//     ],
+//   },
+//   {
+//     id: "v2",
+//     name: "Mercearia Porto",
+//     store: "Mercearia Porto — Porto",
+//     avatar: undefined,
+//     lastSeen: new Date().toISOString(),
+//     typing: true,
+//     messages: [
+//       {
+//         id: "m2",
+//         from: "vendor",
+//         text: "Uploaded the receipt.",
+//         images: [SAMPLE],
+//         at: new Date().toISOString(),
+//         status: "read",
+//       },
+//     ],
+//   },
+//   {
+//     id: "v3",
+//     name: "Restaurante Gaia",
+//     avatar: undefined,
+//     lastSeen: new Date().toISOString(),
+//     typing: false,
+//     messages: [
+//       {
+//         id: "m3",
+//         from: "vendor",
+//         text: "Obrigado!",
+//         at: new Date().toISOString(),
+//         status: "read",
+//       },
+//     ],
+//   },
+// ];
 
 interface IProps {
   vendorsResult: { data: TVendor[]; meta?: TMeta };
 }
 
 export default function ChatWithVendors({ vendorsResult }: IProps) {
-  const [vendorMessages, setVendorMessages] = useState<TMessage[]>([]);
-  const [newVendor, setNewVendor] = useState<TVendor | null>(null);
+  const [vendorMessages, setVendorMessages] = useState<Vendor[]>([]);
+  const [newVendor, setNewVendor] = useState<Vendor | null>(null);
   const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
   const [audioFile, setAudioFile] = useState<string | null>(null);
   const [openSelectModal, setOpenSelectModal] = useState(false);
-  const [previousChatLoading, setPreviousChatLoading] = useState(false);
+  // const [previousChatLoading, setPreviousChatLoading] = useState(false);
 
   const textRef = useRef<HTMLTextAreaElement | null>(null);
   const imageRef = useRef<HTMLInputElement | null>(null);
@@ -136,15 +134,15 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
       );
   }, [vendorMessages, query]);
 
-  const selectedVendorPrevMessages = async (id: string) => {
-    setPreviousChatLoading(true);
-    setSelectedId(id);
-    const result = await getVendorPreviousChats(id);
-    if (result.success) {
-      setVendorMessages(result.data as TMessage[]);
-    }
-    setPreviousChatLoading(false);
-  };
+  // const selectedVendorPrevMessages = async (id: string) => {
+  //   setPreviousChatLoading(true);
+  //   setSelectedId(id);
+  //   const result = await getVendorPreviousChats(id);
+  //   if (result.success) {
+  //     setVendorMessages(result.data as unknown as Vendor[]);
+  //   }
+  //   setPreviousChatLoading(false);
+  // };
 
   // auto-scroll on messages change
   useEffect(() => {
@@ -227,6 +225,7 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachments, audioFile, selected]);
 
   function onSelectImages(e: React.ChangeEvent<HTMLInputElement>) {
@@ -286,12 +285,12 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
               <div
                 role="listitem"
                 className={`flex items-center gap-3 p-3 rounded-2xl transition ${
-                  selectedId === newVendor?.userId
+                  selectedId === newVendor?.id
                     ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
                     : "hover:bg-white/40"
                 }`}
               >
-                <button
+                {/* <button
                   onClick={() =>
                     selectedVendorPrevMessages(newVendor?.userId as string)
                   }
@@ -320,25 +319,25 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-3">
                       <div className="font-medium text-sm">
-                        {newVendor?.businessDetails?.businessName}
-                        {/* {newVendor.pinned ? (
+                        {newVendor?.businessDetails?.businessName} */}
+                {/* {newVendor.pinned ? (
                           <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
                             Pinned
                           </span>
                         ) : null} */}
-                      </div>
-                      {/* <div className="text-xs text-gray-500">
+                {/* </div> */}
+                {/* <div className="text-xs text-gray-500">
                         {new Date(
                           newVendor.lastSeen ?? Date.now()
                         ).toLocaleTimeString()}
                       </div> */}
-                    </div>
+                {/* </div> */}
 
-                    {/* <div className="text-xs text-gray-500 truncate mt-1">
+                {/* <div className="text-xs text-gray-500 truncate mt-1">
                       {newVendor.messages[newVendor.messages.length - 1]?.text ?? "—"}
                     </div> */}
-                  </div>
-                </button>
+                {/* </div>
+                </button> */}
 
                 <div className="flex items-center gap-2">
                   <button
@@ -386,7 +385,9 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                 >
                   <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
                     {v.avatar ? (
-                      <img
+                      <Image
+                        width={500}
+                        height={500}
                         src={v.avatar}
                         alt={`${v.name} avatar`}
                         className="w-full h-full object-cover"
@@ -460,7 +461,9 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12">
                   {selected?.avatar ? (
-                    <img
+                    <Image
+                      width={500}
+                      height={500}
                       src={selected.avatar}
                       alt={`${selected?.name} avatar`}
                       className="w-12 h-12 rounded-full object-cover"
@@ -537,7 +540,9 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                             key={i}
                             className="rounded-lg overflow-hidden border"
                           >
-                            <img
+                            <Image
+                              width={500}
+                              height={500}
                               src={src}
                               alt={`attachment-${i}`}
                               className="w-full h-28 object-cover"
@@ -637,7 +642,9 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                           key={i}
                           className="w-14 h-14 rounded-lg overflow-hidden border"
                         >
-                          <img
+                          <Image
+                            width={500}
+                            height={500}
                             src={a}
                             alt={`attachment-preview-${i}`}
                             className="w-full h-full object-cover"
@@ -675,7 +682,7 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
         open={openSelectModal}
         onOpenChange={setOpenSelectModal}
         onClick={(vendor: TVendor) => {
-          setNewVendor(vendor);
+          setNewVendor(vendor as unknown as Vendor);
           setOpenSelectModal(false);
         }}
       />

@@ -221,15 +221,31 @@ export const AgentOrVendorDetails: React.FC<IProps> = ({
                 <div>
                   <p className="text-sm text-gray-500">Street Address</p>
                   <p className="font-medium">
-                    {fleetManager?.businessLocation.streetAddress},{" "}
-                    {fleetManager?.businessLocation.streetNumber}
+                    {fleetManager?.businessLocation.street || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">City & Postal Code</p>
+                  <p className="text-sm text-gray-500">Postal Code</p>
                   <p className="font-medium">
-                    {fleetManager?.businessLocation.city},{" "}
-                    {fleetManager?.businessLocation.postalCode}
+                    {fleetManager?.businessLocation.postalCode || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">City</p>
+                  <p className="font-medium">
+                    {fleetManager?.businessLocation.city || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">State</p>
+                  <p className="font-medium">
+                    {fleetManager?.businessLocation.state || "N/A"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Country</p>
+                  <p className="font-medium">
+                    {fleetManager?.businessLocation.country || "N/A"}
                   </p>
                 </div>
               </div>
@@ -339,7 +355,7 @@ export const AgentOrVendorDetails: React.FC<IProps> = ({
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                   <p className="text-sm text-gray-500">Drivers</p>
                   <p className="text-2xl font-bold">
-                    {fleetManager?.operationalData.noOfDrivers}
+                    {fleetManager?.operationalData?.totalDrivers || 0}
                   </p>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
