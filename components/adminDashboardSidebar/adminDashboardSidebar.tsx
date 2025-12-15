@@ -290,7 +290,7 @@ const MENU = [
 export default function Sidebar() {
   const pathname = usePathname();
   const currentMenuId = MENU.find((menu) =>
-    menu.items?.some((item) => item.path === pathname)
+    menu.items?.some((item) => pathname.includes(item.path))
   )?.id;
 
   const [open, setOpen] = useState(true);
