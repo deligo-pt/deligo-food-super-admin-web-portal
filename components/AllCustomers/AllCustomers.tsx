@@ -2,16 +2,23 @@
 
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
+import DeleteModal from "@/components/Modals/DeleteModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { USER_STATUS } from "@/consts/user.const";
-import { TMeta } from "@/types";
+import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { TMeta, TResponse } from "@/types";
 import { TCustomer } from "@/types/user.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Check, Eye, Slash, Trash } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   customersResult: { data: TCustomer[]; meta?: TMeta };
@@ -58,6 +65,48 @@ const filterOptions = [
 ];
 
 export default function AllCustomers({ customersResult }: IProps) {
+  const router = useRouter();
+  const [statusInfo, setStatusInfo] = useState({
+    customerId: "",
+    customerName: "",
+    status: "",
+    remarks: "",
+  });
+  const [deleteId, setDeleteId] = useState("");
+
+  const closeDeleteModal = (open: boolean) => {
+    if (!open) {
+      setDeleteId("");
+    }
+  };
+
+  const deleteCustomer = async () => {
+    const toastId = toast.loading("Deleting Customer...");
+
+    try {
+      const result = (await userSoftDeleteReq(
+        deleteId
+      )) as unknown as TResponse<null>;
+
+      if (result?.success) {
+        router.refresh();
+        setDeleteId("");
+        toast.success(result.message || "Customer deleted successfully!", {
+          id: toastId,
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message || "Customer deletion failed",
+        {
+          id: toastId,
+        }
+      );
+    }
+  };
+
   const getStatusColor = (status: TUserStatus) => {
     switch (status) {
       case "PENDING":
@@ -161,14 +210,22 @@ export default function AllCustomers({ customersResult }: IProps) {
 
                 <td className="px-4 py-4 text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <Button size="sm" variant="ghost">
+                    <Link href={`/admin/all-customers/${c.userId}`}>
                       <Eye className="w-4 h-4" />
-                    </Button>
+                    </Link>
 
                     {c.status === "BLOCKED" ? (
                       <Button
                         size="sm"
                         className="whitespace-nowrap bg-[#DC3173] hover:bg-[#DC3173]/90"
+                        onClick={() =>
+                          setStatusInfo({
+                            customerId: c.userId as string,
+                            customerName: `${c.name?.firstName} ${c.name?.lastName}`,
+                            status: "UNBLOCKED",
+                            remarks: "",
+                          })
+                        }
                       >
                         <Check className="w-4 h-4 mr-1" /> Unblock
                       </Button>
@@ -176,6 +233,14 @@ export default function AllCustomers({ customersResult }: IProps) {
                       <Button
                         size="sm"
                         className="whitespace-nowrap bg-yellow-500 hover:bg-yellow-600"
+                        onClick={() =>
+                          setStatusInfo({
+                            customerId: c.userId as string,
+                            customerName: `${c.name?.firstName} ${c.name?.lastName}`,
+                            status: "BLOCKED",
+                            remarks: "",
+                          })
+                        }
                       >
                         <Slash className="w-4 h-4 mr-1" /> Block
                       </Button>
@@ -185,6 +250,7 @@ export default function AllCustomers({ customersResult }: IProps) {
                         size="sm"
                         variant="destructive"
                         className="whitespace-nowrap"
+                        onClick={() => setDeleteId(c.userId as string)}
                       >
                         <Trash className="w-4 h-4 mr-1" /> Delete
                       </Button>
@@ -204,6 +270,29 @@ export default function AllCustomers({ customersResult }: IProps) {
           />
         </div>
       )}
+
+      <DeleteModal
+        open={!!deleteId}
+        onOpenChange={closeDeleteModal}
+        onConfirm={deleteCustomer}
+      />
+
+      <ApproveOrRejectModal
+        open={statusInfo.customerId?.length > 0}
+        onOpenChange={() =>
+          setStatusInfo({
+            customerId: "",
+            customerName: "",
+            status: "",
+            remarks: "",
+          })
+        }
+        status={
+          statusInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
+        userName={statusInfo.customerName}
+        userId={statusInfo.customerId}
+      />
     </div>
   );
 }
