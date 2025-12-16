@@ -1,55 +1,81 @@
 import { USER_STATUS } from "@/consts/user.const";
 
 export type TAdmin = {
+  // ------------------------------------------------------------------
+  // Core Identifiers
+  // ------------------------------------------------------------------
   _id: string;
   userId: string;
   role: "ADMIN" | "SUPER_ADMIN";
   email: string;
+  password: string;
   status: keyof typeof USER_STATUS;
   isEmailVerified: boolean;
   isDeleted: boolean;
+  isUpdateLocked: boolean;
 
-  // fcm tokens for push notifications
+  // Push notifications
   fcmTokens?: string[];
 
-  // OTP Details
+  // ------------------------------------------------------
+  // OTP & Password Reset
+  // ------------------------------------------------------
   otp?: string;
   isOtpExpired?: Date;
 
-  // password reset details
   passwordResetToken?: string;
   passwordResetTokenExpiresAt?: Date;
+  passwordChangedAt?: Date;
 
-  // Personal Details
-  name?: string;
+  // ------------------------------------------------------------------
+  // Personal Information
+  // ------------------------------------------------------------------
+  name?: {
+    firstName?: string;
+    lastName?: string;
+  };
+
   contactNumber?: string;
+  profilePhoto?: string;
+
   address?: {
     street?: string;
     city?: string;
     state?: string;
     country?: string;
-    zipCode?: string;
+    postalCode?: string;
+    latitude?: number;
+    longitude?: number;
+    geoAccuracy?: number;
   };
 
-  profilePhoto?: string;
-  passwordChangedAt?: Date;
-
-  // Permissions
-  permissions?: string[]; // Example: ['MANAGE_USERS', 'APPROVE_VENDORS']
-
-  // Security & Access Details
+  // ------------------------------------------------------------------
+  // Security & Authentication
+  // ------------------------------------------------------------------
   twoFactorEnabled?: boolean;
-  loginDevices?: { deviceId: string; lastLogin: string }[];
+  // loginDevices?: TLoginDevice[];
 
-  // Admin & Audit Fields
+  // ------------------------------------------------------------------
+  // Permissions & Role Controls
+  // ------------------------------------------------------------------
+  permissions?: string[];
+  // Example: ['MANAGE_USERS', 'APPROVE_VENDORS']
+
+  // ------------------------------------------------------------------
+  // Admin Workflow & Audit Logs
+  // ------------------------------------------------------------------
   approvedBy?: string;
   rejectedBy?: string;
   blockedBy?: string;
+
   submittedForApprovalAt?: Date;
   approvedOrRejectedOrBlockedAt?: Date;
+
   remarks?: string;
 
-  // timestamps
-  createdAt?: string;
-  updatedAt?: string;
+  // ------------------------------------------------------------------
+  // Timestamps
+  // ------------------------------------------------------------------
+  createdAt?: Date;
+  updatedAt?: Date;
 };

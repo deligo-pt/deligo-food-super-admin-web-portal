@@ -330,13 +330,15 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
                                 <div className="font-semibold text-slate-900 flex items-center gap-2">
                                   <span className="inline-flex items-center gap-1">
                                     <Store className="w-4 h-4 text-slate-700" />
-                                    {v.name?.firstName} {v.name?.lastName}
+                                    {v.businessDetails?.businessName}
                                   </span>
                                 </div>
                                 <div className="text-xs text-slate-400">
-                                  {v.name?.firstName} • {v.contactNumber}
+                                  {v.name?.firstName} {v.name?.lastName}
                                 </div>
-                                {/* <div className="text-xs text-slate-400 mt-1">Commission: {v.commissionPercent}%</div> */}
+                                <div className="text-xs text-slate-400">
+                                  {v.contactNumber}
+                                </div>
                               </div>
                             </div>
                           </TableCell>

@@ -73,7 +73,7 @@ export default function Profile({ admin }: { admin: TAdmin }) {
             <div className="flex-1 text-center lg:text-left">
               <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-2">
                 <h1 className="text-3xl font-bold text-gray-900">
-                  {admin?.name}
+                  {admin?.name?.firstName} {admin?.name?.lastName}
                 </h1>
                 <motion.span
                   className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
@@ -138,9 +138,11 @@ export default function Profile({ admin }: { admin: TAdmin }) {
             <div className="space-y-1">
               <ProfileInfoRow
                 label="Account Created"
-                value={new Date(
-                  admin?.createdAt as string
-                ).toLocaleDateString()}
+                value={
+                  admin?.createdAt
+                    ? new Date(admin?.createdAt).toLocaleDateString()
+                    : "N/A"
+                }
                 icon={CalendarIcon}
               />
               <ProfileInfoRow
