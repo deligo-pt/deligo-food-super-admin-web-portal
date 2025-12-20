@@ -22,18 +22,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { resendOtpReq } from "@/services/auth/OTP";
 import {
   registerVendorandSendOtpReq,
   updateVendorDataReq,
   verifyOtpReq,
 } from "@/services/dashboard/add-vendor/add-vendor";
+import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { TVendor } from "@/types/user.type";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Banknote, CheckCircle, FileText, Mail, Store } from "lucide-react";
-import { useState } from "react";
+import {
+  BadgeCheck,
+  Banknote,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  FileText,
+  Mail,
+  Store,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -74,7 +85,9 @@ export default function AddVendor({
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [vendorId, setVendorId] = useState("");
+  const [timer, setTimer] = useState(300);
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
     longitude: 0,
@@ -144,6 +157,29 @@ export default function AddVendor({
       toast.error(error?.response?.data?.message || "OTP send failed", {
         id: toastId,
       });
+    }
+  };
+
+  const resendOtp = async () => {
+    const toastId = toast.loading("Resending OTP...");
+    try {
+      const result = (await resendOtpReq({
+        email,
+      })) as unknown as TResponse<null>;
+
+      if (result.success) {
+        setTimer(300);
+        console.log("OTP resent!");
+        toast.success("OTP resent successfully!", { id: toastId });
+        return;
+      }
+      toast.error(result.message, { id: toastId });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "OTP resend failed", {
+        id: toastId,
+      });
+      console.log(error);
     }
   };
 
@@ -232,6 +268,21 @@ export default function AddVendor({
     }
   };
 
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
   return (
     <Form {...form}>
       <form
@@ -310,18 +361,21 @@ export default function AddVendor({
                           type="button"
                           style={{ background: DELIGO }}
                           onClick={sendOtp}
+                          className="w-32"
                         >
                           <Mail className="w-4 h-4 mr-2" /> Send OTP
                         </Button>
                       )}
                       {otpSent && !emailVerified && (
-                        <Input
-                          placeholder="Enter OTP"
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
+                        <Button
+                          disabled={!email || !password}
+                          type="button"
+                          style={{ background: DELIGO }}
+                          onClick={resendOtp}
                           className="w-32"
-                          onKeyUp={(e) => e.key === "Enter" && verifyOtp()}
-                        />
+                        >
+                          Resend ({formatTime(timer)})
+                        </Button>
                       )}
                       {emailVerified && (
                         <span className="text-green-600 flex items-center gap-2 text-sm">
@@ -331,14 +385,50 @@ export default function AddVendor({
                     </div>
                   </div>
 
+                  {otpSent && !emailVerified && (
+                    <div>
+                      <Label className="mb-2">OTP</Label>
+                      <div className="flex items-center gap-3">
+                        <Input
+                          placeholder="Enter OTP"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          style={{ background: DELIGO }}
+                          onClick={verifyOtp}
+                          className="w-32"
+                        >
+                          <BadgeCheck className="w-4 h-4 mr-2" /> Verify OTP
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <Label className="mb-2">Password</Label>
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showPass ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      {showPass ? (
+                        <EyeOff
+                          size={18}
+                          className="absolute right-3 top-2.5 cursor-pointer"
+                          onClick={() => setShowPass(false)}
+                        />
+                      ) : (
+                        <Eye
+                          size={18}
+                          className="absolute right-3 top-2.5 cursor-pointer"
+                          onClick={() => setShowPass(true)}
+                        />
+                      )}
+                    </div>
                   </div>
 
                   <Label className="mb-2">Phone Number</Label>
