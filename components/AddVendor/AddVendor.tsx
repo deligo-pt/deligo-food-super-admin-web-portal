@@ -22,15 +22,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { resendOtpReq } from "@/services/auth/OTP";
+import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
   registerVendorandSendOtpReq,
   updateVendorDataReq,
-  verifyOtpReq,
 } from "@/services/dashboard/add-vendor/add-vendor";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { TVendor } from "@/types/user.type";
+import { formatTime } from "@/utils/formatTime";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -85,8 +85,8 @@ export default function AddVendor({
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [vendorId, setVendorId] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [timer, setTimer] = useState(300);
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
@@ -268,14 +268,6 @@ export default function AddVendor({
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  };
-
   useEffect(() => {
     if (timer > 0) {
       const interval = setInterval(() => setTimer((t) => t - 1), 1000);
@@ -368,13 +360,13 @@ export default function AddVendor({
                       )}
                       {otpSent && !emailVerified && (
                         <Button
-                          disabled={!email || !password}
+                          disabled={timer > 0}
                           type="button"
                           style={{ background: DELIGO }}
                           onClick={resendOtp}
                           className="w-32"
                         >
-                          Resend ({formatTime(timer)})
+                          Resend {timer > 0 && `(${formatTime(timer)})`}
                         </Button>
                       )}
                       {emailVerified && (

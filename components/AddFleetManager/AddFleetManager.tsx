@@ -14,17 +14,28 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
   registerFleetManagerandSendOtpReq,
   updateFleetManagerDataReq,
-  verifyOtpReq,
 } from "@/services/dashboard/add-fleet-manager/add-fleet-manager";
+import { TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
+import { formatTime } from "@/utils/formatTime";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Banknote, CheckCircle, FileText, Mail, Store } from "lucide-react";
-import { useState } from "react";
+import {
+  BadgeCheck,
+  Banknote,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  FileText,
+  Mail,
+  Store,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -53,6 +64,8 @@ export default function AddFleetManager() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fleetManagerId, setFleetManagerId] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [timer, setTimer] = useState(300);
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
     longitude: 0,
@@ -116,6 +129,29 @@ export default function AddFleetManager() {
       toast.error(error?.response?.data?.message || "OTP send failed", {
         id: toastId,
       });
+    }
+  };
+
+  const resendOtp = async () => {
+    const toastId = toast.loading("Resending OTP...");
+    try {
+      const result = (await resendOtpReq({
+        email,
+      })) as unknown as TResponse<null>;
+
+      if (result.success) {
+        setTimer(300);
+        console.log("OTP resent!");
+        toast.success("OTP resent successfully!", { id: toastId });
+        return;
+      }
+      toast.error(result.message, { id: toastId });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "OTP resend failed", {
+        id: toastId,
+      });
+      console.log(error);
     }
   };
 
@@ -206,6 +242,13 @@ export default function AddFleetManager() {
     }
   };
 
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
   return (
     <Form {...form}>
       <form
@@ -274,7 +317,7 @@ export default function AddFleetManager() {
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
-                        placeholder="FleetManager Email"
+                        placeholder="Vendor Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -284,18 +327,21 @@ export default function AddFleetManager() {
                           type="button"
                           style={{ background: DELIGO }}
                           onClick={sendOtp}
+                          className="w-32"
                         >
                           <Mail className="w-4 h-4 mr-2" /> Send OTP
                         </Button>
                       )}
                       {otpSent && !emailVerified && (
-                        <Input
-                          placeholder="Enter OTP"
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
+                        <Button
+                          disabled={timer > 0}
+                          type="button"
+                          style={{ background: DELIGO }}
+                          onClick={resendOtp}
                           className="w-32"
-                          onKeyUp={(e) => e.key === "Enter" && verifyOtp()}
-                        />
+                        >
+                          Resend {timer > 0 && `(${formatTime(timer)})`}
+                        </Button>
                       )}
                       {emailVerified && (
                         <span className="text-green-600 flex items-center gap-2 text-sm">
@@ -305,14 +351,50 @@ export default function AddFleetManager() {
                     </div>
                   </div>
 
+                  {otpSent && !emailVerified && (
+                    <div>
+                      <Label className="mb-2">OTP</Label>
+                      <div className="flex items-center gap-3">
+                        <Input
+                          placeholder="Enter OTP"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          style={{ background: DELIGO }}
+                          onClick={verifyOtp}
+                          className="w-32"
+                        >
+                          <BadgeCheck className="w-4 h-4 mr-2" /> Verify OTP
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <Label className="mb-2">Password</Label>
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showPass ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      {showPass ? (
+                        <EyeOff
+                          size={18}
+                          className="absolute right-3 top-2.5 cursor-pointer"
+                          onClick={() => setShowPass(false)}
+                        />
+                      ) : (
+                        <Eye
+                          size={18}
+                          className="absolute right-3 top-2.5 cursor-pointer"
+                          onClick={() => setShowPass(true)}
+                        />
+                      )}
+                    </div>
                   </div>
 
                   <Label className="mb-2">Phone Number</Label>
