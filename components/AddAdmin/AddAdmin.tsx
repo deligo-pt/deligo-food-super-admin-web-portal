@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { verifyOtpReq } from "@/services/auth/OTP";
 import {
   registerAdminAndSendOtpReq,
   updateAdminDataReq,
-  verifyOtpReq,
 } from "@/services/dashboard/add-admin/add-admin";
 import { TAdmin } from "@/types/admin.type";
 import { addAdminValidation } from "@/validations/add-admin/add-admin.validation";
