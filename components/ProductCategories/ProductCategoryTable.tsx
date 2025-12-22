@@ -36,7 +36,6 @@ import { motion } from "framer-motion";
 import {
   CircleCheckBig,
   Cog,
-  FileCheckIcon,
   InfoIcon,
   ListIcon,
   MoreVertical,
@@ -196,12 +195,6 @@ export default function CategoryTable() {
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                  <FileCheckIcon className="w-4" />
-                  Icon
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
                   <CircleCheckBig className="w-4" />
                   Status
                 </div>
@@ -230,7 +223,6 @@ export default function CategoryTable() {
                 <TableRow key={category._id}>
                   <TableCell>{category.name}</TableCell>
                   <TableCell>{category.description}</TableCell>
-                  <TableCell>{category.image}</TableCell>
                   <TableCell>
                     {category.isActive && !category.isDeleted
                       ? "Active"
