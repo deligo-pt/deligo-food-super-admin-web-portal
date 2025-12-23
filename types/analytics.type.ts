@@ -1,34 +1,60 @@
-// type TAnalytics = {
-//     totalOrders: number;
-//     totalDeliveries: number;
-//     totalCustomers: number;
-//     totalVendors: number;
-//     totalFleets: number;
-//     totalDeliveryPartners: number;
-//     totalProducts: number;
-//     totalBusinessCategories: number;
-//     totalProductCategories: number;
-//     totalOrdersByMonth: number[];
-//     totalDeliveriesByMonth: number[];
-//     totalCustomersByMonth: number[];
-//     totalVendorsByMonth: number[];
-//     totalFleetsByMonth: number[];
-//     totalDeliveryPartnersByMonth: number[];
-//     totalProductsByMonth: number[];
-//     totalBusinessCategoriesByMonth: number[];
-//     totalProductCategoriesByMonth: number[];
-//     totalSubCategoriesByMonth: number[];
-//     totalBrandsByMonth: number[];
-// }
+import { ORDER_STATUS } from "@/consts/order.const";
+
+export type TPopularCategory = {
+  _id: string;
+  name: string;
+  percentage: number;
+};
+
+export type TRecentOrder = {
+  _id: string;
+  orderId: string;
+  orderStatus: keyof typeof ORDER_STATUS;
+  customerId: {
+    name: {
+      firstName: string;
+      lastName: string;
+    };
+  };
+  createdAt: Date;
+};
+
+export type TTopRatedDeliveryPartner = {
+  _id: string;
+  name: {
+    firstName: string;
+    lastName: string;
+  };
+  rating: number;
+  completedDeliveries: number;
+};
+
+export type TTopRatedItems = {
+  _id: string;
+  name: string;
+  rating: number;
+  images: string[];
+  totalOrders: number;
+};
 
 export type TAnalytics = {
-  customers: number;
-  vendors: number;
-  fleetManagers: number;
-  totalOrders: number;
-  pendingOrders: number;
-  completedOrders: number;
-  cancelledOrders: number;
-  totalRevenue: number;
-  todaysRevenue: number;
+  counts: {
+    customers: number;
+    vendors: number;
+    deliveryPartners: number;
+    fleetManagers: number;
+    totalProducts: number;
+  };
+
+  orders: {
+    total: number;
+    pending: number;
+    completed: number;
+    cancelled: number;
+  };
+
+  popularCategories: TPopularCategory[];
+  recentOrders: TRecentOrder[];
+  topRatedDeliveryPartners: TTopRatedDeliveryPartner[];
+  topRatedItems: TTopRatedItems[];
 };

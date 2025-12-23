@@ -5,14 +5,12 @@ import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";
 import { TAnalytics } from "@/types/analytics.type";
 
-
-
 export default async function DashboardPage() {
   let analyticsData: TAnalytics = {} as TAnalytics;
 
   try {
     const result = (await serverRequest.get(
-      "/analytics/overview"
+      "/analytics/admin-dashboard-analytics"
     )) as unknown as TResponse<TAnalytics>;
 
     if (result?.success) {

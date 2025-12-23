@@ -1,36 +1,25 @@
 "use client";
 
+import { TPopularCategory } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 
-const categories = [
-  {
-    name: "Fast Food",
-    percentage: 42,
-    color: "#DC3173",
-  },
-  {
-    name: "Healthy Food",
-    percentage: 28,
-    color: "#3B82F6",
-  },
-  {
-    name: "Desserts",
-    percentage: 18,
-    color: "#F59E0B",
-  },
-  {
-    name: "Beverages",
-    percentage: 12,
-    color: "#10B981",
-  },
-];
+const colors = ["#DC3173", "#3B82F6", "#F59E0B", "#10B981", "#5F3DC4"];
 
-const PopularCategories = () => {
+interface IProps {
+  popularCategories: TPopularCategory[];
+}
+
+const PopularCategories = ({ popularCategories }: IProps) => {
   return (
     <div className="bg-white rounded-lg shadow p-6 border border-gray-100 h-full">
       <h3 className="text-lg font-semibold mb-4">Popular Categories</h3>
       <div className="space-y-4">
-        {categories.map((category, index) => (
+        {popularCategories.length === 0 && (
+          <div className="col-span-4 text-center text-gray-500">
+            No popular categories found
+          </div>
+        )}
+        {popularCategories.map((category, index) => (
           <div key={index}>
             <div className="flex justify-between mb-1">
               <span className="text-sm font-medium">{category.name}</span>
@@ -42,13 +31,13 @@ const PopularCategories = () => {
               <motion.div
                 className="h-2 rounded-full"
                 style={{
-                  backgroundColor: category.color,
+                  backgroundColor: colors[index % 5],
                 }}
                 initial={{
                   width: 0,
                 }}
                 animate={{
-                  width: `${category.percentage}%`,
+                  width: `${Math.min(category.percentage, 100)}%`,
                 }}
                 transition={{
                   duration: 1,

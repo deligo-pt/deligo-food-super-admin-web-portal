@@ -9,9 +9,9 @@ import TopProducts from "@/components/Dashboard/TopProducts";
 import { TAnalytics } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 import {
-  BadgeEuro,
-  ChartBar,
+  Bike,
   CheckCircleIcon,
+  Pizza,
   ShoppingBagIcon,
   StoreIcon,
   TrendingUpIcon,
@@ -41,22 +41,22 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
       >
         <StatCard
           title="Total Vendors"
-          value={analyticsData?.vendors?.toLocaleString() || "0"}
+          value={analyticsData?.counts?.vendors?.toLocaleString() || "0"}
           description="Active food partners"
           icon={<StoreIcon />}
           color="#DC3173"
         />
         <StatCard
           title="Total Fleet Managers"
-          value={analyticsData?.fleetManagers?.toLocaleString() || "0"}
+          value={analyticsData?.counts?.fleetManagers?.toLocaleString() || "0"}
           description="Managing deliveries"
           icon={<TruckIcon />}
           color="#DC3173"
         />
         <StatCard
           title="Total Customers"
-          value={analyticsData?.customers?.toLocaleString() || "0"}
-          description="Registered users"
+          value={analyticsData?.counts?.customers?.toLocaleString() || "0"}
+          description="Registered customers"
           icon={<UsersIcon />}
           color="#DC3173"
         />
@@ -77,17 +77,19 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
         }}
       >
         <StatCard
-          title="Total Revenue"
-          value={analyticsData?.totalRevenue?.toLocaleString() || "0"}
-          description="Gross sales receipts"
-          icon={<BadgeEuro />}
+          title="Total Items"
+          value={analyticsData?.counts?.totalProducts?.toLocaleString() || "0"}
+          description="Total listed items"
+          icon={<Pizza />}
           color="#DC3173"
         />
         <StatCard
-          title="Todays Revenue"
-          value={analyticsData?.todaysRevenue?.toLocaleString() || "0"}
-          description="Dailsy sales total"
-          icon={<ChartBar />}
+          title="Total Delivery Partners"
+          value={
+            analyticsData?.counts?.deliveryPartners?.toLocaleString() || "0"
+          }
+          description="Registered delivery partners"
+          icon={<Bike />}
           color="#DC3173"
         />
       </motion.div>
@@ -108,25 +110,25 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
       >
         <StatusCard
           title="Total Orders"
-          value={analyticsData?.totalOrders?.toLocaleString() || "0"}
+          value={analyticsData?.orders?.total?.toLocaleString() || "0"}
           icon={<ShoppingBagIcon />}
           color="#DC3173"
         />
         <StatusCard
           title="Pending"
-          value={analyticsData?.pendingOrders?.toLocaleString() || "0"}
+          value={analyticsData?.orders?.pending?.toLocaleString() || "0"}
           icon={<TrendingUpIcon />}
           color="#DC3173"
         />
         <StatusCard
           title="Completed"
-          value={analyticsData?.completedOrders?.toLocaleString() || "0"}
+          value={analyticsData?.orders?.completed?.toLocaleString() || "0"}
           icon={<CheckCircleIcon />}
           color="#DC3173"
         />
         <StatusCard
           title="Cancelled"
-          value={analyticsData?.cancelledOrders?.toLocaleString() || "0"}
+          value={analyticsData?.orders?.cancelled?.toLocaleString() || "0"}
           icon={<XCircleIcon />}
           color="#DC3173"
         />
@@ -147,10 +149,12 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
         }}
       >
         <div className="lg:col-span-2">
-          <PopularCategories />
+          <PopularCategories
+            popularCategories={analyticsData?.popularCategories}
+          />
         </div>
         <div>
-          <RecentOrders />
+          <RecentOrders recentOrders={analyticsData?.recentOrders} />
         </div>
       </motion.div>
       <motion.div
@@ -168,7 +172,7 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
           delay: 1,
         }}
       >
-        <TopProducts />
+        <TopProducts topRatedItems={analyticsData?.topRatedItems} />
       </motion.div>
     </div>
   );
