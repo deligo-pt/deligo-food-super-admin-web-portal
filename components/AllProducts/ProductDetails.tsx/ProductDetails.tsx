@@ -1,6 +1,7 @@
 "use client";
 
 import { TProduct } from "@/types/product.type";
+import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
 import {
   AlertCircleIcon,
@@ -324,22 +325,12 @@ export default function ProductDetails({ product }: IProps) {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-medium text-gray-900">
-                  {product.vendor.vendorName}
+                  {product.vendorId?.businessDetails?.businessName}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {product.vendor.vendorType}
+                  {product.vendorId?.businessDetails?.businessType}
                 </p>
               </div>
-              {product.vendor.rating ? (
-                <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded">
-                  <StarIcon className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  <span className="text-sm font-medium text-amber-700">
-                    {product.vendor.rating}
-                  </span>
-                </div>
-              ) : (
-                ""
-              )}
             </div>
           </motion.div>
           {/* Delivery Info */}
@@ -476,8 +467,8 @@ export default function ProductDetails({ product }: IProps) {
                 {product.meta.origin && <p>Origin: {product.meta.origin}</p>}
               </div>
               <div>
-                <p>Created: {product.meta.createdAt.toLocaleString()}</p>
-                <p>Updated: {product.meta.updatedAt.toLocaleString()}</p>
+                <p>Created: {format(product.meta.createdAt, "do MMM yyyy")}</p>
+                <p>Updated: {format(product.meta.updatedAt, "do MMM yyyy")}</p>
               </div>
             </div>
           </motion.div>

@@ -317,7 +317,7 @@ export default function AddFleetManager() {
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
-                        placeholder="Vendor Email"
+                        placeholder="Fleet Manager Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />

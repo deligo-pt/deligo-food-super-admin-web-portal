@@ -29,11 +29,19 @@ export type TProduct = {
 
   images: string[];
 
-  vendor: {
-    vendorId: string;
-    vendorName: string;
-    vendorType: string;
-    rating?: number;
+  vendorId: {
+    _id: string;
+    businessDetails: {
+      businessName: string;
+      businessType: string;
+    };
+    businessLocation: {
+      latitude: number;
+      longitude: number;
+    };
+    documents: {
+      storePhoto: string;
+    };
   };
 
   tags?: string[];

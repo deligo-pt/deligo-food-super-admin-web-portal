@@ -4,6 +4,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { userSoftDeleteReq } from "@/services/auth/deleteUser";
 import { TMeta, TResponse } from "@/types";
@@ -70,6 +71,8 @@ export default function AllAdmins({ adminsResult }: IProps) {
     remarks: "",
   });
   const [deleteId, setDeleteId] = useState("");
+
+  console.log(adminsResult);
 
   const showingInfo = useMemo(() => {
     const page = adminsResult?.meta?.page || 1;
@@ -238,9 +241,16 @@ export default function AllAdmins({ adminsResult }: IProps) {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-gray-600 font-bold text-sm overflow-hidden">
-                          {/* avatar placeholder */}
-                          {a.name?.firstName?.charAt(0)?.toUpperCase() || ""}
-                          {a.name?.lastName?.charAt(0)?.toUpperCase() || ""}
+                          <Avatar className="w-11 h-11">
+                            <AvatarImage
+                              src={a?.profilePhoto}
+                              alt={`${a.name?.firstName} ${a.name?.lastName}`}
+                            />
+                            <AvatarFallback>
+                              {a.name?.firstName?.charAt(0)}
+                              {a.name?.lastName?.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
                         </div>
 
                         <div>

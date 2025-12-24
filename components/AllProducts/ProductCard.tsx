@@ -49,7 +49,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
       <div className="relative h-48 overflow-hidden bg-gray-200">
         {product.images && product.images.length > 0 ? (
           <Image
-            src={product.images[0]}
+            src={product.images?.[0]}
             alt={product.name}
             className="w-full h-full object-cover"
             width={500}
@@ -132,7 +132,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
         )}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div className="text-xs text-gray-500">
-            {product.vendor.vendorName}
+            {product.vendorId?.businessDetails?.businessName}
           </div>
           <div className="flex space-x-2">
             <motion.button
