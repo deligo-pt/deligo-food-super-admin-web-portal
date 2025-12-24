@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { TResponse } from "@/types";
 import { setCookie } from "@/utils/cookies";
+import { getAndSaveFcmToken } from "@/utils/fcmToken";
 import { postData } from "@/utils/requests";
 import { loginValidation } from "@/validations/auth/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,6 +62,9 @@ export default function SuperAdminLoginPage({
           setCookie("accessToken", result.data.accessToken, 7);
           setCookie("refreshToken", result.data.refreshToken, 365);
           toast.success("Login successful!", { id: toastId });
+
+          // get and save fcm token
+          getAndSaveFcmToken(result.data.accessToken);
 
           if (redirect) {
             router.push(redirect);

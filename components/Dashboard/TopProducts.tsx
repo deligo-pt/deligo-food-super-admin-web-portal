@@ -58,7 +58,7 @@ const TopProducts = ({ topRatedItems }: IProps) => {
                     className="text-amber-400 mr-1"
                     fill="currentColor"
                   />
-                  <span className="text-sm">{item.rating}</span>
+                  <span className="text-sm">{item.rating?.average}</span>
                 </div>
                 <span className="text-sm text-gray-600">
                   {item.totalOrders || 0} orders

@@ -32,7 +32,9 @@ export type TTopRatedDeliveryPartner = {
 export type TTopRatedItems = {
   _id: string;
   name: string;
-  rating: number;
+  rating: {
+    average: number;
+  };
   images: string[];
   totalOrders: number;
 };
