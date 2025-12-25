@@ -19,13 +19,11 @@ export async function saveFcmToken(
 ): Promise<void> {
   const payload = { token };
 
-  await postData("/auth/save-fcm-token", {
-    method: "POST",
+  await postData("/auth/save-fcm-token", JSON.stringify(payload), {
     headers: {
       "Content-Type": "application/json",
       authorization: accessToken,
     },
-    body: JSON.stringify(payload),
   });
 }
 

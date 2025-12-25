@@ -31,6 +31,11 @@ import { useEffect, useState } from "react";
 
 import Image from "next/image";
 
+interface IProps {
+  open?: boolean;
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 const PRIMARY = "#DC3173";
 
 const MENU = [
@@ -287,13 +292,12 @@ const MENU = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ open, setOpen }: IProps) {
   const pathname = usePathname();
   const currentMenuId = MENU.find((menu) =>
     menu.items?.some((item) => pathname.includes(item.path))
   )?.id;
 
-  const [open, setOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     ...(currentMenuId ? { [currentMenuId]: true } : {}),
@@ -364,7 +368,7 @@ export default function Sidebar() {
           </div>
 
           <button
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpen && setOpen(!open)}
             className="p-2 rounded-lg hover:bg-pink-100 transition-colors"
           >
             {open ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}

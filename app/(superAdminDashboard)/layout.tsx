@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Sidebar from "@/components/adminDashboardSidebar/adminDashboardSidebar";
+import DesktopSidebar from "@/components/adminDashboardSidebar/DesktopSidebar";
 import Topbar from "@/components/adminTopbar/Topbar";
 import { serverRequest } from "@/lib/serverFetch";
 import { TAdmin } from "@/types/admin.type";
@@ -42,22 +43,7 @@ export default async function AdminLayout({
       </div>
 
       {/* Desktop view */}
-      <div className="hidden md:flex w-full overflow-x-hidden">
-        {/* Sidebar fixed left */}
-        <div className="w-[280px] h-screen fixed top-0 left-0 z-50 bg-white border-r">
-          <Sidebar />
-        </div>
-
-        {/* Content area */}
-        <div className="flex-1 flex flex-col md:ml-[280px] overflow-x-hidden max-w-full">
-          {/* Topbar sticky */}
-          <div className="w-full sticky top-0 z-40">
-            <Topbar admin={adminData} />
-          </div>
-          {/* Page content */}
-          <main className="flex-1 p-4 overflow-y-auto">{children}</main>
-        </div>
-      </div>
+      <DesktopSidebar adminData={adminData}>{children}</DesktopSidebar>
     </div>
   );
 }
