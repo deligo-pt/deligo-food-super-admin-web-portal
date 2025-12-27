@@ -28,9 +28,12 @@ export default async function AllVendorsPage({ searchParams }: IProps) {
 
   try {
     const result = (await serverRequest.get("/vendors", {
+
       params: query,
+
     })) as unknown as TResponse<TVendor[]>;
 
+    console.log(result);
     if (result?.success) {
       initialData.data = result.data;
       initialData.meta = result.meta as TMeta;
@@ -38,6 +41,7 @@ export default async function AllVendorsPage({ searchParams }: IProps) {
   } catch (err) {
     console.error("Server fetch error:", err);
   }
+
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-full overh">
       {/* Page Title */}
