@@ -11,6 +11,7 @@ import { TResponse } from "@/types";
 import { TVendor } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
 import { deleteData } from "@/utils/requests";
+import { format, parse } from "date-fns";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
@@ -275,13 +276,27 @@ export const VendorDetails = ({ vendor }: IProps) => {
               <div>
                 <p className="text-sm text-gray-500">Opening Hours</p>
                 <p className="font-medium">
-                  {vendor?.businessDetails?.openingHours || "N/A"}
+                  {vendor?.businessDetails?.openingHours?format(
+                    parse(
+                      vendor?.businessDetails?.openingHours ,
+                      "HH:mm",
+                      new Date()
+                    ),
+                    "hh:mm a"
+                  ) : "N/A"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Closing Hours</p>
                 <p className="font-medium">
-                  {vendor?.businessDetails?.closingHours || "N/A"}
+                  {vendor?.businessDetails?.closingHours?format(
+                    parse(
+                      vendor?.businessDetails?.closingHours ,
+                      "HH:mm",
+                      new Date()
+                    ),
+                    "hh:mm a"
+                  ) : "N/A"}
                 </p>
               </div>
               <div>

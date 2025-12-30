@@ -28,12 +28,9 @@ export default async function AllVendorsPage({ searchParams }: IProps) {
 
   try {
     const result = (await serverRequest.get("/vendors", {
-
       params: query,
-
     })) as unknown as TResponse<TVendor[]>;
 
-    console.log(result);
     if (result?.success) {
       initialData.data = result.data;
       initialData.meta = result.meta as TMeta;
