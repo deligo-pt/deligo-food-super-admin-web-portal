@@ -2,10 +2,8 @@ import Image from "next/image";
 
 interface IDocs {
   businessLicense?: string | undefined;
-  idProof?: string | undefined;
-  // taxDoc?: string | undefined;
-  // storePhoto?: string | undefined;
-  // menuUpload?: string | undefined;
+  idProofFront?: string | undefined;
+  idProofBack?: string | undefined;
 }
 interface IProps {
   documents: IDocs | undefined;
@@ -21,11 +19,9 @@ export default function AgentDetailsDoc({ documents }: IProps) {
       {docsArr.map((doc) => (
         <div key={doc}>
           <p className="text-sm text-gray-500 mb-2">
-            {doc === "idProof" && "ID Proof"}
+            {doc === "idProofFront" && "ID Proof (Front)"}
+            {doc === "idProofBack" && "ID Proof (Back)"}
             {doc === "businessLicense" && "Business License"}
-            {/* {doc === "taxDoc" && "Tax Document"}
-            {doc === "storePhoto" && "Store Photo"}
-            {doc === "menuUpload" && "Menu / Brochure"} */}
           </p>
           {documents?.[doc as keyof IDocs]?.toLowerCase()?.endsWith(".pdf") ? (
             <iframe
