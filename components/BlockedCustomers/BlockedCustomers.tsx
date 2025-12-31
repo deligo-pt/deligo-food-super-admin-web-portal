@@ -2,6 +2,7 @@
 
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Eye, Unlock } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface IProps {
   customersResult: { data: TCustomer[]; meta?: TMeta };
@@ -25,6 +27,11 @@ const sortOptions = [
 ];
 
 export default function BlockedCustomers({ customersResult }: IProps) {
+  const [statusInfo, setStatusInfo] = useState({
+    customerId: "",
+    customerName: "",
+  });
+
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1
@@ -103,12 +110,23 @@ export default function BlockedCustomers({ customersResult }: IProps) {
 
                   <div className="flex items-center gap-2">
                     <Link href={`/admin/all-customers/${c.userId}`}>
-                      <Eye className="w-4 h-4 mr-1" /> Details
+                      <Button
+                        size="sm"
+                        className="bg-gray-300 hover:bg-gray-200 text-slate-800"
+                      >
+                        <Eye className="w-4 h-4 mr-1" /> Details
+                      </Button>
                     </Link>
 
                     <Button
+                      onClick={() =>
+                        setStatusInfo({
+                          customerId: c.userId,
+                          customerName: `${c.name?.firstName} ${c.name?.lastName}`,
+                        })
+                      }
                       size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white"
                     >
                       <Unlock className="w-4 h-4 mr-1" /> Unblock
                     </Button>
@@ -126,6 +144,14 @@ export default function BlockedCustomers({ customersResult }: IProps) {
           />
         </div>
       )}
+
+      <ApproveOrRejectModal
+        open={statusInfo?.customerId?.length > 0}
+        onOpenChange={() => setStatusInfo({ customerId: "", customerName: "" })}
+        status="UNBLOCKED"
+        userId={statusInfo?.customerId}
+        userName={statusInfo?.customerName}
+      />
     </div>
   );
 }

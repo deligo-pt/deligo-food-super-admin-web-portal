@@ -16,8 +16,10 @@ export default async function DashboardPage() {
     if (result?.success) {
       analyticsData = result?.data;
     }
-  } catch (err) {
-    console.error("Server fetch error:", err);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    console.error("Server fetch error:", err?.response?.data || err);
   }
 
   return <Dashboard analyticsData={analyticsData} />;

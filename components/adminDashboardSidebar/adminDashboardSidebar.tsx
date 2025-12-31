@@ -10,7 +10,6 @@ import {
   ChevronRight,
   Grid,
   LayoutDashboard,
-  LayoutList,
   Menu,
   MessageCircleMore,
   NotepadText,
@@ -144,12 +143,6 @@ const MENU = [
       },
       { name: "All Product Categories", path: "/admin/product-categories" },
     ],
-  },
-  {
-    id: "products",
-    title: "All Products",
-    icon: <LayoutList size={18} />,
-    items: [{ name: "All Products", path: "/admin/all-products" }],
   },
   {
     id: "orders",

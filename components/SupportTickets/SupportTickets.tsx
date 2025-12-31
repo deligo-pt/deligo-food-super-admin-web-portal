@@ -18,7 +18,7 @@ import {
   TMessage,
 } from "@/types/chat.type";
 import { getCookie } from "@/utils/cookies";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { ArrowRight, Mail, MessageCircle, Search, X } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -110,6 +110,7 @@ export default function SupportTickets() {
     null
   );
   const [conversation, setConversation] = useState<TConversation | null>(null);
+  const [conversations, setConversations] = useState<TConversation[] >([]);
 
   const filtered = tickets.filter((t) =>
     [t.subject, t.user, t.id]
@@ -173,6 +174,52 @@ export default function SupportTickets() {
 
       {/* Card Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {conversations.map((c) => (
+          <div
+            key={c._id}
+            onClick={() => setDrawer(c)}
+            className="cursor-pointer bg-white rounded-3xl p-5 shadow-sm border hover:shadow-lg transition group"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <span
+                className={`px-3 py-1 text-xs rounded-full ${STATUS[c.status]}`}
+              >
+                {c.status.replace("_", " ")}
+              </span>
+
+              <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
+            </div>
+
+            {/* Subject */}
+            <h2 className="text-lg font-semibold leading-tight group-hover:text-[#DC3173] transition">
+              {c.lastMessage}
+            </h2>
+
+            {/* User */}
+            <div className="flex items-center gap-3 mt-4">
+              <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center">
+                {c.participants
+                  ?.find((p) => p.role !== "ADMIN" && p.role !== "SUPER_ADMIN")
+                  ?.name?.[0]}
+              </div>
+              <div className="text-sm">
+                <p className="font-medium">{c.participants
+                  ?.find((p) => p.role !== "ADMIN" && p.role !== "SUPER_ADMIN")
+                  ?.name}</p>
+                <p className="text-xs text-gray-500">
+                  {formatDistanceToNow(c.createdAt as Date, { addSuffix: true })}
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between mt-5 pt-4 border-t">
+              <p className="text-xs text-gray-500">Room: {c.room}</p>
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
+            </div>
+          </div>
+        ))}
         {filtered.map((t) => (
           <div
             key={t.id}

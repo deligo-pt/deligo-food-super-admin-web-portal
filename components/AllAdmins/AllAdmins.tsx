@@ -11,7 +11,7 @@ import { TMeta, TResponse } from "@/types";
 import { TAdmin } from "@/types/admin.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
-import { Ban, Check, Edit2, Eye, PlusCircle, Trash } from "lucide-react";
+import { Ban, Check, Eye, PlusCircle, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useMemo, useState } from "react";
@@ -152,7 +152,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 bg-gradient-to-b from-white via-gray-50 to-gray-100">
+    <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -171,7 +171,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
             <motion.button
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#DC3173] to-[#e84b93] text-white font-semibold shadow-lg transform hover:-translate-y-0.5 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-[#DC3173] to-[#e84b93] text-white font-semibold shadow-lg transform hover:-translate-y-0.5 transition"
             >
               <PlusCircle size={18} /> Create
             </motion.button>
@@ -240,7 +240,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center text-gray-600 font-bold text-sm overflow-hidden">
+                        <div className="w-12 h-12 rounded-lg bg-linear-to-br from-gray-100 to-gray-50 flex items-center justify-center text-gray-600 font-bold text-sm overflow-hidden">
                           <Avatar className="w-11 h-11">
                             <AvatarImage
                               src={a?.profilePhoto}
@@ -288,9 +288,9 @@ export default function AllAdmins({ adminsResult }: IProps) {
                           <Button variant="ghost">
                             <Eye size={14} /> View
                           </Button>
-                          <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90">
+                          {/* <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90">
                             <Edit2 size={14} /> Edit
-                          </Button>
+                          </Button> */}
                           {a.status === "APPROVED" && (
                             <Button
                               onClick={() =>

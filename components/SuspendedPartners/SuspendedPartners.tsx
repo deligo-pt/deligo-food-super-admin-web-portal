@@ -189,7 +189,7 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
             >
               <Download className="w-4 h-4" /> Export PDF
             </Button>
-            <Button variant="outline" onClick={() => {}}>
+            <Button variant="outline" onClick={() => router.refresh()}>
               <RefreshCcw className="w-4 h-4" /> Reload
             </Button>
           </div>
@@ -204,20 +204,9 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
         id="suspended-print-area"
         className="rounded-xl bg-white shadow-sm overflow-x-auto border"
       >
-        <table className="min-w-[1200px] w-full text-sm">
+        <table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-700 font-semibold sticky top-0">
             <tr>
-              {/* <th className="px-4 py-3 w-12">
-                <input
-                  aria-label="Select all in page"
-                  type="checkbox"
-                  checked={
-                    paginated.length > 0 &&
-                    paginated.every((p) => selectedIds.includes(p.id))
-                  }
-                  onChange={() => selectAllCurrentPage()}
-                />
-              </th> */}
               <th className="px-4 py-3 text-left w-[260px]">Partner</th>
               <th className="px-4 py-3 text-center w-[120px]">City</th>
               <th className="px-4 py-3 text-center w-[120px]">Rating</th>
@@ -230,10 +219,6 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
           <tbody className="divide-y">
             {partnersResult?.data?.map((p) => (
               <tr key={p._id} className="hover:bg-slate-50 align-top">
-                {/* <td className="px-4 py-4">
-                  <input aria-label={`Select ${p.name}`} type="checkbox" />
-                </td> */}
-
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar className="w-11 h-11">

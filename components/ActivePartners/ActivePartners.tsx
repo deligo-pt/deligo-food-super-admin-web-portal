@@ -69,7 +69,7 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
                 <div className="flex items-center gap-4 min-w-0">
                   <Avatar>
                     <AvatarImage src={p.profilePhoto} />
-                    <AvatarFallback>
+                    <AvatarFallback className="bg-[#DC3173]/30">
                       {p.name?.firstName || p.name?.lastName
                         ? `${p.name?.firstName?.[0]}${p.name?.lastName?.[0]}`
                         : ""}
@@ -91,16 +91,11 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
                         {p.operationalData?.rating?.average}
                       </span>
 
-                      <Badge variant="default">
-                        {p.vehicleInfo?.vehicleType}
-                      </Badge>
-
-                      {/* <span className="text-xs text-slate-400">
-                        Violations:{" "}
-                        <strong className="text-rose-600">
-                          {p.violations ?? 0}
-                        </strong>
-                      </span> */}
+                      {p.vehicleInfo?.vehicleType && (
+                        <Badge variant="default" className="bg-[#DC3173]">
+                          {p.vehicleInfo?.vehicleType}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -114,15 +109,12 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
                     € {p.earnings?.totalEarnings?.toLocaleString()}
                   </p>
                   <div className="flex items-center gap-2">
-                    {/* <div className="text-xs text-slate-400">
-                      {p.lastOnline
-                        ? `Online ${timeAgo(p.lastOnline)}`
-                        : "Offline"}
-                    </div> */}
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => router.push(`/admin/partners/${p.userId}`)}
+                      onClick={() =>
+                        router.push(`/admin/all-delivery-partners/${p.userId}`)
+                      }
                     >
                       <Eye className="w-4 h-4 mr-1" /> Details
                     </Button>
