@@ -1,7 +1,7 @@
 import ChatWithVendors from "@/components/Chat/ChatWithVendors/ChatWithVendors";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { TConversation } from "@/types/chat.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -19,23 +19,24 @@ export default async function ChatWithVendorsPage({ searchParams }: IProps) {
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    status: "APPROVED",
   };
 
-  const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };
+  const conversationsData: { data: TConversation[]; meta?: TMeta } = {
+    data: [],
+  };
 
   try {
-    const result = (await serverRequest.get("/vendors", {
+    const result = (await serverRequest.get("/support/conversations", {
       params: query,
-    })) as unknown as TResponse<TVendor[]>;
+    })) as TResponse<TConversation[]>;
 
     if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
+      conversationsData.data = result.data;
+      conversationsData.meta = result.meta;
     }
   } catch (err) {
     console.error("Server fetch error:", err);
   }
 
-  return <ChatWithVendors vendorsResult={initialData} />;
+  return <ChatWithVendors conversationsData={conversationsData} />;
 }

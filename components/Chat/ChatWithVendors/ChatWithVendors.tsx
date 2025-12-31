@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import SelectVendorModal from "@/components/Chat/ChatWithVendors/SelectVendorModal";
-import { Button } from "@/components/ui/button";
+import { useChatSocket } from "@/hooks/use-chat-socket";
+import { getMessagesByRoom } from "@/services/chat/chat";
 import { TMeta } from "@/types";
+import { TConversation, TMessage } from "@/types/chat.type";
 import { TVendor } from "@/types/user.type";
+import { getCookie } from "@/utils/cookies";
 import {
   Camera,
   Check,
@@ -107,6 +111,12 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
   const [attachments, setAttachments] = useState<string[]>([]);
   const [audioFile, setAudioFile] = useState<string | null>(null);
   const [openSelectModal, setOpenSelectModal] = useState(false);
+  const [messages, setMessages] = useState<TMessage[]>([]);
+  const [status, setStatus] = useState("DISCONNECTED");
+  const [conversations, setConversations] = useState<TConversation[]>([]);
+
+  const accessToken = getCookie("accessToken");
+
   // const [previousChatLoading, setPreviousChatLoading] = useState(false);
 
   const textRef = useRef<HTMLTextAreaElement | null>(null);
@@ -134,6 +144,38 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
       );
   }, [vendorMessages, query]);
 
+  const getNewConversation = async (message: TMessage) => {
+    setConversations((prev) => {
+      const isConversationExist = prev?.find((c) => c.room === message?.room);
+
+      if (!isConversationExist) {
+        return [
+          {
+            _id: "temp-id-" + Math.random().toString(36).substring(2, 15),
+            room: message.room,
+            status: "OPEN",
+            lastMessage: message.message,
+            participants: [],
+            handledBy: null,
+            lastMessageTime: new Date().toISOString(),
+            type: "SUPPORT",
+            unreadCount: { admin: 1 },
+            createdAt: new Date(),
+          },
+          ...prev,
+        ];
+      }
+      const filteredConversations = prev.filter((c) => c.room !== message.room);
+      isConversationExist!.lastMessage = message.message;
+      isConversationExist!.lastMessageTime = new Date().toISOString();
+      // isConversationExist!.unreadCount = {
+      //   ...isConversationExist!.unreadCount,
+      //   admin: (isConversationExist!.unreadCount?.admin || 0) + 1,
+      // };
+      return [isConversationExist, ...filteredConversations];
+    });
+  };
+
   // const selectedVendorPrevMessages = async (id: string) => {
   //   setPreviousChatLoading(true);
   //   setSelectedId(id);
@@ -143,6 +185,16 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
   //   }
   //   setPreviousChatLoading(false);
   // };
+
+  const notification = useChatSocket({
+    // const { sendMessage, closeConversation } = useChatSocket({
+    room: selectedId || "admin-notifications-room",
+    token: accessToken as string,
+    onMessage: (msg) => setMessages((prev) => [...prev, msg]),
+    onClosed: () => setStatus("CLOSED"),
+    onError: (msg) => console.log(msg),
+    onNewTicket: (message) => getNewConversation(message),
+  });
 
   // auto-scroll on messages change
   useEffect(() => {
@@ -246,6 +298,14 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
     e.currentTarget.value = "";
   }
 
+  useEffect(() => {
+    if (selectedId) {
+      getMessagesByRoom(selectedId).then((result) => {
+        console.log(result);
+      });
+    }
+  }, [selectedId]);
+
   return (
     <div className="p-6 h-full">
       <div className="max-w-7xl mx-auto flex gap-6 items-start h-full">
@@ -273,175 +333,66 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
             className="space-y-3 max-h-[68vh] overflow-auto px-1 custom-scroll min-h-full"
             role="list"
           >
-            <div className="mt-6 mb-2 text-center">
-              <Button
-                onClick={() => setOpenSelectModal(true)}
-                className="bg-[#DC3173] hover:bg-[#DC3173]/90 mx-auto"
-              >
-                Start a Conversation
-              </Button>
-            </div>
-            {!!newVendor && (
+            {conversations?.map((c) => (
               <div
+                key={c._id}
                 role="listitem"
                 className={`flex items-center gap-3 p-3 rounded-2xl transition ${
-                  selectedId === newVendor?.id
-                    ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
-                    : "hover:bg-white/40"
-                }`}
-              >
-                {/* <button
-                  onClick={() =>
-                    selectedVendorPrevMessages(newVendor?.userId as string)
-                  }
-                  className="flex items-center gap-3 w-full text-left"
-                  aria-label={`Open conversation with ${newVendor?.businessDetails?.businessName}`}
-                >
-                  <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
-                    {newVendor.profilePhoto ? (
-                      <Image
-                        src={newVendor.profilePhoto}
-                        alt={`${newVendor.businessDetails?.businessName} avatar`}
-                        className="w-full h-full object-cover"
-                        width={500}
-                        height={500}
-                      />
-                    ) : (
-                      <span className="text-lg">
-                        {newVendor?.businessDetails?.businessName
-                          ?.split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="font-medium text-sm">
-                        {newVendor?.businessDetails?.businessName} */}
-                {/* {newVendor.pinned ? (
-                          <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
-                            Pinned
-                          </span>
-                        ) : null} */}
-                {/* </div> */}
-                {/* <div className="text-xs text-gray-500">
-                        {new Date(
-                          newVendor.lastSeen ?? Date.now()
-                        ).toLocaleTimeString()}
-                      </div> */}
-                {/* </div> */}
-
-                {/* <div className="text-xs text-gray-500 truncate mt-1">
-                      {newVendor.messages[newVendor.messages.length - 1]?.text ?? "—"}
-                    </div> */}
-                {/* </div>
-                </button> */}
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      setVendorMessages((s) =>
-                        s.map((x) =>
-                          x.id === newVendor.id
-                            ? { ...x, pinned: !x.pinned }
-                            : x
-                        )
-                      )
-                    }
-                    title="Pin conversation"
-                    className="p-2 rounded-md hover:bg-white/40"
-                    aria-pressed={newVendor.pinned ?? false}
-                  >
-                    <MoreVertical className="w-4 h-4 text-gray-600" />
-                  </button>
-
-                  {/* {newVendor.unread ? (
-                    <div
-                      className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
-                      aria-label={`${newVendor.unread} unread messages`}
-                    >
-                      {newVendor.unread}
-                    </div>
-                  ) : null} */}
-                </div>
-              </div>
-            )}
-            {filtered?.map((v) => (
-              <div
-                key={v.id}
-                role="listitem"
-                className={`flex items-center gap-3 p-3 rounded-2xl transition ${
-                  selectedId === v.id
+                  selectedId === c.room
                     ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
                     : "hover:bg-white/40"
                 }`}
               >
                 <button
-                  onClick={() => setSelectedId(v.id)}
+                  onClick={() => setSelectedId(c.room)}
                   className="flex items-center gap-3 w-full text-left"
-                  aria-label={`Open conversation with ${v.name}`}
+                  aria-label={`Open conversation with ${c.room}`}
                 >
                   <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
-                    {v.avatar ? (
+                    {
+                      c.participants?.find((p) => p.role === "VENDOR")
+                        ?.name?.[0]
+                    }
+                  </div>
+                  {/* <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
+                    {c.avatar ? (
                       <Image
                         width={500}
                         height={500}
-                        src={v.avatar}
-                        alt={`${v.name} avatar`}
+                        src={c.avatar}
+                        alt={`${c.name} avatar`}
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-lg">{v.name[0]}</span>
+                      <span className="text-lg">{c.name[0]}</span>
                     )}
-                  </div>
+                  </div> */}
 
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-3">
                       <div className="font-medium text-sm">
-                        {v.name}
-                        {v.pinned ? (
-                          <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
-                            Pinned
-                          </span>
-                        ) : null}
+                        {c.participants?.find((p) => p.role === "VENDOR")?.name}
                       </div>
                       <div className="text-xs text-gray-500">
                         {new Date(
-                          v.lastSeen ?? Date.now()
+                          c.lastMessageTime ?? Date.now()
                         ).toLocaleTimeString()}
                       </div>
                     </div>
 
                     <div className="text-xs text-gray-500 truncate mt-1">
-                      {v.messages[v.messages.length - 1]?.text ?? "—"}
+                      {c.lastMessage}
                     </div>
                   </div>
                 </button>
 
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      setVendorMessages((s) =>
-                        s.map((x) =>
-                          x.id === v.id ? { ...x, pinned: !x.pinned } : x
-                        )
-                      )
-                    }
-                    title="Pin conversation"
-                    className="p-2 rounded-md hover:bg-white/40"
-                    aria-pressed={v.pinned ?? false}
-                  >
-                    <MoreVertical className="w-4 h-4 text-gray-600" />
-                  </button>
-
-                  {v.unread ? (
+                  {c.unreadCount?.admin > 0 ? (
                     <div
                       className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
-                      aria-label={`${v.unread} unread messages`}
+                      aria-label={`${c.unreadCount?.admin} unread messages`}
                     >
-                      {v.unread}
+                      {c.unreadCount?.admin}
                     </div>
                   ) : null}
                 </div>
@@ -503,37 +454,42 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
               aria-live="polite"
             >
               <div className="flex flex-col gap-4">
-                {selected?.messages.map((m) => (
+                {messages.map((m) => (
                   <article
-                    key={m.id}
+                    key={m._id}
                     className={`max-w-[78%] p-3 rounded-2xl border ${
-                      m.from === "admin"
+                      m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
                         ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
                         : "bg-gray-50 border-gray-100"
                     }`}
                     aria-label={`${
-                      m.from === "admin" ? "You" : selected?.name
+                      m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
+                        ? "You"
+                        : selected?.name
                     } message`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <div className="text-xs text-gray-400">
-                        {m.from === "admin" ? "You" : selected?.name} •{" "}
-                        {new Date(m.at).toLocaleString()}
+                        {m.senderRole === "ADMIN" ||
+                        m.senderRole === "SUPER_ADMIN"
+                          ? "You"
+                          : selected?.name}{" "}
+                        • {new Date(m.createdAt as Date).toLocaleString()}
                       </div>
                       <div className="text-xs text-gray-400">
-                        {m.status === "read" ? (
+                        {m.readBy?.admin ? (
                           <Check className="w-4 h-4 text-[#DC3173]" />
-                        ) : m.status === "delivered" ? (
+                        ) : (
                           <Check className="w-4 h-4" />
-                        ) : null}
+                        )}
                       </div>
                     </div>
 
-                    {m.text && (
-                      <div className="text-sm leading-relaxed">{m.text}</div>
+                    {m.message && (
+                      <div className="text-sm leading-relaxed">{m.message}</div>
                     )}
 
-                    {m.images?.length ? (
+                    {/* {m.images?.length ? (
                       <div className="mt-3 grid grid-cols-2 gap-2">
                         {m.images.map((src, i) => (
                           <div
@@ -556,7 +512,7 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                       <div className="mt-2">
                         <audio controls src={m.audio} className="w-full" />
                       </div>
-                    ) : null}
+                    ) : null} */}
                   </article>
                 ))}
 

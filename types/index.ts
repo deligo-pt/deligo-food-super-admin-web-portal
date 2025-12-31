@@ -11,4 +11,5 @@ export type TResponse<T> = {
   message?: string;
   data: T;
   meta?: TMeta;
+  error?: unknown;
 };

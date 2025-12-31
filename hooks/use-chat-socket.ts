@@ -33,7 +33,7 @@ export function useChatSocket({
     socket.removeAllListeners("new-support-ticket");
 
     socket.on("new-support-ticket", (data) => {
-      console.log("Ticket received:", data.message.id);
+      console.log("Ticket received:", data);
       if (onNewTicket) {
         onNewTicket(data.message);
       }

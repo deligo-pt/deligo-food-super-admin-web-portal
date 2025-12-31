@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { TRecentOrder } from "@/types/analytics.type";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
@@ -14,6 +13,7 @@ import {
   UserCheckIcon,
   XCircleIcon,
 } from "lucide-react";
+import Link from "next/link";
 
 interface IProps {
   recentOrders: TRecentOrder[];
@@ -23,6 +23,31 @@ const STATUS_MAP = {
   PENDING: { label: "Pending", color: "text-amber-500", icon: ClockIcon },
   ACCEPTED: { label: "Accepted", color: "text-blue-500", icon: ThumbsUpIcon },
   REJECTED: { label: "Rejected", color: "text-red-500", icon: XCircleIcon },
+  PREPARING: {
+    label: "Preparing",
+    color: "text-yellow-500",
+    icon: ThumbsUpIcon,
+  },
+  READY_FOR_PICKUP: {
+    label: "Ready For Pickup",
+    color: "text-green-500",
+    icon: ThumbsUpIcon,
+  },
+  AWAITING_PARTNER: {
+    label: "Awaiting Partner",
+    color: "text-teal-500",
+    icon: ThumbsUpIcon,
+  },
+  DISPATCHING: {
+    label: "Dispatching",
+    color: "text-cyan-500",
+    icon: TruckIcon,
+  },
+  REASSIGNMENT_NEEDED: {
+    label: "Reassignment Needed",
+    color: "text-red-600",
+    icon: XCircleIcon,
+  },
   ASSIGNED: {
     label: "Assigned",
     color: "text-indigo-500",
@@ -119,12 +144,14 @@ const RecentOrders = ({ recentOrders }: IProps) => {
           </motion.div>
         ))}
       </motion.div>
-      <Button
-        variant="link"
-        className="w-full mt-4 text-[#DC3173] text-sm font-medium hover:underline"
-      >
-        View All Orders
-      </Button>
+      <div className="text-center mt-4">
+        <Link
+          href="/admin/all-orders"
+          className="w-full text-[#DC3173] text-sm font-medium hover:underline"
+        >
+          View All Orders
+        </Link>
+      </div>
     </div>
   );
 };
