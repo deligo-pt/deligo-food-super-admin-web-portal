@@ -214,13 +214,20 @@ export default function PreparingOrders({ ordersResult }: IProps) {
                   </td>
                 </tr>
               ))}
+              {ordersResult?.meta?.total === 0 && (
+                <tr>
+                  <td colSpan={11} className="py-8 text-center text-slate-500">
+                    No orders found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </Card>
 
       {!!ordersResult?.meta?.total && ordersResult?.meta?.total > 0 && (
-        <div className="px-6 pb-4">
+        <div className="px-6 pb-4 mt-4">
           <PaginationComponent
             totalPages={ordersResult?.meta?.totalPage || 0}
           />

@@ -1,5 +1,7 @@
 "use client";
 
+import AllFilters from "@/components/Filtering/AllFilters";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
@@ -10,6 +12,11 @@ import { useState } from "react";
 interface IProps {
   ordersResult: { data: TOrder[]; meta?: TMeta };
 }
+
+const sortOptions = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Oldest First", value: "createdAt" },
+];
 
 export default function DeliveredOrders({ ordersResult }: IProps) {
   const [selected, setSelected] = useState<TOrder | null>(null);
@@ -80,6 +87,8 @@ export default function DeliveredOrders({ ordersResult }: IProps) {
         </div>
       </motion.div>
 
+      <AllFilters sortOptions={sortOptions} />
+
       {/* Content area */}
       <div className="bg-white border rounded-xl shadow-md p-5 transition-all hover:shadow-lg">
         {/* Desktop Table */}
@@ -140,6 +149,16 @@ export default function DeliveredOrders({ ordersResult }: IProps) {
                     </td>
                   </motion.tr>
                 ))}
+                {ordersResult?.meta?.total === 0 && (
+                  <tr>
+                    <td
+                      colSpan={11}
+                      className="py-8 text-center text-slate-500"
+                    >
+                      No orders found.
+                    </td>
+                  </tr>
+                )}
               </AnimatePresence>
             </tbody>
           </table>
@@ -185,9 +204,24 @@ export default function DeliveredOrders({ ordersResult }: IProps) {
                 </div>
               </motion.div>
             ))}
+            {ordersResult?.meta?.total === 0 && (
+              <div>
+                <div className="py-8 text-center text-slate-500">
+                  No orders found.
+                </div>
+              </div>
+            )}
           </AnimatePresence>
         </div>
       </div>
+
+      {!!ordersResult?.meta?.total && ordersResult?.meta?.total > 0 && (
+        <div className="px-6 pb-4">
+          <PaginationComponent
+            totalPages={ordersResult?.meta?.totalPage || 0}
+          />
+        </div>
+      )}
 
       {/* Modal: Order Details */}
       <AnimatePresence>

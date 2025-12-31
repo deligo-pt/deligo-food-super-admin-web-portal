@@ -170,6 +170,13 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
               </div>
             </div>
           ))}
+          {ordersResult?.meta?.total === 0 && (
+            <div>
+              <div className="py-8 text-center text-slate-500">
+                No orders found.
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 

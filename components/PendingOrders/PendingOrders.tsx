@@ -126,11 +126,18 @@ export default function PendingOrders({ ordersResult }: IProps) {
               </div>
             </motion.div>
           ))}
+          {ordersResult?.meta?.total === 0 && (
+            <div>
+              <div className="py-8 text-center text-slate-500">
+                No orders found.
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 
       {!!ordersResult?.meta?.total && ordersResult?.meta?.total > 0 && (
-        <div className="px-6 pb-4">
+        <div className="px-6 pb-4 mt-4">
           <PaginationComponent
             totalPages={ordersResult?.meta?.totalPage || 0}
           />

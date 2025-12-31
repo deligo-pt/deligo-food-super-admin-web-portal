@@ -362,7 +362,7 @@ export default function AllOrders({ ordersResult }: IProps) {
       </div>
 
       {!!ordersResult?.meta?.total && ordersResult?.meta?.total > 0 && (
-        <div className="px-6 pb-4">
+        <div className="px-6 pb-4 mt-4">
           <PaginationComponent
             totalPages={ordersResult?.meta?.totalPage || 0}
           />
