@@ -121,7 +121,7 @@ export default function Topbar({ sidebarWidth = 280, admin }: Props) {
                 background: "linear-gradient(90deg,#ff3b30,#ff6b6b)",
                 boxShadow: `0 4px 18px ${PRIMARY}33`,
               }}
-              onClick={() => alert("SOS triggered")}
+              onClick={() => router.push("/admin/sos")}
             >
               <motion.span
                 aria-hidden

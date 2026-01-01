@@ -2,12 +2,17 @@ import ChatWithVendors from "@/components/Chat/ChatWithVendors/ChatWithVendors";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TConversation } from "@/types/chat.type";
+import { jwtDecode } from "jwt-decode";
+import { cookies } from "next/headers";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
 export default async function ChatWithVendorsPage({ searchParams }: IProps) {
+  const accessToken = (await cookies()).get("accessToken")?.value;
+  const decoded = jwtDecode(accessToken as string) as { id: string };
+
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -30,6 +35,8 @@ export default async function ChatWithVendorsPage({ searchParams }: IProps) {
       params: query,
     })) as TResponse<TConversation[]>;
 
+    console.log(result);
+
     if (result?.success) {
       conversationsData.data = result.data;
       conversationsData.meta = result.meta;
@@ -38,5 +45,11 @@ export default async function ChatWithVendorsPage({ searchParams }: IProps) {
     console.error("Server fetch error:", err);
   }
 
-  return <ChatWithVendors conversationsData={conversationsData} />;
+  return (
+    <ChatWithVendors
+      conversationsData={conversationsData}
+      accessToken={accessToken as string}
+      decoded={decoded}
+    />
+  );
 }

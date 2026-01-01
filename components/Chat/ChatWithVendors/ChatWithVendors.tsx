@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import SelectVendorModal from "@/components/Chat/ChatWithVendors/SelectVendorModal";
-import { useChatSocket } from "@/hooks/use-chat-socket";
+import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { getMessagesByRoom } from "@/services/chat/chat";
-import { TMeta } from "@/types";
+import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
-import { TVendor } from "@/types/user.type";
-import { getCookie } from "@/utils/cookies";
+import { fetchData } from "@/utils/requests";
+import { formatDistanceToNow } from "date-fns";
 import {
   Camera,
   Check,
@@ -100,22 +99,26 @@ type Vendor = {
 // ];
 
 interface IProps {
-  vendorsResult: { data: TVendor[]; meta?: TMeta };
+  conversationsData: { data: TConversation[]; meta?: TMeta };
+  accessToken: string;
+  decoded: { id: string };
 }
 
-export default function ChatWithVendors({ vendorsResult }: IProps) {
+export default function ChatWithVendors({
+  conversationsData,
+  accessToken,
+  decoded,
+}: IProps) {
   const [vendorMessages, setVendorMessages] = useState<Vendor[]>([]);
-  const [newVendor, setNewVendor] = useState<Vendor | null>(null);
   const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
   const [audioFile, setAudioFile] = useState<string | null>(null);
-  const [openSelectModal, setOpenSelectModal] = useState(false);
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [status, setStatus] = useState("DISCONNECTED");
-  const [conversations, setConversations] = useState<TConversation[]>([]);
-
-  const accessToken = getCookie("accessToken");
+  const [conversations, setConversations] = useState<TConversation[]>(
+    conversationsData?.data || []
+  );
 
   // const [previousChatLoading, setPreviousChatLoading] = useState(false);
 
@@ -125,11 +128,12 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
   const endRef = useRef<HTMLDivElement | null>(null);
 
   // Selected vendor
-  const selected = useMemo(
-    () =>
-      vendorMessages?.find((v) => v.id === selectedId) ?? vendorMessages?.[0],
-    [vendorMessages, selectedId]
-  );
+  const selected = useMemo(() => {
+    const participant = conversations
+      ?.find((c) => c.room === selectedId)
+      ?.participants?.find((p) => p.role === "VENDOR");
+    return participant;
+  }, [conversations, selectedId]);
 
   // Filter & pinned-first
   const filtered = useMemo(() => {
@@ -144,119 +148,101 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
       );
   }, [vendorMessages, query]);
 
-  const getNewConversation = async (message: TMessage) => {
+  const getConversation = async (room: string) => {
+    try {
+      const result = (await fetchData(`/support/conversations/${room}`, {
+        headers: { authorization: accessToken },
+      })) as TResponse<TConversation>;
+
+      console.log(result);
+
+      if (result.success) {
+        return {
+          success: true,
+          data: result.data,
+          message: result.message,
+        };
+      }
+
+      return {
+        success: false,
+        data: null,
+        message: result.message || "Get conversation failed",
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error?.response?.data || error,
+        message: error?.response?.data?.message || "Get conversation failed",
+      };
+    }
+  };
+
+  const getNewConversation = async (message: {
+    message: TMessage;
+    room: string;
+  }) => {
+    let newConversation = {} as TConversation;
+
+    const result = await getConversation(message?.room);
+    if (result.success) {
+      newConversation = result.data;
+    }
+
     setConversations((prev) => {
       const isConversationExist = prev?.find((c) => c.room === message?.room);
 
       if (!isConversationExist) {
-        return [
-          {
-            _id: "temp-id-" + Math.random().toString(36).substring(2, 15),
-            room: message.room,
-            status: "OPEN",
-            lastMessage: message.message,
-            participants: [],
-            handledBy: null,
-            lastMessageTime: new Date().toISOString(),
-            type: "SUPPORT",
-            unreadCount: { admin: 1 },
-            createdAt: new Date(),
-          },
-          ...prev,
-        ];
+        return [newConversation, ...prev];
       }
       const filteredConversations = prev.filter((c) => c.room !== message.room);
-      isConversationExist!.lastMessage = message.message;
-      isConversationExist!.lastMessageTime = new Date().toISOString();
-      // isConversationExist!.unreadCount = {
-      //   ...isConversationExist!.unreadCount,
-      //   admin: (isConversationExist!.unreadCount?.admin || 0) + 1,
-      // };
+      console.log(message);
+
+      isConversationExist!.lastMessage = message.message?.message;
+      isConversationExist!.lastMessageTime = message.message
+        ?.createdAt as unknown as string;
       return [isConversationExist, ...filteredConversations];
     });
   };
 
-  // const selectedVendorPrevMessages = async (id: string) => {
-  //   setPreviousChatLoading(true);
-  //   setSelectedId(id);
-  //   const result = await getVendorPreviousChats(id);
-  //   if (result.success) {
-  //     setVendorMessages(result.data as unknown as Vendor[]);
-  //   }
-  //   setPreviousChatLoading(false);
-  // };
-
-  const notification = useChatSocket({
-    // const { sendMessage, closeConversation } = useChatSocket({
-    room: selectedId || "admin-notifications-room",
+  useAdminChatSocket({
     token: accessToken as string,
-    onMessage: (msg) => setMessages((prev) => [...prev, msg]),
+    onMessage: (msg) =>
+      getNewConversation(
+        msg as unknown as {
+          message: TMessage;
+          room: string;
+        }
+      ),
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
-    onNewTicket: (message) => getNewConversation(message),
+  });
+
+  const { sendMessage } = useChatSocket({
+    // const { sendMessage, closeConversation } = useChatSocket({
+    room: selectedId,
+    token: accessToken as string,
+    onMessage: (msg) => {
+      if (msg.room === selectedId) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    },
+    onClosed: () => setStatus("CLOSED"),
+    onError: (msg) => console.log(msg),
+    // onNewTicket: (message) => getNewConversation(message),
   });
 
   // auto-scroll on messages change
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [selected?.messages.length, selected?.id]);
-
-  // small simulated typing animation for demo
-  useEffect(() => {
-    const t = setInterval(() => {
-      setVendorMessages((p) =>
-        p?.map((v) => (v.id === "v2" ? { ...v, typing: !v.typing } : v))
-      );
-    }, 7000);
-    return () => clearInterval(t);
-  }, []);
+  }, [messages]);
 
   function handleSend() {
-    if (!selected) return;
     const text = textRef.current?.value.trim() ?? "";
     if (!text && attachments.length === 0 && !audioFile) return;
 
-    const msg: Message = {
-      id: `m-${Date.now()}`,
-      from: "admin",
-      text: text || undefined,
-      images: attachments.length ? attachments : undefined,
-      audio: audioFile || undefined,
-      at: new Date().toISOString(),
-      status: "sent",
-    };
-
-    setVendorMessages((prev) =>
-      prev.map((v) =>
-        v.id === selected.id
-          ? { ...v, messages: [...v.messages, msg], unread: 0 }
-          : v
-      )
-    );
-
-    // optimistic demo status updates
-    setTimeout(() => {
-      setVendorMessages((p) =>
-        p.map((v) => ({
-          ...v,
-          messages: v.messages.map((m) => ({
-            ...m,
-            status: m.status === "sent" ? "delivered" : m.status,
-          })),
-        }))
-      );
-    }, 600);
-    setTimeout(() => {
-      setVendorMessages((p) =>
-        p.map((v) => ({
-          ...v,
-          messages: v.messages.map((m) => ({
-            ...m,
-            status: m.status === "delivered" ? "read" : m.status,
-          })),
-        }))
-      );
-    }, 1600);
+    sendMessage(text);
 
     // reset
     if (textRef.current) textRef.current.value = "";
@@ -265,20 +251,20 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
     textRef.current?.focus();
   }
   // keyboard shortcuts
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-        e.preventDefault();
-        handleSend();
-      }
-      if (e.key === "Escape") {
-        textRef.current?.blur();
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attachments, audioFile, selected]);
+  // useEffect(() => {
+  //   function onKey(e: KeyboardEvent) {
+  //     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+  //       e.preventDefault();
+  //       handleSend();
+  //     }
+  //     if (e.key === "Escape") {
+  //       textRef.current?.blur();
+  //     }
+  //   }
+  //   window.addEventListener("keydown", onKey);
+  //   return () => window.removeEventListener("keydown", onKey);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [attachments, audioFile, selected]);
 
   function onSelectImages(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
@@ -301,7 +287,11 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
   useEffect(() => {
     if (selectedId) {
       getMessagesByRoom(selectedId).then((result) => {
-        console.log(result);
+        if (result.success) {
+          setMessages(result.data);
+        } else {
+          setMessages([]);
+        }
       });
     }
   }, [selectedId]);
@@ -330,7 +320,7 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
           </div>
 
           <div
-            className="space-y-3 max-h-[68vh] overflow-auto px-1 custom-scroll min-h-full"
+            className="space-y-3 max-h-[68vh] overflow-auto px-1 custom-scroll min-h-full mt-4"
             role="list"
           >
             {conversations?.map((c) => (
@@ -374,9 +364,9 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                         {c.participants?.find((p) => p.role === "VENDOR")?.name}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {new Date(
-                          c.lastMessageTime ?? Date.now()
-                        ).toLocaleTimeString()}
+                        {formatDistanceToNow(c.lastMessageTime, {
+                          addSuffix: true,
+                        })}
                       </div>
                     </div>
 
@@ -387,12 +377,14 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                 </button>
 
                 <div className="flex items-center gap-2">
-                  {c.unreadCount?.admin > 0 ? (
+                  {c.unreadCount?.[decoded?.id] > 0 ? (
                     <div
                       className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
-                      aria-label={`${c.unreadCount?.admin} unread messages`}
+                      aria-label={`${
+                        c.unreadCount?.[decoded?.id]
+                      } unread messages`}
                     >
-                      {c.unreadCount?.admin}
+                      {c.unreadCount?.[decoded?.id]}
                     </div>
                   ) : null}
                 </div>
@@ -402,94 +394,106 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
         </aside>
 
         {/* Chat area (flex grows) */}
+
         <section
-          className="flex-1 bg-white rounded-3xl shadow-lg border p-0 overflow-hidden h-full"
+          className="max-h-[calc(100vh-148px)] flex-1 bg-white rounded-3xl shadow-lg border p-0 overflow-hidden h-full"
           aria-label="Chat area"
         >
-          <div className="flex flex-col h-full">
-            {/* Header */}
-            <header className="px-6 py-4 border-b flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12">
-                  {selected?.avatar ? (
-                    <Image
-                      width={500}
-                      height={500}
-                      src={selected.avatar}
-                      alt={`${selected?.name} avatar`}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) : (
+          {selectedId ? (
+            <div className="flex flex-col h-full">
+              {/* Header */}
+              <header className="px-6 py-4 border-b flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {/* <div className="w-12 h-12">
+                    {selected?.avatar ? (
+                      <Image
+                        width={500}
+                        height={500}
+                        src={selected.avatar}
+                        alt={`${selected?.name} avatar`}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 flex items-center justify-center text-[#DC3173] font-semibold">
+                        {selected?.name?.[0]}
+                      </div>
+                    )}
+                  </div> */}
+                  <div className="w-12 h-12">
                     <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 flex items-center justify-center text-[#DC3173] font-semibold">
                       {selected?.name?.[0]}
                     </div>
-                  )}
-                </div>
-                <div>
-                  <div className="font-semibold">{selected?.name}</div>
-                  <div className="text-xs text-gray-500">
-                    {selected?.store ?? "Vendor"}
+                  </div>
+                  <div>
+                    <div className="font-semibold">{selected?.name}</div>
+                    <div className="text-xs text-gray-500">Vendor</div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-3 text-sm text-gray-500">
-                Last seen:{" "}
-                {selected
-                  ? new Date(selected.lastSeen ?? Date.now()).toLocaleString()
-                  : "-"}
-                <button
-                  className="p-2 rounded-md hover:bg-gray-100"
-                  aria-label="More options"
-                >
-                  <MoreVertical className="w-5 h-5 text-gray-600" />
-                </button>
-              </div>
-            </header>
-
-            {/* Messages list */}
-            <div
-              className="flex-1 overflow-auto p-6 custom-scroll"
-              role="log"
-              aria-live="polite"
-            >
-              <div className="flex flex-col gap-4">
-                {messages.map((m) => (
-                  <article
-                    key={m._id}
-                    className={`max-w-[78%] p-3 rounded-2xl border ${
-                      m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
-                        ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
-                        : "bg-gray-50 border-gray-100"
-                    }`}
-                    aria-label={`${
-                      m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
-                        ? "You"
-                        : selected?.name
-                    } message`}
+                <div className="flex items-center gap-3 text-sm text-gray-500">
+                  {/* Last seen:{" "}
+                  {selected
+                    ? new Date(selected.lastSeen ?? Date.now()).toLocaleString()
+                    : "-"} */}
+                  <button
+                    className="p-2 rounded-md hover:bg-gray-100"
+                    aria-label="More options"
                   >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="text-xs text-gray-400">
-                        {m.senderRole === "ADMIN" ||
+                    <MoreVertical className="w-5 h-5 text-gray-600" />
+                  </button>
+                </div>
+              </header>
+
+              {/* Messages list */}
+              <div
+                className="flex-1 overflow-auto p-6 custom-scroll"
+                role="log"
+                aria-live="polite"
+              >
+                <div className="flex flex-col gap-4">
+                  {messages.map((m) => (
+                    <article
+                      key={m._id}
+                      className={`max-w-[78%] p-3 rounded-2xl border ${
+                        m.senderRole === "ADMIN" ||
+                        m.senderRole === "SUPER_ADMIN"
+                          ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
+                          : "bg-gray-50 border-gray-100"
+                      }`}
+                      aria-label={`${
+                        m.senderRole === "ADMIN" ||
                         m.senderRole === "SUPER_ADMIN"
                           ? "You"
-                          : selected?.name}{" "}
-                        • {new Date(m.createdAt as Date).toLocaleString()}
+                          : selected?.name
+                      } message`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs text-gray-400">
+                          {m.senderRole === "ADMIN" ||
+                          m.senderRole === "SUPER_ADMIN"
+                            ? "You"
+                            : selected?.name}{" "}
+                          •{" "}
+                          {formatDistanceToNow(m.createdAt as Date, {
+                            addSuffix: true,
+                          })}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {m.readBy?.admin ? (
+                            <Check className="w-4 h-4 text-[#DC3173]" />
+                          ) : (
+                            <Check className="w-4 h-4" />
+                          )}
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-400">
-                        {m.readBy?.admin ? (
-                          <Check className="w-4 h-4 text-[#DC3173]" />
-                        ) : (
-                          <Check className="w-4 h-4" />
-                        )}
-                      </div>
-                    </div>
 
-                    {m.message && (
-                      <div className="text-sm leading-relaxed">{m.message}</div>
-                    )}
+                      {m.message && (
+                        <div className="text-sm leading-relaxed">
+                          {m.message}
+                        </div>
+                      )}
 
-                    {/* {m.images?.length ? (
+                      {/* {m.images?.length ? (
                       <div className="mt-3 grid grid-cols-2 gap-2">
                         {m.images.map((src, i) => (
                           <div
@@ -513,135 +517,132 @@ export default function ChatWithVendors({ vendorsResult }: IProps) {
                         <audio controls src={m.audio} className="w-full" />
                       </div>
                     ) : null} */}
-                  </article>
-                ))}
+                    </article>
+                  ))}
 
-                {selected?.typing && (
-                  <div className="max-w-[50%] p-3 rounded-2xl bg-gray-50 border border-gray-100">
-                    <div className="text-xs text-gray-500">
-                      {selected?.name} is typing...
+                  {/* {selected?.typing && (
+                    <div className="max-w-[50%] p-3 rounded-2xl bg-gray-50 border border-gray-100">
+                      <div className="text-xs text-gray-500">
+                        {selected?.name} is typing...
+                      </div>
+                      <div className="flex gap-1 mt-2">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                        <span
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.12s" }}
+                        />
+                        <span
+                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.24s" }}
+                        />
+                      </div>
                     </div>
-                    <div className="flex gap-1 mt-2">
-                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                      <span
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.12s" }}
-                      />
-                      <span
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.24s" }}
-                      />
-                    </div>
-                  </div>
-                )}
-
+                  )} */}
+                </div>
                 <div ref={endRef} />
               </div>
-            </div>
 
-            {/* Composer (fixed bottom inside card) */}
-            <div className="border-t p-4 bg-white">
-              <div className="flex items-end gap-3">
-                <div className="flex items-center gap-2">
-                  <label
-                    className="cursor-pointer bg-gray-100 p-2 rounded-xl"
-                    title="Attach images"
-                  >
-                    <Camera className="w-5 h-5 text-gray-600" aria-hidden />
-                    <input
-                      ref={imageRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={onSelectImages}
+              {/* Composer (fixed bottom inside card) */}
+              <div className="border-t p-4 bg-white">
+                <div className="flex items-end gap-3">
+                  <div className="flex items-center gap-2">
+                    <label
+                      className="cursor-pointer bg-gray-100 p-2 rounded-xl"
+                      title="Attach images"
+                    >
+                      <Camera className="w-5 h-5 text-gray-600" aria-hidden />
+                      <input
+                        ref={imageRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={onSelectImages}
+                      />
+                    </label>
+
+                    <label
+                      className="cursor-pointer bg-gray-100 p-2 rounded-xl"
+                      title="Attach audio"
+                    >
+                      <Mic className="w-5 h-5 text-gray-600" aria-hidden />
+                      <input
+                        ref={audioRef}
+                        type="file"
+                        accept="audio/*"
+                        className="hidden"
+                        onChange={onSelectAudio}
+                      />
+                    </label>
+
+                    <label
+                      className="cursor-pointer bg-gray-100 p-2 rounded-xl"
+                      title="Attach file"
+                    >
+                      <Paperclip
+                        className="w-5 h-5 text-gray-600"
+                        aria-hidden
+                      />
+                      <input type="file" className="hidden" />
+                    </label>
+                  </div>
+
+                  <div className="flex-1 flex flex-col">
+                    <textarea
+                      ref={textRef}
+                      placeholder="Write a message..."
+                      rows={2}
+                      className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#DC3173]/30 outline-none"
+                      aria-label="Message composer"
                     />
-                  </label>
 
-                  <label
-                    className="cursor-pointer bg-gray-100 p-2 rounded-xl"
-                    title="Attach audio"
-                  >
-                    <Mic className="w-5 h-5 text-gray-600" aria-hidden />
-                    <input
-                      ref={audioRef}
-                      type="file"
-                      accept="audio/*"
-                      className="hidden"
-                      onChange={onSelectAudio}
-                    />
-                  </label>
+                    {/* previews */}
+                    {attachments.length > 0 && (
+                      <div className="mt-2 flex gap-2" aria-live="polite">
+                        {attachments.map((a, i) => (
+                          <div
+                            key={i}
+                            className="w-14 h-14 rounded-lg overflow-hidden border"
+                          >
+                            <Image
+                              width={500}
+                              height={500}
+                              src={a}
+                              alt={`attachment-preview-${i}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                  <label
-                    className="cursor-pointer bg-gray-100 p-2 rounded-xl"
-                    title="Attach file"
-                  >
-                    <Paperclip className="w-5 h-5 text-gray-600" aria-hidden />
-                    <input type="file" className="hidden" />
-                  </label>
-                </div>
+                    {audioFile && (
+                      <div className="mt-2">
+                        <audio controls src={audioFile} className="w-full" />
+                      </div>
+                    )}
+                  </div>
 
-                <div className="flex-1 flex flex-col">
-                  <textarea
-                    ref={textRef}
-                    placeholder="Write a message..."
-                    rows={2}
-                    className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#DC3173]/30 outline-none"
-                    aria-label="Message composer"
-                  />
-
-                  {/* previews */}
-                  {attachments.length > 0 && (
-                    <div className="mt-2 flex gap-2" aria-live="polite">
-                      {attachments.map((a, i) => (
-                        <div
-                          key={i}
-                          className="w-14 h-14 rounded-lg overflow-hidden border"
-                        >
-                          <Image
-                            width={500}
-                            height={500}
-                            src={a}
-                            alt={`attachment-preview-${i}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {audioFile && (
-                    <div className="mt-2">
-                      <audio controls src={audioFile} className="w-full" />
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <button
-                    onClick={handleSend}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#DC3173] text-white shadow-lg"
-                    aria-label="Send message"
-                  >
-                    <Send className="w-4 h-4" />
-                    Send
-                  </button>
+                  <div>
+                    <button
+                      onClick={handleSend}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#DC3173] text-white shadow-lg"
+                      aria-label="Send message"
+                    >
+                      <Send className="w-4 h-4" />
+                      Send
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="border-t p-4 bg-white text-center text-gray-500 h-full flex items-center justify-center">
+              Select a conversation to start chatting
+            </div>
+          )}
         </section>
       </div>
-
-      <SelectVendorModal
-        vendors={vendorsResult?.data}
-        open={openSelectModal}
-        onOpenChange={setOpenSelectModal}
-        onClick={(vendor: TVendor) => {
-          setNewVendor(vendor as unknown as Vendor);
-          setOpenSelectModal(false);
-        }}
-      />
 
       {/* styles */}
       <style jsx>{`

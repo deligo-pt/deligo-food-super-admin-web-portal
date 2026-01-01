@@ -1,11 +1,10 @@
 "use client";
 
 import { useChatSocket } from "@/hooks/use-chat-socket";
-import { getMessagesByRoom } from "@/services/chat/chat";
 import { TMessage } from "@/types/chat.type";
 import { getCookie } from "@/utils/cookies";
 import { jwtDecode } from "jwt-decode";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface Props {
   room: string;
@@ -22,11 +21,6 @@ export default function ChatWithVendorPanel({ room }: Props) {
   const accessToken = getCookie("accessToken");
   const decoded = jwtDecode(accessToken || "") as { id: string };
   const adminId = decoded?.id;
-
-  // Load messages on room change
-  useEffect(() => {
-    getMessagesByRoom(room).then((result) => setMessages(result.data));
-  }, [room]);
 
   const { sendMessage, closeConversation } = useChatSocket({
     room,
