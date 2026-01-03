@@ -1,4 +1,4 @@
-import ChatWithVendors from "@/components/Chat/ChatWithVendors/ChatWithVendors";
+import ChatWithFleetManagers from "@/components/Chat/ChatWithFleetManagers/ChatWithFleetManagers";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TConversation } from "@/types/chat.type";
@@ -24,7 +24,7 @@ export default async function ChatWithVendorsPage({ searchParams }: IProps) {
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    role: "VENDOR",
+    role: "FLEET_MANAGER",
   };
 
   const conversationsData: { data: TConversation[]; meta?: TMeta } = {
@@ -45,7 +45,7 @@ export default async function ChatWithVendorsPage({ searchParams }: IProps) {
   }
 
   return (
-    <ChatWithVendors
+    <ChatWithFleetManagers
       conversationsData={conversationsData}
       accessToken={accessToken as string}
       decoded={decoded}

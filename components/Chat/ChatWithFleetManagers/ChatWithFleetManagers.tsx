@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { getMessagesByRoom } from "@/services/chat/chat";
@@ -18,103 +17,23 @@ import {
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-type Message = {
-  id: string;
-  from: "vendor" | "admin";
-  text?: string;
-  images?: string[];
-  audio?: string | null;
-  at: string;
-  status?: "sent" | "delivered" | "read";
-};
-
-type Vendor = {
-  id: string;
-  name: string;
-  store?: string;
-  avatar?: string;
-  lastSeen?: string;
-  typing?: boolean;
-  unread?: number;
-  pinned?: boolean;
-  messages: Message[];
-};
-
-// const SAMPLE = "/mnt/data/Screenshot from 2025-11-22 23-47-09.png";
-
-// const INITIAL_VENDORS: Vendor[] = [
-//   {
-//     id: "v1",
-//     name: "Padaria Lisboa",
-//     store: "Padaria Lisboa — Lisbon",
-//     avatar: SAMPLE,
-//     lastSeen: new Date().toISOString(),
-//     unread: 2,
-//     pinned: true,
-//     typing: false,
-//     messages: [
-//       {
-//         id: "m1",
-//         from: "vendor",
-//         text: "Hi! Order #123 will be 10 min late.",
-//         at: new Date().toISOString(),
-//         status: "delivered",
-//       },
-//     ],
-//   },
-//   {
-//     id: "v2",
-//     name: "Mercearia Porto",
-//     store: "Mercearia Porto — Porto",
-//     avatar: undefined,
-//     lastSeen: new Date().toISOString(),
-//     typing: true,
-//     messages: [
-//       {
-//         id: "m2",
-//         from: "vendor",
-//         text: "Uploaded the receipt.",
-//         images: [SAMPLE],
-//         at: new Date().toISOString(),
-//         status: "read",
-//       },
-//     ],
-//   },
-//   {
-//     id: "v3",
-//     name: "Restaurante Gaia",
-//     avatar: undefined,
-//     lastSeen: new Date().toISOString(),
-//     typing: false,
-//     messages: [
-//       {
-//         id: "m3",
-//         from: "vendor",
-//         text: "Obrigado!",
-//         at: new Date().toISOString(),
-//         status: "read",
-//       },
-//     ],
-//   },
-// ];
-
 interface IProps {
   conversationsData: { data: TConversation[]; meta?: TMeta };
   accessToken: string;
   decoded: { id: string };
 }
 
-export default function ChatWithVendors({
+export default function ChatWithFleetManagers({
   conversationsData,
   accessToken,
   decoded,
 }: IProps) {
-  const [vendorMessages, setVendorMessages] = useState<Vendor[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
   const [audioFile, setAudioFile] = useState<string | null>(null);
   const [messages, setMessages] = useState<TMessage[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [status, setStatus] = useState("DISCONNECTED");
   const [conversations, setConversations] = useState<TConversation[]>(
     conversationsData?.data || []
@@ -127,34 +46,19 @@ export default function ChatWithVendors({
   const audioRef = useRef<HTMLInputElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  // Selected vendor
+  // Selected fleet manager
   const selected = useMemo(() => {
     const participant = conversations
       ?.find((c) => c.room === selectedId)
-      ?.participants?.find((p) => p.role === "VENDOR");
+      ?.participants?.find((p) => p.role === "FLEET_MANAGER");
     return participant;
   }, [conversations, selectedId]);
-
-  // Filter & pinned-first
-  const filtered = useMemo(() => {
-    return vendorMessages
-      ?.slice()
-      .sort((a, b) => (a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1))
-      .filter((v) =>
-        [v.name, v.store, v.messages.map((m) => m.text).join(" ")]
-          .join(" ")
-          .toLowerCase()
-          .includes(query.toLowerCase())
-      );
-  }, [vendorMessages, query]);
 
   const getConversation = async (room: string) => {
     try {
       const result = (await fetchData(`/support/conversations/${room}`, {
         headers: { authorization: accessToken },
       })) as TResponse<TConversation>;
-
-      console.log(result);
 
       if (result.success) {
         return {
@@ -183,7 +87,7 @@ export default function ChatWithVendors({
     message: TMessage;
     room: string;
   }) => {
-    if (message?.message?.senderRole === "VENDOR") {
+    if (message?.message?.senderRole === "FLEET_MANAGER") {
       let newConversation = {} as TConversation;
 
       const result = await getConversation(message?.room);
@@ -200,7 +104,6 @@ export default function ChatWithVendors({
         const filteredConversations = prev.filter(
           (c) => c.room !== message.room
         );
-        console.log(message);
 
         isConversationExist!.lastMessage = message.message?.message;
         isConversationExist!.lastMessageTime = message.message
@@ -224,7 +127,6 @@ export default function ChatWithVendors({
   });
 
   const { sendMessage } = useChatSocket({
-    // const { sendMessage, closeConversation } = useChatSocket({
     room: selectedId,
     token: accessToken as string,
     onMessage: (msg) => {
@@ -234,7 +136,6 @@ export default function ChatWithVendors({
     },
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
-    // onNewTicket: (message) => getNewConversation(message),
   });
 
   // auto-scroll on messages change
@@ -254,21 +155,6 @@ export default function ChatWithVendors({
     setAudioFile(null);
     textRef.current?.focus();
   }
-  // keyboard shortcuts
-  // useEffect(() => {
-  //   function onKey(e: KeyboardEvent) {
-  //     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-  //       e.preventDefault();
-  //       handleSend();
-  //     }
-  //     if (e.key === "Escape") {
-  //       textRef.current?.blur();
-  //     }
-  //   }
-  //   window.addEventListener("keydown", onKey);
-  //   return () => window.removeEventListener("keydown", onKey);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [attachments, audioFile, selected]);
 
   function onSelectImages(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
@@ -306,17 +192,17 @@ export default function ChatWithVendors({
         {/* Floating glass card sidebar (360px) */}
         <aside
           className="w-[360px] max-w-[360px] min-w-[360px] backdrop-blur-md border border-white/40 rounded-3xl p-4 shadow-xl overflow-hidden h-full! max-h-full! min-h-full! bg-white"
-          aria-label="Vendors (floating card)"
+          aria-label="Fleet Managers (floating card)"
         >
           <div>
-            <h3 className="text-lg font-bold">Vendors</h3>
+            <h3 className="text-lg font-bold">Fleet Managers</h3>
             <p className="text-xs text-gray-600/80">Active conversations</p>
           </div>
           <div className="hidden sm:flex items-center bg-white/60 rounded-lg px-3 py-2 border border-white/30 shadow-sm mt-3">
             <Search className="w-4 h-4 text-gray-500 mr-2" />
             <input
-              aria-label="Search vendorMessages"
-              placeholder="Search vendorMessages..."
+              aria-label="Search fleetManagersMessages"
+              placeholder="Search fleetManagersMessages..."
               className="outline-none text-sm bg-transparent"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -344,28 +230,19 @@ export default function ChatWithVendors({
                 >
                   <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
                     {
-                      c.participants?.find((p) => p.role === "VENDOR")
+                      c.participants?.find((p) => p.role === "FLEET_MANAGER")
                         ?.name?.[0]
                     }
                   </div>
-                  {/* <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
-                    {c.avatar ? (
-                      <Image
-                        width={500}
-                        height={500}
-                        src={c.avatar}
-                        alt={`${c.name} avatar`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-lg">{c.name[0]}</span>
-                    )}
-                  </div> */}
 
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-3">
                       <div className="font-medium text-sm">
-                        {c.participants?.find((p) => p.role === "VENDOR")?.name}
+                        {
+                          c.participants?.find(
+                            (p) => p.role === "FLEET_MANAGER"
+                          )?.name
+                        }
                       </div>
                       <div className="text-xs text-gray-500">
                         {formatDistanceToNow(c.lastMessageTime, {
@@ -408,21 +285,6 @@ export default function ChatWithVendors({
               {/* Header */}
               <header className="px-6 py-4 border-b flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {/* <div className="w-12 h-12">
-                    {selected?.avatar ? (
-                      <Image
-                        width={500}
-                        height={500}
-                        src={selected.avatar}
-                        alt={`${selected?.name} avatar`}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 flex items-center justify-center text-[#DC3173] font-semibold">
-                        {selected?.name?.[0]}
-                      </div>
-                    )}
-                  </div> */}
                   <div className="w-12 h-12">
                     <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 flex items-center justify-center text-[#DC3173] font-semibold">
                       {selected?.name?.[0]}
@@ -430,7 +292,7 @@ export default function ChatWithVendors({
                   </div>
                   <div>
                     <div className="font-semibold">{selected?.name}</div>
-                    <div className="text-xs text-gray-500">Vendor</div>
+                    <div className="text-xs text-gray-500">Fleet Manager</div>
                   </div>
                 </div>
 
@@ -679,7 +541,7 @@ export default function ChatWithVendors({
             padding-left: 12px;
             padding-right: 12px;
           }
-          aside[aria-label="Vendors (floating card)"] {
+          aside[aria-label="Fleet Managers (floating card)"] {
             width: 100%;
             max-width: 100%;
             min-width: auto;
