@@ -315,8 +315,8 @@ export default function ChatWithVendors({
           <div className="hidden sm:flex items-center bg-white/60 rounded-lg px-3 py-2 border border-white/30 shadow-sm mt-3">
             <Search className="w-4 h-4 text-gray-500 mr-2" />
             <input
-              aria-label="Search vendorMessages"
-              placeholder="Search vendorMessages..."
+              aria-label="Search vendors"
+              placeholder="Search..."
               className="outline-none text-sm bg-transparent"
               value={query}
               onChange={(e) => setQuery(e.target.value)}

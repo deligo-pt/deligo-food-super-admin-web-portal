@@ -85,7 +85,6 @@ const MENU = [
       { name: "Active Customers", path: "/admin/active-customers" },
       { name: "Blocked Customers", path: "/admin/blocked-customers" },
       { name: "Customer Feedback", path: "/admin/customer-feedback" },
-      { name: "Customer Orders", path: "/admin/customer-orders" },
     ],
   },
   {
@@ -233,6 +232,10 @@ const MENU = [
     items: [
       { name: "Support Tickets", path: "/admin/support-tickets" },
       { name: "Chat With Vendors", path: "/admin/chat-with-vendors" },
+      {
+        name: "Chat With Fleet Managers",
+        path: "/admin/chat-with-fleet-managers",
+      },
       { name: "Chat With Drivers", path: "/admin/chat-with-drivers" },
       { name: "Chat With Customers", path: "/admin/chat-with-customers" },
     ],
