@@ -29,6 +29,7 @@ export type TMessage = {
 export type TConversation = {
   _id: string;
   room: string;
+  ticketId: string;
   participants: TConversationParticipant[];
   handledBy: string | null;
   status: TConversationStatus;

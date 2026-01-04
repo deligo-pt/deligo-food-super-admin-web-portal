@@ -1,156 +1,156 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useChatSocket } from "@/hooks/use-chat-socket";
+import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
+import { getMessagesByRoom } from "@/services/chat/chat";
+import { TMeta, TResponse } from "@/types";
 import {
   TConversation,
   TConversationStatus,
   TMessage,
 } from "@/types/chat.type";
 import { getCookie } from "@/utils/cookies";
-import { format, formatDistanceToNow } from "date-fns";
-import { ArrowRight, Mail, MessageCircle, Search, X } from "lucide-react";
-import { useRef, useState } from "react";
-
-// Types
-
-type TicketStatus = "open" | "in_progress" | "resolved" | "closed";
-
-type Ticket = {
-  id: string;
-  subject: string;
-  user: string;
-  userEmail: string;
-  createdAt: string;
-  status: TicketStatus;
-  priority: "low" | "medium" | "high";
-  messages: { from: string; body: string; at: string }[];
-};
-
-// Mock Data
-
-const MOCK: Ticket[] = [
-  {
-    id: "TCK-0001",
-    subject: "Order not delivered - address issue",
-    user: "Ana Costa",
-    userEmail: "ana.costa@example.pt",
-    createdAt: "2025-11-20T10:24:00.000Z",
-    status: "open",
-    priority: "high",
-    messages: [
-      {
-        from: "Ana Costa",
-        body: "My order didn’t arrive.",
-        at: "2025-11-20T10:25:00.000Z",
-      },
-    ],
-  },
-  {
-    id: "TCK-0002",
-    subject: "Payment charged twice",
-    user: "Miguel Santos",
-    userEmail: "miguel.santos@example.pt",
-    createdAt: "2025-11-19T08:14:00.000Z",
-    status: "in_progress",
-    priority: "medium",
-    messages: [
-      {
-        from: "Miguel",
-        body: "I see two charges.",
-        at: "2025-11-19T08:15:00.000Z",
-      },
-    ],
-  },
-  {
-    id: "TCK-0003",
-    subject: "App crashed while uploading photo",
-    user: "Joana Alves",
-    userEmail: "joana.alves@example.pt",
-    createdAt: "2025-11-18T12:44:00.000Z",
-    status: "resolved",
-    priority: "low",
-    messages: [
-      {
-        from: "Joana",
-        body: "Crash on upload.",
-        at: "2025-11-18T12:45:00.000Z",
-      },
-    ],
-  },
-];
+import { fetchData } from "@/utils/requests";
+import { formatDistanceToNow } from "date-fns";
+import { ArrowRight, MessageCircle, Search, X } from "lucide-react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 // Status Styling
-const STATUS: Record<TicketStatus, string> = {
-  open: "bg-yellow-100 text-yellow-800",
-  in_progress: "bg-pink-100 text-pink-700",
-  resolved: "bg-green-100 text-green-800",
-  closed: "bg-gray-200 text-gray-700",
+const STATUS: Record<TConversationStatus, string> = {
+  OPEN: "bg-yellow-100 text-yellow-800",
+  IN_PROGRESS: "bg-pink-100 text-pink-700",
+  // resolved: "bg-green-100 text-green-800",
+  CLOSED: "bg-gray-200 text-gray-700",
 };
 
-export default function SupportTickets() {
-  const [tickets] = useState<Ticket[]>(MOCK);
+interface IProps {
+  conversationsData: { data: TConversation[]; meta?: TMeta };
+}
+
+export default function SupportTickets({ conversationsData }: IProps) {
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<TConversationStatus>("OPEN");
-  const [drawer, setDrawer] = useState<Ticket | null>(null);
-  const replyRef = useRef<HTMLTextAreaElement | null>(null);
-  const accessToken = getCookie("accessToken");
-  const [newMessageContent, setNewMessageContent] = useState<TMessage | null>(
-    null
-  );
   const [conversation, setConversation] = useState<TConversation | null>(null);
-  const [conversations, setConversations] = useState<TConversation[] >([]);
-
-  const filtered = tickets.filter((t) =>
-    [t.subject, t.user, t.id]
-      .join(" ")
-      .toLowerCase()
-      .includes(query.toLowerCase())
+  const [conversations, setConversations] = useState<TConversation[]>(
+    conversationsData?.data || []
   );
+  const textRef = useRef<HTMLTextAreaElement | null>(null);
 
-  function formatDate(date: string) {
-    return new Date(date).toLocaleString();
-  }
+  const accessToken = getCookie("accessToken");
 
-  function sendReply() {
-    if (!drawer || !replyRef.current) return;
-    const text = replyRef.current.value.trim();
+  const sendReply = async (e: FormEvent) => {
+    e.preventDefault();
+    const text = textRef.current?.value.trim() ?? "";
     if (!text) return;
 
-    drawer.messages.push({
-      from: "Support",
-      body: text,
-      at: new Date().toISOString(),
-    });
-    replyRef.current.value = "";
-    setDrawer({ ...drawer });
-  }
+    sendMessage(text);
 
-  function openNewMessageModal(message: TMessage) {
-    if (drawer) return;
-    setNewMessageContent(message);
-  }
+    // reset
+    if (textRef.current) textRef.current.value = "";
+    textRef.current?.focus();
+  };
+
+  const getConversation = async (room: string) => {
+    try {
+      const result = (await fetchData(`/support/conversations/${room}`, {
+        headers: { authorization: accessToken },
+      })) as TResponse<TConversation>;
+
+      console.log(result);
+
+      if (result.success) {
+        return {
+          success: true,
+          data: result.data,
+          message: result.message,
+        };
+      }
+
+      return {
+        success: false,
+        data: null,
+        message: result.message || "Get conversation failed",
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error?.response?.data || error,
+        message: error?.response?.data?.message || "Get conversation failed",
+      };
+    }
+  };
+
+  const getNewConversation = async (message: {
+    message: TMessage;
+    room: string;
+  }) => {
+    if (message?.message?.senderRole === "VENDOR") {
+      let newConversation = {} as TConversation;
+
+      const result = await getConversation(message?.room);
+      if (result.success) {
+        newConversation = result.data;
+      }
+
+      setConversations((prev) => {
+        const isConversationExist = prev?.find((c) => c.room === message?.room);
+
+        if (!isConversationExist) {
+          return [newConversation, ...prev];
+        }
+        const filteredConversations = prev.filter(
+          (c) => c.room !== message.room
+        );
+        console.log(message);
+
+        isConversationExist!.lastMessage = message.message?.message;
+        isConversationExist!.lastMessageTime = message.message
+          ?.createdAt as unknown as string;
+        return [isConversationExist, ...filteredConversations];
+      });
+    }
+  };
+
+  useAdminChatSocket({
+    token: accessToken as string,
+    onMessage: (msg) =>
+      getNewConversation(
+        msg as unknown as {
+          message: TMessage;
+          room: string;
+        }
+      ),
+    onClosed: () => setStatus("CLOSED"),
+    onError: (msg) => console.log(msg),
+  });
 
   const { sendMessage } = useChatSocket({
     // const { sendMessage, closeConversation } = useChatSocket({
-    room: "admin-notifications-room",
+    room: conversation?.room as string,
     token: accessToken as string,
-    onMessage: (msg) => setMessages((prev) => [...prev, msg]),
+    onMessage: (msg) => {
+      if (msg.room === conversation?.room) {
+        setMessages((prev) => [...prev, msg]);
+      }
+    },
     onClosed: () => setStatus("CLOSED"),
-    onError: (msg) => alert(msg),
-    onNewTicket: (message) => openNewMessageModal(message),
+    onError: (msg) => console.log(msg),
+    // onNewTicket: (message) => getNewConversation(message),
   });
+
+  useEffect(() => {
+    if (!!conversation) {
+      getMessagesByRoom(conversation?.room).then((result) => {
+        if (result.success) {
+          setMessages(result.data);
+        } else {
+          setMessages([]);
+        }
+      });
+    }
+  }, [conversation]);
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">
@@ -174,10 +174,10 @@ export default function SupportTickets() {
 
       {/* Card Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {conversations.map((c) => (
+        {conversations?.map((c) => (
           <div
             key={c._id}
-            onClick={() => setDrawer(c)}
+            onClick={() => setConversation(c)}
             className="cursor-pointer bg-white rounded-3xl p-5 shadow-sm border hover:shadow-lg transition group"
           >
             {/* Header */}
@@ -199,35 +199,33 @@ export default function SupportTickets() {
             {/* User */}
             <div className="flex items-center gap-3 mt-4">
               <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center">
-                {c.participants
-                  ?.find((p) => p.role !== "ADMIN" && p.role !== "SUPER_ADMIN")
-                  ?.name?.[0]}
+                {c.participants?.[0]?.name?.[0]}
               </div>
               <div className="text-sm">
-                <p className="font-medium">{c.participants
-                  ?.find((p) => p.role !== "ADMIN" && p.role !== "SUPER_ADMIN")
-                  ?.name}</p>
+                <p className="font-medium"> {c.participants?.[0]?.name}</p>
                 <p className="text-xs text-gray-500">
-                  {formatDistanceToNow(c.createdAt as Date, { addSuffix: true })}
+                  {formatDistanceToNow(c.createdAt as Date, {
+                    addSuffix: true,
+                  })}
                 </p>
               </div>
             </div>
 
             {/* Footer */}
             <div className="flex items-center justify-between mt-5 pt-4 border-t">
-              <p className="text-xs text-gray-500">Room: {c.room}</p>
+              <p className="text-xs text-gray-500">ID: {c.ticketId}</p>
               <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
             </div>
           </div>
         ))}
-        {filtered.map((t) => (
+        {/* {filtered.map((t) => (
           <div
             key={t.id}
             onClick={() => setDrawer(t)}
             className="cursor-pointer bg-white rounded-3xl p-5 shadow-sm border hover:shadow-lg transition group"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+          > */}
+        {/* Header */}
+        {/* <div className="flex items-center justify-between mb-4">
               <span
                 className={`px-3 py-1 text-xs rounded-full ${STATUS[t.status]}`}
               >
@@ -235,15 +233,15 @@ export default function SupportTickets() {
               </span>
 
               <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
-            </div>
+            </div> */}
 
-            {/* Subject */}
-            <h2 className="text-lg font-semibold leading-tight group-hover:text-[#DC3173] transition">
+        {/* Subject */}
+        {/* <h2 className="text-lg font-semibold leading-tight group-hover:text-[#DC3173] transition">
               {t.subject}
-            </h2>
+            </h2> */}
 
-            {/* User */}
-            <div className="flex items-center gap-3 mt-4">
+        {/* User */}
+        {/* <div className="flex items-center gap-3 mt-4">
               <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center">
                 {t.user[0]}
               </div>
@@ -253,15 +251,15 @@ export default function SupportTickets() {
                   {formatDate(t.createdAt)}
                 </p>
               </div>
-            </div>
+            </div> */}
 
-            {/* Footer */}
-            <div className="flex items-center justify-between mt-5 pt-4 border-t">
+        {/* Footer */}
+        {/* <div className="flex items-center justify-between mt-5 pt-4 border-t">
               <p className="text-xs text-gray-500">ID: {t.id}</p>
               <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
-            </div>
-          </div>
-        ))}
+            </div> */}
+        {/* </div>
+        ))} */}
       </div>
 
       {/* Drawer */}
@@ -271,10 +269,10 @@ export default function SupportTickets() {
             {/* Top */}
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-xl font-semibold w-10/12 leading-tight">
-                {conversation.room}
+                {conversation.ticketId}
               </h2>
               <button
-                onClick={() => setDrawer(null)}
+                onClick={() => setConversation(null)}
                 className="p-2 rounded-lg hover:bg-gray-100"
               >
                 <X className="w-5 h-5" />
@@ -284,21 +282,15 @@ export default function SupportTickets() {
             {/* User */}
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center text-lg">
-                {
-                  conversation?.participants?.find(
-                    (p) => p.role !== "ADMIN" && p.role !== "SUPER_ADMIN"
-                  )?.name
-                }
+                {conversation?.participants?.[0]?.name?.[0]}
               </div>
               <div>
                 <p className="font-medium">
-                  {
-                    conversation?.participants?.find(
-                      (p) => p.role !== "ADMIN" && p.role !== "SUPER_ADMIN"
-                    )?.name
-                  }
+                  {conversation?.participants?.[0]?.name}
                 </p>
-                {/* // <p className="text-xs text-gray-500">{conversation.userEmail}</p> */}
+                <p className="text-xs text-gray-500">
+                  {conversation?.participants?.[0]?.role}
+                </p>
               </div>
             </div>
 
@@ -314,7 +306,13 @@ export default function SupportTickets() {
                   }`}
                 >
                   <p className="text-xs text-gray-500 mb-1">
-                    {m.senderId} • {format(m.createdAt as Date, "hh:mm a")}
+                    {m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
+                      ? "You"
+                      : conversation?.participants?.[0]?.name}{" "}
+                    •{" "}
+                    {formatDistanceToNow(m.createdAt as Date, {
+                      addSuffix: true,
+                    })}
                   </p>
                   {m.message}
                 </div>
@@ -323,20 +321,17 @@ export default function SupportTickets() {
 
             {/* Reply */}
             <div className="mt-4 pt-4 border-t">
-              <div className="flex items-end gap-3">
+              <form onSubmit={sendReply} className="flex items-end gap-3">
                 <textarea
-                  ref={replyRef}
+                  ref={textRef}
                   rows={2}
                   placeholder="Write a reply..."
                   className="flex-1 rounded-2xl border border-gray-200 px-4 py-3 resize-none focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
                 />
-                <button
-                  onClick={sendReply}
-                  className="px-5 py-3 rounded-2xl bg-[#DC3173] text-white font-semibold"
-                >
+                <button className="px-5 py-3 rounded-2xl bg-[#DC3173] text-white font-semibold">
                   Send
                 </button>
-              </div>
+              </form>
             </div>
           </div>
 
@@ -366,7 +361,7 @@ export default function SupportTickets() {
         </div>
       )}
 
-      <Dialog
+      {/* <Dialog
         open={!!newMessageContent}
         onOpenChange={(open) => !open && setNewMessageContent(null)}
       >
@@ -404,7 +399,7 @@ export default function SupportTickets() {
             </DialogFooter>
           </DialogContent>
         </form>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 }
