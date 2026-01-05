@@ -1,11 +1,11 @@
 "use client";
 
+import TopbarNotification from "@/components/adminTopbar/TopbarNotification";
 import { TAdmin } from "@/types/admin.type";
 import { removeCookie } from "@/utils/cookies";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
-  Bell,
   ChevronDown,
   Globe,
   LogOut,
@@ -134,20 +134,7 @@ export default function Topbar({ sidebarWidth = 280, admin }: Props) {
             </motion.button>
 
             {/* Notification */}
-            <div className="relative shrink-0">
-              <motion.button
-                whileHover={{ scale: 1.06 }}
-                className="p-2 rounded-lg hover:bg-pink-50 transition"
-              >
-                <Bell size={18} className="text-gray-700" />
-              </motion.button>
-
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-pink-600 rounded-full border-2 border-white"
-              />
-            </div>
+            <TopbarNotification />
 
             {/* Messages */}
             <motion.button
