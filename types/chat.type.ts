@@ -42,3 +42,11 @@ export type TConversation = {
   createdAt?: Date;
   updatedAt?: Date;
 };
+
+export type TAdminSupportMessage = {
+  conversationType: string;
+  messagePreview: string;
+  room: string;
+  senderName: string;
+  ticketId: string;
+};

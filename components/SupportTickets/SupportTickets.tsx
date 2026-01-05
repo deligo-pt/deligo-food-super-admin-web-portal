@@ -5,6 +5,7 @@ import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { getMessagesByRoom } from "@/services/chat/chat";
 import { TMeta, TResponse } from "@/types";
 import {
+  TAdminSupportMessage,
   TConversation,
   TConversationStatus,
   TMessage,
@@ -82,46 +83,33 @@ export default function SupportTickets({ conversationsData }: IProps) {
     }
   };
 
-  const getNewConversation = async (message: {
-    message: TMessage;
-    room: string;
-  }) => {
-    if (message?.message?.senderRole === "VENDOR") {
-      let newConversation = {} as TConversation;
+  const getNewConversation = async (message: TAdminSupportMessage) => {
+    let newConversation = {} as TConversation;
 
-      const result = await getConversation(message?.room);
-      if (result.success) {
-        newConversation = result.data;
-      }
-
-      setConversations((prev) => {
-        const isConversationExist = prev?.find((c) => c.room === message?.room);
-
-        if (!isConversationExist) {
-          return [newConversation, ...prev];
-        }
-        const filteredConversations = prev.filter(
-          (c) => c.room !== message.room
-        );
-        console.log(message);
-
-        isConversationExist!.lastMessage = message.message?.message;
-        isConversationExist!.lastMessageTime = message.message
-          ?.createdAt as unknown as string;
-        return [isConversationExist, ...filteredConversations];
-      });
+    const result = await getConversation(message?.room);
+    if (result.success) {
+      newConversation = result.data;
     }
+
+    setConversations((prev) => {
+      const isConversationExist = prev?.find((c) => c.room === message?.room);
+
+      if (!isConversationExist) {
+        return [newConversation, ...prev];
+      }
+      const filteredConversations = prev.filter((c) => c.room !== message.room);
+      console.log(message);
+
+      isConversationExist!.lastMessage = message.messagePreview;
+      // isConversationExist!.lastMessageTime = message.message
+      //   ?.createdAt as unknown as string;
+      return [isConversationExist, ...filteredConversations];
+    });
   };
 
   useAdminChatSocket({
     token: accessToken as string,
-    onMessage: (msg) =>
-      getNewConversation(
-        msg as unknown as {
-          message: TMessage;
-          room: string;
-        }
-      ),
+    onMessage: (msg) => getNewConversation(msg as TAdminSupportMessage),
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
   });
