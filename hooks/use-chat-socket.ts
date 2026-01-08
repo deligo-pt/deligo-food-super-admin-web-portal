@@ -11,6 +11,14 @@ interface Props {
   onMessage: (msg: TMessage) => void;
   onClosed: () => void;
   onError: (msg: string) => void;
+  onTyping: (msg: {
+    userId: string;
+    name: {
+      firstName: string;
+      lastName: string;
+    };
+    isTyping: boolean;
+  }) => void;
 }
 
 interface AdminProps {
@@ -56,6 +64,7 @@ export function useChatSocket({
   onMessage,
   onClosed,
   onError,
+  onTyping,
 }: Props) {
   const socketRef = useRef<Socket | null>(null);
 
@@ -69,11 +78,13 @@ export function useChatSocket({
     });
 
     socket.on("new-message", onMessage);
+    socket.on("user-typing", onTyping);
     socket.on("conversation-closed", onClosed);
     socket.on("chat-error", (e) => onError(e.message));
 
     return () => {
       socket.off("new-message");
+      socket.off("user-typing");
       socket.off("conversation-closed");
       socket.off("chat-error");
       socket.off("new-support-ticket");
@@ -88,6 +99,10 @@ export function useChatSocket({
     });
   };
 
+  const makeTyping = (isTyping: boolean) => {
+    socketRef.current?.emit("typing", { room, isTyping });
+  };
+
   const markRead = () => {
     socketRef.current?.emit("mark-read", { room });
   };
@@ -96,5 +111,5 @@ export function useChatSocket({
     socketRef.current?.emit("close-conversation", { room });
   };
 
-  return { sendMessage, markRead, closeConversation };
+  return { sendMessage, markRead, makeTyping, closeConversation };
 }

@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
+import SelectVendorModal from "@/components/Chat/ChatWithVendors/SelectVendorModal";
+import { Button } from "@/components/ui/button";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { getMessagesByRoom } from "@/services/chat/chat";
+import { openConversationReq } from "@/services/dashboard/chat/chat";
+import { getAllVendorsReq } from "@/services/dashboard/chat/chat-with-vendor";
 import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
+import { TVendor } from "@/types/user.type";
 import { fetchData } from "@/utils/requests";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -101,7 +106,7 @@ type Vendor = {
 interface IProps {
   conversationsData: { data: TConversation[]; meta?: TMeta };
   accessToken: string;
-  decoded: { id: string };
+  decoded: { userId: string };
 }
 
 export default function ChatWithVendors({
@@ -119,6 +124,13 @@ export default function ChatWithVendors({
   const [conversations, setConversations] = useState<TConversation[]>(
     conversationsData?.data || []
   );
+  const [vendors, setVendors] = useState<TVendor[]>([]);
+  const [showSelectModal, setShowSelectModal] = useState(false);
+  const [typingInfo, setTypingInfo] = useState<{
+    userId: string;
+    isTyping: boolean;
+    name: { firstName: string; lastName: string };
+  }>({ userId: "", isTyping: false, name: { firstName: "", lastName: "" } });
 
   // const [previousChatLoading, setPreviousChatLoading] = useState(false);
 
@@ -134,19 +146,6 @@ export default function ChatWithVendors({
       ?.participants?.find((p) => p.role === "VENDOR");
     return participant;
   }, [conversations, selectedId]);
-
-  // Filter & pinned-first
-  const filtered = useMemo(() => {
-    return vendorMessages
-      ?.slice()
-      .sort((a, b) => (a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1))
-      .filter((v) =>
-        [v.name, v.store, v.messages.map((m) => m.text).join(" ")]
-          .join(" ")
-          .toLowerCase()
-          .includes(query.toLowerCase())
-      );
-  }, [vendorMessages, query]);
 
   const getConversation = async (room: string) => {
     try {
@@ -223,7 +222,7 @@ export default function ChatWithVendors({
     onError: (msg) => console.log(msg),
   });
 
-  const { sendMessage } = useChatSocket({
+  const { sendMessage, makeTyping } = useChatSocket({
     // const { sendMessage, closeConversation } = useChatSocket({
     room: selectedId,
     token: accessToken as string,
@@ -232,15 +231,37 @@ export default function ChatWithVendors({
         setMessages((prev) => [...prev, msg]);
       }
     },
+    onTyping: (data) => {
+      if (decoded.userId === data.userId) return;
+      setTypingInfo({
+        userId: data.userId,
+        isTyping: data.isTyping,
+        name: data.name,
+      });
+      scrollToBottom();
+      setTimeout(() => {
+        setTypingInfo({
+          userId: "",
+          isTyping: false,
+          name: { firstName: "", lastName: "" },
+        });
+      }, 3000);
+    },
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
-    // onNewTicket: (message) => getNewConversation(message),
   });
 
-  // auto-scroll on messages change
-  useEffect(() => {
+  const scrollToBottom = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
+
+  const handleTyping = (isTyping: boolean) => {
+    makeTyping(isTyping);
+  };
 
   function handleSend() {
     const text = textRef.current?.value.trim() ?? "";
@@ -288,6 +309,48 @@ export default function ChatWithVendors({
     e.currentTarget.value = "";
   }
 
+  const getVendors = async ({ page = 1, limit = 10 }) => {
+    const result = await getAllVendorsReq({ page, limit });
+
+    if (result.success) {
+      setVendors(result.data);
+    }
+  };
+
+  const selectVendor = async (vendor: TVendor) => {
+    setShowSelectModal(false);
+    // check if conversation already exists
+    const existingConversation = conversations.find((c) =>
+      c.participants?.some(
+        (p) => p.userId === vendor.userId && p.role === "VENDOR"
+      )
+    );
+    if (existingConversation && existingConversation.type === "VENDOR_CHAT") {
+      setSelectedId(existingConversation.room);
+    } else {
+      // create new conversation
+      const result = await openConversationReq({
+        type: "VENDOR_CHAT",
+        targetUser: {
+          userId: vendor.userId,
+          role: "VENDOR",
+          name: `${vendor.name?.firstName} ${vendor.name?.lastName}`,
+        },
+      });
+
+      if (result.success) {
+        setSelectedId(result.data.room);
+        setConversations((prev) => [result.data, ...prev]);
+      } else {
+        console.log(result);
+      }
+    }
+  };
+
+  useEffect(() => {
+    (() => getVendors({ page: 1, limit: 20 }))();
+  }, []);
+
   useEffect(() => {
     if (selectedId) {
       getMessagesByRoom(selectedId).then((result) => {
@@ -327,7 +390,15 @@ export default function ChatWithVendors({
             className="space-y-3 max-h-[68vh] overflow-auto px-1 custom-scroll min-h-full mt-4"
             role="list"
           >
-            {conversations?.map((c) => (
+            <div className="mb-2 text-center">
+              <Button
+                onClick={() => setShowSelectModal(true)}
+                className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+              >
+                Start New Conversation
+              </Button>
+            </div>
+            {conversations?.map((c, i) => (
               <div
                 key={c._id}
                 role="listitem"
@@ -343,10 +414,9 @@ export default function ChatWithVendors({
                   aria-label={`Open conversation with ${c.room}`}
                 >
                   <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
-                    {
-                      c.participants?.find((p) => p.role === "VENDOR")
-                        ?.name?.[0]
-                    }
+                    {c.participants
+                      ?.find((p) => p.role === "VENDOR")
+                      ?.name?.trim()?.[0] ?? `V${i + 1}`}
                   </div>
                   {/* <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
                     {c.avatar ? (
@@ -365,30 +435,32 @@ export default function ChatWithVendors({
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-3">
                       <div className="font-medium text-sm">
-                        {c.participants?.find((p) => p.role === "VENDOR")?.name}
+                        {c.participants
+                          ?.find((p) => p.role === "VENDOR")
+                          ?.name?.trim() || `Vendor${i + 1}`}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {formatDistanceToNow(c.lastMessageTime, {
+                        {formatDistanceToNow(c.lastMessageTime || new Date(), {
                           addSuffix: true,
                         })}
                       </div>
                     </div>
 
                     <div className="text-xs text-gray-500 truncate mt-1">
-                      {c.lastMessage}
+                      {c.lastMessage || "-"}
                     </div>
                   </div>
                 </button>
 
                 <div className="flex items-center gap-2">
-                  {c.unreadCount?.[decoded?.id] > 0 ? (
+                  {c.unreadCount?.[decoded?.userId] > 0 ? (
                     <div
                       className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
                       aria-label={`${
-                        c.unreadCount?.[decoded?.id]
+                        c.unreadCount?.[decoded?.userId]
                       } unread messages`}
                     >
-                      {c.unreadCount?.[decoded?.id]}
+                      {c.unreadCount?.[decoded?.userId]}
                     </div>
                   ) : null}
                 </div>
@@ -450,11 +522,11 @@ export default function ChatWithVendors({
 
               {/* Messages list */}
               <div
-                className="flex-1 overflow-auto p-6 custom-scroll"
+                className="flex-1 overflow-auto custom-scroll flex flex-col"
                 role="log"
                 aria-live="polite"
               >
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col flex-1 gap-4 p-6">
                   {messages.map((m) => (
                     <article
                       key={m._id}
@@ -523,26 +595,30 @@ export default function ChatWithVendors({
                     ) : null} */}
                     </article>
                   ))}
-
-                  {/* {selected?.typing && (
-                    <div className="max-w-[50%] p-3 rounded-2xl bg-gray-50 border border-gray-100">
-                      <div className="text-xs text-gray-500">
-                        {selected?.name} is typing...
-                      </div>
-                      <div className="flex gap-1 mt-2">
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                        <span
-                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.12s" }}
-                        />
-                        <span
-                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.24s" }}
-                        />
-                      </div>
-                    </div>
-                  )} */}
                 </div>
+
+                {typingInfo?.isTyping && (
+                  <div className="max-w-[50%] mx-auto p-3 rounded-2xl bg-gray-50 border border-gray-100 mb-2">
+                    <div className="text-xs text-gray-500">
+                      {typingInfo?.name?.firstName || typingInfo?.name?.lastName
+                        ? `${typingInfo?.name?.firstName} ${typingInfo?.name?.lastName}`
+                        : "Vendor"}{" "}
+                      is typing...
+                    </div>
+                    <div className="flex justify-center gap-1 mt-2">
+                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                      <span
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.12s" }}
+                      />
+                      <span
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.24s" }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div ref={endRef} />
               </div>
 
@@ -598,6 +674,9 @@ export default function ChatWithVendors({
                       rows={2}
                       className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#DC3173]/30 outline-none"
                       aria-label="Message composer"
+                      onKeyUp={(e) => {
+                        handleTyping(e.currentTarget.value.length > 0);
+                      }}
                     />
 
                     {/* previews */}
@@ -646,6 +725,14 @@ export default function ChatWithVendors({
             </div>
           )}
         </section>
+
+        {/* Vendor Selection Modal */}
+        <SelectVendorModal
+          open={showSelectModal}
+          onOpenChange={(open) => !open && setShowSelectModal(open)}
+          onClick={(vendor: TVendor) => selectVendor(vendor)}
+          vendors={vendors}
+        />
       </div>
 
       {/* styles */}

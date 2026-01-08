@@ -60,7 +60,7 @@ export const singleMarkReadReq = async (id: string) => {
 export const allMarkReadReq = async () => {
   try {
     const result = (await serverRequest.patch(
-      "/notifications/all/read"
+      "/notifications/mark-all-as-read"
     )) as TResponse<null>;
 
     if (result.success) {

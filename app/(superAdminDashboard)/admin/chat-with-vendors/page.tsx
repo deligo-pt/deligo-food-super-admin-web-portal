@@ -25,6 +25,7 @@ export default async function ChatWithVendorsPage({ searchParams }: IProps) {
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
     role: "VENDOR",
+    type: "VENDOR_CHAT",
   };
 
   const conversationsData: { data: TConversation[]; meta?: TMeta } = {

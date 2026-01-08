@@ -30,7 +30,7 @@ export default function SelectVendorModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <form>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Start a conversation</DialogTitle>
             <DialogDescription>

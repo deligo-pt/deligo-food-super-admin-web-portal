@@ -31,8 +31,8 @@ export default function TopbarNotification() {
     }
   };
 
-  const markSingleAsRead = async (id: string) => {
-    await singleMarkReadReq(id);
+  const markSingleAsRead = async (notification: TNotification) => {
+    await singleMarkReadReq(notification._id);
     getNotifications({ limit: notificationsData?.meta?.limit || 10 });
   };
 
@@ -75,7 +75,7 @@ export default function TopbarNotification() {
             <div className="space-y-2">
               {notificationsData?.data?.map((notification) => (
                 <div
-                  onClick={() => markSingleAsRead(notification._id)}
+                  onClick={() => markSingleAsRead(notification)}
                   key={notification._id}
                   className={cn(
                     "bg-slate-50 px-4 py-2 rounded-md shadow cursor-pointer",
