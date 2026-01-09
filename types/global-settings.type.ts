@@ -1,0 +1,48 @@
+export type TGlobalSettings = {
+  _id?: string;
+
+  // Delivery pricing
+  deliveryChargePerKm: number;
+  baseDeliveryCharge: number;
+  minDeliveryCharge: number;
+  maxDeliveryCharge?: number;
+  freeDeliveryAbove?: number;
+  maxDeliveryDistanceKm?: number;
+
+  // Platform commission
+  platformCommissionPercent: number;
+  deliveryPartnerCommissionPercent?: number;
+  vendorVatPercent?: number;
+
+  // Order rules
+  minOrderAmount?: number;
+  maxOrderAmount?: number;
+  maxItemsPerOrder?: number;
+
+  // Cancellation & refund
+  cancelTimeLimitMinutes?: number;
+  refundProcessingDays?: number;
+
+  // Offers & coupons
+  isCouponEnabled: boolean;
+  isOfferEnabled: boolean;
+  maxDiscountPercent?: number;
+
+  // Order lifecycle automation
+  autoCancelUnacceptedOrderMinutes?: number;
+  autoMarkDeliveredAfterMinutes?: number;
+
+  // OTP & security
+  orderOtpEnabled: boolean;
+  otpLength?: number;
+  otpExpiryMinutes?: number;
+
+  // Platform state
+  isPlatformLive: boolean;
+  maintenanceMessage?: string;
+
+  // Meta
+  updatedBy?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
