@@ -15,7 +15,7 @@ export default async function GlobalSettingsPage() {
       initialData = result.data;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <GlobalSettings settingsResult={initialData} />;

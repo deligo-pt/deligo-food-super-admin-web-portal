@@ -11,7 +11,7 @@ type IProps = {
 
 export default async function ChatWithVendorsPage({ searchParams }: IProps) {
   const accessToken = (await cookies()).get("accessToken")?.value;
-  const decoded = jwtDecode(accessToken as string) as { id: string };
+  const decoded = jwtDecode(accessToken as string) as { userId: string };
 
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);

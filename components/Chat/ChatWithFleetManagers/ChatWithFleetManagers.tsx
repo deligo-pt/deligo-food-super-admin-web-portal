@@ -134,6 +134,23 @@ export default function ChatWithFleetManagers({
         setMessages((prev) => [...prev, msg]);
       }
     },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onTyping: (data) => {
+      // if (decoded.userId === data.userId) return;
+      // setTypingInfo({
+      //   userId: data.userId,
+      //   isTyping: data.isTyping,
+      //   name: data.name,
+      // });
+      // scrollToBottom();
+      // setTimeout(() => {
+      //   setTypingInfo({
+      //     userId: "",
+      //     isTyping: false,
+      //     name: { firstName: "", lastName: "" },
+      //   });
+      // }, 3000);
+    },
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
   });

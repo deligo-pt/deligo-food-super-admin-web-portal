@@ -123,6 +123,22 @@ export default function SupportTickets({ conversationsData }: IProps) {
         setMessages((prev) => [...prev, msg]);
       }
     },
+    onTyping: (data) => {
+      // if (decoded.userId === data.userId) return;
+      // setTypingInfo({
+      //   userId: data.userId,
+      //   isTyping: data.isTyping,
+      //   name: data.name,
+      // });
+      // scrollToBottom();
+      // setTimeout(() => {
+      //   setTypingInfo({
+      //     userId: "",
+      //     isTyping: false,
+      //     name: { firstName: "", lastName: "" },
+      //   });
+      // }, 3000);
+    },
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
     // onNewTicket: (message) => getNewConversation(message),

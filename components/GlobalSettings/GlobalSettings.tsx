@@ -28,6 +28,7 @@ import {
   Package,
   Percent,
   Save,
+  SettingsIcon,
   Shield,
   Zap,
 } from "lucide-react";
@@ -104,6 +105,7 @@ export function GlobalSettings({
       isOfferEnabled: settings.isOfferEnabled || false,
       isPlatformLive: settings.isPlatformLive || false,
       orderOtpEnabled: settings.orderOtpEnabled || false,
+      maintenanceMessage: settings.maintenanceMessage || "",
     },
   });
 
@@ -154,8 +156,9 @@ export function GlobalSettings({
                 opacity: 1,
                 x: 0,
               }}
-              className="text-3xl font-extrabold text-gray-900 tracking-tight"
+              className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3"
             >
+              <SettingsIcon className="w-6 h-6 text-slate-800" />
               Global Settings
             </motion.h1>
             <motion.p
@@ -170,7 +173,7 @@ export function GlobalSettings({
               transition={{
                 delay: 0.1,
               }}
-              className="text-gray-500 mt-2 text-lg"
+              className="text-sm text-slate-500"
             >
               Manage your platform&lsquo;s core configuration and rules
             </motion.p>
@@ -345,7 +348,7 @@ export function GlobalSettings({
                               <SettingsInput
                                 fieldState={fieldState}
                                 label="Maintenance Message"
-                                type="number"
+                                type="text"
                                 value={field.value}
                                 onChange={(e) => field.onChange(e.target.value)}
                                 placeholder="Enter message shown to users..."
