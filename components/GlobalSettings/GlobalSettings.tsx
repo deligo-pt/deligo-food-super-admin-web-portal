@@ -107,12 +107,10 @@ export function GlobalSettings({
     },
   });
 
-  const watchIsPlatformLive = useWatch({
+  const [watchIsPlatformLive] = useWatch({
     control: form.control,
-    name: "isPlatformLive",
+    name: ["isPlatformLive"],
   });
-
-  console.log(form.formState.errors);
 
   const onSubmit = async (data: TGlobalSettingsForm) => {
     setIsSaving(true);
@@ -463,7 +461,7 @@ export function GlobalSettings({
                   control={form.control}
                   name="freeDeliveryAbove"
                   render={({ field, fieldState }) => (
-                    <FormItem>
+                    <FormItem className="col-span-2">
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
@@ -475,7 +473,28 @@ export function GlobalSettings({
                           }
                           suffix="€"
                           min={0}
-                          className="sm:col-span-2"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="maxDeliveryDistanceKm"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="col-span-2">
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label="Maximum Delivery Distance"
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="km"
+                          min={0}
                         />
                       </FormControl>
                       <FormMessage />
@@ -623,7 +642,7 @@ export function GlobalSettings({
                   control={form.control}
                   name="maxItemsPerOrder"
                   render={({ field, fieldState }) => (
-                    <FormItem>
+                    <FormItem className="col-span-2">
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
@@ -634,7 +653,6 @@ export function GlobalSettings({
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="items"
-                          className="sm:col-span-2"
                           min={0}
                         />
                       </FormControl>
@@ -741,70 +759,70 @@ export function GlobalSettings({
                 </div>
 
                 <AnimatePresence>
-                  {settings.orderOtpEnabled && (
-                    <motion.div
-                      initial={{
-                        height: 0,
-                        opacity: 0,
-                      }}
-                      animate={{
-                        height: "auto",
-                        opacity: 1,
-                      }}
-                      exit={{
-                        height: 0,
-                        opacity: 0,
-                      }}
-                      className="space-y-4"
-                    >
-                      <FormField
-                        control={form.control}
-                        name="otpLength"
-                        render={({ field, fieldState }) => (
-                          <FormItem>
-                            <FormControl>
-                              <SettingsInput
-                                fieldState={fieldState}
-                                label="OTP Length"
-                                type="number"
-                                value={field.value}
-                                onChange={(e) =>
-                                  field.onChange(parseFloat(e.target.value))
-                                }
-                                suffix="digits"
-                                description="Number of digits in the OTP code"
-                                min={0}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="otpExpiryMinutes"
-                        render={({ field, fieldState }) => (
-                          <FormItem>
-                            <FormControl>
-                              <SettingsInput
-                                fieldState={fieldState}
-                                label="OTP Expiry Time"
-                                type="number"
-                                value={field.value}
-                                onChange={(e) =>
-                                  field.onChange(parseFloat(e.target.value))
-                                }
-                                suffix="min"
-                                description="Time before OTP expires and needs regeneration"
-                                min={0}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </motion.div>
-                  )}
+                  {/* {watchOrderOtpEnabled && ( */}
+                  <motion.div
+                    initial={{
+                      height: 0,
+                      opacity: 0,
+                    }}
+                    animate={{
+                      height: "auto",
+                      opacity: 1,
+                    }}
+                    exit={{
+                      height: 0,
+                      opacity: 0,
+                    }}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="otpLength"
+                      render={({ field, fieldState }) => (
+                        <FormItem>
+                          <FormControl>
+                            <SettingsInput
+                              fieldState={fieldState}
+                              label="OTP Length"
+                              type="number"
+                              value={field.value}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value))
+                              }
+                              suffix="digits"
+                              description="Number of digits in the OTP code"
+                              min={0}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="otpExpiryMinutes"
+                      render={({ field, fieldState }) => (
+                        <FormItem>
+                          <FormControl>
+                            <SettingsInput
+                              fieldState={fieldState}
+                              label="OTP Expiry Time"
+                              type="number"
+                              value={field.value}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value))
+                              }
+                              suffix="min"
+                              description="Time before OTP expires and needs regeneration"
+                              min={0}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </motion.div>
+                  {/* )} */}
                 </AnimatePresence>
               </div>
             </SettingsCard>
