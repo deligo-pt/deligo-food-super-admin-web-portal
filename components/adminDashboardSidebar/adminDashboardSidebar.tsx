@@ -274,6 +274,10 @@ const MENU = [
         name: "Legal Documents (Terms, Privacy)",
         path: "/admin/legal-documents",
       },
+      {
+        name: "Global Settings",
+        path: "/admin/global-settings",
+      },
     ],
   },
   {
