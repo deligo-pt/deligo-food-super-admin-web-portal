@@ -1,8 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
+import SelectFleetManagerModal from "@/components/Chat/ChatWithFleetManagers/SelectFleetManagerModal";
+import { Button } from "@/components/ui/button";
+import { USER_ROLE } from "@/consts/user.const";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { getMessagesByRoom } from "@/services/chat/chat";
+import { openConversationReq } from "@/services/dashboard/chat/chat";
+import { getAllFleetManagersReq } from "@/services/dashboard/chat/chat-with-fleet-manager";
 import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
+import { TAgent } from "@/types/user.type";
 import { fetchData } from "@/utils/requests";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -20,7 +27,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 interface IProps {
   conversationsData: { data: TConversation[]; meta?: TMeta };
   accessToken: string;
-  decoded: { id: string };
+  decoded: { userId: string };
 }
 
 export default function ChatWithFleetManagers({
@@ -33,11 +40,17 @@ export default function ChatWithFleetManagers({
   const [attachments, setAttachments] = useState<string[]>([]);
   const [audioFile, setAudioFile] = useState<string | null>(null);
   const [messages, setMessages] = useState<TMessage[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [status, setStatus] = useState("DISCONNECTED");
   const [conversations, setConversations] = useState<TConversation[]>(
     conversationsData?.data || []
   );
+  const [fleetManagers, setFleetManagers] = useState<TAgent[]>([]);
+  const [showSelectModal, setShowSelectModal] = useState(false);
+  const [typingInfo, setTypingInfo] = useState<{
+    userId: string;
+    isTyping: boolean;
+    name: { firstName: string; lastName: string };
+  }>({ userId: "", isTyping: false, name: { firstName: "", lastName: "" } });
 
   // const [previousChatLoading, setPreviousChatLoading] = useState(false);
 
@@ -46,11 +59,11 @@ export default function ChatWithFleetManagers({
   const audioRef = useRef<HTMLInputElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  // Selected fleet manager
+  // Selected fleetManager
   const selected = useMemo(() => {
     const participant = conversations
       ?.find((c) => c.room === selectedId)
-      ?.participants?.find((p) => p.role === "FLEET_MANAGER");
+      ?.participants?.find((p) => p.role === USER_ROLE.FLEET_MANAGER);
     return participant;
   }, [conversations, selectedId]);
 
@@ -87,7 +100,7 @@ export default function ChatWithFleetManagers({
     message: TMessage;
     room: string;
   }) => {
-    if (message?.message?.senderRole === "FLEET_MANAGER") {
+    if (message?.message?.senderRole === USER_ROLE.FLEET_MANAGER) {
       let newConversation = {} as TConversation;
 
       const result = await getConversation(message?.room);
@@ -126,7 +139,7 @@ export default function ChatWithFleetManagers({
     onError: (msg) => console.log(msg),
   });
 
-  const { sendMessage } = useChatSocket({
+  const { sendMessage, makeTyping } = useChatSocket({
     room: selectedId,
     token: accessToken as string,
     onMessage: (msg) => {
@@ -134,31 +147,37 @@ export default function ChatWithFleetManagers({
         setMessages((prev) => [...prev, msg]);
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onTyping: (data) => {
-      // if (decoded.userId === data.userId) return;
-      // setTypingInfo({
-      //   userId: data.userId,
-      //   isTyping: data.isTyping,
-      //   name: data.name,
-      // });
-      // scrollToBottom();
-      // setTimeout(() => {
-      //   setTypingInfo({
-      //     userId: "",
-      //     isTyping: false,
-      //     name: { firstName: "", lastName: "" },
-      //   });
-      // }, 3000);
+      if (decoded.userId === data.userId) return;
+      setTypingInfo({
+        userId: data.userId,
+        isTyping: data.isTyping,
+        name: data.name,
+      });
+      scrollToBottom();
+      setTimeout(() => {
+        setTypingInfo({
+          userId: "",
+          isTyping: false,
+          name: { firstName: "", lastName: "" },
+        });
+      }, 3000);
     },
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
   });
 
-  // auto-scroll on messages change
-  useEffect(() => {
+  const scrollToBottom = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
+
+  const handleTyping = (isTyping: boolean) => {
+    makeTyping(isTyping);
+  };
 
   function handleSend() {
     const text = textRef.current?.value.trim() ?? "";
@@ -191,6 +210,48 @@ export default function ChatWithFleetManagers({
     e.currentTarget.value = "";
   }
 
+  const getFleetManagers = async ({ page = 1, limit = 10 }) => {
+    const result = await getAllFleetManagersReq({ page, limit });
+
+    if (result.success) {
+      setFleetManagers(result.data);
+    }
+  };
+
+  const selectFleetManager = async (fleetManager: TAgent) => {
+    setShowSelectModal(false);
+    // check if conversation already exists
+    const existingConversation = conversations.find((c) =>
+      c.participants?.some(
+        (p) => p.userId === fleetManager.userId && p.role === USER_ROLE.FLEET_MANAGER
+      )
+    );
+    if (existingConversation && existingConversation.type === "FLEET_MANAGER_CHAT") {
+      setSelectedId(existingConversation.room);
+    } else {
+      // create new conversation
+      const result = await openConversationReq({
+        type: "FLEET_MANAGER_CHAT",
+        targetUser: {
+          userId: fleetManager.userId,
+          role: USER_ROLE.FLEET_MANAGER,
+          name: `${fleetManager.name?.firstName} ${fleetManager.name?.lastName}`,
+        },
+      });
+
+      if (result.success) {
+        setSelectedId(result.data.room);
+        setConversations((prev) => [result.data, ...prev]);
+      } else {
+        console.log(result);
+      }
+    }
+  };
+
+  useEffect(() => {
+    (() => getFleetManagers({ page: 1, limit: 20 }))();
+  }, []);
+
   useEffect(() => {
     if (selectedId) {
       getMessagesByRoom(selectedId).then((result) => {
@@ -218,7 +279,7 @@ export default function ChatWithFleetManagers({
           <div className="hidden sm:flex items-center bg-white/60 rounded-lg px-3 py-2 border border-white/30 shadow-sm mt-3">
             <Search className="w-4 h-4 text-gray-500 mr-2" />
             <input
-              aria-label="Search fleetManagers"
+              aria-label="Search fleet Managers"
               placeholder="Search..."
               className="outline-none text-sm bg-transparent"
               value={query}
@@ -230,7 +291,15 @@ export default function ChatWithFleetManagers({
             className="space-y-3 max-h-[68vh] overflow-auto px-1 custom-scroll min-h-full mt-4"
             role="list"
           >
-            {conversations?.map((c) => (
+            <div className="mb-2 text-center">
+              <Button
+                onClick={() => setShowSelectModal(true)}
+                className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+              >
+                Start New Conversation
+              </Button>
+            </div>
+            {conversations?.map((c, i) => (
               <div
                 key={c._id}
                 role="listitem"
@@ -246,43 +315,40 @@ export default function ChatWithFleetManagers({
                   aria-label={`Open conversation with ${c.room}`}
                 >
                   <div className="w-12 h-12 rounded-full bg-[#DC3173]/12 text-[#DC3173] font-semibold overflow-hidden flex items-center justify-center">
-                    {
-                      c.participants?.find((p) => p.role === "FLEET_MANAGER")
-                        ?.name?.[0]
-                    }
+                    {c.participants
+                      ?.find((p) => p.role === USER_ROLE.FLEET_MANAGER)
+                      ?.name?.trim()?.[0] ?? `F${i + 1}`}
                   </div>
 
                   <div className="flex-1">
                     <div className="flex items-center justify-between gap-3">
                       <div className="font-medium text-sm">
-                        {
-                          c.participants?.find(
-                            (p) => p.role === "FLEET_MANAGER"
-                          )?.name
-                        }
+                        {c.participants
+                          ?.find((p) => p.role === USER_ROLE.FLEET_MANAGER)
+                          ?.name?.trim() || `Fleet Manager${i + 1}`}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {formatDistanceToNow(c.lastMessageTime, {
+                        {formatDistanceToNow(c.lastMessageTime || new Date(), {
                           addSuffix: true,
                         })}
                       </div>
                     </div>
 
                     <div className="text-xs text-gray-500 truncate mt-1">
-                      {c.lastMessage}
+                      {c.lastMessage || "-"}
                     </div>
                   </div>
                 </button>
 
                 <div className="flex items-center gap-2">
-                  {c.unreadCount?.[decoded?.id] > 0 ? (
+                  {c.unreadCount?.[decoded?.userId] > 0 ? (
                     <div
                       className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
                       aria-label={`${
-                        c.unreadCount?.[decoded?.id]
+                        c.unreadCount?.[decoded?.userId]
                       } unread messages`}
                     >
-                      {c.unreadCount?.[decoded?.id]}
+                      {c.unreadCount?.[decoded?.userId]}
                     </div>
                   ) : null}
                 </div>
@@ -292,7 +358,6 @@ export default function ChatWithFleetManagers({
         </aside>
 
         {/* Chat area (flex grows) */}
-
         <section
           className="max-h-[calc(100vh-148px)] flex-1 bg-white rounded-3xl shadow-lg border p-0 overflow-hidden h-full"
           aria-label="Chat area"
@@ -309,15 +374,11 @@ export default function ChatWithFleetManagers({
                   </div>
                   <div>
                     <div className="font-semibold">{selected?.name}</div>
-                    <div className="text-xs text-gray-500">Fleet Manager</div>
+                    <div className="text-xs text-gray-500">Fleet Managers</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm text-gray-500">
-                  {/* Last seen:{" "}
-                  {selected
-                    ? new Date(selected.lastSeen ?? Date.now()).toLocaleString()
-                    : "-"} */}
                   <button
                     className="p-2 rounded-md hover:bg-gray-100"
                     aria-label="More options"
@@ -329,11 +390,11 @@ export default function ChatWithFleetManagers({
 
               {/* Messages list */}
               <div
-                className="flex-1 overflow-auto p-6 custom-scroll"
+                className="flex-1 overflow-auto custom-scroll flex flex-col"
                 role="log"
                 aria-live="polite"
               >
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col flex-1 gap-4 p-6">
                   {messages.map((m) => (
                     <article
                       key={m._id}
@@ -402,26 +463,30 @@ export default function ChatWithFleetManagers({
                     ) : null} */}
                     </article>
                   ))}
-
-                  {/* {selected?.typing && (
-                    <div className="max-w-[50%] p-3 rounded-2xl bg-gray-50 border border-gray-100">
-                      <div className="text-xs text-gray-500">
-                        {selected?.name} is typing...
-                      </div>
-                      <div className="flex gap-1 mt-2">
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                        <span
-                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.12s" }}
-                        />
-                        <span
-                          className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                          style={{ animationDelay: "0.24s" }}
-                        />
-                      </div>
-                    </div>
-                  )} */}
                 </div>
+
+                {typingInfo?.isTyping && (
+                  <div className="max-w-[50%] mx-auto p-3 rounded-2xl bg-gray-50 border border-gray-100 mb-2">
+                    <div className="text-xs text-gray-500">
+                      {typingInfo?.name?.firstName || typingInfo?.name?.lastName
+                        ? `${typingInfo?.name?.firstName} ${typingInfo?.name?.lastName}`
+                        : "Fleet Manager"}{" "}
+                      is typing...
+                    </div>
+                    <div className="flex justify-center gap-1 mt-2">
+                      <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                      <span
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.12s" }}
+                      />
+                      <span
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.24s" }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div ref={endRef} />
               </div>
 
@@ -477,6 +542,9 @@ export default function ChatWithFleetManagers({
                       rows={2}
                       className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#DC3173]/30 outline-none"
                       aria-label="Message composer"
+                      onKeyUp={(e) => {
+                        handleTyping(e.currentTarget.value.length > 0);
+                      }}
                     />
 
                     {/* previews */}
@@ -525,6 +593,14 @@ export default function ChatWithFleetManagers({
             </div>
           )}
         </section>
+
+        {/* Fleet Manager Selection Modal */}
+        <SelectFleetManagerModal
+          open={showSelectModal}
+          onOpenChange={(open) => !open && setShowSelectModal(open)}
+          onClick={(fleetManager: TAgent) => selectFleetManager(fleetManager)}
+          fleetManagers={fleetManagers}
+        />
       </div>
 
       {/* styles */}
@@ -558,7 +634,7 @@ export default function ChatWithFleetManagers({
             padding-left: 12px;
             padding-right: 12px;
           }
-          aside[aria-label="Fleet Managers (floating card)"] {
+          aside[aria-label="FleetManagers (floating card)"] {
             width: 100%;
             max-width: 100%;
             min-width: auto;

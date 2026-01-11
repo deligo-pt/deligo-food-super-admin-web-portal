@@ -470,7 +470,6 @@ export default function ChatWithVendors({
         </aside>
 
         {/* Chat area (flex grows) */}
-
         <section
           className="max-h-[calc(100vh-148px)] flex-1 bg-white rounded-3xl shadow-lg border p-0 overflow-hidden h-full"
           aria-label="Chat area"

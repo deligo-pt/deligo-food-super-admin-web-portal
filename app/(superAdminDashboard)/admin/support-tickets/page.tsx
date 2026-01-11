@@ -8,7 +8,8 @@ export default async function SupportTicketsPage() {
 
   try {
     const conversationsResult = (await serverRequest.get(
-      "/support/conversations"
+      "/support/conversations",
+      { params: { type: "SUPPORT" } }
     )) as TResponse<TConversation[]>;
 
     initialData.data = conversationsResult.data;

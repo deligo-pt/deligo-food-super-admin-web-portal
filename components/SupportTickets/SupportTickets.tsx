@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import { USER_ROLE } from "@/consts/user.const";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { getMessagesByRoom } from "@/services/chat/chat";
 import { TMeta, TResponse } from "@/types";
@@ -115,7 +116,6 @@ export default function SupportTickets({ conversationsData }: IProps) {
   });
 
   const { sendMessage } = useChatSocket({
-    // const { sendMessage, closeConversation } = useChatSocket({
     room: conversation?.room as string,
     token: accessToken as string,
     onMessage: (msg) => {
@@ -123,22 +123,7 @@ export default function SupportTickets({ conversationsData }: IProps) {
         setMessages((prev) => [...prev, msg]);
       }
     },
-    onTyping: (data) => {
-      // if (decoded.userId === data.userId) return;
-      // setTypingInfo({
-      //   userId: data.userId,
-      //   isTyping: data.isTyping,
-      //   name: data.name,
-      // });
-      // scrollToBottom();
-      // setTimeout(() => {
-      //   setTypingInfo({
-      //     userId: "",
-      //     isTyping: false,
-      //     name: { firstName: "", lastName: "" },
-      //   });
-      // }, 3000);
-    },
+    onTyping: (data) => {},
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
     // onNewTicket: (message) => getNewConversation(message),
@@ -197,7 +182,7 @@ export default function SupportTickets({ conversationsData }: IProps) {
 
             {/* Subject */}
             <h2 className="text-lg font-semibold leading-tight group-hover:text-[#DC3173] transition">
-              {c.lastMessage}
+              {c.lastMessage || "-"}
             </h2>
 
             {/* User */}
@@ -206,7 +191,17 @@ export default function SupportTickets({ conversationsData }: IProps) {
                 {c.participants?.[0]?.name?.[0]}
               </div>
               <div className="text-sm">
-                <p className="font-medium"> {c.participants?.[0]?.name}</p>
+                <p className="font-medium">
+                  {c.participants?.[0]?.name?.trim() ||
+                    "No Name Provided"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {c.participants?.[0]?.role === USER_ROLE.VENDOR
+                      ? "Vendor"
+                      : c.participants?.[0]?.role === USER_ROLE.FLEET_MANAGER
+                      ? "Fleet Manager"
+                      : "User"}
+                </p>
                 <p className="text-xs text-gray-500">
                   {formatDistanceToNow(c.createdAt as Date, {
                     addSuffix: true,
