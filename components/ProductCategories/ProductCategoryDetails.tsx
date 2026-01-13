@@ -12,10 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { updateProductCategoryReq } from "@/services/dashboard/category/product-category";
 import { TResponse } from "@/types";
 import { TProductCategory } from "@/types/category.type";
 import { getCookie } from "@/utils/cookies";
-import { deleteData, updateData } from "@/utils/requests";
+import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
@@ -50,20 +51,21 @@ export default function ProductCategoryDetails({
   const updateActiveStatus = async () => {
     const toastId = toast.loading("Updating active status...");
     try {
-      const result = (await updateData(
-        `/categories/productCategory/${category._id}`,
-        {
-          isActive: !category.isActive,
-        },
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TProductCategory[]>;
+      const result = await updateProductCategoryReq(category._id, {
+        isActive: !category.isActive,
+      });
       if (result?.success) {
-        toast.success("Active Status updated successfully!", { id: toastId });
+        toast.success(result.message || "Active Status updated successfully!", {
+          id: toastId,
+        });
         router.refresh();
         setUpdateField("");
+        return;
       }
+
+      toast.error(result.message || "Active Status update failed", {
+        id: toastId,
+      });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -216,7 +218,7 @@ export default function ProductCategoryDetails({
         }}
         className="bg-white rounded-xl shadow-lg overflow-hidden relative"
       >
-        {category.image && (
+        {category.icon && (
           <motion.div
             initial={{
               opacity: 0,
@@ -230,7 +232,7 @@ export default function ProductCategoryDetails({
             className="w-full h-64 relative"
           >
             <Image
-              src={category.image}
+              src={category.icon}
               alt={category.name}
               className="w-full h-full object-cover"
               width={500}

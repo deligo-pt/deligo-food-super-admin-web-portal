@@ -25,13 +25,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { updateProductCategoryReq } from "@/services/dashboard/category/product-category";
 import { TMeta, TResponse } from "@/types";
 import {
   TProductCategory,
   TProductCategoryQueryParams,
 } from "@/types/category.type";
 import { getCookie } from "@/utils/cookies";
-import { deleteData, fetchData, updateData } from "@/utils/requests";
+import { deleteData, fetchData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -40,6 +41,7 @@ import {
   ListIcon,
   MoreVertical,
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -71,25 +73,25 @@ export default function CategoryTable() {
     const toastId = toast.loading("Updating active status...");
     setIsLoading(true);
     try {
-      const result = (await updateData(
-        `/categories/productCategory/${statusInfo.categoryId}`,
-        {
-          isActive: statusInfo.isActive,
-        },
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TProductCategory[]>;
+      const result = await updateProductCategoryReq(statusInfo.categoryId, {
+        isActive: statusInfo.isActive,
+      });
       if (result?.success) {
-        toast.success("Active Status updated successfully!", { id: toastId });
+        toast.success(result.message || "Active Status updated successfully!", {
+          id: toastId,
+        });
         fetchCategories();
         setStatusInfo((prevStatusInfo) => ({
           ...prevStatusInfo,
           categoryId: "",
           field: "",
         }));
+        return;
       }
 
+      toast.error(result.message || "Active Status update failed", {
+        id: toastId,
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
@@ -221,7 +223,22 @@ export default function CategoryTable() {
               productCategoriesResult?.data?.length > 0 &&
               productCategoriesResult?.data?.map((category) => (
                 <TableRow key={category._id}>
-                  <TableCell>{category.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {category.icon && (
+                        <div>
+                          <Image
+                            className="w-8 h-8 rounded-full object-cover"
+                            src={category.icon}
+                            alt={category.name}
+                            width={32}
+                            height={32}
+                          />
+                        </div>
+                      )}
+                      <p>{category.name}</p>
+                    </div>
+                  </TableCell>
                   <TableCell>{category.description}</TableCell>
                   <TableCell>
                     {category.isActive && !category.isDeleted

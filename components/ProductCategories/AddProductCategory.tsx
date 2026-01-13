@@ -1,5 +1,6 @@
 "use client";
 
+import { ImageUploader } from "@/components/AllBusinessCategories/BusinessCategoryImageUploader";
 import {
   Form,
   FormControl,
@@ -17,16 +18,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { TResponse } from "@/types";
+import { addProductCategoryReq } from "@/services/dashboard/category/product-category";
 import { TBusinessCategory } from "@/types/category.type";
-import { getCookie } from "@/utils/cookies";
-import { postData } from "@/utils/requests";
 import { productCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { FileTextIcon, LoaderIcon, PlusCircle } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -49,25 +48,46 @@ export default function AddProductCategory({
     defaultValues: {
       name: "",
       description: "",
+      image: { file: null, url: "" },
       businessCategoryId: "",
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [watchImage] = useWatch({
+    control: form.control,
+    name: ["image"],
+  });
+
+  const onChangeImage = (image: { file: File | null; url: string }) => {
+    form.setValue("image", image);
+  };
+
   const onSubmit = async (data: FormData) => {
     const toastId = toast.loading("Adding category...");
     setIsSubmitting(true);
     try {
-      const response = (await postData("/categories/productCategory", data, {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<TProductCategory>;
+      const categoryData = {
+        name: data.name,
+        description: data.description,
+        businessCategoryId: data.businessCategoryId,
+      };
 
-      if (response?.success) {
-        toast.success("Category added successfully!", {
+      const result = await addProductCategoryReq(
+        categoryData,
+        data.image?.file
+      );
+
+      if (result?.success) {
+        toast.success(result.message || "Category added successfully!", {
           id: toastId,
         });
         form.reset();
+        return;
       }
+      toast.error(result.message || "Failed to add category", {
+        id: toastId,
+      });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -153,6 +173,28 @@ export default function AddProductCategory({
                       {...field}
                       placeholder="e.g. Restaurant"
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="image"
+              render={() => (
+                <FormItem className="content-start">
+                  <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="flex items-center">
+                      <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
+                      <span className="ml-2">Category Image</span>
+                    </div>
+                  </FormLabel>
+                  <FormControl>
+                    <ImageUploader
+                      image={watchImage}
+                      onChange={onChangeImage}
                     />
                   </FormControl>
                   <FormMessage />

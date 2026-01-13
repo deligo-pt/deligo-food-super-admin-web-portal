@@ -17,6 +17,7 @@ export type TProductCategory = {
   slug: string;
   description?: string;
   image?: string;
+  icon?: string;
   businessCategoryId: string;
   isActive: boolean;
   isDeleted: boolean;

@@ -9,9 +9,14 @@ export const productCategoryValidation = z.object({
 
   description: z.string().optional(),
 
-  image: z.string().optional(),
-
   businessCategoryId: z.string().nonempty("Business category is required"),
+
+  image: z
+    .object({
+      file: z.file().nullable(),
+      url: z.string(),
+    })
+    .optional(),
 });
 
 export const updateProductCategoryValidation = z.object({
@@ -23,7 +28,12 @@ export const updateProductCategoryValidation = z.object({
 
   description: z.string().optional(),
 
-  image: z.string().optional(),
+  image: z
+    .object({
+      file: z.file().nullable(),
+      url: z.string(),
+    })
+    .optional(),
 
   businessCategoryId: z.string().optional(),
 });

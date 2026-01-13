@@ -11,7 +11,12 @@ export const businessCategoryValidation = z.object({
 
   icon: z.string().optional(),
 
-  image: z.string().optional(),
+  image: z
+    .object({
+      file: z.file().nullable(),
+      url: z.string(),
+    })
+    .optional(),
 });
 
 export const updateBusinessCategoryValidation = z.object({
@@ -25,5 +30,10 @@ export const updateBusinessCategoryValidation = z.object({
 
   icon: z.string().optional(),
 
-  image: z.string().optional(),
+  image: z
+    .object({
+      file: z.file().nullable(),
+      url: z.string(),
+    })
+    .optional(),
 });
