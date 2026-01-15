@@ -7,7 +7,7 @@ import DeleteModal from "@/components/Modals/DeleteModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { userSoftDeleteReq } from "@/services/auth/deleteUser";
-import { TMeta, TResponse } from "@/types";
+import { TMeta } from "@/types";
 import { TAdmin } from "@/types/admin.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -96,25 +96,21 @@ export default function AllAdmins({ adminsResult }: IProps) {
   const deleteAdmin = async () => {
     const toastId = toast.loading("Deleting Admin...");
 
-    try {
-      const result = (await userSoftDeleteReq(
-        deleteId
-      )) as unknown as TResponse<null>;
+    const result = await userSoftDeleteReq(deleteId);
 
-      if (result?.success) {
-        router.refresh();
-        setDeleteId("");
-        toast.success(result.message || "Admin deleted successfully!", {
-          id: toastId,
-        });
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Admin deletion failed", {
+    if (result?.success) {
+      router.refresh();
+      setDeleteId("");
+      toast.success(result.message || "Admin deleted successfully!", {
         id: toastId,
       });
+      return;
     }
+
+    toast.error(result.message || "Admin deletion failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   // Small UI helpers

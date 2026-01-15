@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { USER_STATUS } from "@/consts/user.const";
 import { userSoftDeleteReq } from "@/services/auth/deleteUser";
-import { TMeta, TResponse } from "@/types";
+import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -83,28 +83,21 @@ export default function AllCustomers({ customersResult }: IProps) {
   const deleteCustomer = async () => {
     const toastId = toast.loading("Deleting Customer...");
 
-    try {
-      const result = (await userSoftDeleteReq(
-        deleteId
-      )) as unknown as TResponse<null>;
+    const result = await userSoftDeleteReq(deleteId);
 
-      if (result?.success) {
-        router.refresh();
-        setDeleteId("");
-        toast.success(result.message || "Customer deleted successfully!", {
-          id: toastId,
-        });
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Customer deletion failed",
-        {
-          id: toastId,
-        }
-      );
+    if (result?.success) {
+      router.refresh();
+      setDeleteId("");
+      toast.success(result.message || "Customer deleted successfully!", {
+        id: toastId,
+      });
+      return;
     }
+
+    toast.error(result.message || "Customer deletion failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   const getStatusColor = (status: TUserStatus) => {
