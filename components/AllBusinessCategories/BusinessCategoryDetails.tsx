@@ -12,11 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { updateBusinessCategoryReq } from "@/services/dashboard/category/business-category";
-import { TResponse } from "@/types";
+import {
+  deleteBusinessCategoryReq,
+  updateBusinessCategoryReq,
+} from "@/services/dashboard/category/business-category";
 import { TBusinessCategory } from "@/types/category.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
@@ -50,56 +50,44 @@ export default function BusinessCategoryDetails({
 
   const updateActiveStatus = async () => {
     const toastId = toast.loading("Updating active status...");
-    try {
-      const result = await updateBusinessCategoryReq(category._id, {
-        isActive: !category.isActive,
-      });
-      if (result?.success) {
-        toast.success(result.message || "Active Status updated successfully!", {
-          id: toastId,
-        });
-        setUpdateField("");
-        router.refresh();
-        return;
-      }
 
-      toast.error(result.message || "Active Status update failed", {
+    const result = await updateBusinessCategoryReq(category._id, {
+      isActive: !category.isActive,
+    });
+
+    if (result?.success) {
+      toast.success(result.message || "Active Status updated successfully!", {
         id: toastId,
       });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Active Status update failed",
-        { id: toastId }
-      );
+      setUpdateField("");
+      router.refresh();
+      return;
     }
+
+    toast.error(result.message || "Active Status update failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   const softDeleteCategory = async () => {
     const toastId = toast.loading("Deleting category...");
 
-    try {
-      const result = (await deleteData(
-        `/categories/businessCategory/soft-delete/${category?._id}`,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TBusinessCategory[]>;
-      if (result?.success) {
-        toast.success("Category deleted successfully!", { id: toastId });
-        // fetchCategories();
-        setUpdateField("");
-        router.refresh();
-      }
+    const result = await deleteBusinessCategoryReq(category?._id);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Category delete failed", {
+    if (result?.success) {
+      toast.success(result.message || "Category deleted successfully!", {
         id: toastId,
       });
+      setUpdateField("");
+      router.refresh();
+      return;
     }
+
+    toast.error(result?.message || "Category delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (

@@ -46,37 +46,28 @@ export function AddBusinessCategoryForm() {
   const onSubmit = async (data: FormData) => {
     const toastId = toast.loading("Adding category...");
     setIsSubmitting(true);
-    try {
-      const categoryData = {
-        name: data.name,
-        description: data.description,
-      };
 
-      const result = await addBusinessCategoryReq(
-        categoryData,
-        data.image?.file
-      );
+    const categoryData = {
+      name: data.name,
+      description: data.description,
+    };
 
-      if (result?.success) {
-        toast.success(result.message || "Category added successfully!", {
-          id: toastId,
-        });
-        form.reset();
-        return;
-      }
-      toast.error(result.message || "Failed to add category", {
+    const result = await addBusinessCategoryReq(categoryData, data.image?.file);
+
+    if (result?.success) {
+      toast.success(result.message || "Category added successfully!", {
         id: toastId,
       });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error submitting form:", error);
-      toast.error(error?.response?.data?.message || "Failed to add category", {
-        id: toastId,
-      });
-    } finally {
+      form.reset();
       setIsSubmitting(false);
+      return;
     }
+
+    toast.error(result.message || "Failed to add category", {
+      id: toastId,
+    });
+    setIsSubmitting(false);
+    console.error(result);
   };
 
   return (

@@ -66,41 +66,32 @@ export default function EditBusinessCategoryModal({
 
   const onSubmit = async (data: FormData) => {
     const toastId = toast.loading("Updating category...");
-    try {
-      const categoryData = {
-        name: data.name,
-        description: data.description,
-      };
 
-      const result = await updateBusinessCategoryReq(
-        category._id,
-        categoryData,
-        data.image?.file
-      );
+    const categoryData = {
+      name: data.name,
+      description: data.description,
+    };
 
-      if (result?.success) {
-        toast.success(result.message || "Category updated successfully!", {
-          id: toastId,
-        });
-        form.reset();
-        onClose();
-        router.refresh();
-        return;
-      }
+    const result = await updateBusinessCategoryReq(
+      category._id,
+      categoryData,
+      data.image?.file
+    );
 
-      toast.error(result?.message || "Failed to update category", {
+    if (result?.success) {
+      toast.success(result.message || "Category updated successfully!", {
         id: toastId,
       });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error submitting form:", error);
-      toast.error(
-        error?.response?.data?.message || "Failed to update category",
-        {
-          id: toastId,
-        }
-      );
+      form.reset();
+      onClose();
+      router.refresh();
+      return;
     }
+
+    toast.error(result?.message || "Failed to update category", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (

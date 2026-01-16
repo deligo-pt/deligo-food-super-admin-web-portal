@@ -12,9 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TResponse } from "@/types";
-import { getCookie } from "@/utils/cookies";
-import { updateData } from "@/utils/requests";
+import { approveOrRejectReq } from "@/services/auth/approveOrReject";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -48,49 +46,43 @@ export default function ApproveOrRejectModal({
         ? "Blocking..."
         : "Unblocking..."
     );
-    try {
-      const updateStatus = {
-        status: status === "UNBLOCKED" ? "APPROVED" : status,
-        remarks,
-      };
-      const result = (await updateData(
-        `/auth/${userId}/approved-rejected-user`,
-        updateStatus,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      )) as unknown as TResponse<any>;
-      if (result?.success) {
-        setRemarks("");
-        onOpenChange(false);
-        toast.success(
-          status === "APPROVED"
-            ? "Approved successfully!"
-            : status === "REJECTED"
-            ? "Rejected successfully!"
-            : status === "BLOCKED"
-            ? "Blocked successfully!"
-            : "Unblocked successfully!",
-          { id: toastId }
-        );
-        router.refresh();
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message ||
-          (status === "APPROVED"
-            ? "Approving failed"
-            : status === "REJECTED"
-            ? "Rejecting failed"
-            : status === "BLOCKED"
-            ? "Blocking failed"
-            : "Unblocking failed"),
+
+    const updateStatus = {
+      status: status === "UNBLOCKED" ? "APPROVED" : status,
+      remarks,
+    };
+
+    const result = await approveOrRejectReq(userId, updateStatus);
+
+    if (result?.success) {
+      setRemarks("");
+      onOpenChange(false);
+      toast.success(
+        status === "APPROVED"
+          ? "Approved successfully!"
+          : status === "REJECTED"
+          ? "Rejected successfully!"
+          : status === "BLOCKED"
+          ? "Blocked successfully!"
+          : "Unblocked successfully!",
         { id: toastId }
       );
+      router.refresh();
+      return;
     }
+
+    toast.error(
+      result.message ||
+        (status === "APPROVED"
+          ? "Approving failed"
+          : status === "REJECTED"
+          ? "Rejecting failed"
+          : status === "BLOCKED"
+          ? "Blocking failed"
+          : "Unblocking failed"),
+      { id: toastId }
+    );
+    console.log(result);
   };
 
   return (
