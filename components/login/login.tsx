@@ -43,7 +43,6 @@ export default function SuperAdminLoginPage({
     },
   });
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: LoginForm) => {
@@ -155,7 +154,7 @@ export default function SuperAdminLoginPage({
                               "bg-gray-800/70 text-white placeholder-gray-500 focus:ring-[#DC3173] focus:border-[#DC3173]",
                               fieldState.invalid
                                 ? "border-destructive"
-                                : "border-gray-700"
+                                : "border-gray-700",
                             )}
                             {...field}
                           />

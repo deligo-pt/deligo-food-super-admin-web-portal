@@ -232,7 +232,7 @@ export default function ProductDetails({ product }: IProps) {
                   </span>
                   <span className="text-sm font-medium text-green-600">
                     {Math.round(
-                      (product.pricing.discount / product.pricing.price) * 100
+                      (product.pricing.discount / product.pricing.price) * 100,
                     )}
                     % off
                   </span>
@@ -260,7 +260,7 @@ export default function ProductDetails({ product }: IProps) {
             <div className="flex items-center gap-2">
               <div
                 className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getStockStatusColor(
-                  product.stock.availabilityStatus
+                  product.stock.availabilityStatus,
                 )}`}
               >
                 {getStockStatusIcon(product.stock.availabilityStatus)}
@@ -447,12 +447,14 @@ export default function ProductDetails({ product }: IProps) {
                   Status:{" "}
                   <span
                     className={`font-medium ${
-                      product.meta.status === "Active"
-                        ? "text-green-600"
-                        : "text-red-600"
+                      product.isDeleted
+                        ? "text-red-600"
+                        : product.meta.status === "ACTIVE"
+                          ? "text-green-600"
+                          : "text-yellow-600"
                     }`}
                   >
-                    {product.meta.status}
+                    {product.isDeleted ? "DELETED" : product.meta.status}
                   </span>
                 </p>
                 {product.meta.origin && <p>Origin: {product.meta.origin}</p>}

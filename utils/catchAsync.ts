@@ -1,9 +1,9 @@
-import { TResponse } from "@/src/types";
+import { TResponse } from "@/types";
 
 export const catchAsync = async <T>(
   fn: () => Promise<TResponse<T>>,
   customSuccessMsg?: string,
-  customErrMsg?: string
+  customErrMsg?: string,
 ) => {
   try {
     const result = await fn();

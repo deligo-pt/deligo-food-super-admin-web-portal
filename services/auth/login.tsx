@@ -1,3 +1,5 @@
+"use server";
+
 import { serverRequest } from "@/lib/serverFetch";
 import { catchAsync } from "@/utils/catchAsync";
 
