@@ -14,10 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TMeta, TResponse } from "@/types";
+import { deleteProductReq } from "@/services/dashboard/product/product";
+import { TMeta } from "@/types";
 import { TProduct, TProductsQueryParams } from "@/types/product.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
 import { AnimatePresence, motion } from "framer-motion";
 import { RefreshCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -101,30 +100,21 @@ export default function Products({
 
   const handleDeleteProduct = async () => {
     const toastId = toast.loading("Deleting product...");
-    if (selectedProduct.id && selectedProduct.action === "delete") {
-      try {
-        const result = (await deleteData(
-          `/products/soft-delete/${selectedProduct.id}`,
-          {
-            headers: {
-              authorization: getCookie("accessToken"),
-            },
-          }
-        )) as unknown as TResponse<null>;
 
-        if (result.success) {
-          toast.success("Product deleted successfully", { id: toastId });
-          // await getProducts(queryParams);
-          setSelectedProduct({ id: null, action: null });
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        toast.error(
-          error?.response?.data?.message || "Deleting product failed",
-          { id: toastId }
-        );
-        console.log(error);
+    if (selectedProduct.id && selectedProduct.action === "delete") {
+      const result = await deleteProductReq(selectedProduct.id);
+
+      if (result.success) {
+        toast.success("Product deleted successfully", { id: toastId });
+        router.refresh();
+        setSelectedProduct({ id: null, action: null });
+        return;
       }
+
+      toast.error(result?.message || "Product delete failed", {
+        id: toastId,
+      });
+      console.log(result);
     }
   };
 

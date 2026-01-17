@@ -1,6 +1,7 @@
 "use client";
 
 import AllFilters from "@/components/Filtering/AllFilters";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -43,7 +44,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import PaginationComponent from "../Filtering/PaginationComponent";
 
 interface IProps {
   categoriesResult: {
@@ -289,8 +289,8 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                 {statusInfo.field === "isDeleted"
                   ? "Delete"
                   : !statusInfo.isActive
-                  ? "Inactive"
-                  : "Active"}{" "}
+                    ? "Inactive"
+                    : "Active"}{" "}
                 category
               </DialogTitle>
               <DialogDescription>
@@ -298,8 +298,8 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                 {statusInfo.field === "isDeleted"
                   ? "selete"
                   : !statusInfo.isActive
-                  ? "inactive"
-                  : "active"}{" "}
+                    ? "inactive"
+                    : "active"}{" "}
                 this category?
               </DialogDescription>
             </DialogHeader>

@@ -25,15 +25,6 @@ interface IProps {
 
 export default function ProductDetails({ product }: IProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  //   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  //   const handleDelete = () => {
-  //     if (product._id) {
-  //       onDelete(product._id);
-  //     } else if (product.productId) {
-  //       onDelete(product.productId);
-  //     }
-  //     // setIsDeleteDialogOpen(false);
-  //   };
 
   const getStockStatusColor = (status: string) => {
     switch (status) {
@@ -431,8 +422,8 @@ export default function ProductDetails({ product }: IProps) {
                           i < Math.floor(product?.rating?.average || 0)
                             ? "text-amber-400 fill-amber-400"
                             : i < (product?.rating?.average || 0)
-                            ? "text-amber-400 fill-amber-400 opacity-50"
-                            : "text-gray-300"
+                              ? "text-amber-400 fill-amber-400 opacity-50"
+                              : "text-gray-300"
                         }`}
                       />
                     ))}
