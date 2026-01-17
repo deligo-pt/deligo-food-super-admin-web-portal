@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { uploadVendorDocumentsReq } from "@/services/dashboard/add-vendor/add-vendor";
 import { TResponse } from "@/types";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/use-translation";
 
 type DocKey =
   | "businessLicenseDoc"
@@ -16,22 +17,6 @@ type DocKey =
   | "idProof"
   | "storePhoto"
   | "menuUpload";
-
-const DOCUMENTS: {
-  key: DocKey;
-  label: string;
-  prefersImagePreview: boolean;
-}[] = [
-  {
-    key: "businessLicenseDoc",
-    label: "Business License",
-    prefersImagePreview: false,
-  },
-  { key: "taxDoc", label: "Tax Document", prefersImagePreview: false },
-  { key: "idProof", label: "ID Proof", prefersImagePreview: true },
-  { key: "storePhoto", label: "Store Photo", prefersImagePreview: true },
-  { key: "menuUpload", label: "Menu / Brochure", prefersImagePreview: true },
-];
 
 type FilePreview = {
   file: File | null;
@@ -44,6 +29,7 @@ export default function UploadVendorDocuments({
 }: {
   vendorId: string;
 }) {
+  const { t } = useTranslation();
   const [previews, setPreviews] = useState<Record<DocKey, FilePreview | null>>({
     businessLicenseDoc: null,
     taxDoc: null,
@@ -51,6 +37,23 @@ export default function UploadVendorDocuments({
     storePhoto: null,
     menuUpload: null,
   });
+
+  const DOCUMENTS: {
+    key: DocKey;
+    label: string;
+    prefersImagePreview: boolean;
+  }[] = [
+      {
+        key: "businessLicenseDoc",
+        label: t("business_license"),
+        prefersImagePreview: false,
+      },
+      { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
+      { key: "idProof", label: t("id_proof"), prefersImagePreview: true },
+      { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
+      { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
+    ];
+
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
 
   const openPicker = (key: DocKey) => {
@@ -134,15 +137,13 @@ export default function UploadVendorDocuments({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
-            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${
-              isSelected ? "border-[#DC3173]/30 bg-[#FFF7FB]" : "bg-white"
-            }`}
+            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${isSelected ? "border-[#DC3173]/30 bg-[#FFF7FB]" : "bg-white"
+              }`}
           >
             <div className="flex items-center gap-4">
               <div
-                className={`w-14 h-14 rounded-lg flex items-center justify-center ${
-                  isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
-                }`}
+                className={`w-14 h-14 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
+                  }`}
               >
                 {d.prefersImagePreview ? (
                   <ImageIcon className="w-6 h-6 text-[#DC3173]" />
@@ -185,7 +186,7 @@ export default function UploadVendorDocuments({
                       </div>
                     )
                   ) : (
-                    <span>No file selected</span>
+                    <span>{t("no_file_selected")}</span>
                   )}
                 </div>
               </div>
@@ -219,14 +220,14 @@ export default function UploadVendorDocuments({
                     }
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm border border-gray-200 hover:shadow"
                   >
-                    <Eye className="w-4 h-4 text-[#DC3173]" /> View
+                    <Eye className="w-4 h-4 text-[#DC3173]" /> {t("view")}
                   </button>
 
                   <button
                     onClick={() => removeFile(d.key)}
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm text-gray-600 border border-gray-100 hover:bg-gray-50"
                   >
-                    Remove
+                    {t("remove")}
                   </button>
                 </>
               ) : (
@@ -236,7 +237,7 @@ export default function UploadVendorDocuments({
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#DC3173] border border-[#DC3173]/20 hover:bg-[#DC3173]/5 transition"
                 >
                   <UploadCloud className="w-4 h-4" />
-                  Select file
+                  {t("select_file")}
                 </button>
               )}
             </div>

@@ -21,8 +21,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
   CheckCircle,
@@ -55,14 +57,9 @@ interface IProps {
   vendorsResult: { data: TVendor[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function PendingApprovals({ vendorsResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const [statusInfo, setStatusInfo] = useState({
     vendorId: "",
     vendorName: "",
@@ -88,11 +85,10 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
               <Store className="w-6 h-6 text-slate-800" />
-              Pending Vendor Approvals
+              {t("pending_vendor_approvals")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Review newly registered vendors before they go live on Deligo
-              Portugal
+              {t("review_newly_registered_vendors")}
             </p>
           </div>
         </div>
@@ -110,19 +106,19 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
             <div className="p-4 sm:p-6">
               <h2 className="font-medium text-lg flex items-center gap-2 mb-4">
                 <Clock className="w-4 h-4" />
-                Pending Approvals: {vendorsResult?.meta?.total || 0}
+                {t("pending_approvals")}: {vendorsResult?.meta?.total || 0}
               </h2>
 
               <div className="overflow-auto rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-white">
-                      <TableCell className="pl-6">Vendor</TableCell>
-                      <TableCell>Owner</TableCell>
-                      <TableCell>City</TableCell>
-                      <TableCell>Cuisine</TableCell>
-                      <TableCell>Submitted</TableCell>
-                      <TableCell className="text-right pr-6">Actions</TableCell>
+                      <TableCell className="pl-6">{t("vendor")}</TableCell>
+                      <TableCell>{t("owner")}</TableCell>
+                      <TableCell>{t("city")}</TableCell>
+                      <TableCell>{t("cuisine")}</TableCell>
+                      <TableCell>{t("submitted")}</TableCell>
+                      <TableCell className="text-right pr-6">{t("actions")}</TableCell>
                     </TableRow>
                   </TableHeader>
 
@@ -131,7 +127,7 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
                       <TableRow>
                         <TableCell colSpan={6}>
                           <div className="py-12 text-center text-slate-500">
-                            No pending vendors found.
+                            {t("no_pending_vendors_found")}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -213,7 +209,7 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
                                   router.push(`/admin/vendor/${v.userId}`)
                                 }
                               >
-                                <Eye className="w-4 h-4 mr-2" /> View
+                                <Eye className="w-4 h-4 mr-2" /> {t("view")}
                               </Button>
                               <motion.div whileTap={{ scale: 0.96 }}>
                                 <Button
@@ -231,7 +227,7 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
                                   }
                                 >
                                   <CheckCircle className="w-4 h-4 mr-2" />{" "}
-                                  Approve
+                                  {t("approve")}
                                 </Button>
                               </motion.div>
                               <motion.div whileTap={{ scale: 0.96 }}>
@@ -246,7 +242,7 @@ export default function PendingApprovals({ vendorsResult }: IProps) {
                                     })
                                   }
                                 >
-                                  <XCircle className="w-4 h-4 mr-2" /> Reject
+                                  <XCircle className="w-4 h-4 mr-2" /> {t("reject")}
                                 </Button>
                               </motion.div>
                             </div>

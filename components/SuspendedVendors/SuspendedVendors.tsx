@@ -14,8 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -35,14 +37,9 @@ interface IProps {
   vendorsResult: { data: TVendor[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function SuspendedVendors({ vendorsResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     open: false,
@@ -67,11 +64,10 @@ export default function SuspendedVendors({ vendorsResult }: IProps) {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
-              <Ban className="w-6 h-6 text-red-600" /> Suspended Vendors
+              <Ban className="w-6 h-6 text-red-600" /> {t("suspended_vendors")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Manage and review vendors suspended due to policy violations,
-              fraud or document issues.
+              {t("manage_review_vendors_suspended_due_policy")}
             </p>
           </div>
         </div>
@@ -88,22 +84,22 @@ export default function SuspendedVendors({ vendorsResult }: IProps) {
             <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-medium text-lg flex items-center gap-2">
-                  <Ban className="w-4 h-4 text-red-600" /> Suspended Vendors:{" "}
+                  <Ban className="w-4 h-4 text-red-600" /> {t("suspended_vendors")}:{" "}
                   {vendorsResult?.meta?.total}
                 </h2>
-                <Badge variant="outline">Portugal</Badge>
+                <Badge variant="outline">{t("portugal")}</Badge>
               </div>
 
               <div className="overflow-auto rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-white">
-                      <TableCell className="pl-6">Vendor</TableCell>
-                      <TableCell>City</TableCell>
-                      <TableCell>Reason</TableCell>
-                      <TableCell>Suspended On</TableCell>
-                      <TableCell>Documents</TableCell>
-                      <TableCell className="text-right pr-6">Actions</TableCell>
+                      <TableCell className="pl-6">{t("vendor")}</TableCell>
+                      <TableCell>{t("city")}</TableCell>
+                      <TableCell>{t("reason")}</TableCell>
+                      <TableCell>{t("suspended_on")}</TableCell>
+                      <TableCell>{t("documents")}</TableCell>
+                      <TableCell className="text-right pr-6">{t("actions")}</TableCell>
                     </TableRow>
                   </TableHeader>
 
@@ -112,7 +108,7 @@ export default function SuspendedVendors({ vendorsResult }: IProps) {
                       <TableRow>
                         <TableCell colSpan={6}>
                           <div className="py-12 text-center text-slate-500">
-                            No suspended vendors found.
+                            {t("no_suspended_vendors_found")}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -172,8 +168,8 @@ export default function SuspendedVendors({ vendorsResult }: IProps) {
                           <TableCell>
                             {v.approvedOrRejectedOrBlockedAt
                               ? new Date(
-                                  v.approvedOrRejectedOrBlockedAt
-                                ).toLocaleDateString("en-GB")
+                                v.approvedOrRejectedOrBlockedAt
+                              ).toLocaleDateString("en-GB")
                               : ""}
                           </TableCell>
 
@@ -186,10 +182,10 @@ export default function SuspendedVendors({ vendorsResult }: IProps) {
                                 ).length === 5
                                   ? "Uploaded"
                                   : 5 -
-                                    Object.values(v.documents || {}).filter(
-                                      (v) => !!v
-                                    ).length +
-                                    " Missing"}
+                                  Object.values(v.documents || {}).filter(
+                                    (v) => !!v
+                                  ).length +
+                                  " Missing"}
                               </span>
                             </div>
                           </TableCell>
@@ -203,7 +199,7 @@ export default function SuspendedVendors({ vendorsResult }: IProps) {
                                   router.push(`/admin/vendor/${v.userId}`)
                                 }
                               >
-                                <Eye className="w-4 h-4 mr-2" /> View
+                                <Eye className="w-4 h-4 mr-2" /> {t("view")}
                               </Button>
                               <Button
                                 size="sm"
@@ -217,7 +213,7 @@ export default function SuspendedVendors({ vendorsResult }: IProps) {
                                   })
                                 }
                               >
-                                <Undo2 className="w-4 h-4 mr-2" /> Reinstate
+                                <Undo2 className="w-4 h-4 mr-2" /> {t("reinstate")}
                               </Button>
                             </div>
                           </TableCell>

@@ -12,8 +12,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { BarChart2, Eye, FileText, MapPin, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -41,14 +43,9 @@ interface IProps {
   vendorsResult: { data: TVendor[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function ActiveVendors({ vendorsResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
   //   const [vendors, setVendors] = useState<Vendor[]>([]);
   //   const [query, setQuery] = useState('');
@@ -124,8 +121,8 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
         Object.values(v.documents || {}).filter((v) => !!v).length === 5
           ? "Uploaded"
           : 5 -
-            Object.values(v.documents || {}).filter((v) => !!v).length +
-            " Missing",
+          Object.values(v.documents || {}).filter((v) => !!v).length +
+          " Missing",
       ]),
     ];
 
@@ -151,11 +148,10 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
               <Store className="w-6 h-6 text-slate-800" />
-              Active Vendors
+              {t("active_vendors")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Manage live vendors on Deligo Portugal — monitor performance, live
-              orders and status
+              {t("manage_live_vendors_deligo_portugal")}
             </p>
           </div>
 
@@ -258,14 +254,14 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
             <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-medium text-lg flex items-center gap-2">
-                  <Store className="w-4 h-4" /> Active Vendors:{" "}
+                  <Store className="w-4 h-4" /> {t("active_vendors")}:{" "}
                   {vendorsResult?.meta?.total}
                 </h2>
                 {/* <div className="flex items-center gap-2">
                   <Badge variant="outline">Portugal</Badge>
                 </div> */}
                 <Button size="sm" variant="outline" onClick={exportCSV}>
-                  Export CSV
+                  {t("export_csv")}
                 </Button>
               </div>
 
@@ -273,13 +269,13 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-white">
-                      <TableCell className="pl-6">Vendor</TableCell>
-                      <TableCell>City</TableCell>
-                      <TableCell>Total Orders</TableCell>
-                      <TableCell>Rating</TableCell>
+                      <TableCell className="pl-6">{t("vendor")}</TableCell>
+                      <TableCell>{t("city")}</TableCell>
+                      <TableCell>{t("total_orders")}</TableCell>
+                      <TableCell>{t("rating")}</TableCell>
                       {/* <TableCell>Zones</TableCell> */}
-                      <TableCell>Docs</TableCell>
-                      <TableCell className="text-right pr-6">Actions</TableCell>
+                      <TableCell>{t("docs")}</TableCell>
+                      <TableCell className="text-right pr-6">{t("actions")}</TableCell>
                     </TableRow>
                   </TableHeader>
 
@@ -297,7 +293,7 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
                       <TableRow>
                         <TableCell colSpan={7}>
                           <div className="py-12 text-center text-slate-500">
-                            No active vendors found.
+                            {t("no_active_vendors_found")}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -382,10 +378,10 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
                                 ).length === 5
                                   ? "Uploaded"
                                   : 5 -
-                                    Object.values(v.documents || {}).filter(
-                                      (v) => !!v
-                                    ).length +
-                                    " Missing"}
+                                  Object.values(v.documents || {}).filter(
+                                    (v) => !!v
+                                  ).length +
+                                  " Missing"}
                               </span>
                             </div>
                           </TableCell>
@@ -400,7 +396,7 @@ export default function ActiveVendors({ vendorsResult }: IProps) {
                                 }
                               >
                                 <Eye className="w-4 h-4" />
-                                View
+                                {t("view")}
                               </Button>
 
                               {/* {v.active ? (
