@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TTopRatedItems } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 import { StarIcon } from "lucide-react";
@@ -10,13 +11,15 @@ interface IProps {
 }
 
 const TopProducts = ({ topRatedItems }: IProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
-      <h3 className="text-lg font-semibold mb-4">Top rated Items</h3>
+      <h3 className="text-lg font-semibold mb-4">{t("top_rated_items")}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {topRatedItems.length === 0 && (
           <div className="col-span-4 text-center text-gray-500">
-            No top rated items found
+            {t("no_top_rated_items_found")}
           </div>
         )}
         {topRatedItems.map((item, index) => (
@@ -61,7 +64,7 @@ const TopProducts = ({ topRatedItems }: IProps) => {
                   <span className="text-sm">{item.rating?.average}</span>
                 </div>
                 <span className="text-sm text-gray-600">
-                  {item.totalOrders || 0} orders
+                  {item.totalOrders || 0} {t("orders")}
                 </span>
               </div>
             </div>

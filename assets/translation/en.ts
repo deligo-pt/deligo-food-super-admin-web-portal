@@ -28,4 +28,45 @@ export const en = {
     confirm_password: "ConfirmPassword",
     confirm_new_password: "Confirm new password",
 
+    // dashboard page
+    hello: "Hello",
+    welcome_food_delivery_dashboard_overview: "Welcome to your food delivery dashboard overview",
+    total_vendors:"Total Vendors",
+    active_food_partners:"Active food partners",
+    total_fleet_managers:"Total Fleet Managers",
+    managing_deliveries:"Managing deliveries",
+    total_customers:"Total Customers",
+    registered_customers:"Registered customers",
+    total_items:"Total Items",
+    tatal_listed_items:"Total listed items",
+    total_delivery_partners:"Total Delivery Partners",
+    registered_delivery_partners:"Registered delivery partners",
+    total_orders:"Total Orders",
+    // -> status
+    pending:"Pending",
+    completed:"Completed",
+    cancelled:"Cancelled",
+    accepted: "Accepted",
+    rejected:"Rejected",
+    preparing:"Preparing",
+    ready_for_pickup:"Ready For Pickup",
+    awaiting_partner:"Awaiting Partner",
+    dispatching:"Dispatching",
+    reassignment_needed:"Reassignment Needed",
+    assigned:"Assigned",
+    picked_up:"Picked Up",
+    on_the_way:"On The Way",
+    delivered:"Delivered",
+
+
+    popular_categories: "Popular Categories",
+    no_popular_categories_found: "No popular categories found",
+    recent_orders: "Recent Orders",
+    no_recent_orders_found: "No recent orders found",
+    view_all_orders: "View All Orders",
+    top_rated_items: "Top rated Items",
+    no_top_rated_items_found: "No top rated items found",
+    orders: "orders",
+
+
 };

@@ -6,6 +6,7 @@ import RecentOrders from "@/components/Dashboard/RecentOrders";
 import StatCard from "@/components/Dashboard/StatCard";
 import StatusCard from "@/components/Dashboard/StatusCard";
 import TopProducts from "@/components/Dashboard/TopProducts";
+import { useTranslation } from "@/hooks/use-translation";
 import { TAnalytics } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 import {
@@ -21,6 +22,8 @@ import {
 } from "lucide-react";
 
 const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-7xl mx-auto">
       <DashboardHeader />
@@ -40,23 +43,23 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
         }}
       >
         <StatCard
-          title="Total Vendors"
+          title={t("total_vendors")}
           value={analyticsData?.counts?.vendors?.toLocaleString() || "0"}
-          description="Active food partners"
+          description={t("active_food_partners")}
           icon={<StoreIcon />}
           color="#DC3173"
         />
         <StatCard
-          title="Total Fleet Managers"
+          title={t("total_fleet_managers")}
           value={analyticsData?.counts?.fleetManagers?.toLocaleString() || "0"}
-          description="Managing deliveries"
+          description={t("managing_deliveries")}
           icon={<TruckIcon />}
           color="#DC3173"
         />
         <StatCard
-          title="Total Customers"
+          title={t("total_customers")}
           value={analyticsData?.counts?.customers?.toLocaleString() || "0"}
-          description="Registered customers"
+          description={t("registered_customers")}
           icon={<UsersIcon />}
           color="#DC3173"
         />
@@ -77,18 +80,18 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
         }}
       >
         <StatCard
-          title="Total Items"
+          title={t("total_items")}
           value={analyticsData?.counts?.totalProducts?.toLocaleString() || "0"}
-          description="Total listed items"
+          description={t("tatal_listed_items")}
           icon={<Pizza />}
           color="#DC3173"
         />
         <StatCard
-          title="Total Delivery Partners"
+          title={t("total_delivery_partners")}
           value={
             analyticsData?.counts?.deliveryPartners?.toLocaleString() || "0"
           }
-          description="Registered delivery partners"
+          description={t("registered_delivery_partners")}
           icon={<Bike />}
           color="#DC3173"
         />
@@ -109,25 +112,25 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
         }}
       >
         <StatusCard
-          title="Total Orders"
+          title={t("total_orders")}
           value={analyticsData?.orders?.total?.toLocaleString() || "0"}
           icon={<ShoppingBagIcon />}
           color="#DC3173"
         />
         <StatusCard
-          title="Pending"
+          title={t("pending")}
           value={analyticsData?.orders?.pending?.toLocaleString() || "0"}
           icon={<TrendingUpIcon />}
           color="#DC3173"
         />
         <StatusCard
-          title="Completed"
+          title={t("completed")}
           value={analyticsData?.orders?.completed?.toLocaleString() || "0"}
           icon={<CheckCircleIcon />}
           color="#DC3173"
         />
         <StatusCard
-          title="Cancelled"
+          title={t("cancelled")}
           value={analyticsData?.orders?.cancelled?.toLocaleString() || "0"}
           icon={<XCircleIcon />}
           color="#DC3173"
