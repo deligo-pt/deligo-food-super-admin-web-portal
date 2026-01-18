@@ -231,7 +231,10 @@ export default function BusinessCategoryDetails({
         )}
 
         <div className="absolute top-4 right-4">
-          <BusinessCategoryStatusBadge isActive={category.isActive} />
+          <BusinessCategoryStatusBadge
+            isActive={category.isActive}
+            isDeleted={category.isDeleted}
+          />
         </div>
         <div className="p-6">
           <div className="mb-6">
