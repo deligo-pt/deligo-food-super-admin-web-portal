@@ -1,3 +1,4 @@
+import { ImageUploader } from "@/components/AllBusinessCategories/BusinessCategoryImageUploader";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,16 +26,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { updateProductCategoryReq } from "@/services/dashboard/category/product-category";
 import { TResponse } from "@/types";
 import { TBusinessCategory, TProductCategory } from "@/types/category.type";
 import { getCookie } from "@/utils/cookies";
-import { fetchData, updateData } from "@/utils/requests";
+import { fetchData } from "@/utils/requests";
 import { updateProductCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { FileTextIcon, ImageIcon, PlusCircleIcon } from "lucide-react";
+import { FileTextIcon, PlusCircleIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -51,6 +54,7 @@ export default function EditProductCategoryModal({
   onClose,
   category,
 }: IProps) {
+  const router = useRouter();
   const [businessCategories, setBusinessCategories] = useState<
     TBusinessCategory[]
   >([]);
@@ -59,40 +63,48 @@ export default function EditProductCategoryModal({
     defaultValues: {
       name: category?.name || "",
       description: category?.description || "",
-      image: category?.image || "",
+      image: { file: null, url: category?.icon || "" },
       businessCategoryId: category?.businessCategoryId || "",
     },
   });
 
+  const [watchImage] = useWatch({
+    control: form.control,
+    name: ["image"],
+  });
+
+  const onChangeImage = (image: { file: File | null; url: string }) => {
+    form.setValue("image", image);
+  };
+
   const onSubmit = async (data: FormData) => {
     const toastId = toast.loading("Updating category...");
-    try {
-      const response = (await updateData(
-        `/categories/productCategory/${category._id}`,
-        data,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TProductCategory>;
 
-      if (response?.success) {
-        toast.success("Category updated successfully!", {
-          id: toastId,
-        });
-        form.reset();
-        onClose();
-      }
+    const categoryData = {
+      name: data.name,
+      description: data.description,
+    };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error submitting form:", error);
-      toast.error(
-        error?.response?.data?.message || "Failed to update category",
-        {
-          id: toastId,
-        }
-      );
+    const result = await updateProductCategoryReq(
+      category._id,
+      categoryData,
+      data.image?.file
+    );
+
+    if (result?.success) {
+      toast.success(result.message || "Category updated successfully!", {
+        id: toastId,
+      });
+      form.reset();
+      onClose();
+      router.refresh();
+      return;
     }
+
+    toast.error(result?.message || "Failed to update category", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   const getBusinessCategories = async () => {
@@ -137,16 +149,15 @@ export default function EditProductCategoryModal({
         >
           <Dialog open={isOpen} onOpenChange={onClose}>
             <form>
-              <DialogContent className="sm:max-w-[425px]">
-                {" "}
+              <DialogContent className="w-full h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Edit Product Category</DialogTitle>{" "}
+                  <DialogTitle>Edit Product Category</DialogTitle>
                   <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="p-6 space-y-6"
+                    className="space-y-6"
                   >
                     <div className="space-y-4">
                       <FormField
@@ -165,6 +176,28 @@ export default function EditProductCategoryModal({
                                 {...field}
                                 placeholder="e.g. Restaurant"
                                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="image"
+                        render={() => (
+                          <FormItem className="content-start">
+                            <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
+                              <div className="flex items-center">
+                                <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
+                                <span className="ml-2">Category Image</span>
+                              </div>
+                            </FormLabel>
+                            <FormControl>
+                              <ImageUploader
+                                image={watchImage}
+                                onChange={onChangeImage}
                               />
                             </FormControl>
                             <FormMessage />
@@ -224,27 +257,6 @@ export default function EditProductCategoryModal({
                                   )}
                                 </SelectContent>
                               </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field }) => (
-                          <FormItem className="content-start">
-                            <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                              <div className="flex items-center">
-                                <ImageIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">Image Url</span>
-                              </div>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
-                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

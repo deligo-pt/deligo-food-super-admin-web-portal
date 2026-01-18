@@ -1,6 +1,7 @@
 "use client";
 
-import PaginationCard from "@/components/PaginationCard/PaginationCard";
+import AllFilters from "@/components/Filtering/AllFilters";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,13 +26,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TMeta, TResponse } from "@/types";
 import {
-  TBusinessCategory,
-  TBusinessCategoryQueryParams,
-} from "@/types/category.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData, fetchData, updateData } from "@/utils/requests";
+  deleteBusinessCategoryReq,
+  updateBusinessCategoryReq,
+} from "@/services/dashboard/category/business-category";
+import { TMeta } from "@/types";
+import { TBusinessCategory } from "@/types/category.type";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -40,16 +40,28 @@ import {
   ListIcon,
   MoreVertical,
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-export default function CategoryTable() {
-  const router = useRouter();
-  const [businessCategoriesResult, setBusinessCategoriesResult] = useState<{
+interface IProps {
+  categoriesResult: {
     data: TBusinessCategory[];
-    meta: TMeta;
-  } | null>(null);
+    meta?: TMeta;
+    isLoading: boolean;
+  };
+}
+
+const sortOptions = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Oldest First", value: "createdAt" },
+  { label: "Name (A-Z)", value: "name.firstName" },
+  { label: "Name (Z-A)", value: "-name.lastName" },
+];
+
+export default function CategoryTable({ categoriesResult }: IProps) {
+  const router = useRouter();
   const [statusInfo, setStatusInfo] = useState<{
     categoryId: string;
     isActive?: boolean;
@@ -61,118 +73,61 @@ export default function CategoryTable() {
     isDeleted: false,
     field: "",
   });
-  const [queryParams, setQueryParams] = useState<TBusinessCategoryQueryParams>({
-    limit: 10,
-    page: 1,
-  });
-  const [isLoading, setIsLoading] = useState(false);
 
   const updateActiveStatus = async () => {
     const toastId = toast.loading("Updating active status...");
-    setIsLoading(true);
-    try {
-      const result = (await updateData(
-        `/categories/businessCategory/${statusInfo.categoryId}`,
-        {
-          isActive: statusInfo.isActive,
-        },
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TBusinessCategory[]>;
-      if (result?.success) {
-        toast.success("Active Status updated successfully!", { id: toastId });
-        fetchCategories();
-        setStatusInfo((prevStatusInfo) => ({
-          ...prevStatusInfo,
-          categoryId: "",
-          field: "",
-        }));
-      }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Active Status update failed",
-        { id: toastId }
-      );
-    } finally {
-      setIsLoading(false);
+    const result = await updateBusinessCategoryReq(statusInfo.categoryId, {
+      isActive: statusInfo.isActive,
+    });
+
+    if (result?.success) {
+      toast.success(result.message || "Active Status updated successfully!", {
+        id: toastId,
+      });
+      router.refresh();
+      setStatusInfo((prevStatusInfo) => ({
+        ...prevStatusInfo,
+        categoryId: "",
+        field: "",
+      }));
+      return;
     }
+
+    toast.error(result.message || "Active Status update failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   const softDeleteCategory = async () => {
     const toastId = toast.loading("Deleting category...");
-    setIsLoading(true);
-    try {
-      const result = (await deleteData(
-        `/categories/businessCategory/soft-delete/${statusInfo.categoryId}`,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TBusinessCategory[]>;
-      if (result?.success) {
-        toast.success("Category deleted successfully!", { id: toastId });
-        fetchCategories();
-        setStatusInfo((prevStatusInfo) => ({
-          ...prevStatusInfo,
-          categoryId: "",
-          field: "",
-        }));
-      }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Category delete failed", {
+    const result = await deleteBusinessCategoryReq(statusInfo.categoryId);
+
+    if (result?.success) {
+      toast.success(result.message || "Category deleted successfully!", {
         id: toastId,
       });
-    } finally {
-      setIsLoading(false);
+      setStatusInfo((prevStatusInfo) => ({
+        ...prevStatusInfo,
+        categoryId: "",
+        field: "",
+      }));
+      router.refresh();
+      return;
     }
+
+    toast.error(result?.message || "Category delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
-
-  const fetchCategories = async (
-    queries: TBusinessCategoryQueryParams = queryParams
-  ) => {
-    let params: Partial<TBusinessCategoryQueryParams> = {};
-
-    if (queries) {
-      queries = Object.fromEntries(
-        Object.entries(queries).filter((q) => !!q?.[1])
-      );
-    } else {
-      params = Object.fromEntries(
-        Object.entries(queryParams).filter((q) => !!q?.[1])
-      );
-    }
-
-    setIsLoading(true);
-
-    try {
-      const data = (await fetchData("/categories/businessCategory", {
-        params: params || queryParams,
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<{ data: TBusinessCategory[]; meta: TMeta }>;
-
-      if (data?.success) {
-        setBusinessCategoriesResult(data?.data);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    (() => fetchCategories())();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <>
+      <AllFilters sortOptions={sortOptions} />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -206,7 +161,7 @@ export default function CategoryTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && (
+            {categoriesResult.isLoading && (
               <TableRow>
                 <TableCell
                   className="text-center text-lg text-[#DC3173]"
@@ -216,12 +171,25 @@ export default function CategoryTable() {
                 </TableCell>
               </TableRow>
             )}
-            {!isLoading &&
-              businessCategoriesResult &&
-              businessCategoriesResult?.data?.length > 0 &&
-              businessCategoriesResult?.data?.map((category) => (
+            {!categoriesResult.isLoading &&
+              categoriesResult?.data?.map((category) => (
                 <TableRow key={category._id}>
-                  <TableCell>{category.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {category.icon && (
+                        <div>
+                          <Image
+                            className="w-8 h-8 rounded-full object-cover"
+                            src={category.icon}
+                            alt={category.name}
+                            width={32}
+                            height={32}
+                          />
+                        </div>
+                      )}
+                      <p>{category.name}</p>
+                    </div>
+                  </TableCell>
                   <TableCell>{category.description}</TableCell>
                   <TableCell>
                     {category.isActive && !category.isDeleted
@@ -281,95 +249,88 @@ export default function CategoryTable() {
                   </TableCell>
                 </TableRow>
               ))}
-            {!isLoading && businessCategoriesResult?.data?.length === 0 && (
-              <TableRow>
-                <TableCell
-                  className="text-center text-lg text-[#DC3173]"
-                  colSpan={5}
-                >
-                  No categorys found
-                </TableCell>
-              </TableRow>
-            )}
+            {!categoriesResult.isLoading &&
+              categoriesResult?.meta?.total === 0 && (
+                <TableRow>
+                  <TableCell
+                    className="text-center text-lg text-[#DC3173]"
+                    colSpan={5}
+                  >
+                    No categorys found
+                  </TableCell>
+                </TableRow>
+              )}
           </TableBody>
         </Table>
       </motion.div>
-      {businessCategoriesResult?.data &&
-        businessCategoriesResult?.data?.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-4 md:px-6"
-          >
-            <PaginationCard
-              currentPage={businessCategoriesResult?.meta?.page as number}
-              totalPages={businessCategoriesResult?.meta?.totalPage as number}
-              paginationItemsToDisplay={businessCategoriesResult?.meta?.limit}
-              setQueryParams={setQueryParams}
-            />
-          </motion.div>
-        )}
-      {
-        <Dialog
-          open={statusInfo?.categoryId?.length > 0}
-          onOpenChange={() =>
-            setStatusInfo((prevStatusInfo) => ({
-              ...prevStatusInfo,
-              categoryId: "",
-              field: "",
-            }))
-          }
-        >
-          <form>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>
-                  {statusInfo.field === "isDeleted"
-                    ? "Delete"
-                    : !statusInfo.isActive
+
+      {!!categoriesResult?.meta?.total && categoriesResult?.meta?.total > 0 && (
+        <div className="px-6 mt-4">
+          <PaginationComponent
+            totalPages={categoriesResult?.meta?.totalPage || 0}
+          />
+        </div>
+      )}
+
+      <Dialog
+        open={statusInfo?.categoryId?.length > 0}
+        onOpenChange={() =>
+          setStatusInfo((prevStatusInfo) => ({
+            ...prevStatusInfo,
+            categoryId: "",
+            field: "",
+          }))
+        }
+      >
+        <form>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>
+                {statusInfo.field === "isDeleted"
+                  ? "Delete"
+                  : !statusInfo.isActive
                     ? "Inactive"
                     : "Active"}{" "}
-                  category
-                </DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to{" "}
-                  {statusInfo.field === "isDeleted"
-                    ? "selete"
-                    : !statusInfo.isActive
+                category
+              </DialogTitle>
+              <DialogDescription>
+                Are you sure you want to{" "}
+                {statusInfo.field === "isDeleted"
+                  ? "selete"
+                  : !statusInfo.isActive
                     ? "inactive"
                     : "active"}{" "}
-                  this category?
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
+                this category?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
 
-                {statusInfo.field === "isDeleted" ? (
-                  <Button variant="destructive" onClick={softDeleteCategory}>
-                    Delete
-                  </Button>
-                ) : !statusInfo.isActive ? (
-                  <Button
-                    onClick={updateActiveStatus}
-                    className="bg-yellow-600 hover:bg-yellow-500"
-                  >
-                    Inactive
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={updateActiveStatus}
-                    className="bg-[#DC3173] hover:bg-[#DC3173]/90"
-                  >
-                    Active
-                  </Button>
-                )}
-              </DialogFooter>
-            </DialogContent>
-          </form>
-        </Dialog>
-      }
+              {statusInfo.field === "isDeleted" ? (
+                <Button variant="destructive" onClick={softDeleteCategory}>
+                  Delete
+                </Button>
+              ) : !statusInfo.isActive ? (
+                <Button
+                  onClick={updateActiveStatus}
+                  className="bg-yellow-600 hover:bg-yellow-500"
+                >
+                  Inactive
+                </Button>
+              ) : (
+                <Button
+                  onClick={updateActiveStatus}
+                  className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+                >
+                  Active
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </>
   );
 }

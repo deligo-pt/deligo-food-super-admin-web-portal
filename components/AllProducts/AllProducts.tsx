@@ -3,26 +3,16 @@
 import DeleteProductDialog from "@/components/AllProducts/DeleteProductDialog";
 import ProductCard from "@/components/AllProducts/ProductCard";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
-import SearchFilter from "@/components/Filtering/SearchFilter";
-import SelectFilter from "@/components/Filtering/SelectFilter";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { TMeta, TResponse } from "@/types";
-import { TProduct, TProductsQueryParams } from "@/types/product.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
+import { deleteProductReq } from "@/services/dashboard/product/product";
+import { TMeta } from "@/types";
+import { TProduct } from "@/types/product.type";
 import { AnimatePresence, motion } from "framer-motion";
-import { RefreshCcw, Search, SlidersHorizontal, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import AllFilters from "../Filtering/AllFilters";
 
 const sortOptions = [
   { label: "Newest First", value: "-createdAt" },
@@ -35,6 +25,29 @@ const sortOptions = [
   { label: "lowest Rated", value: "rating.average" },
 ];
 
+const filterOptions = [
+  {
+    label: "Availability Status",
+    key: "status",
+    placeholder: "Select a status",
+    type: "select",
+    items: [
+      {
+        label: "In Stock",
+        value: "In Stock",
+      },
+      {
+        label: "Out of Stock",
+        value: "Out of Stock",
+      },
+      {
+        label: "Limited",
+        value: "Limited",
+      },
+    ],
+  },
+];
+
 export default function Products({
   initialData,
 }: {
@@ -42,54 +55,13 @@ export default function Products({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [prevFilters, setPrevFilters] = useState<TProductsQueryParams>({
-    status: searchParams?.get("status") || "",
-  });
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeFilters, setActiveFilters] = useState({
-    status: searchParams?.get("status") || "",
-  });
   const [selectedProduct, setSelectedProduct] = useState<{
     id: string | null;
     action: "edit" | "delete" | null;
     product?: TProduct | null;
   }>({ id: null, action: null });
 
-  const handleAddFilter = () => {
-    if (activeFilters?.status?.length > 0) {
-      setPrevFilters((prevQuery) => ({
-        ...prevQuery,
-        status: activeFilters.status,
-      }));
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("status", activeFilters.status);
-      router.push(`?${params.toString()}`);
-    }
-    setShowFilters(false);
-  };
-
-  const removeFilter = (key: "status") => {
-    setActiveFilters((prevFilters) => ({
-      ...prevFilters,
-      [key]: "",
-    }));
-    setPrevFilters((prevQuery) => ({
-      ...prevQuery,
-      [key]: "",
-    }));
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete(key);
-    router.push(`?${params.toString()}`);
-  };
-
   const clearAllFilters = () => {
-    setActiveFilters({
-      status: "",
-    });
-    setPrevFilters((prevQuery) => ({
-      ...prevQuery,
-      status: "",
-    }));
     const params = new URLSearchParams(searchParams.toString());
     params.delete("status");
     router.push(`?${params.toString()}`);
@@ -101,30 +73,21 @@ export default function Products({
 
   const handleDeleteProduct = async () => {
     const toastId = toast.loading("Deleting product...");
-    if (selectedProduct.id && selectedProduct.action === "delete") {
-      try {
-        const result = (await deleteData(
-          `/products/soft-delete/${selectedProduct.id}`,
-          {
-            headers: {
-              authorization: getCookie("accessToken"),
-            },
-          }
-        )) as unknown as TResponse<null>;
 
-        if (result.success) {
-          toast.success("Product deleted successfully", { id: toastId });
-          // await getProducts(queryParams);
-          setSelectedProduct({ id: null, action: null });
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        toast.error(
-          error?.response?.data?.message || "Deleting product failed",
-          { id: toastId }
-        );
-        console.log(error);
+    if (selectedProduct.id && selectedProduct.action === "delete") {
+      const result = await deleteProductReq(selectedProduct.id);
+
+      if (result.success) {
+        toast.success("Product deleted successfully", { id: toastId });
+        router.refresh();
+        setSelectedProduct({ id: null, action: null });
+        return;
       }
+
+      toast.error(result?.message || "Product delete failed", {
+        id: toastId,
+      });
+      console.log(result);
     }
   };
 
@@ -142,128 +105,8 @@ export default function Products({
           </div>
         </div>
       </div>
-      <div className="mb-6">
-        <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
-          <SearchFilter paramName="searchTerm" placeholder="Searching..." />
-          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-            <div className="w-full lg:w-48">
-              <SelectFilter
-                paramName="sortBy"
-                options={sortOptions}
-                placeholder="Sort By"
-              />
-            </div>
-            <Button
-              variant="outline"
-              className={`flex items-center ${
-                showFilters ||
-                Object.entries(activeFilters)?.filter(
-                  (filter) => filter[1] !== ""
-                )?.length > 0
-                  ? "border-[#DC3173] text-[#DC3173]"
-                  : ""
-              }`}
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <SlidersHorizontal className="mr-2 h-4 w-4" />
-              Filters{" "}
-              {Object.entries(activeFilters)?.filter(
-                (filter) => filter[1] !== ""
-              )?.length || ""}
-            </Button>
-          </div>
-        </div>
-        {Object.entries(activeFilters)?.filter((filter) => filter[1] !== "")
-          ?.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {activeFilters["status"].length > 0 && (
-              <Badge
-                variant="outline"
-                className="text-[#DC3173] border-[#DC3173]"
-              >
-                {activeFilters["status"]}
-                <X
-                  className="ml-2 h-4 w-4"
-                  onClick={() => removeFilter("status")}
-                />
-              </Badge>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
-            >
-              <RefreshCcw className="h-3 w-3 mr-1" /> Clear All
-            </Button>
-          </div>
-        )}
 
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{
-                height: 0,
-                opacity: 0,
-              }}
-              animate={{
-                height: "auto",
-                opacity: 1,
-              }}
-              exit={{
-                height: 0,
-                opacity: 0,
-              }}
-              transition={{
-                duration: 0.2,
-              }}
-              className="overflow-hidden"
-            >
-              <div className="mt-4 p-4 border rounded-lg bg-gray-50">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Availability Status
-                    </label>
-                    <Select
-                      value={prevFilters.status}
-                      onValueChange={(value) =>
-                        setActiveFilters((prevFilters) => ({
-                          ...prevFilters,
-                          status: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {["In Stock", "Out of Stock", "Limited"].map(
-                          (status) => (
-                            <SelectItem key={status} value={status || "a"}>
-                              {status}
-                            </SelectItem>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <Button
-                    variant="ghost"
-                    className="mr-2"
-                    onClick={() => setShowFilters(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddFilter}>Apply Filters</Button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
       {initialData.data?.length > 0 && (
         <div className="flex justify-between items-center mb-4">
@@ -272,7 +115,11 @@ export default function Products({
             {((initialData.meta?.page || 1) - 1) *
               (initialData.meta?.limit || 10) +
               1}
-            -{(initialData.meta?.page || 1) * (initialData.meta?.limit || 10)}{" "}
+            -{" "}
+            {Math.min(
+              (initialData.meta?.page || 1) * (initialData.meta?.limit || 10),
+              initialData.meta?.total || 0,
+            )}{" "}
             of {initialData.meta?.total || 0} items
           </p>
         </div>
@@ -316,13 +163,11 @@ export default function Products({
           </Button>
         </motion.div>
       )}
+
       {/* Pagination */}
-      {initialData?.data?.length > 0 && (
-        <div className="mt-8">
-          <PaginationComponent
-            totalPages={initialData.meta?.totalPage || 1}
-            itemsNoArray={[10, 20, 50, 100]}
-          />
+      {!!initialData?.meta?.total && initialData?.meta?.total > 0 && (
+        <div className="pb-4 my-3">
+          <PaginationComponent totalPages={initialData?.meta?.totalPage || 0} />
         </div>
       )}
 

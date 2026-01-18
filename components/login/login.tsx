@@ -12,10 +12,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { TResponse } from "@/types";
+import { loginReq } from "@/services/auth/login";
 import { setCookie } from "@/utils/cookies";
 import { getAndSaveFcmToken } from "@/utils/fcmToken";
-import { postData } from "@/utils/requests";
 import { loginValidation } from "@/validations/auth/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -44,46 +43,41 @@ export default function SuperAdminLoginPage({
     },
   });
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: LoginForm) => {
     const toastId = toast.loading("Logging in...");
-    try {
-      const result = (await postData(
-        "/auth/login",
-        data
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      )) as unknown as TResponse<any>;
 
-      if (result?.success) {
-        const decoded = jwtDecode(result.data.accessToken) as { role: string };
-        if (decoded.role === "SUPER_ADMIN" || decoded.role === "ADMIN") {
-          setCookie("accessToken", result.data.accessToken, 7);
-          setCookie("refreshToken", result.data.refreshToken, 365);
-          toast.success("Login successful!", { id: toastId });
+    const result = await loginReq(data);
 
-          // get and save fcm token
+    if (result?.success) {
+      const decoded = jwtDecode(result.data.accessToken) as { role: string };
+
+      if (decoded.role === "SUPER_ADMIN" || decoded.role === "ADMIN") {
+        setCookie("accessToken", result.data.accessToken, 7);
+        setCookie("refreshToken", result.data.refreshToken, 365);
+        toast.success("Login successful!", { id: toastId });
+
+        // get and save fcm token
+        setTimeout(() => {
           getAndSaveFcmToken(result.data.accessToken);
+        }, 1000);
 
-          if (redirect) {
-            router.push(redirect);
-            return;
-          }
-          router.push("/admin/dashboard");
+        if (redirect) {
+          router.push(redirect);
           return;
         }
-        toast.error("You are not a super admin", { id: toastId });
+
+        router.push("/admin/dashboard");
         return;
       }
-      toast.error(result.message, { id: toastId });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Login failed", {
-        id: toastId,
-      });
-      console.error("Error logging in:", error);
+
+      toast.error("You are not a super admin", { id: toastId });
+      return;
     }
+
+    toast.error(result.message, { id: toastId });
+    console.log(result);
   };
 
   return (
@@ -160,7 +154,7 @@ export default function SuperAdminLoginPage({
                               "bg-gray-800/70 text-white placeholder-gray-500 focus:ring-[#DC3173] focus:border-[#DC3173]",
                               fieldState.invalid
                                 ? "border-destructive"
-                                : "border-gray-700"
+                                : "border-gray-700",
                             )}
                             {...field}
                           />

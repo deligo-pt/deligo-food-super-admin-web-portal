@@ -1,4 +1,3 @@
-// app/products/page.tsx
 import AllProducts from "@/components/AllProducts/AllProducts";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
@@ -29,7 +28,7 @@ export default async function ProductsPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/products", {
       params: query,
-    })) as unknown as TResponse<TProduct[]>;
+    })) as TResponse<TProduct[]>;
 
     if (result?.success) {
       initialData.data = result.data;

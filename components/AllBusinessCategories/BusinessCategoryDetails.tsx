@@ -12,10 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TResponse } from "@/types";
+import {
+  deleteBusinessCategoryReq,
+  updateBusinessCategoryReq,
+} from "@/services/dashboard/category/business-category";
 import { TBusinessCategory } from "@/types/category.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
@@ -49,56 +50,44 @@ export default function BusinessCategoryDetails({
 
   const updateActiveStatus = async () => {
     const toastId = toast.loading("Updating active status...");
-    try {
-      const result = (await updateData(
-        `/categories/businessCategory/${category._id}`,
-        {
-          isActive: !category.isActive,
-        },
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TBusinessCategory[]>;
-      if (result?.success) {
-        toast.success("Active Status updated successfully!", { id: toastId });
-        setUpdateField("");
-        router.refresh();
-      }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Active Status update failed",
-        { id: toastId }
-      );
+    const result = await updateBusinessCategoryReq(category._id, {
+      isActive: !category.isActive,
+    });
+
+    if (result?.success) {
+      toast.success(result.message || "Active Status updated successfully!", {
+        id: toastId,
+      });
+      setUpdateField("");
+      router.refresh();
+      return;
     }
+
+    toast.error(result.message || "Active Status update failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   const softDeleteCategory = async () => {
     const toastId = toast.loading("Deleting category...");
 
-    try {
-      const result = (await deleteData(
-        `/categories/businessCategory/soft-delete/${category?._id}`,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TBusinessCategory[]>;
-      if (result?.success) {
-        toast.success("Category deleted successfully!", { id: toastId });
-        // fetchCategories();
-        setUpdateField("");
-        router.refresh();
-      }
+    const result = await deleteBusinessCategoryReq(category?._id);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Category delete failed", {
+    if (result?.success) {
+      toast.success(result.message || "Category deleted successfully!", {
         id: toastId,
       });
+      setUpdateField("");
+      router.refresh();
+      return;
     }
+
+    toast.error(result?.message || "Category delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (
@@ -191,7 +180,7 @@ export default function BusinessCategoryDetails({
                   whileTap={{
                     scale: 0.95,
                   }}
-                  onClick={() => setUpdateField("isDelete")}
+                  onClick={() => setUpdateField("isDeleted")}
                   className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-600/90"
                 >
                   <TrashIcon size={16} />
@@ -217,7 +206,7 @@ export default function BusinessCategoryDetails({
         }}
         className="bg-white rounded-xl shadow-lg overflow-hidden relative"
       >
-        {category.image && (
+        {category.icon && (
           <motion.div
             initial={{
               opacity: 0,
@@ -231,13 +220,12 @@ export default function BusinessCategoryDetails({
             className="w-full h-64"
           >
             <Image
-              src={category.image}
+              src={category.icon}
               alt={category.name}
               className="w-full h-full object-cover"
               width={500}
               height={500}
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
           </motion.div>
         )}
 
@@ -300,7 +288,7 @@ export default function BusinessCategoryDetails({
                 <DialogTitle>
                   {updateField === "isDeleted"
                     ? "Delete"
-                    : !category.isActive
+                    : category.isActive
                     ? "Inactive"
                     : "Active"}{" "}
                   Category
@@ -309,7 +297,7 @@ export default function BusinessCategoryDetails({
                   Are you sure you want to{" "}
                   {updateField === "isDeleted"
                     ? "delete"
-                    : !category.isActive
+                    : category.isActive
                     ? "inactive"
                     : "active"}{" "}
                   this category?
@@ -324,7 +312,7 @@ export default function BusinessCategoryDetails({
                   <Button variant="destructive" onClick={softDeleteCategory}>
                     Delete
                   </Button>
-                ) : !category.isActive ? (
+                ) : category.isActive ? (
                   <Button
                     onClick={updateActiveStatus}
                     className="bg-yellow-500 hover:bg-opacity-90"

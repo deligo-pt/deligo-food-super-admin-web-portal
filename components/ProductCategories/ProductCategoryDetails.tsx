@@ -12,10 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TResponse } from "@/types";
+import {
+  deleteProductCategoryReq,
+  updateProductCategoryReq,
+} from "@/services/dashboard/category/product-category";
 import { TProductCategory } from "@/types/category.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData, updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
@@ -49,55 +50,41 @@ export default function ProductCategoryDetails({
 
   const updateActiveStatus = async () => {
     const toastId = toast.loading("Updating active status...");
-    try {
-      const result = (await updateData(
-        `/categories/productCategory/${category._id}`,
-        {
-          isActive: !category.isActive,
-        },
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TProductCategory[]>;
-      if (result?.success) {
-        toast.success("Active Status updated successfully!", { id: toastId });
-        router.refresh();
-        setUpdateField("");
-      }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Active Status update failed",
-        { id: toastId }
-      );
+    const result = await updateProductCategoryReq(category._id, {
+      isActive: !category.isActive,
+    });
+
+    if (result?.success) {
+      toast.success(result.message || "Active Status updated successfully!", {
+        id: toastId,
+      });
+      router.refresh();
+      setUpdateField("");
+      return;
     }
+
+    toast.error(result.message || "Active Status update failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   const softDeleteCategory = async () => {
     const toastId = toast.loading("Deleting category...");
 
-    try {
-      const result = (await deleteData(
-        `/categories/productCategory/soft-delete/${category?._id}`,
-        {
-          headers: { authorization: getCookie("accessToken") },
-        }
-      )) as unknown as TResponse<TProductCategory[]>;
-      if (result?.success) {
-        toast.success("Category deleted successfully!", { id: toastId });
-        router.refresh();
-        setUpdateField("");
-      }
+    const result = await deleteProductCategoryReq(category?._id);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Category delete failed", {
-        id: toastId,
-      });
+    if (result?.success) {
+      toast.success("Category deleted successfully!", { id: toastId });
+      router.refresh();
+      return;
     }
+
+    toast.error(result?.message || "Category delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (
@@ -216,7 +203,7 @@ export default function ProductCategoryDetails({
         }}
         className="bg-white rounded-xl shadow-lg overflow-hidden relative"
       >
-        {category.image && (
+        {category.icon && (
           <motion.div
             initial={{
               opacity: 0,
@@ -230,7 +217,7 @@ export default function ProductCategoryDetails({
             className="w-full h-64 relative"
           >
             <Image
-              src={category.image}
+              src={category.icon}
               alt={category.name}
               className="w-full h-full object-cover"
               width={500}
@@ -299,8 +286,8 @@ export default function ProductCategoryDetails({
                   {updateField === "isDeleted"
                     ? "Delete"
                     : category.isActive
-                    ? "Inactive"
-                    : "Active"}{" "}
+                      ? "Inactive"
+                      : "Active"}{" "}
                   Category
                 </DialogTitle>
                 <DialogDescription>
@@ -308,8 +295,8 @@ export default function ProductCategoryDetails({
                   {updateField === "isDeleted"
                     ? "delete"
                     : category.isActive
-                    ? "inactive"
-                    : "active"}{" "}
+                      ? "inactive"
+                      : "active"}{" "}
                   this category?
                 </DialogDescription>
               </DialogHeader>
