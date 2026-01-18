@@ -7,8 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Eye, Unlock } from "lucide-react";
@@ -19,14 +21,9 @@ interface IProps {
   customersResult: { data: TCustomer[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function BlockedCustomers({ customersResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const [statusInfo, setStatusInfo] = useState({
     customerId: "",
     customerName: "",
@@ -39,7 +36,7 @@ export default function BlockedCustomers({ customersResult }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6"
       >
-        Blocked Customers
+        {t("blocked_customers")}
       </motion.h1>
 
       <AllFilters sortOptions={sortOptions} />
@@ -47,9 +44,9 @@ export default function BlockedCustomers({ customersResult }: IProps) {
       {/* List */}
       <Card className="p-6 rounded-2xl shadow-sm bg-white">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Blocked Customers</h2>
+          <h2 className="text-xl font-semibold">{t("blocked_customers")}</h2>
           <div className="text-sm text-slate-500">
-            {customersResult?.meta?.total} results
+            {customersResult?.meta?.total} {t("results")}
           </div>
         </div>
 
@@ -58,7 +55,7 @@ export default function BlockedCustomers({ customersResult }: IProps) {
         <div className="space-y-4">
           {customersResult?.data?.length === 0 ? (
             <div className="py-8 text-center text-slate-500">
-              No blocked customers found.
+              {t("no_blocked_customers_found")}
             </div>
           ) : (
             customersResult?.data?.map((c) => (
@@ -84,14 +81,14 @@ export default function BlockedCustomers({ customersResult }: IProps) {
                     </p>
                     <p className="text-xs text-slate-500 truncate">{c.email}</p>
                     <p className="text-xs text-slate-400">
-                      City: {c.address?.city || "—"}
+                      {t("city")}: {c.address?.city || "—"}
                     </p>
                     <div className="mt-2 flex items-center gap-2">
                       <span className="inline-block bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-semibold">
-                        Blocked
+                        {t("blocked")}
                       </span>
                       <span className="text-xs text-slate-500">
-                        Orders: {c.orders?.totalOrders}
+                        {t("orders_lg")}: {c.orders?.totalOrders}
                       </span>
                     </div>
                   </div>
@@ -100,7 +97,7 @@ export default function BlockedCustomers({ customersResult }: IProps) {
                 {/* Right */}
                 <div className="text-right flex flex-col items-end gap-3">
                   <p className="text-sm text-slate-500">
-                    Blocked:{" "}
+                    {t("blocked")}:{" "}
                     {c.approvedOrRejectedOrBlockedAt &&
                       format(
                         c.approvedOrRejectedOrBlockedAt,
@@ -114,7 +111,7 @@ export default function BlockedCustomers({ customersResult }: IProps) {
                         size="sm"
                         className="bg-gray-300 hover:bg-gray-200 text-slate-800"
                       >
-                        <Eye className="w-4 h-4 mr-1" /> Details
+                        <Eye className="w-4 h-4 mr-1" /> {t("details")}
                       </Button>
                     </Link>
 
@@ -128,7 +125,7 @@ export default function BlockedCustomers({ customersResult }: IProps) {
                       size="sm"
                       className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white"
                     >
-                      <Unlock className="w-4 h-4 mr-1" /> Unblock
+                      <Unlock className="w-4 h-4 mr-1" /> {t("unblock")}
                     </Button>
                   </div>
                 </div>

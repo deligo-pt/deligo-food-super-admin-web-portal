@@ -374,11 +374,71 @@ export const en = {
     recipients: "recipients",
     this_action_irreversible_queued_batch: "This action is irreversible for the queued batch. You can cancel scheduled sends from the scheduled tasks panel.",
 
-
     // suspended/blocked-fleet-managers
     blocked_fleet_managers: "Blocked Fleet Managers",
     blocked_managers: "Blocked Managers",
     no_blocked_managers_found: "No blocked managers found.",
+
+    // all-customers
+    all_customers: "All Customers",
+    customer: "Customer",
+    spend: "Spend",
+    joined: "Joined",
+    orders_lg: "Orders",
+    // -> delete modal
+    are_you_absolutely_sure: "Are you absolutely sure?",
+    this_action_cannot_be_undone: "This action cannot be undone. This will delete this data and cannot be undone.",
+    // -> approve_reject modal
+    let_them_know_why_you_are: "Let them know why you are",
+    remarks: "Remarks",
+
+    // customer-details
+    no_name_provided: "No Name Provided",
+    go_back: "Go Back",
+    personal_details: "Personal Details",
+    full_name: "Full Name",
+    contact_number: "Contact Number",
+    address: "Address",
+    street: "Street",
+    state: "State",
+    country: "Country",
+    zip_code: "Zip Code",
+    account_created: "Account Created",
+    last_updated: "Last Updated",
+    approved_rejected_blocked_at: "Approved/Rejected/Blocked At",
+
+    // active customers
+    active_customers: "Active Customers",
+
+    // blocked customers
+    blocked_customers: "Blocked Customers",
+    results: "results",
+    no_blocked_customers_found: "No blocked customers found.",
+
+    // customer-feedback
+    customer_feedback: "Customer Feedback",
+    total_feedback: "Total Feedback",
+    positive: "Positive",
+    trend_7d: "Trend (7d)",
+    search_comments_names_tags: "Search comments, names, tags...",
+    all_ratings: "All Ratings",
+    stars: "Stars",
+    star:"Star",
+    all_cities:"All Cities",
+    comment:"Comment",
+    tags:"Tags",
+    feedback_details:"Feedback Details",
+    view_full_feedback_nd_reply:"View full feedback and reply",
+    attachments:"Attachments",
+    admin_reply:"Admin Reply",
+    feedback_id:"Feedback ID",
+    sentiment:"Sentiment",
+    flag:"Flag",
+    delete_feedback:"Delete Feedback",
+    are_you_sure_want_delete_feedback:"Are you sure you want to permanently delete this feedback? This action cannot be undone.",
+    send_reply:"Send Reply",
+
+
 
 
 

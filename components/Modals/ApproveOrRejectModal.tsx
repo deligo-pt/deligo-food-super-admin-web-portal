@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/hooks/use-translation";
 import { approveOrRejectReq } from "@/services/auth/approveOrReject";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -32,6 +33,7 @@ export default function ApproveOrRejectModal({
   userName,
   userId,
 }: IProps) {
+  const { t } = useTranslation();
   const [remarks, setRemarks] = useState<string>("");
   const router = useRouter();
 
@@ -41,10 +43,10 @@ export default function ApproveOrRejectModal({
       status === "APPROVED"
         ? "Approving..."
         : status === "REJECTED"
-        ? "Rejecting..."
-        : status === "BLOCKED"
-        ? "Blocking..."
-        : "Unblocking..."
+          ? "Rejecting..."
+          : status === "BLOCKED"
+            ? "Blocking..."
+            : "Unblocking..."
     );
 
     const updateStatus = {
@@ -61,10 +63,10 @@ export default function ApproveOrRejectModal({
         status === "APPROVED"
           ? "Approved successfully!"
           : status === "REJECTED"
-          ? "Rejected successfully!"
-          : status === "BLOCKED"
-          ? "Blocked successfully!"
-          : "Unblocked successfully!",
+            ? "Rejected successfully!"
+            : status === "BLOCKED"
+              ? "Blocked successfully!"
+              : "Unblocked successfully!",
         { id: toastId }
       );
       router.refresh();
@@ -73,13 +75,13 @@ export default function ApproveOrRejectModal({
 
     toast.error(
       result.message ||
-        (status === "APPROVED"
-          ? "Approving failed"
-          : status === "REJECTED"
+      (status === "APPROVED"
+        ? "Approving failed"
+        : status === "REJECTED"
           ? "Rejecting failed"
           : status === "BLOCKED"
-          ? "Blocking failed"
-          : "Unblocking failed"),
+            ? "Blocking failed"
+            : "Unblocking failed"),
       { id: toastId }
     );
     console.log(result);
@@ -97,7 +99,7 @@ export default function ApproveOrRejectModal({
               {status === "UNBLOCKED" && "Unblock"} {userName}
             </DialogTitle>
             <DialogDescription>
-              Let them know why you are {status === "APPROVED" && "approving"}
+              {t("let_them_know_why_you_are")} {status === "APPROVED" && "approving"}
               {status === "REJECTED" && "rejecting"}
               {status === "BLOCKED" && "blocking"}
               {status === "UNBLOCKED" && "unblocking"}
@@ -109,7 +111,7 @@ export default function ApproveOrRejectModal({
             className="grid gap-4"
           >
             <div className="grid gap-3">
-              <Label htmlFor="remarks">Remarks</Label>
+              <Label htmlFor="remarks">{t("remarks")}</Label>
               <Input
                 id="remarks"
                 name="remarks"
@@ -119,7 +121,7 @@ export default function ApproveOrRejectModal({
           </form>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{t("cancel")}</Button>
             </DialogClose>
             {status === "APPROVED" && (
               <Button
@@ -127,12 +129,12 @@ export default function ApproveOrRejectModal({
                 type="submit"
                 className="bg-green-600 hover:bg-green-500"
               >
-                Approve
+                {t("approve")}
               </Button>
             )}
             {status === "REJECTED" && (
               <Button form="remarksForm" type="submit" variant="destructive">
-                Reject
+                {t("reject")}
               </Button>
             )}
             {status === "BLOCKED" && (
@@ -141,7 +143,7 @@ export default function ApproveOrRejectModal({
                 type="submit"
                 className="bg-yellow-500 hover:bg-yellow-600"
               >
-                Block
+                {t("block")}
               </Button>
             )}
             {status === "UNBLOCKED" && (
@@ -150,7 +152,7 @@ export default function ApproveOrRejectModal({
                 type="submit"
                 className="bg-[#DC3173] hover:bg-[#DC3173]/90"
               >
-                Unblock
+                {t("unblock")}
               </Button>
             )}
           </DialogFooter>

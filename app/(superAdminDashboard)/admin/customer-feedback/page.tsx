@@ -11,7 +11,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
-import { Star, Search as SearchIcon, Download, Trash2, MessageSquare } from 'lucide-react';
+import { Star, Download, Trash2, MessageSquare } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 const DELIGO = '#DC3173';
 const SAMPLE_IMAGE = '/mnt/data/Screenshot from 2025-11-21 00-13-57.png';
@@ -32,6 +33,7 @@ type Feedback = {
 };
 
 export default function CustomerFeedbackPremium() {
+  const { t } = useTranslation();
   const [data, setData] = useState<Feedback[]>([]);
   const [query, setQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<number | 'all'>('all');
@@ -71,7 +73,7 @@ export default function CustomerFeedbackPremium() {
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `feedback_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+    a.href = url; a.download = `feedback_${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
   }
 
   // function deleteFeedback(id: string) {
@@ -89,52 +91,52 @@ export default function CustomerFeedbackPremium() {
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <Star className="w-7 h-7" style={{ color: DELIGO }} /> Customer Feedback
+        <Star className="w-7 h-7" style={{ color: DELIGO }} /> {t("customer_feedback")}
       </motion.h1>
 
       {/* Top: stats + filters */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Average Rating</p>
+          <p className="text-xs text-slate-500">{t("average_rating")}</p>
           <h3 className="text-2xl font-bold">{stats.avg} <span className="text-sm text-slate-500">/ 5</span></h3>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Total Feedback</p>
+          <p className="text-xs text-slate-500">{t("total_feedback")}</p>
           <h3 className="text-2xl font-bold">{stats.total}</h3>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Positive</p>
+          <p className="text-xs text-slate-500">{t("positive")}</p>
           <h3 className="text-2xl font-bold">{stats.positive}%</h3>
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Trend (7d)</p>
+          <p className="text-xs text-slate-500">{t("trend_7d")}</p>
           <div className="mt-2"><Sparkline data={data.slice(0, 12).map((d) => d.rating)} /></div>
         </Card>
       </div>
 
       {/* Filters row */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <Input placeholder="Search comments, names, tags..." value={query} onChange={(e) => setQuery(e.target.value)} className="max-w-xl" />
+        <Input placeholder={t("search_comments_names_tags")} value={query} onChange={(e) => setQuery(e.target.value)} className="max-w-xl" />
 
         <Select value={String(ratingFilter)} onValueChange={(v) => setRatingFilter(v === 'all' ? 'all' : Number(v) as any)}>
           <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Ratings</SelectItem>
-            <SelectItem value="5">5 Stars</SelectItem>
-            <SelectItem value="4">4 Stars</SelectItem>
-            <SelectItem value="3">3 Stars</SelectItem>
-            <SelectItem value="2">2 Stars</SelectItem>
-            <SelectItem value="1">1 Star</SelectItem>
+            <SelectItem value="all">{t("all_ratings")}</SelectItem>
+            <SelectItem value="5">5 {t("stars")}</SelectItem>
+            <SelectItem value="4">4 {t("stars")}</SelectItem>
+            <SelectItem value="3">3 {t("stars")}</SelectItem>
+            <SelectItem value="2">2 {t("stars")}</SelectItem>
+            <SelectItem value="1">1 {t("star")}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={String(cityFilter)} onValueChange={(v) => setCityFilter(v === 'all' ? 'all' : v as any)}>
           <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Cities</SelectItem>
+            <SelectItem value="all">{t("all_cities")}</SelectItem>
             {cities.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
@@ -145,8 +147,12 @@ export default function CustomerFeedbackPremium() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" onClick={() => { setQuery(''); setRatingFilter('all'); setCityFilter('all'); setDateFrom(''); setDateTo(''); }}>Reset</Button>
-          <Button onClick={() => exportCSV(filtered)} className="flex items-center gap-2"><Download className="w-4 h-4" />Export CSV</Button>
+          <Button variant="outline" onClick={() => { setQuery(''); setRatingFilter('all'); setCityFilter('all'); setDateFrom(''); setDateTo(''); }}>
+            {t("reset")}
+          </Button>
+          <Button onClick={() => exportCSV(filtered)} className="flex items-center gap-2"><Download className="w-4 h-4" />
+            {t("export_csv")}
+          </Button>
         </div>
       </div>
 
@@ -156,12 +162,12 @@ export default function CustomerFeedbackPremium() {
           <thead className="bg-slate-100 text-slate-700 font-semibold">
             <tr>
               <th className="px-4 py-3 text-left w-[60px]">#</th>
-              <th className="px-4 py-3 text-left w-[260px]">Customer</th>
-              <th className="px-4 py-3 text-left w-[380px]">Comment</th>
-              <th className="px-4 py-3 text-center w-[110px]">Rating</th>
-              <th className="px-4 py-3 text-center w-[140px]">Date</th>
-              <th className="px-4 py-3 text-center w-[160px]">Tags</th>
-              <th className="px-4 py-3 text-center w-[180px]">Actions</th>
+              <th className="px-4 py-3 text-left w-[260px]">{t("customer")}</th>
+              <th className="px-4 py-3 text-left w-[380px]">{t("comment")}</th>
+              <th className="px-4 py-3 text-center w-[110px]">{t("rating")}</th>
+              <th className="px-4 py-3 text-center w-[140px]">{t("date")}</th>
+              <th className="px-4 py-3 text-center w-40">{t("tags")}</th>
+              <th className="px-4 py-3 text-center w-[180px]">{t("actions")}</th>
             </tr>
           </thead>
 
@@ -217,8 +223,8 @@ export default function CustomerFeedbackPremium() {
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
         <SheetContent className="max-w-2xl p-6 overflow-y-auto border-l bg-white">
           <SheetHeader>
-            <SheetTitle>Feedback Details</SheetTitle>
-            <SheetDescription>View full feedback and reply</SheetDescription>
+            <SheetTitle>{t("feedback_details")}</SheetTitle>
+            <SheetDescription>{t("view_full_feedback_nd_reply")}</SheetDescription>
           </SheetHeader>
 
           {selected && (
@@ -236,13 +242,13 @@ export default function CustomerFeedbackPremium() {
                 <Separator />
 
                 <div className="mt-4">
-                  <h4 className="font-semibold mb-2">Comment</h4>
+                  <h4 className="font-semibold mb-2">{t("comment")}</h4>
                   <p className="text-slate-700 whitespace-pre-wrap">{selected.comment}</p>
                 </div>
 
                 {selected.attachments && selected.attachments.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="font-semibold mb-2">Attachments</h4>
+                    <h4 className="font-semibold mb-2">{t("attachments")}</h4>
                     <div className="flex gap-3 flex-wrap">
                       {selected.attachments.map((a, i) => (
                         <div key={i} className="w-32 h-20 bg-slate-100 rounded-md flex items-center justify-center text-xs">{a.name}</div>
@@ -252,30 +258,30 @@ export default function CustomerFeedbackPremium() {
                 )}
 
                 <div className="mt-6">
-                  <h4 className="font-semibold mb-2">Admin Reply</h4>
+                  <h4 className="font-semibold mb-2">{t("admin_reply")}</h4>
                   <ReplyForm feedback={selected} onReply={(text) => replyToFeedback(selected.id, text)} />
                 </div>
               </div>
 
               <div className="col-span-1">
                 <Card className="p-4 mb-4">
-                  <p className="text-xs text-slate-500">Feedback ID</p>
+                  <p className="text-xs text-slate-500">{t("feedback_id")}</p>
                   <p className="font-semibold">{selected.id}</p>
                 </Card>
 
                 <Card className="p-4 mb-4">
-                  <p className="text-xs text-slate-500">Date</p>
+                  <p className="text-xs text-slate-500">{t("date")}</p>
                   <p className="font-semibold">{new Date(selected.date).toLocaleString()}</p>
                 </Card>
 
                 <Card className="p-4 mb-4">
-                  <p className="text-xs text-slate-500">Sentiment</p>
+                  <p className="text-xs text-slate-500">{t("sentiment")}</p>
                   <p className="font-semibold capitalize">{selected.sentiment || '—'}</p>
                 </Card>
 
                 <div className="space-y-2">
-                  <Button className="w-full" onClick={() => alert('flagged (mock)')}>Flag</Button>
-                  <Button variant="destructive" className="w-full" onClick={() => { setConfirmDelete(selected); }}>Delete</Button>
+                  <Button className="w-full" onClick={() => alert('flagged (mock)')}>{t("flag")}</Button>
+                  <Button variant="destructive" className="w-full" onClick={() => { setConfirmDelete(selected); }}>{t("delete")}</Button>
                 </div>
               </div>
             </div>
@@ -287,12 +293,12 @@ export default function CustomerFeedbackPremium() {
       <Dialog open={!!confirmDelete} onOpenChange={() => setConfirmDelete(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Delete Feedback</DialogTitle>
+            <DialogTitle>{t("delete_feedback")}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-slate-600 mb-4">Are you sure you want to permanently delete this feedback? This action cannot be undone.</p>
+          <p className="text-sm text-slate-600 mb-4">{t("are_you_sure_want_delete_feedback")}</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmDelete(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => deleteFeedback(confirmDelete!.id)}>Delete</Button>
+            <Button variant="outline" onClick={() => setConfirmDelete(null)}>{t("cancel")}</Button>
+            <Button variant="destructive" onClick={() => deleteFeedback(confirmDelete!.id)}>{t("delete")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -322,13 +328,14 @@ function Sparkline({ data }: { data: number[] }) {
 }
 
 function ReplyForm({ feedback, onReply }: { feedback: Feedback; onReply: (t: string) => void }) {
+  const { t } = useTranslation();
   const [text, setText] = useState('');
   return (
     <div>
       <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Write a reply..." className="w-full p-3 rounded-md border resize-y min-h-[100px]" />
       <div className="mt-2 flex gap-2">
-        <Button onClick={() => { onReply(text); setText(''); }}>Send Reply</Button>
-        <Button variant="outline" onClick={() => setText('')}>Clear</Button>
+        <Button onClick={() => { onReply(text); setText(''); }}>{t("send_reply")}</Button>
+        <Button variant="outline" onClick={() => setText('')}>{t("clear")}</Button>
       </div>
     </div>
   );
