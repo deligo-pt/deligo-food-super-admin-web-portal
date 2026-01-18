@@ -88,7 +88,7 @@ export default function EditProductCategoryModal({
     const result = await updateProductCategoryReq(
       category._id,
       categoryData,
-      data.image?.file
+      data.image?.file,
     );
 
     if (result?.success) {
@@ -174,7 +174,7 @@ export default function EditProductCategoryModal({
                             <FormControl>
                               <Input
                                 {...field}
-                                placeholder="e.g. Restaurant"
+                                placeholder="e.g. Pizza"
                                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
                               />
                             </FormControl>
@@ -253,7 +253,7 @@ export default function EditProductCategoryModal({
                                       >
                                         {businessCategory.name}
                                       </SelectItem>
-                                    )
+                                    ),
                                   )}
                                 </SelectContent>
                               </Select>

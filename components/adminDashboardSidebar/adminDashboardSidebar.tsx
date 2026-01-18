@@ -28,11 +28,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import TopbarIcons from "@/components/adminTopbar/TopbarIcons";
+import { TAdmin } from "@/types/admin.type";
 import Image from "next/image";
 
 interface IProps {
   open?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  admin: TAdmin;
 }
 
 const PRIMARY = "#DC3173";
@@ -292,10 +295,10 @@ const MENU = [
   },
 ];
 
-export default function Sidebar({ open, setOpen }: IProps) {
+export default function Sidebar({ open, setOpen, admin }: IProps) {
   const pathname = usePathname();
   const currentMenuId = MENU.find((menu) =>
-    menu.items?.some((item) => pathname.includes(item.path))
+    menu.items?.some((item) => pathname.includes(item.path)),
   )?.id;
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -328,9 +331,12 @@ export default function Sidebar({ open, setOpen }: IProps) {
           </div>
           <h1 className="font-bold text-xl text-[#DC3173]">DeliGo</h1>
         </div>
-        <button onClick={() => setMobileOpen(true)}>
-          <Menu size={24} className="text-gray-700" />
-        </button>
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0 relative z-1001">
+          <TopbarIcons admin={admin} />
+          <button onClick={() => setMobileOpen(true)}>
+            <Menu size={24} className="text-gray-700" />
+          </button>
+        </div>
       </div>
 
       {/* Desktop Sidebar */}
