@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/use-translation";
 import { AnimatePresence, motion } from "framer-motion";
 import { RefreshCcw, SlidersHorizontal, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,6 +29,7 @@ interface IProps {
 }
 
 export default function AllFilters({ sortOptions, filterOptions }: IProps) {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const oldFilters =
     filterOptions?.reduce((acc, option) => {
@@ -96,18 +98,17 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
           {filterOptions && (
             <Button
               variant="outline"
-              className={`flex items-center ${
-                showFilters ||
+              className={`flex items-center ${showFilters ||
                 Object.entries(paramFilters)?.filter(
                   (filter) => filter[1] !== ""
                 )?.length > 0
-                  ? "border-[#DC3173] text-[#DC3173]"
-                  : ""
-              }`}
+                ? "border-[#DC3173] text-[#DC3173]"
+                : ""
+                }`}
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="mr-2 h-4 w-4" />
-              Filters{" "}
+              {t("filters")}{" "}
               {Object.entries(paramFilters)?.filter(
                 (filter) => filter[1] !== ""
               )?.length || ""}
@@ -138,15 +139,15 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
         )}
         {Object.entries(paramFilters)?.filter((filter) => filter[1] !== "")
           ?.length > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearAllFilters}
-            className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
-          >
-            <RefreshCcw className="h-3 w-3 mr-1" /> Clear All
-          </Button>
-        )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearAllFilters}
+              className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
+            >
+              <RefreshCcw className="h-3 w-3 mr-1" /> {t("clear_all")}
+            </Button>
+          )}
       </div>
 
       <AnimatePresence>
@@ -205,13 +206,13 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
                   className="mr-2"
                   onClick={() => setShowFilters(false)}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button
                   className="mr-2 bg-[#DC3173] hover:bg-[#DC3173]/90 text-white"
                   onClick={handleAddFilter}
                 >
-                  Apply Filters
+                  {t("apply_filters")}
                 </Button>
               </div>
             </div>
