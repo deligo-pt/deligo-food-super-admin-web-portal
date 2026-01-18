@@ -31,13 +31,13 @@ export default async function BusinessCategoryPage({ searchParams }: IProps) {
   } = { data: [], isLoading: true };
 
   try {
-    const result = (await serverRequest.get("/categories/businessCategory", {
+    const result = (await serverRequest.get("/categories/productCategory", {
       params: query,
-    })) as TResponse<TProductCategory[]>;
+    })) as TResponse<{ data: TProductCategory[]; meta?: TMeta }>;
 
     if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
+      initialData.data = result.data.data;
+      initialData.meta = result.data.meta;
       initialData.isLoading = false;
     }
   } catch (err) {

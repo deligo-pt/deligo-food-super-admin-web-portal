@@ -17,6 +17,7 @@ import {
   updateProductCategoryReq,
 } from "@/services/dashboard/category/product-category";
 import { TProductCategory } from "@/types/category.type";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
@@ -153,7 +154,7 @@ export default function ProductCategoryDetails({
                 className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-500/90"
               >
                 <ShieldXIcon size={16} />
-                Inactive
+                Deactivate
               </motion.button>
             ) : (
               <>
@@ -168,7 +169,7 @@ export default function ProductCategoryDetails({
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-600/90"
                 >
                   <ShieldCheckIcon size={16} />
-                  Active
+                  Activate
                 </motion.button>
                 <motion.button
                   whileHover={{
@@ -227,7 +228,10 @@ export default function ProductCategoryDetails({
           </motion.div>
         )}
         <div className="absolute top-4 right-4">
-          <ProductCategoryStatusBadge isActive={category.isActive} />
+          <ProductCategoryStatusBadge
+            isActive={category.isActive}
+            isDeleted={category.isDeleted}
+          />
         </div>
         <div className="p-6">
           <div className="mb-6">
@@ -248,19 +252,13 @@ export default function ProductCategoryDetails({
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  Created:{" "}
-                  {new Date(
-                    category.createdAt as unknown as string
-                  )?.toLocaleDateString()}
+                  Created: {format(category.createdAt as Date, "do MMM yyyy")}
                 </span>
               </div>
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  Updated:{" "}
-                  {new Date(
-                    category.updatedAt as unknown as string
-                  )?.toLocaleDateString()}
+                  Updated: {format(category.updatedAt as Date, "do MMM yyyy")}
                 </span>
               </div>
             </div>
@@ -286,8 +284,8 @@ export default function ProductCategoryDetails({
                   {updateField === "isDeleted"
                     ? "Delete"
                     : category.isActive
-                      ? "Inactive"
-                      : "Active"}{" "}
+                      ? "Deactivate"
+                      : "Activate"}{" "}
                   Category
                 </DialogTitle>
                 <DialogDescription>
@@ -295,8 +293,8 @@ export default function ProductCategoryDetails({
                   {updateField === "isDeleted"
                     ? "delete"
                     : category.isActive
-                      ? "inactive"
-                      : "active"}{" "}
+                      ? "deactivate"
+                      : "activate"}{" "}
                   this category?
                 </DialogDescription>
               </DialogHeader>
@@ -314,14 +312,14 @@ export default function ProductCategoryDetails({
                     onClick={updateActiveStatus}
                     className="bg-yellow-500 hover:bg-opacity-90"
                   >
-                    Inactive
+                    Deactivate
                   </Button>
                 ) : (
                   <Button
                     onClick={updateActiveStatus}
                     className="bg-[#DC3173] hover:bg-[#DC3173]/90"
                   >
-                    Active
+                    Activate
                   </Button>
                 )}
               </DialogFooter>
