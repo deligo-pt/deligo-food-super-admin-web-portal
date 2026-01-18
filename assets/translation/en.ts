@@ -196,6 +196,27 @@ export const en = {
     account_holder: "Account Holder",
     close: "",
 
+    // all-fleet-manager
+    no_fleet_manager_found: "No Fleet Manager found",
+
+    // add-fleet-manager
+    add_new_fleet_manager: "Add New Fleet Manager",
+    fleet_manager_email: "Fleet Manager Email",
+    submit_fleetManager: "Submit FleetManager",
+
+    // fleet-manager-wallet
+    fleet_manager_wallet: "Fleet Manager Wallet",
+    search_fleet_manager_id_reason: "Search fleet manager, ID or reason...",
+    all_status: "All Status",
+    failed: "Failed",
+    all_types: "All Types",
+    credit: "Credit",
+    debit: "Debit",
+    total_wallet_balance: "Total Wallet Balance",
+    total_credit: "Total Credit",
+    total_debit: "Total Debit",
+    pending_transactions: "Pending Transactions",
+    transactions: "Transactions",
 
 
 };

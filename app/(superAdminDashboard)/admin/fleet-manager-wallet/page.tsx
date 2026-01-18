@@ -19,6 +19,7 @@ import {
   Download,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from '@/hooks/use-translation';
 
 const DELIGO = '#DC3173';
 
@@ -35,16 +36,17 @@ type Transaction = {
 };
 
 export default function FleetManagerWalletPage() {
+  const { t } = useTranslation();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [query, setQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');
 
   useEffect(() => {
-  Promise.resolve().then(() => {
-    setTransactions(mockWallet());
-  });
-}, []);
+    Promise.resolve().then(() => {
+      setTransactions(mockWallet());
+    });
+  }, []);
 
 
   const filtered = transactions.filter((t) => {
@@ -59,12 +61,12 @@ export default function FleetManagerWalletPage() {
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <Wallet className="w-8 h-8" style={{ color: DELIGO }} /> Fleet Manager Wallet
+        <Wallet className="w-8 h-8" style={{ color: DELIGO }} /> {t("fleet_manager_wallet")}
       </motion.h1>
 
       {/* Search + Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <Input placeholder="Search fleet manager, ID or reason..." value={query} onChange={(e) => setQuery(e.target.value)} className="max-w-xs" />
+        <Input placeholder={t("search_fleet_manager_id_reason")} value={query} onChange={(e) => setQuery(e.target.value)} className="max-w-xs" />
 
         <Button style={{ background: DELIGO }}><Search className="w-4 h-4" /></Button>
 
@@ -74,10 +76,10 @@ export default function FleetManagerWalletPage() {
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <option value="all">All Status</option>
-          <option value="completed">Completed</option>
-          <option value="pending">Pending</option>
-          <option value="failed">Failed</option>
+          <option value="all">{t("all_status")}</option>
+          <option value="completed">{t("completed")}</option>
+          <option value="pending">{t("pending")}</option>
+          <option value="failed">{t("failed")}</option>
         </select>
 
         {/* Filter by type */}
@@ -86,55 +88,75 @@ export default function FleetManagerWalletPage() {
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
         >
-          <option value="all">All Types</option>
-          <option value="credit">Credit</option>
-          <option value="debit">Debit</option>
+          <option value="all">{t("all_types")}</option>
+          <option value="credit">{t("credit")}</option>
+          <option value="debit">{t("debit")}</option>
         </select>
 
         <Button variant="outline" className="flex items-center gap-2">
-          <Download className="w-4 h-4" /> Export CSV
+          <Download className="w-4 h-4" /> {t("export_csv")}
         </Button>
       </div>
 
       {/* Wallet Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <SummaryCard title="Total Wallet Balance" value={`€ ${totalBalance.toLocaleString()}`} icon={<Wallet className="w-6 h-6" style={{ color: DELIGO }} />} />
-        <SummaryCard title="Total Credit" value={`€ ${filtered.filter((t) => t.type === 'credit').reduce((s, t) => s + t.amount, 0).toLocaleString()}`} icon={<TrendingUp className="w-6 h-6 text-green-600" />} />
-        <SummaryCard title="Total Debit" value={`€ ${filtered.filter((t) => t.type === 'debit').reduce((s, t) => s + t.amount, 0).toLocaleString()}`} icon={<TrendingUp className="w-6 h-6 text-red-600" />} />
-        <SummaryCard title="Pending Transactions" value={`${filtered.filter((t) => t.status === 'pending').length}`} icon={<Filter className="w-6 h-6" style={{ color: DELIGO }} />} />
+        <SummaryCard
+          title={t("total_wallet_balance")}
+          value={`€ ${totalBalance.toLocaleString()}`}
+          icon={<Wallet className="w-6 h-6" style={{ color: DELIGO }} />}
+        />
+
+        <SummaryCard
+          title={t("total_credit")}
+          value={`€ ${filtered.filter((t) => t.type === 'credit').reduce((s, t) => s + t.amount, 0).toLocaleString()}`}
+          icon={<TrendingUp className="w-6 h-6 text-green-600" />}
+        />
+
+        <SummaryCard
+          title={t("total_debit")}
+          value={`€ ${filtered.filter((t) => t.type === 'debit').reduce((s, t) => s + t.amount, 0).toLocaleString()}`}
+          icon={<TrendingUp className="w-6 h-6 text-red-600" />}
+        />
+
+        <SummaryCard
+          title={t("pending_transactions")}
+          value={`${filtered.filter((t) => t.status === 'pending').length}`}
+          icon={<Filter className="w-6 h-6" style={{ color: DELIGO }} />}
+        />
+
       </div>
 
       {/* Transactions */}
       <Card className="p-6 shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Transactions</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("transactions")}</h2>
         <Separator className="mb-4" />
 
         <div className="space-y-4">
-          {filtered.map((t) => (
-            <motion.div key={t.id} whileHover={{ scale: 1.01 }} className="p-4 bg-slate-50 rounded-xl border flex items-center justify-between">
+          {filtered.map((trx) => (
+            <motion.div key={trx.id} whileHover={{ scale: 1.01 }} className="p-4 bg-slate-50 rounded-xl border flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {t.type === 'credit' ? (
+                {trx.type === 'credit' ? (
                   <ArrowUpCircle className="w-7 h-7 text-green-600" />
                 ) : (
                   <ArrowDownCircle className="w-7 h-7 text-red-600" />
                 )}
 
                 <div>
-                  <div className="font-semibold">{t.fleetManager}</div>
-                  <div className="text-xs text-slate-500">{t.reason}</div>
+                  <div className="font-semibold">{trx.fleetManager}</div>
+                  <div className="text-xs text-slate-500">{trx.reason}</div>
 
-                  <Badge className="mt-1" variant={badgeVariant(t.status)}>
-                    {t.status}
+                  <Badge className="mt-1" variant={badgeVariant(trx.status)}>
+                    {trx.status}
                   </Badge>
                 </div>
               </div>
 
               <div className="text-right">
-                <div className={`text-lg font-bold ${t.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                  {t.type === 'credit' ? '+' : '-'} € {t.amount.toLocaleString()}
+                <div className={`text-lg font-bold ${trx.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
+                  {trx.type === 'credit' ? '+' : '-'} € {trx.amount.toLocaleString()}
                 </div>
-                <div className="text-xs text-slate-500">{new Date(t.date).toLocaleString()}</div>
-                <div className="text-xs text-slate-400 italic">Method: {t.method}</div>
+                <div className="text-xs text-slate-500">{new Date(trx.date).toLocaleString()}</div>
+                <div className="text-xs text-slate-400 italic">{t("method")}: {trx.method}</div>
               </div>
             </motion.div>
           ))}

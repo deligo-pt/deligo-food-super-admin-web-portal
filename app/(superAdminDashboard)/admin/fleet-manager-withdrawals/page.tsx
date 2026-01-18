@@ -1,4 +1,3 @@
-// File: app/admin/fleet-manager/fleet-manager-withdrawals/page.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
@@ -10,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import {
-  
   Search,
   Clock,
   CheckCircle,
@@ -66,10 +64,10 @@ export default function FleetManagerWithdrawalsPage() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   useEffect(() => {
-  Promise.resolve().then(() => {
-    setWithdrawals(mockData());
-  });
-}, []);
+    Promise.resolve().then(() => {
+      setWithdrawals(mockData());
+    });
+  }, []);
 
 
   // ---------- sort & filter ----------
@@ -203,7 +201,7 @@ export default function FleetManagerWithdrawalsPage() {
         </div>
       </Card>
 
-     
+
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <SheetContent className="w-full sm:max-w-md p-4 overflow-y-auto max-h-[100vh]">
           <SheetHeader>
@@ -295,7 +293,7 @@ export default function FleetManagerWithdrawalsPage() {
           <p className="text-sm text-slate-600 mb-4">Are you sure you want to <strong>{confirmAction?.type}</strong> this withdrawal?</p>
 
           <div className="flex items-center gap-2 mb-4">
-            <Input placeholder="Optional note (will be saved in audit log)" onChange={() => {}} />
+            <Input placeholder="Optional note (will be saved in audit log)" onChange={() => { }} />
           </div>
 
           <DialogFooter>

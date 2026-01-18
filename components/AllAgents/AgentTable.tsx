@@ -18,10 +18,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta, TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
 import { deleteData } from "@/utils/requests";
+import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -39,45 +41,10 @@ interface IProps {
   agentsResult: { data: TAgent[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
 
 export default function AgentTable({ agentsResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     agentId: "",
@@ -86,6 +53,37 @@ export default function AgentTable({ agentsResult }: IProps) {
     remarks: "",
   });
   const [deleteId, setDeleteId] = useState("");
+
+  const filterOptions = [
+    {
+      label: t("status"),
+      key: "status",
+      placeholder: t("select_status"),
+      type: "select",
+      items: [
+        {
+          label: t("pending"),
+          value: "PENDING",
+        },
+        {
+          label: t("submitted"),
+          value: "SUBMITTED",
+        },
+        {
+          label: t("approved"),
+          value: "APPROVED",
+        },
+        {
+          label: t("rejected"),
+          value: "REJECTED",
+        },
+        {
+          label: t("blocked"),
+          value: "BLOCKED",
+        },
+      ],
+    },
+  ];
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -134,30 +132,30 @@ export default function AgentTable({ agentsResult }: IProps) {
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <IdCard className="w-4" />
-                  Name
+                  {t("name")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <Mail className="w-4" />
-                  Email
+                  {t("email")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <Phone className="w-4" />
-                  Phone
+                  {t("phone")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <CircleCheckBig className="w-4" />
-                  Status
+                  {t("status")}
                 </div>
               </TableHead>
               <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
                 <Cog className="w-4" />
-                Actions
+                {t("actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -187,7 +185,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                               router.push("/admin/agent/" + agent.userId)
                             }
                           >
-                            View
+                            {t("view")}
                           </DropdownMenuItem>
                           {agent.status === "SUBMITTED" && (
                             <>
@@ -201,7 +199,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                                   })
                                 }
                               >
-                                Approve
+                                {t("approve")}
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
@@ -214,7 +212,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                                   })
                                 }
                               >
-                                Reject
+                                {t("reject")}
                               </DropdownMenuItem>
                             </>
                           )}
@@ -229,7 +227,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                                 })
                               }
                             >
-                              Block
+                              {t("block")}
                             </DropdownMenuItem>
                           )}
                           {agent.status === "BLOCKED" && (
@@ -243,14 +241,14 @@ export default function AgentTable({ agentsResult }: IProps) {
                                 })
                               }
                             >
-                              Unblock
+                              {t("unblock")}
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => setDeleteId(agent.userId as string)}
                           >
-                            Delete
+                            {t("delete")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -264,7 +262,7 @@ export default function AgentTable({ agentsResult }: IProps) {
                   className="text-[#DC3173] text-lg text-center"
                   colSpan={5}
                 >
-                  No Fleet Manager found
+                  {t("no_fleet_manager_found")}
                 </TableCell>
               </TableRow>
             )}
