@@ -80,6 +80,7 @@ export default function AddProductCategory({
         id: toastId,
       });
       form.reset();
+      setIsSubmitting(false);
       return;
     }
 

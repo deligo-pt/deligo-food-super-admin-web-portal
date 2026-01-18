@@ -1,19 +1,28 @@
 import { motion } from "framer-motion";
-import { CheckCircleIcon, XCircleIcon } from "lucide-react";
-interface StatusBadgeProps {
+import { BanIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
+
+interface IProps {
   isActive: boolean;
+  isDeleted: boolean;
 }
+
 export default function ProductCategoryStatusBadge({
   isActive,
-}: StatusBadgeProps) {
+  isDeleted,
+}: IProps) {
   return (
     <motion.button
       className={`
         inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
-        ${isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+        ${isDeleted ? "bg-red-100 text-red-800" : isActive ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
          `}
     >
-      {isActive ? (
+      {isDeleted ? (
+        <>
+          <BanIcon size={14} />
+          <span>Deleted</span>
+        </>
+      ) : isActive ? (
         <>
           <CheckCircleIcon size={14} />
           <span>Active</span>

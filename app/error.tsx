@@ -112,7 +112,7 @@ export default function GlobalError() {
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
           <Button
-            onClick={() => router.refresh()}
+            onClick={() => window.location.reload()}
             variant="default"
             className="bg-[#DC3173] hover:bg-[#bb1f61] text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg"
           >

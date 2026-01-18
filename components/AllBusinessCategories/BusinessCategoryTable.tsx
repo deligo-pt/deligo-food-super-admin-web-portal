@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import {
   deleteBusinessCategoryReq,
   updateBusinessCategoryReq,
@@ -191,10 +192,20 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                     </div>
                   </TableCell>
                   <TableCell>{category.description}</TableCell>
-                  <TableCell>
-                    {category.isActive && !category.isDeleted
-                      ? "Active"
-                      : "Inactive"}
+                  <TableCell
+                    className={cn(
+                      category.isDeleted
+                        ? "text-red-500"
+                        : category.isActive
+                          ? "text-green-500"
+                          : "text-yellow-500",
+                    )}
+                  >
+                    {category.isDeleted
+                      ? "Deleted"
+                      : category.isActive
+                        ? "Active"
+                        : "Inactive"}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -206,7 +217,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                           className=""
                           onClick={() =>
                             router.push(
-                              "/admin/business-categories/" + category._id
+                              "/admin/business-categories/" + category._id,
                             )
                           }
                         >
@@ -240,7 +251,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                                 })
                               }
                             >
-                              {category.isActive ? "Inactive" : "Active"}
+                              {category.isActive ? "Deactivate" : "Activate"}
                             </DropdownMenuItem>
                           </>
                         )}
@@ -289,8 +300,8 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                 {statusInfo.field === "isDeleted"
                   ? "Delete"
                   : !statusInfo.isActive
-                    ? "Inactive"
-                    : "Active"}{" "}
+                    ? "Deactivate"
+                    : "Activate"}{" "}
                 category
               </DialogTitle>
               <DialogDescription>
@@ -298,8 +309,8 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                 {statusInfo.field === "isDeleted"
                   ? "selete"
                   : !statusInfo.isActive
-                    ? "inactive"
-                    : "active"}{" "}
+                    ? "deactivate"
+                    : "activate"}{" "}
                 this category?
               </DialogDescription>
             </DialogHeader>
@@ -317,14 +328,14 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                   onClick={updateActiveStatus}
                   className="bg-yellow-600 hover:bg-yellow-500"
                 >
-                  Inactive
+                  Deactivate
                 </Button>
               ) : (
                 <Button
                   onClick={updateActiveStatus}
                   className="bg-[#DC3173] hover:bg-[#DC3173]/90"
                 >
-                  Active
+                  Activate
                 </Button>
               )}
             </DialogFooter>
