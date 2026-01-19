@@ -3,7 +3,6 @@
 import SettingsCard from "@/components/GlobalSettings/SettingsCard";
 import SettingsInput from "@/components/GlobalSettings/SettingsInput";
 import SettingsToggle from "@/components/GlobalSettings/SettingsToggle";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -39,34 +38,6 @@ import z from "zod";
 
 type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
-// const initialSettings: TGlobalSettings = {
-//   deliveryChargePerKm: 1.5,
-//   baseDeliveryCharge: 5.0,
-//   minDeliveryCharge: 5.0,
-//   maxDeliveryCharge: 25.0,
-//   freeDeliveryAbove: 100.0,
-//   maxDeliveryDistanceKm: 15,
-//   platformCommissionPercent: 10,
-//   deliveryPartnerCommissionPercent: 5,
-//   vendorVatPercent: 15,
-//   minOrderAmount: 10,
-//   maxOrderAmount: 500,
-//   maxItemsPerOrder: 20,
-//   cancelTimeLimitMinutes: 5,
-//   refundProcessingDays: 3,
-//   isCouponEnabled: true,
-//   isOfferEnabled: true,
-//   maxDiscountPercent: 50,
-//   autoCancelUnacceptedOrderMinutes: 10,
-//   autoMarkDeliveredAfterMinutes: 60,
-//   isPlatformLive: true,
-//   maintenanceMessage:
-//     "We are currently undergoing scheduled maintenance. We'll be back shortly!",
-//   orderOtpEnabled: true,
-//   otpLength: 6,
-//   otpExpiryMinutes: 10,
-// };
-
 export function GlobalSettings({
   settingsResult: settings,
 }: {
@@ -74,7 +45,7 @@ export function GlobalSettings({
 }) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
-    "idle"
+    "idle",
   );
   const form = useForm<TGlobalSettingsForm>({
     resolver: zodResolver(globalSettingsSchema),
@@ -143,62 +114,65 @@ export function GlobalSettings({
       {/* Header Background Gradient */}
       <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#DC3173]/80 to-transparent -z-10" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-          <div>
-            <motion.h1
-              initial={{
-                opacity: 0,
-                x: -20,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3"
-            >
-              <SettingsIcon className="w-6 h-6 text-slate-800" />
-              Global Settings
-            </motion.h1>
-            <motion.p
-              initial={{
-                opacity: 0,
-                x: -20,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              transition={{
-                delay: 0.1,
-              }}
-              className="text-sm text-slate-500"
-            >
-              Manage your platform&lsquo;s core configuration and rules
-            </motion.p>
-          </div>
+      <Form {...form}>
+        <form
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10"
+        >
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+            <div>
+              <motion.h1
+                initial={{
+                  opacity: 0,
+                  x: -20,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                }}
+                className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3"
+              >
+                <SettingsIcon className="w-6 h-6 text-slate-800" />
+                Global Settings
+              </motion.h1>
+              <motion.p
+                initial={{
+                  opacity: 0,
+                  x: -20,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                }}
+                transition={{
+                  delay: 0.1,
+                }}
+                className="text-sm text-slate-500"
+              >
+                Manage your platform&lsquo;s core configuration and rules
+              </motion.p>
+            </div>
 
-          <motion.button
-            form="globalSettingsForm"
-            initial={{
-              opacity: 0,
-              scale: 0.9,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-            }}
-            whileHover={{
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-            type="submit"
-            // onClick={handleSave}
-            disabled={isSaving}
-            className={`
+            <motion.button
+              initial={{
+                opacity: 0,
+                scale: 0.9,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              type="submit"
+              disabled={isSaving}
+              className={`
               relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-white shadow-lg shadow-[#DC3173]/30 transition-all
               ${
                 isSaving
@@ -206,34 +180,28 @@ export function GlobalSettings({
                   : "bg-[#DC3173] hover:bg-[#DC3173]/90 hover:shadow-[#DC3173]/40"
               }
             `}
-          >
-            {isSaving ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Saving...</span>
-              </>
-            ) : saveStatus === "success" ? (
-              <>
-                <CheckCircle2 size={20} />
-                <span>Saved!</span>
-              </>
-            ) : (
-              <>
-                <Save size={20} />
-                <span>Save Changes</span>
-              </>
-            )}
-          </motion.button>
-        </div>
+            >
+              {isSaving ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Saving...</span>
+                </>
+              ) : saveStatus === "success" ? (
+                <>
+                  <CheckCircle2 size={20} />
+                  <span>Saved!</span>
+                </>
+              ) : (
+                <>
+                  <Save size={20} />
+                  <span>Save Changes</span>
+                </>
+              )}
+            </motion.button>
+          </div>
 
-        {/* Main Grid */}
-        <Form {...form}>
-          <form
-            id="globalSettingsForm"
-            noValidate
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-          >
+          {/* Main Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Platform Status - Full Width Hero */}
             <div className="lg:col-span-2">
               <motion.div
@@ -961,11 +929,9 @@ export function GlobalSettings({
                 />
               </div>
             </SettingsCard>
-
-            <Button type="submit" className="hidden" />
-          </form>
-        </Form>
-      </div>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
