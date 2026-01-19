@@ -102,7 +102,10 @@ export default function ProductCard({ product, onDelete }: IProps) {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
             <span className="text-lg font-bold text-[#DC3173]">
-              {product.pricing.currency} {product.pricing.finalPrice.toFixed(2)}
+              {product.pricing.currency}{" "}
+              {new Intl.NumberFormat("de-DE", {
+                minimumFractionDigits: 2,
+              }).format(product.pricing.finalPrice)}
             </span>
             {product?.pricing?.discount ? (
               <span className="text-xs line-through text-gray-400 ml-2">
