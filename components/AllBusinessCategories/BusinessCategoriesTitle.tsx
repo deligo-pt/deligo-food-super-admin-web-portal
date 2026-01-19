@@ -1,10 +1,12 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function CategoriesTitle() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -13,10 +15,10 @@ export default function CategoriesTitle() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">
-              Business Categories
+              {t("business_categories")}
             </h1>
             <p className="text-pink-100 mt-1">
-              Manage your all business categories
+              {t("manage_all_business_categories")}
             </p>
           </div>
           <motion.button
@@ -30,7 +32,7 @@ export default function CategoriesTitle() {
             onClick={() => router.push("/admin/business-categories/add")}
           >
             <PlusCircle className="mr-2 h-5 w-5" />
-            Add Category
+            {t("add_category")}
           </motion.button>
         </div>
       </div>
