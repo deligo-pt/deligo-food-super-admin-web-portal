@@ -6,6 +6,7 @@
 import React, { JSX, useMemo, useState } from "react";
 import { Download, Calendar, DollarSign, TrendingUp, Users, Search, BarChart3, BadgeEuroIcon } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts";
+import { useTranslation } from "@/hooks/use-translation";
 
 // ----------------------------------------------------------------------
 // Types
@@ -57,6 +58,7 @@ function formatCurrency(v: number) {
 // MAIN COMPONENT (CLEAN, NO OVERFLOW)
 // ----------------------------------------------------------------------
 export default function PlatformEarningsPage(): JSX.Element {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [rows] = useState<EarningRow[]>(sampleRows);
   const [range, setRange] = useState("Last 30 days");
@@ -84,7 +86,7 @@ export default function PlatformEarningsPage(): JSX.Element {
 
   const exportCSV = () => {
     const header = ["id", "date", "orderId", "vendor", "region", "gross", "platformFee", "status"];
-    const csv = [header.join(",")] 
+    const csv = [header.join(",")]
       .concat(
         filtered.map((r) =>
           [r.id, r.date, r.orderId, r.vendor, r.region, r.gross, r.platformFee, r.status].join(",")
@@ -107,9 +109,9 @@ export default function PlatformEarningsPage(): JSX.Element {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900">
-            <BarChart3 className="w-7 h-7 text-[#DC3173]" /> Platform Earnings
+            <BarChart3 className="w-7 h-7 text-[#DC3173]" /> {t("platform_earnings")}
           </h1>
-          <p className="text-sm text-gray-500">Track platform revenue & fees in a simple clean layout.</p>
+          <p className="text-sm text-gray-500">{t("track_platform_revenue_fees_simple")}</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
@@ -132,7 +134,7 @@ export default function PlatformEarningsPage(): JSX.Element {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search order, vendor, region"
+              placeholder={t("search_order_vendor_region")}
               className="ml-2 bg-transparent outline-none text-sm w-full"
             />
           </div>
@@ -141,7 +143,7 @@ export default function PlatformEarningsPage(): JSX.Element {
             onClick={exportCSV}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#DC3173] text-white shadow hover:opacity-90"
           >
-            <Download className="w-4 h-4" /> Export
+            <Download className="w-4 h-4" /> {t("export")}
           </button>
         </div>
       </div>
@@ -155,13 +157,13 @@ export default function PlatformEarningsPage(): JSX.Element {
                 <BadgeEuroIcon className="w-6 h-6 text-[#DC3173]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Total Gross</p>
+                <p className="text-xs text-gray-500">{t("total_gross")}</p>
                 <h2 className="text-2xl font-bold">{formatCurrency(totalGross)}</h2>
               </div>
             </div>
 
             <div className="text-right">
-              <p className="text-xs text-gray-500">Platform Fees</p>
+              <p className="text-xs text-gray-500">{t("platform_fees")}</p>
               <h2 className="text-xl font-semibold text-[#DC3173]">{formatCurrency(totalPlatform)}</h2>
             </div>
           </div>
@@ -188,16 +190,16 @@ export default function PlatformEarningsPage(): JSX.Element {
               <Users className="w-5 h-5 text-[#DC3173]" />
             </div>
             <div>
-              <p className="text-xs text-gray-500">Active Vendors</p>
+              <p className="text-xs text-gray-500">{t("active_vendors")}</p>
               <h3 className="text-xl font-semibold">{Math.floor(20 + Math.random() * 50)}</h3>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-green-600 text-sm">
-            <TrendingUp className="w-4 h-4" /> Growth +12.4%
+            <TrendingUp className="w-4 h-4" /> {t("growth")} +12.4%
           </div>
 
-          <p className="text-sm text-gray-500 leading-relaxed">Platform vendor activity trends for this period.</p>
+          <p className="text-sm text-gray-500 leading-relaxed">{t("platform_vendor_activity")}</p>
         </div>
       </div>
 
@@ -207,13 +209,13 @@ export default function PlatformEarningsPage(): JSX.Element {
           <table className="min-w-full text-sm">
             <thead className="text-xs text-gray-500 uppercase border-b">
               <tr>
-                <th className="py-3 px-3 text-left">Date</th>
-                <th className="py-3 px-3 text-left">Order</th>
-                <th className="py-3 px-3 text-left">Vendor</th>
-                <th className="py-3 px-3 text-left">Region</th>
-                <th className="py-3 px-3 text-left">Gross (€)</th>
-                <th className="py-3 px-3 text-left">Platform Fee (€)</th>
-                <th className="py-3 px-3 text-left">Status</th>
+                <th className="py-3 px-3 text-left">{t("date")}</th>
+                <th className="py-3 px-3 text-left">{t("order")}</th>
+                <th className="py-3 px-3 text-left">{t("vendor")}</th>
+                <th className="py-3 px-3 text-left">{t("region")}</th>
+                <th className="py-3 px-3 text-left">{t("gross")} (€)</th>
+                <th className="py-3 px-3 text-left">{t("platform_fee")} (€)</th>
+                <th className="py-3 px-3 text-left">{t("status")}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -227,13 +229,12 @@ export default function PlatformEarningsPage(): JSX.Element {
                   <td className="py-3 px-3 text-[#DC3173] whitespace-nowrap">{formatCurrency(r.platformFee)}</td>
                   <td className="py-3 px-3 whitespace-nowrap">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        r.status === "Paid"
-                          ? "bg-green-100 text-green-700"
-                          : r.status === "Pending"
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${r.status === "Paid"
+                        ? "bg-green-100 text-green-700"
+                        : r.status === "Pending"
                           ? "bg-yellow-100 text-yellow-700"
                           : "bg-red-100 text-red-700"
-                      }`}
+                        }`}
                     >
                       {r.status}
                     </span>

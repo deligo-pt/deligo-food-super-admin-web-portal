@@ -701,4 +701,18 @@ export const en = {
     refund: "Refund",
     cannot_approve_reject_buttons: "Note: connect approve/reject buttons to your refund processing API.",
 
+    // platform earnings
+    platform_earnings: "Platform Earnings",
+    track_platform_revenue_fees_simple: "Track platform revenue & fees in a simple clean layout.",
+    search_order_vendor_region:"Search order, vendor, region",
+    total_gross:"Total Gross",
+    platform_fees:"Platform Fees",
+    growth:"Growth",
+    platform_vendor_activity:"Platform vendor activity trends for this period.",
+    region:"Region",
+    gross:"Gross",
+    platform_fee:"Platform Fee",
+
+
+
 };
