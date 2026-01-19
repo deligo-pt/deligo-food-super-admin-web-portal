@@ -199,10 +199,10 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                     )}
                   >
                     {category.isDeleted
-                      ? "Deleted"
+                      ? t("deleted")
                       : category.isActive
-                        ? "Active"
-                        : "Inactive"}
+                        ? t("active")
+                        : t("inactive")}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

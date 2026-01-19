@@ -287,7 +287,7 @@ export default function BusinessCategoryDetails({
               <DialogHeader>
                 <DialogTitle>
                   {updateField === "isDeleted"
-                    ? "Delete"
+                    ? t("delete")
                     : category.isActive
                       ? t("deactivate")
                       : t("activate")}{" "}

@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteProductCategoryReq,
   updateProductCategoryReq,
@@ -41,6 +42,7 @@ export default function ProductCategoryDetails({
 }: {
   category: TProductCategory;
 }) {
+  const { t } = useTranslation();
   const [showEditModal, setShowEditModal] = useState(false);
   const [updateField, setUpdateField] = useState("");
   const router = useRouter();
@@ -109,11 +111,11 @@ export default function ProductCategoryDetails({
           className="text-[#DC3173] hover:text-[#DC3173]/90 flex items-center gap-2 mb-4"
         >
           <ArrowLeftIcon size={16} />
-          Back to Categories
+          {t("back_to_categories")}
         </Link>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h1 className="text-3xl font-bold text-[#DC3173]">
-            Product Category Details
+            {t("product_category_details")}
           </h1>
           <div className="flex gap-2">
             <motion.button
@@ -127,7 +129,7 @@ export default function ProductCategoryDetails({
               className="flex items-center gap-2 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-md hover:bg-[#DC3173]/90"
             >
               <Edit2Icon size={16} />
-              Edit
+              {t("edit")}
             </motion.button>
             {category?.isDeleted ? (
               <motion.button
@@ -140,7 +142,7 @@ export default function ProductCategoryDetails({
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg shadow-md cursor-not-allowed"
               >
                 <BanIcon size={16} />
-                Deleted
+                {t("deleted")}
               </motion.button>
             ) : category?.isActive ? (
               <motion.button
@@ -154,7 +156,7 @@ export default function ProductCategoryDetails({
                 className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-md hover:bg-yellow-500/90"
               >
                 <ShieldXIcon size={16} />
-                Deactivate
+                {t("deactivate")}
               </motion.button>
             ) : (
               <>
@@ -169,7 +171,7 @@ export default function ProductCategoryDetails({
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-600/90"
                 >
                   <ShieldCheckIcon size={16} />
-                  Activate
+                  {t("activate")}
                 </motion.button>
                 <motion.button
                   whileHover={{
@@ -182,7 +184,7 @@ export default function ProductCategoryDetails({
                   className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-600/90"
                 >
                   <TrashIcon size={16} />
-                  Delete
+                  {t("delete")}
                 </motion.button>
               </>
             )}
@@ -252,13 +254,13 @@ export default function ProductCategoryDetails({
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  Created: {format(category.createdAt as Date, "do MMM yyyy")}
+                  {t("created")}: {format(category.createdAt as Date, "do MMM yyyy")}
                 </span>
               </div>
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  Updated: {format(category.updatedAt as Date, "do MMM yyyy")}
+                  {t("updated")}: {format(category.updatedAt as Date, "do MMM yyyy")}
                 </span>
               </div>
             </div>
@@ -282,44 +284,44 @@ export default function ProductCategoryDetails({
               <DialogHeader>
                 <DialogTitle>
                   {updateField === "isDeleted"
-                    ? "Delete"
+                    ? t("delete")
                     : category.isActive
-                      ? "Deactivate"
-                      : "Activate"}{" "}
-                  Category
+                      ? t("deactivate")
+                      : t("activate")}{" "}
+                  {t("category_lg")}
                 </DialogTitle>
                 <DialogDescription>
-                  Are you sure you want to{" "}
+                  {t("are_you_sure_want_to")}{" "}
                   {updateField === "isDeleted"
                     ? "delete"
                     : category.isActive
                       ? "deactivate"
                       : "activate"}{" "}
-                  this category?
+                   {t("this_category")}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">{t("cancel")}</Button>
                 </DialogClose>
 
                 {updateField === "isDeleted" ? (
                   <Button variant="destructive" onClick={softDeleteCategory}>
-                    Delete
+                    {t("delete")}
                   </Button>
                 ) : category.isActive ? (
                   <Button
                     onClick={updateActiveStatus}
                     className="bg-yellow-500 hover:bg-opacity-90"
                   >
-                    Deactivate
+                    {t("deactivate")}
                   </Button>
                 ) : (
                   <Button
                     onClick={updateActiveStatus}
                     className="bg-[#DC3173] hover:bg-[#DC3173]/90"
                   >
-                    Activate
+                    {t("activate")}
                   </Button>
                 )}
               </DialogFooter>

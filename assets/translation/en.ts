@@ -628,8 +628,25 @@ export const en = {
     created: "Created",
     updated: "Updated",
     category_lg: "Category",
+    edit_business_category: "Edit Business Category",
+    update_business_category: "Update Business Category",
 
 
+    // add-product-category
+    add_product_category: "Add Product Category",
+    create_new_product_category: "Create a new product category with details and visuals",
+    business_category: "Business Category",
+    select_business_category: "Select Business Category",
+
+    // product categories
+    // -> title
+    product_categories: "Product Categories",
+    manage_your_all_products_categories: "Manage your all products categories",
+
+    //-> content
+    product_category_details: "Product Category Details",
+    edit_product_category: "Edit Product Category",
+    update_product_category: "Update Product Category",
 
 
 
