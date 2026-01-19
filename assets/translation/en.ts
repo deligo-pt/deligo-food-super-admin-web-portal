@@ -642,14 +642,63 @@ export const en = {
     // -> title
     product_categories: "Product Categories",
     manage_your_all_products_categories: "Manage your all products categories",
-
     //-> content
     product_category_details: "Product Category Details",
     edit_product_category: "Edit Product Category",
     update_product_category: "Update Product Category",
 
 
+    // all-orders
+    all_orders: "All Orders",
+    manage_all_customer_orders_realtime: "Manage all customer orders — realtime overview",
+    order_id: "Order ID",
+    items: "Items",
+    no_orders_found: "No orders found.",
+    order_details: "Order Details",
+    complete_information_about_selected_order: "Complete information about the selected order.",
+    payment: "Payment",
+    delivery_timeline: "Delivery Timeline",
+    rider: "Rider",
 
+    // pending-orders
+    pending_orders: "Pending Orders",
+    live_pending_orders: "Live Pending Orders",
 
+    // preparing-orders
+    preparing_orders: "Preparing Orders",
+    live_kitchen_dashboard_assign_riders: "Live kitchen dashboard — assign riders, track timers & manage delays.",
+    export: "Export",
+    order: "Order",
+    restaurant_perfomance: "Restaurant / Performance",
+    customer_items: "Customer & Items",
+    timer: "Timer",
+    full_details_nd_quick_actions: "Full details & quick actions",
+    order_created: "Order created",
+
+    // on the way orders
+    on_the_way_orders: "On The Way Orders",
+    live_tracking_delivery_partner_location: "Live tracking — delivery partner location, ETA and customer coordination.",
+    full_route_eta_partner_info: "Full route, ETA, partner info",
+
+    // delivered-orders
+    delivered_orders_portugal: "Delivered Orders (Portugal)",
+    gestao_professional_das_encomendas: "Gestão profissional das encomendas entregues — otimizado para Portugal.",
+    delivery_partner: "Delivery Partner",
+    delivered_at: "Delivered At",
+    payment_eur: "Payment (EUR)",
+
+    // cancelled-orders
+    cancelled_orders: "Cancelled Orders",
+    cancelled_orders_desc: "Encomendas canceladas — monitorize motivos e parceiros para reduzir churn.",
+    cancelled_at: "Cancelled At",
+
+    // refund-requests
+    refund_requests: "Refund Requests",
+    manage_all_customer_refund_requests: "Manage all customer refund requests efficiently.",
+    search_order_customer_reason: "Search order, customer, reason...",
+    assign: "Assign",
+    average_value: "Average Value",
+    refund: "Refund",
+    cannot_approve_reject_buttons: "Note: connect approve/reject buttons to your refund processing API.",
 
 };

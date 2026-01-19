@@ -22,6 +22,7 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
+import { useTranslation } from "@/hooks/use-translation";
 
 // Brand color
 const DELIGO = "#DC3173";
@@ -30,14 +31,15 @@ interface IProps {
   ordersResult: { data: TOrder[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
 
 export default function AllOrders({ ordersResult }: IProps) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<TOrder | null>(null);
   const [exporting, setExporting] = useState(false);
+  const sortOptions = [
+    { label: t("newest_first"), value: "-createdAt" },
+    { label: t("oldest_first"), value: "createdAt" },
+  ];
 
   // Export CSV
   function exportCSV() {
@@ -59,8 +61,8 @@ export default function AllOrders({ ordersResult }: IProps) {
       o.orderId,
       o.customerId?.name?.firstName + " " + o.customerId?.name?.lastName,
       o.deliveryPartnerId?.name?.firstName +
-        " " +
-        o.deliveryPartnerId?.name?.lastName,
+      " " +
+      o.deliveryPartnerId?.name?.lastName,
       o.finalAmount?.toLocaleString(),
       o.orderStatus,
       o.deliveryAddress?.city,
@@ -69,12 +71,12 @@ export default function AllOrders({ ordersResult }: IProps) {
       format(o.createdAt, "Do MMM yyyy"),
       o.deliveredAt ?? "-",
       o.deliveryAddress?.street +
-        ", " +
-        o.deliveryAddress?.postalCode +
-        ", " +
-        o.deliveryAddress?.city +
-        ", " +
-        o.deliveryAddress?.country,
+      ", " +
+      o.deliveryAddress?.postalCode +
+      ", " +
+      o.deliveryAddress?.city +
+      ", " +
+      o.deliveryAddress?.country,
     ]);
 
     const csv = [head, ...rows]
@@ -125,24 +127,23 @@ export default function AllOrders({ ordersResult }: IProps) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-extrabold flex items-center gap-3">
-              <BadgeEuro className="w-8 h-8" style={{ color: DELIGO }} /> All
-              Orders
+              <BadgeEuro className="w-8 h-8" style={{ color: DELIGO }} /> {t("all_orders")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Manage all customer orders — realtime overview
+              {t("")}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <Button onClick={exportCSV} className="flex items-center gap-2">
-              <Download className="w-4 h-4" /> Export CSV
+              <Download className="w-4 h-4" /> {t("export_csv")}
             </Button>
             <Button
               onClick={exportPDF}
               className="flex items-center gap-2"
               disabled={exporting}
             >
-              <Download className="w-4 h-4" /> Export PDF
+              <Download className="w-4 h-4" /> {t("export_pdf")}
             </Button>
           </div>
         </div>
@@ -183,17 +184,17 @@ export default function AllOrders({ ordersResult }: IProps) {
           <table className="w-full text-sm max-w-full">
             <thead className="bg-slate-100 text-slate-700 font-semibold">
               <tr>
-                <th className="px-4 py-2 text-left w-[140px]">Order ID</th>
-                <th className="px-4 py-2 text-left w-[260px]">Customer</th>
+                <th className="px-4 py-2 text-left w-[140px]">{t("order_id")}</th>
+                <th className="px-4 py-2 text-left w-[260px]">{t("customer")}</th>
                 {/* <th className="px-4 py-2 text-left w-[260px]">Partner</th> */}
-                <th className="px-4 py-2 text-center w-[100px]">Amount</th>
-                <th className="px-4 py-2 text-center w-[120px]">Status</th>
+                <th className="px-4 py-2 text-center w-[100px]">{t("amount")}</th>
+                <th className="px-4 py-2 text-center w-[120px]">{t("status")}</th>
                 {/* <th className="px-4 py-2 text-center w-[120px]">City</th> */}
-                <th className="px-4 py-2 text-center w-[80px]">Items</th>
+                <th className="px-4 py-2 text-center w-[80px]">{t("items")}</th>
                 {/* <th className="px-4 py-2 text-center w-[120px]">Payment</th> */}
-                <th className="px-4 py-2 text-center w-[160px]">Created</th>
+                <th className="px-4 py-2 text-center w-[160px]">{t("created")}</th>
                 {/* <th className="px-4 py-2 text-center w-[160px]">Delivered</th> */}
-                <th className="px-4 py-2 text-center w-[120px]">Actions</th>
+                <th className="px-4 py-2 text-center w-[120px]">{t("actions")}</th>
               </tr>
             </thead>
 
@@ -298,7 +299,7 @@ export default function AllOrders({ ordersResult }: IProps) {
               {ordersResult?.meta?.total === 0 && (
                 <tr>
                   <td colSpan={11} className="py-8 text-center text-slate-500">
-                    No orders found.
+                    {t("no_orders_found")}
                   </td>
                 </tr>
               )}
@@ -376,16 +377,16 @@ export default function AllOrders({ ordersResult }: IProps) {
       >
         <SheetContent className="max-w-xl p-6 overflow-y-auto border-l bg-white">
           <SheetHeader>
-            <SheetTitle>Order Details</SheetTitle>
+            <SheetTitle>{t("order_details")}</SheetTitle>
             <SheetDescription>
-              Complete information about the selected order.
+              {t("complete_information_about_selected_order")}
             </SheetDescription>
           </SheetHeader>
 
           {selected && (
             <div className="mt-4 space-y-6">
               <div>
-                <p className="text-sm text-slate-500">Order ID</p>
+                <p className="text-sm text-slate-500">{t("order_id")}</p>
                 <p className="text-lg font-semibold">{selected.orderId}</p>
               </div>
 
@@ -441,13 +442,13 @@ export default function AllOrders({ ordersResult }: IProps) {
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-xs text-slate-500">Amount</p>
+                  <p className="text-xs text-slate-500">{t("amount")}</p>
                   <p className="font-semibold">
                     € {selected.totalPrice?.toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Items</p>
+                  <p className="text-xs text-slate-500">{t("items")}</p>
                   <p className="font-semibold">
                     {selected.items?.map((item, i) => (
                       <span key={i}>
@@ -457,11 +458,11 @@ export default function AllOrders({ ordersResult }: IProps) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Payment</p>
+                  <p className="text-xs text-slate-500">{t("payment")}</p>
                   <p className="font-semibold">{selected.paymentStatus}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Status</p>
+                  <p className="text-xs text-slate-500">{t("status")}</p>
                   <p className="font-semibold">{selected.orderStatus}</p>
                 </div>
               </div>
@@ -469,17 +470,17 @@ export default function AllOrders({ ordersResult }: IProps) {
               <Separator />
 
               <div>
-                <p className="text-sm text-slate-500">Delivery Timeline</p>
+                <p className="text-sm text-slate-500">{t("delivery_timeline")}</p>
                 <ul className="mt-2 text-sm space-y-2">
                   <li>
-                    • Created: {format(selected.createdAt, "Do MMM yyyy")}
+                    • {t("created")}: {format(selected.createdAt, "Do MMM yyyy")}
                   </li>
                   <li>
-                    • Rider: {selected.deliveryPartnerId?.name?.firstName}{" "}
+                    • {t("rider")}: {selected.deliveryPartnerId?.name?.firstName}{" "}
                     {selected.deliveryPartnerId?.name?.lastName}
                   </li>
                   <li>
-                    • Delivered:{" "}
+                    • {t("delivered")}:{" "}
                     {selected.deliveredAt
                       ? format(selected.deliveredAt, "Do MMM yyyy")
                       : "—"}
@@ -489,7 +490,7 @@ export default function AllOrders({ ordersResult }: IProps) {
 
               <div className="flex items-center gap-2 justify-end">
                 <Button variant="outline" onClick={() => setSelected(null)}>
-                  Close
+                  {t("close")}
                 </Button>
               </div>
             </div>

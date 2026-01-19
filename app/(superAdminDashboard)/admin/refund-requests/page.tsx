@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Filter, Download, RefreshCcw, ChevronLeft, ChevronRight, ClipboardList } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 // -----------------------------------------------------------------------------
 // SUPER ADMIN — REFUND REQUESTS PAGE (Portugal Optimized)
@@ -44,6 +45,7 @@ const mockRefunds: RefundRequest[] = Array.from({ length: 24 }).map((_, i) => {
 const fmt = (iso: string) => new Date(iso).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 export default function RefundRequestsPage() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -98,16 +100,16 @@ export default function RefundRequestsPage() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-[#DC3173] flex items-center gap-2">
-              <ClipboardList className="text-[#DC3173]" /> Refund Requests
+              <ClipboardList className="text-[#DC3173]" /> {t("refund_requests")}
             </h1>
-            <p className="text-sm text-slate-600">Manage all customer refund requests efficiently.</p>
+            <p className="text-sm text-slate-600">{t("manage_all_customer_refund_requests")}</p>
           </div>
 
           <div className="flex items-center gap-3 w-full lg:w-auto">
             <div className="relative hidden md:flex items-center bg-white border rounded-lg px-3 py-1 shadow-sm flex-1 lg:flex-none">
               <Search className="text-[#DC3173] mr-2" />
               <input
-                placeholder="Search order, customer, reason..."
+                placeholder={t("search_order_customer_reason")}
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -121,11 +123,11 @@ export default function RefundRequestsPage() {
             </div>
 
             <button onClick={() => setShowFilters((v) => !v)} className="border px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-[#DC317310] transition">
-              <Filter className="text-[#DC3173]" /> <span className="hidden sm:inline">Filters</span>
+              <Filter className="text-[#DC3173]" /> <span className="hidden sm:inline">{t("filters")}</span>
             </button>
 
             <button onClick={() => exportCSV(filtered)} className="bg-[#DC3173] text-white px-4 py-2 rounded-lg flex gap-2 items-center">
-              <Download /> Export
+              <Download /> {t("export")}
             </button>
           </div>
         </div>
@@ -135,7 +137,7 @@ export default function RefundRequestsPage() {
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mt-4 overflow-hidden">
               <div className="bg-white border rounded-xl p-4 flex flex-col md:flex-row gap-4">
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-slate-600">Status</label>
+                  <label className="text-sm text-slate-600">{t("status")}</label>
                   <select value={statusFilter ?? ""} onChange={(e) => { setStatusFilter(e.target.value || null); setPage(1); }} className="border rounded px-3 py-1 text-sm">
                     <option value="">All</option>
                     <option value="Pending">Pending</option>
@@ -164,13 +166,13 @@ export default function RefundRequestsPage() {
             <table className="min-w-[1000px] w-full text-sm">
               <thead>
                 <tr className="text-left text-slate-600">
-                  <th className="p-3 whitespace-nowrap">Order</th>
-                  <th className="p-3 whitespace-nowrap">Customer</th>
-                  <th className="p-3 whitespace-nowrap">Amount</th>
-                  <th className="p-3 whitespace-nowrap">Reason</th>
-                  <th className="p-3 whitespace-nowrap">Requested At</th>
-                  <th className="p-3 whitespace-nowrap">Status</th>
-                  <th className="p-3 whitespace-nowrap">Actions</th>
+                  <th className="p-3 whitespace-nowrap">{t("order")}</th>
+                  <th className="p-3 whitespace-nowrap">{t("customer")}</th>
+                  <th className="p-3 whitespace-nowrap">{t("amount")}</th>
+                  <th className="p-3 whitespace-nowrap">{t("reason")}</th>
+                  <th className="p-3 whitespace-nowrap">{t("requested_at")}</th>
+                  <th className="p-3 whitespace-nowrap">{t("status")}</th>
+                  <th className="p-3 whitespace-nowrap">{t("actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -185,14 +187,14 @@ export default function RefundRequestsPage() {
                     <td className="p-3 max-w-[260px] overflow-hidden text-ellipsis whitespace-nowrap align-top">{r.reason}</td>
                     <td className="p-3 whitespace-nowrap align-top">{fmt(r.requestedAt)}</td>
                     <td className="p-3 whitespace-nowrap align-top">
-                      {r.status === "Pending" && <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">Pending</span>}
-                      {r.status === "Approved" && <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">Approved</span>}
-                      {r.status === "Rejected" && <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium">Rejected</span>}
+                      {r.status === "Pending" && <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">{t("pending")}</span>}
+                      {r.status === "Approved" && <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">{t("approved")}</span>}
+                      {r.status === "Rejected" && <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium">{t("rejected")}</span>}
                     </td>
                     <td className="p-3 whitespace-nowrap align-top">
                       <div className="flex items-center gap-2">
-                        <button onClick={() => setSelected(r)} className="px-3 py-1 rounded border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition">Details</button>
-                        <button className="px-3 py-1 rounded border border-slate-200 text-slate-700 hover:bg-slate-50 transition">Assign</button>
+                        <button onClick={() => setSelected(r)} className="px-3 py-1 rounded border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition">{t("details")}</button>
+                        <button className="px-3 py-1 rounded border border-slate-200 text-slate-700 hover:bg-slate-50 transition">{t("assign")}</button>
                       </div>
                     </td>
                   </tr>
@@ -203,7 +205,7 @@ export default function RefundRequestsPage() {
 
           <div className="lg:hidden grid gap-3">
             {pageItems.map((r) => (
-              <motion.div key={r.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="border rounded-xl p-4 shadow-sm hover:shadow-md transition break-words">
+              <motion.div key={r.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="border rounded-xl p-4 shadow-sm hover:shadow-md transition wrap-break-word">
                 <div className="flex justify-between items-start">
                   <div>
                     <div className="font-medium text-[#DC3173]">{r.orderNo}</div>
@@ -214,8 +216,8 @@ export default function RefundRequestsPage() {
                   <div className="text-right">
                     <div className="text-xs text-slate-400">{fmt(r.requestedAt)}</div>
                     <div className="mt-2 flex flex-col gap-2">
-                      <button onClick={() => setSelected(r)} className="px-3 py-1 rounded border border-[#DC3173] text-[#DC3173]">Details</button>
-                      <button className="px-3 py-1 rounded border border-slate-200 text-slate-700">Assign</button>
+                      <button onClick={() => setSelected(r)} className="px-3 py-1 rounded border border-[#DC3173] text-[#DC3173]">{t("details")}</button>
+                      <button className="px-3 py-1 rounded border border-slate-200 text-slate-700">{t("assign")}</button>
                     </div>
                   </div>
                 </div>
@@ -235,17 +237,17 @@ export default function RefundRequestsPage() {
 
         <div className="lg:col-span-1 space-y-4">
           <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <div className="text-sm text-slate-500">Total Requests</div>
+            <div className="text-sm text-slate-500">{t("total_requests")}</div>
             <div className="text-2xl font-semibold mt-2">{stats.total}</div>
           </div>
 
           <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <div className="text-sm text-slate-500">Pending</div>
+            <div className="text-sm text-slate-500">{t("pending")}</div>
             <div className="text-2xl font-semibold mt-2">{stats.pending}</div>
           </div>
 
           <div className="bg-white border rounded-xl p-4 shadow-sm">
-            <div className="text-sm text-slate-500">Average Value</div>
+            <div className="text-sm text-slate-500">{t("average_value")}</div>
             <div className="text-2xl font-semibold mt-2">€ {stats.avg.toFixed(2)}</div>
           </div>
         </div>
@@ -259,7 +261,7 @@ export default function RefundRequestsPage() {
             <motion.div initial={{ y: 40, scale: 0.98 }} animate={{ y: 0, scale: 1 }} exit={{ y: 20, opacity: 0 }} className="relative bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
               <div className="p-4 border-b flex items-center justify-between">
                 <div>
-                  <div className="font-semibold">Refund {selected.orderNo}</div>
+                  <div className="font-semibold">{t("refund")} {selected.orderNo}</div>
                   <div className="text-xs text-slate-400">{selected.id}</div>
                 </div>
                 <button onClick={() => setSelected(null)} className="p-2 rounded hover:bg-slate-100"><X /></button>
@@ -267,28 +269,28 @@ export default function RefundRequestsPage() {
 
               <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-slate-500">Customer</div>
+                  <div className="text-sm text-slate-500">{t("customer")}</div>
                   <div className="font-medium">{selected.customerName}</div>
-                  <div className="mt-4 text-sm text-slate-500">Reason</div>
+                  <div className="mt-4 text-sm text-slate-500">{t("reason")}</div>
                   <div className="text-sm text-slate-700">{selected.reason}</div>
                 </div>
 
                 <div>
-                  <div className="text-sm text-slate-500">Requested At</div>
+                  <div className="text-sm text-slate-500">{t("requested_at")}</div>
                   <div className="font-medium">{fmt(selected.requestedAt)}</div>
 
-                  <div className="mt-4 text-sm text-slate-500">Amount</div>
+                  <div className="mt-4 text-sm text-slate-500">{t("amount")}</div>
                   <div className="font-medium">€ {selected.amount.toFixed(2)}</div>
 
                   <div className="mt-6 flex items-center gap-2">
-                    <button onClick={() => { alert('Approve action — wire to API'); }} className="px-4 py-2 bg-green-600 text-white rounded">Approve</button>
-                    <button onClick={() => { alert('Reject action — wire to API'); }} className="px-4 py-2 border rounded">Reject</button>
-                    <button onClick={() => exportCSV([selected])} className="ml-auto px-3 py-2 bg-[#DC3173] text-white rounded">Export</button>
+                    <button onClick={() => { alert('Approve action — wire to API'); }} className="px-4 py-2 bg-green-600 text-white rounded">{t("approve")}</button>
+                    <button onClick={() => { alert('Reject action — wire to API'); }} className="px-4 py-2 border rounded">{t("reject")}</button>
+                    <button onClick={() => exportCSV([selected])} className="ml-auto px-3 py-2 bg-[#DC3173] text-white rounded">{t("export")}</button>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 border-t text-sm text-slate-500">Note: connect approve/reject buttons to your refund processing API.</div>
+              <div className="p-4 border-t text-sm text-slate-500">{t("cannot_approve_reject_buttons")}</div>
             </motion.div>
           </motion.div>
         )}

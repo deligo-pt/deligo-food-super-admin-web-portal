@@ -14,6 +14,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format, formatDistanceToNow } from "date-fns";
@@ -34,6 +35,7 @@ const sortOptions = [
 ];
 
 export default function PendingOrders({ ordersResult }: IProps) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<TOrder | null>(null);
 
   return (
@@ -41,7 +43,7 @@ export default function PendingOrders({ ordersResult }: IProps) {
       {/* HEADER */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-extrabold flex items-center gap-3 mb-6">
-          <Clock className="w-8 h-8" style={{ color: DELIGO }} /> Pending Orders
+          <Clock className="w-8 h-8" style={{ color: DELIGO }} /> {t("pending_orders")}
         </h1>
       </motion.div>
 
@@ -51,8 +53,7 @@ export default function PendingOrders({ ordersResult }: IProps) {
       {/* CARD WRAPPER */}
       <Card className="p-6 bg-white shadow-sm rounded-2xl">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Loader className="w-5 h-5 animate-spin text-slate-600" /> Live
-          Pending Orders
+          <Loader className="w-5 h-5 animate-spin text-slate-600" /> {t("live_pending_orders")}
         </h2>
         <Separator className="mb-4" />
 
@@ -96,14 +97,14 @@ export default function PendingOrders({ ordersResult }: IProps) {
                     variant="outline"
                     className="mt-1 border-amber-500 text-amber-600"
                   >
-                    {order.totalItems} items
+                    {order.totalItems} {t("items")}
                   </Badge>
                 </div>
               </div>
 
               {/* RIGHT SECTION */}
               <div className="text-right min-w-[120px]">
-                <p className="text-sm text-slate-500">Amount</p>
+                <p className="text-sm text-slate-500">{t("amount")}</p>
                 <p className="text-lg font-bold">
                   € {order.totalPrice?.toLocaleString()}
                 </p>
@@ -129,7 +130,7 @@ export default function PendingOrders({ ordersResult }: IProps) {
           {ordersResult?.meta?.total === 0 && (
             <div>
               <div className="py-8 text-center text-slate-500">
-                No orders found.
+                {t("no_orders_found")}
               </div>
             </div>
           )}
@@ -150,16 +151,16 @@ export default function PendingOrders({ ordersResult }: IProps) {
       >
         <SheetContent className="max-w-xl p-6 overflow-y-auto border-l bg-white">
           <SheetHeader>
-            <SheetTitle>Order Details</SheetTitle>
+            <SheetTitle>{t("order_details")}</SheetTitle>
             <SheetDescription>
-              Complete information about the selected order.
+              {t("complete_information_about_selected_order")}
             </SheetDescription>
           </SheetHeader>
 
           {selected && (
             <div className="mt-4 space-y-6">
               <div>
-                <p className="text-sm text-slate-500">Order ID</p>
+                <p className="text-sm text-slate-500">{t("order_id")}</p>
                 <p className="text-lg font-semibold">{selected.orderId}</p>
               </div>
 
@@ -215,13 +216,13 @@ export default function PendingOrders({ ordersResult }: IProps) {
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-xs text-slate-500">Amount</p>
+                  <p className="text-xs text-slate-500">{t("amount")}</p>
                   <p className="font-semibold">
                     € {selected.totalPrice?.toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Items</p>
+                  <p className="text-xs text-slate-500">{t("items")}</p>
                   <p className="font-semibold">
                     {selected.items?.map((item, i) => (
                       <span key={i}>
@@ -231,11 +232,11 @@ export default function PendingOrders({ ordersResult }: IProps) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Payment</p>
+                  <p className="text-xs text-slate-500">{t("payment")}</p>
                   <p className="font-semibold">{selected.paymentStatus}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Status</p>
+                  <p className="text-xs text-slate-500">{t("status")}</p>
                   <p className="font-semibold">{selected.orderStatus}</p>
                 </div>
               </div>
@@ -243,17 +244,17 @@ export default function PendingOrders({ ordersResult }: IProps) {
               <Separator />
 
               <div>
-                <p className="text-sm text-slate-500">Delivery Timeline</p>
+                <p className="text-sm text-slate-500">{t("delivery_timeline")}</p>
                 <ul className="mt-2 text-sm space-y-2">
                   <li>
-                    • Created: {format(selected.createdAt, "do MMM yyyy")}
+                    • {t("created")}: {format(selected.createdAt, "do MMM yyyy")}
                   </li>
                   <li>
-                    • Rider: {selected.deliveryPartnerId?.name?.firstName}{" "}
+                    • {t('rider')}: {selected.deliveryPartnerId?.name?.firstName}{" "}
                     {selected.deliveryPartnerId?.name?.lastName}
                   </li>
                   <li>
-                    • Delivered:{" "}
+                    • {t("delivered")}:{" "}
                     {selected.deliveredAt
                       ? format(selected.deliveredAt, "do MMM yyyy")
                       : "—"}
@@ -263,7 +264,7 @@ export default function PendingOrders({ ordersResult }: IProps) {
 
               <div className="flex items-center gap-2 justify-end">
                 <Button variant="outline" onClick={() => setSelected(null)}>
-                  Close
+                  {t("close")}
                 </Button>
               </div>
             </div>

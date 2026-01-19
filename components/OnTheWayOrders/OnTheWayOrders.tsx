@@ -12,6 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
@@ -28,6 +29,7 @@ interface IProps {
 }
 
 export default function OnTheWayOrders({ ordersResult }: IProps) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<TOrder | null>(null);
 
   function exportCSV() {
@@ -73,12 +75,10 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-extrabold flex items-center gap-3">
-              <Navigation className="w-8 h-8" style={{ color: DELIGO }} /> On
-              The Way Orders
+              <Navigation className="w-8 h-8" style={{ color: DELIGO }} /> {t("on_the_way_orders")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Live tracking — delivery partner location, ETA and customer
-              coordination.
+              {t("live_tracking_delivery_partner_location")}
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
               className="flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
-              Export CSV
+              {t("export_csv")}
             </Button>
           </div>
         </div>
@@ -107,9 +107,9 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
       <Card className="p-4 overflow-x-auto">
         {/* header row (sticky-looking inside card) */}
         <div className="bg-slate-100/80 rounded-md px-3 py-2 mb-4 font-semibold text-slate-700 grid grid-cols-3 items-center">
-          <div>Order</div>
-          <div>Customer</div>
-          <div className="text-center">Actions</div>
+          <div>{t("order")}</div>
+          <div>{t("customer")}</div>
+          <div className="text-center">{t("actions")}</div>
         </div>
 
         <div className="space-y-4">
@@ -131,7 +131,7 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
 
               {/* Customer col */}
               <div className="flex items-start gap-3 min-w-0">
-                <Avatar className="w-10 h-10 flex-shrink-0">
+                <Avatar className="w-10 h-10 shrink-0">
                   <AvatarImage src={SAMPLE_AVATAR} />
                   <AvatarFallback>
                     {o.customerId?.name?.firstName?.charAt(0)}
@@ -173,7 +173,7 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
           {ordersResult?.meta?.total === 0 && (
             <div>
               <div className="py-8 text-center text-slate-500">
-                No orders found.
+                {t("no_orders_found")}
               </div>
             </div>
           )}
@@ -187,8 +187,8 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
       >
         <SheetContent className="max-w-2xl p-6 overflow-y-auto border-l bg-white">
           <SheetHeader>
-            <SheetTitle>Order Details</SheetTitle>
-            <SheetDescription>Full route, ETA, partner info</SheetDescription>
+            <SheetTitle>{t("order_details")}</SheetTitle>
+            <SheetDescription>{t("full_route_eta_partner_info")}</SheetDescription>
           </SheetHeader>
 
           {selected && (
@@ -204,7 +204,7 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
                 <div>
                   {/* <h3 className="text-xl font-bold">{selected.restaurant} — {selected.id}</h3> */}
                   <p className="text-sm text-slate-500">
-                    Customer: {selected.customerId?.name?.firstName}{" "}
+                    {t("customer")}: {selected.customerId?.name?.firstName}{" "}
                     {selected.customerId?.name?.lastName}
                   </p>
                 </div>
@@ -213,7 +213,7 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
               <Separator />
 
               <div>
-                <h4 className="font-semibold">Items</h4>
+                <h4 className="font-semibold">{t("items")}</h4>
                 <ul className="mt-2 space-y-1 text-sm">
                   {selected.items.map((it, idx) => (
                     <li key={idx}>
@@ -227,7 +227,7 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-xs text-slate-500">Partner</p>
+                  <p className="text-xs text-slate-500">{t("partner")}</p>
                   <p className="font-semibold">
                     {selected.deliveryPartnerId?.name?.firstName}{" "}
                     {selected.deliveryPartnerId?.name?.lastName}
@@ -237,7 +237,7 @@ export default function OnTheWayOrders({ ordersResult }: IProps) {
 
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setSelected(null)}>
-                  Close
+                  {("close")}
                 </Button>
               </div>
             </div>
