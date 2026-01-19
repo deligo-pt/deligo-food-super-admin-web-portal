@@ -73,6 +73,11 @@ export default function TopbarNotification() {
               </div>
             </div>
             <div className="space-y-2">
+              {notificationsData?.meta?.total === 0 && (
+                <div className="text-center">
+                  <p className="text-sm text-slate-500">No notifications</p>
+                </div>
+              )}
               {notificationsData?.data?.map((notification) => (
                 <div
                   onClick={() => markSingleAsRead(notification)}
@@ -81,7 +86,7 @@ export default function TopbarNotification() {
                     "bg-slate-50 px-4 py-2 rounded-md shadow cursor-pointer",
                     notification?.isRead
                       ? "bg-slate-50 hover:bg-slate-100"
-                      : "bg-[#DC3173]/30 hover:bg-[#DC3173]/20"
+                      : "bg-[#DC3173]/30 hover:bg-[#DC3173]/20",
                   )}
                 >
                   <h2 className="text-sm font-medium">{notification?.title}</h2>

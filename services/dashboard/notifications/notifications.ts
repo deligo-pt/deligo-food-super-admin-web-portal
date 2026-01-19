@@ -34,7 +34,7 @@ export const getAllNotificationsReq = async ({ limit = 10 }) => {
 export const singleMarkReadReq = async (id: string) => {
   try {
     const result = (await serverRequest.patch(
-      `/notifications/${id}/read`
+      `/notifications/${id}/read`,
     )) as TResponse<null>;
 
     if (result.success) {
@@ -60,7 +60,7 @@ export const singleMarkReadReq = async (id: string) => {
 export const allMarkReadReq = async () => {
   try {
     const result = (await serverRequest.patch(
-      "/notifications/mark-all-as-read"
+      "/notifications/mark-all-as-read",
     )) as TResponse<null>;
 
     if (result.success) {

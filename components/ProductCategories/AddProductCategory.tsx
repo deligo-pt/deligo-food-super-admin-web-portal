@@ -164,7 +164,7 @@ export default function AddProductCategory({
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder={t("eg_restaurant")}
+                      placeholder={t("eg_pizza")}
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
                     />
                   </FormControl>
