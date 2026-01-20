@@ -1058,6 +1058,35 @@ export const en = {
     ai_generated_insights: "AI‑Generated Insights",
 
 
+    // email and notification pages
+    all_users:"All Users",
+    restaurants:"Restaurants",
+    admins:"Admins",
+    email_broadcast:"Email Broadcast",
+    send_announcements_alerts_promotional_emails:"Send announcements, alerts, or promotional emails to specific user groups.",
+    select_user_type:"Select User Type",
+    email_subject:"Email Subject",
+    send_email:"Send Email",
+    selected_group:"Selected Group",
+    quick_tips:"Quick Tips",
+    keep_subjects_short_and_clear:"Keep subjects short & clear.",
+    always_check_before_broadcasting:"Always check before broadcasting.",
+    do_not_spam_users_frequently:"Do not spam users frequently.",
+    use_the_preview_before_sending:"Use the preview before sending.",
+    preview_email:"Preview Email",
+    to:"To",
+    subject:"Subject",
+
+    // maintenance mode
+    configure_global_maintenance_mode:"Configure global maintenance mode. When enabled, all users will see a maintenance screen.",
+    enable_maintenance_mode:"Enable Maintenance Mode",
+    show_global_downtime_screen_users:"Show global downtime screen to all users.",
+    maintenance_title:"Maintenance Title",
+    we_will_be_back_soon:"We’ll be back soon",
+    schedule_optional:"Schedule (Optional)",
+    users_will_see_scheduled_downtime_info:"Users will see scheduled downtime info.",
+    maintenance_mode_disabled:"Maintenance mode is disabled",
+    scheduled:"Scheduled",
 
 
 };
