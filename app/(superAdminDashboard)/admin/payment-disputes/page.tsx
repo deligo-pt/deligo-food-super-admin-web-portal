@@ -16,6 +16,7 @@ import {
   Calendar,
   X,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 // ---------------------- Types ----------------------
 type DisputeRow = {
@@ -65,7 +66,7 @@ function useDebounced<T>(value: T, ms = 300) {
 export default function PaymentDisputesPage() {
   // Local 'server' data - in real app replace with server fetch & pagination
   const [allRows, setAllRows] = useState<DisputeRow[]>(sampleRows);
-
+  const { t } = useTranslation();
   // UI controls
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounced(query, 280);
@@ -141,14 +142,14 @@ export default function PaymentDisputesPage() {
 
   // CSV export
   const exportCSV = () => {
-    const header = ["id","date","orderId","vendor","customer","reason","amount","status"];
+    const header = ["id", "date", "orderId", "vendor", "customer", "reason", "amount", "status"];
     const csv = [header.join(',')]
-      .concat(filtered.map(r => [r.id,r.date,r.orderId,r.vendor,r.customer,`"${r.reason.replace(/"/g,'""')}\``,r.amount.toFixed(2),r.status].join(',')))
+      .concat(filtered.map(r => [r.id, r.date, r.orderId, r.vendor, r.customer, `"${r.reason.replace(/"/g, '""')}\``, r.amount.toFixed(2), r.status].join(',')))
       .join('');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `payment-disputes-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+    a.href = url; a.download = `payment-disputes-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
   };
 
   // API placeholders for Resolve / Reject
@@ -181,24 +182,24 @@ export default function PaymentDisputesPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
-            <AlertTriangle className="w-7 h-7 text-[#DC3173]" /> Payment Disputes
+            <AlertTriangle className="w-7 h-7 text-[#DC3173]" /> {t("payment_disputes")}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Systematic dispute management with action controls and audit-ready export.</p>
+          <p className="text-sm text-gray-500 mt-1">{t("systematic_dispute_management_action")}</p>
         </div>
 
         <div className="flex gap-2 items-center">
           <button onClick={exportCSV} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#DC3173] text-white shadow">
-            <Download className="w-4 h-4" /> Export
+            <Download className="w-4 h-4" /> {t("export")}
           </button>
         </div>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <SummaryCard title="Open" value={counts.open} color="bg-red-50" icon={<AlertTriangle className="text-red-600 w-6 h-6" />} onClick={() => setStatusFilter('Open')} />
-        <SummaryCard title="Resolved" value={counts.resolved} color="bg-green-50" icon={<CheckCircle className="text-green-600 w-6 h-6" />} onClick={() => setStatusFilter('Resolved')} />
-        <SummaryCard title="Pending Vendor" value={counts.pendingVendor} color="bg-blue-50" icon={<Clock className="text-blue-600 w-6 h-6" />} onClick={() => setStatusFilter('Pending Vendor')} />
-        <SummaryCard title="Pending Customer" value={counts.pendingCustomer} color="bg-orange-50" icon={<Clock className="text-orange-500 w-6 h-6" />} onClick={() => setStatusFilter('Pending Customer')} />
+        <SummaryCard title={t("open")} value={counts.open} color="bg-red-50" icon={<AlertTriangle className="text-red-600 w-6 h-6" />} onClick={() => setStatusFilter('Open')} />
+        <SummaryCard title={t("resolved")} value={counts.resolved} color="bg-green-50" icon={<CheckCircle className="text-green-600 w-6 h-6" />} onClick={() => setStatusFilter('Resolved')} />
+        <SummaryCard title={t("pending_vendor")} value={counts.pendingVendor} color="bg-blue-50" icon={<Clock className="text-blue-600 w-6 h-6" />} onClick={() => setStatusFilter('Pending Vendor')} />
+        <SummaryCard title={t("pending_customer")} value={counts.pendingCustomer} color="bg-orange-50" icon={<Clock className="text-orange-500 w-6 h-6" />} onClick={() => setStatusFilter('Pending Customer')} />
       </div>
 
       {/* Filters */}
@@ -207,21 +208,21 @@ export default function PaymentDisputesPage() {
           <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border">
             <Filter className="w-4 h-4 text-gray-400" />
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="bg-transparent outline-none text-sm">
-              <option value="all">All Status</option>
-              <option value="Open">Open</option>
-              <option value="Resolved">Resolved</option>
-              <option value="Pending Vendor">Pending Vendor</option>
-              <option value="Pending Customer">Pending Customer</option>
+              <option value="all">{t("all_status")}</option>
+              <option value="Open">{t("open")}</option>
+              <option value="Resolved">{t("resolved")}</option>
+              <option value="Pending Vendor">{t("pending_vendor")}</option>
+              <option value="Pending Customer">{t("pending_customer")}</option>
             </select>
           </div>
 
           <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border">
             <Calendar className="w-4 h-4 text-gray-400" />
             <select value={preset} onChange={(e) => setPreset(e.target.value)} className="bg-transparent outline-none text-sm">
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Last 90 days</option>
-              <option>Year to date</option>
+              <option>{t("last_7_days")}</option>
+              <option>{t("last_30_days")}</option>
+              <option>{t("last_90_days")}</option>
+              <option>{t("year_to_date")}</option>
             </select>
           </div>
 
@@ -235,11 +236,11 @@ export default function PaymentDisputesPage() {
         <div className="flex gap-3 items-center w-full lg:w-auto">
           <div className="flex items-center bg-white px-3 py-2 rounded-lg border w-full lg:w-72">
             <Search className="w-4 h-4 text-gray-400" />
-            <input aria-label="Search disputes" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search dispute, order, vendor, customer" className="ml-2 bg-transparent outline-none text-sm w-full" />
+            <input aria-label="Search disputes" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("search_dispute_order_vendor")} className="ml-2 bg-transparent outline-none text-sm w-full" />
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-500">Rows</label>
+            <label className="text-sm text-gray-500">{t("rows")}</label>
             <select value={perPage} onChange={(e) => setPerPage(Number(e.target.value))} className="px-2 py-1 rounded-md border">
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -255,15 +256,15 @@ export default function PaymentDisputesPage() {
           <table className="min-w-full text-sm">
             <thead>
               <tr className="uppercase text-xs text-gray-500 border-b bg-white sticky top-0 z-10">
-                <ThSortable label="Date" active={sortBy === 'date'} dir={sortDir} onClick={() => { if (sortBy === 'date') setSortDir(d => d==='asc'?'desc':'asc'); else { setSortBy('date'); setSortDir('desc'); } }} />
-                <th className="py-3 px-3 text-left">Dispute ID</th>
-                <th className="py-3 px-3 text-left">Order ID</th>
-                <th className="py-3 px-3 text-left">Vendor</th>
-                <th className="py-3 px-3 text-left">Customer</th>
-                <th className="py-3 px-3 text-left">Reason</th>
-                <ThSortable label="Amount" active={sortBy === 'amount'} dir={sortDir} onClick={() => { if (sortBy === 'amount') setSortDir(d => d==='asc'?'desc':'asc'); else { setSortBy('amount'); setSortDir('desc'); } }} />
-                <th className="py-3 px-3 text-left">Status</th>
-                <th className="py-3 px-3 text-left">Actions</th>
+                <ThSortable label="Date" active={sortBy === 'date'} dir={sortDir} onClick={() => { if (sortBy === 'date') setSortDir(d => d === 'asc' ? 'desc' : 'asc'); else { setSortBy('date'); setSortDir('desc'); } }} />
+                <th className="py-3 px-3 text-left">{t("dispute_id")}</th>
+                <th className="py-3 px-3 text-left">{t("order_id")}</th>
+                <th className="py-3 px-3 text-left">{t("vendor")}</th>
+                <th className="py-3 px-3 text-left">{t("customer")}</th>
+                <th className="py-3 px-3 text-left">{t("reason")}</th>
+                <ThSortable label="Amount" active={sortBy === 'amount'} dir={sortDir} onClick={() => { if (sortBy === 'amount') setSortDir(d => d === 'asc' ? 'desc' : 'asc'); else { setSortBy('amount'); setSortDir('desc'); } }} />
+                <th className="py-3 px-3 text-left">{t("status")}</th>
+                <th className="py-3 px-3 text-left">{t("actions")}</th>
               </tr>
             </thead>
 
@@ -280,28 +281,28 @@ export default function PaymentDisputesPage() {
                   <td className="py-3 px-3 whitespace-nowrap"><StatusBadge status={r.status} /></td>
                   <td className="py-3 px-3 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => openDetail(r)} className="px-3 py-1 rounded-md border text-sm">View</button>
+                      <button onClick={() => openDetail(r)} className="px-3 py-1 rounded-md border text-sm">{t("view")}</button>
                       {r.status !== 'Resolved' && (
                         <>
-                          <button 
-  onClick={() => {
-    setConfirmAction({ open: true, action: 'resolve' });
-    setSelected(r);
-  }}
-  className="px-3 py-1 rounded-md bg-green-50 text-green-800 text-sm"
->
-  Resolve
-</button>
+                          <button
+                            onClick={() => {
+                              setConfirmAction({ open: true, action: 'resolve' });
+                              setSelected(r);
+                            }}
+                            className="px-3 py-1 rounded-md bg-green-50 text-green-800 text-sm"
+                          >
+                            {t("resolve")}
+                          </button>
 
-<button 
-  onClick={() => {
-    setConfirmAction({ open: true, action: 'reject' });
-    setSelected(r);
-  }}
-  className="px-3 py-1 rounded-md bg-red-50 text-red-800 text-sm"
->
-  Reject
-</button>
+                          <button
+                            onClick={() => {
+                              setConfirmAction({ open: true, action: 'reject' });
+                              setSelected(r);
+                            }}
+                            className="px-3 py-1 rounded-md bg-red-50 text-red-800 text-sm"
+                          >
+                            {t("reject")}
+                          </button>
 
                         </>
                       )}
@@ -315,11 +316,11 @@ export default function PaymentDisputesPage() {
 
         {/* Footer / Pagination */}
         <div className="flex items-center justify-between p-4 border-t">
-          <div className="text-sm text-gray-600">Showing <span className="font-medium">{filtered.length}</span> disputes</div>
+          <div className="text-sm text-gray-600">{t("showing")} <span className="font-medium">{filtered.length}</span> {t("disputes")}</div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setPage(p => Math.max(1, p-1))} className="px-3 py-1 border rounded-md">Prev</button>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} className="px-3 py-1 border rounded-md">Prev</button>
             <div className="px-3 py-1 border rounded-md text-sm">{page} / {totalPages}</div>
-            <button onClick={() => setPage(p => Math.min(totalPages, p+1))} className="px-3 py-1 border rounded-md">Next</button>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="px-3 py-1 border rounded-md">Next</button>
           </div>
         </div>
       </div>
@@ -332,23 +333,23 @@ export default function PaymentDisputesPage() {
               <div>{r.date}</div>
               <div className="flex items-center gap-2">
                 <StatusBadge status={r.status} />
-                <button onClick={() => openDetail(r)} aria-label={`Open details for ${r.id}`} className="px-2 py-1 border rounded-md text-sm">Details</button>
+                <button onClick={() => openDetail(r)} aria-label={`Open details for ${r.id}`} className="px-2 py-1 border rounded-md text-sm">{t("details")}</button>
               </div>
             </div>
 
             <h3 className="text-base font-semibold text-gray-900">{r.reason}</h3>
-            <div className="text-sm text-gray-500">Order: {r.orderId}</div>
-            <div className="text-sm text-gray-500">Vendor: {r.vendor}</div>
-            <div className="text-sm text-gray-500">Customer: {r.customer}</div>
+            <div className="text-sm text-gray-500">{t("order")}: {r.orderId}</div>
+            <div className="text-sm text-gray-500">{t("vendor")}: {r.vendor}</div>
+            <div className="text-sm text-gray-500">{t("customer")}: {r.customer}</div>
             <div className="text-lg font-bold text-[#DC3173]">{formatCurrency(r.amount)}</div>
           </article>
         ))}
 
         {/* mobile pagination simple */}
         <div className="flex items-center justify-between">
-          <button onClick={() => setPage(p => Math.max(1, p-1))} className="px-3 py-1 border rounded-md">Prev</button>
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} className="px-3 py-1 border rounded-md">Prev</button>
           <div className="text-sm">{page} / {totalPages}</div>
-          <button onClick={() => setPage(p => Math.min(totalPages, p+1))} className="px-3 py-1 border rounded-md">Next</button>
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="px-3 py-1 border rounded-md">Next</button>
         </div>
       </div>
 
@@ -360,7 +361,7 @@ export default function PaymentDisputesPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold">{selected.id}</h2>
-                <p className="text-sm text-gray-500">Order {selected.orderId} — {selected.date}</p>
+                <p className="text-sm text-gray-500">{t("order")} {selected.orderId} — {selected.date}</p>
               </div>
               <button onClick={() => setSelected(null)} className="p-2 rounded-md border">
                 <X className="w-4 h-4" />
@@ -368,21 +369,21 @@ export default function PaymentDisputesPage() {
             </div>
 
             <div className="mt-4 space-y-3">
-              <div><span className="text-xs text-gray-500">Vendor</span><div className="font-medium">{selected.vendor}</div></div>
-              <div><span className="text-xs text-gray-500">Customer</span><div className="font-medium">{selected.customer}</div></div>
-              <div><span className="text-xs text-gray-500">Reason</span><div className="font-medium">{selected.reason}</div></div>
-              <div><span className="text-xs text-gray-500">Details</span><div className="text-sm text-gray-700">{selected.details}</div></div>
-              <div><span className="text-xs text-gray-500">Amount</span><div className="font-semibold text-[#DC3173]">{formatCurrency(selected.amount)}</div></div>
-              <div><span className="text-xs text-gray-500">Status</span><div className="mt-1"><StatusBadge status={selected.status} /></div></div>
+              <div><span className="text-xs text-gray-500">{t("vendor")}</span><div className="font-medium">{selected.vendor}</div></div>
+              <div><span className="text-xs text-gray-500">{t("customer")}</span><div className="font-medium">{selected.customer}</div></div>
+              <div><span className="text-xs text-gray-500">{t("reason")}</span><div className="font-medium">{selected.reason}</div></div>
+              <div><span className="text-xs text-gray-500">{t("details")}</span><div className="text-sm text-gray-700">{selected.details}</div></div>
+              <div><span className="text-xs text-gray-500">{t("amount")}</span><div className="font-semibold text-[#DC3173]">{formatCurrency(selected.amount)}</div></div>
+              <div><span className="text-xs text-gray-500">{t("status")}</span><div className="mt-1"><StatusBadge status={selected.status} /></div></div>
 
               <div className="pt-4 flex gap-2">
                 {selected.status !== 'Resolved' && (
                   <>
-                    <button onClick={() => setConfirmAction({ open: true, action: 'resolve' })} className="px-4 py-2 rounded-md bg-green-600 text-white">Resolve</button>
-                    <button onClick={() => setConfirmAction({ open: true, action: 'reject' })} className="px-4 py-2 rounded-md bg-red-600 text-white">Reject</button>
+                    <button onClick={() => setConfirmAction({ open: true, action: 'resolve' })} className="px-4 py-2 rounded-md bg-green-600 text-white">{t("resolve")}</button>
+                    <button onClick={() => setConfirmAction({ open: true, action: 'reject' })} className="px-4 py-2 rounded-md bg-red-600 text-white">{t("reject")}</button>
                   </>
                 )}
-                <button onClick={() => { /* placeholder for contacting vendor */ alert('Open chat / email to vendor (placeholder)'); }} className="px-4 py-2 rounded-md border">Contact Vendor</button>
+                <button onClick={() => { /* placeholder for contacting vendor */ alert('Open chat / email to vendor (placeholder)'); }} className="px-4 py-2 rounded-md border">{t("contact_vendor")}</button>
               </div>
             </div>
           </aside>
@@ -394,11 +395,13 @@ export default function PaymentDisputesPage() {
         <div className="fixed inset-0 z-60 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmAction({ open: false, action: null })} />
           <div className="bg-white rounded-2xl p-6 z-70 w-full max-w-lg">
-            <h3 className="text-lg font-semibold">Confirm {confirmAction.action === 'resolve' ? 'Resolve' : 'Reject'}</h3>
-            <p className="text-sm text-gray-600 mt-2">Are you sure you want to {confirmAction.action === 'resolve' ? 'mark this dispute as Resolved' : 'reject this dispute (it will remain Open)'}? This action is audit-logged.</p>
+            <h3 className="text-lg font-semibold">{t("confirm")} {confirmAction.action === 'resolve' ? t("resolve") : t("reject")}</h3>
+            <p className="text-sm text-gray-600 mt-2">{t("are_you_sure_want_to")} {confirmAction.action === 'resolve' ? t("mark_this_dispute_resolved") : t("reject_this_dispute_will_remain_open")}? {t("this_action_is_audit_logged")}</p>
             <div className="mt-4 flex gap-2 justify-end">
-              <button onClick={() => setConfirmAction({ open: false, action: null })} className="px-4 py-2 rounded-md border">Cancel</button>
-              <button onClick={() => { if (selected) performAction(selected.id, confirmAction.action === 'resolve' ? 'resolve' : 'reject'); }} className="px-4 py-2 rounded-md bg-[#DC3173] text-white">Yes, {confirmAction.action}</button>
+              
+              <button onClick={() => setConfirmAction({ open: false, action: null })} className="px-4 py-2 rounded-md border">{t("cancel")}</button>
+
+              <button onClick={() => { if (selected) performAction(selected.id, confirmAction.action === 'resolve' ? 'resolve' : 'reject'); }} className="px-4 py-2 rounded-md bg-[#DC3173] text-white">{t("yes")}, {confirmAction.action}</button>
             </div>
           </div>
         </div>

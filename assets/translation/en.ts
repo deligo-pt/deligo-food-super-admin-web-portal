@@ -637,6 +637,7 @@ export const en = {
     create_new_product_category: "Create a new product category with details and visuals",
     business_category: "Business Category",
     select_business_category: "Select Business Category",
+    eg_pizza: "e.g. Pizza",
 
     // product categories
     // -> title
@@ -704,14 +705,77 @@ export const en = {
     // platform earnings
     platform_earnings: "Platform Earnings",
     track_platform_revenue_fees_simple: "Track platform revenue & fees in a simple clean layout.",
-    search_order_vendor_region:"Search order, vendor, region",
-    total_gross:"Total Gross",
-    platform_fees:"Platform Fees",
-    growth:"Growth",
-    platform_vendor_activity:"Platform vendor activity trends for this period.",
-    region:"Region",
-    gross:"Gross",
-    platform_fee:"Platform Fee",
+    search_order_vendor_region: "Search order, vendor, region",
+    total_gross: "Total Gross",
+    platform_fees: "Platform Fees",
+    growth: "Growth",
+    platform_vendor_activity: "Platform vendor activity trends for this period.",
+    region: "Region",
+    gross: "Gross",
+    platform_fee: "Platform Fee",
+
+    // driver payouts
+    driver_payouts: "Driver Payouts",
+    search_driver_city_payout_method_status: "Search by driver, city, payout method, status or id...",
+    driver: "Driver",
+
+    // transaction history
+    transaction_history: "Transaction History",
+    full_ledger_platform_transactions_payouts: "Full ledger of platform transactions — payouts, payments and refunds.",
+    refresh: "Refresh",
+    current_balance: "Current Balance",
+    inflow: "Inflow",
+    outflow: "Outflow",
+    order_payment: "Order Payment",
+    success: "Success",
+    search_tx_id_partner_type: "Search tx id, partner, type",
+    rows: "Rows",
+    tx_id: "Tx ID",
+    type: "Type",
+    balance: "Balance",
+    no_transactions_match_filters: "No transactions match your filters.",
+
+    // payment-disputes
+    payment_disputes: "Payment Disputes",
+    systematic_dispute_management_action: "Systematic dispute management with action controls and audit-ready export.",
+    resolved: "",
+    pending_vendor: "Pending Vendor",
+    pending_customer: "Pending Customer",
+    last_90_days: "Last 90 days",
+    year_to_date: "Year to date",
+    search_dispute_order_vendor: "Search dispute, order, vendor, customer",
+    dispute_id: "Dispute ID",
+    resolve: "Resolve",
+    disputes: "disputes",
+    contact_vendor: "Contact Vendor",
+    confirm: "Confirm",
+    mark_this_dispute_resolved: "mark this dispute as Resolved",
+    reject_this_dispute_will_remain_open: "reject this dispute (it will remain Open)",
+    this_action_is_audit_logged: "This action is audit-logged.",
+
+    // tax management
+    tax_management: "Tax Management",
+    vat_rules_reports_audit_logs: "VAT rules, reports and audit logs.",
+    new_rule: "New Rule",
+    vat_collected_period: "VAT collected (period)",
+    taxable_total: "Taxable total",
+    rules: "Rules",
+    active_rules: "Active rules",
+    regions: "Regions",
+    audit: "Audit",
+    tax_rules: "Tax Rules",
+    tax: "Tax",
+    effective_from: "Effective From",
+    vat_payout_report: "VAT Payout Report",
+    search_transaction_vendor_region: "Search transaction, vendor, region",
+    transaction: "Transaction",
+    taxable: "Taxable",
+    vat:"VAT",
+    audit_log: "Audit Log",
+    no_audit_entries: "No audit entries.",
+    dismiss: "Dismiss",
+    tax_rate: "Tax Rate",
+
 
 
 
