@@ -13,46 +13,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import AllFilters from "../Filtering/AllFilters";
+import { useTranslation } from "@/hooks/use-translation";
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name" },
-  { label: "Name (Z-A)", value: "-name" },
-  { label: "Price (High to Low)", value: "-pricing.finalPrice" },
-  { label: "Price (low to High)", value: "pricing.finalPrice" },
-  { label: "Highest Rated", value: "-rating.average" },
-  { label: "lowest Rated", value: "rating.average" },
-];
-
-const filterOptions = [
-  {
-    label: "Availability Status",
-    key: "status",
-    placeholder: "Select a status",
-    type: "select",
-    items: [
-      {
-        label: "In Stock",
-        value: "In Stock",
-      },
-      {
-        label: "Out of Stock",
-        value: "Out of Stock",
-      },
-      {
-        label: "Limited",
-        value: "Limited",
-      },
-    ],
-  },
-];
 
 export default function Products({
   initialData,
 }: {
   initialData: { data: TProduct[]; meta?: TMeta };
 }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedProduct, setSelectedProduct] = useState<{
@@ -60,6 +29,40 @@ export default function Products({
     action: "edit" | "delete" | null;
     product?: TProduct | null;
   }>({ id: null, action: null });
+
+  const sortOptions = [
+    { label: t("newest_first"), value: "-createdAt" },
+    { label: t("oldest_first"), value: "createdAt" },
+    { label: t("name_a_z"), value: "name" },
+    { label: t("name_z_a"), value: "-name" },
+    { label: t("price_high_low"), value: "-pricing.finalPrice" },
+    { label: t("price_low_high"), value: "pricing.finalPrice" },
+    { label: t("highest_rated"), value: "-rating.average" },
+    { label: t("lowest_rated"), value: "rating.average" },
+  ];
+
+  const filterOptions = [
+    {
+      label: t("availability_status"),
+      key: "status",
+      placeholder: t("select_status"),
+      type: "select",
+      items: [
+        {
+          label: t("in_stock"),
+          value: "In Stock",
+        },
+        {
+          label: t("out_of_stock"),
+          value: "Out of Stock",
+        },
+        {
+          label: t("limited"),
+          value: "Limited",
+        },
+      ],
+    },
+  ];
 
   const clearAllFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
@@ -97,10 +100,10 @@ export default function Products({
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">
-              Food Items
+              {t("food_items")}
             </h1>
             <p className="text-pink-100 mt-1">
-              Manage your restaurant&lsquo;s food delivery catalog
+              {t("manage_restaurant_food_delivery_catalog")}
             </p>
           </div>
         </div>
@@ -111,7 +114,7 @@ export default function Products({
       {initialData.data?.length > 0 && (
         <div className="flex justify-between items-center mb-4">
           <p className="text-sm text-gray-500">
-            Showing{" "}
+            {t("showing")}{" "}
             {((initialData.meta?.page || 1) - 1) *
               (initialData.meta?.limit || 10) +
               1}
@@ -120,7 +123,7 @@ export default function Products({
               (initialData.meta?.page || 1) * (initialData.meta?.limit || 10),
               initialData.meta?.total || 0,
             )}{" "}
-            of {initialData.meta?.total || 0} items
+            {t("of")} {initialData.meta?.total || 0} {t("items")}
           </p>
         </div>
       )}
@@ -153,13 +156,12 @@ export default function Products({
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
             <Search className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-medium mb-2">No items found</h3>
+          <h3 className="text-xl font-medium mb-2">{t("no_items_found")}</h3>
           <p className="text-gray-500 max-w-md">
-            No items match your current filters. Try adjusting your search or
-            filters to find what you&lsquo;re looking for.
+            {t("no_items_match_current_filters")}
           </p>
           <Button variant="outline" className="mt-4" onClick={clearAllFilters}>
-            Clear All Filters
+            {t("clear_all_filters")}
           </Button>
         </motion.div>
       )}

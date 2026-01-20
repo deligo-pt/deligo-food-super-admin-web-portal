@@ -1,4 +1,5 @@
 "use client"
+import { useTranslation } from "@/hooks/use-translation";
 import React, { useEffect, useState, useMemo } from "react";
 
 
@@ -22,6 +23,7 @@ const sampleItems: StockItem[] = [
 ];
 
 export default function OutOfStockAlertsPage() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<StockItem[]>(sampleItems);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -54,13 +56,13 @@ export default function OutOfStockAlertsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-5">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Out‑of‑Stock Alerts</h1>
-          <p className="text-gray-600 mt-1 text-sm">Live stock monitoring across all vendors — premium Deligo admin panel.</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{t("out_of_stock_alerts")}</h1>
+          <p className="text-gray-600 mt-1 text-sm">{t("live_stock_monitoring_acroos_all_vendors")}</p>
         </div>
 
         <div className="flex flex-wrap gap-3 items-center">
           <input
-            placeholder="Search item, vendor, category..."
+            placeholder={t("search_item_vendor_category")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="border rounded-xl px-4 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
@@ -71,18 +73,20 @@ export default function OutOfStockAlertsPage() {
             onChange={(e) => setFilter(e.target.value)}
             className="border rounded-xl px-4 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
           >
-            <option value="all">All</option>
-            <option value="out">Out of Stock</option>
-            <option value="low">Low Stock</option>
+            <option value="all">{t("all")}</option>
+            <option value="out">{t("Out of Stock")}</option>
+            <option value="low">{t("low_stock")}</option>
           </select>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-8">
-        <StatCard title="Total Alerts" value={filtered.length} gradient="from-[#DC3173] to-pink-500" />
-        <StatCard title="Out of Stock" value={filtered.filter((x) => x.inventory === 0).length} gradient="from-red-600 to-red-400" />
-        <StatCard title="Low Stock" value={filtered.filter((x) => x.inventory > 0 && x.inventory <= x.threshold).length} gradient="from-yellow-500 to-amber-400" />
+        <StatCard title={t("total_alerts")} value={filtered.length} gradient="from-[#DC3173] to-pink-500" />
+
+        <StatCard title={t("Out of Stock")} value={filtered.filter((x) => x.inventory === 0).length} gradient="from-red-600 to-red-400" />
+
+        <StatCard title={t("low_stock")} value={filtered.filter((x) => x.inventory > 0 && x.inventory <= x.threshold).length} gradient="from-yellow-500 to-amber-400" />
       </div>
 
       {/* Table */}
@@ -97,19 +101,19 @@ export default function OutOfStockAlertsPage() {
           <table className="w-full text-sm table-auto border-collapse">
             <thead className="bg-gray-100 text-gray-700 border-b">
               <tr>
-                <th className="p-4 text-left">Item</th>
-                <th className="p-4 text-left">Vendor</th>
-                <th className="p-4 text-left">Category</th>
-                <th className="p-4 text-left">Inventory</th>
-                <th className="p-4 text-left">Status</th>
-                <th className="p-4 text-left">Last Updated</th>
+                <th className="p-4 text-left">{t("item")}</th>
+                <th className="p-4 text-left">{t("vendor")}</th>
+                <th className="p-4 text-left">{t("category_lg")}</th>
+                <th className="p-4 text-left">{t("inventory")}</th>
+                <th className="p-4 text-left">{t("status")}</th>
+                <th className="p-4 text-left">{t("last_updated")}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-10 text-center text-gray-500">
-                    No matching results.
+                    {t("no_matching_results")}
                   </td>
                 </tr>
               ) : (
@@ -128,7 +132,7 @@ export default function OutOfStockAlertsPage() {
 function StatCard({ title, value, gradient }: { title: string; value: number; gradient: string }) {
   return (
     <div
-      className={`rounded-2xl p-6 text-white shadow-lg bg-gradient-to-br ${gradient} transform hover:scale-[1.02] transition`}
+      className={`rounded-2xl p-6 text-white shadow-lg bg-linear-to-br ${gradient} transform hover:scale-[1.02] transition`}
     >
       <p className="text-sm opacity-90">{title}</p>
       <h3 className="text-3xl font-bold mt-1">{value}</h3>
@@ -141,8 +145,8 @@ function StockRow({ item }: { item: StockItem }) {
     item.inventory === 0
       ? { label: "Out of Stock", className: "bg-red-100 text-red-600 border-red-300" }
       : item.inventory <= item.threshold
-      ? { label: "Low Stock", className: "bg-amber-100 text-amber-700 border-amber-300" }
-      : { label: "In Stock", className: "bg-green-100 text-green-700 border-green-300" };
+        ? { label: "Low Stock", className: "bg-amber-100 text-amber-700 border-amber-300" }
+        : { label: "In Stock", className: "bg-green-100 text-green-700 border-green-300" };
 
   return (
     <tr className="border-b hover:bg-gray-50 transition-all duration-150">
