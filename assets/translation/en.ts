@@ -838,5 +838,59 @@ export const en = {
     save_changes: "Save Changes",
     add_item: "Add Item",
 
+    // active-campaigns
+    ongoing: "Ongoing",
+    upcomong: "Upcoming",
+    expired: "Expired",
+    active_campaigns: "Active Campaigns",
+    manage_ongoing_upcoming_promotional_campaign: "Manage ongoing and upcoming promotional campaigns for Deligo — Portugal.",
+    search_campaign_vendor_type: "Search campaigns, vendor or type",
+    new_campaign: "New Campaign",
+    campaign: "Campaign",
+    discount: "Discount",
+    duration: "Duration",
+    no_campaigns_found: "No campaigns found.",
+    off_lg: "OFF",
+    start_date: "Start Date",
+    end_date: "End Date",
+
+    // creaet-new-offer
+    create_new_offer: "Create New Offer",
+    add_promotion_boost_restuarant_sales: "Add a promotion to boost your restaurant's sales",
+    offer_details: "Offer Details",
+    offer_title_eg: "Offer Title (e.g., 20% OFF on Burgers)",
+    offer_description: "Offer Description",
+    offer_type: "Offer Type",
+    percentage_discount: "Percentage Discount",
+    flat_amount_off: "Flat Amount OFF",
+    buy_1_get_1: "Buy 1 Get 1",
+    discount_eg_20: "Discount % (e.g., 20)",
+    flat_discount: "Flat Discount (€)",
+    choose_an_item: "Choose an Item",
+    validity: "Validity",
+    minimum_order_amount: "Minimum Order Amount",
+    will_auto_apply: "Will Auto Apply?",
+    promo_code: "Promo Code",
+    enter_promo_code_optional: "Enter promo code (optional)",
+    create_offer: "Create Offer",
+
+    // coupon-analytics
+    coupon_analytics:"Coupon Analytics",
+    performance_insights_coupon_campaigns:"Performance insights for all coupon campaigns across Portugal.",
+    today:"Today",
+    percentage:"Percentage",
+    free_delivery:"Free Delivery",
+    total_coupons_used:"Total Coupons Used",
+    total_coupons_issued:"Total Coupons Issued",
+    success_rate:"Success Rate",
+    top_performing_coupons:"Top Performing Coupons",
+    coupon:"Coupon",
+    used:"Used",
+    issued:"Issued",
+    usage_rate:"Usage Rate",
+
+
+
+
 
 };

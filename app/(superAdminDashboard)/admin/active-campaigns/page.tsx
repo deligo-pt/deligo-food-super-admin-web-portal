@@ -2,6 +2,7 @@
 "use client"
 import React, { useState, useMemo, useEffect, JSX } from "react";
 import { Plus, Edit3, Trash2, Calendar, PercentCircle, Timer, CheckCircle2, XCircle, Search } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 export type Campaign = {
@@ -59,20 +60,21 @@ function uid(prefix = "id") {
 }
 
 export default function ActiveCampaignsPage(): JSX.Element {
+  const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<Campaign[]>(() => {
     try {
       if (typeof window !== "undefined") {
         const raw = localStorage.getItem(LS_KEY);
         return raw ? JSON.parse(raw) : sampleCampaigns;
       }
-    } catch (e) {}
+    } catch (e) { }
     return sampleCampaigns;
   });
 
   useEffect(() => {
     try {
       localStorage.setItem(LS_KEY, JSON.stringify(campaigns));
-    } catch (e) {}
+    } catch (e) { }
   }, [campaigns]);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -128,11 +130,11 @@ export default function ActiveCampaignsPage(): JSX.Element {
         prev.map((p) =>
           p.id === editing.id
             ? {
-                ...p,
-                ...data,
-                status: calculateStatus(data.startDate || p.startDate, data.endDate || p.endDate),
-                updatedAt: new Date().toISOString(),
-              }
+              ...p,
+              ...data,
+              status: calculateStatus(data.startDate || p.startDate, data.endDate || p.endDate),
+              updatedAt: new Date().toISOString(),
+            }
             : p
         )
       );
@@ -157,18 +159,18 @@ export default function ActiveCampaignsPage(): JSX.Element {
     if (status === "ongoing")
       return (
         <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium flex items-center gap-1">
-          <CheckCircle2 size={14} /> Ongoing
+          <CheckCircle2 size={14} /> {t("ongoing")}
         </span>
       );
     if (status === "upcoming")
       return (
         <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium flex items-center gap-1">
-          <Timer size={14} /> Upcoming
+          <Timer size={14} /> {t("upcoming")}
         </span>
       );
     return (
       <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium flex items-center gap-1">
-        <XCircle size={14} /> Expired
+        <XCircle size={14} /> {t("expired")}
       </span>
     );
   };
@@ -185,19 +187,19 @@ export default function ActiveCampaignsPage(): JSX.Element {
     <div className="p-6 md:p-10 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold">Active Campaigns</h1>
-          <p className="text-gray-600 text-sm mt-1">Manage ongoing and upcoming promotional campaigns for Deligo — Portugal.</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold">{t("active_campaigns")}</h1>
+          <p className="text-gray-600 text-sm mt-1">{t("manage_ongoing_upcoming_promotional_campaign")}</p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center bg-white border rounded-full px-3 py-1 shadow-sm">
             <Search size={14} className="text-gray-400" />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search campaigns, vendor or type" className="ml-2 outline-none w-56 text-sm" />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("search_campaign_vendor_type")} className="ml-2 outline-none w-56 text-sm" />
           </div>
 
           <div className="hidden sm:block">
             <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="border rounded-full px-4 py-2 text-sm shadow-sm">
-              <option value="all">All Types</option>
+              <option value="all">{t("all_types")}</option>
               {campaignTypes.map((t) => (
                 <option key={t} value={t}>
                   {t}
@@ -207,7 +209,7 @@ export default function ActiveCampaignsPage(): JSX.Element {
           </div>
 
           <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 rounded-full text-white font-semibold shadow" style={{ background: "#DC3173" }}>
-            <Plus size={16} /> New Campaign
+            <Plus size={16} /> {t("new_campaign")}
           </button>
         </div>
       </div>
@@ -216,7 +218,7 @@ export default function ActiveCampaignsPage(): JSX.Element {
       <div className="sm:hidden mt-4 flex gap-2">
         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search..." className="w-full border rounded-xl px-3 py-2 text-sm" />
         <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="border rounded-xl px-3 py-2 text-sm">
-          <option value="all">All</option>
+          <option value="all">{t("all")}</option>
           {campaignTypes.map((t) => (
             <option key={t} value={t}>
               {t}
@@ -230,13 +232,13 @@ export default function ActiveCampaignsPage(): JSX.Element {
         <table className="w-full text-sm table-auto">
           <thead className="bg-gray-50 border-b text-gray-600">
             <tr>
-              <th className="p-4 text-left">Campaign</th>
-              <th className="p-4 text-left">Type</th>
-              <th className="p-4 text-left">Vendor</th>
-              <th className="p-4 text-left">Discount</th>
-              <th className="p-4 text-left">Duration</th>
-              <th className="p-4 text-left">Status</th>
-              <th className="p-4 text-left">Actions</th>
+              <th className="p-4 text-left">{t("campaign")}</th>
+              <th className="p-4 text-left">{t("type")}</th>
+              <th className="p-4 text-left">{t("vendor")}</th>
+              <th className="p-4 text-left">{t("discount")}</th>
+              <th className="p-4 text-left">{t("duration")}</th>
+              <th className="p-4 text-left">{t("status")}</th>
+              <th className="p-4 text-left">{t("actions")}</th>
             </tr>
           </thead>
 
@@ -244,7 +246,7 @@ export default function ActiveCampaignsPage(): JSX.Element {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={7} className="p-8 text-center text-gray-500">
-                  No campaigns found.
+                  {t("no_campaigns_found")}
                 </td>
               </tr>
             ) : (
@@ -274,7 +276,7 @@ export default function ActiveCampaignsPage(): JSX.Element {
       {/* Mobile cards */}
       <div className="md:hidden grid grid-cols-1 gap-4 mt-6">
         {filtered.length === 0 ? (
-          <div className="p-6 bg-white rounded-2xl border text-center text-gray-500">No campaigns found.</div>
+          <div className="p-6 bg-white rounded-2xl border text-center text-gray-500">{t("no_campaigns_found")}</div>
         ) : (
           filtered.map((c) => (
             <div key={c.id} className="p-4 bg-white rounded-2xl shadow border">
@@ -284,8 +286,8 @@ export default function ActiveCampaignsPage(): JSX.Element {
                   <div className="flex items-center gap-2 text-sm mt-1 text-[#DC3173]">
                     {typeIcon(c.type)} {c.type}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">Vendor: {c.vendor}</div>
-                  <div className="text-sm font-semibold mt-1">{c.discount}% OFF</div>
+                  <div className="text-xs text-gray-500 mt-1">{t("vendor")}: {c.vendor}</div>
+                  <div className="text-sm font-semibold mt-1">{c.discount}% {t("off_lg")}</div>
                   <div className="text-xs text-gray-500 mt-1">{c.startDate} → {c.endDate}</div>
                   <div className="mt-2">{statusBadge(c.status)}</div>
                 </div>
@@ -336,6 +338,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
 
 // Campaign form component
 function CampaignForm({ initial, campaignTypes, onSave, onCancel }: any) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(initial?.title || "");
   const [type, setType] = useState(initial?.type || campaignTypes[0]);
   const [vendor, setVendor] = useState(initial?.vendor || "All Vendors");
@@ -362,13 +365,13 @@ function CampaignForm({ initial, campaignTypes, onSave, onCancel }: any) {
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <div>
-        <label className="text-sm font-medium">Title</label>
+        <label className="text-sm font-medium">{t("title")}</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1" required />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
-          <label className="text-sm font-medium">Type</label>
+          <label className="text-sm font-medium">{t("type")}</label>
           <select value={type} onChange={(e) => setType(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1">
             {campaignTypes.map((t: string) => (
               <option key={t} value={t}>
@@ -379,30 +382,30 @@ function CampaignForm({ initial, campaignTypes, onSave, onCancel }: any) {
         </div>
 
         <div>
-          <label className="text-sm font-medium">Vendor</label>
+          <label className="text-sm font-medium">{t("vendor")}</label>
           <input value={vendor} onChange={(e) => setVendor(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-          <label className="text-sm font-medium">Discount (%)</label>
+          <label className="text-sm font-medium">{t("discount")} (%)</label>
           <input type="number" min={0} max={100} value={discount} onChange={(e) => setDiscount(Number(e.target.value))} className="w-full border rounded-xl px-3 py-2 mt-1" />
         </div>
 
         <div>
-          <label className="text-sm font-medium">Start Date</label>
+          <label className="text-sm font-medium">{t("start_date")}</label>
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1" />
         </div>
 
         <div>
-          <label className="text-sm font-medium">End Date</label>
+          <label className="text-sm font-medium">{t("end_date")}</label>
           <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1" />
         </div>
       </div>
 
       <div className="flex justify-end gap-2">
-        <button type="button" onClick={onCancel} className="px-4 py-2 rounded-xl border">Cancel</button>
+        <button type="button" onClick={onCancel} className="px-4 py-2 rounded-xl border">{t("cancel")}</button>
         <button type="submit" className="px-4 py-2 rounded-xl text-white" style={{ background: "#DC3173" }}>
           {initial ? "Save Campaign" : "Create Campaign"}
         </button>
