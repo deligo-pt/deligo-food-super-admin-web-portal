@@ -6,9 +6,11 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/deleteUser";
 import { TMeta } from "@/types";
 import { TAdmin } from "@/types/admin.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Ban, Check, Eye, PlusCircle, Trash } from "lucide-react";
@@ -24,45 +26,39 @@ interface IProps {
   adminsResult: { data: TAdmin[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
-
 export default function AllAdmins({ adminsResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
+  const filterOptions = [
+    {
+      label: t("status"),
+      key: "status",
+      placeholder: t("select_status"),
+      type: "select",
+      items: [
+        {
+          label: t("pending"),
+          value: "PENDING",
+        },
+        {
+          label: t("submitted"),
+          value: "SUBMITTED",
+        },
+        {
+          label: t("approved"),
+          value: "APPROVED",
+        },
+        {
+          label: t("rejected"),
+          value: "REJECTED",
+        },
+        {
+          label: t("blocked"),
+          value: "BLOCKED",
+        },
+      ],
+    },
+  ];
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     adminId: "",
@@ -71,8 +67,6 @@ export default function AllAdmins({ adminsResult }: IProps) {
     remarks: "",
   });
   const [deleteId, setDeleteId] = useState("");
-
-  console.log(adminsResult);
 
   const showingInfo = useMemo(() => {
     const page = adminsResult?.meta?.page || 1;
@@ -157,10 +151,10 @@ export default function AllAdmins({ adminsResult }: IProps) {
         >
           <div>
             <h1 className="text-3xl font-extrabold text-[#DC3173]">
-              All Admins
+              {t("all_admins")}
             </h1>
             <p className="mt-1 text-sm text-gray-600">
-              Manage users who can access and administer the Deligo platform.
+              {t("manage_users_who_can_access_administer")}
             </p>
           </div>
           <Link href="/admin/add-admin">
@@ -169,7 +163,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-[#DC3173] to-[#e84b93] text-white font-semibold shadow-lg transform hover:-translate-y-0.5 transition"
             >
-              <PlusCircle size={18} /> Create
+              <PlusCircle size={18} /> {t("create")}
             </motion.button>
           </Link>
         </motion.div>
@@ -185,11 +179,11 @@ export default function AllAdmins({ adminsResult }: IProps) {
         >
           <div className="px-4 py-3 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <h2>Total Admins: {adminsResult?.meta?.total}</h2>
+              <h2>{t("total_admins")}: {adminsResult?.meta?.total}</h2>
             </div>
 
             <div className="text-sm text-gray-500">
-              Showing{" "}
+              {t("showing")}{" "}
               <span className="font-medium text-gray-700">
                 {showingInfo?.first}
               </span>{" "}
@@ -197,7 +191,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
               <span className="font-medium text-gray-700">
                 {showingInfo?.last}
               </span>{" "}
-              of{" "}
+              {t("of")}{" "}
               <span className="font-medium">{adminsResult?.meta?.total}</span>
             </div>
           </div>
@@ -207,19 +201,19 @@ export default function AllAdmins({ adminsResult }: IProps) {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Admin
+                    {t("admin")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
+                    {t("role")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t("status")}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
+                    {t("created")}
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    {t("actions")}
                   </th>
                 </tr>
               </thead>
@@ -264,11 +258,10 @@ export default function AllAdmins({ adminsResult }: IProps) {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                          a.status === "APPROVED"
-                            ? "bg-green-50 text-green-800"
-                            : "bg-red-50 text-red-800"
-                        }`}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${a.status === "APPROVED"
+                          ? "bg-green-50 text-green-800"
+                          : "bg-red-50 text-red-800"
+                          }`}
                       >
                         {a.status}
                       </span>
@@ -282,7 +275,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
                       {a.role !== "SUPER_ADMIN" && (
                         <div className="flex items-center justify-end gap-2">
                           <Button variant="ghost">
-                            <Eye size={14} /> View
+                            <Eye size={14} /> {t("view")}
                           </Button>
                           {/* <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90">
                             <Edit2 size={14} /> Edit
@@ -299,7 +292,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
                               }
                               className="bg-yellow-500 hover:bg-yellow-600"
                             >
-                              <Ban size={14} /> Block
+                              <Ban size={14} /> {t("block")}
                             </Button>
                           )}
                           {a.status === "BLOCKED" && (
@@ -314,7 +307,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
                               }
                               className="bg-green-500 hover:bg-green-600"
                             >
-                              <Check size={14} /> Unblock
+                              <Check size={14} /> {t("unblock")}
                             </Button>
                           )}
                           {!a.isDeleted && (
@@ -322,7 +315,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
                               onClick={() => setDeleteId(a.userId as string)}
                               variant="destructive"
                             >
-                              <Trash size={14} /> Delete
+                              <Trash size={14} /> {t("delete")}
                             </Button>
                           )}
                         </div>
@@ -337,7 +330,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
                       colSpan={5}
                       className="px-6 py-12 text-center text-gray-500"
                     >
-                      No admins found matching your search.
+                      {t("no_admins_found_match")}
                     </td>
                   </tr>
                 )}

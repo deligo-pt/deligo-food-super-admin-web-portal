@@ -1,7 +1,8 @@
 "use client"
 import React, { useMemo, useState } from "react";
-import { Search,  Clock, User,  Download, Eye } from "lucide-react";
+import { Search, Clock, User, Download, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/use-translation";
 
 // Mock log data
 interface LogEntry {
@@ -24,6 +25,7 @@ const initialLogs: LogEntry[] = [
 ];
 
 export default function ActivityLogsPage() {
+  const { t } = useTranslation();
   const [logs] = useState<LogEntry[]>(initialLogs);
   const [query, setQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
@@ -46,12 +48,12 @@ export default function ActivityLogsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 bg-gradient-to-b from-white via-gray-50 to-gray-100">
+    <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Activity Logs</h1>
-          <p className="text-gray-600 mt-1">Track every important action inside the Deligo admin system.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("activity_logs")}</h1>
+          <p className="text-gray-600 mt-1">{t("track_every_important_action_inside")}</p>
         </div>
 
         {/* SEARCH + FILTERS */}
@@ -73,15 +75,15 @@ export default function ActivityLogsPage() {
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
-                <option value="all">All Types</option>
-                <option value="info">Info</option>
-                <option value="warning">Warnings</option>
-                <option value="danger">Critical</option>
+                <option value="all">{t("all_types")}</option>
+                <option value="info">{t("info")}</option>
+                <option value="warning">{t("warnings")}</option>
+                <option value="danger">{t("critical")}</option>
               </select>
             </div>
 
             <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#DC3173] text-white shadow hover:brightness-95">
-              <Download size={16} /> Export Logs
+              <Download size={16} /> {t("export_logs")}
             </button>
           </div>
         </div>
@@ -96,12 +98,12 @@ export default function ActivityLogsPage() {
           <table className="min-w-full table-auto text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="p-4 text-left">Admin</th>
-                <th className="p-4 text-left">Action</th>
-                <th className="p-4 text-left">Target</th>
-                <th className="p-4 text-left">Time</th>
-                <th className="p-4 text-center">Type</th>
-                <th className="p-4 text-right">Details</th>
+                <th className="p-4 text-left">{t("admin")}</th>
+                <th className="p-4 text-left">{t("action")}</th>
+                <th className="p-4 text-left">{t("target")}</th>
+                <th className="p-4 text-left">{t("time")}</th>
+                <th className="p-4 text-center">{t("type")}</th>
+                <th className="p-4 text-right">{t("details")}</th>
               </tr>
             </thead>
             <tbody>
@@ -136,7 +138,7 @@ export default function ActivityLogsPage() {
 
                     <td className="p-4 text-right">
                       <button className="inline-flex items-center gap-1 px-3 py-1 rounded-md border text-gray-600 hover:bg-gray-100">
-                        <Eye size={14} /> View
+                        <Eye size={14} /> {t("view")}
                       </button>
                     </td>
                   </motion.tr>
@@ -154,12 +156,12 @@ export default function ActivityLogsPage() {
                           <div className="flex items-start gap-4">
                             <User className="text-[#DC3173]" />
                             <div>
-                              <div className="font-semibold text-gray-800 mb-1">Detailed Info</div>
-                              <p><span className="font-medium">Admin:</span> {log.admin}</p>
-                              <p><span className="font-medium">Email:</span> {log.email}</p>
-                              <p><span className="font-medium">Action:</span> {log.action}</p>
-                              <p><span className="font-medium">Target:</span> {log.target || "N/A"}</p>
-                              <p><span className="font-medium">Timestamp:</span> {log.timestamp}</p>
+                              <div className="font-semibold text-gray-800 mb-1">{t("detailed_info")}</div>
+                              <p><span className="font-medium">{t("admin")}:</span> {log.admin}</p>
+                              <p><span className="font-medium">{t("email")}:</span> {log.email}</p>
+                              <p><span className="font-medium">{t("action")}:</span> {log.action}</p>
+                              <p><span className="font-medium">{t("target")}:</span> {log.target || "N/A"}</p>
+                              <p><span className="font-medium">{t("timestamp")}:</span> {log.timestamp}</p>
                             </div>
                           </div>
                         </td>
