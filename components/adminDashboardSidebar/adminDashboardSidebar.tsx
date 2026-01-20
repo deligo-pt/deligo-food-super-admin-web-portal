@@ -215,6 +215,14 @@ const MENU = [
         path: "/admin/email-notification-settings",
       },
       { name: "Maintenance Mode", path: "/admin/maintenance-mode" },
+      {
+        name: "All Taxes",
+        path: "/admin/all-taxes",
+      },
+      {
+        name: "Create New Tax",
+        path: "/admin/create-tax",
+      },
     ],
   },
   {
