@@ -281,8 +281,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <AlertCircle size={18} />,
       items: [
         { name: t("critical_alerts"), path: "/admin/critical-alerts" },
-        { name: t("contact_support_team"), path: "/admin/contact-support-team" },
-        { name: t("system_health_status"), path: "/admin/system-health-status" },
       ],
     },
   ];
