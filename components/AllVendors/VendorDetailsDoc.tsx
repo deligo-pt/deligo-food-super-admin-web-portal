@@ -3,7 +3,8 @@ import Image from "next/image";
 interface IDocs {
   businessLicenseDoc?: string | undefined;
   taxDoc?: string | undefined;
-  idProof?: string | undefined;
+  idProofFront?: string | undefined;
+  idProofBack?: string | undefined;
   storePhoto?: string | undefined;
   menuUpload?: string | undefined;
 }
@@ -13,7 +14,7 @@ interface IProps {
 
 export default function VendorDetailsDoc({ documents }: IProps) {
   const docsArr = Object.keys(documents || {}).filter(
-    (key) => !!documents?.[key as keyof IDocs]
+    (key) => !!documents?.[key as keyof IDocs],
   );
 
   return (
@@ -21,7 +22,8 @@ export default function VendorDetailsDoc({ documents }: IProps) {
       {docsArr.map((doc) => (
         <div key={doc}>
           <p className="text-sm text-gray-500 mb-2">
-            {doc === "idProof" && "ID Proof"}
+            {doc === "idProofFront" && "ID Proof Front"}
+            {doc === "idProofBack" && "ID Proof Back"}
             {doc === "businessLicenseDoc" && "Business License"}
             {doc === "taxDoc" && "Tax Document"}
             {doc === "storePhoto" && "Store Photo"}

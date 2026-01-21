@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import Dashboard from "@/components/Dashboard/Dashboard";
+import Dashboard from "@/components/Dashboard/Dashboard/Dashboard";
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";
 import { TAnalytics } from "@/types/analytics.type";
@@ -10,7 +10,7 @@ export default async function DashboardPage() {
 
   try {
     const result = (await serverRequest.get(
-      "/analytics/admin-dashboard-analytics"
+      "/analytics/admin-dashboard-analytics",
     )) as unknown as TResponse<TAnalytics>;
 
     if (result?.success) {

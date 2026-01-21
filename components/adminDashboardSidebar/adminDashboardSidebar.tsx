@@ -376,10 +376,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
               {menu.path ? (
                 <Link
                   href={menu.path}
-                  className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${pathname === menu.path
-                    ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                    : "hover:bg-pink-100"
-                    }`}
+                  className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${
+                    pathname === menu.path
+                      ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                      : "hover:bg-pink-100"
+                  } ${!open ? "justify-center" : ""}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="text-pink-600">{menu.icon}</div>
@@ -394,7 +395,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                 <>
                   <button
                     onClick={() => toggleExpand(menu.id)}
-                    className="flex items-center w-full justify-between p-2 rounded-lg hover:bg-pink-100 transition-colors"
+                    className={`flex items-center w-full justify-between p-2 rounded-lg hover:bg-pink-100 transition-colors  ${!open ? "justify-center" : ""}`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="text-pink-600">{menu.icon}</div>

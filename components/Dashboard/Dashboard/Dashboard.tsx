@@ -1,11 +1,4 @@
 "use client";
-
-import DashboardHeader from "@/components/Dashboard/DashboardHeader";
-import PopularCategories from "@/components/Dashboard/PopularCategories";
-import RecentOrders from "@/components/Dashboard/RecentOrders";
-import StatCard from "@/components/Dashboard/StatCard";
-import StatusCard from "@/components/Dashboard/StatusCard";
-import TopProducts from "@/components/Dashboard/TopProducts";
 import { useTranslation } from "@/hooks/use-translation";
 import { TAnalytics } from "@/types/analytics.type";
 import { motion } from "framer-motion";
@@ -20,6 +13,12 @@ import {
   UsersIcon,
   XCircleIcon,
 } from "lucide-react";
+import DashboardHeader from "./DashboardHeader";
+import StatCard from "./StatCard";
+import StatusCard from "./StatusCard";
+import PopularCategories from "./PopularCategories";
+import RecentOrders from "./RecentOrders";
+import TopProducts from "./TopProducts";
 
 const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
   const { t } = useTranslation();
@@ -118,19 +117,19 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
           color="#DC3173"
         />
         <StatusCard
-          title={t("pending")}
+          title={t("pending_orders")}
           value={analyticsData?.orders?.pending?.toLocaleString() || "0"}
           icon={<TrendingUpIcon />}
           color="#DC3173"
         />
         <StatusCard
-          title={t("completed")}
+          title={t("completed_orders")}
           value={analyticsData?.orders?.completed?.toLocaleString() || "0"}
           icon={<CheckCircleIcon />}
           color="#DC3173"
         />
         <StatusCard
-          title={t("cancelled")}
+          title={t("cancelled_orders")}
           value={analyticsData?.orders?.cancelled?.toLocaleString() || "0"}
           icon={<XCircleIcon />}
           color="#DC3173"

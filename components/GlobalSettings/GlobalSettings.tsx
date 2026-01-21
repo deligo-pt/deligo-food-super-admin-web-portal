@@ -3,7 +3,6 @@
 import SettingsCard from "@/components/GlobalSettings/SettingsCard";
 import SettingsInput from "@/components/GlobalSettings/SettingsInput";
 import SettingsToggle from "@/components/GlobalSettings/SettingsToggle";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -40,34 +39,6 @@ import z from "zod";
 
 type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
-// const initialSettings: TGlobalSettings = {
-//   deliveryChargePerKm: 1.5,
-//   baseDeliveryCharge: 5.0,
-//   minDeliveryCharge: 5.0,
-//   maxDeliveryCharge: 25.0,
-//   freeDeliveryAbove: 100.0,
-//   maxDeliveryDistanceKm: 15,
-//   platformCommissionPercent: 10,
-//   deliveryPartnerCommissionPercent: 5,
-//   vendorVatPercent: 15,
-//   minOrderAmount: 10,
-//   maxOrderAmount: 500,
-//   maxItemsPerOrder: 20,
-//   cancelTimeLimitMinutes: 5,
-//   refundProcessingDays: 3,
-//   isCouponEnabled: true,
-//   isOfferEnabled: true,
-//   maxDiscountPercent: 50,
-//   autoCancelUnacceptedOrderMinutes: 10,
-//   autoMarkDeliveredAfterMinutes: 60,
-//   isPlatformLive: true,
-//   maintenanceMessage:
-//     "We are currently undergoing scheduled maintenance. We'll be back shortly!",
-//   orderOtpEnabled: true,
-//   otpLength: 6,
-//   otpExpiryMinutes: 10,
-// };
-
 export function GlobalSettings({
   settingsResult: settings,
 }: {
@@ -76,7 +47,7 @@ export function GlobalSettings({
   const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
-    "idle"
+    "idle",
   );
   const form = useForm<TGlobalSettingsForm>({
     resolver: zodResolver(globalSettingsSchema),
@@ -181,26 +152,24 @@ export function GlobalSettings({
             </motion.p>
           </div>
 
-          <motion.button
-            form="globalSettingsForm"
-            initial={{
-              opacity: 0,
-              scale: 0.9,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-            }}
-            whileHover={{
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-            type="submit"
-            // onClick={handleSave}
-            disabled={isSaving}
-            className={`
+            <motion.button
+              initial={{
+                opacity: 0,
+                scale: 0.9,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              type="submit"
+              disabled={isSaving}
+              className={`
               relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-white shadow-lg shadow-[#DC3173]/30 transition-all
               ${isSaving
                 ? "bg-[#DC3173]/50 cursor-wait"
@@ -227,14 +196,8 @@ export function GlobalSettings({
           </motion.button>
         </div>
 
-        {/* Main Grid */}
-        <Form {...form}>
-          <form
-            id="globalSettingsForm"
-            noValidate
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-          >
+          {/* Main Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Platform Status - Full Width Hero */}
             <div className="lg:col-span-2">
               <motion.div
@@ -957,11 +920,9 @@ export function GlobalSettings({
                 />
               </div>
             </SettingsCard>
-
-            <Button type="submit" className="hidden" />
-          </form>
-        </Form>
-      </div>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
