@@ -11,6 +11,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   createGlobalSettingsReq,
   updateGlobalSettingsReq,
@@ -72,6 +73,7 @@ export function GlobalSettings({
 }: {
   settingsResult: TGlobalSettings;
 }) {
+  const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
     "idle"
@@ -141,7 +143,7 @@ export function GlobalSettings({
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Header Background Gradient */}
-      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#DC3173]/80 to-transparent -z-10" />
+      <div className="absolute top-0 left-0 w-full h-64 bg-linear-to-b from-[#DC3173]/80 to-transparent -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         {/* Header */}
@@ -159,7 +161,7 @@ export function GlobalSettings({
               className="text-2xl md:text-3xl font-extrabold text-slate-900 flex items-center gap-3"
             >
               <SettingsIcon className="w-6 h-6 text-slate-800" />
-              Global Settings
+              {t("global_settings")}
             </motion.h1>
             <motion.p
               initial={{
@@ -175,7 +177,7 @@ export function GlobalSettings({
               }}
               className="text-sm text-slate-500"
             >
-              Manage your platform&lsquo;s core configuration and rules
+              {t("manage_your_platform_core_configuration")}
             </motion.p>
           </div>
 
@@ -200,27 +202,26 @@ export function GlobalSettings({
             disabled={isSaving}
             className={`
               relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-white shadow-lg shadow-[#DC3173]/30 transition-all
-              ${
-                isSaving
-                  ? "bg-[#DC3173]/50 cursor-wait"
-                  : "bg-[#DC3173] hover:bg-[#DC3173]/90 hover:shadow-[#DC3173]/40"
+              ${isSaving
+                ? "bg-[#DC3173]/50 cursor-wait"
+                : "bg-[#DC3173] hover:bg-[#DC3173]/90 hover:shadow-[#DC3173]/40"
               }
             `}
           >
             {isSaving ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Saving...</span>
+                <span>{t("saving")}</span>
               </>
             ) : saveStatus === "success" ? (
               <>
                 <CheckCircle2 size={20} />
-                <span>Saved!</span>
+                <span>{t("saved")}</span>
               </>
             ) : (
               <>
                 <Save size={20} />
-                <span>Save Changes</span>
+                <span>{t("save_changes")}</span>
               </>
             )}
           </motion.button>
@@ -250,11 +251,10 @@ export function GlobalSettings({
                 }}
                 className={`
                 relative overflow-hidden rounded-2xl border transition-all duration-300
-                ${
-                  watchIsPlatformLive
+                ${watchIsPlatformLive
                     ? "bg-white border-gray-200 shadow-sm"
                     : "bg-gray-900 border-gray-800 shadow-xl"
-                }
+                  }
               `}
               >
                 <div className="absolute top-0 right-0 p-32 bg-[#DC3173]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
@@ -264,44 +264,40 @@ export function GlobalSettings({
                     <div
                       className={`
                     p-4 rounded-2xl transition-colors duration-300
-                    ${
-                      watchIsPlatformLive
-                        ? "bg-green-100 text-green-600"
-                        : "bg-gray-800 text-gray-400"
-                    }
+                    ${watchIsPlatformLive
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-800 text-gray-400"
+                        }
                   `}
                     >
                       <Activity size={32} strokeWidth={2.5} />
                     </div>
                     <div>
                       <h2
-                        className={`text-2xl font-bold ${
-                          watchIsPlatformLive ? "text-gray-900" : "text-white"
-                        }`}
+                        className={`text-2xl font-bold ${watchIsPlatformLive ? "text-gray-900" : "text-white"
+                          }`}
                       >
-                        Platform Status
+                        {t("platform_status")}
                       </h2>
                       <p
-                        className={`mt-1 font-medium ${
-                          watchIsPlatformLive
-                            ? "text-gray-500"
-                            : "text-gray-400"
-                        }`}
+                        className={`mt-1 font-medium ${watchIsPlatformLive
+                          ? "text-gray-500"
+                          : "text-gray-400"
+                          }`}
                       >
                         {watchIsPlatformLive
-                          ? "Your platform is currently live and accepting orders."
-                          : "Platform is in maintenance mode. No orders can be placed."}
+                          ? t("your_platform_currently_live")
+                          : t("platform_maintenance_mode")}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <span
-                      className={`text-sm font-bold uppercase tracking-wider ${
-                        watchIsPlatformLive ? "text-green-600" : "text-gray-400"
-                      }`}
+                      className={`text-sm font-bold uppercase tracking-wider ${watchIsPlatformLive ? "text-green-600" : "text-gray-400"
+                        }`}
                     >
-                      {watchIsPlatformLive ? "Live" : "Maintenance"}
+                      {watchIsPlatformLive ? t("live") : t("maintenance")}
                     </span>
                     <FormField
                       control={form.control}
@@ -347,11 +343,11 @@ export function GlobalSettings({
                             <FormControl>
                               <SettingsInput
                                 fieldState={fieldState}
-                                label="Maintenance Message"
+                                label={t("maintenance_message")}
                                 type="text"
                                 value={field.value}
                                 onChange={(e) => field.onChange(e.target.value)}
-                                placeholder="Enter message shown to users..."
+                                placeholder={t("enter_message_shown_to_users")}
                               />
                             </FormControl>
                             <FormMessage />
@@ -366,8 +362,8 @@ export function GlobalSettings({
 
             {/* Delivery Pricing */}
             <SettingsCard
-              title="Delivery Pricing"
-              description="Configure base rates and distance calculations"
+              title={t("delivery_pricing")}
+              description={t("configure_base_rates_distance")}
               icon={EuroIcon}
               delay={0.1}
             >
@@ -380,7 +376,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Base Charge"
+                          label={t("base_charge")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -402,7 +398,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Charge per KM"
+                          label={t("charge_per_km")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -424,7 +420,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Min Charge"
+                          label={t("min_charge")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -446,7 +442,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Max Charge"
+                          label={t("max_charge")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -468,7 +464,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Free Delivery Above"
+                          label={t("free_delivery_above")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -490,7 +486,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Maximum Delivery Distance"
+                          label={t("maximum_delivery_distance")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -509,8 +505,8 @@ export function GlobalSettings({
 
             {/* Commission & Fees */}
             <SettingsCard
-              title="Commissions & Fees"
-              description="Set platform earnings and tax rates"
+              title={t("commissions_and_fees")}
+              description={t("set_platform_earnings_tax_rates")}
               icon={Percent}
               delay={0.2}
             >
@@ -523,14 +519,14 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Platform Commission"
+                          label={t("platform_commission")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="%"
-                          description="Percentage taken from each order total"
+                          description={t("percentage_taken_from_each_order_total")}
                           min={0}
                           max={100}
                         />
@@ -547,14 +543,14 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Delivery Partner Commission"
+                          label={t("delivery_partner_commission")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="%"
-                          description="Percentage paid to the driver"
+                          description={t("percentage_paid_to_driver")}
                           min={0}
                           max={100}
                         />
@@ -571,7 +567,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Vendor VAT"
+                          label={t("vendor_vat")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -591,8 +587,8 @@ export function GlobalSettings({
 
             {/* Order Rules */}
             <SettingsCard
-              title="Order Rules"
-              description="Define constraints for customer orders"
+              title={t("order_rules")}
+              description={t("define_constraints_for_customer_orders")}
               icon={Package}
               delay={0.3}
             >
@@ -605,7 +601,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Min Order Amount"
+                          label={t("min_order_amount")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -627,7 +623,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Max Order Amount"
+                          label={t("max_order_amount")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -649,7 +645,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Max Items per Order"
+                          label={t("max_items_per_order")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -668,8 +664,8 @@ export function GlobalSettings({
 
             {/* Cancellation & Refunds */}
             <SettingsCard
-              title="Cancellation & Refunds"
-              description="Manage time limits and processing"
+              title={t("cancellation_and_refunds")}
+              description={t("manage_time_limits_processing")}
               icon={Clock}
               delay={0.4}
             >
@@ -682,14 +678,14 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Cancellation Time Limit"
+                          label={t("cancellation_time_limit")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="min"
-                          description="Time window for customers to cancel without penalty"
+                          description={t("time_widow_customers_cancel")}
                           min={0}
                         />
                       </FormControl>
@@ -705,7 +701,7 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Refund Processing Days"
+                          label={t("refund_processing_days")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -724,8 +720,8 @@ export function GlobalSettings({
 
             {/* OTP & Security */}
             <SettingsCard
-              title="OTP & Security"
-              description="Configure order verification settings"
+              title={t("otp_security")}
+              description={t("configure_order_verification_settings")}
               icon={Shield}
               delay={0.45}
             >
@@ -738,8 +734,8 @@ export function GlobalSettings({
                       <FormItem>
                         <FormControl>
                           <SettingsToggle
-                            label="Enable Order OTP"
-                            description="Require OTP verification for order delivery"
+                            label={t("enable_order_otp")}
+                            description={t("require_otp_verification_order_delivery")}
                             checked={field.value}
                             onChange={(val) => field.onChange(val)}
                           />
@@ -786,14 +782,14 @@ export function GlobalSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="OTP Length"
+                              label={t("otp_length")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
                                 field.onChange(parseFloat(e.target.value))
                               }
                               suffix="digits"
-                              description="Number of digits in the OTP code"
+                              description={t("number_of_digits_otp_code")}
                               min={0}
                             />
                           </FormControl>
@@ -809,14 +805,14 @@ export function GlobalSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="OTP Expiry Time"
+                              label={t("otp_expiry_time")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
                                 field.onChange(parseFloat(e.target.value))
                               }
                               suffix="min"
-                              description="Time before OTP expires and needs regeneration"
+                              description={t("time_before_otp_expires")}
                               min={0}
                             />
                           </FormControl>
@@ -832,8 +828,8 @@ export function GlobalSettings({
 
             {/* Offers & Promotions */}
             <SettingsCard
-              title="Offers & Promotions"
-              description="Control global discount settings"
+              title={t("offers_and_promotions")}
+              description={t("control_global_discount_settings")}
               icon={Gift}
               delay={0.5}
             >
@@ -846,8 +842,8 @@ export function GlobalSettings({
                       <FormItem>
                         <FormControl>
                           <SettingsToggle
-                            label="Enable Coupons"
-                            description="Allow customers to use promo codes at checkout"
+                            label={t("enable_coupons")}
+                            description={t("allow_customers_use_promo")}
                             checked={field.value}
                             onChange={(val) => field.onChange(val)}
                           />
@@ -866,8 +862,8 @@ export function GlobalSettings({
                       <FormItem>
                         <FormControl>
                           <SettingsToggle
-                            label="Enable Global Offers"
-                            description="Activate sitewide promotional campaigns"
+                            label={t("enable_global_offers")}
+                            description={t("activate_sitewide_promotional")}
                             checked={field.value}
                             onChange={(val) => field.onChange(val)}
                           />
@@ -886,14 +882,14 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Max Discount Percentage"
+                          label={t("max_discount_percentage")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="%"
-                          description="Safety cap for all generated discounts"
+                          description={t("safety_cap_generated_discounts")}
                           min={0}
                           max={100}
                         />
@@ -907,8 +903,8 @@ export function GlobalSettings({
 
             {/* Automation */}
             <SettingsCard
-              title="Automation"
-              description="Configure automated system actions"
+              title={t("automation")}
+              description={t("configure_automated_system_actions")}
               icon={Zap}
               delay={0.6}
             >
@@ -921,14 +917,14 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Auto-cancel Unaccepted Orders"
+                          label={t("auto_cancel_unaccepted_orders")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="min"
-                          description="Cancel orders if no driver accepts within this time"
+                          description={t("cancel_orders_if_no_driver_accepts")}
                           min={0}
                         />
                       </FormControl>
@@ -944,14 +940,14 @@ export function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Auto-mark Delivered"
+                          label={t("auto_mark_delivered")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="min"
-                          description="Automatically complete orders after driver arrival"
+                          description={t("automatically_complete_orders")}
                           min={0}
                         />
                       </FormControl>

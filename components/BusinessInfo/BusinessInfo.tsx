@@ -3,10 +3,13 @@
 import KPICard from "@/components/BusinessInfo/KPICard";
 import OperationalMetrics from "@/components/BusinessInfo/OperationalMetrics";
 import RevenueChart from "@/components/BusinessInfo/RevenueChart";
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { Clock, DollarSign, ShoppingBag, TrendingUp } from "lucide-react";
 
 export function BusinessInfo() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50/50 font-sans text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -25,9 +28,9 @@ export function BusinessInfo() {
               duration: 0.5,
             }}
           >
-            <h1 className="text-2xl font-bold text-[#DC3173]">Business Info</h1>
+            <h1 className="text-2xl font-bold text-[#DC3173]">{t("business_info")}</h1>
             <p className="text-gray-500 mt-1">
-              Real-time overview of DeliGo&lsquo;s performance
+              {t("real_time_overview_deligo_performance")}
             </p>
           </motion.div>
         </div>
@@ -35,7 +38,7 @@ export function BusinessInfo() {
         {/* KPI Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <KPICard
-            title="Total Revenue"
+            title={t("total_revenue")}
             value="147,031"
             prefix="€ "
             icon={DollarSign}
@@ -43,14 +46,14 @@ export function BusinessInfo() {
             delay={0.1}
           />
           <KPICard
-            title="Total Orders"
+            title={t("total_orders")}
             value="3,842"
             icon={ShoppingBag}
             trend={8.2}
             delay={0.2}
           />
           <KPICard
-            title="Avg. Delivery Time"
+            title={t("avg_delivery_time")}
             value="25.13"
             suffix=" min"
             icon={Clock}
@@ -59,7 +62,7 @@ export function BusinessInfo() {
             delay={0.3}
           />
           <KPICard
-            title="Avg. Order Value"
+            title={t("avg_order_value")}
             value="38.40"
             prefix="€ "
             icon={TrendingUp}
@@ -71,7 +74,7 @@ export function BusinessInfo() {
         {/* Operational Metrics Section */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 px-1">
-            Operational Status
+            {t("operational_status")}
           </h2>
           <OperationalMetrics />
         </div>
@@ -99,7 +102,7 @@ export function BusinessInfo() {
             className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col"
           >
             <h3 className="font-bold text-gray-900 mb-4">
-              Top Performing Zones
+              {t("top_performing_zones")}
             </h3>
             <div className="space-y-4 flex-1">
               {[
@@ -147,7 +150,7 @@ export function BusinessInfo() {
                         {zone.name}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {zone.orders} orders
+                        {zone.orders} {t("orders")}
                       </p>
                     </div>
                   </div>
@@ -156,11 +159,10 @@ export function BusinessInfo() {
                       {zone.revenue}
                     </p>
                     <p
-                      className={`text-xs font-medium ${
-                        zone.growth.startsWith("+")
+                      className={`text-xs font-medium ${zone.growth.startsWith("+")
                           ? "text-green-600"
                           : "text-red-500"
-                      }`}
+                        }`}
                     >
                       {zone.growth}
                     </p>
@@ -169,7 +171,7 @@ export function BusinessInfo() {
               ))}
             </div>
             <button className="w-full mt-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
-              View All Zones
+              {t("view_all_zones")}
             </button>
           </motion.div>
         </div>

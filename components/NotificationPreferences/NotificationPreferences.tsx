@@ -4,6 +4,7 @@ import { CurrencyInput } from "@/components/Localization/CurrencyInput";
 import { Switch } from "@/components/Switch/Switch";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import {
   Mail,
@@ -17,64 +18,66 @@ import { useState } from "react";
 
 type TActiveTab = "customer" | "vendor" | "driver";
 
-const userTypes = [
-  {
-    id: "customer",
-    label: "Customer",
-    icon: User,
-  },
-  {
-    id: "vendor",
-    label: "Vendor",
-    icon: Store,
-  },
-  {
-    id: "driver",
-    label: "Delivery Partner",
-    icon: Truck,
-  },
-];
-
-const channels = [
-  {
-    id: "push",
-    label: "Push Notification",
-    icon: Smartphone,
-  },
-  {
-    id: "email",
-    label: "Email",
-    icon: Mail,
-  },
-  {
-    id: "sms",
-    label: "SMS",
-    icon: MessageSquare,
-  },
-];
-
-const events = [
-  {
-    id: "order_confirmation",
-    label: "Order Confirmation",
-  },
-  {
-    id: "order_shipped",
-    label: "Order Picked Up",
-  },
-  {
-    id: "order_delivered",
-    label: "Order Delivered",
-  },
-  {
-    id: "promo",
-    label: "Promotional",
-  },
-];
 
 export function NotificationPreferences() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TActiveTab>("customer");
   const [activeTemplate, setActiveTemplate] = useState("order_confirmation");
+
+  const userTypes = [
+    {
+      id: "customer",
+      label: t("customer"),
+      icon: User,
+    },
+    {
+      id: "vendor",
+      label: t("vendor"),
+      icon: Store,
+    },
+    {
+      id: "driver",
+      label: t("delivery_partner"),
+      icon: Truck,
+    },
+  ];
+
+  const channels = [
+    {
+      id: "push",
+      label: t("push_notification"),
+      icon: Smartphone,
+    },
+    {
+      id: "email",
+      label: t("email"),
+      icon: Mail,
+    },
+    {
+      id: "sms",
+      label: t("sms"),
+      icon: MessageSquare,
+    },
+  ];
+
+  const events = [
+    {
+      id: "order_confirmation",
+      label: t("order_confirmation"),
+    },
+    {
+      id: "order_shipped",
+      label: t("order_picked_up"),
+    },
+    {
+      id: "order_delivered",
+      label: t("order_delivered"),
+    },
+    {
+      id: "promo",
+      label: t("promotional")
+    },
+  ];
 
   return (
     <div className="space-y-8 p-4 md:p-6">
@@ -92,8 +95,8 @@ export function NotificationPreferences() {
             duration: 0.5,
           }}
         >
-          <h1 className="text-2xl font-bold text-[#DC3173]">Notifications</h1>
-          <p className="text-gray-500 mt-1">Configure alerts and templates</p>
+          <h1 className="text-2xl font-bold text-[#DC3173]">{t("notifications")}</h1>
+          <p className="text-gray-500 mt-1">{t("configure_alerts_templates")}</p>
         </motion.div>
       </div>
       {/* User Type Tabs */}
@@ -104,10 +107,9 @@ export function NotificationPreferences() {
             onClick={() => setActiveTab(type.id as TActiveTab)}
             className={`
               relative flex items-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg transition-all
-              ${
-                activeTab === type.id
-                  ? "text-gray-900"
-                  : "text-gray-500 hover:text-gray-700"
+              ${activeTab === type.id
+                ? "text-gray-900"
+                : "text-gray-500 hover:text-gray-700"
               }
             `}
           >
@@ -136,10 +138,10 @@ export function NotificationPreferences() {
           <Card>
             <CardContent>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Active Channels
+                {t("active_channels")}
               </h3>
               <p className="text-sm text-gray-500 mb-6">
-                Enable communication channels for{" "}
+                {t("enable_communication_channels_for")}{" "}
                 {userTypes.find((t) => t.id === activeTab)?.label}s.
               </p>
 
@@ -157,7 +159,7 @@ export function NotificationPreferences() {
                         {channel.label}
                       </span>
                     </div>
-                    <Switch checked={true} onCheckedChange={() => {}} />
+                    <Switch checked={true} onCheckedChange={() => { }} />
                   </div>
                 ))}
               </div>
@@ -167,7 +169,7 @@ export function NotificationPreferences() {
           <Card>
             <CardContent>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Event Triggers
+                {t("event_triggers")}
               </h3>
               <div className="space-y-1">
                 {events.map((event) => (
@@ -176,11 +178,10 @@ export function NotificationPreferences() {
                     onClick={() => setActiveTemplate(event.id)}
                     className={`
                     w-full flex items-center justify-between px-4 py-3 text-sm rounded-lg transition-colors
-                    ${
-                      activeTemplate === event.id
+                    ${activeTemplate === event.id
                         ? "bg-pink-50 text-[#DC3173] font-medium"
                         : "text-gray-600 hover:bg-gray-50"
-                    }
+                      }
                   `}
                   >
                     {event.label}
@@ -201,38 +202,38 @@ export function NotificationPreferences() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">
-                    Template Editor
+                    {t("template_editor")}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    Editing{" "}
+                    {t("editing")}{" "}
                     <span className="font-medium text-[#DC3173]">
                       {events.find((e) => e.id === activeTemplate)?.label}
                     </span>{" "}
-                    email template
+                    {t("email_template")}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline">
-                    Send Test
+                    {t("send_test")}
                   </Button>
                   <Button
                     className="bg-[#DC3173] hover:bg-[#DC3173]/90"
                     size="sm"
                   >
-                    Save Template
+                    {t("save_template")}
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-4 flex-1">
                 <CurrencyInput
-                  label="Subject Line"
+                  label={t("subject_line")}
                   defaultValue="Your order #12345 has been confirmed!"
                 />
 
                 <div className="flex-1 flex flex-col">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Email Body
+                    {t("email_body")}
                   </label>
                   <div className="flex-1 border border-gray-300 rounded-lg overflow-hidden flex flex-col min-h-[400px]">
                     {/* Mock Toolbar */}
@@ -249,7 +250,7 @@ export function NotificationPreferences() {
                       )}
                       <div className="w-px h-4 bg-gray-300 mx-1 self-center" />
                       <button className="px-2 py-1 text-xs font-medium text-[#DC3173] bg-pink-50 hover:bg-pink-100 rounded">
-                        {"{"} Variable {"}"}
+                        {"{"} {t("variable")} {"}"}
                       </button>
                     </div>
 
@@ -274,17 +275,17 @@ The FoodApp Team`}
                     />
                   </div>
                   <p className="mt-2 text-xs text-gray-500">
-                    Available variables:{" "}
+                    {t("available_variables")}:{" "}
                     <code className="bg-gray-100 px-1 rounded">
-                      customer_name
+                      {t("customer_name")}
                     </code>
                     ,{" "}
                     <code className="bg-gray-100 px-1 rounded">
-                      restaurant_name
+                      {t("restaurant_name")}
                     </code>
                     ,{" "}
                     <code className="bg-gray-100 px-1 rounded">
-                      order_total
+                      {t("order_total")}
                     </code>
                   </p>
                 </div>

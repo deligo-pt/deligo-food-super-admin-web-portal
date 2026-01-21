@@ -4,12 +4,14 @@ import { ColorPicker } from "@/components/ColorPicker/ColorPicker";
 import { FileUpload } from "@/components/FileUpload/FileUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { RefreshCw, Save, Smartphone } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
 export function BrandingTheme() {
+  const { t } = useTranslation();
   const [primaryColor, setPrimaryColor] = useState("#DC3173");
   const [accentColor, setAccentColor] = useState("#FCDDEC");
   const [font, setFont] = useState("Inter");
@@ -37,10 +39,10 @@ export function BrandingTheme() {
           }}
         >
           <h1 className="text-2xl font-bold text-[#DC3173]">
-            Branding & Theme
+            {t("branding_and_theme")}
           </h1>
           <p className="text-gray-500 mt-1">
-            Manage logos, colors, and typography
+            {t("manage_logos_colors_typography")}
           </p>
         </motion.div>
       </div>
@@ -51,21 +53,21 @@ export function BrandingTheme() {
             <CardContent>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Visual Identity
+                  {t("visual_identity")}
                 </h2>
                 <span className="text-xs font-medium px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full">
-                  Global
+                  {t("global")}
                 </span>
               </div>
 
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FileUpload label="Main Logo (Light Mode)" accept="image/*" />
-                  <FileUpload label="Main Logo (Dark Mode)" accept="image/*" />
+                  <FileUpload label={t("main_logo_light_mode")} accept="image/*" />
+                  <FileUpload label={t("main_logo_dark_mode")} accept="image/*" />
                 </div>
 
                 <FileUpload
-                  label="Favicon / App Icon"
+                  label={t("favicon_app_icon")}
                   accept="image/png, image/ico"
                   maxSize={1}
                 />
@@ -76,28 +78,28 @@ export function BrandingTheme() {
           <Card>
             <CardContent>
               <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                Color Palette
+                {t("color_palatte")}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ColorPicker
-                  label="Primary Color"
+                  label={t("primary_color")}
                   color={primaryColor}
                   onChange={setPrimaryColor}
                 />
                 <ColorPicker
-                  label="Accent Color"
+                  label={t("accent_color")}
                   color={accentColor}
                   onChange={setAccentColor}
                 />
                 <ColorPicker
-                  label="Success Color"
+                  label={t("success_color")}
                   color="#10B981"
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
                 <ColorPicker
-                  label="Error Color"
+                  label={t("error_color")}
                   color="#EF4444"
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
               </div>
             </CardContent>
@@ -106,12 +108,12 @@ export function BrandingTheme() {
           <Card>
             <CardContent>
               <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                Typography
+                {t("typography")}
               </h2>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Primary Font Family
+                    {t("primary_font_family")}
                   </label>
                   <select
                     value={font}
@@ -124,20 +126,19 @@ export function BrandingTheme() {
                     <option value="Open Sans">Open Sans</option>
                   </select>
                   <p className="mt-2 text-xs text-gray-500">
-                    This font will be applied to all customer, vendor, and
-                    partner apps.
+                    {t("this_font_will_be_applied_all_customer")}
                   </p>
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <p className="text-sm text-gray-500 mb-2">Preview:</p>
+                  <p className="text-sm text-gray-500 mb-2">{t("preview")}:</p>
                   <p
                     className="text-2xl font-bold text-gray-900 mb-1"
                     style={{
                       fontFamily: font,
                     }}
                   >
-                    The quick brown fox jumps over the lazy dog
+                    {t("the_quick_brown_fox_jumps")}
                   </p>
                   <p
                     className="text-base text-gray-600"
@@ -145,8 +146,7 @@ export function BrandingTheme() {
                       fontFamily: font,
                     }}
                   >
-                    ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
-                    1234567890
+                   {t("abcdef")}
                   </p>
                 </div>
               </div>
@@ -159,7 +159,7 @@ export function BrandingTheme() {
           <div className="sticky top-24 space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-                Live Preview
+                {t("live_preview")}
               </h3>
               <div className="flex gap-2">
                 <button className="p-1.5 text-gray-400 hover:text-[#DC3173] rounded bg-white shadow-sm border border-gray-200">
@@ -169,15 +169,15 @@ export function BrandingTheme() {
             </div>
 
             {/* Mobile App Preview Mockup */}
-            <div className="relative mx-auto border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl">
-              <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
-              <div className="h-[32px] w-[3px] bg-gray-800 absolute -start-[17px] top-[72px] rounded-s-lg"></div>
+            <div className="relative mx-auto border-gray-800 bg-gray-800 border-14 rounded-[2.5rem] h-[600px] w-[300px] shadow-xl">
+              <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-2xl left-1/2 -translate-x-1/2 absolute"></div>
+              <div className="h-8 w-[3px] bg-gray-800 absolute -start-[17px] top-[72px] rounded-s-lg"></div>
               <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[124px] rounded-s-lg"></div>
               <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[178px] rounded-s-lg"></div>
-              <div className="h-[64px] w-[3px] bg-gray-800 absolute -end-[17px] top-[142px] rounded-e-lg"></div>
+              <div className="h-16 w-[3px] bg-gray-800 absolute -end-[17px] top-[142px] rounded-e-lg"></div>
 
               {/* Screen Content */}
-              <div className="rounded-[2rem] overflow-hidden w-full h-full bg-white flex flex-col relative">
+              <div className="rounded-4xl overflow-hidden w-full h-full bg-white flex flex-col relative">
                 {/* Splash Screen Mode */}
                 <div
                   className="absolute inset-0 flex flex-col items-center justify-center z-10"
@@ -231,7 +231,7 @@ export function BrandingTheme() {
             </div>
 
             <p className="text-center text-sm text-gray-500">
-              Splash Screen Preview
+              {t("splash_screen_preview")}
             </p>
           </div>
         </div>
@@ -253,9 +253,9 @@ export function BrandingTheme() {
               <RefreshCw className="w-5 h-5 text-gray-400" />
             </div>
             <div>
-              <p className="font-medium">Unsaved Changes</p>
+              <p className="font-medium">{t("unsaved_changes")}</p>
               <p className="text-xs text-gray-400">
-                Preview updates instantly across all apps
+                {t("preview_updates_instantly_across")}
               </p>
             </div>
           </div>
@@ -264,10 +264,10 @@ export function BrandingTheme() {
               variant="ghost"
               className="text-white hover:bg-gray-800 hover:text-white"
             >
-              Discard
+              {t("discard")}
             </Button>
             <Button onClick={handleSave} disabled={isSaving}>
-              <Save className="w-4 h-4" /> Save Changes
+              <Save className="w-4 h-4" /> {t("save_changes")}
             </Button>
           </div>
         </div>
