@@ -4,6 +4,7 @@ import { ProfileInfoRow } from "@/components/Profile/ProfileInfoRow";
 import ProfilePhotoUpload from "@/components/Profile/ProfilePhotoUpload";
 import { ProfileSection } from "@/components/Profile/ProfileSection";
 import { USER_STATUS } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { TAdmin } from "@/types/admin.type";
 import { motion } from "framer-motion";
 import {
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 
 export default function Profile({ admin }: { admin: TAdmin }) {
+  const { t } = useTranslation();
   const getStatusColor = (status: keyof typeof USER_STATUS) => {
     const colors = {
       APPROVED: "bg-green-100 text-green-700 border-green-200",
@@ -99,7 +101,7 @@ export default function Profile({ admin }: { admin: TAdmin }) {
                 {admin?.isEmailVerified && (
                   <div className="flex items-center gap-1 text-[#DC3173]">
                     <ShieldCheckIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">Verified</span>
+                    <span className="text-sm font-medium">{t("verified")}</span>
                   </div>
                 )}
               </div>
@@ -111,18 +113,18 @@ export default function Profile({ admin }: { admin: TAdmin }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Personal Information */}
           <ProfileSection
-            title="Personal Information"
+            title={t("personal_information")}
             icon={UserIcon}
             delay={0.1}
           >
             <div className="space-y-1">
               <ProfileInfoRow
-                label="Phone Number"
+                label={t("phone_number")}
                 value={admin?.contactNumber}
                 icon={PhoneIcon}
               />
               <ProfileInfoRow
-                label="Email"
+                label={t("email")}
                 value={admin?.email}
                 icon={MailIcon}
               />
@@ -131,13 +133,13 @@ export default function Profile({ admin }: { admin: TAdmin }) {
 
           {/* Activity */}
           <ProfileSection
-            title="Account Activity"
+            title={t("account_activity")}
             icon={ClockIcon}
             delay={0.35}
           >
             <div className="space-y-1">
               <ProfileInfoRow
-                label="Account Created"
+                label={t("account_created")}
                 value={
                   admin?.createdAt
                     ? new Date(admin?.createdAt).toLocaleDateString()
@@ -146,7 +148,7 @@ export default function Profile({ admin }: { admin: TAdmin }) {
                 icon={CalendarIcon}
               />
               <ProfileInfoRow
-                label="Two-Factor Auth"
+                label={t("two_factor_auth")}
                 value={admin?.twoFactorEnabled ? "Enabled" : "Disabled"}
                 icon={ShieldCheckIcon}
               />

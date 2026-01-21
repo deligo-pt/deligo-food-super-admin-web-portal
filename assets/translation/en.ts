@@ -1362,13 +1362,15 @@ export const en = {
     max_discount_percentage: "Max Discount Percentage",
     safety_cap_generated_discounts: "Safety cap for all generated discounts",
     automation: "Automation",
-    configure_automated_system_actions:"Configure automated system actions" ,
+    configure_automated_system_actions: "Configure automated system actions",
     auto_cancel_unaccepted_orders: "Auto-cancel Unaccepted Orders",
     cancel_orders_if_no_driver_accepts: "Cancel orders if no driver accepts within this time",
     auto_mark_delivered: "Auto-mark Delivered",
     automatically_complete_orders: "Automatically complete orders after driver arrival",
 
-
-
+    // profile
+    personal_information: "Personal Information",
+    account_activity: "Account Activity",
+    two_factor_auth: "Two-Factor Auth",
 
 };
