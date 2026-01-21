@@ -9,7 +9,7 @@ import {
   DownloadCloud,
   ChevronLeft,
   ChevronRight,
-  
+
 } from "lucide-react";
 
 import {
@@ -26,6 +26,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useTranslation } from "@/hooks/use-translation";
 
 /**
  * Drivers Performance Report - White background version (single-file)
@@ -117,13 +118,14 @@ function StatusPill({ status }: { status: string }) {
     status === "Completed"
       ? "bg-green-100 text-green-700"
       : status === "Canceled"
-      ? "bg-red-100 text-red-700"
-      : "bg-yellow-100 text-yellow-700";
+        ? "bg-red-100 text-red-700"
+        : "bg-yellow-100 text-yellow-700";
   return <span className={`px-2 py-1 rounded-full text-xs ${cls}`}>{status}</span>;
 }
 
 // ----------------- MAIN PAGE -----------------
 export default function DriversPerformanceReport(): JSX.Element {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [zoneFilter, setZoneFilter] = useState<string | "All">("All");
   const [page, setPage] = useState(1);
@@ -165,13 +167,13 @@ export default function DriversPerformanceReport(): JSX.Element {
   // charts: zone and revenue-by-day like data
   const zoneChart = useMemo(() => zones.map((z) => ({ name: z, value: filtered.filter((o) => o.zone === z).length })), [zones, filtered]);
 
- /*  const revenueByDay = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const o of filtered) map[o.date] = (map[o.date] || 0) + (o as any).amount || 0; 
-    return Object.keys(map)
-      .sort()
-      .map((d) => ({ date: d, revenue: +map[d].toFixed ? map[d].toFixed(2) : map[d] }));
-  }, [filtered]); */
+  /*  const revenueByDay = useMemo(() => {
+     const map: Record<string, number> = {};
+     for (const o of filtered) map[o.date] = (map[o.date] || 0) + (o as any).amount || 0; 
+     return Object.keys(map)
+       .sort()
+       .map((d) => ({ date: d, revenue: +map[d].toFixed ? map[d].toFixed(2) : map[d] }));
+   }, [filtered]); */
 
   // CSV export
   const exportCSV = useCallback(() => {
@@ -188,15 +190,15 @@ export default function DriversPerformanceReport(): JSX.Element {
 
   // reset page on filter changes
   useEffect(() => {
-  Promise.resolve().then(() => setPage(1));
-}, [query, zoneFilter]);
+    Promise.resolve().then(() => setPage(1));
+  }, [query, zoneFilter]);
 
 
   // animation variants (framer-motion)
-/*   const barVariants = {
-    hidden: { width: 0 },
-    show: (w: number) => ({ width: `${w}%`, transition: { duration: 0.8, ease: "easeOut" } }),
-  }; */
+  /*   const barVariants = {
+      hidden: { width: 0 },
+      show: (w: number) => ({ width: `${w}%`, transition: { duration: 0.8, ease: "easeOut" } }),
+    }; */
 
   return (
     <div className="min-h-screen p-6 md:p-10 bg-gray-50 text-gray-900">
@@ -208,9 +210,9 @@ export default function DriversPerformanceReport(): JSX.Element {
               <span className="inline-flex items-center justify-center rounded-full w-10 h-10 bg-[linear-gradient(90deg,#ff6584,#dc3173)] shadow text-white">
                 <Truck className="w-5 h-5" />
               </span>
-              Drivers Performance
+              {t("drivers_performance")}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Performance score · Deliveries · Ratings · Operational insights</p>
+            <p className="text-sm text-gray-500 mt-1">{t("performance_score_deliveries_ratings")}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -219,7 +221,7 @@ export default function DriversPerformanceReport(): JSX.Element {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search drivers..."
+                placeholder={t("search_drivers")}
                 className="ml-2 bg-transparent outline-none text-sm"
               />
             </div>
@@ -229,7 +231,7 @@ export default function DriversPerformanceReport(): JSX.Element {
               onChange={(e) => setZoneFilter(e.target.value)}
               className="px-3 py-2 rounded-xl border bg-white text-sm"
             >
-              <option value="All">All zones</option>
+              <option value="All">{t("all_zones")}</option>
               {zones.map((z) => (
                 <option key={z} value={z}>
                   {z}
@@ -238,7 +240,7 @@ export default function DriversPerformanceReport(): JSX.Element {
             </select>
 
             <button onClick={exportCSV} className="px-4 py-2 rounded-xl text-white shadow" style={{ background: PRIMARY }}>
-              <DownloadCloud className="w-4 h-4 inline mr-1" /> Export
+              <DownloadCloud className="w-4 h-4 inline mr-1" /> {t("export")}
             </button>
           </div>
         </header>
@@ -246,20 +248,20 @@ export default function DriversPerformanceReport(): JSX.Element {
         {/* KPI Cards */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
-            <Metric label="Total Deliveries" value={totalDeliveries} sub="Last 30 days" />
+            <Metric label={t("total_deliveries")} value={totalDeliveries} sub="Last 30 days" />
           </Card>
 
           <Card>
-            <Metric label="Average Rating" value={`${avgRating}/5`} sub="Customer reviews" />
+            <Metric label={t("average_rating")} value={`${avgRating}/5`} sub="Customer reviews" />
           </Card>
 
           <Card>
-            <Metric label="Avg Delivery Time" value={`${avgDelivery} min`} sub="Across drivers" />
+            <Metric label={t("avg_delivery_time")} value={`${avgDelivery} min`} sub="Across drivers" />
           </Card>
 
           <Card>
             <Metric
-              label="Total Late Deliveries"
+              label={t("total_late_deliveries")}
               value={SAMPLE_DRIVERS.reduce((s, d) => s + d.lateDeliveries, 0)}
               sub="Action required"
             />
@@ -271,8 +273,8 @@ export default function DriversPerformanceReport(): JSX.Element {
           {/* Pie: Issues */}
           <Card>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Issue Breakdown</h3>
-              <div className="text-xs text-gray-500">Last 30 days</div>
+              <h3 className="font-semibold">{t("issue_breakdown")}</h3>
+              <div className="text-xs text-gray-500">{t("last_30_days")}</div>
             </div>
 
             <div className="flex items-center gap-4">
@@ -299,7 +301,7 @@ export default function DriversPerformanceReport(): JSX.Element {
                   </div>
                 ))}
                 <div className="mt-3">
-                  <button className="w-full px-3 py-2 rounded-lg bg-white border text-sm">Open Quality Panel</button>
+                  <button className="w-full px-3 py-2 rounded-lg bg-white border text-sm">{t("open_quality_panel")}</button>
                 </div>
               </div>
             </div>
@@ -308,8 +310,8 @@ export default function DriversPerformanceReport(): JSX.Element {
           {/* Bar: Orders by Zone */}
           <Card>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Orders by Zone</h3>
-              <div className="text-xs text-gray-500">Distribution</div>
+              <h3 className="font-semibold">{t("orders_by_zone")}</h3>
+              <div className="text-xs text-gray-500">{t("distribution")}</div>
             </div>
 
             <div style={{ height: 240 }}>
@@ -328,8 +330,8 @@ export default function DriversPerformanceReport(): JSX.Element {
           {/* Area: Delivery Trend */}
           <Card>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Delivery Time Trend</h3>
-              <div className="text-xs text-gray-500">Last 10 days</div>
+              <h3 className="font-semibold">{t("delivery_time_trend")}</h3>
+              <div className="text-xs text-gray-500">{t("last_10_days")}</div>
             </div>
 
             <div style={{ height: 240 }}>
@@ -358,9 +360,9 @@ export default function DriversPerformanceReport(): JSX.Element {
           <section className="lg:col-span-2">
             <Card className="p-0 overflow-hidden">
               <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-semibold">Drivers</h3>
+                <h3 className="font-semibold">{t("drivers")}</h3>
                 <div className="flex items-center gap-3">
-                  <div className="text-sm text-gray-600">Showing {filtered.length} drivers</div>
+                  <div className="text-sm text-gray-600">{t("showing")} {filtered.length} {t("drivers_sm")}</div>
                   <div className="text-xs text-gray-500">Page {page} / {totalPages}</div>
                 </div>
               </div>
@@ -369,14 +371,14 @@ export default function DriversPerformanceReport(): JSX.Element {
                 <table className="w-full text-sm">
                   <thead className="text-xs text-gray-500">
                     <tr className="border-b">
-                      <th className="p-3 text-left">Driver</th>
-                      <th className="p-3 text-left">Deliveries</th>
-                      <th className="p-3 text-left">Accept %</th>
-                      <th className="p-3 text-left">Avg min</th>
-                      <th className="p-3 text-left">Rating</th>
-                      <th className="p-3 text-left">Late</th>
-                      <th className="p-3 text-left">Zone</th>
-                      <th className="p-3 text-left">Actions</th>
+                      <th className="p-3 text-left">{t("driver")}</th>
+                      <th className="p-3 text-left">{t("deliveries")}</th>
+                      <th className="p-3 text-left">{t("accept")} %</th>
+                      <th className="p-3 text-left">{t("avg_min")}</th>
+                      <th className="p-3 text-left">{t("rating")}</th>
+                      <th className="p-3 text-left">{t("late")}</th>
+                      <th className="p-3 text-left">{t("zone")}</th>
+                      <th className="p-3 text-left">{t("actions")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -394,8 +396,8 @@ export default function DriversPerformanceReport(): JSX.Element {
                         <td className="p-3">{d.zone}</td>
                         <td className="p-3">
                           <div className="flex items-center gap-2">
-                            <button className="px-2 py-1 rounded bg-white border text-sm">Profile</button>
-                            <button className="px-2 py-1 rounded bg-white border text-sm">Details</button>
+                            <button className="px-2 py-1 rounded bg-white border text-sm">{t("profile")}</button>
+                            <button className="px-2 py-1 rounded bg-white border text-sm">{t("details")}</button>
                           </div>
                         </td>
                       </tr>
@@ -404,7 +406,7 @@ export default function DriversPerformanceReport(): JSX.Element {
                     {paged.length === 0 && (
                       <tr>
                         <td colSpan={8} className="p-6 text-center text-gray-500">
-                          No drivers found
+                          {t("no_drivers_found")}
                         </td>
                       </tr>
                     )}
@@ -414,7 +416,7 @@ export default function DriversPerformanceReport(): JSX.Element {
 
               <div className="p-4 flex items-center justify-between border-t border-gray-100">
                 <div className="text-xs text-gray-600">
-                  Showing {Math.min((page - 1) * PAGE + 1, filtered.length)} - {Math.min(page * PAGE, filtered.length)} of {filtered.length}
+                  {t("showing")} {Math.min((page - 1) * PAGE + 1, filtered.length)} - {Math.min(page * PAGE, filtered.length)} {t("of")} {filtered.length}
                 </div>
                 <div className="flex items-center gap-2">
                   <button onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-2 rounded bg-white border">
@@ -433,8 +435,8 @@ export default function DriversPerformanceReport(): JSX.Element {
           <aside>
             <Card>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold">Top Drivers</h3>
-                <div className="text-xs text-gray-500">Score</div>
+                <h3 className="font-semibold">{t("top_drivers")}</h3>
+                <div className="text-xs text-gray-500">{t("score")}</div>
               </div>
 
               <div className="space-y-3">
@@ -451,7 +453,7 @@ export default function DriversPerformanceReport(): JSX.Element {
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="text-sm font-medium">{d.name}</div>
-                            <div className="text-xs text-gray-500">{d.zone} • {d.deliveries} deliveries</div>
+                            <div className="text-xs text-gray-500">{d.zone} • {d.deliveries} {t("deliveries_sm")}</div>
                           </div>
 
                           <div className="text-sm font-semibold">{d.score}</div>
@@ -476,8 +478,8 @@ export default function DriversPerformanceReport(): JSX.Element {
             <div className="mt-4 space-y-4">
               <Card>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold">Peak Hours</h3>
-                  <div className="text-xs text-gray-500">Approx</div>
+                  <h3 className="font-semibold">{t("peak_hours")}</h3>
+                  <div className="text-xs text-gray-500">{t("approx")}</div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-xs">
@@ -491,12 +493,12 @@ export default function DriversPerformanceReport(): JSX.Element {
 
               <Card>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold">Quick Actions</h3>
+                  <h3 className="font-semibold">{t("quick_actions")}</h3>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <button className="w-full px-3 py-2 rounded bg-white border">Message low-rated drivers</button>
-                  <button className="w-full px-3 py-2 rounded bg-white border">Open Quality Panel</button>
+                  <button className="w-full px-3 py-2 rounded bg-white border">{t("message_low_rated_drivers")}</button>
+                  <button className="w-full px-3 py-2 rounded bg-white border">{t("open_quality_panel")}</button>
                 </div>
               </Card>
             </div>

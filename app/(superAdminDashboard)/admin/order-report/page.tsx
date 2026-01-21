@@ -28,6 +28,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
@@ -90,8 +91,8 @@ function StatusPill({ status }: { status: string }) {
     status === "Completed"
       ? "bg-green-100 dark:bg-green-900/30 text-green-700"
       : status === "Canceled"
-      ? "bg-red-100 dark:bg-red-900/30 text-red-700"
-      : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700";
+        ? "bg-red-100 dark:bg-red-900/30 text-red-700"
+        : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700";
   return <span className={`px-2 py-1 rounded-full text-xs ${cls}`}>{status}</span>;
 }
 
@@ -208,6 +209,7 @@ function FiltersDrawer({
 
 // ---- Main Page ----
 export default function OrderReportPage(): JSX.Element {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | "All">("All");
   const [zoneFilter, setZoneFilter] = useState<string | "All">("All");
@@ -282,37 +284,40 @@ export default function OrderReportPage(): JSX.Element {
   React.useEffect(() => setPage(1), [query, statusFilter, zoneFilter]);
 
   return (
-    <div className="min-h-screen p-6 md:p-10 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 dark:from-gray-900 dark:via-gray-950 dark:to-black text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen p-6 md:p-10 bg-linear-to-br from-gray-100 via-gray-50 to-gray-200 dark:from-gray-900 dark:via-gray-950 dark:to-black text-gray-900 dark:text-gray-100">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Order Report</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Full analytics · Performance insights · Zone heatmaps</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t("order_report")}</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">{t("full_analytics_performance_insights")}</p>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center bg-white dark:bg-gray-800 px-3 py-2 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
               <Search className="w-4 h-4 text-gray-400" />
-              <input placeholder="Search orders..." value={query} onChange={(e) => setQuery(e.target.value)} className="ml-2 bg-transparent outline-none text-sm w-48" />
+              <input placeholder={t("search_orders")} value={query} onChange={(e) => setQuery(e.target.value)} className="ml-2 bg-transparent outline-none text-sm w-48" />
             </div>
 
             <button onClick={() => setDrawerOpen(true)} className="px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-2">
-              <Filter className="w-4 h-4" /> Filters
+              <Filter className="w-4 h-4" /> {t("filters")}
             </button>
 
             <button onClick={exportCSV} className="px-4 py-2 rounded-xl shadow text-white font-medium" style={{ background: DELIGO }}>
-              <DownloadCloud className="w-4 h-4 inline" /> Export
+              <DownloadCloud className="w-4 h-4 inline" /> {t("export")}
             </button>
           </div>
         </header>
 
         {/* Metrics */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard label="Total Revenue" value={`€${totalRevenue.toFixed(2)}`} subtitle={`Avg order: €${avgOrder}`} icon={<BarChart className="w-5 h-5" />} />
-          <MetricCard label="Total Orders" value={filtered.length} subtitle={`Zones: ${zones.length}`} icon={<PieChart className="w-5 h-5" />} />
-          <MetricCard label="Unique Zones" value={zones.length} subtitle="Operational regions" icon={<Eye className="w-5 h-5" />} />
-          <MetricCard label="Avg Order" value={`€${avgOrder}`} subtitle="Order-level average" icon={<Search className="w-5 h-5" />} />
+          <MetricCard label={t("total_revenue")} value={`€${totalRevenue.toFixed(2)}`} subtitle={`Avg order: €${avgOrder}`} icon={<BarChart className="w-5 h-5" />} />
+
+          <MetricCard label={t("total_orders")} value={filtered.length} subtitle={`${t("zones")}: ${zones.length}`} icon={<PieChart className="w-5 h-5" />} />
+
+          <MetricCard label={t("unique_zones")} value={zones.length} subtitle={t("operational_regions")} icon={<Eye className="w-5 h-5" />} />
+
+          <MetricCard label={t("avg_order")} value={`€${avgOrder}`} subtitle={t("order_level_average")} icon={<Search className="w-5 h-5" />} />
         </section>
 
         {/* Charts grid */}
@@ -320,7 +325,7 @@ export default function OrderReportPage(): JSX.Element {
           {/* Pie - Status distribution */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <PieChart className="w-4 h-4" /> Status Distribution
+              <PieChart className="w-4 h-4" /> {t("status_distribution")}
             </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -338,7 +343,7 @@ export default function OrderReportPage(): JSX.Element {
           {/* Bar - Zone counts */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <BarChart className="w-4 h-4" /> Orders by Zone
+              <BarChart className="w-4 h-4" /> {t("orders_by_zone")}
             </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -356,7 +361,7 @@ export default function OrderReportPage(): JSX.Element {
           {/* Area - Revenue trend */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <BarChart className="w-4 h-4" /> Revenue Trend
+              <BarChart className="w-4 h-4" /> {t("revenue_trend")}
             </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -386,14 +391,14 @@ export default function OrderReportPage(): JSX.Element {
               <table className="w-full text-sm" role="table" aria-label="Orders table">
                 <thead>
                   <tr className="text-xs text-gray-500">
-                    <th className="pb-2">ID</th>
-                    <th className="pb-2">Restaurant</th>
-                    <th className="pb-2">Date / Time</th>
-                    <th className="pb-2">Courier</th>
-                    <th className="pb-2">Zone</th>
-                    <th className="pb-2">Amount</th>
-                    <th className="pb-2">Status</th>
-                    <th className="pb-2">Action</th>
+                    <th className="pb-2">{t("id")}</th>
+                    <th className="pb-2">{t("restaurant")}</th>
+                    <th className="pb-2">{t("date")} / {t("time")}</th>
+                    <th className="pb-2">{t("courier")}</th>
+                    <th className="pb-2">{t("zone")}</th>
+                    <th className="pb-2">{t("amount")}</th>
+                    <th className="pb-2">{t("status")}</th>
+                    <th className="pb-2">{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -414,8 +419,8 @@ export default function OrderReportPage(): JSX.Element {
                       </td>
                       <td className="py-3">
                         <div className="flex items-center gap-2">
-                          <button className="px-2 py-1 rounded bg-white dark:bg-gray-900/40">View</button>
-                          <button className="px-2 py-1 rounded bg-white dark:bg-gray-900/40">Details</button>
+                          <button className="px-2 py-1 rounded bg-white dark:bg-gray-900/40">{t("view")}</button>
+                          <button className="px-2 py-1 rounded bg-white dark:bg-gray-900/40">{t("details")}</button>
                         </div>
                       </td>
                     </tr>
@@ -424,7 +429,7 @@ export default function OrderReportPage(): JSX.Element {
                   {paged.length === 0 && (
                     <tr>
                       <td colSpan={8} className="py-6 text-center text-sm text-gray-500">
-                        No orders found
+                        {t("no_orders_found")}
                       </td>
                     </tr>
                   )}
@@ -435,7 +440,7 @@ export default function OrderReportPage(): JSX.Element {
             {/* Pagination */}
             <div className="mt-4 flex items-center justify-between">
               <div className="text-xs text-gray-500">
-                Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)} - {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+                {t("showing")} {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)} - {Math.min(page * PAGE_SIZE, filtered.length)} {t("of")} {filtered.length}
               </div>
               <Pagination
                 page={page}
@@ -449,8 +454,8 @@ export default function OrderReportPage(): JSX.Element {
           {/* Right analytics */}
           <aside className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium">Zone Analytics</h3>
-              <div className="text-sm text-gray-500">Last 30 days</div>
+              <h3 className="font-medium">{t("zone_analytics")}</h3>
+              <div className="text-sm text-gray-500">{t("last_30_days")}</div>
             </div>
 
             <div style={{ height: 220 }}>
@@ -466,10 +471,10 @@ export default function OrderReportPage(): JSX.Element {
             </div>
 
             <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Peak Hours (approx)</h4>
+              <h4 className="text-sm font-medium mb-2">{t("peak_hour_approx")}</h4>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 {Array.from({ length: 9 }).map((_, i) => (
-                  <div key={i} className={`p-2 rounded ${i % 4 === 0 ? "bg-[var(--deligo)] text-white" : "bg-gray-100 dark:bg-gray-900"}`}>
+                  <div key={i} className={`p-2 rounded ${i % 4 === 0 ? "bg-(--deligo) text-white" : "bg-gray-100 dark:bg-gray-900"}`}>
                     {8 + i}:00 - {8 + i + 1}:00
                   </div>
                 ))}
@@ -477,7 +482,7 @@ export default function OrderReportPage(): JSX.Element {
             </div>
 
             <div className="mt-4 border-t pt-3">
-              <h4 className="text-sm font-medium">Quick Filters</h4>
+              <h4 className="text-sm font-medium">{t("quick_filters")}</h4>
               <div className="flex flex-wrap gap-2 mt-2">
                 <button
                   onClick={() => {
@@ -487,7 +492,7 @@ export default function OrderReportPage(): JSX.Element {
                   }}
                   className="px-3 py-1 rounded bg-gray-50 dark:bg-gray-900"
                 >
-                  Reset
+                  {t("reset")}
                 </button>
                 <button
                   onClick={() => {
@@ -496,7 +501,7 @@ export default function OrderReportPage(): JSX.Element {
                   }}
                   className="px-3 py-1 rounded bg-white dark:bg-gray-800"
                 >
-                  Top Zone
+                  {t("top_zone")}
                 </button>
                 <button
                   onClick={() => {
@@ -505,7 +510,7 @@ export default function OrderReportPage(): JSX.Element {
                   }}
                   className="px-3 py-1 rounded bg-white dark:bg-gray-800"
                 >
-                  Show Canceled
+                  {t("show_cancelled")}
                 </button>
               </div>
             </div>

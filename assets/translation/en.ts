@@ -1166,7 +1166,66 @@ export const en = {
     last_seen: "Last seen",
 
     // chat-with-customers
-    search_customers:"Search customers...",
+    search_customers: "Search customers...",
+
+    // sales-report
+    overview_revenue_orders_metrics: "Overview of revenue, orders and top metrics for your delivery platform.",
+    filter: "Filter",
+    completed_orders: "Completed Orders",
+    avg_order: "Avg Order",
+    search_orders_restaurants: "Search orders or restaurants",
+    this_week: "This Week",
+    this_month: "This Month",
+    top_earning_day: "Top Earning Day",
+    show_cancelled: "Show Cancelled",
+    restaurant: "Restaurant",
+    earnings_by_day: "Earnings by Day",
+
+    // order report
+    full_analytics_performance_insights: "Full analytics · Performance insights · Zone heatmaps",
+    search_orders: "Search orders...",
+    unique_zones: "Unique Zones",
+    operational_regions: "Operational regions",
+    order_level_average: "Order-level average",
+    status_distribution: "Status Distribution",
+    orders_by_zone: "Orders by Zone",
+    revenue_trend: "Revenue Trend",
+    courier: "Courier",
+    zone_analytics: "Zone Analytics",
+    quick_filters: "Quick Filters",
+    top_zone: "Top Zone",
+
+    // drivers performance report
+    drivers_performance: "Drivers Performance",
+    performance_score_deliveries_ratings: "Performance score · Deliveries · Ratings · Operational insights",
+    total_late_deliveries: "Total Late Deliveries",
+    issue_breakdown: "Issue Breakdown",
+    open_quality_panel: "Open Quality Panel",
+    distribution: "Distribution",
+    delivery_time_trend: "Delivery Time Trend",
+    last_10_days:"Last 10 days",
+    drivers_sm: "drivers",
+    accept: "Accept",
+    avg_min: "Avg min",
+    profile: "Profile",
+    no_drivers_found: "No drivers found",
+    score: "Score",
+    deliveries_sm: "deliveries",
+    peak_hours: "Peak Hours",
+    approx: "Approx",
+    message_low_rated_drivers: "Message low-rated drivers",
+
+    // vendor-report
+    vendor_analytics:"Vendor Analytics",
+    total_revenue_euro:"Total Revenue (€)",
+    revenue_over_time: "Revenue Over Time",
+    orders_per_vendor:"Orders Per Vendor",
+    hourly_orders_heatmap_avg:"Hourly Orders Heatmap (Avg)",
+    vendor_growth_monthly:"Vendor Growth (Monthly)",
+    click_vendor_view_detailed_analytics:"Click a vendor to view detailed analytics",
+    hourly_orders_today_average:"Hourly Orders (Today average)",
+    open_vendor:"Open Vendor",
+
 
 
 
