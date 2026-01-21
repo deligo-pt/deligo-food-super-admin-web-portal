@@ -1,4 +1,4 @@
-import PendingApprovals from "@/components/PendingApprovals/PendingApprovals";
+import Vendors from "@/components/Dashboard/Vendors/Vendors";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TVendor } from "@/types/user.type";
@@ -7,7 +7,7 @@ type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function PendingApprovalsPage({ searchParams }: IProps) {
+export default async function AllVendorsPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -20,6 +20,7 @@ export default async function PendingApprovalsPage({ searchParams }: IProps) {
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
     status: "SUBMITTED",
+    isDeleted: false,
   };
 
   const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };
@@ -27,7 +28,7 @@ export default async function PendingApprovalsPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/vendors", {
       params: query,
-    })) as unknown as TResponse<TVendor[]>;
+    })) as TResponse<TVendor[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -37,5 +38,11 @@ export default async function PendingApprovalsPage({ searchParams }: IProps) {
     console.error("Server fetch error:", err);
   }
 
-  return <PendingApprovals vendorsResult={initialData} />;
+  return (
+    <Vendors
+      vendorsResult={initialData}
+      title="Pending Approvals"
+      subtitle="All submitted requests for vendor approval"
+    />
+  );
 }

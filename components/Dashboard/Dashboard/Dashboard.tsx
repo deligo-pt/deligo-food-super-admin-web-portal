@@ -1,11 +1,11 @@
 "use client";
 
-import DashboardHeader from "@/components/Dashboard/DashboardHeader";
-import PopularCategories from "@/components/Dashboard/PopularCategories";
-import RecentOrders from "@/components/Dashboard/RecentOrders";
-import StatCard from "@/components/Dashboard/StatCard";
-import StatusCard from "@/components/Dashboard/StatusCard";
-import TopProducts from "@/components/Dashboard/TopProducts";
+import DashboardHeader from "@/components/Dashboard/Dashboard/DashboardHeader";
+import PopularCategories from "@/components/Dashboard/Dashboard/PopularCategories";
+import RecentOrders from "@/components/Dashboard/Dashboard/RecentOrders";
+import StatCard from "@/components/Dashboard/Dashboard/StatCard";
+import StatusCard from "@/components/Dashboard/Dashboard/StatusCard";
+import TopProducts from "@/components/Dashboard/Dashboard/TopProducts";
 import { TAnalytics } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 import {
@@ -115,19 +115,19 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
           color="#DC3173"
         />
         <StatusCard
-          title="Pending"
+          title="Pending Orders"
           value={analyticsData?.orders?.pending?.toLocaleString() || "0"}
           icon={<TrendingUpIcon />}
           color="#DC3173"
         />
         <StatusCard
-          title="Completed"
+          title="Completed Orders"
           value={analyticsData?.orders?.completed?.toLocaleString() || "0"}
           icon={<CheckCircleIcon />}
           color="#DC3173"
         />
         <StatusCard
-          title="Cancelled"
+          title="Cancelled Orders"
           value={analyticsData?.orders?.cancelled?.toLocaleString() || "0"}
           icon={<XCircleIcon />}
           color="#DC3173"

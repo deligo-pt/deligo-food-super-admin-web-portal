@@ -59,7 +59,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
 
         {
           headers: { authorization: getCookie("accessToken") },
-        }
+        },
       )) as unknown as TResponse<null>;
       if (result?.success) {
         setShowDeleteModal(false);
@@ -133,7 +133,7 @@ export const VendorDetails = ({ vendor }: IProps) => {
           >
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                vendor?.status
+                vendor?.status,
               )}`}
             >
               {vendor?.status}
@@ -276,27 +276,31 @@ export const VendorDetails = ({ vendor }: IProps) => {
               <div>
                 <p className="text-sm text-gray-500">Opening Hours</p>
                 <p className="font-medium">
-                  {vendor?.businessDetails?.openingHours?format(
-                    parse(
-                      vendor?.businessDetails?.openingHours ,
-                      "HH:mm",
-                      new Date()
-                    ),
-                    "hh:mm a"
-                  ) : "N/A"}
+                  {vendor?.businessDetails?.openingHours
+                    ? format(
+                        parse(
+                          vendor?.businessDetails?.openingHours,
+                          "HH:mm",
+                          new Date(),
+                        ),
+                        "hh:mm a",
+                      )
+                    : "N/A"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Closing Hours</p>
                 <p className="font-medium">
-                  {vendor?.businessDetails?.closingHours?format(
-                    parse(
-                      vendor?.businessDetails?.closingHours ,
-                      "HH:mm",
-                      new Date()
-                    ),
-                    "hh:mm a"
-                  ) : "N/A"}
+                  {vendor?.businessDetails?.closingHours
+                    ? format(
+                        parse(
+                          vendor?.businessDetails?.closingHours,
+                          "HH:mm",
+                          new Date(),
+                        ),
+                        "hh:mm a",
+                      )
+                    : "N/A"}
                 </p>
               </div>
               <div>
@@ -380,6 +384,54 @@ export const VendorDetails = ({ vendor }: IProps) => {
             ) : (
               <p className="text-gray-500 italic">No bank details provided</p>
             )}
+          </AgentOrVendorSection>
+          <AgentOrVendorSection
+            title="Activity Logs"
+            icon={<BriefcaseIcon size={20} />}
+            defaultOpen={true}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Registered On</p>
+                <p className="font-medium">
+                  {format(vendor?.createdAt, "do MMM yyyy")}
+                </p>
+              </div>
+              {vendor?.submittedForApprovalAt && (
+                <div>
+                  <p className="text-sm text-gray-500">Submitted On</p>
+                  <p className="font-medium">
+                    {format(vendor?.submittedForApprovalAt, "do MMM yyyy")}
+                  </p>
+                </div>
+              )}
+              {(vendor?.status === "APPROVED" ||
+                vendor?.status === "REJECTED" ||
+                vendor?.status === "BLOCKED") &&
+                vendor?.approvedOrRejectedOrBlockedAt && (
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      {vendor?.status.charAt(0).toUpperCase() +
+                        vendor?.status.slice(1)}{" "}
+                      On
+                    </p>
+                    <p className="font-medium">
+                      {format(
+                        vendor?.approvedOrRejectedOrBlockedAt,
+                        "do MMM yyyy",
+                      )}
+                    </p>
+                  </div>
+                )}
+              {vendor?.lastLoginAt && (
+                <div>
+                  <p className="text-sm text-gray-500">Last logged On</p>
+                  <p className="font-medium">
+                    {format(vendor?.lastLoginAt, "do MMM yyyy")}
+                  </p>
+                </div>
+              )}
+            </div>
           </AgentOrVendorSection>
           <AgentOrVendorSection
             title="Documents"
