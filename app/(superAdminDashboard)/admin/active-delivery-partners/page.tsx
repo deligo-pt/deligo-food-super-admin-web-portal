@@ -37,7 +37,7 @@ export default async function ActiveDeliveryPartnersPage({
       initialData.meta = result.meta;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <ActiveDeliveryPartners partnersResult={initialData} />;

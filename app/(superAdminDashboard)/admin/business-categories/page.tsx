@@ -42,7 +42,7 @@ export default async function BusinessCategoryPage({ searchParams }: IProps) {
     }
   } catch (err) {
     initialData.isLoading = false;
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return (

@@ -10,14 +10,14 @@ export default async function AddVendorPage() {
 
   try {
     const result = (await serverRequest.get(
-      "/categories/businessCategory"
+      "/categories/businessCategory",
     )) as unknown as TResponse<{ data: TBusinessCategory[] }>;
 
     if (result?.success) {
       businessCategories = result?.data?.data;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <AddVendor businessCategories={businessCategories} />;

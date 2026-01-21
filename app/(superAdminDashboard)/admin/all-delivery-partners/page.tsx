@@ -41,7 +41,7 @@ export default async function AllDeliveryPartnersPage({
       initialData.meta = result.meta as TMeta;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return (

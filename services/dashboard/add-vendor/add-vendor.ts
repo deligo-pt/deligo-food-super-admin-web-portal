@@ -59,7 +59,7 @@ export const verifyOtpReq = async (data: { email: string; otp: string }) => {
 export const uploadVendorDocumentsReq = async (
   id: string,
   key: string,
-  file: Blob
+  file: Blob,
 ) => {
   try {
     const formData = new FormData();
@@ -77,7 +77,7 @@ export const uploadVendorDocumentsReq = async (
     return { success: false, data: result.data, message: result.message };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
     return {
       success: false,
       data: null,
@@ -88,7 +88,7 @@ export const uploadVendorDocumentsReq = async (
 
 export const updateVendorDataReq = async (
   id: string,
-  data: Partial<TVendor>
+  data: Partial<TVendor>,
 ) => {
   try {
     const result = await serverRequest.patch(`/vendors/${id}`, {
@@ -100,7 +100,7 @@ export const updateVendorDataReq = async (
         `/auth/${id}/approved-rejected-user`,
         {
           data: { status: "APPROVED" },
-        }
+        },
       );
 
       if (result2.success) {
@@ -112,7 +112,7 @@ export const updateVendorDataReq = async (
     return { success: false, data: result.data, message: result.message };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
     return {
       success: false,
       data: null,

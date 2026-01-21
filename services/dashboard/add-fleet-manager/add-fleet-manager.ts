@@ -14,7 +14,7 @@ export const registerFleetManagerandSendOtpReq = async (data: {
       "/auth/register/create-fleet-manager",
       {
         data,
-      }
+      },
     )) as TResponse<null>;
 
     if (result.success) {
@@ -63,7 +63,7 @@ export const verifyOtpReq = async (data: { email: string; otp: string }) => {
 export const uploadFleetManagerDocumentsReq = async (
   id: string,
   key: string,
-  file: Blob
+  file: Blob,
 ) => {
   try {
     const formData = new FormData();
@@ -81,7 +81,7 @@ export const uploadFleetManagerDocumentsReq = async (
     return { success: false, data: result.data, message: result.message };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
     return {
       success: false,
       data: null,
@@ -92,7 +92,7 @@ export const uploadFleetManagerDocumentsReq = async (
 
 export const updateFleetManagerDataReq = async (
   id: string,
-  data: Partial<TAgent>
+  data: Partial<TAgent>,
 ) => {
   try {
     const result = await serverRequest.patch(`/fleet-managers/${id}`, {
@@ -104,7 +104,7 @@ export const updateFleetManagerDataReq = async (
         `/auth/${id}/approved-rejected-user`,
         {
           data: { status: "APPROVED" },
-        }
+        },
       );
 
       if (result2.success) {
@@ -116,7 +116,7 @@ export const updateFleetManagerDataReq = async (
     return { success: false, data: result.data, message: result.message };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
     return {
       success: false,
       data: null,

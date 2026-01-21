@@ -36,7 +36,7 @@ export default async function AllAdminsPage({ searchParams }: IProps) {
       initialData.meta = result.meta as TMeta;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <AllAdmins adminsResult={initialData} />;
