@@ -1121,22 +1121,54 @@ export const en = {
     moderator: "Moderator",
 
     // activity-logs
-    track_every_important_action_inside:"Track every important action inside the Deligo admin system.",
-    info:"Info",
-    export_logs:"Export Logs",
-    action:"Action",
-    target:"Target",
-    detailed_info:"Detailed Info",
-    timestamp:"Timestamp",
+    track_every_important_action_inside: "Track every important action inside the Deligo admin system.",
+    info: "Info",
+    export_logs: "Export Logs",
+    action: "Action",
+    target: "Target",
+    detailed_info: "Detailed Info",
+    timestamp: "Timestamp",
 
     // login-history
-    see_recent_sign_ins_failed_attempts:"See recent sign-ins, failed attempts, and session activity for admins.",
-    list:'List',
-    revoke:"Revoke",
-    no_login_records_found:"No login records found.",
-    ip_location:"IP / Location",
-    device:"Device",
-    browser_os:"Browser / OS",
+    see_recent_sign_ins_failed_attempts: "See recent sign-ins, failed attempts, and session activity for admins.",
+    list: 'List',
+    revoke: "Revoke",
+    no_login_records_found: "No login records found.",
+    ip_location: "IP / Location",
+    device: "Device",
+    browser_os: "Browser / OS",
+
+    // support-tickets
+    manage_issues: "Manage issues",
+    search_tickets: "Search tickets...",
+    user: "User",
+    write_a_reply: "Write a reply...",
+    send: "Send",
+
+    // chat-with-vendors
+    active_conversations: "Active conversations",
+    start_new_conversation: "Start New Conversation",
+    is_typing: "is typing...",
+    attach_images: "Attach images",
+    attach_audio: "Attach audio",
+    attach_file: "Attach file",
+    write_a_message: "Write a message...",
+    select_conversation_start_chatting: "Select a conversation to start chatting",
+    start_a_conversation: "Start a conversation",
+    select_vendor_to_start_conversation: "Select a vendor to start a conversation",
+
+    // chat-with-fleet-manager
+    select_fleet_manager_to_start_conversation: "Select a fleet manager to start a conversation",
+
+    // chat-with-drivers
+    search_drivers: "Search drivers...",
+    pinned: "Pinned",
+    last_seen: "Last seen",
+
+    // chat-with-customers
+    search_customers:"Search customers...",
+
+
 
 
 };
