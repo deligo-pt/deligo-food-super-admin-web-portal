@@ -14,6 +14,7 @@ import {
   Bar,
   Legend,
 } from "recharts";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
@@ -50,6 +51,7 @@ const revenueData = [
 ];
 
 export default function SalesReportPage(): JSX.Element {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [showCanceled, setShowCanceled] = useState(true);
   const [range, setRange] = useState("Last 7 days");
@@ -87,8 +89,8 @@ export default function SalesReportPage(): JSX.Element {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-semibold">Sales Report</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Overview of revenue, orders and top metrics for your delivery platform.</p>
+            <h1 className="text-2xl md:text-3xl font-semibold">{t("sales_report")}</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t("overview_revenue_orders_metrics")}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -100,28 +102,27 @@ export default function SalesReportPage(): JSX.Element {
                 onChange={(e) => setRange(e.target.value)}
                 className="bg-transparent outline-none text-sm text-gray-700 dark:text-gray-200"
               >
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>This Month</option>
-                <option>Custom Range</option>
+                <option>{t("last_7_days")}</option>
+                <option>{t("last_30_days")}</option>
+                <option>{t("custom")}</option>
               </select>
               <ChevronDown className="w-4 h-4 text-gray-600" />
             </div>
 
             <button
               className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white dark:bg-gray-800 shadow hover:shadow-md transition"
-              title="Export CSV"
+              title={t("export_csv")}
             >
               <DownloadCloud className="w-4 h-4 text-gray-700" />
-              <span className="text-sm">Export</span>
+              <span className="text-sm">{t("export")}</span>
             </button>
 
             <button
               className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white dark:bg-gray-800 shadow hover:shadow-md transition"
-              title="Filters"
+              title={t("filtes")}
             >
               <Filter className="w-4 h-4 text-gray-700" />
-              <span className="text-sm">Filter</span>
+              <span className="text-sm">{t("filter")}</span>
             </button>
           </div>
         </div>
@@ -130,7 +131,7 @@ export default function SalesReportPage(): JSX.Element {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <motion.div initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.02 }} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Total Revenue</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t("total_revenue")}</p>
               <p className="text-xl font-semibold mt-1">€{totals.totalRevenue.toFixed(2)}</p>
             </div>
             <div className="p-3 rounded-lg" style={{ background: `${DELIGO}22` }}>
@@ -140,27 +141,27 @@ export default function SalesReportPage(): JSX.Element {
 
           <motion.div initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.04 }} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Completed Orders</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t("completed_orders")}</p>
               <p className="text-xl font-semibold mt-1">{totals.completed}</p>
             </div>
             <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
             </div>
           </motion.div>
 
           <motion.div initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.06 }} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Canceled</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t("cancelled")}</p>
               <p className="text-xl font-semibold mt-1">{totals.canceled}</p>
             </div>
             <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
             </div>
           </motion.div>
 
           <motion.div initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.08 }} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Avg Order</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t("avg_order")}</p>
               <p className="text-xl font-semibold mt-1">€{totals.avgOrder}</p>
             </div>
             <div className="p-3 rounded-lg" style={{ background: `${DELIGO}22` }}>
@@ -174,15 +175,15 @@ export default function SalesReportPage(): JSX.Element {
           {/* Chart area */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-5 shadow">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">Revenue</h2>
+              <h2 className="text-lg font-medium">{t("revenue")}</h2>
               <div className="flex items-center gap-3">
                 <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded p-2">
                   <Search className="w-4 h-4 text-gray-600" />
-                  <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search orders or restaurants" className="bg-transparent outline-none text-sm w-56" />
+                  <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("search_orders_restaurants")} className="bg-transparent outline-none text-sm w-56" />
                 </div>
                 <button className="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-white dark:bg-gray-700 shadow-sm hover:shadow-md transition">
                   <Eye className="w-4 h-4" />
-                  <span className="text-sm">Preview</span>
+                  <span className="text-sm">{t("preview")}</span>
                 </button>
               </div>
             </div>
@@ -207,17 +208,17 @@ export default function SalesReportPage(): JSX.Element {
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40">
-                <p className="text-xs text-gray-500">This Week</p>
+                <p className="text-xs text-gray-500">{t("this_week")}</p>
                 <p className="font-semibold mt-1">€{revenueData.slice(-7).reduce((s, r) => s + r.revenue, 0)}</p>
               </div>
 
               <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40">
-                <p className="text-xs text-gray-500">This Month</p>
+                <p className="text-xs text-gray-500">{t("this_month")}</p>
                 <p className="font-semibold mt-1">€{revenueData.reduce((s, r) => s + r.revenue, 0)}</p>
               </div>
 
               <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40">
-                <p className="text-xs text-gray-500">Top Earning Day</p>
+                <p className="text-xs text-gray-500">{t("top_earning_day")}</p>
                 <p className="font-semibold mt-1">{revenueData.reduce((a, b) => (a.revenue > b.revenue ? a : b)).date}</p>
               </div>
             </div>
@@ -226,11 +227,11 @@ export default function SalesReportPage(): JSX.Element {
           {/* Right column: Orders table & quick filters */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }} className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium">Recent Orders</h3>
+              <h3 className="font-medium">{t("recent_orders")}</h3>
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" checked={showCanceled} onChange={() => setShowCanceled((s) => !s)} className="w-4 h-4" />
-                  <span className="text-xs text-gray-500">Show Canceled</span>
+                  <span className="text-xs text-gray-500">{t("show_cancelled")}</span>
                 </label>
               </div>
             </div>
@@ -239,12 +240,12 @@ export default function SalesReportPage(): JSX.Element {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="text-xs text-gray-500">
-                    <th className="pb-2">ID</th>
-                    <th className="pb-2">Restaurant</th>
-                    <th className="pb-2">Date</th>
-                    <th className="pb-2">Amount</th>
-                    <th className="pb-2">Status</th>
-                    <th className="pb-2">Action</th>
+                    <th className="pb-2">{t("id")}</th>
+                    <th className="pb-2">{t("restaurant")}</th>
+                    <th className="pb-2">{t("date")}</th>
+                    <th className="pb-2">{t("amount")}</th>
+                    <th className="pb-2">{t("status")}</th>
+                    <th className="pb-2">{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -255,9 +256,8 @@ export default function SalesReportPage(): JSX.Element {
                       <td className="py-3 text-gray-500">{o.date}</td>
                       <td className="py-3">€{o.amount.toFixed(2)}</td>
                       <td className="py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          o.status === "Completed" ? "bg-green-100 dark:bg-green-900/30 text-green-700" : o.status === "Canceled" ? "bg-red-100 dark:bg-red-900/30 text-red-700" : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700"
-                        }`}>
+                        <span className={`px-2 py-1 rounded-full text-xs ${o.status === "Completed" ? "bg-green-100 dark:bg-green-900/30 text-green-700" : o.status === "Canceled" ? "bg-red-100 dark:bg-red-900/30 text-red-700" : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700"
+                          }`}>
                           {o.status}
                         </span>
                       </td>
@@ -272,7 +272,7 @@ export default function SalesReportPage(): JSX.Element {
 
                   {paged.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="py-6 text-center text-sm text-gray-500">No orders found</td>
+                      <td colSpan={6} className="py-6 text-center text-sm text-gray-500">{t("no_orders_found")}</td>
                     </tr>
                   )}
                 </tbody>
@@ -281,7 +281,7 @@ export default function SalesReportPage(): JSX.Element {
 
             {/* Pagination */}
             <div className="mt-4 flex items-center justify-between">
-              <div className="text-xs text-gray-500">Showing {Math.min((page - 1) * pageSize + 1, filtered.length)} - {Math.min(page * pageSize, filtered.length)} of {filtered.length}</div>
+              <div className="text-xs text-gray-500">{t("showing")} {Math.min((page - 1) * pageSize + 1, filtered.length)} - {Math.min(page * pageSize, filtered.length)} {t("of")} {filtered.length}</div>
               <div className="flex items-center gap-2">
                 <button onClick={() => setPage((p) => Math.max(1, p - 1))} className="p-2 rounded-md bg-gray-100 dark:bg-gray-700" title="Previous"><ChevronLeft className="w-4 h-4" /></button>
                 <div className="px-3 py-1 rounded-md bg-white dark:bg-gray-800 border">{page} / {pages}</div>
@@ -294,8 +294,8 @@ export default function SalesReportPage(): JSX.Element {
         {/* Bottom analytics area: example bar chart for categories or zones */}
         <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl p-5 shadow">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium">Earnings by Day</h3>
-            <div className="text-sm text-gray-500">Last 7 days</div>
+            <h3 className="font-medium">{t("earnings_by_day")}</h3>
+            <div className="text-sm text-gray-500">{t("last_7_days")}</div>
           </div>
 
           <div style={{ height: 220 }}>

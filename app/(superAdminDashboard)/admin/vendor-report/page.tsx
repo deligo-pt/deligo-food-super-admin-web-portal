@@ -45,10 +45,11 @@ type Vendor = {
   revenue: number;
   cuisine: string;
   createdAt: string;
-  hourlyOrders?: number[]; 
+  hourlyOrders?: number[];
 };
 
 export default function VendorAnalyticsPage() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
 
   // date range
@@ -97,7 +98,7 @@ export default function VendorAnalyticsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `vendor_analytics_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `vendor_analytics_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -117,7 +118,7 @@ export default function VendorAnalyticsPage() {
       const imgWidth = pageWidth;
       const imgHeight = (imgProps.height * pageWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`vendor_analytics_${new Date().toISOString().slice(0,10)}.pdf`);
+      pdf.save(`vendor_analytics_${new Date().toISOString().slice(0, 10)}.pdf`);
     } catch (e) {
       // fallback
       // eslint-disable-next-line no-console
@@ -129,20 +130,20 @@ export default function VendorAnalyticsPage() {
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="text-3xl font-extrabold mb-4 flex items-center gap-3">
-        <BarChart2 className="w-9 h-9" style={{ color: DELIGO }} /> Vendor Analytics
+        <BarChart2 className="w-9 h-9" style={{ color: DELIGO }} /> {t("vendor_analytics")}
       </motion.h1>
 
       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 mb-6">
         <div className="flex items-center gap-3 w-full lg:w-auto">
           <Input placeholder="Search vendor, city, cuisine..." value={query} onChange={(e) => setQuery(e.target.value)} />
-          <Button style={{ background: DELIGO }}>Filter</Button>
+          <Button style={{ background: DELIGO }}>{t("filter")}</Button>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
           <div className="flex items-center gap-2">
-            <button className={`px-3 py-1 rounded-md border ${range === '7d' ? 'bg-white border-slate-200 shadow-sm' : 'bg-white'}`} onClick={() => setRange('7d')}>7d</button>
-            <button className={`px-3 py-1 rounded-md border ${range === '30d' ? 'bg-white border-slate-200 shadow-sm' : 'bg-white'}`} onClick={() => setRange('30d')}>30d</button>
-            <button className={`px-3 py-1 rounded-md border ${range === 'custom' ? 'bg-white border-slate-200 shadow-sm' : 'bg-white'}`} onClick={() => setRange('custom')}>Custom</button>
+            <button className={`px-3 py-1 rounded-md border ${range === '7d' ? 'bg-white border-slate-200 shadow-sm' : 'bg-white'}`} onClick={() => setRange('7d')}>{t("d7")}</button>
+            <button className={`px-3 py-1 rounded-md border ${range === '30d' ? 'bg-white border-slate-200 shadow-sm' : 'bg-white'}`} onClick={() => setRange('30d')}>{t("d30")}</button>
+            <button className={`px-3 py-1 rounded-md border ${range === 'custom' ? 'bg-white border-slate-200 shadow-sm' : 'bg-white'}`} onClick={() => setRange('custom')}>{t("custom")}</button>
           </div>
 
           {range === 'custom' && (
@@ -154,11 +155,11 @@ export default function VendorAnalyticsPage() {
           )}
 
           <Button size="sm" variant="outline" onClick={exportCSV}>
-            <Download className="w-4 h-4 mr-2" /> Export CSV
+            <Download className="w-4 h-4 mr-2" /> {t("export_csv")}
           </Button>
 
           <Button size="sm" onClick={exportPDF}>
-            <Download className="w-4 h-4 mr-2" /> Export PDF
+            <Download className="w-4 h-4 mr-2" /> {t("export_pdf")}
           </Button>
         </div>
       </div>
@@ -167,15 +168,15 @@ export default function VendorAnalyticsPage() {
       <div ref={printRef as any}>
         {/* Summary */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <AnalyticsCard title="Total Vendors" value={`${vendors.length}`} icon={<Store style={{ color: DELIGO }} className="w-6 h-6" />} />
-          <AnalyticsCard title="Active Vendors" value={`${vendors.filter(v => v.orders > 0).length}`} icon={<TrendingUp style={{ color: DELIGO }} className="w-6 h-6" />} />
-          <AnalyticsCard title="Total Orders" value={`${vendors.reduce((s, v) => s + v.orders, 0)}`} icon={<Users style={{ color: DELIGO }} className="w-6 h-6" />} />
-          <AnalyticsCard title="Total Revenue (€)" value={`€ ${vendors.reduce((s, v) => s + v.revenue, 0).toLocaleString()}`} icon={<Euro style={{ color: DELIGO }} className="w-6 h-6" />} />
+          <AnalyticsCard title={t("total_vendors")} value={`${vendors.length}`} icon={<Store style={{ color: DELIGO }} className="w-6 h-6" />} />
+          <AnalyticsCard title={t("active_vendors")} value={`${vendors.filter(v => v.orders > 0).length}`} icon={<TrendingUp style={{ color: DELIGO }} className="w-6 h-6" />} />
+          <AnalyticsCard title={t("total_orders")} value={`${vendors.reduce((s, v) => s + v.orders, 0)}`} icon={<Users style={{ color: DELIGO }} className="w-6 h-6" />} />
+          <AnalyticsCard title={t("total_revenue_euro")} value={`€ ${vendors.reduce((s, v) => s + v.revenue, 0).toLocaleString()}`} icon={<Euro style={{ color: DELIGO }} className="w-6 h-6" />} />
         </motion.div>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
-          <ChartCard title="Revenue Over Time">
+          <ChartCard title={t("revenue_over_time")}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={revenueData} margin={{ top: 6, right: 6, left: -8, bottom: 6 }}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -188,7 +189,7 @@ export default function VendorAnalyticsPage() {
             </ResponsiveContainer>
           </ChartCard>
 
-          <ChartCard title="Orders Per Vendor">
+          <ChartCard title={t("orders_per_vendor")}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ordersData} margin={{ top: 6, right: 6, left: -8, bottom: 6 }}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -202,7 +203,7 @@ export default function VendorAnalyticsPage() {
         </div>
 
         {/* Heatmap (hourly peak) represented as hourly bars colored by intensity */}
-        <ChartCard title="Hourly Orders Heatmap (Avg)">
+        <ChartCard title={t("hourly_orders_heatmap_avg")}>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={generateHourlyHeatmap(vendors)} margin={{ top: 6, right: 6, left: -8, bottom: 6 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -220,7 +221,7 @@ export default function VendorAnalyticsPage() {
         </ChartCard>
 
         {/* Vendor growth */}
-        <ChartCard title="Vendor Growth (Monthly)">
+        <ChartCard title={t("vendor_growth_monthly")}>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={generateVendorGrowthData()} margin={{ top: 6, right: 6, left: -8, bottom: 6 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -235,8 +236,8 @@ export default function VendorAnalyticsPage() {
         {/* Top vendors list with drill-down */}
         <Card className="p-6 shadow-md bg-white mt-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2"><Flame style={{ color: DELIGO }} className="w-5 h-5" /> Top Vendors</h2>
-            <div className="text-sm text-slate-500">Click a vendor to view detailed analytics</div>
+            <h2 className="text-xl font-semibold flex items-center gap-2"><Flame style={{ color: DELIGO }} className="w-5 h-5" /> {t("top_vendors")}</h2>
+            <div className="text-sm text-slate-500">{t("click_vendor_view_detailed_analytics")}</div>
           </div>
           <Separator className="mb-4" />
 
@@ -246,7 +247,7 @@ export default function VendorAnalyticsPage() {
                 <div className="flex items-center gap-3">
                   <Avatar>
                     <AvatarImage src={`/images/vendors/${v.id}.jpg`} />
-                    <AvatarFallback>{v.name.split(' ').map(n => n[0]).slice(0,2).join('')}</AvatarFallback>
+                    <AvatarFallback>{v.name.split(' ').map(n => n[0]).slice(0, 2).join('')}</AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-semibold">{v.name}</div>
@@ -255,11 +256,11 @@ export default function VendorAnalyticsPage() {
                 </div>
 
                 <div className="text-right">
-                  <div className="text-sm text-slate-500">Orders</div>
+                  <div className="text-sm text-slate-500">{t("orders")}</div>
                   <div className="font-bold">{v.orders}</div>
                   <div className="text-xs text-slate-500">€ {v.revenue.toLocaleString()}</div>
                   <div className="mt-2">
-                    <Button size="sm" onClick={() => setSelectedVendor(v)}>View</Button>
+                    <Button size="sm" onClick={() => setSelectedVendor(v)}>{t("view")}</Button>
                   </div>
                 </div>
               </motion.div>
@@ -271,7 +272,7 @@ export default function VendorAnalyticsPage() {
         <Dialog open={!!selectedVendor} onOpenChange={(open) => { if (!open) setSelectedVendor(null); }}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
-              <DialogTitle>Vendor Analytics</DialogTitle>
+              <DialogTitle>{t("vendor_analytics")}</DialogTitle>
             </DialogHeader>
 
             {selectedVendor && (
@@ -279,20 +280,20 @@ export default function VendorAnalyticsPage() {
                 <div>
                   <Avatar className="w-28 h-28">
                     <AvatarImage src={`/images/vendors/${selectedVendor.id}.jpg`} />
-                    <AvatarFallback>{selectedVendor.name.split(' ').map(n => n[0]).slice(0,2).join('')}</AvatarFallback>
+                    <AvatarFallback>{selectedVendor.name.split(' ').map(n => n[0]).slice(0, 2).join('')}</AvatarFallback>
                   </Avatar>
                   <div className="mt-3">
                     <h3 className="font-semibold text-lg">{selectedVendor.name}</h3>
                     <div className="text-sm text-slate-500">{selectedVendor.city} • {selectedVendor.cuisine}</div>
-                    <div className="mt-2 text-sm">Orders: <strong>{selectedVendor.orders}</strong></div>
-                    <div className="text-sm">Revenue: <strong>€ {selectedVendor.revenue.toLocaleString()}</strong></div>
+                    <div className="mt-2 text-sm">{t("orders")}: <strong>{selectedVendor.orders}</strong></div>
+                    <div className="text-sm">{t("revenue")}: <strong>€ {selectedVendor.revenue.toLocaleString()}</strong></div>
                   </div>
                 </div>
 
                 <div className="md:col-span-2">
-                  <h4 className="text-sm font-medium mb-2">Hourly Orders (Today average)</h4>
+                  <h4 className="text-sm font-medium mb-2">{t("hourly_orders_today_average")}</h4>
                   <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={selectedVendor.hourlyOrders?.map((o,i) => ({ hour: String(i), orders: o })) || []}>
+                    <BarChart data={selectedVendor.hourlyOrders?.map((o, i) => ({ hour: String(i), orders: o })) || []}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="hour" />
                       <YAxis />
@@ -304,8 +305,8 @@ export default function VendorAnalyticsPage() {
                   <Separator className="my-4" />
 
                   <div className="flex items-center gap-2 justify-end">
-                    <Button variant="outline" onClick={() => setSelectedVendor(null)}>Close</Button>
-                    <Button style={{ background: DELIGO }} onClick={() => { /* navigate to vendor page */ }}>Open Vendor</Button>
+                    <Button variant="outline" onClick={() => setSelectedVendor(null)}>{t("close")}</Button>
+                    <Button style={{ background: DELIGO }} onClick={() => { /* navigate to vendor page */ }}>{t("open_vendor")}</Button>
                   </div>
                 </div>
               </div>
@@ -321,6 +322,7 @@ export default function VendorAnalyticsPage() {
 
 /* ---------------- UI Helpers & Mock generators ---------------- */
 import { Cell } from 'recharts';
+import { useTranslation } from '@/hooks/use-translation';
 
 function AnalyticsCard({ title, value, icon }: { title: string; value: string; icon?: React.ReactNode }) {
   return (
@@ -363,8 +365,8 @@ function fade(hex: string, opacity = 0.1) {
 }
 
 function generateMonthlyRevenue(days: number) {
-  const labels = days <= 7 ? ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] : ['W1','W2','W3','W4'];
-  return labels.map((l, i) => ({ label: l, revenue: Math.round((Math.random() * 50000) + (i*2000)) }));
+  const labels = days <= 7 ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['W1', 'W2', 'W3', 'W4'];
+  return labels.map((l, i) => ({ label: l, revenue: Math.round((Math.random() * 50000) + (i * 2000)) }));
 }
 
 function generateTopVendors(days: number) {
@@ -425,20 +427,20 @@ function generateHourlyHeatmap(vendors: Vendor[]) {
 
 function colorScale(value: number) {
   // simple scale from light to DELIGO
-  const max =  Math.max(...generateHourlyHeatmap(generateVendors(30)).map(d => d.orders), 1);
+  const max = Math.max(...generateHourlyHeatmap(generateVendors(30)).map(d => d.orders), 1);
   const t = Math.min(1, value / max);
   // interpolate between light gray and DELIGO
   return interpolateColor('#f1f5f9', DELIGO, t);
 }
 
 function interpolateColor(a: string, b: string, t: number) {
-  const ah = a.replace('#',''); const bh = b.replace('#','');
-  const ar = parseInt(ah.substring(0,2),16), ag = parseInt(ah.substring(2,4),16), ab = parseInt(ah.substring(4,6),16);
-  const br = parseInt(bh.substring(0,2),16), bg = parseInt(bh.substring(2,4),16), bb = parseInt(bh.substring(4,6),16);
+  const ah = a.replace('#', ''); const bh = b.replace('#', '');
+  const ar = parseInt(ah.substring(0, 2), 16), ag = parseInt(ah.substring(2, 4), 16), ab = parseInt(ah.substring(4, 6), 16);
+  const br = parseInt(bh.substring(0, 2), 16), bg = parseInt(bh.substring(2, 4), 16), bb = parseInt(bh.substring(4, 6), 16);
   const rr = Math.round(ar + (br - ar) * t); const rg = Math.round(ag + (bg - ag) * t); const rb = Math.round(ab + (bb - ab) * t);
   return `rgb(${rr}, ${rg}, ${rb})`;
 }
 
 function generateVendorGrowthData() {
-  return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m,i) => ({ month: m, vendors: 100 + i * 5 + Math.floor(Math.random() * 10) }));
+  return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => ({ month: m, vendors: 100 + i * 5 + Math.floor(Math.random() * 10) }));
 }

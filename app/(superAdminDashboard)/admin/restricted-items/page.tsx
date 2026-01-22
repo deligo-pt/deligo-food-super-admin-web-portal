@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useMemo, useEffect, JSX } from "react";
 import { Plus, Edit3, Trash2, Download, Search } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
@@ -26,13 +27,14 @@ function uid(prefix = "id") {
 }
 
 export default function RestrictedItemsPage(): JSX.Element {
+  const { t } = useTranslation();
   const [items, setItems] = useState<RestrictedItem[]>(() => {
     try {
       if (typeof window !== "undefined") {
         const raw = localStorage.getItem(LS_KEY);
         return raw ? JSON.parse(raw) : sampleData;
       }
-    } catch (e) {}
+    } catch (e) { }
     return sampleData;
   });
 
@@ -47,7 +49,7 @@ export default function RestrictedItemsPage(): JSX.Element {
   useEffect(() => {
     try {
       localStorage.setItem(LS_KEY, JSON.stringify(items));
-    } catch (e) {}
+    } catch (e) { }
   }, [items]);
 
   const filtered = useMemo(() => {
@@ -100,7 +102,7 @@ export default function RestrictedItemsPage(): JSX.Element {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `deligo_restricted_items_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `deligo_restricted_items_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -110,25 +112,25 @@ export default function RestrictedItemsPage(): JSX.Element {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold leading-tight">Restricted Items</h1>
-          <p className="text-gray-600 mt-1">Manage items vendors are not allowed to sell on Deligo.</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold leading-tight">{t("restricted_items")}</h1>
+          <p className="text-gray-600 mt-1">{t("manage_items_vendors_allowed_sell")}</p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center bg-white border rounded-full px-3 py-1 shadow-sm">
             <Search size={16} className="text-gray-500" />
-            <input aria-label="Search restricted items" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search items, reason or category" className="ml-2 outline-none w-52 sm:w-64 text-sm" />
+            <input aria-label="Search restricted items" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("search_items_reason_category")} className="ml-2 outline-none w-52 sm:w-64 text-sm" />
           </div>
 
           <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="border rounded-full px-4 py-2 text-sm shadow-sm">
-            <option value="all">All Categories</option>
+            <option value="all">{t("all_categories")}</option>
             {categories.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
 
           <button onClick={openNew} className="flex items-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow" style={{ background: "#DC3173" }}>
-            <Plus size={16} /> Add
+            <Plus size={16} /> {t("add")}
           </button>
         </div>
       </div>
@@ -137,13 +139,13 @@ export default function RestrictedItemsPage(): JSX.Element {
       <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div className="flex items-center gap-3">
           <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm shadow-sm">
-            <Download size={14} /> Export CSV
+            <Download size={14} /> {t("export_csv")}
           </button>
 
-          <button onClick={() => setCompact((c) => !c)} className="px-3 py-2 rounded-lg border text-sm shadow-sm">Toggle Compact</button>
+          <button onClick={() => setCompact((c) => !c)} className="px-3 py-2 rounded-lg border text-sm shadow-sm">{t("toggle_compact")}</button>
         </div>
 
-        <div className="text-sm text-gray-500">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</div>
+        <div className="text-sm text-gray-500">{filtered.length} {t("result")}{filtered.length !== 1 ? "s" : ""}</div>
       </div>
 
       {/* Table */}
@@ -152,28 +154,28 @@ export default function RestrictedItemsPage(): JSX.Element {
           <table className="w-full table-auto text-sm border-collapse">
             <thead className="bg-gray-50 text-gray-700 border-b">
               <tr>
-                <th className="p-4 text-left">Item</th>
-                <th className="p-4 text-left">Category</th>
-                <th className="p-4 text-left">Reason</th>
-                <th className="p-4 text-left">Flagged Vendors</th>
-                <th className="p-4 text-left">Updated</th>
-                <th className="p-4 text-left">Actions</th>
+                <th className="p-4 text-left">{t("item")}</th>
+                <th className="p-4 text-left">{t("category")}</th>
+                <th className="p-4 text-left">{t("reason")}</th>
+                <th className="p-4 text-left">{t("flagged_vendors")}</th>
+                <th className="p-4 text-left">{t("updated")}</th>
+                <th className="p-4 text-left">{t("actions")}</th>
               </tr>
             </thead>
 
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500">No restricted items found.</td>
+                  <td colSpan={6} className="p-8 text-center text-gray-500">{t("no_restricted_items_found")}</td>
                 </tr>
               ) : (
                 filtered.map((it) => (
                   <tr key={it.id} className={`border-b hover:bg-gray-50 transition ${compact ? "text-sm" : "text-base"}`}>
                     <td className="p-4 font-medium flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#FFE8F0] to-[#FFDFE8] flex items-center justify-center text-[#DC3173] font-bold">{it.name.split(" ")[0].slice(0,2).toUpperCase()}</div>
+                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-[#FFE8F0] to-[#FFDFE8] flex items-center justify-center text-[#DC3173] font-bold">{it.name.split(" ")[0].slice(0, 2).toUpperCase()}</div>
                       <div>
                         <div className="font-semibold">{it.name}</div>
-                        <div className="text-xs text-gray-500">ID: {it.id}</div>
+                        <div className="text-xs text-gray-500">{t("id")}: {it.id}</div>
                       </div>
                     </td>
 
@@ -189,10 +191,10 @@ export default function RestrictedItemsPage(): JSX.Element {
 
                     <td className="p-4 flex gap-2">
                       <button aria-label={`Edit ${it.name}`} onClick={() => onEdit(it)} className="flex items-center gap-2 px-3 py-2 rounded-lg border hover:bg-gray-50">
-                        <Edit3 size={16} /> Edit
+                        <Edit3 size={16} /> {t("edit")}
                       </button>
                       <button aria-label={`Delete ${it.name}`} onClick={() => deleteItem(it.id)} className="flex items-center gap-2 px-3 py-2 rounded-lg border text-red-600 hover:bg-red-50">
-                        <Trash2 size={16} /> Delete
+                        <Trash2 size={16} /> {t("delete")}
                       </button>
                     </td>
                   </tr>
@@ -205,22 +207,22 @@ export default function RestrictedItemsPage(): JSX.Element {
         {/* Mobile / tablet cards */}
         <div className="md:hidden grid grid-cols-1 gap-4 mt-3">
           {filtered.length === 0 ? (
-            <div className="p-6 bg-white rounded-2xl border text-center text-gray-500">No restricted items found.</div>
+            <div className="p-6 bg-white rounded-2xl border text-center text-gray-500">{t("no_restricted_items_found")}</div>
           ) : (
             filtered.map((it) => (
               <div key={it.id} className="p-4 bg-white rounded-2xl border shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#FFE8F0] to-[#FFDFE8] flex items-center justify-center text-[#DC3173] font-bold">{it.name.split(" ")[0].slice(0,2).toUpperCase()}</div>
+                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-[#FFE8F0] to-[#FFDFE8] flex items-center justify-center text-[#DC3173] font-bold">{it.name.split(" ")[0].slice(0, 2).toUpperCase()}</div>
                       <div>
                         <div className="font-semibold">{it.name}</div>
-                        <div className="text-xs text-gray-500">{it.category} • Flagged: {it.flaggedVendors}</div>
+                        <div className="text-xs text-gray-500">{it.category} • {t("flagged")}: {it.flaggedVendors}</div>
                       </div>
                     </div>
 
                     <div className="text-sm text-gray-600 mt-2">{it.reason}</div>
-                    <div className="text-xs text-gray-400 mt-2">Updated: {new Date(it.updatedAt).toLocaleString()}</div>
+                    <div className="text-xs text-gray-400 mt-2">{t("updated")}: {new Date(it.updatedAt).toLocaleString()}</div>
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -271,6 +273,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
 }
 
 function RestrictedForm({ initial, categories, onSave, onCancel }: any) {
+  const { t } = useTranslation();
   const [name, setName] = useState(initial?.name || "");
   const [category, setCategory] = useState(initial?.category || categories[0] || "Other");
   const [reason, setReason] = useState(initial?.reason || "");
@@ -293,33 +296,33 @@ function RestrictedForm({ initial, categories, onSave, onCancel }: any) {
       className="flex flex-col gap-4"
     >
       <div>
-        <label className="text-sm font-medium">Name</label>
+        <label className="text-sm font-medium">{t("name")}</label>
         <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1" required />
       </div>
 
       <div>
-        <label className="text-sm font-medium">Category</label>
+        <label className="text-sm font-medium">{t("category")}</label>
         <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1">
           {categories.map((c: string) => (
             <option key={c} value={c}>{c}</option>
           ))}
-          <option value="Other">Other</option>
+          <option value="Other">{t("other")}</option>
         </select>
       </div>
 
       <div>
-        <label className="text-sm font-medium">Reason</label>
+        <label className="text-sm font-medium">{t("reason")}</label>
         <textarea value={reason} onChange={(e) => setReason(e.target.value)} className="w-full border rounded-xl px-3 py-2 mt-1" rows={3} />
       </div>
 
       <div>
-        <label className="text-sm font-medium">Flagged Vendors</label>
+        <label className="text-sm font-medium">{t("flagged_vendors")}</label>
         <input type="number" min={0} value={flaggedVendors} onChange={(e) => setFlaggedVendors(Number(e.target.value))} className="w-32 border rounded-xl px-3 py-2 mt-1" />
       </div>
 
       <div className="flex justify-end gap-2">
-        <button type="button" onClick={onCancel} className="px-4 py-2 rounded-xl border">Cancel</button>
-        <button type="submit" className="px-4 py-2 rounded-xl text-white" style={{ background: "#DC3173" }}>{initial ? "Save Changes" : "Add Item"}</button>
+        <button type="button" onClick={onCancel} className="px-4 py-2 rounded-xl border">{t("cancel")}</button>
+        <button type="submit" className="px-4 py-2 rounded-xl text-white" style={{ background: "#DC3173" }}>{initial ? t("save_changes") : t("add_item")}</button>
       </div>
     </form>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { Calendar, TrendingUp } from "lucide-react";
 import {
@@ -51,6 +52,8 @@ const data = [
 ];
 
 export default function RevenueChart() {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{
@@ -71,15 +74,15 @@ export default function RevenueChart() {
         <div>
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <TrendingUp className="text-primary-500" size={20} />
-            Revenue Overview
+            {t("revenue_overview")}
           </h3>
           <p className="text-sm text-gray-500">
-            Daily revenue performance for the last 7 days
+            {t("daily_revenue_performance")}
           </p>
         </div>
         <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
           <Calendar size={16} className="text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Last 7 Days</span>
+          <span className="text-sm font-medium text-gray-700">{t("last_7_days")}</span>
         </div>
       </div>
 

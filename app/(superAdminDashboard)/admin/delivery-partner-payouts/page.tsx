@@ -18,9 +18,6 @@ import {
   FileText,
   CheckCircle,
   XCircle,
-  Search,
-  Calendar,
-  Trash2,
   Upload,
 } from 'lucide-react';
 
@@ -33,6 +30,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
+import { useTranslation } from '@/hooks/use-translation';
 
 // --- Branding ---
 const DELIGO = '#DC3173';
@@ -77,6 +75,7 @@ function badgeVariantFor(status: PayoutStatus) {
 
 // ---------------- Component ----------------
 export default function DeliveryPartnerPayoutsPremium() {
+  const { t } = useTranslation();
   // data
   const [payouts, setPayouts] = useState<Payout[]>([]);
   // UI state
@@ -118,7 +117,7 @@ export default function DeliveryPartnerPayoutsPremium() {
       list = list.filter(p => new Date(p.requestedAt).getTime() >= cutoff);
     } else if (dateRange === 'custom' && customFrom && customTo) {
       const from = new Date(customFrom).getTime();
-      const to = new Date(customTo).getTime() + 24*60*60*1000 - 1;
+      const to = new Date(customTo).getTime() + 24 * 60 * 60 * 1000 - 1;
       list = list.filter(p => {
         const t = new Date(p.requestedAt).getTime();
         return t >= from && t <= to;
@@ -188,18 +187,18 @@ export default function DeliveryPartnerPayoutsPremium() {
   function uploadReceiptForSelected() {
     if (!selected || !receiptFile) return;
     const url = URL.createObjectURL(receiptFile);
-    setPayouts(prev => prev.map(p => p.id === selected.id ? { ...p, documents: [...(p.documents||[]), { name: receiptFile.name, url }], timeline: [...(p.timeline||[]), { step: 'Receipt uploaded', at: new Date().toISOString(), note: receiptFile.name }] } : p));
+    setPayouts(prev => prev.map(p => p.id === selected.id ? { ...p, documents: [...(p.documents || []), { name: receiptFile.name, url }], timeline: [...(p.timeline || []), { step: 'Receipt uploaded', at: new Date().toISOString(), note: receiptFile.name }] } : p));
     setReceiptFile(null);
   }
 
   // Export CSV
   function exportCSV() {
-    const head = ['ID','Partner','PartnerID','City','Amount','RequestedAt','Status','Method','IBAN'];
+    const head = ['ID', 'Partner', 'PartnerID', 'City', 'Amount', 'RequestedAt', 'Status', 'Method', 'IBAN'];
     const rows = processed.map(p => [p.id, p.partner, p.partnerId, p.city, p.amount, p.requestedAt, p.status, p.method, p.iban ?? '']);
     const csv = [head, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `payouts_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+    const a = document.createElement('a'); a.href = url; a.download = `payouts_${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
   }
 
   // Export PDF: html2canvas + jsPDF recommended (install instructions noted at top)
@@ -215,7 +214,7 @@ export default function DeliveryPartnerPayoutsPremium() {
       const pw = pdf.internal.pageSize.getWidth();
       const ph = (canvas.height * pw) / canvas.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
-      pdf.save(`payouts_${new Date().toISOString().slice(0,10)}.pdf`);
+      pdf.save(`payouts_${new Date().toISOString().slice(0, 10)}.pdf`);
     } catch (e) {
       // fallback to print
       // eslint-disable-next-line no-console
@@ -229,16 +228,16 @@ export default function DeliveryPartnerPayoutsPremium() {
       {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-extrabold">Delivery Partner Payouts</h1>
-          <p className="text-sm text-slate-500 mt-1">Approve, process and audit partner payouts — Portugal</p>
+          <h1 className="text-3xl font-extrabold">{t("delivery_partner_payouts")}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t("approve_process_audit_partner")}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Search partner, id or city..." className="max-w-xs" />
+          <Input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder={t("search_partner_id_city")} className="max-w-xs" />
           <div className="flex items-center gap-1">
-            <button onClick={() => setDateRange('7')} className={`px-2 py-1 rounded ${dateRange==='7' ? 'bg-white border' : ''}`}>7d</button>
-            <button onClick={() => setDateRange('30')} className={`px-2 py-1 rounded ${dateRange==='30' ? 'bg-white border' : ''}`}>30d</button>
-            <button onClick={() => setDateRange('custom')} className={`px-2 py-1 rounded ${dateRange==='custom' ? 'bg-white border' : ''}`}>Custom</button>
+            <button onClick={() => setDateRange('7')} className={`px-2 py-1 rounded ${dateRange === '7' ? 'bg-white border' : ''}`}>{t("d7")}</button>
+            <button onClick={() => setDateRange('30')} className={`px-2 py-1 rounded ${dateRange === '30' ? 'bg-white border' : ''}`}>{t("d30")}</button>
+            <button onClick={() => setDateRange('custom')} className={`px-2 py-1 rounded ${dateRange === 'custom' ? 'bg-white border' : ''}`}>{t("custom")}</button>
           </div>
           {dateRange === 'custom' && (
             <div className="flex items-center gap-2 border rounded p-2 bg-white">
@@ -249,22 +248,22 @@ export default function DeliveryPartnerPayoutsPremium() {
           )}
 
           <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value as any); setPage(1); }} className="px-3 py-2 border rounded bg-white">
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
-            <option value="rejected">Rejected</option>
+            <option value="all">{t("all_statuses")}</option>
+            <option value="pending">{t("pending")}</option>
+            <option value="processing">{t("processing")}</option>
+            <option value="completed">{t("completed")}</option>
+            <option value="rejected">{t("rejected")}</option>
           </select>
 
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className="px-3 py-2 border rounded bg-white">
-            <option value="date">Sort by date</option>
-            <option value="amount">Sort by amount</option>
-            <option value="status">Sort by status</option>
+            <option value="date">{t("sort_by_date")}</option>
+            <option value="amount">{t("sort_by_amount")}</option>
+            <option value="status">{t("sort_by_status")}</option>
           </select>
 
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="outline" onClick={exportCSV} className="flex items-center gap-2"><Download className="w-4 h-4" />CSV</Button>
-            <Button onClick={exportPDF} className="flex items-center gap-2"><Download className="w-4 h-4" />PDF</Button>
+            <Button variant="outline" onClick={exportCSV} className="flex items-center gap-2"><Download className="w-4 h-4" />{t("csv")}</Button>
+            <Button onClick={exportPDF} className="flex items-center gap-2"><Download className="w-4 h-4" />{t("pdf")}</Button>
           </div>
         </div>
       </div>
@@ -272,15 +271,15 @@ export default function DeliveryPartnerPayoutsPremium() {
       {/* Summary cards */}
       <div id="payouts-print-area" className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Total Requests</p>
+          <p className="text-xs text-slate-500">{t("total_requests")}</p>
           <h3 className="text-2xl font-bold">{total}</h3>
         </Card>
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Pending</p>
+          <p className="text-xs text-slate-500">{t("pending")}</p>
           <h3 className="text-2xl font-bold">{payouts.filter(p => p.status === 'pending').length}</h3>
         </Card>
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Total Amount</p>
+          <p className="text-xs text-slate-500">{t("total_amount")}</p>
           <h3 className="text-2xl font-bold">{currency(payouts.reduce((s, p) => s + p.amount, 0))}</h3>
         </Card>
       </div>
@@ -289,11 +288,15 @@ export default function DeliveryPartnerPayoutsPremium() {
       {selectedIds.size > 0 && (
         <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="fixed left-6 right-6 top-20 z-50">
           <Card className="p-3 flex items-center justify-between">
-            <div className="text-sm text-slate-700">{selectedIds.size} selected</div>
+            <div className="text-sm text-slate-700">{selectedIds.size} {t("selected")}</div>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="destructive" onClick={() => setConfirm({ type: 'reject', ids: Array.from(selectedIds) })}>Bulk Reject</Button>
-              <Button size="sm" style={{ background: DELIGO }} onClick={() => setConfirm({ type: 'approve', ids: Array.from(selectedIds) })}>Bulk Approve</Button>
-              <Button size="sm" variant="outline" onClick={() => { setSelectedIds(new Set()); setSelectAllOnPage(false); }}>Clear</Button>
+
+              <Button size="sm" variant="destructive" onClick={() => setConfirm({ type: 'reject', ids: Array.from(selectedIds) })}>{t("bulk_reject")}</Button>
+
+              <Button size="sm" style={{ background: DELIGO }} onClick={() => setConfirm({ type: 'approve', ids: Array.from(selectedIds) })}>{t("bulk_approve")}</Button>
+
+              <Button size="sm" variant="outline" onClick={() => { setSelectedIds(new Set()); setSelectAllOnPage(false); }}>{t("clear")}</Button>
+
             </div>
           </Card>
         </motion.div>
@@ -305,10 +308,10 @@ export default function DeliveryPartnerPayoutsPremium() {
         <Card className="p-4 h-64">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h4 className="font-semibold">Recent Payout Sizes</h4>
-              <p className="text-xs text-slate-500 mt-1">Last {Math.min(12, payouts.length)} requests</p>
+              <h4 className="font-semibold">{t("recent_payout_sizes")}</h4>
+              <p className="text-xs text-slate-500 mt-1">{t("last")} {Math.min(12, payouts.length)} {t("requests")}</p>
             </div>
-            <div className="text-sm text-slate-400">Live</div>
+            <div className="text-sm text-slate-400">{t("live")}</div>
           </div>
 
           <div className="h-44">
@@ -327,8 +330,8 @@ export default function DeliveryPartnerPayoutsPremium() {
         {/* Recent list with controls */}
         <Card className="p-4 col-span-2">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold">Recent Requests</h4>
-            <div className="text-sm text-slate-500">{(page-1)*perPage + 1}–{Math.min(page*perPage, total)} of {total}</div>
+            <h4 className="font-semibold">{t("recent_requests")}</h4>
+            <div className="text-sm text-slate-500">{(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}</div>
           </div>
 
           {/* table header (scrollable) */}
@@ -336,7 +339,7 @@ export default function DeliveryPartnerPayoutsPremium() {
             <table className="min-w-[1000px] w-full text-sm">
               <thead className="bg-slate-100 text-slate-700">
                 <tr>
-                  <th className="px-3 py-2 w-[48px]">
+                  <th className="px-3 py-2 w-12">
                     <Checkbox
                       id="select-all-page"
                       checked={selectAllOnPage}
@@ -345,12 +348,12 @@ export default function DeliveryPartnerPayoutsPremium() {
                       aria-label="Select all on page"
                     />
                   </th>
-                  <th className="px-3 py-2 text-left w-[260px]">Partner</th>
-                  <th className="px-3 py-2 text-center w-[120px]">City</th>
-                  <th className="px-3 py-2 text-center w-[120px]">Amount</th>
-                  <th className="px-3 py-2 text-center w-[160px]">Requested</th>
-                  <th className="px-3 py-2 text-center w-[120px]">Status</th>
-                  <th className="px-3 py-2 text-center w-[140px]">Actions</th>
+                  <th className="px-3 py-2 text-left w-[260px]">{t("partner")}</th>
+                  <th className="px-3 py-2 text-center w-[120px]">{t("city")}</th>
+                  <th className="px-3 py-2 text-center w-[120px]">{t("amount")}</th>
+                  <th className="px-3 py-2 text-center w-40">{t("requested")}</th>
+                  <th className="px-3 py-2 text-center w-[120px]">{t("status")}</th>
+                  <th className="px-3 py-2 text-center w-[140px]">{t("actions")}</th>
                 </tr>
               </thead>
 
@@ -383,12 +386,12 @@ export default function DeliveryPartnerPayoutsPremium() {
                         <Button size="sm" variant="ghost" onClick={() => setSelected(p)} aria-label={`View ${p.id}`}><FileText className="w-4 h-4" /></Button>
                         {p.status === 'pending' && (
                           <>
-                            <Button size="sm" style={{ background: DELIGO }} onClick={() => setConfirm({ type: 'approve', ids: [p.id] })}><CheckCircle className="w-4 h-4 mr-1" />Approve</Button>
-                            <Button size="sm" variant="destructive" onClick={() => setConfirm({ type: 'reject', ids: [p.id] })}><XCircle className="w-4 h-4 mr-1" />Reject</Button>
+                            <Button size="sm" style={{ background: DELIGO }} onClick={() => setConfirm({ type: 'approve', ids: [p.id] })}><CheckCircle className="w-4 h-4 mr-1" />{t("approve")}</Button>
+                            <Button size="sm" variant="destructive" onClick={() => setConfirm({ type: 'reject', ids: [p.id] })}><XCircle className="w-4 h-4 mr-1" />{t("reject")}</Button>
                           </>
                         )}
                         {p.status === 'processing' && (
-                          <Button size="sm" onClick={() => finalize(p.id)}>Mark Complete</Button>
+                          <Button size="sm" onClick={() => finalize(p.id)}>{t("mark_complete")}</Button>
                         )}
                       </div>
                     </td>
@@ -397,7 +400,7 @@ export default function DeliveryPartnerPayoutsPremium() {
 
                 {pageData.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-500">No payouts match your filters.</td>
+                    <td colSpan={7} className="py-8 text-center text-slate-500">{t("no_payouts_match_your_filters")}</td>
                   </tr>
                 )}
               </tbody>
@@ -407,9 +410,9 @@ export default function DeliveryPartnerPayoutsPremium() {
           {/* Pagination & page size */}
           <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={() => setPage(Math.max(1, page-1))}>Prev</Button>
+              <Button size="sm" variant="outline" onClick={() => setPage(Math.max(1, page - 1))}>Prev</Button>
               <div className="px-3 py-1 bg-white border rounded">{page}</div>
-              <Button size="sm" variant="outline" onClick={() => setPage(Math.min(pages, page+1))}>Next</Button>
+              <Button size="sm" variant="outline" onClick={() => setPage(Math.min(pages, page + 1))}>Next</Button>
             </div>
 
             <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -428,8 +431,8 @@ export default function DeliveryPartnerPayoutsPremium() {
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <SheetContent className="max-w-lg p-6 overflow-y-auto border-l bg-white">
           <SheetHeader>
-            <SheetTitle>Payout Details</SheetTitle>
-            <SheetDescription>Review & process payout</SheetDescription>
+            <SheetTitle>{t("payout_details")}</SheetTitle>
+            <SheetDescription>{t("review_nd_process_payout")}</SheetDescription>
           </SheetHeader>
 
           {selected && (
@@ -445,22 +448,22 @@ export default function DeliveryPartnerPayoutsPremium() {
               <Separator />
 
               <div className="grid grid-cols-1 gap-2 text-sm">
-                <div><strong>Amount:</strong> <span className="ml-2 font-semibold">{currency(selected.amount)}</span></div>
-                <div><strong>Method:</strong> <span className="ml-2">{selected.method}</span></div>
-                <div><strong>IBAN:</strong> <span className="ml-2">{selected.iban ?? '—'}</span></div>
-                <div><strong>Requested:</strong> <span className="ml-2">{new Date(selected.requestedAt).toLocaleString()}</span></div>
-                <div><strong>Status:</strong> <span className="ml-2"><Badge variant={badgeVariantFor(selected.status)}>{selected.status}</Badge></span></div>
+                <div><strong>{t("amount")}:</strong> <span className="ml-2 font-semibold">{currency(selected.amount)}</span></div>
+                <div><strong>{t("method")}:</strong> <span className="ml-2">{selected.method}</span></div>
+                <div><strong>{t("iban")}:</strong> <span className="ml-2">{selected.iban ?? '—'}</span></div>
+                <div><strong>{t("requested")}:</strong> <span className="ml-2">{new Date(selected.requestedAt).toLocaleString()}</span></div>
+                <div><strong>{t("status")}:</strong> <span className="ml-2"><Badge variant={badgeVariantFor(selected.status)}>{selected.status}</Badge></span></div>
               </div>
 
               <Separator />
 
               {/* Bank verification preview */}
               <div>
-                <h4 className="font-medium">Bank verification</h4>
+                <h4 className="font-medium">{t("bank_verification")}</h4>
                 <div className="p-3 mt-2 bg-slate-50 rounded border text-sm">
-                  <div>Account holder: <strong>{selected.partner}</strong></div>
-                  <div>IBAN match: <strong>Yes</strong></div>
-                  <div>Verified on: <strong>{new Date().toLocaleDateString()}</strong></div>
+                  <div>{t("account_holder")}: <strong>{selected.partner}</strong></div>
+                  <div>{t("iban_match")}: <strong>{t("yes")}</strong></div>
+                  <div>{t("verified_on")}: <strong>{new Date().toLocaleDateString()}</strong></div>
                 </div>
               </div>
 
@@ -468,20 +471,20 @@ export default function DeliveryPartnerPayoutsPremium() {
 
               {/* Documents */}
               <div>
-                <h4 className="font-medium">Documents</h4>
+                <h4 className="font-medium">{t("documents")}</h4>
                 <div className="mt-2 space-y-2">
                   {(selected.documents || []).map((d, i) => (
                     <div key={i} className="flex items-center justify-between p-2 bg-white rounded border">
                       <div className="text-sm">{d.name}</div>
                       <div className="flex items-center gap-2">
-                        <Button size="sm" variant="outline" onClick={() => d.url && window.open(d.url, '_blank')}><FileText className="w-4 h-4 mr-1" />View</Button>
+                        <Button size="sm" variant="outline" onClick={() => d.url && window.open(d.url, '_blank')}><FileText className="w-4 h-4 mr-1" />{t("view")}</Button>
                       </div>
                     </div>
                   ))}
 
                   <div className="mt-2 flex items-center gap-2">
                     <input aria-label="upload receipt" type="file" onChange={(e) => setReceiptFile(e.target.files?.[0] ?? null)} />
-                    <Button size="sm" style={{ background: DELIGO }} onClick={uploadReceiptForSelected}><Upload className="w-4 h-4 mr-1" />Upload</Button>
+                    <Button size="sm" style={{ background: DELIGO }} onClick={uploadReceiptForSelected}><Upload className="w-4 h-4 mr-1" />{t("upload")}</Button>
                   </div>
                 </div>
               </div>
@@ -490,7 +493,7 @@ export default function DeliveryPartnerPayoutsPremium() {
 
               {/* Timeline */}
               <div>
-                <h4 className="font-medium">Timeline</h4>
+                <h4 className="font-medium">{t("timeline")}</h4>
                 <ol className="mt-2 space-y-2 text-sm">
                   {(selected.timeline || []).map((t, i) => (
                     <li key={i} className="p-2 rounded border bg-white">
@@ -503,9 +506,9 @@ export default function DeliveryPartnerPayoutsPremium() {
               </div>
 
               <div className="flex items-center gap-2 justify-end pt-3">
-                <Button variant="outline" onClick={() => setSelected(null)}>Close</Button>
-                {selected.status === 'pending' && <Button style={{ background: DELIGO }} onClick={() => setConfirm({ type: 'approve', ids: [selected.id] })}>Approve</Button>}
-                {selected.status === 'processing' && <Button onClick={() => finalize(selected.id)}>Mark Completed</Button>}
+                <Button variant="outline" onClick={() => setSelected(null)}>{t("close")}</Button>
+                {selected.status === 'pending' && <Button style={{ background: DELIGO }} onClick={() => setConfirm({ type: 'approve', ids: [selected.id] })}>{t("approve")}</Button>}
+                {selected.status === 'processing' && <Button onClick={() => finalize(selected.id)}>{t("mark_completed")}</Button>}
               </div>
             </div>
           )}
@@ -516,18 +519,18 @@ export default function DeliveryPartnerPayoutsPremium() {
       <Dialog open={!!confirm} onOpenChange={() => setConfirm(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{confirm?.type === 'approve' ? 'Confirm Approve' : 'Confirm Reject'}</DialogTitle>
+            <DialogTitle>{confirm?.type === 'approve' ? t("confirm_approve") : t("confirm_reject") }</DialogTitle>
           </DialogHeader>
 
           <div className="text-sm text-slate-600 mb-4">
-            You are about to <strong>{confirm?.type}</strong> {confirm?.ids.length} payout(s).
-            <div className="mt-2">Add an optional note for this action:</div>
+            {t("you_are_about_to")} <strong>{confirm?.type}</strong> {confirm?.ids.length} {t("payouts")}.
+            <div className="mt-2">{t("add_an_optional_note")}:</div>
             <textarea onChange={(e) => setConfirm(c => c ? { ...c, note: e.target.value } : c)} className="w-full mt-2 border rounded p-2" placeholder="Optional note (e.g., bank issue, corrected IBAN)"></textarea>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirm(null)}>Cancel</Button>
-            <Button variant={confirm?.type === 'approve' ? undefined : 'destructive'} onClick={() => { if (confirm) bulkApply(confirm.type, confirm.ids, confirm.note); }}>{confirm?.type === 'approve' ? 'Approve' : 'Reject'}</Button>
+            <Button variant="outline" onClick={() => setConfirm(null)}>{t("cancel")}</Button>
+            <Button variant={confirm?.type === 'approve' ? undefined : 'destructive'} onClick={() => { if (confirm) bulkApply(confirm.type, confirm.ids, confirm.note); }}>{confirm?.type === 'approve' ? t("approve") : t("reject")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -545,26 +548,26 @@ function finalize(id: string) {
 
 // ---------------- Mock Data ----------------
 function mockPayouts(): Payout[] {
-  const names = ['João Silva','Maria Fernandes','Rui Costa','Ana Pereira','Rui Almeida','Rita Gomes','Carlos Sousa'];
+  const names = ['João Silva', 'Maria Fernandes', 'Rui Costa', 'Ana Pereira', 'Rui Almeida', 'Rita Gomes', 'Carlos Sousa'];
   return Array.from({ length: 36 }).map((_, i) => {
     const name = names[i % names.length];
-    const status = (['pending','processing','completed','rejected'] as PayoutStatus[])[i % 4];
+    const status = (['pending', 'processing', 'completed', 'rejected'] as PayoutStatus[])[i % 4];
     const monthTrend = Array.from({ length: 12 }).map((__, idx) => ({
-      month: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][idx],
-      deliveries: Math.floor(50 + Math.random()*200),
-      avgTime: Math.floor(20 + Math.random()*20),
-      onTimePct: Math.floor(70 + Math.random()*25),
-      revenue: Math.floor(1000 + Math.random()*5000),
+      month: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][idx],
+      deliveries: Math.floor(50 + Math.random() * 200),
+      avgTime: Math.floor(20 + Math.random() * 20),
+      onTimePct: Math.floor(70 + Math.random() * 25),
+      revenue: Math.floor(1000 + Math.random() * 5000),
     }));
     return {
       id: `P-${4000 + i}`,
       partner: name,
       partnerId: `DP-${5000 + i}`,
-      city: ['Lisbon','Porto','Coimbra','Braga','Faro'][i % 5],
+      city: ['Lisbon', 'Porto', 'Coimbra', 'Braga', 'Faro'][i % 5],
       amount: Math.floor(100 + Math.random() * 2000),
       requestedAt: new Date(Date.now() - i * 1000 * 60 * 60 * 12).toISOString(),
       status,
-      method: (['bank','mbway','wallet'] as PayoutMethod[])[i % 3],
+      method: (['bank', 'mbway', 'wallet'] as PayoutMethod[])[i % 3],
       iban: 'PT50 1234 5678 9101 2345 6',
       documents: i % 5 === 0 ? [{ name: 'receipt.pdf', url: '' }] : [],
       timeline: [

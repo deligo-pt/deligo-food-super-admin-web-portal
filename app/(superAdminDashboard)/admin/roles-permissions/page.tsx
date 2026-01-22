@@ -1,7 +1,8 @@
 "use client"
 import React, { useState } from "react";
-import { ShieldCheck, LockKeyhole, UserCog, PlusCircle, Check, X, PenLine } from "lucide-react";
+import { ShieldCheck, Check, X, PenLine } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/use-translation";
 
 // Types
 interface PermissionGroup {
@@ -19,60 +20,62 @@ interface Role {
 
 // Mock data
 type PG = PermissionGroup;
-const permissionGroups: PG[] = [
-  {
-    id: "pg-users",
-    title: "User Management",
-    permissions: [
-      { id: "p-user-view", label: "View Users" },
-      { id: "p-user-edit", label: "Edit Users" },
-      { id: "p-user-delete", label: "Delete Users" },
-      { id: "p-user-suspend", label: "Suspend Users" },
-    ],
-  },
-  {
-    id: "pg-orders",
-    title: "Order Management",
-    permissions: [
-      { id: "p-order-view", label: "View Orders" },
-      { id: "p-order-update", label: "Update Orders" },
-      { id: "p-order-refund", label: "Process Refunds" },
-    ],
-  },
-  {
-    id: "pg-admin",
-    title: "Admin Management",
-    permissions: [
-      { id: "p-admin-view", label: "View Admins" },
-      { id: "p-admin-edit", label: "Edit Admins" },
-      { id: "p-admin-create", label: "Create Admins" },
-      { id: "p-admin-remove", label: "Remove Admins" },
-    ],
-  },
-];
-
-const initialRoles: Role[] = [
-  {
-    id: "r-super",
-    name: "Super Admin",
-    color: "#DC3173",
-    permissions: permissionGroups.flatMap((pg) => pg.permissions.map((p) => p.id)),
-  },
-  {
-    id: "r-admin",
-    name: "Admin",
-    color: "#3b82f6",
-    permissions: ["p-user-view", "p-user-edit", "p-order-view", "p-order-update", "p-admin-view"],
-  },
-  {
-    id: "r-moderator",
-    name: "Moderator",
-    color: "#22c55e",
-    permissions: ["p-user-view", "p-order-view"],
-  },
-];
 
 export default function RolesPermissionsPage() {
+  const { t } = useTranslation();
+  const permissionGroups: PG[] = [
+    {
+      id: "pg-users",
+      title: t("user_management"),
+      permissions: [
+        { id: "p-user-view", label: t("view_users") },
+        { id: "p-user-edit", label: t("edit_users") },
+        { id: "p-user-delete", label: t("delete_users") },
+        { id: "p-user-suspend", label: t("suspend_users") },
+      ],
+    },
+    {
+      id: "pg-orders",
+      title: t("order_management"),
+      permissions: [
+        { id: "p-order-view", label: t("view_orders") },
+        { id: "p-order-update", label: t("update_orders") },
+        { id: "p-order-refund", label: t("process_refunds") },
+      ],
+    },
+    {
+      id: "pg-admin",
+      title: t("admin_management"),
+      permissions: [
+        { id: "p-admin-view", label: t("view_admins") },
+        { id: "p-admin-edit", label: t("edit_admins") },
+        { id: "p-admin-create", label: t("create_admins") },
+        { id: "p-admin-remove", label: t("remove_admins") },
+      ],
+    },
+  ];
+
+  const initialRoles: Role[] = [
+    {
+      id: "r-super",
+      name: t("super_admin"),
+      color: "#DC3173",
+      permissions: permissionGroups.flatMap((pg) => pg.permissions.map((p) => p.id)),
+    },
+    {
+      id: "r-admin",
+      name: t("admin"),
+      color: "#3b82f6",
+      permissions: ["p-user-view", "p-user-edit", "p-order-view", "p-order-update", "p-admin-view"],
+    },
+    {
+      id: "r-moderator",
+      name: t("moderator"),
+      color: "#22c55e",
+      permissions: ["p-user-view", "p-order-view"],
+    },
+  ];
+
   const [roles, setRoles] = useState<Role[]>(initialRoles);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -82,11 +85,11 @@ export default function RolesPermissionsPage() {
       prev.map((r) =>
         r.id === roleId
           ? {
-              ...r,
-              permissions: r.permissions.includes(permId)
-                ? r.permissions.filter((p) => p !== permId)
-                : [...r.permissions, permId],
-            }
+            ...r,
+            permissions: r.permissions.includes(permId)
+              ? r.permissions.filter((p) => p !== permId)
+              : [...r.permissions, permId],
+          }
           : r
       )
     );
@@ -103,13 +106,13 @@ export default function RolesPermissionsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 bg-gradient-to-b from-white via-gray-50 to-gray-100">
+    <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="mb-8">
-          
-          <h1 className="text-3xl font-bold tracking-tight">Roles & Permissions</h1>
-          <p className="text-gray-600 mt-1">Control access levels and permissions across the Deligo platform.</p>
+
+          <h1 className="text-3xl font-bold tracking-tight">{t("roles_and_permissions")}</h1>
+          <p className="text-gray-600 mt-1">{t("control_access_levels_permissions")}</p>
         </div>
 
         {/* ROLES LIST */}
@@ -134,7 +137,7 @@ export default function RolesPermissionsPage() {
                 </button>
               </div>
 
-              <div className="text-sm text-gray-500 mb-2">Permissions:</div>
+              <div className="text-sm text-gray-500 mb-2">{t("permissions")}:</div>
 
               <div className="flex flex-wrap gap-2">
                 {role.permissions.map((pid) => (
@@ -153,14 +156,14 @@ export default function RolesPermissionsPage() {
         {/* PERMISSION MATRIX */}
         <div className="mt-10">
           <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <ShieldCheck className="text-[#DC3173]" /> Permissions Matrix
+            <ShieldCheck className="text-[#DC3173]" /> {t("permissions_matrix")}
           </h3>
 
           <div className="bg-white rounded-2xl shadow-lg border overflow-hidden">
             <table className="min-w-full table-auto text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
-                  <th className="p-4 text-left">Permission</th>
+                  <th className="p-4 text-left">{t("permission")}</th>
                   {roles.map((r) => (
                     <th key={r.id} className="p-4 text-center">{r.name}</th>
                   ))}
@@ -182,11 +185,10 @@ export default function RolesPermissionsPage() {
                           <td key={role.id} className="text-center p-4">
                             <button
                               onClick={() => togglePermission(role.id, perm.id)}
-                              className={`mx-auto w-8 h-8 flex items-center justify-center rounded-md border transition ${
-                                role.permissions.includes(perm.id)
-                                  ? "bg-[#DC3173] border-[#DC3173] text-white"
-                                  : "bg-white border-gray-300 text-gray-400 hover:bg-gray-100"
-                              }`}
+                              className={`mx-auto w-8 h-8 flex items-center justify-center rounded-md border transition ${role.permissions.includes(perm.id)
+                                ? "bg-[#DC3173] border-[#DC3173] text-white"
+                                : "bg-white border-gray-300 text-gray-400 hover:bg-gray-100"
+                                }`}
                             >
                               {role.permissions.includes(perm.id) ? <Check size={16} /> : <X size={16} />}
                             </button>
@@ -219,7 +221,7 @@ export default function RolesPermissionsPage() {
                 transition={{ duration: 0.2 }}
                 className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 z-10"
               >
-                <h2 className="text-xl font-semibold mb-3">Edit Role - {editingRole.name}</h2>
+                <h2 className="text-xl font-semibold mb-3">{t("edit_role")} - {editingRole.name}</h2>
 
                 <form
                   onSubmit={(e) => {
@@ -232,7 +234,7 @@ export default function RolesPermissionsPage() {
                   className="space-y-4"
                 >
                   <div>
-                    <label className="text-sm font-medium">Role Name</label>
+                    <label className="text-sm font-medium">{t("role_name")}</label>
                     <input
                       name="name"
                       defaultValue={editingRole.name}
@@ -241,7 +243,7 @@ export default function RolesPermissionsPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">Role Color</label>
+                    <label className="text-sm font-medium">{t("role_color")}</label>
                     <input
                       name="color"
                       type="color"
@@ -256,13 +258,13 @@ export default function RolesPermissionsPage() {
                       onClick={() => setShowModal(false)}
                       className="px-4 py-2 border rounded-lg"
                     >
-                      Cancel
+                      {t("cancel")}
                     </button>
                     <button
                       type="submit"
                       className="px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow hover:brightness-95"
                     >
-                      Save Changes
+                      {t("save_changes")}
                     </button>
                   </div>
                 </form>

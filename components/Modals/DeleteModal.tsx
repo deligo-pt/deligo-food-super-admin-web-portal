@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
   open: boolean;
@@ -16,25 +17,26 @@ interface IProps {
 }
 
 const DeleteModal = ({ open, onOpenChange, onConfirm }: IProps) => {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <form>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogTitle>{t("are_you_absolutely_sure")}</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will delete this data and
-              cannot be undone.
+              {t("this_action_cannot_be_undone")}
             </DialogDescription>
           </DialogHeader>{" "}
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Cancel
+                {t("cancel")}
               </Button>
             </DialogClose>
             <Button variant="destructive" onClick={onConfirm} type="submit">
-              Delete
+              {t("delete")}
             </Button>
           </DialogFooter>
         </DialogContent>

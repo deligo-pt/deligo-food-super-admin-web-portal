@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ImageIcon, UploadIcon, XIcon } from "lucide-react";
 import Image from "next/image";
@@ -11,6 +12,7 @@ interface IProps {
 }
 
 export function ImageUploader({ image, onChange }: IProps) {
+  const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -76,11 +78,10 @@ export function ImageUploader({ image, onChange }: IProps) {
       <div className={!!image?.url ? "grid lg:grid-cols-2 gap-6" : ""}>
         <div
           onDragEnter={handleDrag}
-          className={`border-2 border-dashed rounded-lg p-8 text-center ${
-            dragActive
+          className={`border-2 border-dashed rounded-lg p-8 text-center ${dragActive
               ? "border-[#DC3173] bg-pink-50"
               : "border-gray-300 hover:border-gray-400"
-          } transition-colors duration-200`}
+            } transition-colors duration-200`}
         >
           {dragActive && (
             <div
@@ -102,10 +103,10 @@ export function ImageUploader({ image, onChange }: IProps) {
           >
             <ImageIcon className="h-12 w-12 text-gray-400 mb-3" />
             <p className="text-lg font-medium text-gray-700">
-              Drag & Drop your image here
+              {t("drag_drop_image_here")}
             </p>
-            <p className="text-sm text-gray-500 mt-1">Or click to browse</p>
-            <p className="text-xs text-gray-400 mt-2">PNG, JPG, JPEG</p>
+            <p className="text-sm text-gray-500 mt-1">{t("or_click_browse")}</p>
+            <p className="text-xs text-gray-400 mt-2">{t("png_jpg_jpeg")}</p>
             <label className="mt-4">
               <motion.span
                 whileHover={{
@@ -117,7 +118,7 @@ export function ImageUploader({ image, onChange }: IProps) {
                 className="inline-flex items-center px-4 py-2 bg-[#DC3173] text-white rounded-md cursor-pointer hover:bg-[#B02458] transition-colors"
               >
                 <UploadIcon className="h-4 w-4 mr-2" />
-                Upload Image
+                {t("upload_image")}
               </motion.span>
               <input
                 ref={inputRef}

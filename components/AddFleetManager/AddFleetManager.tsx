@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/hooks/use-translation";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
   registerFleetManagerandSendOtpReq,
@@ -58,6 +59,7 @@ function isValidPassword(password: string) {
 }
 
 export default function AddFleetManager() {
+  const { t } = useTranslation();
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -260,7 +262,7 @@ export default function AddFleetManager() {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-extrabold mb-6 flex items-center gap-3"
         >
-          <Store className="w-8 h-8 text-slate-800" /> Add New Fleet Manager
+          <Store className="w-8 h-8 text-slate-800" /> {t("add_new_fleet_manager")}
         </motion.h1>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -280,7 +282,7 @@ export default function AddFleetManager() {
                 style={{ borderColor: DELIGO }}
               >
                 <h2 className="text-xl font-semibold mb-4">
-                  1. Account Information
+                  1. {t("account_information")}
                 </h2>
 
                 <div className="space-y-4 items-start">
@@ -289,9 +291,9 @@ export default function AddFleetManager() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>{t("first_name")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="First Name" {...field} />
+                          <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -303,9 +305,9 @@ export default function AddFleetManager() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>{t("last_name")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Last Name" {...field} />
+                          <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -313,11 +315,11 @@ export default function AddFleetManager() {
                   />
 
                   <div>
-                    <Label>Email</Label>
+                    <Label>{t("email")}</Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
-                        placeholder="Fleet Manager Email"
+                        placeholder={t("fleet_manager_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -329,7 +331,7 @@ export default function AddFleetManager() {
                           onClick={sendOtp}
                           className="w-32"
                         >
-                          <Mail className="w-4 h-4 mr-2" /> Send OTP
+                          <Mail className="w-4 h-4 mr-2" /> {t("send_otp")}
                         </Button>
                       )}
                       {otpSent && !emailVerified && (
@@ -340,12 +342,12 @@ export default function AddFleetManager() {
                           onClick={resendOtp}
                           className="w-32"
                         >
-                          Resend {timer > 0 && `(${formatTime(timer)})`}
+                          {t("resend")} {timer > 0 && `(${formatTime(timer)})`}
                         </Button>
                       )}
                       {emailVerified && (
                         <span className="text-green-600 flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4" /> Verified
+                          <CheckCircle className="w-4 h-4" /> {t("verified")}
                         </span>
                       )}
                     </div>
@@ -353,10 +355,10 @@ export default function AddFleetManager() {
 
                   {otpSent && !emailVerified && (
                     <div>
-                      <Label className="mb-2">OTP</Label>
+                      <Label className="mb-2">{t("otp")}</Label>
                       <div className="flex items-center gap-3">
                         <Input
-                          placeholder="Enter OTP"
+                          placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
                         />
@@ -366,18 +368,18 @@ export default function AddFleetManager() {
                           onClick={verifyOtp}
                           className="w-32"
                         >
-                          <BadgeCheck className="w-4 h-4 mr-2" /> Verify OTP
+                          <BadgeCheck className="w-4 h-4 mr-2" /> {t("verify_otp")}
                         </Button>
                       </div>
                     </div>
                   )}
 
                   <div>
-                    <Label className="mb-2">Password</Label>
+                    <Label className="mb-2">{t("password")}</Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
-                        placeholder="Password"
+                        placeholder={t("password")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
@@ -397,7 +399,7 @@ export default function AddFleetManager() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">Phone Number</Label>
+                  <Label className="mb-2">{t("phone_number")}</Label>
                   <div className="relative">
                     <FormField
                       control={form.control}
@@ -427,7 +429,7 @@ export default function AddFleetManager() {
                                   position: "relative",
                                 }}
                                 inputProps={{
-                                  placeholder: "Phone Number",
+                                  placeholder: t("phone_number"),
                                   disabled: true,
                                 }}
                               />
@@ -480,7 +482,7 @@ export default function AddFleetManager() {
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4">
-                        2. Business Details
+                        2. {t("business_details")}
                       </h2>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -489,9 +491,9 @@ export default function AddFleetManager() {
                           name="businessName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Business Name</FormLabel>
+                              <FormLabel>{t("business_name")}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Business Name" {...field} />
+                                <Input placeholder={t('business_name')} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -503,10 +505,10 @@ export default function AddFleetManager() {
                           name="businessLicenseNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Business License Number</FormLabel>
+                              <FormLabel>{t("business_license_number")}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="License Number"
+                                  placeholder={t("license_number")}
                                   {...field}
                                 />
                               </FormControl>
@@ -532,8 +534,7 @@ export default function AddFleetManager() {
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <Banknote className="w-5 h-5" /> 3. Bank & Payment
-                        Information
+                        <Banknote className="w-5 h-5" /> 3. {t("bank_nd_payment_information")}
                       </h2>
 
                       <div className="space-y-4">
@@ -542,9 +543,9 @@ export default function AddFleetManager() {
                           name="bankName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Bank Name</FormLabel>
+                              <FormLabel>{t("bank_name")}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Bank Name" {...field} />
+                                <Input placeholder={t("bank_name")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -556,10 +557,10 @@ export default function AddFleetManager() {
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Account Holder Name</FormLabel>
+                              <FormLabel>{t("account_holder_name")}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="Account Holder Name"
+                                  placeholder={t("account_holder_name")}
                                   {...field}
                                 />
                               </FormControl>
@@ -573,9 +574,9 @@ export default function AddFleetManager() {
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>IBAN</FormLabel>
+                              <FormLabel>{t("iban")}</FormLabel>
                               <FormControl>
-                                <Input placeholder="IBAN" {...field} />
+                                <Input placeholder={t("iban")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -587,9 +588,9 @@ export default function AddFleetManager() {
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Swift Code</FormLabel>
+                              <FormLabel>{t("swift_code")}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Swift Code" {...field} />
+                                <Input placeholder={t("swift_code")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -621,8 +622,9 @@ export default function AddFleetManager() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <Banknote className="w-5 h-5" /> 4. Bank & Payment
-                      Information
+                      {/* <Banknote className="w-5 h-5" /> 4. Bank & Payment
+                      Information */}
+                      <Banknote className="w-5 h-5" /> 4. {t("business_location_information")}
                     </h2>
 
                     <BusinessLocationMap
@@ -646,8 +648,7 @@ export default function AddFleetManager() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <FileText className="w-5 h-5" /> 5. Documents &
-                      Verification
+                      <FileText className="w-5 h-5" /> 5. {t("documents_nd_verification")}
                     </h2>
 
                     <UploadFleetManagerDocuments
@@ -667,7 +668,7 @@ export default function AddFleetManager() {
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
             >
-              Submit FleetManager
+              {t("submit_fleetManager")}
             </Button>
           </div>
         )}

@@ -23,6 +23,7 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
+import { useTranslation } from '@/hooks/use-translation';
 
 // --- Config / constants ---
 const DELIGO = '#DC3173';
@@ -95,6 +96,7 @@ function RangeBtn({ label, v, state, set }: { label: string; v: '30' | '90' | '3
 
 // ----------------- Main Page -----------------
 export default function DeliveryPartnerPerformancePage() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [partners, setPartners] = useState<PartnerSummary[]>([]);
   const [selected, setSelected] = useState<PartnerSummary | null>(null);
@@ -120,7 +122,7 @@ export default function DeliveryPartnerPerformancePage() {
 
   // aggregated monthly chart (sum of top partners for demonstration)
   const monthly = useMemo(() => {
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months.map((m, i) => {
       const deliveries = topPartners.reduce((s, p) => s + (p.monthTrend[i]?.deliveries || 0), 0);
       const revenue = topPartners.reduce((s, p) => s + (p.monthTrend[i]?.revenue || 0), 0);
@@ -130,14 +132,14 @@ export default function DeliveryPartnerPerformancePage() {
 
   // Export CSV
   function exportCSV() {
-    const head = ['ID','Name','City','Deliveries','OnTime %','AvgTime (m)','Cancel %','Earnings (€)'];
+    const head = ['ID', 'Name', 'City', 'Deliveries', 'OnTime %', 'AvgTime (m)', 'Cancel %', 'Earnings (€)'];
     const rows = filtered.map(p => [
       p.id, p.name, p.city, String(p.deliveries), String(p.onTimePct), String(p.avgTime), String(p.cancelPct), String(p.earnings)
     ]);
     const csv = [head, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `partner_performance_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+    const a = document.createElement('a'); a.href = url; a.download = `partner_performance_${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
   }
 
   return (
@@ -146,28 +148,28 @@ export default function DeliveryPartnerPerformancePage() {
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-extrabold">Delivery Partner Performance</h1>
-            <p className="text-sm text-slate-500 mt-1">Overview of delivery partner KPIs & monthly trends (Portugal)</p>
+            <h1 className="text-3xl font-extrabold">{t("delivery_partner_performance")}</h1>
+            <p className="text-sm text-slate-500 mt-1">{t("overview_of_delivery_partner_kpi_monthly")}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name, city or ID..." className="max-w-md" />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("search_by_name_city_id")} className="max-w-md" />
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => setSortBy('deliveries')} className={sortBy === 'deliveries' ? 'bg-white border' : ''}>Top Deliveries</Button>
-              <Button variant="outline" onClick={() => setSortBy('onTimePct')} className={sortBy === 'onTimePct' ? 'bg-white border' : ''}>Best On-time</Button>
-              <Button variant="outline" onClick={() => setSortBy('earnings')} className={sortBy === 'earnings' ? 'bg-white border' : ''}>Top Earnings</Button>
+              <Button variant="outline" onClick={() => setSortBy('deliveries')} className={sortBy === 'deliveries' ? 'bg-white border' : ''}>{t("top_deliveries")}</Button>
+              <Button variant="outline" onClick={() => setSortBy('onTimePct')} className={sortBy === 'onTimePct' ? 'bg-white border' : ''}>{t("best_on_time")}</Button>
+              <Button variant="outline" onClick={() => setSortBy('earnings')} className={sortBy === 'earnings' ? 'bg-white border' : ''}>{t("top_earnings")}</Button>
             </div>
-            <Button onClick={exportCSV} className="flex items-center gap-2"><Download className="w-4 h-4" />Export CSV</Button>
+            <Button onClick={exportCSV} className="flex items-center gap-2"><Download className="w-4 h-4" />{t("export_csv")}</Button>
           </div>
         </div>
       </motion.div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <KPICard title="Total Partners (filtered)" value={filtered.length} icon={<Users />} />
-        <KPICard title="Avg On-time %" value={`${calcAvg(filtered,'onTimePct')}%`} />
-        <KPICard title="Avg Delivery Time" value={`${calcAvg(filtered,'avgTime')} min`} />
-        <KPICard title="Total Earnings" value={`€ ${calcSum(filtered,'earnings').toLocaleString()}`} />
+        <KPICard title={t("total_partners_filtered")} value={filtered.length} icon={<Users />} />
+        <KPICard title={t("avg_on_time")} value={`${calcAvg(filtered, 'onTimePct')}%`} />
+        <KPICard title={t("avg_delivery_time")} value={`${calcAvg(filtered, 'avgTime')} min`} />
+        <KPICard title={t("total_earnings")} value={`€ ${calcSum(filtered, 'earnings').toLocaleString()}`} />
       </div>
 
       {/* Charts + Leaderboard */}
@@ -176,8 +178,8 @@ export default function DeliveryPartnerPerformancePage() {
         <Card className="p-6 h-72">
           <div className="flex items-start justify-between mb-3">
             <div>
-              <h4 className="font-semibold">Deliveries / Revenue ({dateRange === '30' ? 'Last 3 months' : dateRange === '90' ? 'Last 6 months' : 'Last 12 months'})</h4>
-              <p className="text-xs text-slate-500 mt-1">Aggregated for top partners</p>
+              <h4 className="font-semibold">{t("deliveries_revenue")} ({dateRange === '30' ? 'Last 3 months' : dateRange === '90' ? t("last_6_months") : t("last_12_months")})</h4>
+              <p className="text-xs text-slate-500 mt-1">{t("aggregated_for_top_partners")}</p>
             </div>
             <div className="flex items-center gap-2">
               <RangeBtn label="3m" v="30" state={dateRange} set={setDateRange} />
@@ -204,8 +206,8 @@ export default function DeliveryPartnerPerformancePage() {
         {/* Leaderboard */}
         <Card className="p-4 col-span-1 lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-lg">Top Partners</h4>
-            <div className="text-sm text-slate-500">Sorted by <strong>{sortBy}</strong></div>
+            <h4 className="font-semibold text-lg">{t("top_partners")}</h4>
+            <div className="text-sm text-slate-500">{t("sorted_by")} <strong>{sortBy}</strong></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -216,16 +218,16 @@ export default function DeliveryPartnerPerformancePage() {
                   <div className="min-w-0">
                     <div className="font-semibold truncate">{idx + 1}. {p.name}</div>
                     <div className="text-xs text-slate-500 truncate">{p.city} • {p.vehicle || '—'}</div>
-                    <div className="text-xs text-slate-400 mt-1">Rating: <strong>{p.rating} ⭐</strong></div>
+                    <div className="text-xs text-slate-400 mt-1">{t("rating")}: <strong>{p.rating} ⭐</strong></div>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-sm text-slate-500">Deliveries</div>
+                  <div className="text-sm text-slate-500">{t("deliveries")}</div>
                   <div className="font-bold text-lg">{p.deliveries}</div>
                   <div className="text-xs text-slate-500 mt-1">€ {p.earnings.toLocaleString()}</div>
                   <div className="mt-2 flex items-center gap-2 justify-end">
-                    <Button size="sm" variant="ghost" onClick={() => setSelected(p)}><Eye className="w-4 h-4 mr-1" />View</Button>
+                    <Button size="sm" variant="ghost" onClick={() => setSelected(p)}><Eye className="w-4 h-4 mr-1" />{t("view")}</Button>
                   </div>
                 </div>
               </motion.div>
@@ -240,14 +242,14 @@ export default function DeliveryPartnerPerformancePage() {
           <thead className="bg-slate-100 text-slate-700 font-semibold">
             <tr>
               <th className="px-4 py-2 text-left w-[60px]">#</th>
-              <th className="px-4 py-2 text-left w-[260px]">Partner</th>
-              <th className="px-4 py-2 text-center w-[120px]">City</th>
-              <th className="px-4 py-2 text-center w-[120px]">Deliveries</th>
-              <th className="px-4 py-2 text-center w-[120px]">On-time %</th>
-              <th className="px-4 py-2 text-center w-[120px]">Avg Time</th>
-              <th className="px-4 py-2 text-center w-[120px]">Cancel %</th>
-              <th className="px-4 py-2 text-center w-[140px]">Earnings</th>
-              <th className="px-4 py-2 text-center w-[120px]">Actions</th>
+              <th className="px-4 py-2 text-left w-[260px]">{t("partner")}</th>
+              <th className="px-4 py-2 text-center w-[120px]">{t("city")}</th>
+              <th className="px-4 py-2 text-center w-[120px]">{t("deliveries")}</th>
+              <th className="px-4 py-2 text-center w-[120px]">{t("on_time")} %</th>
+              <th className="px-4 py-2 text-center w-[120px]">{t("avg_time")}</th>
+              <th className="px-4 py-2 text-center w-[120px]">{t("cancel")} %</th>
+              <th className="px-4 py-2 text-center w-[140px]">{t("earnings")}</th>
+              <th className="px-4 py-2 text-center w-[120px]">{t("actions")}</th>
             </tr>
           </thead>
 
@@ -278,7 +280,7 @@ export default function DeliveryPartnerPerformancePage() {
                   </div>
                 </td>
 
-                <td className="px-4 py-3 text-center">{p.avgTime} min</td>
+                <td className="px-4 py-3 text-center">{p.avgTime} {t("min")}</td>
                 <td className="px-4 py-3 text-center">
                   <span className={`px-2 py-1 rounded-full text-xs font-semibold ${p.cancelPct > 3 ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}`}>
                     {p.cancelPct}%
@@ -290,14 +292,14 @@ export default function DeliveryPartnerPerformancePage() {
                 <td className="px-4 py-3 text-center">
                   <div className="flex items-center gap-2 justify-center">
                     <Button size="sm" variant="ghost" onClick={() => setSelected(p)}><Eye className="w-4 h-4" /></Button>
-                    <Button size="sm" style={{ background: DELIGO }} onClick={() => alert('Open payout modal (mock)')}>Payout</Button>
+                    <Button size="sm" style={{ background: DELIGO }} onClick={() => alert('Open payout modal (mock)')}>{t("payout")}</Button>
                   </div>
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={9} className="py-8 text-center text-slate-500">No partners match your filters.</td>
+                <td colSpan={9} className="py-8 text-center text-slate-500">{t("no_partners_match_filters")}</td>
               </tr>
             )}
           </tbody>
@@ -308,8 +310,8 @@ export default function DeliveryPartnerPerformancePage() {
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <SheetContent className="max-w-3xl p-6 overflow-y-auto border-l bg-white">
           <SheetHeader>
-            <SheetTitle>Partner Analytics — {selected?.name}</SheetTitle>
-            <SheetDescription>Detailed performance, monthly growth & activity</SheetDescription>
+            <SheetTitle>{t("partner_analytics")} — {selected?.name}</SheetTitle>
+            <SheetDescription>{t("detailed_performance_monthly_growth")}</SheetDescription>
           </SheetHeader>
 
           {selected && (
@@ -319,15 +321,15 @@ export default function DeliveryPartnerPerformancePage() {
                   <Avatar className="w-16 h-16"><AvatarImage src={SAMPLE_AVATAR} /><AvatarFallback>{initials(selected.name)}</AvatarFallback></Avatar>
                   <div>
                     <h3 className="text-xl font-bold">{selected.name}</h3>
-                    <div className="text-sm text-slate-500">{selected.city} • Rating: <strong>{selected.rating} ⭐</strong></div>
-                    <div className="text-xs text-slate-400 mt-1">Last active: {selected.lastActive || '—'}</div>
+                    <div className="text-sm text-slate-500">{selected.city} • {t("rating")}: <strong>{selected.rating} ⭐</strong></div>
+                    <div className="text-xs text-slate-400 mt-1">{t("last_active")}: {selected.lastActive || '—'}</div>
                   </div>
                 </div>
 
                 <Separator />
 
                 <div className="mt-4 mb-4">
-                  <h4 className="font-semibold mb-2">Monthly Growth</h4>
+                  <h4 className="font-semibold mb-2">{t("monthly_growth")}</h4>
                   <div style={{ height: 220 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={selected.monthTrend}>
@@ -345,7 +347,7 @@ export default function DeliveryPartnerPerformancePage() {
                 <Separator />
 
                 <div className="mt-4">
-                  <h4 className="font-semibold mb-2">Recent Activity</h4>
+                  <h4 className="font-semibold mb-2">{t("recent_activity")}</h4>
                   <ul className="space-y-3 text-sm">
                     <li>• Completed 35 deliveries in last 7 days</li>
                     <li>• On-time rate improved by 4% vs previous period</li>
@@ -356,23 +358,23 @@ export default function DeliveryPartnerPerformancePage() {
 
               <div className="col-span-1 space-y-4">
                 <Card className="p-4">
-                  <p className="text-xs text-slate-500">Deliveries</p>
+                  <p className="text-xs text-slate-500">{t("deliveries")}</p>
                   <h3 className="text-2xl font-bold">{selected.deliveries}</h3>
                 </Card>
 
                 <Card className="p-4">
-                  <p className="text-xs text-slate-500">On-time %</p>
+                  <p className="text-xs text-slate-500">{t("on_time")} %</p>
                   <h3 className="text-2xl font-bold">{selected.onTimePct}%</h3>
                 </Card>
 
                 <Card className="p-4">
-                  <p className="text-xs text-slate-500">Avg Time</p>
-                  <h3 className="text-2xl font-bold">{selected.avgTime} min</h3>
+                  <p className="text-xs text-slate-500">{t("avg_time")}</p>
+                  <h3 className="text-2xl font-bold">{selected.avgTime} {t("min")}</h3>
                 </Card>
 
                 <div className="space-y-2">
-                  <Button className="w-full" style={{ background: DELIGO }} onClick={() => alert('Message partner (mock)')}>Message Partner</Button>
-                  <Button variant="outline" className="w-full" onClick={() => alert('View violations (mock)')}>View Violations</Button>
+                  <Button className="w-full" style={{ background: DELIGO }} onClick={() => alert('Message partner (mock)')}>{t("message_partner")}</Button>
+                  <Button variant="outline" className="w-full" onClick={() => alert('View violations (mock)')}>{t("view_violations")}</Button>
                 </div>
               </div>
             </div>
@@ -385,7 +387,7 @@ export default function DeliveryPartnerPerformancePage() {
 
 // ---------------- Mock Data ----------------
 function monthsForDemo() {
-  const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return labels.map((m, i) => ({
     month: m,
     deliveries: Math.floor(200 + Math.random() * 800),
@@ -397,7 +399,7 @@ function monthsForDemo() {
 
 function mockPartners(): PartnerSummary[] {
   const baseMonths = monthsForDemo();
-  const names = ['João Silva','Maria Fernandes','Rui Costa','Ana Pereira','Rui Almeida','Rita Gomes','Carlos Sousa','Prego Urban'];
+  const names = ['João Silva', 'Maria Fernandes', 'Rui Costa', 'Ana Pereira', 'Rui Almeida', 'Rita Gomes', 'Carlos Sousa', 'Prego Urban'];
   return names.map((n, i) => {
     const monthTrend = baseMonths.map((m, idx) => ({
       month: m.month,
@@ -422,7 +424,7 @@ function mockPartners(): PartnerSummary[] {
       cancelPct: Math.floor(Math.random() * 5),
       earnings,
       lastActive: new Date(Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24)).toISOString(),
-      vehicle: ['Bike','Scooter','Car'][i % 3],
+      vehicle: ['Bike', 'Scooter', 'Car'][i % 3],
       monthTrend,
     } as PartnerSummary;
   });

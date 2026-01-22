@@ -1,10 +1,10 @@
 "use client"
-import  { useState } from "react";
+import { useState } from "react";
 import {
-  
+
   Flame,
   Timer,
-  
+
   Download,
   ChevronDown,
   ChevronUp,
@@ -19,8 +19,9 @@ import {
   Tooltip,
   BarChart,
   Bar,
-  
+
 } from "recharts";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
@@ -66,6 +67,7 @@ const weekdayData = [
 ];
 
 export default function PeakHoursAnalysisPage() {
+  const { t } = useTranslation();
   const [range, setRange] = useState("Last 7 days");
   const [expanded, setExpanded] = useState(false);
 
@@ -90,8 +92,8 @@ export default function PeakHoursAnalysisPage() {
         {/* Header */}
         <header className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold">Peak Hours Analysis</h1>
-            <p className="text-sm text-gray-500 mt-1">Real-time demand spikes & hourly order patterns — Portugal.</p>
+            <h1 className="text-2xl md:text-3xl font-extrabold">{t("peak_hours_analysis")}</h1>
+            <p className="text-sm text-gray-500 mt-1">{t("real_time_demand_spikes_hourly_order")}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -101,17 +103,17 @@ export default function PeakHoursAnalysisPage() {
               className="px-3 py-2 rounded-md border text-sm shadow-sm focus:outline-none focus:ring-2"
               style={{ borderColor: PRIMARY }}
             >
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Last 90 days</option>
-              <option>Current week</option>
+               <option>{t("last_7_days")}</option>
+              <option>{t("last_30_days")}</option>
+              <option>{t("last_90_days")}</option>
+              <option>{t("current_week")}</option>
             </select>
 
             <button
               onClick={exportCSV}
               className="flex items-center gap-2 px-3 py-2 rounded-md bg-white text-sm border shadow-sm hover:shadow transition"
             >
-              <Download size={16} /> Export
+              <Download size={16} /> {t("export")}
             </button>
           </div>
         </header>
@@ -121,9 +123,9 @@ export default function PeakHoursAnalysisPage() {
           <div className="bg-white p-4 rounded-2xl shadow hover:shadow-md transition">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm text-gray-500">Peak Hour</h3>
+                <h3 className="text-sm text-gray-500">{t("peak_hour")}</h3>
                 <p className="text-2xl font-semibold mt-1">{bestHour.hour}:00</p>
-                <p className="text-xs text-gray-500">{bestHour.orders} orders</p>
+                <p className="text-xs text-gray-500">{bestHour.orders} {t("orders")}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ background: `${PRIMARY}11` }}>
                 <Flame color={PRIMARY} size={26} />
@@ -134,9 +136,9 @@ export default function PeakHoursAnalysisPage() {
           <div className="bg-white p-4 rounded-2xl shadow hover:shadow-md transition">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm text-gray-500">Lowest Hour</h3>
+                <h3 className="text-sm text-gray-500">{t("lowest_hour")}</h3>
                 <p className="text-2xl font-semibold mt-1">{worstHour.hour}:00</p>
-                <p className="text-xs text-gray-500">{worstHour.orders} orders</p>
+                <p className="text-xs text-gray-500">{worstHour.orders} {t("orders")}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ background: `${PRIMARY}11` }}>
                 <Timer color={PRIMARY} size={26} />
@@ -146,7 +148,7 @@ export default function PeakHoursAnalysisPage() {
 
           <div className="bg-white p-4 rounded-2xl shadow hover:shadow-md transition">
             <div>
-              <h3 className="text-sm text-gray-500">Most Active Day</h3>
+              <h3 className="text-sm text-gray-500">{t("most_active_day")}</h3>
               <p className="text-2xl font-semibold mt-1">Saturday</p>
               <p className="text-xs text-gray-500">11.3k orders</p>
             </div>
@@ -154,17 +156,17 @@ export default function PeakHoursAnalysisPage() {
 
           <div className="bg-white p-4 rounded-2xl shadow hover:shadow-md transition">
             <div>
-              <h3 className="text-sm text-gray-500">Weekly Volume</h3>
+              <h3 className="text-sm text-gray-500">{t("weekly_volume")}</h3>
               <p className="text-2xl font-semibold mt-1">52.4k</p>
-              <p className="text-xs text-gray-500">Total orders this week</p>
+              <p className="text-xs text-gray-500">{t("total_orders_this_week")}</p>
             </div>
           </div>
         </section>
 
         {/* Hourly Line Chart */}
         <section className="bg-white p-5 rounded-2xl shadow mb-6">
-          <h2 className="font-semibold text-lg mb-1">Hourly Order Flow</h2>
-          <p className="text-sm text-gray-500 mb-4">Shows which hours experience maximum demand</p>
+          <h2 className="font-semibold text-lg mb-1">{t("hourly_order_flow")}</h2>
+          <p className="text-sm text-gray-500 mb-4">{t("shows_which_hours_experience_maximum_demand")}</p>
 
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -181,8 +183,8 @@ export default function PeakHoursAnalysisPage() {
 
         {/* Weekday Bar Chart */}
         <section className="bg-white p-5 rounded-2xl shadow mb-6">
-          <h2 className="font-semibold text-lg mb-1">Demand by Day of Week</h2>
-          <p className="text-sm text-gray-500 mb-4">Average total daily order volume</p>
+          <h2 className="font-semibold text-lg mb-1">{t("demand_by_day_of_week")}</h2>
+          <p className="text-sm text-gray-500 mb-4">{t("average_total_daily_order_volume")}</p>
 
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -203,7 +205,7 @@ export default function PeakHoursAnalysisPage() {
             onClick={() => setExpanded(!expanded)}
             className="flex items-center justify-between w-full text-left"
           >
-            <h3 className="font-semibold text-lg">AI‑Generated Insights</h3>
+            <h3 className="font-semibold text-lg">{t("ai_generated_insights")}</h3>
             {expanded ? <ChevronUp /> : <ChevronDown />}
           </button>
 

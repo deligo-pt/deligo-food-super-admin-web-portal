@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "@/hooks/use-translation";
 import { updateBusinessCategoryReq } from "@/services/dashboard/category/business-category";
 import { TBusinessCategory } from "@/types/category.type";
 import { updateBusinessCategoryValidation } from "@/validations/category/business-category.validation";
@@ -40,6 +41,7 @@ export default function EditBusinessCategoryModal({
   onClose,
   category,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const form = useForm<FormData>({
     resolver: zodResolver(updateBusinessCategoryValidation),
@@ -121,7 +123,7 @@ export default function EditBusinessCategoryModal({
             <form>
               <DialogContent className="w-full h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Edit Business Category</DialogTitle>
+                  <DialogTitle>{t("edit_business_category")}</DialogTitle>
                   <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -138,13 +140,13 @@ export default function EditBusinessCategoryModal({
                             <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                               <div className="flex items-center">
                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">Category Name</span>
+                                <span className="ml-2">{t("category_name")}</span>
                               </div>
                             </FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
-                                placeholder="e.g. Restaurant"
+                                placeholder={t("eg_restaurant")}
                                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
                               />
                             </FormControl>
@@ -161,7 +163,7 @@ export default function EditBusinessCategoryModal({
                             <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                               <div className="flex items-center">
                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">Category Image</span>
+                                <span className="ml-2">{t("category_image")}</span>
                               </div>
                             </FormLabel>
                             <FormControl>
@@ -183,7 +185,7 @@ export default function EditBusinessCategoryModal({
                             <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                               <div className="flex items-center">
                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">Description</span>
+                                <span className="ml-2">{t("description")}</span>
                               </div>
                             </FormLabel>
                             <FormControl>
@@ -208,7 +210,7 @@ export default function EditBusinessCategoryModal({
                           scale: 0.98,
                         }}
                       >
-                        Update Business Category
+                        {t("update_business_category")}
                       </motion.button>
                     </div>
                   </form>

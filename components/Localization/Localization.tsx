@@ -4,6 +4,7 @@ import { CurrencyInput } from "@/components/Localization/CurrencyInput";
 import { Switch } from "@/components/Switch/Switch";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { BadgeEuro, Check, Clock, Globe, Search } from "lucide-react";
 import { useState } from "react";
@@ -48,6 +49,7 @@ const staticLanguages = [
 ];
 
 export function Localization() {
+  const { t } = useTranslation();
   const [languages, setLanguages] = useState(staticLanguages);
 
   const toggleLanguage = (code: string) => {
@@ -55,9 +57,9 @@ export function Localization() {
       languages.map((lang) =>
         lang.code === code && !lang.default
           ? {
-              ...lang,
-              enabled: !lang.enabled,
-            }
+            ...lang,
+            enabled: !lang.enabled,
+          }
           : lang
       )
     );
@@ -79,9 +81,9 @@ export function Localization() {
             duration: 0.5,
           }}
         >
-          <h1 className="text-2xl font-bold text-[#DC3173]">Localization</h1>
+          <h1 className="text-2xl font-bold text-[#DC3173]">{t("localization")}</h1>
           <p className="text-gray-500 mt-1">
-            Languages, currencies, and timezones
+            {t("languages_currencies_timezones")}
           </p>
         </motion.div>
       </div>
@@ -95,10 +97,10 @@ export function Localization() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Supported Languages
+                  {t("supported_languages")}
                 </h2>
                 <p className="text-sm text-gray-500">
-                  Manage available languages for your platform
+                  {t("manage_available_languages")}
                 </p>
               </div>
             </div>
@@ -109,22 +111,20 @@ export function Localization() {
                   key={lang.code}
                   className={`
                   flex items-center justify-between p-4 rounded-xl border transition-all duration-200
-                  ${
-                    lang.enabled
+                  ${lang.enabled
                       ? "border-[#DC3173] bg-pink-50/30"
                       : "border-gray-200 bg-white opacity-70"
-                  }
+                    }
                 `}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`
                     w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold uppercase
-                    ${
-                      lang.enabled
-                        ? "bg-[#DC3173] text-white"
-                        : "bg-gray-100 text-gray-500"
-                    }
+                    ${lang.enabled
+                          ? "bg-[#DC3173] text-white"
+                          : "bg-gray-100 text-gray-500"
+                        }
                   `}
                     >
                       {lang.code}
@@ -147,7 +147,7 @@ export function Localization() {
               ))}
 
               <button className="flex items-center justify-center p-4 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50 transition-all">
-                <span className="text-sm font-medium">+ Add New Language</span>
+                <span className="text-sm font-medium">+ {t("add_new_language")}</span>
               </button>
             </div>
           </CardContent>
@@ -162,24 +162,24 @@ export function Localization() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Currency Format
+                  {t("currency_format")}
                 </h2>
                 <p className="text-sm text-gray-500">
-                  Configure how prices are displayed
+                  {t("configure_how_prices_displayed")}
                 </p>
               </div>
             </div>
 
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <CurrencyInput label="Currency Symbol" defaultValue="€" />
-                <CurrencyInput label="Currency Code" defaultValue="EURO" />
+                <CurrencyInput label={t("currency_symbol")} defaultValue="€" />
+                <CurrencyInput label={t("currency_code")} defaultValue="EURO" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Decimal Places
+                    {t("decimal_places")}
                   </label>
                   <select className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#DC3173]">
                     <option>0 (100)</option>
@@ -189,7 +189,7 @@ export function Localization() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Separator
+                    {t("separator")}
                   </label>
                   <select className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#DC3173]">
                     <option>Comma (1,000.00)</option>
@@ -200,7 +200,7 @@ export function Localization() {
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-between">
-                <span className="text-sm text-gray-500">Preview:</span>
+                <span className="text-sm text-gray-500">{t("preview")}:</span>
                 <span className="text-xl font-bold text-gray-900">
                   € 1,234.56
                 </span>
@@ -218,10 +218,10 @@ export function Localization() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Regional Settings
+                  {t("regional_settings")}
                 </h2>
                 <p className="text-sm text-gray-500">
-                  Timezone and date formats
+                  {t("timezone_date_formats")}
                 </p>
               </div>
             </div>
@@ -229,7 +229,7 @@ export function Localization() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Operational Timezone
+                  {t("operational_timezone")}
                 </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -244,7 +244,7 @@ export function Localization() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Date Format
+                  {t("date_format")}
                 </label>
                 <div className="space-y-2">
                   {[
@@ -276,7 +276,7 @@ export function Localization() {
 
       <div className="flex justify-end pt-6 border-t border-gray-200">
         <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90" size="lg">
-          <Check className="w-4 h-4" /> Save Configuration
+          <Check className="w-4 h-4" /> {t("save_configuration")}
         </Button>
       </div>
     </div>

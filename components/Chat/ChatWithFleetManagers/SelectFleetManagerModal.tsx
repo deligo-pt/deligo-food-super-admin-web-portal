@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/hooks/use-translation";
 import { TAgent } from "@/types/user.type";
 import { Mail, Store, UserCircle } from "lucide-react";
 
@@ -27,14 +28,16 @@ export default function SelectFleetManagerModal({
   onClick,
   fleetManagers,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <form>
         <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Start a conversation</DialogTitle>
+            <DialogTitle>{t("start_a_conversation")}</DialogTitle>
             <DialogDescription>
-              Select a fleet manager to start a conversation
+              {t("")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -76,7 +79,7 @@ export default function SelectFleetManagerModal({
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{t("cancel")}</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

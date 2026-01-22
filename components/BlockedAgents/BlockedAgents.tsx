@@ -17,6 +17,8 @@ import { TMeta } from "@/types";
 import { TAgent } from "@/types/user.type";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/hooks/use-translation";
+import { getSortOptions } from "@/utils/sortOptions";
 
 const DELIGO = "#DC3173";
 
@@ -24,14 +26,10 @@ interface IProps {
   agentsResult: { data: TAgent[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
 
 export default function BlockedFleetManagers({ agentsResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     agentId: "",
@@ -46,8 +44,7 @@ export default function BlockedFleetManagers({ agentsResult }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6 flex items-center gap-3"
       >
-        <Ban className="w-8 h-8" style={{ color: DELIGO }} /> Blocked Fleet
-        Managers
+        <Ban className="w-8 h-8" style={{ color: DELIGO }} /> {t("blocked_fleet_managers")}
       </motion.h1>
 
       {/* SEARCH */}
@@ -56,14 +53,14 @@ export default function BlockedFleetManagers({ agentsResult }: IProps) {
       {/* LIST CARD */}
       <Card className="p-6 bg-white shadow-sm rounded-2xl">
         <h2 className="text-xl font-semibold mb-4">
-          Blocked Managers: {agentsResult?.meta?.total}
+          {t("blocked_managers")}: {agentsResult?.meta?.total}
         </h2>
         <Separator className="mb-4" />
 
         <div className="space-y-4">
           {agentsResult?.data?.length === 0 ? (
             <div className="py-8 text-center text-slate-500">
-              No blocked managers found.
+              {t("no_blocked_managers_found")}
             </div>
           ) : (
             agentsResult?.data?.map((f) => (
@@ -78,8 +75,8 @@ export default function BlockedFleetManagers({ agentsResult }: IProps) {
                     <AvatarFallback>
                       {f.name?.firstName || f.name?.lastName
                         ? `${f.name?.firstName?.charAt(
-                            0
-                          )}${f.name?.lastName?.charAt(0)}`
+                          0
+                        )}${f.name?.lastName?.charAt(0)}`
                         : ""}
                     </AvatarFallback>
                   </Avatar>
@@ -90,18 +87,18 @@ export default function BlockedFleetManagers({ agentsResult }: IProps) {
                     </div>
                     <div className="text-xs text-slate-500">{f.email}</div>
                     <div className="text-xs text-slate-500">
-                      City: {f.businessLocation?.city}
+                      {t("city")}: {f.businessLocation?.city}
                     </div>
 
                     <div className="mt-2 flex items-center gap-2">
-                      <Badge variant="destructive">Blocked</Badge>
+                      <Badge variant="destructive">{t("blocked")}</Badge>
                     </div>
                   </div>
                 </div>
 
                 <div className="text-right">
                   <p className="font-semibold text-slate-600 text-sm">
-                    Blocked:{" "}
+                    {t("blocked")}:{" "}
                     {f.approvedOrRejectedOrBlockedAt
                       ? format(f.approvedOrRejectedOrBlockedAt, "dd/MM/yyyy")
                       : "N/A"}
@@ -113,7 +110,7 @@ export default function BlockedFleetManagers({ agentsResult }: IProps) {
                       variant="outline"
                       onClick={() => router.push(`/admin/agent/${f.userId}`)}
                     >
-                      <Eye className="w-4 h-4 mr-1" /> Details
+                      <Eye className="w-4 h-4 mr-1" /> {t("details")}
                     </Button>
                     <Button
                       size="sm"
@@ -125,7 +122,7 @@ export default function BlockedFleetManagers({ agentsResult }: IProps) {
                         })
                       }
                     >
-                      <CheckCircle className="w-4 h-4 mr-1" /> Unblock
+                      <CheckCircle className="w-4 h-4 mr-1" /> {t("unblock")}
                     </Button>
                   </div>
                 </div>

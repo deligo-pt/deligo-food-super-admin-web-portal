@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/use-translation";
+import { getSortOptions } from "@/utils/sortOptions";
 
 const DELIGO = "#DC3173";
 
@@ -33,14 +35,9 @@ interface IProps {
   partnersResult: { data: TDeliveryPartner[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [isExporting, setIsExporting] = useState(false);
   const [statusInfo, setStatusInfo] = useState({
@@ -161,36 +158,36 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
         className="text-3xl font-extrabold mb-6 flex items-center gap-3"
       >
         <AlertTriangle className="w-8 h-8" style={{ color: DELIGO }} />{" "}
-        Suspended Delivery Partners
+        {t("suspended_delivery_partners")}
       </motion.h1>
 
       {/* Stats row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Total Suspended</p>
+          <p className="text-xs text-slate-500">{t("total_suspended")}</p>
           <h3 className="text-2xl font-bold">{partnersResult?.meta?.total}</h3>
         </Card>
         <div />
         <div />
         <Card className="p-4">
-          <p className="text-xs text-slate-500">Actions</p>
+          <p className="text-xs text-slate-500">{t("actions")}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <Button
               variant="outline"
               onClick={() => exportCSV()}
               disabled={isExporting}
             >
-              <Download className="w-4 h-4" /> Export CSV
+              <Download className="w-4 h-4" /> {t("export_csv")}
             </Button>
             <Button
               onClick={exportPDF}
               disabled={isExporting}
               className="flex items-center gap-2"
             >
-              <Download className="w-4 h-4" /> Export PDF
+              <Download className="w-4 h-4" /> {t("export_pdf")}
             </Button>
             <Button variant="outline" onClick={() => router.refresh()}>
-              <RefreshCcw className="w-4 h-4" /> Reload
+              <RefreshCcw className="w-4 h-4" /> {t("reload")}
             </Button>
           </div>
         </Card>
@@ -207,12 +204,12 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
         <table className="w-full text-sm">
           <thead className="bg-slate-100 text-slate-700 font-semibold sticky top-0">
             <tr>
-              <th className="px-4 py-3 text-left w-[260px]">Partner</th>
-              <th className="px-4 py-3 text-center w-[120px]">City</th>
-              <th className="px-4 py-3 text-center w-[120px]">Rating</th>
-              <th className="px-4 py-3 text-center w-[180px]">Suspended At</th>
-              <th className="px-4 py-3 text-left w-[320px]">Reason</th>
-              <th className="px-4 py-3 text-center w-[200px]">Actions</th>
+              <th className="px-4 py-3 text-left w-[260px]">{t("partner")}</th>
+              <th className="px-4 py-3 text-center w-[120px]">{t("city")}</th>
+              <th className="px-4 py-3 text-center w-[120px]">{t("rating")}</th>
+              <th className="px-4 py-3 text-center w-[180px]">{t("suspended_at")}</th>
+              <th className="px-4 py-3 text-left w-[320px]">{t("reason")}</th>
+              <th className="px-4 py-3 text-center w-[200px]">{t("actions")}</th>
             </tr>
           </thead>
 
@@ -226,8 +223,8 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
                       <AvatarFallback>
                         {p.name?.firstName || p.name?.lastName
                           ? `${p.name?.firstName?.charAt(
-                              0
-                            )}${p.name?.lastName?.charAt(0)}`
+                            0
+                          )}${p.name?.lastName?.charAt(0)}`
                           : ""}
                       </AvatarFallback>
                     </Avatar>
@@ -268,7 +265,7 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
                       }
                       aria-label={`View ${p.name} details`}
                     >
-                      View
+                      {t("view")}
                     </Button>
                     <Button
                       size="sm"
@@ -282,7 +279,7 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
                       }
                     >
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      Reactivate
+                      {t("reactivate")}
                     </Button>
                     <Button
                       size="sm"
@@ -290,7 +287,7 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
                       aria-label={`Delete ${p.name}`}
                     >
                       <XCircle className="w-4 h-4 mr-1" />
-                      Delete
+                      {t("delete")}
                     </Button>
                   </div>
                 </td>
@@ -300,7 +297,7 @@ export default function SuspendedDeliveryPartners({ partnersResult }: IProps) {
             {partnersResult?.data?.length === 0 && (
               <tr>
                 <td colSpan={9} className="py-8 text-center text-slate-500">
-                  No suspended partners match your filters.
+                  {t("no_suspended_partners_match_your_filters")}
                 </td>
               </tr>
             )}

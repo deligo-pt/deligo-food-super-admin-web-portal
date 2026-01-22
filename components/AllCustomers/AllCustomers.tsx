@@ -9,9 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { USER_STATUS } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/deleteUser";
 import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Check, Eye, Slash, Trash } from "lucide-react";
@@ -26,45 +28,9 @@ interface IProps {
 
 type TUserStatus = keyof typeof USER_STATUS;
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
-
 export default function AllCustomers({ customersResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     customerId: "",
@@ -73,6 +39,36 @@ export default function AllCustomers({ customersResult }: IProps) {
     remarks: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const filterOptions = [
+    {
+      label: t("status"),
+      key: "status",
+      placeholder: t("select_status"),
+      type: "select",
+      items: [
+        {
+          label: t("pending"),
+          value: "PENDING",
+        },
+        {
+          label: t("submitted"),
+          value: "SUBMITTED",
+        },
+        {
+          label: t("approved"),
+          value: "APPROVED",
+        },
+        {
+          label: t("rejected"),
+          value: "REJECTED",
+        },
+        {
+          label: t("blocked"),
+          value: "BLOCKED",
+        },
+      ],
+    },
+  ];
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -122,7 +118,7 @@ export default function AllCustomers({ customersResult }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6"
       >
-        All Customers
+        {t("all_customers")}
       </motion.h1>
 
       <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
@@ -133,12 +129,12 @@ export default function AllCustomers({ customersResult }: IProps) {
           <thead className="bg-slate-100 text-slate-700 font-semibold">
             <tr>
               <th className="px-4 py-3 text-left w-[60px]">#</th>
-              <th className="px-4 py-3 text-left w-[280px]">Customer</th>
-              <th className="px-4 py-3 text-center w-[120px]">Orders</th>
-              <th className="px-4 py-3 text-center w-[150px]">Spend (€)</th>
-              <th className="px-4 py-3 text-center w-[150px]">Status</th>
-              <th className="px-4 py-3 text-center w-[150px]">Joined</th>
-              <th className="px-4 py-3 text-center w-[260px]">Actions</th>
+              <th className="px-4 py-3 text-left w-[280px]">{t("customer")}</th>
+              <th className="px-4 py-3 text-center w-[120px]">{t("orders_lg")}</th>
+              <th className="px-4 py-3 text-center w-[150px]">{t("spend")} (€)</th>
+              <th className="px-4 py-3 text-center w-[150px]">{t("status")}</th>
+              <th className="px-4 py-3 text-center w-[150px]">{t("joined")}</th>
+              <th className="px-4 py-3 text-center w-[260px]">{t("actions")}</th>
             </tr>
           </thead>
 
@@ -178,7 +174,7 @@ export default function AllCustomers({ customersResult }: IProps) {
 
                 <td className="px-4 py-4 text-center">
                   <div className="font-semibold">{c.orders?.totalOrders}</div>
-                  <div className="text-xs text-slate-500">orders</div>
+                  <div className="text-xs text-slate-500">{t("orders")}</div>
                 </td>
 
                 <td className="px-4 py-4 text-center">
@@ -220,7 +216,7 @@ export default function AllCustomers({ customersResult }: IProps) {
                           })
                         }
                       >
-                        <Check className="w-4 h-4 mr-1" /> Unblock
+                        <Check className="w-4 h-4 mr-1" /> {t("unblock")}
                       </Button>
                     ) : (
                       <Button
@@ -235,7 +231,7 @@ export default function AllCustomers({ customersResult }: IProps) {
                           })
                         }
                       >
-                        <Slash className="w-4 h-4 mr-1" /> Block
+                        <Slash className="w-4 h-4 mr-1" /> {t("block")}
                       </Button>
                     )}
                     {!c?.isDeleted && (
@@ -245,7 +241,7 @@ export default function AllCustomers({ customersResult }: IProps) {
                         className="whitespace-nowrap"
                         onClick={() => setDeleteId(c.userId as string)}
                       >
-                        <Trash className="w-4 h-4 mr-1" /> Delete
+                        <Trash className="w-4 h-4 mr-1" /> {t("delete")}
                       </Button>
                     )}
                   </div>

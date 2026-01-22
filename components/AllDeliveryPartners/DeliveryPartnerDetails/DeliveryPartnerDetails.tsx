@@ -7,6 +7,7 @@ import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteDeliveryPartner } from "@/services/dashboard/deliveryPartner/deliveryPartner";
 import { TResponse } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
@@ -47,12 +48,13 @@ const formatDate = (date: Date | undefined) => {
 };
 
 export const DeliveryPartnerDetails = ({ partner }: IProps) => {
+  const { t } = useTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const router = useRouter();
   const fullName =
     `${partner.name?.firstName || ""} ${partner.name?.lastName || ""}`.trim() ||
-    "No Name Provided";
+    t("no_name_provided");
 
   const getVehicleIcon = () => {
     switch (partner.vehicleInfo?.vehicleType) {
@@ -104,7 +106,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle /> Go Back
+          <ArrowLeftCircle /> {t("go_back")}
         </Button>
       </div>
       <motion.div
@@ -202,174 +204,172 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         <Section title="Personal Details" icon={<User />} defaultOpen={true}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
-              <InfoRow label="Full Name" value={fullName} />
-              <InfoRow label="Email" value={partner.email} />
+              <InfoRow label={t("full_name")} value={fullName} />
+              <InfoRow label={t("email")} value={partner.email} />
               <InfoRow
-                label="Contact Number"
+                label={t("contact_number")}
                 value={partner?.contactNumber || "N/A"}
               />
               <InfoRow
-                label="Gender"
+                label={t("gender")}
                 value={partner.personalInfo?.gender || "N/A"}
               />
             </div>
             <div>
               <InfoRow
-                label="Date of Birth"
+                label={t("date_of_birth")}
                 value={formatDate(partner.personalInfo?.dateOfBirth)}
               />
               <InfoRow
-                label="Nationality"
+                label={t("nationality")}
                 value={partner.personalInfo?.nationality || "N/A"}
               />
               <InfoRow
-                label="Email Verified"
+                label={t("email_verified")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${
-                      partner.isEmailVerified
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
+                    className={`px-2 py-0.5 rounded text-xs ${partner.isEmailVerified
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                      }`}
                   >
-                    {partner.isEmailVerified ? "Yes" : "No"}
+                    {partner.isEmailVerified ? t("yes") : t("no")}
                   </span>
                 }
               />
               <InfoRow
-                label="ID Expiry Date"
+                label={t("id_expiry_date")}
                 value={formatDate(partner.personalInfo?.idExpiryDate)}
               />
             </div>
           </div>
         </Section>
-        <Section title="Address" icon={<MapPin />}>
+        <Section title={t("address")} icon={<MapPin />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Street"
+                label={t("street")}
                 value={partner.address?.street || "N/A"}
               />
-              <InfoRow label="City" value={partner.address?.city || "N/A"} />
+              <InfoRow label={t("city")} value={partner.address?.city || "N/A"} />
             </div>
             <div>
-              <InfoRow label="State" value={partner.address?.state || "N/A"} />
+              <InfoRow label={t("state")} value={partner.address?.state || "N/A"} />
               <InfoRow
-                label="Country"
+                label={t("country")}
                 value={partner.address?.country || "N/A"}
               />
               <InfoRow
-                label="Zip Code"
+                label={t("zip_code")}
                 value={partner.address?.postalCode || "N/A"}
               />
             </div>
           </div>
         </Section>
-        <Section title="Vehicle Information" icon={getVehicleIcon()}>
+        <Section title={t("vehicle_information")} icon={getVehicleIcon()}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Vehicle Type"
+                label={t("vehicle_type")}
                 value={partner.vehicleInfo?.vehicleType || "N/A"}
               />
               <InfoRow
-                label="Brand"
+                label={t("brand")}
                 value={partner.vehicleInfo?.brand || "N/A"}
               />
               <InfoRow
-                label="Model"
+                label={t("model")}
                 value={partner.vehicleInfo?.model || "N/A"}
               />
               <InfoRow
-                label="License Plate"
+                label={t("license_plate")}
                 value={partner.vehicleInfo?.licensePlate || "N/A"}
               />
             </div>
             <div>
               <InfoRow
-                label="Driving License Number"
+                label={t("driving_license_number")}
                 value={partner.vehicleInfo?.drivingLicenseNumber || "N/A"}
               />
               <InfoRow
-                label="License Expiry"
+                label={t("license_expiry")}
                 value={formatDate(partner.vehicleInfo?.drivingLicenseExpiry)}
               />
               <InfoRow
-                label="Insurance Policy Number"
+                label={t("insurance_policy_number")}
                 value={partner.vehicleInfo?.insurancePolicyNumber || "N/A"}
               />
               <InfoRow
-                label="Insurance Expiry"
+                label={t("insurance_expiry")}
                 value={formatDate(partner.vehicleInfo?.insuranceExpiry)}
               />
             </div>
           </div>
         </Section>
-        <Section title="Bank Details" icon={<CreditCard />}>
+        <Section title={t("bank_details")} icon={<CreditCard />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Bank Name"
+                label={t("bank_name")}
                 value={partner.bankDetails?.bankName || "N/A"}
               />
               <InfoRow
-                label="Account Holder"
+                label={t("account_holder")}
                 value={partner.bankDetails?.accountHolderName || "N/A"}
               />
             </div>
             <div>
               <InfoRow
-                label="IBAN"
+                label={t("iban")}
                 value={partner.bankDetails?.iban || "N/A"}
               />
               <InfoRow
-                label="SWIFT Code"
+                label={t("swift_code")}
                 value={partner.bankDetails?.swiftCode || "N/A"}
               />
             </div>
           </div>
         </Section>
-        <Section title="Legal Status" icon={<Gavel />}>
+        <Section title={t("legal_status")} icon={<Gavel />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Residence Permit Type"
+                label={t("residence_permit_type")}
                 value={partner.legalStatus?.residencePermitType || "N/A"}
               />
               <InfoRow
-                label="Residence Permit Number"
+                label={t("residence_permit_number")}
                 value={partner.legalStatus?.residencePermitNumber || "N/A"}
               />
             </div>
             <div>
               <InfoRow
-                label="Permit Expiry Date"
+                label={t("permit_expiry_date")}
                 value={formatDate(partner.legalStatus?.residencePermitExpiry)}
               />
               <InfoRow
-                label="Criminal Record Certificate"
+                label={t("criminal_record_certification")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${
-                      partner.criminalRecord?.certificate
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
+                    className={`px-2 py-0.5 rounded text-xs ${partner.criminalRecord?.certificate
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-800"
+                      }`}
                   >
                     {partner.criminalRecord?.certificate
-                      ? "Provided"
-                      : "Not Provided"}
+                      ? t("provided")
+                      : t("not_provided")}
                   </span>
                 }
               />
             </div>
           </div>
         </Section>
-        <Section title="Documents" icon={<FileText />}>
+        <Section title={t("documents")} icon={<FileText />}>
           <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6">
             {partner.documents?.idDocumentFront && (
               <div>
-                <div className="mb-2 text-gray-500 text-sm">ID Proof Front</div>
+                <div className="mb-2 text-gray-500 text-sm">{t("id_proof_front")}</div>
                 <ImagePreview
                   url={partner.documents.idDocumentFront}
                   alt="ID Proof Front"
@@ -378,7 +378,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             )}
             {partner.documents?.idDocumentBack && (
               <div>
-                <div className="mb-2 text-gray-500 text-sm">ID Proof Back</div>
+                <div className="mb-2 text-gray-500 text-sm">{t("id_proof_back")}</div>
                 <ImagePreview
                   url={partner.documents.idDocumentBack}
                   alt="ID Proof Back"
@@ -388,7 +388,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             {partner.documents?.drivingLicense && (
               <div>
                 <div className="mb-2 text-gray-500 text-sm">
-                  Driving License
+                  {t("driving_license")}
                 </div>
                 <ImagePreview
                   url={partner.documents.drivingLicense}
@@ -399,7 +399,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             {partner.documents?.vehicleRegistration && (
               <div>
                 <div className="mb-2 text-gray-500 text-sm">
-                  Vehicle Registration
+                  {t("vehicle_registration")}
                 </div>
                 <ImagePreview
                   url={partner.documents.vehicleRegistration}
@@ -410,7 +410,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             {partner.documents?.criminalRecordCertificate && (
               <div>
                 <div className="mb-2 text-gray-500 text-sm">
-                  Criminal Record Certificate
+                  {t("criminal_record_certificate")}
                 </div>
                 <ImagePreview
                   url={partner.documents.criminalRecordCertificate}
@@ -420,46 +420,46 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             )}
           </div>
         </Section>
-        <Section title="Operational Data" icon={<Package />}>
+        <Section title={t("operational_date")} icon={<Package />}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-              <div className="text-gray-500 text-xs mb-1">Total Deliveries</div>
+              <div className="text-gray-500 text-xs mb-1">{t("total_deliveries")}</div>
               <div className="text-2xl font-bold text-gray-900">
                 {partner.operationalData?.totalDeliveries || 0}
               </div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-              <div className="text-gray-500 text-xs mb-1">Completed</div>
+              <div className="text-gray-500 text-xs mb-1">{t("completed")}</div>
               <div className="text-2xl font-bold text-green-600">
                 {partner.operationalData?.completedDeliveries || 0}
               </div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-              <div className="text-gray-500 text-xs mb-1">Canceled</div>
+              <div className="text-gray-500 text-xs mb-1">{t("cancelled")}</div>
               <div className="text-2xl font-bold text-red-600">
                 {partner.operationalData?.canceledDeliveries || 0}
               </div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-              <div className="text-gray-500 text-xs mb-1">Rating</div>
+              <div className="text-gray-500 text-xs mb-1">{t("rating")}</div>
               <div className="text-2xl font-bold text-amber-500 flex items-center justify-center">
                 {partner.operationalData?.rating?.average.toFixed(1) || "N/A"}{" "}
                 <Star className="w-4 h-4 ml-1" fill="currentColor" />
               </div>
               <div className="text-xs text-gray-500">
-                {partner.operationalData?.rating?.totalReviews || 0} reviews
+                {partner.operationalData?.rating?.totalReviews || 0} {t("reviews")}
               </div>
             </div>
           </div>
           {partner.earnings && (
             <div className="mt-6">
               <h4 className="text-sm font-medium text-gray-700 mb-2">
-                Earnings
+                {t("earnings")}
               </h4>
               <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="text-gray-500 text-xs mb-1">
-                    Total Earnings
+                    {t("total_earnings")}
                   </div>
                   <div className="text-xl font-bold text-gray-900">
                     €{partner.earnings.totalEarnings?.toFixed(2) || "0.00"}
@@ -467,7 +467,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="text-gray-500 text-xs mb-1">
-                    Pending Earnings
+                    {t("pending_earnings")}
                   </div>
                   <div className="text-xl font-bold text-[#DC3173]">
                     €{partner.earnings.pendingEarnings?.toFixed(2) || "0.00"}
@@ -477,103 +477,100 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             </div>
           )}
         </Section>
-        <Section title="Work Preferences" icon={<Briefcase />}>
+        <Section title={t("work_preferences")} icon={<Briefcase />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Preferred Zones"
+                label={t("preferred_zones")}
                 value={
                   partner.workPreferences?.preferredZones?.join(", ") ||
-                  "None specified"
+                  t("none_specified")
                 }
               />
               <InfoRow
-                label="Preferred Hours"
+                label={t("preferred_hours")}
                 value={
                   partner.workPreferences?.preferredHours?.join(", ") ||
-                  "None specified"
+                  t("none_specified")
                 }
               />
               <InfoRow
-                label="Worked with other platforms"
+                label={t("worked_with_other_platform")}
                 value={
                   partner.workPreferences?.workedWithOtherPlatform
-                    ? "Yes"
-                    : "No"
+                    ? t("yes")
+                    : t("no")
                 }
               />
               {partner.workPreferences?.workedWithOtherPlatform && (
                 <InfoRow
-                  label="Platform Name"
+                  label={t("platform_name")}
                   value={
                     partner.workPreferences?.otherPlatformName ||
-                    "Not specified"
+                    t("not_specified")
                   }
                 />
               )}
             </div>
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-2">
-                Equipment
+                {t("equipment")}
               </h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${
-                      partner.workPreferences?.hasEquipment?.isothermalBag
-                        ? "bg-[#DC3173]"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.isothermalBag
+                      ? "bg-[#DC3173]"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
-                  <span className="text-sm text-gray-700">Isothermal Bag</span>
+                  <span className="text-sm text-gray-700">{t("isothermal_bag")}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${
-                      partner.workPreferences?.hasEquipment?.helmet
-                        ? "bg-[#DC3173]"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.helmet
+                      ? "bg-[#DC3173]"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
-                  <span className="text-sm text-gray-700">Helmet</span>
+                  <span className="text-sm text-gray-700">{t("helmet")}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${
-                      partner.workPreferences?.hasEquipment?.powerBank
-                        ? "bg-[#DC3173]"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.powerBank
+                      ? "bg-[#DC3173]"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
-                  <span className="text-sm text-gray-700">Power Bank</span>
+                  <span className="text-sm text-gray-700">{t("power_bank")}</span>
                 </div>
               </div>
             </div>
           </div>
         </Section>
-        <Section title="Account Information" icon={<CalendarClock />}>
+        <Section title={t("account_information")} icon={<CalendarClock />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Account Created"
+                label={t("account_created")}
                 value={formatDate(partner.createdAt)}
               />
               <InfoRow
-                label="Last Updated"
+                label={t("last_updated")}
                 value={formatDate(partner.updatedAt)}
               />
               <InfoRow
-                label="Submitted For Approval"
+                label={t("submitted_for_approval")}
                 value={formatDate(partner.submittedForApprovalAt)}
               />
             </div>
             <div>
               <InfoRow
-                label="Approved/Rejected/Blocked At"
+                label={t("approved_rejected_blocked_at")}
                 value={formatDate(partner.approvedOrRejectedOrBlockedAt)}
               />
               {partner.remarks && (
-                <InfoRow label="Remarks" value={partner.remarks} />
+                <InfoRow label={t("remarks")} value={partner.remarks} />
               )}
             </div>
           </div>
@@ -592,7 +589,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
               >
                 <Check className="w-4 h-4" />
-                <span>Approve</span>
+                <span>{t("approve")}</span>
               </motion.button>
               <motion.button
                 onClick={() => setApproveStatus("REJECTED")}
@@ -605,7 +602,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 className="flex items-center space-x-1 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-sm hover:bg-yellow-600"
               >
                 <X className="w-4 h-4" />
-                <span>Reject</span>
+                <span>{t("reject")}</span>
               </motion.button>
             </>
           )}
@@ -621,7 +618,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               className="flex items-center space-x-1 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-sm hover:bg-yellow-600"
             >
               <Ban className="w-4 h-4" />
-              <span>Block</span>
+              <span>{t("block")}</span>
             </motion.button>
           )}
           {partner.status === "BLOCKED" && (
@@ -636,7 +633,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
             >
               <Check className="w-4 h-4" />
-              <span>Unblock</span>
+              <span>{t("unblock")}</span>
             </motion.button>
           )}
           {!partner.isDeleted && (
@@ -651,7 +648,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               className="flex items-center space-x-1 px-4 py-2 bg-red-500 bg-opacity-10 text-white rounded-lg transition-all hover:bg-opacity-20"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Delete</span>
+              <span>{t("delete")}</span>
             </motion.button>
           )}
         </div>

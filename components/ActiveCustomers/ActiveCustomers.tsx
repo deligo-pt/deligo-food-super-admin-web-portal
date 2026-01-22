@@ -8,8 +8,10 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Check, Eye, Slash, Trash } from "lucide-react";
@@ -19,14 +21,10 @@ interface IProps {
   customersResult: { data: TCustomer[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function ActiveCustomers({ customersResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
+
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1
@@ -34,7 +32,7 @@ export default function ActiveCustomers({ customersResult }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6"
       >
-        Active Customers
+        {t("active_customers")}
       </motion.h1>
       <AllFilters sortOptions={sortOptions} />
       {/* Table with horizontal scroll */}
@@ -43,11 +41,11 @@ export default function ActiveCustomers({ customersResult }: IProps) {
           <thead className="bg-slate-100 text-slate-700 font-semibold">
             <tr>
               <th className="px-4 py-3 text-left w-[60px]">#</th>
-              <th className="px-4 py-3 text-left w-[260px]">Customer</th>
-              <th className="px-4 py-3 text-center w-[140px]">Orders</th>
-              <th className="px-4 py-3 text-center w-[150px]">Spend (€)</th>
-              <th className="px-4 py-3 text-center w-[150px]">Joined</th>
-              <th className="px-4 py-3 text-center w-[220px]">Actions</th>
+              <th className="px-4 py-3 text-left w-[280px]">{t("customer")}</th>
+              <th className="px-4 py-3 text-center w-[120px]">{t("orders_lg")}</th>
+              <th className="px-4 py-3 text-center w-[150px]">{t("spend")} (€)</th>
+              <th className="px-4 py-3 text-center w-[150px]">{t("joined")}</th>
+              <th className="px-4 py-3 text-center w-[260px]">{t("actions")}</th>
             </tr>
           </thead>
 
@@ -84,7 +82,7 @@ export default function ActiveCustomers({ customersResult }: IProps) {
 
                 <td className="px-4 py-4 text-center">
                   <div className="font-semibold">{c.orders?.totalOrders}</div>
-                  <p className="text-xs text-slate-500">orders</p>
+                  <p className="text-xs text-slate-500">{t("orders")}</p>
                 </td>
 
                 <td className="px-4 py-4 text-center font-bold text-emerald-600">
@@ -105,14 +103,14 @@ export default function ActiveCustomers({ customersResult }: IProps) {
                         size="sm"
                         className="whitespace-nowrap bg-[#DC3173] hover:bg-[#DC3173]/90"
                       >
-                        <Check className="w-4 h-4 mr-1" /> Unblock
+                        <Check className="w-4 h-4 mr-1" /> {t("unblock")}
                       </Button>
                     ) : (
                       <Button
                         size="sm"
                         className="whitespace-nowrap bg-yellow-500 hover:bg-yellow-600"
                       >
-                        <Slash className="w-4 h-4 mr-1" /> Block
+                        <Slash className="w-4 h-4 mr-1" /> {t("block")}
                       </Button>
                     )}
                     {!c?.isDeleted && (
@@ -121,7 +119,7 @@ export default function ActiveCustomers({ customersResult }: IProps) {
                         variant="destructive"
                         className="whitespace-nowrap"
                       >
-                        <Trash className="w-4 h-4 mr-1" /> Delete
+                        <Trash className="w-4 h-4 mr-1" /> {t("delete")}
                       </Button>
                     )}
                   </div>

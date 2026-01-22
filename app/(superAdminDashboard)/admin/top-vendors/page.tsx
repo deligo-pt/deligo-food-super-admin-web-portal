@@ -1,5 +1,5 @@
 "use client"
-import  { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Star,
   Search,
@@ -17,6 +17,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
@@ -119,6 +120,7 @@ const MOCK_VENDORS: Vendor[] = [
 ];
 
 export default function TopVendorsPage() {
+  const { t } = useTranslation();
   // UI state
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -193,12 +195,12 @@ export default function TopVendorsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-b from-white to-gray-50 text-gray-800">
+    <div className="min-h-screen p-6 bg-linear-to-b from-white to-gray-50 text-gray-800">
       <div className="max-w-7xl mx-auto">
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">Top Vendors</h1>
-            <p className="text-sm text-gray-500 mt-1">Curated ranking of the best-performing restaurants — Portugal (Deligo).</p>
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">{t("top_vendors")}</h1>
+            <p className="text-sm text-gray-500 mt-1">{t("curated_ranking_the_best_performing_restaurants")}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -208,7 +210,7 @@ export default function TopVendorsPage() {
                 id="vendor-search"
                 className="pl-11 pr-3 py-2 w-64 rounded-full border text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-white"
                 style={{ borderColor: PRIMARY }}
-                placeholder="Search name or zone (Ctrl/Cmd+K)"
+                placeholder={t("search_name_zone")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 aria-label="Search vendors"
@@ -222,7 +224,7 @@ export default function TopVendorsPage() {
                 title="Toggle view"
                 aria-pressed={view === "grid"}
               >
-                {view === "grid" ? "Table" : "Grid"}
+                {view === "grid" ? t("table") : t("grid")}
               </button>
 
               <button
@@ -231,8 +233,8 @@ export default function TopVendorsPage() {
                 aria-label="Export CSV"
               >
                 <Download size={16} />
-                <span className="sr-only">Export</span>
-                <span className="text-sm">Export</span>
+                <span className="sr-only">{t("export")}</span>
+                <span className="text-sm">{t("export")}</span>
               </button>
             </div>
           </div>
@@ -241,7 +243,7 @@ export default function TopVendorsPage() {
         {/* Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="text-xs text-gray-500">Sort by</div>
+            <div className="text-xs text-gray-500">{t("sort_by")}</div>
             <div className="inline-flex bg-white rounded-full shadow-sm overflow-hidden" role="tablist" aria-label="Sort options">
               <button
                 onClick={() => toggleSort("revenue")}
@@ -249,7 +251,7 @@ export default function TopVendorsPage() {
                 role="tab"
                 aria-selected={sortBy === "revenue"}
               >
-                Revenue {sortBy === "revenue" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
+                {t("revenue")} {sortBy === "revenue" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
               </button>
               <button
                 onClick={() => toggleSort("orders")}
@@ -257,7 +259,7 @@ export default function TopVendorsPage() {
                 role="tab"
                 aria-selected={sortBy === "orders"}
               >
-                Orders {sortBy === "orders" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
+                {t("orders_lg")} {sortBy === "orders" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
               </button>
               <button
                 onClick={() => toggleSort("growth")}
@@ -265,7 +267,7 @@ export default function TopVendorsPage() {
                 role="tab"
                 aria-selected={sortBy === "growth"}
               >
-                Growth {sortBy === "growth" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
+                {t("growth")} {sortBy === "growth" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
               </button>
               <button
                 onClick={() => toggleSort("rating")}
@@ -273,13 +275,13 @@ export default function TopVendorsPage() {
                 role="tab"
                 aria-selected={sortBy === "rating"}
               >
-                Rating {sortBy === "rating" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
+                {t("rating")} {sortBy === "rating" && (desc ? <ChevronDown size={14} /> : <ChevronUp size={14} />)}
               </button>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-500">Results: <span className="font-medium text-gray-700">{filtered.length}</span></div>
+            <div className="text-sm text-gray-500">{t("results_lg")}: <span className="font-medium text-gray-700">{filtered.length}</span></div>
 
             <div className="inline-flex items-center gap-2 text-sm">
               <button
@@ -316,11 +318,11 @@ export default function TopVendorsPage() {
             {view === "grid" ? (
               <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6" aria-live="polite">
                 {pageItems.map((v) => (
-                  <article key={v.id} tabIndex={0} aria-labelledby={`vendor-${v.id}-name`} className="bg-white rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2" onKeyDown={(e)=>{ if(e.key === 'Enter') setSelectedVendor(v); }}>
+                  <article key={v.id} tabIndex={0} aria-labelledby={`vendor-${v.id}-name`} className="bg-white rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2" onKeyDown={(e) => { if (e.key === 'Enter') setSelectedVendor(v); }}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-50 to-pink-100 flex items-center justify-center text-white font-bold text-sm" style={{ color: PRIMARY }}>
-                          {v.name.split(" ").slice(0,2).map(n=>n[0]).join("")}
+                        <div className="w-12 h-12 rounded-xl bg-linear-to-br from-pink-50 to-pink-100 flex items-center justify-center text-white font-bold text-sm" style={{ color: PRIMARY }}>
+                          {v.name.split(" ").slice(0, 2).map(n => n[0]).join("")}
                         </div>
                         <div>
                           <h3 id={`vendor-${v.id}-name`} className="font-semibold">{v.name}</h3>
@@ -336,12 +338,12 @@ export default function TopVendorsPage() {
 
                     <div className="mt-3 grid grid-cols-2 gap-3 items-center">
                       <div>
-                        <div className="text-xs text-gray-500">Orders</div>
+                        <div className="text-xs text-gray-500">{t("orders")}</div>
                         <div className="font-medium">{v.orders.toLocaleString()}</div>
                       </div>
 
                       <div className="flex flex-col items-end">
-                        <div className="text-xs text-gray-500">Rating</div>
+                        <div className="text-xs text-gray-500">{t("rating")}</div>
                         <div className="font-medium flex items-center gap-2"><Star size={14} className="text-yellow-500" /> {v.rating}</div>
                       </div>
                     </div>
@@ -365,17 +367,17 @@ export default function TopVendorsPage() {
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {v.status === "Active" ? (
-                          <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14} /> Active</span>
+                          <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14} /> {t("active")}</span>
                         ) : v.status === "Paused" ? (
-                          <span className="text-red-600 flex items-center gap-1"><XCircle size={14} /> Paused</span>
+                          <span className="text-red-600 flex items-center gap-1"><XCircle size={14} /> {t("paused")}</span>
                         ) : (
-                          <span className="text-yellow-600">Pending</span>
+                          <span className="text-yellow-600">{t("pending")}</span>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <button onClick={()=>setSelectedVendor(v)} className="px-3 py-1 rounded-md bg-white border hover:shadow text-sm focus:outline-none focus:ring-2">View</button>
-                        <button className="px-3 py-1 rounded-md text-white" style={{ background: PRIMARY }}>Promote</button>
+                        <button onClick={() => setSelectedVendor(v)} className="px-3 py-1 rounded-md bg-white border hover:shadow text-sm focus:outline-none focus:ring-2">{t("view")}</button>
+                        <button className="px-3 py-1 rounded-md text-white" style={{ background: PRIMARY }}>{t("promote")}</button>
                       </div>
                     </div>
                   </article>
@@ -387,15 +389,15 @@ export default function TopVendorsPage() {
                 <table className="w-full text-left text-sm table-auto" role="table" aria-label="Top vendors table">
                   <thead>
                     <tr className="text-gray-500">
-                      <th className="pb-3">Vendor</th>
-                      <th className="pb-3">Rating</th>
-                      <th className="pb-3">Orders</th>
-                      <th className="pb-3">Revenue</th>
-                      <th className="pb-3">Zone</th>
-                      <th className="pb-3">Trend</th>
-                      <th className="pb-3">Growth</th>
-                      <th className="pb-3">Status</th>
-                      <th className="pb-3">Actions</th>
+                      <th className="pb-3">{t("vendor")}</th>
+                      <th className="pb-3">{t("rating")}</th>
+                      <th className="pb-3">{t("orders")}</th>
+                      <th className="pb-3">{t("revenue")}</th>
+                      <th className="pb-3">{t("zone")}</th>
+                      <th className="pb-3">{t("trend")}</th>
+                      <th className="pb-3">{t("growth")}</th>
+                      <th className="pb-3">{t("status")}</th>
+                      <th className="pb-3">{t("actions")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -424,15 +426,15 @@ export default function TopVendorsPage() {
                         </td>
                         <td className="py-3">
                           {v.status === "Active" ? (
-                            <span className="flex items-center gap-1 text-green-600"><CheckCircle size={14} /> Active</span>
+                            <span className="flex items-center gap-1 text-green-600"><CheckCircle size={14} /> {t("active")}</span>
                           ) : (
-                            <span className="flex items-center gap-1 text-red-600"><XCircle size={14} /> Paused</span>
+                            <span className="flex items-center gap-1 text-red-600"><XCircle size={14} /> {t("paused")}</span>
                           )}
                         </td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <button onClick={()=>setSelectedVendor(v)} className="px-3 py-1 rounded-md bg-white border hover:shadow text-sm focus:outline-none focus:ring-2">View</button>
-                            <button className="px-3 py-1 rounded-md text-white" style={{ background: PRIMARY }}>Promote</button>
+                            <button onClick={() => setSelectedVendor(v)} className="px-3 py-1 rounded-md bg-white border hover:shadow text-sm focus:outline-none focus:ring-2">{t("view")}</button>
+                            <button className="px-3 py-1 rounded-md text-white" style={{ background: PRIMARY }}>{t("promote")}</button>
                           </div>
                         </td>
                       </tr>
@@ -444,7 +446,7 @@ export default function TopVendorsPage() {
 
             {/* Pagination controls repeated below for easy access */}
             <div className="flex items-center justify-between gap-4 mb-6">
-              <div className="text-sm text-gray-500">Showing <span className="font-medium text-gray-700">{(page-1)*pageSize+1}</span> - <span className="font-medium text-gray-700">{Math.min(page*pageSize, filtered.length)}</span> of <span className="font-medium text-gray-700">{filtered.length}</span></div>
+              <div className="text-sm text-gray-500">{t("showing")} <span className="font-medium text-gray-700">{(page - 1) * pageSize + 1}</span> - <span className="font-medium text-gray-700">{Math.min(page * pageSize, filtered.length)}</span> {t("of")} <span className="font-medium text-gray-700">{filtered.length}</span></div>
               <div className="inline-flex items-center gap-2 text-sm">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -477,7 +479,7 @@ export default function TopVendorsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h2 id="vendor-modal-title" className="text-xl font-semibold">{selectedVendor.name}</h2>
-                  <p className="text-sm text-gray-500 mt-1">{selectedVendor.zone} • Rating {selectedVendor.rating}</p>
+                  <p className="text-sm text-gray-500 mt-1">{selectedVendor.zone} • {t("rating")} {selectedVendor.rating}</p>
                 </div>
                 <button aria-label="Close" className="p-2 rounded-md hover:bg-gray-100" onClick={() => setSelectedVendor(null)}>
                   <X size={18} />
@@ -498,11 +500,11 @@ export default function TopVendorsPage() {
 
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-xs text-gray-500">Orders</div>
+                      <div className="text-xs text-gray-500">{t("orders")}</div>
                       <div className="font-semibold">{selectedVendor.orders.toLocaleString()}</div>
                     </div>
                     <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-xs text-gray-500">Revenue</div>
+                      <div className="text-xs text-gray-500">{t("revenue")}</div>
                       <div className="font-semibold">€{selectedVendor.revenue.toLocaleString()}</div>
                     </div>
                   </div>
@@ -510,21 +512,21 @@ export default function TopVendorsPage() {
 
                 <aside className="bg-gray-50 p-4 rounded-lg flex flex-col gap-3">
                   <div className="flex items-center justify-between">
-                    <div className="text-xs text-gray-500">Growth</div>
-                    <div className={`text-sm font-semibold ${selectedVendor.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>{selectedVendor.growth >=0 ? `+${selectedVendor.growth}%` : `${selectedVendor.growth}%`}</div>
+                    <div className="text-xs text-gray-500">{t("growth")}</div>
+                    <div className={`text-sm font-semibold ${selectedVendor.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>{selectedVendor.growth >= 0 ? `+${selectedVendor.growth}%` : `${selectedVendor.growth}%`}</div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {selectedVendor.status === 'Active' ? (
-                      <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14}/> Active</span>
+                      <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14} /> {t("active")}</span>
                     ) : (
-                      <span className="text-red-600 flex items-center gap-1"><XCircle size={14}/> Paused</span>
+                      <span className="text-red-600 flex items-center gap-1"><XCircle size={14} /> {t("paused")}</span>
                     )}
                   </div>
 
                   <div className="pt-2">
-                    <button className="w-full px-3 py-2 rounded-md text-white font-medium" style={{ background: PRIMARY }}>Promote vendor</button>
-                    <button className="w-full mt-2 px-3 py-2 rounded-md border" onClick={()=>{ alert('Open payout settings (placeholder)'); }}>Payouts</button>
+                    <button className="w-full px-3 py-2 rounded-md text-white font-medium" style={{ background: PRIMARY }}>{t("promote_vendor")}</button>
+                    <button className="w-full mt-2 px-3 py-2 rounded-md border" onClick={() => { alert('Open payout settings (placeholder)'); }}>{t("payouts")}</button>
                   </div>
                 </aside>
               </div>

@@ -1,5 +1,5 @@
 "use client"
-import  { useState } from "react";
+import { useState } from "react";
 import {
   ShieldAlert,
   Power,
@@ -9,10 +9,12 @@ import {
   CheckCircle,
   Wrench,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
 export default function MaintenanceMode() {
+  const { t } = useTranslation();
   const [enabled, setEnabled] = useState(false);
   const [title, setTitle] = useState("We'll be back soon");
   const [message, setMessage] = useState("We are performing scheduled maintenance. The system will return shortly.");
@@ -32,10 +34,10 @@ export default function MaintenanceMode() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-2">
-            <Wrench className="text-[#DC3173]" /> Maintenance Mode
+            <Wrench className="text-[#DC3173]" /> {t("maintenance_mode")}
           </h1>
           <p className="text-sm text-gray-500 mt-1 max-w-xl">
-            Configure global maintenance mode. When enabled, all users will see a maintenance screen.
+            {t("configure_global_maintenance_mode")}
           </p>
         </div>
 
@@ -44,7 +46,7 @@ export default function MaintenanceMode() {
           className="px-4 py-2 rounded-xl text-white shadow-md flex items-center gap-2"
           style={{ background: "#DC3173" }}
         >
-          <Save size={16} /> Save Changes
+          <Save size={16} /> {t("save_changes")}
         </button>
       </header>
 
@@ -56,8 +58,8 @@ export default function MaintenanceMode() {
             <div className="flex items-center gap-3">
               <ShieldAlert size={22} className={enabled ? "text-red-600" : "text-gray-400"} />
               <div>
-                <div className="font-medium text-gray-900">Enable Maintenance Mode</div>
-                <p className="text-xs text-gray-500">Show global downtime screen to all users.</p>
+                <div className="font-medium text-gray-900">{t("enable_maintenance_mode")}</div>
+                <p className="text-xs text-gray-500">{t("show_global_downtime_screen_users")}</p>
               </div>
             </div>
 
@@ -72,18 +74,18 @@ export default function MaintenanceMode() {
 
           {/* TITLE */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Maintenance Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("maintenance_title")}</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border focus:ring-2 focus:ring-[#ffd4e6]"
-              placeholder="We’ll be back soon"
+              placeholder={t("we_will_be_back_soon")}
             />
           </div>
 
           {/* MESSAGE */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("message")}</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -93,7 +95,7 @@ export default function MaintenanceMode() {
 
           {/* SCHEDULE */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Schedule (Optional)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t("schedule_optional")}</label>
             <div className="flex items-center gap-3">
               <Clock className="text-gray-500" />
               <input
@@ -103,7 +105,7 @@ export default function MaintenanceMode() {
                 className="px-3 py-2 rounded-lg border focus:ring-2 focus:ring-[#ffd4e6]"
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">Users will see scheduled downtime info.</p>
+            <p className="text-xs text-gray-400 mt-1">{t("users_will_see_scheduled_downtime_info")}</p>
           </div>
         </section>
 
@@ -111,12 +113,12 @@ export default function MaintenanceMode() {
         <aside className="space-y-6">
           <div className="bg-white rounded-2xl shadow p-5">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <AlertTriangle size={18} className="text-[#DC3173]" /> Preview
+              <AlertTriangle size={18} className="text-[#DC3173]" /> {t("preview")}
             </h3>
 
             <div className="mt-4 p-4 border rounded-xl bg-gray-50">
               {!enabled && (
-                <div className="text-gray-400 text-sm text-center py-10">Maintenance mode is disabled</div>
+                <div className="text-gray-400 text-sm text-center py-10">{t("maintenance_mode_disabled")}</div>
               )}
 
               {enabled && (
@@ -126,7 +128,7 @@ export default function MaintenanceMode() {
                   <p className="text-sm text-gray-600 whitespace-pre-line">{message}</p>
 
                   {schedule && (
-                    <div className="text-xs text-gray-500 mt-2">Scheduled: {new Date(schedule).toLocaleString()}</div>
+                    <div className="text-xs text-gray-500 mt-2">{t("scheduled")}: {new Date(schedule).toLocaleString()}</div>
                   )}
                 </div>
               )}
@@ -136,11 +138,10 @@ export default function MaintenanceMode() {
           {/* STATUS */}
           {status.type && (
             <div
-              className={`p-3 rounded-lg text-sm flex items-center gap-2 ${
-                status.type === "success"
+              className={`p-3 rounded-lg text-sm flex items-center gap-2 ${status.type === "success"
                   ? "bg-green-50 text-green-700 border border-green-200"
                   : "bg-red-50 text-red-700 border border-red-200"
-              }`}
+                }`}
             >
               {status.type === "success" ? (
                 <CheckCircle size={16} />

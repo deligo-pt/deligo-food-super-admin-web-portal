@@ -8,14 +8,15 @@ import {
   Cpu,
   Smartphone,
   Globe,
- 
+
   CheckCircle,
   XCircle,
   Trash2,
-  
+
   ToggleLeft,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/use-translation";
 
 type LoginRecord = {
   id: string;
@@ -24,7 +25,7 @@ type LoginRecord = {
   ip: string;
   city?: string;
   country?: string;
-  device: string; 
+  device: string;
   browser: string;
   os: string;
   status: "success" | "failed";
@@ -52,6 +53,7 @@ const secToH = (s?: number) => {
 };
 
 export default function LoginHistoryPage() {
+  const { t } = useTranslation();
   const [records, setRecords] = useState<LoginRecord[]>(mock);
   const [query, setQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "success" | "failed">("all");
@@ -65,7 +67,7 @@ export default function LoginHistoryPage() {
       const matchQ = !q || r.admin.toLowerCase().includes(q) || r.email.toLowerCase().includes(q) || r.ip.includes(q) || (r.city && r.city.toLowerCase().includes(q));
       const matchStatus = filterStatus === "all" || r.status === filterStatus;
       return matchQ && matchStatus;
-    }).sort((a,b) => +new Date(b.timestamp) - +new Date(a.timestamp));
+    }).sort((a, b) => +new Date(b.timestamp) - +new Date(a.timestamp));
   }, [records, query, filterStatus]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
@@ -87,18 +89,18 @@ export default function LoginHistoryPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `login-history-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `login-history-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 bg-gradient-to-b from-white via-gray-50 to-gray-100">
+    <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
       <div className="max-w-6xl mx-auto">
         <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Login History</h1>
-            <p className="mt-1 text-sm text-gray-600">See recent sign-ins, failed attempts, and session activity for admins.</p>
+            <h1 className="text-2xl md:text-3xl font-bold">{t("login_history")}</h1>
+            <p className="mt-1 text-sm text-gray-600">{t("see_recent_sign_ins_failed_attempts")}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -108,17 +110,17 @@ export default function LoginHistoryPage() {
             </div>
 
             <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value as any); setPage(1); }} className="px-3 py-2 border rounded-lg bg-white shadow-sm">
-              <option value="all">All</option>
-              <option value="success">Success</option>
-              <option value="failed">Failed</option>
+              <option value="all">{t("all")}</option>
+              <option value="success">{t("success")}</option>
+              <option value="failed">{t("failed")}</option>
             </select>
 
             <button onClick={exportCSV} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#DC3173] text-white shadow hover:brightness-95">
-              <Download size={16} /> Export
+              <Download size={16} /> {t("export")}
             </button>
 
             <button onClick={() => setTimeline(t => !t)} className="inline-flex items-center gap-2 px-3 py-2 rounded-full border bg-white">
-              <ToggleLeft size={16} /> {timeline ? 'Timeline' : 'List'}
+              <ToggleLeft size={16} /> {timeline ? t("timeline") : t("list")}
             </button>
           </div>
         </header>
@@ -161,7 +163,7 @@ export default function LoginHistoryPage() {
 
                         <div className="ml-auto flex items-center gap-2">
                           <button onClick={() => revokeSession(r.id)} className="flex items-center gap-2 px-3 py-1 rounded-md bg-red-50 text-red-700 border">
-                            <Trash2 size={14} /> Revoke
+                            <Trash2 size={14} /> {t("revoke")}
                           </button>
                         </div>
                       </div>
@@ -169,13 +171,13 @@ export default function LoginHistoryPage() {
                   </motion.div>
                 ))}
 
-                {visible.length === 0 && <div className="text-center text-gray-500 py-8">No login records found.</div>}
+                {visible.length === 0 && <div className="text-center text-gray-500 py-8">{t("no_login_records_found")}</div>}
 
                 {/* pagination */}
                 <div className="pt-4 flex items-center justify-center">
-                  <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page===1} className="px-3 py-1 rounded-md border mr-2">Prev</button>
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded-md border mr-2">Prev</button>
                   <div className="px-3 py-1 rounded-md bg-gray-50 border">{page} / {totalPages}</div>
-                  <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page===totalPages} className="px-3 py-1 rounded-md border ml-2">Next</button>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded-md border ml-2">Next</button>
                 </div>
               </div>
             </div>
@@ -184,13 +186,13 @@ export default function LoginHistoryPage() {
               <table className="min-w-full table-auto text-sm">
                 <thead className="bg-gray-50 text-gray-600">
                   <tr>
-                    <th className="p-3 text-left">Admin</th>
-                    <th className="p-3 text-left">IP / Location</th>
-                    <th className="p-3 text-left">Device</th>
-                    <th className="p-3 text-left">Browser / OS</th>
-                    <th className="p-3 text-left">Time</th>
-                    <th className="p-3 text-left">Status</th>
-                    <th className="p-3 text-right">Actions</th>
+                    <th className="p-3 text-left">{t('admin')}</th>
+                    <th className="p-3 text-left">{t("ip_location")}</th>
+                    <th className="p-3 text-left">{t("device")}</th>
+                    <th className="p-3 text-left">{t("browser_os")}</th>
+                    <th className="p-3 text-left">{t("time")}</th>
+                    <th className="p-3 text-left">{t("status")}</th>
+                    <th className="p-3 text-right">{t("actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,28 +209,28 @@ export default function LoginHistoryPage() {
                       <td className="p-3">{r.browser} / {r.os}</td>
                       <td className="p-3">{fmt(r.timestamp)} <div className="text-xs text-gray-400">{secToH(r.durationSec)}</div></td>
                       <td className="p-3">
-                        {r.status === 'success' ? <span className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-green-50 text-green-700"><CheckCircle size={14} /> Success</span> : <span className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-red-50 text-red-700"><XCircle size={14} /> Failed</span>}
+                        {r.status === 'success' ? <span className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-green-50 text-green-700"><CheckCircle size={14} /> {t("success")}</span> : <span className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-red-50 text-red-700"><XCircle size={14} /> {t("failed")}</span>}
                       </td>
                       <td className="p-3 text-right">
                         <div className="flex items-center gap-2 justify-end">
-                          <button onClick={() => revokeSession(r.id)} className="px-3 py-1 rounded-md border text-red-600">Revoke</button>
-                          <button onClick={() => alert('Show more details - implement modal')} className="px-3 py-1 rounded-md bg-[#DC3173] text-white">Details</button>
+                          <button onClick={() => revokeSession(r.id)} className="px-3 py-1 rounded-md border text-red-600">{t("revoke")}</button>
+                          <button onClick={() => alert('Show more details - implement modal')} className="px-3 py-1 rounded-md bg-[#DC3173] text-white">{t("details")}</button>
                         </div>
                       </td>
                     </motion.tr>
                   ))}
 
-                  {visible.length === 0 && <tr><td colSpan={7} className="text-center p-8 text-gray-500">No login records found.</td></tr>}
+                  {visible.length === 0 && <tr><td colSpan={7} className="text-center p-8 text-gray-500">{t("no_login_records_found")}</td></tr>}
                 </tbody>
               </table>
 
               {/* pagination strip */}
               <div className="p-4 border-t flex items-center justify-between">
-                <div className="text-sm text-gray-600">Showing {(page-1)*perPage + 1} - {Math.min(page*perPage, filtered.length)} of {filtered.length}</div>
+                <div className="text-sm text-gray-600">{t('showing')} {(page - 1) * perPage + 1} - {Math.min(page * perPage, filtered.length)} {t("of")} {filtered.length}</div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page===1} className="px-3 py-1 rounded-md border">Prev</button>
+                  <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded-md border">Prev</button>
                   <div className="px-3 py-1 rounded-md bg-gray-50 border">{page} / {totalPages}</div>
-                  <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page===totalPages} className="px-3 py-1 rounded-md border">Next</button>
+                  <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded-md border">Next</button>
                 </div>
               </div>
             </div>

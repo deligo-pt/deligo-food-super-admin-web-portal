@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader,  DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogFooter } from '@/components/ui/dialog';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion } from 'framer-motion';
-import { Bell, Send, Users,  CheckCircle, AlertTriangle } from 'lucide-react';
+import { Bell, Send, Users, CheckCircle, AlertTriangle } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 const DELIGO = '#DC3173';
 
@@ -27,6 +28,7 @@ const TEMPLATES = [
 ];
 
 export default function SendNotificationFleetPage() {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<AudienceGroup>('all');
@@ -132,7 +134,7 @@ export default function SendNotificationFleetPage() {
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <Bell className="w-8 h-8" style={{ color: DELIGO }} /> Send Notification to Fleet
+        <Bell className="w-8 h-8" style={{ color: DELIGO }} /> {t("send_notification_to_fleet")}
       </motion.h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -140,14 +142,14 @@ export default function SendNotificationFleetPage() {
         <Card className="p-6 shadow-sm rounded-2xl col-span-2">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold">Create Notification</h2>
-              <p className="text-sm text-slate-500 mt-1">Compose a message and send to fleet managers / teams. Use templates to speed up.</p>
+              <h2 className="text-xl font-semibold">{t("create_notification")}</h2>
+              <p className="text-sm text-slate-500 mt-1">{t("compose_message_send_to_fleet")}</p>
             </div>
 
             <div className="text-right">
-              <div className="text-xs text-slate-500">Recipients</div>
+              <div className="text-xs text-slate-500">{t("recipients_lg")}</div>
               <div className="text-xl font-bold" style={{ color: DELIGO }}>{audienceCount}</div>
-              <div className="text-xs text-slate-400">Est. recipients</div>
+              <div className="text-xs text-slate-400">{t("est_recipients")}</div>
             </div>
           </div>
 
@@ -155,51 +157,51 @@ export default function SendNotificationFleetPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="text-xs text-slate-500">Title</label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Short title (max 100 chars)" maxLength={100} aria-label="notification-title" />
+              <label className="text-xs text-slate-500">{t("title")}</label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("short_title_max_100_chars")} maxLength={100} aria-label="notification-title" />
             </div>
 
             <div>
-              <label className="text-xs text-slate-500">Message</label>
-              <Textarea value={message} onChange={(e) => setMessage(e.target.value)} className="min-h-[140px]" placeholder="Write notification message (plain text)" aria-label="notification-body" />
+              <label className="text-xs text-slate-500">{t("message")}</label>
+              <Textarea value={message} onChange={(e) => setMessage(e.target.value)} className="min-h-[140px]" placeholder={t("write_notification_message")} aria-label="notification-body" />
               <div className="flex items-center justify-between text-xs text-slate-500 mt-1">
                 <div>
-                  {charWarning ? <span className="text-red-600">{charWarning}</span> : <span>{charCount} characters</span>}
+                  {charWarning ? <span className="text-red-600">{charWarning}</span> : <span>{charCount} {t("characters")}</span>}
                 </div>
                 <div>
-                  <span>Preview: </span>
-                  <Button size="sm" variant="ghost" onClick={() => setPreviewOpen(true)}>Open</Button>
+                  <span>{t("preview")}: </span>
+                  <Button size="sm" variant="ghost" onClick={() => setPreviewOpen(true)}>{t("open")}</Button>
                 </div>
               </div>
             </div>
 
             {/* Templates */}
             <div>
-              <label className="text-xs text-slate-500">Templates</label>
+              <label className="text-xs text-slate-500">{t("templates")}</label>
               <div className="flex gap-2 flex-wrap mt-2">
                 {TEMPLATES.map((t) => (
                   <Button key={t.id} size="sm" variant={templateId === t.id ? 'default' : 'outline'} onClick={() => applyTemplate(t.id)}>
                     {t.title}
                   </Button>
                 ))}
-                <Button size="sm" variant="ghost" onClick={() => { setTemplateId(null); setTitle(''); setMessage(''); }}>Clear</Button>
+                <Button size="sm" variant="ghost" onClick={() => { setTemplateId(null); setTitle(''); setMessage(''); }}>{t("clear")}</Button>
               </div>
             </div>
 
             {/* Audience */}
             <div>
-              <label className="text-xs text-slate-500">Audience</label>
+              <label className="text-xs text-slate-500">{t("audience")}</label>
               <div className="mt-2 flex items-center gap-3">
                 <Select value={selectedGroup} onValueChange={(v) => setSelectedGroup(v as AudienceGroup)}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Fleet Managers</SelectItem>
-                    <SelectItem value="active">Active Only</SelectItem>
-                    <SelectItem value="suspended">Suspended Only</SelectItem>
-                    <SelectItem value="zone">By Zone</SelectItem>
-                    <SelectItem value="managers">Specific Managers</SelectItem>
+                    <SelectItem value="all">{t("all_fleet_managers")}</SelectItem>
+                    <SelectItem value="active">{t("active_only")}</SelectItem>
+                    <SelectItem value="suspended">{t("suspended_only")}</SelectItem>
+                    <SelectItem value="zone">{t("by_zone")}</SelectItem>
+                    <SelectItem value="managers">{t("specific_managers")}</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -227,10 +229,16 @@ export default function SendNotificationFleetPage() {
 
             {/* Scheduling */}
             <div>
-              <label className="text-xs text-slate-500">Schedule</label>
+              <label className="text-xs text-slate-500">{t("schedule")}</label>
               <div className="mt-2 flex items-center gap-3">
-                <Button size="sm" variant={scheduleMode === 'now' ? 'default' : 'outline'} onClick={() => setScheduleMode('now')}>Send Now</Button>
-                <Button size="sm" variant={scheduleMode === 'later' ? 'default' : 'outline'} onClick={() => setScheduleMode('later')}>Schedule</Button>
+                <Button size="sm" variant={scheduleMode === 'now' ? 'default' : 'outline'} onClick={() => setScheduleMode('now')}>
+                  {t("send_now")}
+                </Button>
+
+                <Button size="sm" variant={scheduleMode === 'later' ? 'default' : 'outline'} onClick={() => setScheduleMode('later')}>
+                  {t("schedule")}
+                </Button>
+
                 {scheduleMode === 'later' && (
                   <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className="w-auto" />
                 )}
@@ -239,11 +247,14 @@ export default function SendNotificationFleetPage() {
 
             {/* Controls */}
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-slate-500">Do a quick preview and confirm before sending.</div>
+              <div className="text-sm text-slate-500">{t("do_quick_preview_confirm_before")}</div>
+
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={() => setPreviewOpen(true)}>Preview</Button>
+                <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                  {t("preview")}
+                </Button>
                 <Button style={{ background: DELIGO }} onClick={() => setConfirmOpen(true)} disabled={sending} className="flex items-center gap-2">
-                  <Send className="w-4 h-4" /> {sending ? 'Sending...' : 'Send Notification'}
+                  <Send className="w-4 h-4" /> {sending ? t("sending") : t("send_notification")}
                 </Button>
               </div>
             </div>
@@ -255,8 +266,8 @@ export default function SendNotificationFleetPage() {
           <div className="flex items-center gap-3 mb-4">
             <Users className="w-6 h-6 text-slate-700" />
             <div>
-              <div className="text-xs text-slate-500">Audience</div>
-              <div className="font-medium">{selectedGroup === 'all' ? 'All Fleet Managers' : selectedGroup}</div>
+              <div className="text-xs text-slate-500">{t("audience")}</div>
+              <div className="font-medium">{selectedGroup === 'all' ? t("all_fleet_manager") : selectedGroup}</div>
             </div>
           </div>
 
@@ -264,22 +275,22 @@ export default function SendNotificationFleetPage() {
 
           <div className="space-y-3">
             <div>
-              <div className="text-xs text-slate-500">Title</div>
-              <div className="font-medium">{title || <span className="text-slate-400">Untitled</span>}</div>
+              <div className="text-xs text-slate-500">{t("title")}</div>
+              <div className="font-medium">{title || <span className="text-slate-400">{t("untitled")}</span>}</div>
             </div>
 
             <div>
-              <div className="text-xs text-slate-500">Message</div>
-              <div className="text-sm text-slate-700 whitespace-pre-line">{message || <span className="text-slate-400">No message yet</span>}</div>
+              <div className="text-xs text-slate-500">{t("message")}</div>
+              <div className="text-sm text-slate-700 whitespace-pre-line">{message || <span className="text-slate-400">{t("no_message_yet")}</span>}</div>
             </div>
 
             <div>
-              <div className="text-xs text-slate-500">Schedule</div>
-              <div className="font-medium">{scheduleMode === 'now' ? 'Immediate' : scheduledAt || 'Not set'}</div>
+              <div className="text-xs text-slate-500">{t("schedule")}</div>
+              <div className="font-medium">{scheduleMode === 'now' ? t("immediate") : scheduledAt || t("not_set")}</div>
             </div>
 
             <div className="pt-2">
-              <Button size="sm" variant="outline" onClick={() => { setTitle(''); setMessage(''); setTemplateId(null); }}>Clear Draft</Button>
+              <Button size="sm" variant="outline" onClick={() => { setTitle(''); setMessage(''); setTemplateId(null); }}>{t("clear_draft")}</Button>
             </div>
           </div>
         </Card>
@@ -292,20 +303,20 @@ export default function SendNotificationFleetPage() {
             <div className="flex items-center gap-3">
               <Bell className="w-6 h-6" style={{ color: DELIGO }} />
               <div>
-                <h3 className="text-lg font-semibold">Notification Preview</h3>
-                <div className="text-xs text-slate-500">How the notification will look on devices</div>
+                <h3 className="text-lg font-semibold">{t("notification_preview")}</h3>
+                <div className="text-xs text-slate-500">{t("how_notification_look_on_devices")}</div>
               </div>
             </div>
           </DialogHeader>
 
           <div className="mt-4 p-4 bg-slate-50 rounded-md">
-            <div className="text-sm font-semibold mb-2">{title || 'Untitled Notification'}</div>
-            <div className="text-sm text-slate-700 whitespace-pre-line">{message || 'No message'}</div>
+            <div className="text-sm font-semibold mb-2">{title || t("untitled_notification")}</div>
+            <div className="text-sm text-slate-700 whitespace-pre-line">{message || t("no_message")}</div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPreviewOpen(false)}>Close</Button>
-            <Button style={{ background: DELIGO }} onClick={() => { setPreviewOpen(false); setConfirmOpen(true); }}>Confirm & Send</Button>
+            <Button variant="outline" onClick={() => setPreviewOpen(false)}>{t("close")}</Button>
+            <Button style={{ background: DELIGO }} onClick={() => { setPreviewOpen(false); setConfirmOpen(true); }}>{t("confirm_nd_send")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -314,32 +325,32 @@ export default function SendNotificationFleetPage() {
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <h3 className="text-lg font-semibold">Confirm Send</h3>
-            <div className="text-sm text-slate-500 mt-1">You&apos;re sending to <strong>{audienceCount}</strong> recipients.</div>
+            <h3 className="text-lg font-semibold">{t("confirm_send")}</h3>
+            <div className="text-sm text-slate-500 mt-1">{t("your_re_sending_to")} <strong>{audienceCount}</strong> {t("recipients")}.</div>
           </DialogHeader>
 
           <div className="mt-4 space-y-3">
             <div>
-              <div className="text-xs text-slate-500">Title</div>
+              <div className="text-xs text-slate-500">{t("title")}</div>
               <div className="font-medium">{title}</div>
             </div>
 
             <div>
-              <div className="text-xs text-slate-500">Message</div>
+              <div className="text-xs text-slate-500">{t("message")}</div>
               <div className="text-sm text-slate-700 whitespace-pre-line max-h-40 overflow-auto">{message}</div>
             </div>
 
             <div>
-              <div className="text-xs text-slate-500">Schedule</div>
+              <div className="text-xs text-slate-500">{t("schedule")}</div>
               <div>{scheduleMode === 'now' ? 'Immediate' : scheduledAt}</div>
             </div>
 
-            <div className="pt-2 text-sm text-slate-500">This action is irreversible for the queued batch. You can cancel scheduled sends from the scheduled tasks panel.</div>
+            <div className="pt-2 text-sm text-slate-500">{t("this_action_irreversible_queued_batch")}</div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
-            <Button style={{ background: DELIGO }} onClick={confirmSend} disabled={sending}>{sending ? 'Sending...' : 'Send Now'}</Button>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>{t("cancel")}</Button>
+            <Button style={{ background: DELIGO }} onClick={confirmSend} disabled={sending}>{sending ? t("sending") : t("send_now")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -349,7 +360,7 @@ export default function SendNotificationFleetPage() {
         <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 ${toast.kind === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}`}>
           {toast.kind === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
           <div className="text-sm">{toast.message}</div>
-          <button className="ml-3 text-xs underline" onClick={() => setToast(null)}>Close</button>
+          <button className="ml-3 text-xs underline" onClick={() => setToast(null)}>{t("close")}</button>
         </div>
       )}
     </div>

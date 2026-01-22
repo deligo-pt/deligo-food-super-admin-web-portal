@@ -14,6 +14,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { motion } from "framer-motion";
@@ -34,6 +35,7 @@ const sortOptions = [
 ];
 
 export default function PreparingOrders({ ordersResult }: IProps) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<TOrder | null>(null);
 
   function exportCSV() {
@@ -82,11 +84,10 @@ export default function PreparingOrders({ ordersResult }: IProps) {
           <div>
             <h1 className="text-3xl font-extrabold flex items-center gap-3">
               <Clock className="w-8 h-8" style={{ color: DELIGO }} />
-              Preparing Orders
+              {t("preparing_orders")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Live kitchen dashboard — assign riders, track timers & manage
-              delays.
+              {t("live_kitchen_dashboard_assign_riders")}
             </p>
           </div>
 
@@ -96,7 +97,7 @@ export default function PreparingOrders({ ordersResult }: IProps) {
               onClick={exportCSV}
               className="flex items-center gap-2"
             >
-              <Download className="w-4 h-4" /> Export
+              <Download className="w-4 h-4" /> {t("export")}
             </Button>
           </div>
         </div>
@@ -118,13 +119,13 @@ export default function PreparingOrders({ ordersResult }: IProps) {
           <table className="w-full table-fixed text-sm">
             <thead className="bg-slate-100 text-slate-700 text-left">
               <tr className="align-middle">
-                <th className="px-4 py-3 w-28">Order</th>
-                <th className="px-4 py-3 w-64">Restaurant / Performance</th>
-                <th className="px-4 py-3 w-80">Customer & Items</th>
-                <th className="px-4 py-3 w-28 text-center">Timer</th>
-                <th className="px-4 py-3 w-28 text-center">ETA</th>
-                <th className="px-4 py-3 w-28 text-center">Status</th>
-                <th className="px-4 py-3 w-40 text-center">Actions</th>
+                <th className="px-4 py-3 w-28">{t("order")}</th>
+                <th className="px-4 py-3 w-64">{t("restaurant_perfomance")}</th>
+                <th className="px-4 py-3 w-80">{t("customer_items")}</th>
+                <th className="px-4 py-3 w-28 text-center">{t("timer")}</th>
+                <th className="px-4 py-3 w-28 text-center">{t("eta")}</th>
+                <th className="px-4 py-3 w-28 text-center">{t("status")}</th>
+                <th className="px-4 py-3 w-40 text-center">{t("actions")}</th>
               </tr>
             </thead>
 
@@ -158,7 +159,7 @@ export default function PreparingOrders({ ordersResult }: IProps) {
 
                     <div className="mt-2">
                       <div
-                        className="h-8 rounded-md bg-gradient-to-r from-slate-100 to-white"
+                        className="h-8 rounded-md bg-linear-to-r from-slate-100 to-white"
                         aria-hidden
                       />
                     </div>
@@ -167,7 +168,7 @@ export default function PreparingOrders({ ordersResult }: IProps) {
                   {/* CUSTOMER & ITEMS */}
                   <td className="px-4 py-4 align-middle">
                     <div className="flex items-start gap-3 min-w-0">
-                      <Avatar className="w-10 h-10 flex-shrink-0">
+                      <Avatar className="w-10 h-10 shrink-0">
                         <AvatarImage src={SAMPLE_AVATAR} />
                         <AvatarFallback>
                           {o.customerId?.name?.firstName?.charAt(0)}
@@ -217,7 +218,7 @@ export default function PreparingOrders({ ordersResult }: IProps) {
               {ordersResult?.meta?.total === 0 && (
                 <tr>
                   <td colSpan={11} className="py-8 text-center text-slate-500">
-                    No orders found.
+                    {t("no_orders_found")}
                   </td>
                 </tr>
               )}
@@ -241,8 +242,8 @@ export default function PreparingOrders({ ordersResult }: IProps) {
       >
         <SheetContent className="max-w-2xl p-6 overflow-y-auto border-l bg-white">
           <SheetHeader>
-            <SheetTitle>Order Details</SheetTitle>
-            <SheetDescription>Full details & quick actions</SheetDescription>
+            <SheetTitle>{t("order_details")}</SheetTitle>
+            <SheetDescription>{t("full_details_nd_quick_actions")}</SheetDescription>
           </SheetHeader>
 
           {selected && (
@@ -257,7 +258,7 @@ export default function PreparingOrders({ ordersResult }: IProps) {
                 </Avatar>
                 <div>
                   <p className="text-sm text-slate-500">
-                    Customer: {selected.customerId?.name?.firstName}{" "}
+                    {t("customer")}: {selected.customerId?.name?.firstName}{" "}
                     {selected.customerId?.name?.lastName} •{" "}
                     {selected.customerId?.address?.city}
                   </p>
@@ -267,7 +268,7 @@ export default function PreparingOrders({ ordersResult }: IProps) {
               <Separator />
 
               <div>
-                <h4 className="font-semibold">Items</h4>
+                <h4 className="font-semibold">{t("items")}</h4>
                 <ul className="mt-2 space-y-2">
                   {selected.items.map((it, idx) => (
                     <li key={idx} className="flex items-center justify-between">
@@ -284,20 +285,20 @@ export default function PreparingOrders({ ordersResult }: IProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-xs text-slate-500">Order created</p>
+                  <p className="text-xs text-slate-500">{t("order_created")}</p>
                   <p className="font-semibold">
                     {new Date(selected.createdAt).toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Status</p>
+                  <p className="text-xs text-slate-500">{t("status")}</p>
                   <p className="font-semibold">{selected.orderStatus}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 justify-end">
                 <Button variant="outline" onClick={() => setSelected(null)}>
-                  Close
+                  {t("close")}
                 </Button>
                 {/* <Button
                     style={{ background: DELIGO }}

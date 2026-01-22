@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/hooks/use-translation";
 import { forgotPasswordReq } from "@/services/forgotResetPassword/forgotResetPassword";
 import { TResponse } from "@/types";
 import { forgotPasswordValidation } from "@/validations/forgot-reset-password/forgot-reset-password.validation";
@@ -27,6 +28,7 @@ type ForgotPasswordForm = {
 };
 
 export default function ForgotPasswordForm() {
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const form = useForm<ForgotPasswordForm>({
     resolver: zodResolver(forgotPasswordValidation),
@@ -84,8 +86,8 @@ export default function ForgotPasswordForm() {
 
   return isSubmitted ? (
     <ForgotResetPassword
-      title="Check Your Email"
-      subtitle="We've sent a password reset link to your email"
+      title={t("check_your_email")}
+      subtitle={t("we_ve_sent_password_reset")}
     >
       <motion.div
         initial={{
@@ -102,10 +104,10 @@ export default function ForgotPasswordForm() {
           <Check className="w-8 h-8 text-green-500" />
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Recovery Email Sent
+          {t("recovery_email_sent")}
         </h3>
         <p className="text-gray-500 mb-6">
-          We&lsquo;ve sent a password reset link to{" "}
+          {t("we_ve_sent_password_reset_link_to")}{" "}
           <span className="font-medium text-gray-700">{watchEmail}</span>
         </p>
         <Button
@@ -113,14 +115,14 @@ export default function ForgotPasswordForm() {
           variant="outline"
           className="mt-2"
         >
-          Back to Forgot Password
+          {t("back_to_forgot_password")}
         </Button>
       </motion.div>
     </ForgotResetPassword>
   ) : (
     <ForgotResetPassword
-      title="Forgot Password"
-      subtitle="Enter your email to reset your password"
+      title={t("forgot_password")}
+      subtitle={t("enter_your_email_to_reset_password")}
     >
       <Form {...form}>
         <motion.form
@@ -138,12 +140,12 @@ export default function ForgotPasswordForm() {
                   <div className="relative">
                     <FormLabel className="flex items-center text-[#DC3173] mb-2">
                       <Mail className="w-5 h-5" />
-                      <span>Email</span>
+                      <span>{t("email")}</span>
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter your email address"
+                        placeholder={t("enter_your_email_address")}
                         className="py-3 text-base focus-visible:ring-1 focus-visible:ring-[#DC3173] focus:border-[#DC3173]! transition-all duration-300 rounded-sm"
                         {...field}
                       />
@@ -159,7 +161,7 @@ export default function ForgotPasswordForm() {
               className="w-full bg-[#DC3173] hover:bg-[#DC3173]/90"
               type="submit"
             >
-              Send Reset Link
+              {t("send_reset_link")}
             </Button>
           </motion.div>
           <motion.div variants={itemVariants} className="mt-6 text-center">
@@ -167,7 +169,7 @@ export default function ForgotPasswordForm() {
               href="/login"
               className="text-sm text-gray-600 hover:text-[#DC3173] transition-colors"
             >
-              Back to Login
+              {t("back_to_login")}
             </Link>
           </motion.div>
         </motion.form>

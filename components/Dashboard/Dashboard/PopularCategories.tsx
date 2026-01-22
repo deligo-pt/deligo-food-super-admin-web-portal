@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TPopularCategory } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 
@@ -10,13 +11,15 @@ interface IProps {
 }
 
 const PopularCategories = ({ popularCategories }: IProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white rounded-lg shadow p-6 border border-gray-100 h-full">
-      <h3 className="text-lg font-semibold mb-4">Popular Categories</h3>
+      <h3 className="text-lg font-semibold mb-4">{t("popular_categories")}</h3>
       <div className="space-y-4">
         {popularCategories.length === 0 && (
           <div className="col-span-4 text-center text-gray-500">
-            No popular categories found
+            {t("no_popular_categories_found")}
           </div>
         )}
         {popularCategories.map((category, index) => (

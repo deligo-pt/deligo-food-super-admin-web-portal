@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TProduct } from "@/types/product.type";
 import { motion } from "framer-motion";
 import { Clock, ShoppingBag, Star, Tag } from "lucide-react";
@@ -12,6 +13,7 @@ interface IProps {
 }
 
 export default function ProductCard({ product, onDelete }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const statusColors = {
     ACTIVE: "bg-green-100 text-green-800",
@@ -63,13 +65,12 @@ export default function ProductCard({ product, onDelete }: IProps) {
         )}
         {product.meta.isFeatured && (
           <div className="absolute top-2 right-2 bg-[#DC3173] text-white text-xs font-bold px-2 py-1 rounded-md">
-            Featured
+            {t("featured")}
           </div>
         )}
         <div
-          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${
-            statusColors[product.isDeleted ? "DELETED" : product.meta.status]
-          }`}
+          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[product.isDeleted ? "DELETED" : product.meta.status]
+            }`}
         >
           {product.isDeleted ? "DELETED" : product.meta.status}
         </div>
@@ -116,9 +117,8 @@ export default function ProductCard({ product, onDelete }: IProps) {
             )}
           </div>
           <div
-            className={`text-xs px-2 py-1 rounded-full ${
-              availabilityColors[product.stock.availabilityStatus]
-            }`}
+            className={`text-xs px-2 py-1 rounded-full ${availabilityColors[product.stock.availabilityStatus]
+              }`}
           >
             {product.stock.availabilityStatus}
           </div>
@@ -151,7 +151,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
               }
               className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
             >
-              View
+              {t("view")}
             </motion.button>
             <motion.button
               whileHover={{
@@ -163,7 +163,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
               onClick={() => onDelete(product.productId)}
               className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
             >
-              Delete
+              {t("delete")}
             </motion.button>
           </div>
         </div>

@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import {
   deleteBusinessCategoryReq,
@@ -33,6 +34,7 @@ import {
 } from "@/services/dashboard/category/business-category";
 import { TMeta } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -54,14 +56,9 @@ interface IProps {
   };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function CategoryTable({ categoriesResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState<{
     categoryId: string;
@@ -140,24 +137,24 @@ export default function CategoryTable({ categoriesResult }: IProps) {
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <ListIcon className="w-4" />
-                  Name
+                  {t("name")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <InfoIcon className="w-4" />
-                  Description
+                  {t("description")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <CircleCheckBig className="w-4" />
-                  Status
+                  {t("status")}
                 </div>
               </TableHead>
               <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
                 <Cog className="w-4" />
-                Actions
+                {t("actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -168,7 +165,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                   className="text-center text-lg text-[#DC3173]"
                   colSpan={5}
                 >
-                  Loading...
+                  {t("loading")}
                 </TableCell>
               </TableRow>
             )}
@@ -202,10 +199,10 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                     )}
                   >
                     {category.isDeleted
-                      ? "Deleted"
+                      ? t("deleted")
                       : category.isActive
-                        ? "Active"
-                        : "Inactive"}
+                        ? t("active")
+                        : t("inactive")}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -221,11 +218,11 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                             )
                           }
                         >
-                          View
+                          {t("view")}
                         </DropdownMenuItem>
                         {category.isDeleted ? (
                           <DropdownMenuItem className="text-red-500">
-                            Deleted
+                            {t("deleted")}
                           </DropdownMenuItem>
                         ) : (
                           <>
@@ -239,7 +236,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                                   })
                                 }
                               >
-                                Delete
+                                {t("delete")}
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
@@ -251,7 +248,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                                 })
                               }
                             >
-                              {category.isActive ? "Deactivate" : "Activate"}
+                              {category.isActive ? t("deactivate") : t("activate")}
                             </DropdownMenuItem>
                           </>
                         )}
@@ -267,7 +264,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                     className="text-center text-lg text-[#DC3173]"
                     colSpan={5}
                   >
-                    No categorys found
+                    {t("no_categories_found")}
                   </TableCell>
                 </TableRow>
               )}
@@ -298,44 +295,44 @@ export default function CategoryTable({ categoriesResult }: IProps) {
             <DialogHeader>
               <DialogTitle>
                 {statusInfo.field === "isDeleted"
-                  ? "Delete"
+                  ? t("delete")
                   : !statusInfo.isActive
-                    ? "Deactivate"
-                    : "Activate"}{" "}
-                category
+                    ? t("deactivate")
+                    : t("activate")}{" "}
+                {t("category")}
               </DialogTitle>
               <DialogDescription>
-                Are you sure you want to{" "}
+                {t("are_you_sure_want_to")}{" "}
                 {statusInfo.field === "isDeleted"
-                  ? "selete"
+                  ? "delete"
                   : !statusInfo.isActive
                     ? "deactivate"
                     : "activate"}{" "}
-                this category?
+                {t("this_category")}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline">{t("cancel")}</Button>
               </DialogClose>
 
               {statusInfo.field === "isDeleted" ? (
                 <Button variant="destructive" onClick={softDeleteCategory}>
-                  Delete
+                  {t("delete")}
                 </Button>
               ) : !statusInfo.isActive ? (
                 <Button
                   onClick={updateActiveStatus}
                   className="bg-yellow-600 hover:bg-yellow-500"
                 >
-                  Deactivate
+                  {t("deactivate")}
                 </Button>
               ) : (
                 <Button
                   onClick={updateActiveStatus}
                   className="bg-[#DC3173] hover:bg-[#DC3173]/90"
                 >
-                  Activate
+                  {t("activate")}
                 </Button>
               )}
             </DialogFooter>
