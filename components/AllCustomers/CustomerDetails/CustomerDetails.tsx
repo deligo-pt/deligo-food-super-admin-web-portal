@@ -48,26 +48,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
     }
   };
 
-  const handleDeletePartner = async () => {
-    // const toastId = toast.loading("Deleting Delivery Partner...");
-    // try {
-    //   const result = (await deleteCustomer(
-    //     customer.userId
-    //   )) as TResponse<null>;
-    //   if (result.success) {
-    //     toast.success("Delivery Partner deleted successfully", { id: toastId });
-    //     setShowDeleteModal(false);
-    //     router.refresh();
-    //   }
-    //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // } catch (error: any) {
-    //   console.log(error);
-    //   toast.error(
-    //     error?.response?.data?.message || "Delivery Partner deletion failed",
-    //     { id: toastId }
-    //   );
-    // }
-  };
+  const handleDeleteCustomer = async () => {};
 
   return (
     <div>
@@ -311,7 +292,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
       <DeleteModal
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
-        onConfirm={handleDeletePartner}
+        onConfirm={handleDeleteCustomer}
       />
 
       <ApproveOrRejectModal

@@ -1,13 +1,13 @@
-import AllCustomers from "@/components/AllCustomers/AllCustomers";
+import Customers from "@/components/Dashboard/Customers/Customers";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import { TCustomer, TUserQueryParams } from "@/types/user.type";
+import { TCustomer } from "@/types/user.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function AllCustomersPage({ searchParams }: IProps) {
+export default async function AllVendorsPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -15,12 +15,13 @@ export default async function AllCustomersPage({ searchParams }: IProps) {
   const sortBy = queries.sortBy || "-createdAt";
   const status = queries.status || "";
 
-  const query: Partial<TUserQueryParams> = {
+  const query = {
     limit,
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
     ...(status ? { status: status } : {}),
+    isDeleted: false,
   };
 
   const initialData: { data: TCustomer[]; meta?: TMeta } = { data: [] };
@@ -28,15 +29,22 @@ export default async function AllCustomersPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/customers", {
       params: query,
-    })) as unknown as TResponse<TCustomer[]>;
+    })) as TResponse<TCustomer[]>;
 
     if (result?.success) {
       initialData.data = result.data;
-      initialData.meta = result.meta as TMeta;
+      initialData.meta = result.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  return <AllCustomers customersResult={initialData} />;
+  return (
+    <Customers
+      customersResult={initialData}
+      showFilters={true}
+      title="All Customers"
+      subtitle="Manage all registered customers"
+    />
+  );
 }
