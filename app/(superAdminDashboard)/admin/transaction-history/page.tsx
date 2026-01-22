@@ -25,6 +25,7 @@ import {
   ChevronUp,
   RefreshCw,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 // ---------------------- Types ----------------------
 type TxRow = {
@@ -57,6 +58,7 @@ const datePresets = ["Last 7 days", "Last 30 days", "Last 90 days", "Year to dat
 
 // ---------------------- Component ----------------------
 export default function TransactionHistoryPage(): JSX.Element {
+  const { t } = useTranslation();
   // Controls
   const [rows] = useState<TxRow[]>(sampleRows);
   const [query, setQuery] = useState("");
@@ -73,18 +75,18 @@ export default function TransactionHistoryPage(): JSX.Element {
 
   // Derived: apply preset to from/to when preset changes
   useEffect(() => {
-  const now = new Date();
+    const now = new Date();
 
-  Promise.resolve().then(() => {
-    if (preset === "Last 7 days") {
-      setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)));
-      setTo(toISO(now));
-    } else if (preset === "Last 30 days") {
-      setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30)));
-      setTo(toISO(now));
-    }
-  });
-}, [preset]);
+    Promise.resolve().then(() => {
+      if (preset === "Last 7 days") {
+        setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)));
+        setTo(toISO(now));
+      } else if (preset === "Last 30 days") {
+        setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30)));
+        setTo(toISO(now));
+      }
+    });
+  }, [preset]);
 
 
   // Filtered + sorted
@@ -120,18 +122,18 @@ export default function TransactionHistoryPage(): JSX.Element {
   }, [rows, from, to, query, typeFilter, statusFilter, sortBy, sortDir]);
 
   // pagination
-const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
 
-useEffect(() => {
-  Promise.resolve().then(() => {
-    if (page > totalPages) setPage(1);
-  });
-}, [totalPages, page]);
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      if (page > totalPages) setPage(1);
+    });
+  }, [totalPages, page]);
 
-const paginated = useMemo(() => {
-  const start = (page - 1) * perPage;
-  return filtered.slice(start, start + perPage);
-}, [filtered, page, perPage]);
+  const paginated = useMemo(() => {
+    const start = (page - 1) * perPage;
+    return filtered.slice(start, start + perPage);
+  }, [filtered, page, perPage]);
 
 
   // summary values
@@ -141,14 +143,14 @@ const paginated = useMemo(() => {
 
   // CSV export
   const exportCSV = () => {
-    const header = ["id","date","type","partner","amount","balance","status"];
+    const header = ["id", "date", "type", "partner", "amount", "balance", "status"];
     const csv = [header.join(',')]
-      .concat(filtered.map(r => [r.id,r.date,r.type,r.partner,r.amount.toFixed(2),r.balance.toFixed(2),r.status].join(',')))
+      .concat(filtered.map(r => [r.id, r.date, r.type, r.partner, r.amount.toFixed(2), r.balance.toFixed(2), r.status].join(',')))
       .join('');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `transactions-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+    a.href = url; a.download = `transactions-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
   };
 
   // simulate refresh
@@ -167,18 +169,18 @@ const paginated = useMemo(() => {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <Wallet className="w-7 h-7 text-[#DC3173]" />
-            Transaction History
+            {t("transaction_history")}
           </h1>
-          <p className="text-sm text-gray-500">Full ledger of platform transactions — payouts, payments and refunds.</p>
+          <p className="text-sm text-gray-500">{t("full_ledger_platform_transactions_payouts")}</p>
         </div>
 
         <div className="flex items-center gap-3">
           <button onClick={handleRefresh} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border bg-white shadow-sm">
-            <RefreshCw className="w-4 h-4" /> Refresh
+            <RefreshCw className="w-4 h-4" /> {t("refresh")}
           </button>
 
           <button onClick={exportCSV} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#DC3173] text-white shadow hover:opacity-95">
-            <Download className="w-4 h-4" /> Export
+            <Download className="w-4 h-4" /> {t("export")}
           </button>
         </div>
       </div>
@@ -187,7 +189,7 @@ const paginated = useMemo(() => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-2xl p-4 shadow-sm border flex items-center justify-between">
           <div>
-            <p className="text-xs text-gray-500">Current Balance</p>
+            <p className="text-xs text-gray-500">{t("current_balance")}</p>
             <p className="text-xl font-semibold">{formatCurrency(currentBalance)}</p>
           </div>
           <div className="p-2 rounded-md bg-[#DC3173]/10">
@@ -197,7 +199,7 @@ const paginated = useMemo(() => {
 
         <div className="bg-white rounded-2xl p-4 shadow-sm border flex items-center justify-between">
           <div>
-            <p className="text-xs text-gray-500">Inflow</p>
+            <p className="text-xs text-gray-500">{t("inflow")}</p>
             <p className="text-xl font-semibold text-green-600">{formatCurrency(inflow)}</p>
           </div>
           <div className="p-2 rounded-md bg-green-50">
@@ -207,7 +209,7 @@ const paginated = useMemo(() => {
 
         <div className="bg-white rounded-2xl p-4 shadow-sm border flex items-center justify-between">
           <div>
-            <p className="text-xs text-gray-500">Outflow</p>
+            <p className="text-xs text-gray-500">{t("outflow")}</p>
             <p className="text-xl font-semibold text-red-600">{formatCurrency(outflow)}</p>
           </div>
           <div className="p-2 rounded-md bg-red-50">
@@ -235,19 +237,19 @@ const paginated = useMemo(() => {
 
           <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border">
             <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as any)} className="outline-none text-sm bg-transparent">
-              <option value="all">All types</option>
-              <option value="Payout">Payout</option>
-              <option value="Order Payment">Order Payment</option>
-              <option value="Refund">Refund</option>
+              <option value="all">{t("all_types")}</option>
+              <option value="Payout">{t("payout")}</option>
+              <option value="Order Payment">{t("order_payment")}</option>
+              <option value="Refund">{t("refund")}</option>
             </select>
           </div>
 
           <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border">
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)} className="outline-none text-sm bg-transparent">
-              <option value="all">All status</option>
-              <option value="Success">Success</option>
-              <option value="Processing">Processing</option>
-              <option value="Failed">Failed</option>
+              <option value="all">{t("all_status")}</option>
+              <option value="Success">{t("success")}</option>
+              <option value="Processing">{t("processing")}</option>
+              <option value="Failed">{t("failed")}</option>
             </select>
           </div>
         </div>
@@ -255,11 +257,11 @@ const paginated = useMemo(() => {
         <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
           <div className="flex items-center bg-white px-3 py-2 rounded-lg border w-full lg:w-64">
             <Search className="w-4 h-4 text-gray-400" />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search tx id, partner, type" className="ml-2 bg-transparent outline-none text-sm w-full" />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("search_tx_id_partner_type")} className="ml-2 bg-transparent outline-none text-sm w-full" />
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="text-sm text-gray-500">Rows</div>
+            <div className="text-sm text-gray-500">{t("rows")}</div>
             <select value={perPage} onChange={(e) => setPerPage(Number(e.target.value))} className="px-2 py-1 rounded-md border">
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -275,19 +277,19 @@ const paginated = useMemo(() => {
           <table className="min-w-full text-sm">
             <thead className="bg-white sticky top-0">
               <tr className="text-xs text-gray-500 uppercase border-b">
-                <th className="py-3 px-3 text-left">Date
-                  <button onClick={() => toggleSort('date')} className="ml-2 inline-flex items-center text-gray-400">{sortBy==='date'? (sortDir==='asc'? <ChevronUp className="w-3 h-3"/> : <ChevronDown className="w-3 h-3"/>) : <ChevronDown className="w-3 h-3 opacity-40"/>}</button>
+                <th className="py-3 px-3 text-left">{t("date")}
+                  <button onClick={() => toggleSort('date')} className="ml-2 inline-flex items-center text-gray-400">{sortBy === 'date' ? (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronDown className="w-3 h-3 opacity-40" />}</button>
                 </th>
-                <th className="py-3 px-3 text-left">Tx ID</th>
-                <th className="py-3 px-3 text-left">Type</th>
-                <th className="py-3 px-3 text-left">Partner</th>
-                <th className="py-3 px-3 text-left">Amount
-                  <button onClick={() => toggleSort('amount')} className="ml-2 inline-flex items-center text-gray-400">{sortBy==='amount'? (sortDir==='asc'? <ChevronUp className="w-3 h-3"/> : <ChevronDown className="w-3 h-3"/>) : <ChevronDown className="w-3 h-3 opacity-40"/>}</button>
+                <th className="py-3 px-3 text-left">{t("tx_id")}</th>
+                <th className="py-3 px-3 text-left">{t("type")}</th>
+                <th className="py-3 px-3 text-left">{t("partner")}</th>
+                <th className="py-3 px-3 text-left">{t("amount")}
+                  <button onClick={() => toggleSort('amount')} className="ml-2 inline-flex items-center text-gray-400">{sortBy === 'amount' ? (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronDown className="w-3 h-3 opacity-40" />}</button>
                 </th>
-                <th className="py-3 px-3 text-left">Balance
-                  <button onClick={() => toggleSort('balance')} className="ml-2 inline-flex items-center text-gray-400">{sortBy==='balance'? (sortDir==='asc'? <ChevronUp className="w-3 h-3"/> : <ChevronDown className="w-3 h-3"/>) : <ChevronDown className="w-3 h-3 opacity-40"/>}</button>
+                <th className="py-3 px-3 text-left">{t("balance")}
+                  <button onClick={() => toggleSort('balance')} className="ml-2 inline-flex items-center text-gray-400">{sortBy === 'balance' ? (sortDir === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronDown className="w-3 h-3 opacity-40" />}</button>
                 </th>
-                <th className="py-3 px-3 text-left">Status</th>
+                <th className="py-3 px-3 text-left">{t("status")}</th>
               </tr>
             </thead>
 
@@ -303,17 +305,17 @@ const paginated = useMemo(() => {
                     {r.type}
                   </td>
                   <td className="py-3 px-3 whitespace-nowrap">{r.partner}</td>
-                  <td className={`py-3 px-3 whitespace-nowrap font-semibold ${r.type==='Payout' ? 'text-red-600' : 'text-green-700'}`}>{formatCurrency(r.amount)}</td>
+                  <td className={`py-3 px-3 whitespace-nowrap font-semibold ${r.type === 'Payout' ? 'text-red-600' : 'text-green-700'}`}>{formatCurrency(r.amount)}</td>
                   <td className="py-3 px-3 whitespace-nowrap text-[#DC3173] font-medium">{formatCurrency(r.balance)}</td>
                   <td className="py-3 px-3 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${r.status==='Success' ? 'bg-green-100 text-green-800' : r.status==='Processing' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>{r.status}</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${r.status === 'Success' ? 'bg-green-100 text-green-800' : r.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>{r.status}</span>
                   </td>
                 </tr>
               ))}
 
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="text-center py-8 text-gray-400">No transactions match your filters.</td>
+                  <td colSpan={7} className="text-center py-8 text-gray-400">{t("no_transactions_match_filters")}</td>
                 </tr>
               )}
             </tbody>
@@ -322,12 +324,12 @@ const paginated = useMemo(() => {
 
         {/* Footer controls */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 border-t">
-          <div className="text-sm text-gray-600">Showing <span className="font-medium">{filtered.length}</span> transactions</div>
+          <div className="text-sm text-gray-600">{t("showing")} <span className="font-medium">{filtered.length}</span> {t("transactions")}</div>
 
           <div className="flex items-center gap-2">
-            <button onClick={() => setPage(p => Math.max(1, p-1))} className="px-3 py-1 rounded-md border">Prev</button>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} className="px-3 py-1 rounded-md border">Prev</button>
             <div className="px-3 py-1 border rounded-md text-sm">{page} / {totalPages}</div>
-            <button onClick={() => setPage(p => Math.min(totalPages, p+1))} className="px-3 py-1 rounded-md border">Next</button>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} className="px-3 py-1 rounded-md border">Next</button>
           </div>
         </div>
       </div>

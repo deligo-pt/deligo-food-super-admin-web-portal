@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import {
   CheckCircle,
@@ -49,6 +50,7 @@ type Payout = {
 };
 
 export default function VendorPayoutsPage() {
+  const { t } = useTranslation();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [selected, setSelected] = useState<Payout | null>(null);
   const [query, setQuery] = useState("");
@@ -131,14 +133,14 @@ export default function VendorPayoutsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6 flex items-center gap-3"
       >
-        <Wallet className="w-8 h-8 text-slate-800" /> Vendor Payouts
+        <Wallet className="w-8 h-8 text-slate-800" /> {t("vendor_payouts")}
       </motion.h1>
 
       {/* Search + Export */}
       <div className="flex flex-col md:flex-row items-start md:items-center gap-3 mb-6">
         <div className="flex items-center gap-3 w-full md:max-w-lg">
           <Input
-            placeholder="Search by vendor, city, payout method, status or id..."
+            placeholder={t("search_vendor_city_payout")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -148,7 +150,7 @@ export default function VendorPayoutsPage() {
               /* search */
             }}
           >
-            <Search className="w-4 h-4 mr-2" /> Search
+            <Search className="w-4 h-4 mr-2" /> {t("search")}
           </Button>
           <Button
             variant="outline"
@@ -156,13 +158,13 @@ export default function VendorPayoutsPage() {
               setQuery("");
             }}
           >
-            Reset
+            {t("reset")}
           </Button>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={exportCSV}>
-            <Download className="w-4 h-4 mr-2" /> Export CSV
+            <Download className="w-4 h-4 mr-2" /> {t("export_csv")}
           </Button>
         </div>
       </div>
@@ -170,16 +172,16 @@ export default function VendorPayoutsPage() {
       {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
         <StatCard
-          title="Total Requests"
+          title={t("total_requests")}
           value={payouts.length}
           icon={<Wallet />}
         />
         <StatCard
-          title="Pending"
+          title={t("pending")}
           value={payouts.filter((p) => p.status === "Pending").length}
         />
         <StatCard
-          title="Completed"
+          title={t("completed")}
           value={payouts.filter((p) => p.status === "Completed").length}
         />
       </div>
@@ -187,19 +189,19 @@ export default function VendorPayoutsPage() {
       {/* Table */}
       <Card className="p-0 overflow-hidden shadow-md">
         <div className="p-4 sm:p-6">
-          <h2 className="font-semibold text-lg mb-4">Payout Requests</h2>
+          <h2 className="font-semibold text-lg mb-4">{t("payout_requests")}</h2>
 
           <div className="overflow-auto rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableCell className="pl-6">Vendor</TableCell>
-                  <TableCell>Amount</TableCell>
-                  <TableCell>Method</TableCell>
-                  <TableCell>City</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell className="text-right pr-6">Actions</TableCell>
+                  <TableCell className="pl-6">{t("vendor")}</TableCell>
+                  <TableCell>{t("amount")}</TableCell>
+                  <TableCell>{t("method")}</TableCell>
+                  <TableCell>{t("city")}</TableCell>
+                  <TableCell>{t("date")}</TableCell>
+                  <TableCell>{t("status")}</TableCell>
+                  <TableCell className="text-right pr-6">{t("actions")}</TableCell>
                 </TableRow>
               </TableHeader>
 
@@ -207,7 +209,7 @@ export default function VendorPayoutsPage() {
                 {loading ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-6">
-                      Loading...
+                      {t("loading")}
                     </TableCell>
                   </TableRow>
                 ) : filtered.length === 0 ? (
@@ -216,7 +218,7 @@ export default function VendorPayoutsPage() {
                       colSpan={7}
                       className="text-center py-6 text-slate-500"
                     >
-                      No payouts found.
+                      {t("no_payouts_found")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -262,8 +264,8 @@ export default function VendorPayoutsPage() {
                             p.status === "Pending"
                               ? "bg-yellow-100 text-yellow-800"
                               : p.status === "Completed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
                           }
                         >
                           {p.status}
@@ -277,7 +279,7 @@ export default function VendorPayoutsPage() {
                             variant="ghost"
                             onClick={() => setSelected(p)}
                           >
-                            <Eye className="w-4 h-4 mr-2" /> View
+                            <Eye className="w-4 h-4 mr-2" /> {t("view")}
                           </Button>
 
                           {p.status === "Pending" && (
@@ -290,14 +292,14 @@ export default function VendorPayoutsPage() {
                                 }}
                                 onClick={() => approve(p.id)}
                               >
-                                <CheckCircle className="w-4 h-4 mr-2" /> Approve
+                                <CheckCircle className="w-4 h-4 mr-2" /> {("approve")}
                               </Button>
                               <Button
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => reject(p.id)}
                               >
-                                <XCircle className="w-4 h-4 mr-2" /> Reject
+                                <XCircle className="w-4 h-4 mr-2" /> {t("reject")}
                               </Button>
                             </>
                           )}
@@ -321,7 +323,7 @@ export default function VendorPayoutsPage() {
       >
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Payout Details</DialogTitle>
+            <DialogTitle>{t("payout_details")}</DialogTitle>
           </DialogHeader>
 
           {selected && (
@@ -351,27 +353,27 @@ export default function VendorPayoutsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Info
-                  label="Amount"
+                  label={t("amount")}
                   value={`€ ${selected.amount.toFixed(2)}`}
                 />
-                <Info label="Method" value={selected.payoutMethod} />
-                <Info label="Status" value={selected.status} />
+                <Info label={t("method")} value={selected.payoutMethod} />
+                <Info label={t("status")} value={selected.status} />
                 <Info
-                  label="Date"
+                  label={t("date")}
                   value={new Date(selected.date).toLocaleString()}
                 />
                 <Info
-                  label="Account Holder"
+                  label={t("account_holder")}
                   value={selected.accountHolder ?? "-"}
                 />
-                <Info label="IBAN" value={selected.iban ?? "-"} />
+                <Info label={t("iban")} value={selected.iban ?? "-"} />
               </div>
 
               <Separator className="my-4" />
 
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setSelected(null)}>
-                  Close
+                  {t("close")}
                 </Button>
                 {selected.status === "Pending" && (
                   <>
@@ -382,7 +384,7 @@ export default function VendorPayoutsPage() {
                         setSelected({ ...selected, status: "Completed" });
                       }}
                     >
-                      <CheckCircle className="w-4 h-4 mr-2" /> Approve
+                      <CheckCircle className="w-4 h-4 mr-2" /> {t("approve")}
                     </Button>
                     <Button
                       variant="destructive"
@@ -391,7 +393,7 @@ export default function VendorPayoutsPage() {
                         setSelected({ ...selected, status: "Rejected" });
                       }}
                     >
-                      <XCircle className="w-4 h-4 mr-2" /> Reject
+                      <XCircle className="w-4 h-4 mr-2" /> {t("reject")}
                     </Button>
                   </>
                 )}

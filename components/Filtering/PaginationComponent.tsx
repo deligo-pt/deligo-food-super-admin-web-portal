@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePagination } from "@/hooks/use-pagination";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
@@ -29,6 +30,7 @@ export default function PaginationComponent({
   totalPages,
   itemsNoArray = [10, 20, 50, 100],
 }: PaginationProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -83,8 +85,8 @@ export default function PaginationComponent({
         className="text-muted-foreground flex-1 text-sm whitespace-nowrap text-center lg:text-left"
         aria-live="polite"
       >
-        Page <span className="text-[#DC3173] font-semibold">{currentPage}</span>{" "}
-        of <span className="text-foreground">{totalPages}</span>
+        {t("page_lg")} <span className="text-[#DC3173] font-semibold">{currentPage}</span>{" "}
+        {t("of")} <span className="text-foreground">{totalPages}</span>
       </p>
       <div className="grow my-4 lg:my-0">
         <Pagination>
@@ -154,7 +156,7 @@ export default function PaginationComponent({
           <SelectContent>
             {itemsNoArray.map((itemsNo) => (
               <SelectItem key={itemsNo} value={String(itemsNo)}>
-                {itemsNo} / page
+                {itemsNo} / {t("page_sm")}
               </SelectItem>
             ))}
           </SelectContent>

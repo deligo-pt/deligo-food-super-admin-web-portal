@@ -6,6 +6,7 @@ import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
 import { TCustomer } from "@/types/user.type";
 import { motion } from "framer-motion";
 import {
@@ -34,13 +35,13 @@ const formatDate = (date: Date | undefined) => {
 };
 
 export const CustomerDetails = ({ customer }: IProps) => {
+  const { t } = useTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const router = useRouter();
   const fullName =
-    `${customer.name?.firstName || ""} ${
-      customer.name?.lastName || ""
-    }`.trim() || "No Name Provided";
+    `${customer.name?.firstName || ""} ${customer.name?.lastName || ""
+      }`.trim() || t("no_name_provided");
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -58,7 +59,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle /> Go Back
+          <ArrowLeftCircle /> {t("go_back")}
         </Button>
       </div>
       <motion.div
@@ -153,59 +154,59 @@ export const CustomerDetails = ({ customer }: IProps) => {
         </div>
       </motion.div>
       <div className="bg-gray-50 p-6 rounded-b-lg">
-        <Section title="Personal Details" icon={<User />} defaultOpen={true}>
+        <Section title={t("personal_details")} icon={<User />} defaultOpen={true}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
-              <InfoRow label="Full Name" value={fullName} />
-              <InfoRow label="Email" value={customer.email} />
+              <InfoRow label={t("full_name")} value={fullName} />
+              <InfoRow label={t("email")} value={customer.email} />
               <InfoRow
-                label="Contact Number"
+                label={t("contact_number")}
                 value={customer?.contactNumber || "N/A"}
               />
             </div>
           </div>
         </Section>
-        <Section title="Address" icon={<MapPin />}>
+        <Section title={t("address")} icon={<MapPin />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Street"
+                label={t("street")}
                 value={customer.address?.street || "N/A"}
               />
-              <InfoRow label="City" value={customer.address?.city || "N/A"} />
+              <InfoRow label={t("city")} value={customer.address?.city || "N/A"} />
             </div>
             <div>
-              <InfoRow label="State" value={customer.address?.state || "N/A"} />
+              <InfoRow label={t("state")} value={customer.address?.state || "N/A"} />
               <InfoRow
-                label="Country"
+                label={t("country")}
                 value={customer.address?.country || "N/A"}
               />
               <InfoRow
-                label="Zip Code"
+                label={t("zip_code")}
                 value={customer.address?.postalCode || "N/A"}
               />
             </div>
           </div>
         </Section>
-        <Section title="Account Information" icon={<CalendarClock />}>
+        <Section title={t("account_information")} icon={<CalendarClock />}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow
-                label="Account Created"
+                label={t("account_created")}
                 value={formatDate(customer.createdAt)}
               />
               <InfoRow
-                label="Last Updated"
+                label={t("last_updated")}
                 value={formatDate(customer.updatedAt)}
               />
             </div>
             <div>
               <InfoRow
-                label="Approved/Rejected/Blocked At"
+                label={t("approved_rejected_blocked_at")}
                 value={formatDate(customer.approvedOrRejectedOrBlockedAt)}
               />
               {customer.remarks && (
-                <InfoRow label="Remarks" value={customer.remarks} />
+                <InfoRow label={t("remarks")} value={customer.remarks} />
               )}
             </div>
           </div>
@@ -224,7 +225,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
                 className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
               >
                 <Check className="w-4 h-4" />
-                <span>Approve</span>
+                <span>{t("approve")}</span>
               </motion.button>
               <motion.button
                 onClick={() => setApproveStatus("REJECTED")}
@@ -237,7 +238,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
                 className="flex items-center space-x-1 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-sm hover:bg-yellow-600"
               >
                 <X className="w-4 h-4" />
-                <span>Reject</span>
+                <span>{t("reject")}</span>
               </motion.button>
             </>
           )}
@@ -253,7 +254,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
               className="flex items-center space-x-1 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow-sm hover:bg-yellow-600"
             >
               <Ban className="w-4 h-4" />
-              <span>Block</span>
+              <span>{t("block")}</span>
             </motion.button>
           )}
           {customer.status === "BLOCKED" && (
@@ -268,7 +269,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
               className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
             >
               <Check className="w-4 h-4" />
-              <span>Unblock</span>
+              <span>{t("unblock")}</span>
             </motion.button>
           )}
           {!customer.isDeleted && (
@@ -283,7 +284,7 @@ export const CustomerDetails = ({ customer }: IProps) => {
               className="flex items-center space-x-1 px-4 py-2 bg-red-500 bg-opacity-10 text-white rounded-lg transition-all hover:bg-opacity-20"
             >
               <Trash2 className="w-4 h-4" />
-              <span>Delete</span>
+              <span>{t("delete")}</span>
             </motion.button>
           )}
         </div>

@@ -3,6 +3,7 @@
 
 import { USER_ROLE } from "@/consts/user.const";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
+import { useTranslation } from "@/hooks/use-translation";
 import { getMessagesByRoom } from "@/services/chat/chat";
 import { TMeta, TResponse } from "@/types";
 import {
@@ -30,6 +31,7 @@ interface IProps {
 }
 
 export default function SupportTickets({ conversationsData }: IProps) {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<TConversationStatus>("OPEN");
@@ -123,7 +125,7 @@ export default function SupportTickets({ conversationsData }: IProps) {
         setMessages((prev) => [...prev, msg]);
       }
     },
-    onTyping: (data) => {},
+    onTyping: (data) => { },
     onClosed: () => setStatus("CLOSED"),
     onError: (msg) => console.log(msg),
     // onNewTicket: (message) => getNewConversation(message),
@@ -146,14 +148,14 @@ export default function SupportTickets({ conversationsData }: IProps) {
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Support Tickets</h1>
-          <p className="text-gray-500 text-sm">Manage issues</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("support_tickets")}</h1>
+          <p className="text-gray-500 text-sm">{t("manage_issues")}</p>
         </div>
 
         <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border shadow-sm">
           <Search className="w-4 h-4 text-gray-400" />
           <input
-            placeholder="Search tickets..."
+            placeholder={t("search_tickets")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="outline-none text-sm"
@@ -193,14 +195,14 @@ export default function SupportTickets({ conversationsData }: IProps) {
               <div className="text-sm">
                 <p className="font-medium">
                   {c.participants?.[0]?.name?.trim() ||
-                    "No Name Provided"}
+                    t("no_name_provided")}
                 </p>
                 <p className="text-xs text-gray-500">
                   {c.participants?.[0]?.role === USER_ROLE.VENDOR
-                      ? "Vendor"
-                      : c.participants?.[0]?.role === USER_ROLE.FLEET_MANAGER
-                      ? "Fleet Manager"
-                      : "User"}
+                    ? t("vendor")
+                    : c.participants?.[0]?.role === USER_ROLE.FLEET_MANAGER
+                      ? t("fleet_manager")
+                      : t("user")}
                 </p>
                 <p className="text-xs text-gray-500">
                   {formatDistanceToNow(c.createdAt as Date, {
@@ -212,7 +214,7 @@ export default function SupportTickets({ conversationsData }: IProps) {
 
             {/* Footer */}
             <div className="flex items-center justify-between mt-5 pt-4 border-t">
-              <p className="text-xs text-gray-500">ID: {c.ticketId}</p>
+              <p className="text-xs text-gray-500">{t("id")}: {c.ticketId}</p>
               <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
             </div>
           </div>
@@ -298,11 +300,10 @@ export default function SupportTickets({ conversationsData }: IProps) {
               {messages.map((m, i) => (
                 <div
                   key={i}
-                  className={`max-w-[85%] p-4 rounded-2xl border text-sm leading-relaxed ${
-                    m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
-                      ? "ml-auto bg-[#DC3173]/20 border-[#DC3173]/30"
-                      : "bg-gray-50 border-gray-200"
-                  }`}
+                  className={`max-w-[85%] p-4 rounded-2xl border text-sm leading-relaxed ${m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
+                    ? "ml-auto bg-[#DC3173]/20 border-[#DC3173]/30"
+                    : "bg-gray-50 border-gray-200"
+                    }`}
                 >
                   <p className="text-xs text-gray-500 mb-1">
                     {m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
@@ -324,11 +325,11 @@ export default function SupportTickets({ conversationsData }: IProps) {
                 <textarea
                   ref={textRef}
                   rows={2}
-                  placeholder="Write a reply..."
+                  placeholder={t("write_a_reply")}
                   className="flex-1 rounded-2xl border border-gray-200 px-4 py-3 resize-none focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
                 />
                 <button className="px-5 py-3 rounded-2xl bg-[#DC3173] text-white font-semibold">
-                  Send
+                  {t("send")}
                 </button>
               </form>
             </div>

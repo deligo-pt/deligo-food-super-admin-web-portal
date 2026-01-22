@@ -1,5 +1,5 @@
 "use client"
-import  { useState } from "react";
+import { useState } from "react";
 import { TrendingUp, Users, Clock, BarChart2, Download } from "lucide-react";
 import {
   LineChart,
@@ -10,9 +10,9 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Legend,
   CartesianGrid,
 } from "recharts";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
@@ -41,6 +41,7 @@ const mockBarData = [
 ];
 
 export default function SalesAnalyticsPage() {
+  const { t } = useTranslation();
   const [range, setRange] = useState("Last 7 days");
   const [metric, setMetric] = useState<"orders" | "revenue">("revenue");
 
@@ -60,8 +61,8 @@ export default function SalesAnalyticsPage() {
         {/* Header */}
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Sales Analytics & Insights</h1>
-            <p className="text-sm text-gray-600 mt-1">Overview of orders, revenue and top regions — tailored for Portugal (Deligo).</p>
+            <h1 className="text-2xl md:text-3xl font-bold">{t("sales_analytics_nd_insights")}</h1>
+            <p className="text-sm text-gray-600 mt-1">{t("overview_orders_revenue_top_regions")}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -71,31 +72,29 @@ export default function SalesAnalyticsPage() {
               className="border rounded-md px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2"
               style={{ borderColor: primary }}
             >
-              <option>Last 24 hours</option>
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Last 90 days</option>
-              <option>Custom range</option>
+              <option>{t("last_24_hours")}</option>
+              <option>{t("last_7_days")}</option>
+              <option>{t("last_30_days")}</option>
+              <option>{t("last_90_days")}</option>
+              <option>{t("custom")}</option>
             </select>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setMetric("revenue")}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-shadow duration-150 shadow-sm ${
-                  metric === "revenue" ? "bg-white ring-2" : "bg-white/60"
-                }`}
-                style={ metric === "revenue" ? { borderColor: primary, boxShadow: `0 6px 18px ${primary}22` } : undefined }
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-shadow duration-150 shadow-sm ${metric === "revenue" ? "bg-white ring-2" : "bg-white/60"
+                  }`}
+                style={metric === "revenue" ? { borderColor: primary, boxShadow: `0 6px 18px ${primary}22` } : undefined}
               >
-                Revenue
+                {t("revenue")}
               </button>
               <button
                 onClick={() => setMetric("orders")}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-shadow duration-150 shadow-sm ${
-                  metric === "orders" ? "bg-white ring-2" : "bg-white/60"
-                }`}
-                style={ metric === "orders" ? { borderColor: primary, boxShadow: `0 6px 18px ${primary}22` } : undefined }
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-shadow duration-150 shadow-sm ${metric === "orders" ? "bg-white ring-2" : "bg-white/60"
+                  }`}
+                style={metric === "orders" ? { borderColor: primary, boxShadow: `0 6px 18px ${primary}22` } : undefined}
               >
-                Orders
+                {t("orders")}
               </button>
 
               <button
@@ -103,7 +102,7 @@ export default function SalesAnalyticsPage() {
                 title="Export CSV"
               >
                 <Download size={16} />
-                <span>Export</span>
+                <span>{t("export")}</span>
               </button>
             </div>
           </div>
@@ -114,53 +113,53 @@ export default function SalesAnalyticsPage() {
           <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm text-gray-500">Total Revenue</h3>
+                <h3 className="text-sm text-gray-500">{t("total_revenue")}</h3>
                 <p className="text-2xl font-semibold mt-1">€{overview.revenue.toLocaleString()}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ background: `${primary}11` }}>
                 <TrendingUp size={28} color={primary} />
               </div>
             </div>
-            <p className="text-xs text-green-600 mt-3">+12.4% vs previous period</p>
+            <p className="text-xs text-green-600 mt-3">+12.4% vs {t("previous_period")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm text-gray-500">Orders</h3>
+                <h3 className="text-sm text-gray-500">{t("orders")}</h3>
                 <p className="text-2xl font-semibold mt-1">{overview.orders.toLocaleString()}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ background: `${primary}11` }}>
                 <BarChart2 size={28} color={primary} />
               </div>
             </div>
-            <p className="text-xs text-green-600 mt-3">+9.1% vs previous period</p>
+            <p className="text-xs text-green-600 mt-3">+9.1% vs {t("previous_period")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm text-gray-500">Avg Order Value</h3>
+                <h3 className="text-sm text-gray-500">{t("avg_order_value")}</h3>
                 <p className="text-2xl font-semibold mt-1">€{overview.aov.toFixed(2)}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ background: `${primary}11` }}>
                 <Users size={28} color={primary} />
               </div>
             </div>
-            <p className="text-xs text-red-600 mt-3">-1.8% vs previous period</p>
+            <p className="text-xs text-red-600 mt-3">-1.8% vs {t("previous_period")}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm text-gray-500">Avg Delivery Time</h3>
-                <p className="text-2xl font-semibold mt-1">{overview.avgDeliveryMin} min</p>
+                <h3 className="text-sm text-gray-500">{t("avg_delivery_time")}</h3>
+                <p className="text-2xl font-semibold mt-1">{overview.avgDeliveryMin} {t("min")}</p>
               </div>
               <div className="p-3 rounded-lg" style={{ background: `${primary}11` }}>
                 <Clock size={28} color={primary} />
               </div>
             </div>
-            <p className="text-xs text-green-600 mt-3">On track</p>
+            <p className="text-xs text-green-600 mt-3">{t("on_track")}</p>
           </div>
         </section>
 
@@ -169,11 +168,11 @@ export default function SalesAnalyticsPage() {
           <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-lg font-semibold">{metric === "revenue" ? "Revenue" : "Orders"} over time</h2>
-                <p className="text-sm text-gray-500 mt-1">{range} • Portugal</p>
+                <h2 className="text-lg font-semibold">{metric === "revenue" ? "Revenue" : "Orders"} {t("over_time")}</h2>
+                <p className="text-sm text-gray-500 mt-1">{range} • {t("portugal")}</p>
               </div>
 
-              <div className="text-sm text-gray-600">Live preview</div>
+              <div className="text-sm text-gray-600">{t("live_preview")}</div>
             </div>
 
             <div className="h-64 md:h-72">
@@ -196,14 +195,14 @@ export default function SalesAnalyticsPage() {
             </div>
 
             <div className="mt-4 flex gap-3 flex-wrap">
-              <div className="text-xs bg-gray-50 px-3 py-1 rounded-full">Orders: total</div>
-              <div className="text-xs bg-gray-50 px-3 py-1 rounded-full">Revenue: gross</div>
-              <div className="text-xs bg-gray-50 px-3 py-1 rounded-full">Net: after fees</div>
+              <div className="text-xs bg-gray-50 px-3 py-1 rounded-full">{t("orders")}: {t("total")}</div>
+              <div className="text-xs bg-gray-50 px-3 py-1 rounded-full">{t("revenue")}: {t("gross")}</div>
+              <div className="text-xs bg-gray-50 px-3 py-1 rounded-full">{t("net_after_fees")}</div>
             </div>
           </div>
 
           <aside className="bg-white rounded-2xl p-5 shadow-sm flex flex-col gap-4">
-            <h3 className="text-lg font-semibold">Top Regions</h3>
+            <h3 className="text-lg font-semibold">{t("top_regions")}</h3>
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={mockBarData} layout="vertical" margin={{ left: 0, right: 10 }}>
@@ -232,15 +231,15 @@ export default function SalesAnalyticsPage() {
         {/* Insights / CTA */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <h3 className="text-lg font-semibold mb-3">Actionable Insights</h3>
+            <h3 className="text-lg font-semibold mb-3">{t("acionable_insights")}</h3>
             <ul className="space-y-3 text-sm text-gray-700">
               <li className="flex items-start gap-3">
                 <div className="mt-1 text-white p-2 rounded-lg" style={{ background: primary }}>
                   <TrendingUp size={16} />
                 </div>
                 <div>
-                  <p className="font-medium">Weekend boost in Porto</p>
-                  <p className="text-xs text-gray-500">Orders increase by 18% on Saturdays — consider targeted promos.</p>
+                  <p className="font-medium">{t("weekend_boost_in_porto")}</p>
+                  <p className="text-xs text-gray-500">{t("")} 18% on Saturdays — {t("consider_targeted_promos")}</p>
                 </div>
               </li>
 
@@ -249,8 +248,8 @@ export default function SalesAnalyticsPage() {
                   <Users size={16} />
                 </div>
                 <div>
-                  <p className="font-medium">New customers rising</p>
-                  <p className="text-xs text-gray-500">Acquisition rate up 9% — allocate budget to channels driving sign-ups.</p>
+                  <p className="font-medium">{t("new_customers_rising")}</p>
+                  <p className="text-xs text-gray-500">{t("acquisition_rate_up")} 9% — {t("allocate_budget_channels_driving")}</p>
                 </div>
               </li>
 
@@ -259,24 +258,24 @@ export default function SalesAnalyticsPage() {
                   <Clock size={16} />
                 </div>
                 <div>
-                  <p className="font-medium">Delivery time steady</p>
-                  <p className="text-xs text-gray-500">Average delivery at 27 min — keep monitoring peak hours.</p>
+                  <p className="font-medium">{t("delivery_time_steedy")}</p>
+                  <p className="text-xs text-gray-500">{t("average_delivery_at")} 27 min — {t("keep_moritoring_peak_hours")}</p>
                 </div>
               </li>
             </ul>
           </div>
 
-          <div className="bg-gradient-to-br from-white to-white p-5 rounded-2xl shadow-sm flex flex-col justify-between" style={{ border: `1px solid ${primary}11` }}>
+          <div className="bg-linear-to-br from-white to-white p-5 rounded-2xl shadow-sm flex flex-col justify-between" style={{ border: `1px solid ${primary}11` }}>
             <div>
-              <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
-              <p className="text-sm text-gray-500 mb-4">Take immediate steps to improve conversion and driver availability.</p>
+              <h3 className="text-lg font-semibold mb-2">{t("quick_actions")}</h3>
+              <p className="text-sm text-gray-500 mb-4">{t("take_immediate_steps_to_imporve")}</p>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <button className="px-4 py-2 rounded-md text-white font-medium shadow" style={{ background: primary }}>
-                  Create Promo
+                  {t("create_promo")}
                 </button>
-                <button className="px-4 py-2 rounded-md border border-gray-200 hover:shadow-sm">Adjust Delivery Zones</button>
-                <button className="px-4 py-2 rounded-md border border-gray-200 hover:shadow-sm">Pause Low-Performing Areas</button>
+                <button className="px-4 py-2 rounded-md border border-gray-200 hover:shadow-sm">{t("adjust_delivery_zones")}</button>
+                <button className="px-4 py-2 rounded-md border border-gray-200 hover:shadow-sm">{t("pause_low_performing_areas")}</button>
               </div>
             </div>
 
@@ -286,41 +285,41 @@ export default function SalesAnalyticsPage() {
 
         {/* Footer / small KPI table */}
         <section className="bg-white rounded-2xl p-5 shadow-sm">
-          <h3 className="text-lg font-semibold mb-3">KPI Snapshot</h3>
+          <h3 className="text-lg font-semibold mb-3">{t("kpi_snapshot")}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="text-gray-500">
-                  <th className="pb-3">Metric</th>
-                  <th className="pb-3">Value</th>
-                  <th className="pb-3">Change</th>
-                  <th className="pb-3">Notes</th>
+                  <th className="pb-3">{t("metric")}</th>
+                  <th className="pb-3">{t("value")}</th>
+                  <th className="pb-3">{t("change")}</th>
+                  <th className="pb-3">{t("notes")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3">Gross Revenue</td>
+                  <td className="py-3">{t("gross_revenue")}</td>
                   <td className="py-3">€{overview.revenue.toLocaleString()}</td>
                   <td className="py-3 text-green-600">+12.4%</td>
-                  <td className="py-3 text-gray-500">Net of promotions</td>
+                  <td className="py-3 text-gray-500">{t("net_of_promotions")}</td>
                 </tr>
                 <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3">Total Orders</td>
+                  <td className="py-3">{t("total_orders")}</td>
                   <td className="py-3">{overview.orders.toLocaleString()}</td>
                   <td className="py-3 text-green-600">+9.1%</td>
-                  <td className="py-3 text-gray-500">Peak at 18:00</td>
+                  <td className="py-3 text-gray-500">{t("peak_at")} 18:00</td>
                 </tr>
                 <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3">Avg Order Value</td>
+                  <td className="py-3">{t("avg_order_value")}</td>
                   <td className="py-3">€{overview.aov.toFixed(2)}</td>
                   <td className="py-3 text-red-600">-1.8%</td>
-                  <td className="py-3 text-gray-500">Test bundle pricing</td>
+                  <td className="py-3 text-gray-500">{t("test_bundle_pricing")}</td>
                 </tr>
                 <tr className="hover:bg-gray-50 transition-colors">
-                  <td className="py-3">Avg Delivery Time</td>
+                  <td className="py-3">{t("avg_delivery_time")}</td>
                   <td className="py-3">{overview.avgDeliveryMin} min</td>
                   <td className="py-3 text-green-600">-4.2%</td>
-                  <td className="py-3 text-gray-500">Improved routing</td>
+                  <td className="py-3 text-gray-500">{t("imporving_routing")}</td>
                 </tr>
               </tbody>
             </table>

@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { Bike, Eye, MapPin, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -19,14 +21,9 @@ interface IProps {
   partnersResult: { data: TDeliveryPartner[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
 export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t);
   const router = useRouter();
 
   return (
@@ -36,8 +33,7 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6 flex items-center gap-3"
       >
-        <Bike className="w-8 h-8" style={{ color: DELIGO }} /> Active Delivery
-        Partners
+        <Bike className="w-8 h-8" style={{ color: DELIGO }} /> {t("active_delivery_partners")}
       </motion.h1>
 
       <AllFilters sortOptions={sortOptions} />
@@ -45,9 +41,9 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
       {/* List */}
       <Card className="p-6 bg-white rounded-2xl shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">All Active Partners</h2>
+          <h2 className="text-xl font-semibold">{t("all_active_partners")}</h2>
           <div className="text-sm text-slate-500">
-            {partnersResult?.meta?.total} total
+            {partnersResult?.meta?.total} {t("total")}
           </div>
         </div>
 
@@ -56,7 +52,7 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
         <div className="space-y-4">
           {partnersResult?.data?.length === 0 ? (
             <div className="py-8 text-center text-slate-500">
-              No partners found.
+              {t("no_partners_found")}
             </div>
           ) : (
             partnersResult?.data?.map((p) => (
@@ -103,7 +99,7 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
                 {/* Right */}
                 <div className="text-right flex flex-col items-end gap-3">
                   <p className="text-sm text-slate-500">
-                    Delivered: {p.operationalData?.totalDeliveries}
+                    {t("delivered")}: {p.operationalData?.totalDeliveries}
                   </p>
                   <p className="text-sm text-emerald-600 font-bold">
                     € {p.earnings?.totalEarnings?.toLocaleString()}
@@ -116,7 +112,7 @@ export default function ActiveDeliveryPartners({ partnersResult }: IProps) {
                         router.push(`/admin/all-delivery-partners/${p.userId}`)
                       }
                     >
-                      <Eye className="w-4 h-4 mr-1" /> Details
+                      <Eye className="w-4 h-4 mr-1" /> {t("details")}
                     </Button>
                   </div>
                 </div>

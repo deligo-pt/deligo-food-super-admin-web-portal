@@ -31,6 +31,7 @@ import {
   Eye,
   Download,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 const DELIGO = '#DC3173';
 
@@ -49,6 +50,7 @@ type Payout = {
 };
 
 export default function DriverPayoutsPage() {
+  const { t } = useTranslation();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [selected, setSelected] = useState<Payout | null>(null);
   const [query, setQuery] = useState('');
@@ -97,7 +99,7 @@ export default function DriverPayoutsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `driver_payouts_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `driver_payouts_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -105,66 +107,66 @@ export default function DriverPayoutsPage() {
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <Wallet className="w-8 h-8 text-slate-800" /> driver Payouts
+        <Wallet className="w-8 h-8 text-slate-800" /> {t("driver_payouts")}
       </motion.h1>
 
       {/* Search + Export */}
       <div className="flex flex-col md:flex-row items-start md:items-center gap-3 mb-6">
         <div className="flex items-center gap-3 w-full md:max-w-lg">
           <Input
-            placeholder="Search by driver, city, payout method, status or id..."
+            placeholder={t("search_driver_city_payout_method_status")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
           <Button style={{ background: DELIGO, borderColor: DELIGO }} onClick={() => { /* search */ }}>
-            <Search className="w-4 h-4 mr-2" /> Search
+            <Search className="w-4 h-4 mr-2" /> {t("search")}
           </Button>
           <Button variant="outline" onClick={() => { setQuery(''); }}>
-            Reset
+            {t("reset")}
           </Button>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={exportCSV}>
-            <Download className="w-4 h-4 mr-2" /> Export CSV
+            <Download className="w-4 h-4 mr-2" /> {t("export_csv")}
           </Button>
         </div>
       </div>
 
       {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-        <StatCard title="Total Requests" value={payouts.length} icon={<Wallet />} />
-        <StatCard title="Pending" value={payouts.filter((p) => p.status === 'Pending').length} />
-        <StatCard title="Completed" value={payouts.filter((p) => p.status === 'Completed').length} />
+        <StatCard title={t("total_requests")} value={payouts.length} icon={<Wallet />} />
+        <StatCard title={t("pending")} value={payouts.filter((p) => p.status === 'Pending').length} />
+        <StatCard title={t("completed")} value={payouts.filter((p) => p.status === 'Completed').length} />
       </div>
 
       {/* Table */}
       <Card className="p-0 overflow-hidden shadow-md">
         <div className="p-4 sm:p-6">
-          <h2 className="font-semibold text-lg mb-4">Payout Requests</h2>
+          <h2 className="font-semibold text-lg mb-4">{t("payout_requests")}</h2>
 
           <div className="overflow-auto rounded-md border">
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell className="pl-6">driver</TableCell>
-                  <TableCell>Amount</TableCell>
-                  <TableCell>Method</TableCell>
-                  <TableCell>City</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell className="text-right pr-6">Actions</TableCell>
+                  <TableCell className="pl-6">{t("driver")}</TableCell>
+                  <TableCell>{t("amount")}</TableCell>
+                  <TableCell>{t("method")}</TableCell>
+                  <TableCell>{t("city")}</TableCell>
+                  <TableCell>{t("date")}</TableCell>
+                  <TableCell>{t("status")}</TableCell>
+                  <TableCell className="text-right pr-6">{t("actions")}</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-6">Loading...</TableCell>
+                    <TableCell colSpan={7} className="text-center py-6">{t("loading")}</TableCell>
                   </TableRow>
                 ) : filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-6 text-slate-500">No payouts found.</TableCell>
+                    <TableCell colSpan={7} className="text-center py-6 text-slate-500">{t("no_payouts_found")}</TableCell>
                   </TableRow>
                 ) : (
                   filtered.map((p) => (
@@ -199,16 +201,16 @@ export default function DriverPayoutsPage() {
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-2">
                           <Button size="sm" variant="ghost" onClick={() => setSelected(p)}>
-                            <Eye className="w-4 h-4 mr-2" /> View
+                            <Eye className="w-4 h-4 mr-2" /> {t("view")}
                           </Button>
 
                           {p.status === 'Pending' && (
                             <>
                               <Button size="sm" style={{ background: DELIGO, borderColor: DELIGO }} onClick={() => approve(p.id)}>
-                                <CheckCircle className="w-4 h-4 mr-2" /> Approve
+                                <CheckCircle className="w-4 h-4 mr-2" /> {t("approve")}
                               </Button>
                               <Button size="sm" variant="destructive" onClick={() => reject(p.id)}>
-                                <XCircle className="w-4 h-4 mr-2" /> Reject
+                                <XCircle className="w-4 h-4 mr-2" /> {t("reject")}
                               </Button>
                             </>
                           )}
@@ -227,7 +229,7 @@ export default function DriverPayoutsPage() {
       <Dialog open={!!selected} onOpenChange={(open) => { if (!open) setSelected(null); }}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Payout Details</DialogTitle>
+            <DialogTitle>{t("payout_details")}</DialogTitle>
           </DialogHeader>
 
           {selected && (
@@ -247,25 +249,25 @@ export default function DriverPayoutsPage() {
               <Separator className="my-4" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Info label="Amount" value={`€ ${selected.amount.toFixed(2)}`} />
-                <Info label="Method" value={selected.payoutMethod} />
-                <Info label="Status" value={selected.status} />
-                <Info label="Date" value={new Date(selected.date).toLocaleString()} />
-                <Info label="Account Holder" value={selected.accountHolder ?? '-'} />
-                <Info label="IBAN" value={selected.iban ?? '-'} />
+                <Info label={t("amount")} value={`€ ${selected.amount.toFixed(2)}`} />
+                <Info label={t("method")} value={selected.payoutMethod} />
+                <Info label={t("status")} value={selected.status} />
+                <Info label={t("date")} value={new Date(selected.date).toLocaleString()} />
+                <Info label={t("account_holder")} value={selected.accountHolder ?? '-'} />
+                <Info label={t("iban")} value={selected.iban ?? '-'} />
               </div>
 
               <Separator className="my-4" />
 
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setSelected(null)}>Close</Button>
+                <Button variant="outline" onClick={() => setSelected(null)}>{t("close")}</Button>
                 {selected.status === 'Pending' && (
                   <>
                     <Button style={{ background: DELIGO, borderColor: DELIGO }} onClick={() => { approve(selected.id); setSelected({ ...selected, status: 'Completed' }); }}>
-                      <CheckCircle className="w-4 h-4 mr-2" /> Approve
+                      <CheckCircle className="w-4 h-4 mr-2" /> {t("approve")}
                     </Button>
                     <Button variant="destructive" onClick={() => { reject(selected.id); setSelected({ ...selected, status: 'Rejected' }); }}>
-                      <XCircle className="w-4 h-4 mr-2" /> Reject
+                      <XCircle className="w-4 h-4 mr-2" /> {t("reject")}
                     </Button>
                   </>
                 )}

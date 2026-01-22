@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TRecentOrder } from "@/types/analytics.type";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
@@ -19,55 +20,57 @@ interface IProps {
   recentOrders: TRecentOrder[];
 }
 
-const STATUS_MAP = {
-  PENDING: { label: "Pending", color: "text-amber-500", icon: ClockIcon },
-  ACCEPTED: { label: "Accepted", color: "text-blue-500", icon: ThumbsUpIcon },
-  REJECTED: { label: "Rejected", color: "text-red-500", icon: XCircleIcon },
-  PREPARING: {
-    label: "Preparing",
-    color: "text-yellow-500",
-    icon: ThumbsUpIcon,
-  },
-  READY_FOR_PICKUP: {
-    label: "Ready For Pickup",
-    color: "text-green-500",
-    icon: ThumbsUpIcon,
-  },
-  AWAITING_PARTNER: {
-    label: "Awaiting Partner",
-    color: "text-teal-500",
-    icon: ThumbsUpIcon,
-  },
-  DISPATCHING: {
-    label: "Dispatching",
-    color: "text-cyan-500",
-    icon: TruckIcon,
-  },
-  REASSIGNMENT_NEEDED: {
-    label: "Reassignment Needed",
-    color: "text-red-600",
-    icon: XCircleIcon,
-  },
-  ASSIGNED: {
-    label: "Assigned",
-    color: "text-indigo-500",
-    icon: UserCheckIcon,
-  },
-  PICKED_UP: {
-    label: "Picked Up",
-    color: "text-purple-500",
-    icon: PackageCheckIcon,
-  },
-  ON_THE_WAY: { label: "On The Way", color: "text-sky-500", icon: TruckIcon },
-  DELIVERED: {
-    label: "Delivered",
-    color: "text-green-500",
-    icon: CheckCircle2Icon,
-  },
-  CANCELED: { label: "Canceled", color: "text-gray-500", icon: BanIcon },
-};
-
 const RecentOrders = ({ recentOrders }: IProps) => {
+  const { t } = useTranslation();
+
+  const STATUS_MAP = {
+    PENDING: { label: t("pending"), color: "text-amber-500", icon: ClockIcon },
+    ACCEPTED: { label: t("accepted"), color: "text-blue-500", icon: ThumbsUpIcon },
+    REJECTED: { label: t("rejected"), color: "text-red-500", icon: XCircleIcon },
+    PREPARING: {
+      label: t("preparing"),
+      color: "text-yellow-500",
+      icon: ThumbsUpIcon,
+    },
+    READY_FOR_PICKUP: {
+      label: t("ready_for_pickup"),
+      color: "text-green-500",
+      icon: ThumbsUpIcon,
+    },
+    AWAITING_PARTNER: {
+      label: t("awaiting_partner"),
+      color: "text-teal-500",
+      icon: ThumbsUpIcon,
+    },
+    DISPATCHING: {
+      label: t("dispatching"),
+      color: "text-cyan-500",
+      icon: TruckIcon,
+    },
+    REASSIGNMENT_NEEDED: {
+      label: t("reassignment_needed"),
+      color: "text-red-600",
+      icon: XCircleIcon,
+    },
+    ASSIGNED: {
+      label: t("assigned"),
+      color: "text-indigo-500",
+      icon: UserCheckIcon,
+    },
+    PICKED_UP: {
+      label: t("picked_up"),
+      color: "text-purple-500",
+      icon: PackageCheckIcon,
+    },
+    ON_THE_WAY: { label: t("on_the_way"), color: "text-sky-500", icon: TruckIcon },
+    DELIVERED: {
+      label: t("delivered"),
+      color: "text-green-500",
+      icon: CheckCircle2Icon,
+    },
+    CANCELED: { label: t("cancelled"), color: "text-gray-500", icon: BanIcon },
+  };
+
   const container = {
     hidden: {
       opacity: 0,
@@ -93,7 +96,7 @@ const RecentOrders = ({ recentOrders }: IProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6 border border-gray-100 h-full">
-      <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
+      <h3 className="text-lg font-semibold mb-4">{t("recent_orders")}</h3>
       <motion.div
         className="space-y-3"
         variants={container}
@@ -102,7 +105,7 @@ const RecentOrders = ({ recentOrders }: IProps) => {
       >
         {recentOrders.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-gray-500">No recent orders found</p>
+            <p className="text-sm text-gray-500">{t("no_recent_orders_found")}</p>
           </div>
         )}
         {recentOrders.map((order, index) => (
@@ -149,7 +152,7 @@ const RecentOrders = ({ recentOrders }: IProps) => {
           href="/admin/all-orders"
           className="w-full text-[#DC3173] text-sm font-medium hover:underline"
         >
-          View All Orders
+          {t("view_all_orders")}
         </Link>
       </div>
     </div>

@@ -1,4 +1,3 @@
-// File: app/admin/fleet-manager/fleet-manager-withdrawals/page.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
@@ -10,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import {
-  
   Search,
   Clock,
   CheckCircle,
@@ -34,6 +32,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet';
+import { useTranslation } from '@/hooks/use-translation';
 
 const DELIGO = '#DC3173';
 
@@ -51,6 +50,7 @@ type Withdrawal = {
 
 // ---------- main component ----------
 export default function FleetManagerWithdrawalsPage() {
+  const { t } = useTranslation();
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [query, setQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | Withdrawal['status']>('all');
@@ -66,10 +66,10 @@ export default function FleetManagerWithdrawalsPage() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   useEffect(() => {
-  Promise.resolve().then(() => {
-    setWithdrawals(mockData());
-  });
-}, []);
+    Promise.resolve().then(() => {
+      setWithdrawals(mockData());
+    });
+  }, []);
 
 
   // ---------- sort & filter ----------
@@ -125,7 +125,7 @@ export default function FleetManagerWithdrawalsPage() {
     <div className="min-h-screen p-6 bg-slate-50">
       {/* Header */}
       <motion.h1 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <EuroIcon className="w-8 h-8" style={{ color: DELIGO }} /> Fleet Manager Withdrawals
+        <EuroIcon className="w-8 h-8" style={{ color: DELIGO }} /> {t("fleet_manager_withdrawals")}
       </motion.h1>
 
       {/* Controls */}
@@ -134,30 +134,42 @@ export default function FleetManagerWithdrawalsPage() {
         <Button style={{ background: DELIGO }}><Search className="w-4 h-4" /></Button>
 
         <select className="px-3 py-2 border rounded-md bg-white" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value as any)}>
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
+          <option value="all">{t("all_status")}</option>
+          <option value="pending">{t("pending")}</option>
+          <option value="approved">{t("approved")}</option>
+          <option value="rejected">{t("rejected")}</option>
         </select>
 
         <select className="px-3 py-2 border rounded-md bg-white" value={sortBy} onChange={(e) => setSortBy(e.target.value as any)}>
-          <option value="date">Sort by Date</option>
-          <option value="amount">Sort by Amount</option>
+          <option value="date">{t("sort_by_date")}</option>
+          <option value="amount">{t("sort_by_amount")}</option>
         </select>
 
-        <Button variant="outline" onClick={exportPDF} className="flex items-center gap-2"><Download className="w-4 h-4" /> Export PDF</Button>
+        <Button variant="outline" onClick={exportPDF} className="flex items-center gap-2"><Download className="w-4 h-4" /> {t("export_pdf")}</Button>
       </div>
 
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <SummaryCard title="Total Withdrawal Requests" value={`${filtered.length}`} icon={<EuroIcon className="w-6 h-6" style={{ color: DELIGO }} />} />
-        <SummaryCard title="Pending Requests" value={`${filtered.filter((w) => w.status === 'pending').length}`} icon={<Clock className="w-6 h-6 text-orange-500" />} />
-        <SummaryCard title="Approved Amount (€)" value={`€ ${filtered.filter((w) => w.status === 'approved').reduce((s, w) => s + w.amount, 0).toLocaleString()}`} icon={<CheckCircle className="w-6 h-6 text-green-600" />} />
+        <SummaryCard
+          title={t("total_withdrawal_requests")}
+          value={`${filtered.length}`}
+          icon={<EuroIcon className="w-6 h-6" style={{ color: DELIGO }} />}
+        />
+        <SummaryCard
+          title={t("pending_requests")}
+          value={`${filtered.filter((w) => w.status === 'pending').length}`}
+          icon={<Clock className="w-6 h-6 text-orange-500" />}
+        />
+        <SummaryCard
+          title={t("approved_amount")}
+          value={`€ ${filtered.filter((w) => w.status === 'approved').reduce((s, w) => s + w.amount, 0).toLocaleString()}`}
+          icon={<CheckCircle className="w-6 h-6 text-green-600" />}
+        />
       </div>
 
       {/* List */}
       <Card className="p-6 shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Withdrawal Requests</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("withdrawal_requests")}</h2>
         <Separator className="mb-4" />
 
         <div className="space-y-4">
@@ -175,7 +187,7 @@ export default function FleetManagerWithdrawalsPage() {
 
                 <div>
                   <div className="font-semibold">{w.fleetManager}</div>
-                  <div className="text-xs text-slate-500">ID: {w.id}</div>
+                  <div className="text-xs text-slate-500">{t("id")}: {w.id}</div>
                   <Badge className="mt-1" variant={badgeVariant(w.status)}>{w.status}</Badge>
                 </div>
               </div>
@@ -187,14 +199,18 @@ export default function FleetManagerWithdrawalsPage() {
 
                 {w.status === 'pending' && (
                   <div className="flex items-center justify-end gap-2 mt-2">
-                    <Button size="sm" variant="destructive" onClick={() => onRowRejectClick(w.id)}>Reject</Button>
-                    <Button size="sm" style={{ background: DELIGO }} onClick={() => onRowApproveClick(w.id)}>Approve</Button>
+                    <Button size="sm" variant="destructive" onClick={() => onRowRejectClick(w.id)}>
+                      {t("reject")}
+                    </Button>
+                    <Button size="sm" style={{ background: DELIGO }} onClick={() => onRowApproveClick(w.id)}>
+                      {t("approve")}
+                    </Button>
                   </div>
                 )}
 
                 {w.status !== 'pending' && (
                   <div className="mt-2">
-                    <Button size="sm" variant="outline" onClick={() => setSelected(w)}><FileText className="w-4 h-4 mr-1" /> Details</Button>
+                    <Button size="sm" variant="outline" onClick={() => setSelected(w)}><FileText className="w-4 h-4 mr-1" /> {t("details")}</Button>
                   </div>
                 )}
               </div>
@@ -203,80 +219,86 @@ export default function FleetManagerWithdrawalsPage() {
         </div>
       </Card>
 
-     
+
       <Sheet open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <SheetContent className="w-full sm:max-w-md p-4 overflow-y-auto max-h-[100vh]">
+        <SheetContent className="w-full sm:max-w-md p-4 overflow-y-auto max-h-screen">
           <SheetHeader>
-            <SheetTitle className="text-xl font-bold">Withdrawal Details</SheetTitle>
-            <SheetDescription>Full payout breakdown, bank verification & documents</SheetDescription>
+            <SheetTitle className="text-xl font-bold">{t("withdrawal_details")}</SheetTitle>
+            <SheetDescription>{t("full_payout_breakdown_bank")}</SheetDescription>
           </SheetHeader>
 
           {selected && (
             <div className="mt-6 space-y-6 pb-12">
-              <Detail label="Fleet Manager" value={selected.fleetManager} />
-              <Detail label="Withdrawal ID" value={selected.id} />
-              <Detail label="Amount" value={`€ ${selected.amount.toLocaleString()}`} />
-              <Detail label="Status" value={selected.status} />
-              <Detail label="Method" value={selected.method.replace('_', ' ')} />
-              <Detail label="IBAN" value={selected.iban} />
-              <Detail label="Requested At" value={new Date(selected.requestedAt).toLocaleString()} />
+              <Detail label={t("fleet_manager")} value={selected.fleetManager} />
+              <Detail label={t("withdrawal_id")} value={selected.id} />
+              <Detail label={t("amount")} value={`€ ${selected.amount.toLocaleString()}`} />
+              <Detail label={t("status")} value={selected.status} />
+              <Detail label={t("method")} value={selected.method.replace('_', ' ')} />
+              <Detail label={("iban")} value={selected.iban} />
+              <Detail label={t("requested_at")} value={new Date(selected.requestedAt).toLocaleString()} />
 
               {/* Bank verification preview (mock) */}
               <div>
-                <h3 className="font-semibold">Bank Verification</h3>
+                <h3 className="font-semibold">{t("bank_verification")}</h3>
                 <div className="p-3 mt-2 border rounded-md bg-slate-50 text-sm">
-                  <div>Account Holder: <strong>{selected.fleetManager}</strong></div>
-                  <div>IBAN Match: <strong>Yes</strong></div>
-                  <div>Verified On: <strong>{new Date(new Date(selected.requestedAt).getTime() - 3600 * 1000 * 24).toLocaleDateString()}</strong></div>
+                  <div>{t("account_holder")}: <strong>{selected.fleetManager}</strong></div>
+                  <div>{t("iban_match")}: <strong>{t("yes")}</strong></div>
+                  <div>{t("verified_on")}: <strong>{new Date(new Date(selected.requestedAt).getTime() - 3600 * 1000 * 24).toLocaleDateString()}</strong></div>
                 </div>
               </div>
 
               {/* Documents */}
               <div>
-                <h3 className="font-semibold">Documents</h3>
+                <h3 className="font-semibold">{t("documents")}</h3>
                 <div className="mt-2 space-y-2">
                   {(selected.documents || []).map((d, i) => (
                     <div key={i} className="flex items-center justify-between p-2 border rounded-md bg-white">
                       <div className="text-sm">{d.name}</div>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={() => d.url && window.open(d.url, '_blank')}><FileText className="w-4 h-4 mr-1" /> View</Button>
+                        <Button variant="outline" size="sm" onClick={() => d.url && window.open(d.url, '_blank')}><FileText className="w-4 h-4 mr-1" /> {t("view")}</Button>
                       </div>
                     </div>
                   ))}
 
                   {(!selected.documents || selected.documents.length === 0) && (
-                    <div className="text-sm text-slate-500">No documents uploaded.</div>
+                    <div className="text-sm text-slate-500">{t("no_documents_uploaded")}</div>
                   )}
                 </div>
               </div>
 
               {/* Upload transfer receipt */}
               <div>
-                <h3 className="font-semibold">Upload Transfer Receipt</h3>
+                <h3 className="font-semibold">{t("upload_transfer_receipt")}</h3>
                 <div className="mt-2 flex items-center gap-2">
                   <input type="file" onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)} />
-                  <Button size="sm" style={{ background: DELIGO }} onClick={handleUploadReceiptInDrawer}><Upload className="w-4 h-4 mr-1" /> Upload</Button>
+                  <Button size="sm" style={{ background: DELIGO }} onClick={handleUploadReceiptInDrawer}><Upload className="w-4 h-4 mr-1" /> {t("upload")}</Button>
                 </div>
               </div>
 
               {/* Timeline */}
               <div>
-                <h3 className="font-semibold">Payout Processing Timeline</h3>
+                <h3 className="font-semibold">{t("payout_processing_timeline")}</h3>
                 <ol className="mt-2 text-sm space-y-2">
-                  <li>1. Request received — <span className="text-slate-500">{new Date(selected.requestedAt).toLocaleString()}</span></li>
-                  <li>2. Bank verification — <span className="text-slate-500">In progress</span></li>
-                  <li>3. Transfer initiated — <span className="text-slate-500">—</span></li>
+                  <li>1. {t("request_received")} — <span className="text-slate-500">{new Date(selected.requestedAt).toLocaleString()}</span></li>
+                  <li>2. {t("bank_verification")} — <span className="text-slate-500">In progress</span></li>
+                  <li>3. {t("transfer_initiated")} — <span className="text-slate-500">—</span></li>
                   <li>4. Completed — <span className="text-slate-500">—</span></li>
                 </ol>
               </div>
 
               {/* Actions (drawer) */}
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setSelected(null)}>Close</Button>
+                <Button variant="outline" onClick={() => setSelected(null)}>
+                  {t("close")}
+                </Button>
                 {selected.status === 'pending' && (
                   <>
-                    <Button variant="destructive" onClick={() => setConfirmAction({ type: 'reject', id: selected.id })}>Reject</Button>
-                    <Button style={{ background: DELIGO }} onClick={() => setConfirmAction({ type: 'approve', id: selected.id })}>Approve</Button>
+                    <Button variant="destructive" onClick={() => setConfirmAction({ type: 'reject', id: selected.id })}>
+                      {t("reject")}
+                    </Button>
+                    <Button style={{ background: DELIGO }} onClick={() => setConfirmAction({ type: 'approve', id: selected.id })}>
+                      {t("approve")}
+                    </Button>
                   </>
                 )}
               </div>
@@ -289,17 +311,19 @@ export default function FleetManagerWithdrawalsPage() {
       <Dialog open={!!confirmAction} onOpenChange={() => setConfirmAction(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{confirmAction?.type === 'approve' ? 'Approve Withdrawal' : 'Reject Withdrawal'}</DialogTitle>
+            <DialogTitle>{confirmAction?.type === 'approve' ? t("approve_withdrawal") : t("reject_withdrawal")}</DialogTitle>
           </DialogHeader>
 
-          <p className="text-sm text-slate-600 mb-4">Are you sure you want to <strong>{confirmAction?.type}</strong> this withdrawal?</p>
+          <p className="text-sm text-slate-600 mb-4">{t("are_you_sure_want_to")} <strong>{confirmAction?.type}</strong> {t("this_withdrawal")}</p>
 
           <div className="flex items-center gap-2 mb-4">
-            <Input placeholder="Optional note (will be saved in audit log)" onChange={() => {}} />
+            <Input placeholder={t("optional_note_will_saved_in_audit")} onChange={() => { }} />
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmAction(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setConfirmAction(null)}>
+              {t("cancel")}
+            </Button>
             <Button
               style={{ background: DELIGO }}
               onClick={() => {
@@ -308,7 +332,7 @@ export default function FleetManagerWithdrawalsPage() {
                 else rejectWithdrawalById(confirmAction.id);
               }}
             >
-              {confirmAction?.type === 'approve' ? 'Approve' : 'Reject'}
+              {confirmAction?.type === 'approve' ? t("approve") : t('reject')}
             </Button>
           </DialogFooter>
         </DialogContent>

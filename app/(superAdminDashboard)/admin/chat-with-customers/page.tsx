@@ -9,6 +9,7 @@ import {
   MoreVertical,
   Check,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 
 
@@ -74,6 +75,7 @@ const INITIAL_customers: Vendor[] = [
 ];
 
 export default function ChatWithcustomersGlass() {
+  const { t } = useTranslation();
   const [customers, setcustomers] = useState<Vendor[]>(INITIAL_customers);
   const [selectedId, setSelectedId] = useState<string>(INITIAL_customers[0].id);
   const [query, setQuery] = useState("");
@@ -175,7 +177,7 @@ export default function ChatWithcustomersGlass() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-6">
+    <div className="min-h-screen bg-linear-to-b from-white to-gray-50 p-6">
       <div className="max-w-7xl mx-auto flex gap-6 items-start">
         {/* Floating glass card sidebar (360px) */}
         <aside
@@ -184,15 +186,15 @@ export default function ChatWithcustomersGlass() {
         >
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-bold">customers</h3>
-              <p className="text-xs text-gray-600/80">Active conversations</p>
+              <h3 className="text-lg font-bold">{t("customers")}</h3>
+              <p className="text-xs text-gray-600/80">{t("active_conversations")}</p>
             </div>
 
             <div className="hidden sm:flex items-center bg-white/60 rounded-lg px-3 py-2 border border-white/30 shadow-sm">
               <Search className="w-4 h-4 text-gray-500 mr-2" />
               <input
                 aria-label="Search customers"
-                placeholder="Search customers..."
+                placeholder={t("search_customers")}
                 className="outline-none text-sm bg-transparent"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -205,9 +207,8 @@ export default function ChatWithcustomersGlass() {
               <div
                 key={v.id}
                 role="listitem"
-                className={`flex items-center gap-3 p-3 rounded-2xl transition ${
-                  selectedId === v.id ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6" : "hover:bg-white/40"
-                }`}
+                className={`flex items-center gap-3 p-3 rounded-2xl transition ${selectedId === v.id ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6" : "hover:bg-white/40"
+                  }`}
               >
                 <button
                   onClick={() => setSelectedId(v.id)}
@@ -226,7 +227,7 @@ export default function ChatWithcustomersGlass() {
                     <div className="flex items-center justify-between gap-3">
                       <div className="font-medium text-sm">
                         {v.name}
-                        {v.pinned ? <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">Pinned</span> : null}
+                        {v.pinned ? <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">{t("pinned")}</span> : null}
                       </div>
                       <div className="text-xs text-gray-500">{new Date(v.lastSeen ?? Date.now()).toLocaleTimeString()}</div>
                     </div>
@@ -278,7 +279,7 @@ export default function ChatWithcustomersGlass() {
               </div>
 
               <div className="flex items-center gap-3 text-sm text-gray-500">
-                Last seen: {selected ? new Date(selected.lastSeen ?? Date.now()).toLocaleString() : "-"}
+                {t("last_seen")}: {selected ? new Date(selected.lastSeen ?? Date.now()).toLocaleString() : "-"}
                 <button className="p-2 rounded-md hover:bg-gray-100" aria-label="More options">
                   <MoreVertical className="w-5 h-5 text-gray-600" />
                 </button>
@@ -325,7 +326,7 @@ export default function ChatWithcustomersGlass() {
 
                 {selected?.typing && (
                   <div className="max-w-[50%] p-3 rounded-2xl bg-gray-50 border border-gray-100">
-                    <div className="text-xs text-gray-500">{selected?.name} is typing...</div>
+                    <div className="text-xs text-gray-500">{selected?.name} {t("is_typing")}</div>
                     <div className="flex gap-1 mt-2">
                       <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                       <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.12s" }} />
@@ -342,17 +343,17 @@ export default function ChatWithcustomersGlass() {
             <div className="border-t p-4 bg-white">
               <div className="flex items-end gap-3">
                 <div className="flex items-center gap-2">
-                  <label className="cursor-pointer bg-gray-100 p-2 rounded-xl" title="Attach images">
+                  <label className="cursor-pointer bg-gray-100 p-2 rounded-xl" title={t("attach_images")}>
                     <Camera className="w-5 h-5 text-gray-600" aria-hidden />
                     <input ref={imageRef} type="file" accept="image/*" multiple className="hidden" onChange={onSelectImages} />
                   </label>
 
-                  <label className="cursor-pointer bg-gray-100 p-2 rounded-xl" title="Attach audio">
+                  <label className="cursor-pointer bg-gray-100 p-2 rounded-xl" title={t("attach_audio")}>
                     <Mic className="w-5 h-5 text-gray-600" aria-hidden />
                     <input ref={audioRef} type="file" accept="audio/*" className="hidden" onChange={onSelectAudio} />
                   </label>
 
-                  <label className="cursor-pointer bg-gray-100 p-2 rounded-xl" title="Attach file">
+                  <label className="cursor-pointer bg-gray-100 p-2 rounded-xl" title={t("attach_file")}>
                     <Paperclip className="w-5 h-5 text-gray-600" aria-hidden />
                     <input type="file" className="hidden" />
                   </label>
@@ -361,7 +362,7 @@ export default function ChatWithcustomersGlass() {
                 <div className="flex-1 flex flex-col">
                   <textarea
                     ref={textRef}
-                    placeholder="Write a message..."
+                    placeholder={t("write_a_message")}
                     rows={2}
                     className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#DC3173]/30 outline-none"
                     aria-label="Message composer"
@@ -388,7 +389,7 @@ export default function ChatWithcustomersGlass() {
                 <div>
                   <button onClick={handleSend} className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#DC3173] text-white shadow-lg" aria-label="Send message">
                     <Send className="w-4 h-4" />
-                    Send
+                    {t('send')}
                   </button>
                 </div>
               </div>

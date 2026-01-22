@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "@/hooks/use-translation";
 import { addProductCategoryReq } from "@/services/dashboard/category/product-category";
 import { TBusinessCategory } from "@/types/category.type";
 import { productCategoryValidation } from "@/validations/category/product-category.validation";
@@ -43,6 +44,7 @@ export default function AddProductCategory({
 }: {
   businessCategories: TBusinessCategory[];
 }) {
+  const { t } = useTranslation();
   const form = useForm<FormData>({
     resolver: zodResolver(productCategoryValidation),
     defaultValues: {
@@ -116,7 +118,7 @@ export default function AddProductCategory({
             delay: 0.2,
           }}
         >
-          Add Product Category
+          {t("add_product_category")}
         </motion.h1>
         <motion.p
           className="text-pink-100 mt-2"
@@ -130,7 +132,7 @@ export default function AddProductCategory({
             delay: 0.3,
           }}
         >
-          Create a new product category with details and visuals
+          {t("create_new_product_category")}
         </motion.p>
       </div>
       <Form {...form}>
@@ -156,13 +158,13 @@ export default function AddProductCategory({
                   <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center">
                       <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                      <span className="ml-2">Category Name</span>
+                      <span className="ml-2">{t("category_name")}</span>
                     </div>
                   </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="e.g. Pizza"
+                      placeholder={t("eg_pizza")}
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
                     />
                   </FormControl>
@@ -179,7 +181,7 @@ export default function AddProductCategory({
                   <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center">
                       <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                      <span className="ml-2">Category Image</span>
+                      <span className="ml-2">{t("category_image")}</span>
                     </div>
                   </FormLabel>
                   <FormControl>
@@ -200,7 +202,7 @@ export default function AddProductCategory({
                   <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center">
                       <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                      <span className="ml-2">Description</span>
+                      <span className="ml-2">{t("description")}</span>
                     </div>
                   </FormLabel>
                   <FormControl>
@@ -221,13 +223,13 @@ export default function AddProductCategory({
                   <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center">
                       <PlusCircle className="w-5 h-5 text-[#DC3173]" />
-                      <span className="ml-2">Business Category</span>
+                      <span className="ml-2">{t("business_category")}</span>
                     </div>
                   </FormLabel>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300">
-                        <SelectValue placeholder="Select Business Category" />
+                        <SelectValue placeholder={t("select_business_category")} />
                       </SelectTrigger>
                       <SelectContent>
                         {businessCategories.map((businessCategory) => (
@@ -263,7 +265,7 @@ export default function AddProductCategory({
               ) : (
                 <>
                   <PlusCircle className="w-5 h-5 mr-2" />
-                  Add Product Category
+                  {t("add_product_category")}
                 </>
               )}
             </motion.button>

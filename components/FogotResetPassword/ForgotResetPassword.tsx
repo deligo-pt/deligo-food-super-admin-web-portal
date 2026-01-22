@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,6 +15,8 @@ export default function ForgotResetPassword({
   title,
   subtitle,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center p-4">
       <motion.div
@@ -102,12 +105,12 @@ export default function ForgotResetPassword({
               delay: 0.6,
             }}
           >
-            Need help?{" "}
+            {t("need_help")}{" "}
             <Link
               href="/support"
               className="text-[#DC3173] font-medium hover:underline"
             >
-              Contact Support
+              {t("contact_support")}
             </Link>
           </motion.p>
         </div>

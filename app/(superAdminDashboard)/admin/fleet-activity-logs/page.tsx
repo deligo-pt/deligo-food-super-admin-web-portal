@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
 import { Clock, Filter, Search, MapPin, Truck, User, AlertTriangle } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 const DELIGO = '#DC3173';
 
@@ -35,6 +36,7 @@ type LogEntry = {
 
 // ---------------------- Page ----------------------
 export default function FleetActivityLogsPage() {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [query, setQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | LogType>('all');
@@ -65,13 +67,13 @@ export default function FleetActivityLogsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6 flex items-center gap-3"
       >
-        <Clock className="w-8 h-8" style={{ color: DELIGO }} /> Fleet Activity Logs
+        <Clock className="w-8 h-8" style={{ color: DELIGO }} /> {t("fleet_activity_logs")}
       </motion.h1>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Input
-          placeholder="Search logs, fleet manager or zone..."
+          placeholder={t("search_logs_fleet_manager_zone")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="max-w-sm"
@@ -83,14 +85,14 @@ export default function FleetActivityLogsPage() {
           value={filterType}
           onChange={(e) => setFilterType(e.target.value as any)}
         >
-          <option value="all">All Types</option>
-          <option value="login">Login</option>
-          <option value="logout">Logout</option>
-          <option value="zone_change">Zone Change</option>
-          <option value="rider_added">Rider Added</option>
-          <option value="rider_removed">Rider Removed</option>
-          <option value="payout_request">Payout Request</option>
-          <option value="warning">Warning</option>
+          <option value="all">{t("all_types")}</option>
+          <option value="login">{t("login")}</option>
+          <option value="logout">{t("logout")}</option>
+          <option value="zone_change">{t("zone_change")}</option>
+          <option value="rider_added">{t("rider_added")}</option>
+          <option value="rider_removed">{t("rider_removed")}</option>
+          <option value="payout_request">{t("payout_request")}</option>
+          <option value="warning">{t("warning")}</option>
         </select>
 
         <select
@@ -98,18 +100,18 @@ export default function FleetActivityLogsPage() {
           value={filterSeverity}
           onChange={(e) => setFilterSeverity(e.target.value as any)}
         >
-          <option value="all">All Severity</option>
-          <option value="normal">Normal</option>
-          <option value="warning">Warning</option>
-          <option value="critical">Critical</option>
+          <option value="all">{t("all_severity")}</option>
+          <option value="normal">{t("normal")}</option>
+          <option value="warning">{t("warnings")}</option>
+          <option value="critical">{t("critical")}</option>
         </select>
 
         <Button variant="outline" className="flex items-center gap-2">
-          <Filter className="w-4 h-4" /> Advanced Filters
+          <Filter className="w-4 h-4" /> {t("advanced_filters")}
         </Button>
 
         <div className="ml-auto flex items-center gap-3">
-          <div className="text-sm text-slate-500">Showing</div>
+          <div className="text-sm text-slate-500">{t("showing")}</div>
           <div className="px-3 py-1 rounded-md bg-white border">{filtered.length}</div>
         </div>
       </div>
@@ -117,17 +119,17 @@ export default function FleetActivityLogsPage() {
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <SummaryCard
-          label="Total Logs"
+          label={t("total_logs")}
           value={String(filtered.length)}
           icon={<Clock className="w-6 h-6" style={{ color: DELIGO }} />}
         />
         <SummaryCard
-          label="Warnings"
+          label={t("warnings")}
           value={String(filtered.filter((l) => l.severity === 'warning').length)}
           icon={<AlertTriangle className="w-6 h-6 text-orange-500" />}
         />
         <SummaryCard
-          label="Critical Alerts"
+          label={t("critical_alerts")}
           value={String(filtered.filter((l) => l.severity === 'critical').length)}
           icon={<AlertTriangle className="w-6 h-6 text-red-600" />}
         />
@@ -135,12 +137,12 @@ export default function FleetActivityLogsPage() {
 
       {/* Logs list */}
       <Card className="p-6 shadow-sm rounded-2xl">
-        <h3 className="text-xl font-semibold mb-4">Recent Activity</h3>
+        <h3 className="text-xl font-semibold mb-4">{t("recent_activity")}</h3>
         <Separator className="mb-4" />
 
         <div className="space-y-3 max-h-[640px] overflow-y-auto pr-2">
           {filtered.length === 0 ? (
-            <div className="py-10 text-center text-slate-500">No logs match your filters.</div>
+            <div className="py-10 text-center text-slate-500">{t("no_logs_match_your_filters")}</div>
           ) : (
             filtered.map((log) => (
               <motion.div

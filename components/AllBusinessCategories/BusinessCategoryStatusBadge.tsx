@@ -1,3 +1,4 @@
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { BanIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
 
@@ -10,6 +11,8 @@ export default function BusinessCategoryStatusBadge({
   isActive,
   isDeleted,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.button
       whileHover={{
@@ -23,17 +26,17 @@ export default function BusinessCategoryStatusBadge({
       {isDeleted ? (
         <>
           <BanIcon size={14} />
-          <span>Deleted</span>
+          <span>{t("deleted")}</span>
         </>
       ) : isActive ? (
         <>
           <CheckCircleIcon size={14} />
-          <span>Active</span>
+          <span>{t("active")}</span>
         </>
       ) : (
         <>
           <XCircleIcon size={14} />
-          <span>Inactive</span>
+          <span>{t("inactive")}</span>
         </>
       )}
     </motion.button>

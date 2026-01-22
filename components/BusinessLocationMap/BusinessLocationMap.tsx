@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/hooks/use-translation";
 import { Search } from "lucide-react";
 import {
   Dispatch,
@@ -73,6 +74,7 @@ const BusinessLocationMap = ({
   businessLocation,
   setLocationCoordinates,
 }: IProps) => {
+  const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<any>(null);
   const geocoderRef = useRef<any>(null);
@@ -209,7 +211,7 @@ const BusinessLocationMap = ({
         <Search className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
         <input
           id="autocomplete"
-          placeholder="Search your business address..."
+          placeholder={t("search_business_address")}
           className="pl-10 py-3 rounded-xl border w-full"
         />
       </div>

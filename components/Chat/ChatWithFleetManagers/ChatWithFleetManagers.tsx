@@ -4,6 +4,7 @@ import SelectFleetManagerModal from "@/components/Chat/ChatWithFleetManagers/Sel
 import { Button } from "@/components/ui/button";
 import { USER_ROLE } from "@/consts/user.const";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
+import { useTranslation } from "@/hooks/use-translation";
 import { getMessagesByRoom } from "@/services/chat/chat";
 import { openConversationReq } from "@/services/dashboard/chat/chat";
 import { getAllFleetManagersReq } from "@/services/dashboard/chat/chat-with-fleet-manager";
@@ -35,6 +36,7 @@ export default function ChatWithFleetManagers({
   accessToken,
   decoded,
 }: IProps) {
+  const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
@@ -273,14 +275,14 @@ export default function ChatWithFleetManagers({
           aria-label="Fleet Managers (floating card)"
         >
           <div>
-            <h3 className="text-lg font-bold">Fleet Managers</h3>
-            <p className="text-xs text-gray-600/80">Active conversations</p>
+            <h3 className="text-lg font-bold">{t("fleet_managers")}</h3>
+            <p className="text-xs text-gray-600/80">{t("active_conversations")}</p>
           </div>
           <div className="hidden sm:flex items-center bg-white/60 rounded-lg px-3 py-2 border border-white/30 shadow-sm mt-3">
             <Search className="w-4 h-4 text-gray-500 mr-2" />
             <input
               aria-label="Search fleet Managers"
-              placeholder="Search..."
+              placeholder={`${t("search")}...`}
               className="outline-none text-sm bg-transparent"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -296,18 +298,17 @@ export default function ChatWithFleetManagers({
                 onClick={() => setShowSelectModal(true)}
                 className="bg-[#DC3173] hover:bg-[#DC3173]/90"
               >
-                Start New Conversation
+                {t("start_new_conversation")}
               </Button>
             </div>
             {conversations?.map((c, i) => (
               <div
                 key={c._id}
                 role="listitem"
-                className={`flex items-center gap-3 p-3 rounded-2xl transition ${
-                  selectedId === c.room
-                    ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
-                    : "hover:bg-white/40"
-                }`}
+                className={`flex items-center gap-3 p-3 rounded-2xl transition ${selectedId === c.room
+                  ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
+                  : "hover:bg-white/40"
+                  }`}
               >
                 <button
                   onClick={() => setSelectedId(c.room)}
@@ -344,9 +345,8 @@ export default function ChatWithFleetManagers({
                   {c.unreadCount?.[decoded?.userId] > 0 ? (
                     <div
                       className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
-                      aria-label={`${
-                        c.unreadCount?.[decoded?.userId]
-                      } unread messages`}
+                      aria-label={`${c.unreadCount?.[decoded?.userId]
+                        } unread messages`}
                     >
                       {c.unreadCount?.[decoded?.userId]}
                     </div>
@@ -374,7 +374,7 @@ export default function ChatWithFleetManagers({
                   </div>
                   <div>
                     <div className="font-semibold">{selected?.name}</div>
-                    <div className="text-xs text-gray-500">Fleet Managers</div>
+                    <div className="text-xs text-gray-500">{t("fleet_managers")}</div>
                   </div>
                 </div>
 
@@ -398,23 +398,21 @@ export default function ChatWithFleetManagers({
                   {messages.map((m) => (
                     <article
                       key={m._id}
-                      className={`max-w-[78%] p-3 rounded-2xl border ${
-                        m.senderRole === "ADMIN" ||
+                      className={`max-w-[78%] p-3 rounded-2xl border ${m.senderRole === "ADMIN" ||
                         m.senderRole === "SUPER_ADMIN"
-                          ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
-                          : "bg-gray-50 border-gray-100"
-                      }`}
-                      aria-label={`${
-                        m.senderRole === "ADMIN" ||
+                        ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
+                        : "bg-gray-50 border-gray-100"
+                        }`}
+                      aria-label={`${m.senderRole === "ADMIN" ||
                         m.senderRole === "SUPER_ADMIN"
-                          ? "You"
-                          : selected?.name
-                      } message`}
+                        ? "You"
+                        : selected?.name
+                        } message`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <div className="text-xs text-gray-400">
                           {m.senderRole === "ADMIN" ||
-                          m.senderRole === "SUPER_ADMIN"
+                            m.senderRole === "SUPER_ADMIN"
                             ? "You"
                             : selected?.name}{" "}
                           •{" "}
@@ -470,8 +468,8 @@ export default function ChatWithFleetManagers({
                     <div className="text-xs text-gray-500">
                       {typingInfo?.name?.firstName || typingInfo?.name?.lastName
                         ? `${typingInfo?.name?.firstName} ${typingInfo?.name?.lastName}`
-                        : "Fleet Manager"}{" "}
-                      is typing...
+                        : t("fleet_managers")}{" "}
+                      {t("is_typing")}
                     </div>
                     <div className="flex justify-center gap-1 mt-2">
                       <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
@@ -496,7 +494,7 @@ export default function ChatWithFleetManagers({
                   <div className="flex items-center gap-2">
                     <label
                       className="cursor-pointer bg-gray-100 p-2 rounded-xl"
-                      title="Attach images"
+                      title={t("attach_images")}
                     >
                       <Camera className="w-5 h-5 text-gray-600" aria-hidden />
                       <input
@@ -511,7 +509,7 @@ export default function ChatWithFleetManagers({
 
                     <label
                       className="cursor-pointer bg-gray-100 p-2 rounded-xl"
-                      title="Attach audio"
+                      title={t("attach_audio")}
                     >
                       <Mic className="w-5 h-5 text-gray-600" aria-hidden />
                       <input
@@ -525,7 +523,7 @@ export default function ChatWithFleetManagers({
 
                     <label
                       className="cursor-pointer bg-gray-100 p-2 rounded-xl"
-                      title="Attach file"
+                      title={t("attach_file")}
                     >
                       <Paperclip
                         className="w-5 h-5 text-gray-600"
@@ -538,7 +536,7 @@ export default function ChatWithFleetManagers({
                   <div className="flex-1 flex flex-col">
                     <textarea
                       ref={textRef}
-                      placeholder="Write a message..."
+                      placeholder={t("write_a_message")}
                       rows={2}
                       className="w-full resize-none rounded-2xl border border-gray-200 px-4 py-3 focus:ring-2 focus:ring-[#DC3173]/30 outline-none"
                       aria-label="Message composer"
@@ -581,7 +579,7 @@ export default function ChatWithFleetManagers({
                       aria-label="Send message"
                     >
                       <Send className="w-4 h-4" />
-                      Send
+                      {t("send")}
                     </button>
                   </div>
                 </div>
@@ -589,7 +587,7 @@ export default function ChatWithFleetManagers({
             </div>
           ) : (
             <div className="border-t p-4 bg-white text-center text-gray-500 h-full flex items-center justify-center">
-              Select a conversation to start chatting
+              {t("select_conversation_start_chatting")}
             </div>
           )}
         </section>

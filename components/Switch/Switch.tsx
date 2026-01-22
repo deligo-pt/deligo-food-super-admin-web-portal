@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 interface SwitchProps {
   checked: boolean;
@@ -13,6 +14,8 @@ export function Switch({
   disabled = false,
   id,
 }: SwitchProps) {
+  const {t} = useTranslation();
+
   return (
     <button
       type="button"
@@ -29,7 +32,7 @@ export function Switch({
         ${disabled ? "opacity-50 cursor-not-allowed" : ""}
       `}
     >
-      <span className="sr-only">Use setting</span>
+      <span className="sr-only">{t("use_setting")}</span>
       <motion.span
         layout
         transition={{

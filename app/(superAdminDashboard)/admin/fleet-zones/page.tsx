@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Map, Pencil, Trash2, PlusCircle } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 const DELIGO = '#DC3173';
 
@@ -30,7 +31,8 @@ type Zone = {
 
 // ----------------------- Component -----------------------
 export default function FleetZonesPage() {
-  const [zones, setZones] = useState<Zone[]>([]);
+  const { t } = useTranslation();
+  const [zones, setZones] = useState<Zone[]>(mockZones());
   const [query, setQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Zone | null>(null);
@@ -46,10 +48,6 @@ export default function FleetZonesPage() {
     active: true,
     manager: '',
   });
-
-  useEffect(() => {
-    setZones(mockZones());
-  }, []);
 
   const filtered = zones.filter((z) =>
     [z.name, z.city, z.group, z.manager].join(' ').toLowerCase().includes(query.toLowerCase())
@@ -132,35 +130,35 @@ export default function FleetZonesPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-extrabold mb-6 flex items-center gap-3"
       >
-        <Map className="w-8 h-8" style={{ color: DELIGO }} /> Fleet Zones
+        <Map className="w-8 h-8" style={{ color: DELIGO }} /> {t("fleet_zones")}
       </motion.h1>
 
       {/* Search + Add */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Input
-          placeholder="Search zone, city, group or manager..."
+          placeholder={t("search_zone_city_group")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="max-w-md"
         />
         <Button style={{ background: DELIGO }} onClick={openAddModal}>
-          <PlusCircle className="w-4 h-4 mr-1" /> Add Zone
+          <PlusCircle className="w-4 h-4 mr-1" /> {t("add_zone")}
         </Button>
 
         <div className="ml-auto flex items-center gap-2">
-          <div className="text-sm text-slate-500">Total zones:</div>
+          <div className="text-sm text-slate-500">{t("total_zones")}:</div>
           <div className="px-3 py-1 rounded-md bg-white border">{zones.length}</div>
         </div>
       </div>
 
       {/* Zones list */}
       <Card className="p-6 shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">All Zones</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("all_zones")}</h2>
         <Separator className="mb-4" />
 
         <div className="space-y-4">
           {filtered.length === 0 ? (
-            <div className="py-8 text-center text-slate-500">No zones found.</div>
+            <div className="py-8 text-center text-slate-500">{t("no_zones_found")}</div>
           ) : (
             filtered.map((z) => (
               <motion.div
@@ -174,22 +172,22 @@ export default function FleetZonesPage() {
                     <span className="w-3 h-3 rounded-full" style={{ background: z.color }} />
                     <div className="font-bold text-lg">{z.name}</div>
                     <Badge variant={z.active ? 'default' : 'destructive'} className="ml-3">
-                      {z.active ? 'Active' : 'Maintenance'}
+                      {z.active ? t("active") : t("maintenance")}
                     </Badge>
                   </div>
 
                   <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600">
-                    <div>City: <strong className="text-slate-800">{z.city}</strong></div>
-                    <div>Group: <strong className="text-slate-800">{z.group}</strong></div>
-                    <div>Base Fee: <strong className="text-slate-800">€ {z.baseFee}</strong></div>
-                    <div>Per KM Fee: <strong className="text-slate-800">€ {z.perKmFee}</strong></div>
-                    <div>ETA: <strong className="text-slate-800">{z.estimatedTime}</strong></div>
-                    <div>Manager: <strong className="text-slate-800">{z.manager ?? '—'}</strong></div>
+                    <div>{t("city")}: <strong className="text-slate-800">{z.city}</strong></div>
+                    <div>{t("group")}: <strong className="text-slate-800">{z.group}</strong></div>
+                    <div>{t("base_fee")}: <strong className="text-slate-800">€ {z.baseFee}</strong></div>
+                    <div>{t("per_km_fee")}: <strong className="text-slate-800">€ {z.perKmFee}</strong></div>
+                    <div>{t("eta")}: <strong className="text-slate-800">{z.estimatedTime}</strong></div>
+                    <div>{t("manager")}: <strong className="text-slate-800">{z.manager ?? '—'}</strong></div>
                   </div>
                 </div>
 
                 {/* actions */}
-                <div className="flex-shrink-0 flex items-center gap-3">
+                <div className="shrink-0 flex items-center gap-3">
                   <Button size="sm" variant="outline" onClick={() => openEditModal(z)}>
                     <Pencil className="w-4 h-4" />
                   </Button>
@@ -207,48 +205,48 @@ export default function FleetZonesPage() {
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Zone' : 'Add Zone'}</DialogTitle>
+            <DialogTitle>{editing ? t("edit_zone") : t("add_zone")}</DialogTitle>
           </DialogHeader>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <Input placeholder="Zone Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <Input placeholder="City" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+            <Input placeholder={t("zone_name")} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <Input placeholder={t("city")} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
 
             <div>
-              <label className="text-xs text-slate-500">Group</label>
+              <label className="text-xs text-slate-500">{t("group")}</label>
               <select className="w-full mt-1 border rounded-md p-2" value={form.group} onChange={(e) => setForm({ ...form, group: e.target.value })}>
-                <option value="North">North</option>
-                <option value="Central">Central</option>
-                <option value="South">South</option>
+                <option value="North">{t("north")}</option>
+                <option value="Central">{t("central")}</option>
+                <option value="South">{t("south")}</option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs text-slate-500">Fleet Manager (optional)</label>
-              <Input placeholder="Manager name" value={form.manager} onChange={(e) => setForm({ ...form, manager: e.target.value })} />
+              <label className="text-xs text-slate-500">{t("fleet_manager")} ({t("optional")})</label>
+              <Input placeholder={t("manager_name")} value={form.manager} onChange={(e) => setForm({ ...form, manager: e.target.value })} />
             </div>
 
-            <Input placeholder="Base Fee (€)" value={form.baseFee} onChange={(e) => setForm({ ...form, baseFee: e.target.value })} />
-            <Input placeholder="Per KM Fee (€)" value={form.perKmFee} onChange={(e) => setForm({ ...form, perKmFee: e.target.value })} />
+            <Input placeholder={`${t("base_fee")} (€)`} value={form.baseFee} onChange={(e) => setForm({ ...form, baseFee: e.target.value })} />
+            <Input placeholder={`${t("per_km_fee")} (€)`} value={form.perKmFee} onChange={(e) => setForm({ ...form, perKmFee: e.target.value })} />
 
-            <Input placeholder="Estimated Time (e.g. 20-30 min)" value={form.estimatedTime} onChange={(e) => setForm({ ...form, estimatedTime: e.target.value })} />
+            <Input placeholder={t("estimated_time_min")} value={form.estimatedTime} onChange={(e) => setForm({ ...form, estimatedTime: e.target.value })} />
 
             <div className="flex items-center gap-3">
               <div>
-                <label className="text-xs text-slate-500">Zone Color</label>
+                <label className="text-xs text-slate-500">{t("zone_color")}</label>
                 <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-12 h-10 p-0 border-0" />
               </div>
 
               <div className="flex items-center gap-2">
                 <input id="zone-active" type="checkbox" checked={!!form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
-                <label htmlFor="zone-active" className="text-sm">Active Zone</label>
+                <label htmlFor="zone-active" className="text-sm">{t("active_zone")}</label>
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button style={{ background: DELIGO }} onClick={saveZone}>{editing ? 'Update' : 'Save'}</Button>
+            <Button variant="outline" onClick={() => setModalOpen(false)}>{t("cancel")}</Button>
+            <Button style={{ background: DELIGO }} onClick={saveZone}>{editing ? t("update") : t("save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

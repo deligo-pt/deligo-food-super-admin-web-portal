@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/hooks/use-translation";
 import { resetPasswordReq } from "@/services/forgotResetPassword/forgotResetPassword";
 import { TResponse } from "@/types";
 import { resetPasswordValidation } from "@/validations/forgot-reset-password/forgot-reset-password.validation";
@@ -26,6 +27,7 @@ import z from "zod";
 type ResetPasswordForm = z.infer<typeof resetPasswordValidation>;
 
 const ResetPasswordForm = ({ token }: { token: string }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -88,8 +90,8 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
 
   return isSubmitted ? (
     <ForgotResetPassword
-      title="Password Reset Complete"
-      subtitle="Your password has been successfully reset"
+      title={t("password_reset_complete")}
+      subtitle={t("password_has_been_successfully_reset")}
     >
       <motion.div
         initial={{
@@ -106,19 +108,18 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
           <CheckCircleIcon className="h-8 w-8 text-green-500" />
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Password Updated
+          {t("password_updated")}
         </h3>
         <p className="text-gray-500 mb-6">
-          Your password has been successfully reset. You can now use your new
-          password to log in.
+          {t("password_has_successfully_reset_can_use_now")}
         </p>
-        <Button className="mt-2">Continue to Login</Button>
+        <Button className="mt-2">{t("continue_to_login")}</Button>
       </motion.div>
     </ForgotResetPassword>
   ) : (
     <ForgotResetPassword
-      title="Reset Password"
-      subtitle="Create a new password for your account"
+      title={t("reset_password")}
+      subtitle={t("create_new_password_account")}
     >
       <Form {...form}>
         <motion.form
@@ -137,12 +138,12 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
                   <div className="relative">
                     <FormLabel className="flex items-center text-[#DC3173] mb-2">
                       <Mail className="w-5 h-5" />
-                      <span>Email</span>
+                      <span>{t("email")}</span>
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="Enter your email address"
+                        placeholder={t("enter_your_email_address")}
                         className="py-3 text-base focus-visible:ring-1 focus-visible:ring-[#DC3173] focus:border-[#DC3173]! transition-all duration-300 rounded-sm"
                         {...field}
                       />
@@ -162,13 +163,13 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
                   <div>
                     <FormLabel className="flex items-center text-[#DC3173] mb-2">
                       <LockIcon className="w-5 h-5" />
-                      <span>New Password</span>
+                      <span>{t("new_password")}</span>
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showPassword ? "text" : "password"}
-                          placeholder="Enter a new password"
+                          placeholder={t("enter_new_password")}
                           className="py-3 text-base focus-visible:ring-1 focus-visible:ring-[#DC3173] focus:border-[#DC3173]! transition-all duration-300 rounded-sm"
                           {...field}
                         />
@@ -200,13 +201,13 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
                   <div>
                     <FormLabel className="flex items-center text-[#DC3173] mb-2">
                       <LockIcon className="w-5 h-5" />
-                      <span>ConfirmPassword</span>
+                      <span>{t("confirm_password")}</span>
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showPassword ? "text" : "password"}
-                          placeholder="Confirm new password"
+                          placeholder={t("confirm_new_password")}
                           className="py-3 text-base focus-visible:ring-1 focus-visible:ring-[#DC3173] focus:border-[#DC3173]! transition-all duration-300 rounded-sm"
                           {...field}
                         />
@@ -234,7 +235,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
               className="w-full bg-[#DC3173] hover:bg-[#DC3173]/90"
               type="submit"
             >
-              Reset Password
+              {t("reset_password")}
             </Button>
           </motion.div>
           <motion.div variants={itemVariants} className="mt-6 text-center">
@@ -242,7 +243,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
               href="#"
               className="text-sm text-gray-600 hover:text-[#DC3173] transition-colors"
             >
-              Back to Login
+              {t("back_to_login")}
             </a>
           </motion.div>
         </motion.form>

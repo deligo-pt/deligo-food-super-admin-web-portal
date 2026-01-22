@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TProduct } from "@/types/product.type";
 import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
@@ -24,6 +25,7 @@ interface IProps {
 }
 
 export default function ProductDetails({ product }: IProps) {
+  const { t } = useTranslation();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const getStockStatusColor = (status: string) => {
@@ -113,7 +115,7 @@ export default function ProductDetails({ product }: IProps) {
           className="text-2xl font-bold text-white"
           variants={itemVariants as Variants}
         >
-          Product Details
+          {t("product_details")}
         </motion.h1>
         {/* <motion.div
           variants={itemVariants as Variants}
@@ -162,9 +164,8 @@ export default function ProductDetails({ product }: IProps) {
               {product.images.map((image, index) => (
                 <motion.div
                   key={index}
-                  className={`aspect-square rounded-md overflow-hidden cursor-pointer ${
-                    index === currentImageIndex ? "ring-2 ring-[#DC3173]" : ""
-                  }`}
+                  className={`aspect-square rounded-md overflow-hidden cursor-pointer ${index === currentImageIndex ? "ring-2 ring-[#DC3173]" : ""
+                    }`}
                   onClick={() => setCurrentImageIndex(index)}
                   whileHover={{
                     scale: 1.05,
@@ -190,22 +191,21 @@ export default function ProductDetails({ product }: IProps) {
           <motion.div variants={itemVariants as Variants}>
             <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
             <div className="flex items-center mt-2 space-x-4">
-              <span className="text-sm text-gray-500">SKU: {product.sku}</span>
+              <span className="text-sm text-gray-500">{t("sku")}: {product.sku}</span>
               <span className="text-sm text-gray-500">
-                ID: {product.productId}
+                {t("id")}: {product.productId}
               </span>
               <div
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  product.isApproved
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isApproved
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+                  }`}
               >
-                {product.isApproved ? "Approved" : "Not Approved"}
+                {product.isApproved ? t("approved") : t("not_approved")}
               </div>
               {product.meta.isFeatured && (
                 <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                  Featured
+                  {t("featured")}
                 </div>
               )}
             </div>
@@ -216,7 +216,7 @@ export default function ProductDetails({ product }: IProps) {
             variants={itemVariants as Variants}
           >
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              Pricing
+              {t("pricing")}
             </h2>
             <div className="flex items-center gap-2 mb-2"></div>
             <div className="flex items-baseline gap-2">
@@ -234,7 +234,7 @@ export default function ProductDetails({ product }: IProps) {
                     {Math.round(
                       (product.pricing.discount / product.pricing.price) * 100,
                     )}
-                    % off
+                    % {t("off")}
                   </span>
                 </>
               ) : (
@@ -243,7 +243,7 @@ export default function ProductDetails({ product }: IProps) {
             </div>
             {product.pricing.tax ? (
               <p className="text-sm text-gray-500 mt-1">
-                Includes {product.pricing.tax}% tax
+                {t("includes")} {product.pricing.tax}% {t("tax")}
               </p>
             ) : (
               ""
@@ -254,7 +254,7 @@ export default function ProductDetails({ product }: IProps) {
             <div className="flex items-center gap-2 mb-2">
               <ShoppingBagIcon className="w-5 h-5 text-[#DC3173]" />
               <h2 className="text-lg font-semibold text-gray-900">
-                Stock Information
+                {t("stock_information")}
               </h2>
             </div>
             <div className="flex items-center gap-2">
@@ -267,7 +267,7 @@ export default function ProductDetails({ product }: IProps) {
                 {product.stock.availabilityStatus}
               </div>
               <span className="text-gray-700">
-                {product.stock.quantity} {product.stock.unit} available
+                {product.stock.quantity} {product.stock.unit} {t("available")}
               </span>
             </div>
           </motion.div>
@@ -276,7 +276,7 @@ export default function ProductDetails({ product }: IProps) {
             <div className="flex items-center gap-2 mb-2">
               <InfoIcon className="w-5 h-5 text-[#DC3173]" />
               <h2 className="text-lg font-semibold text-gray-900">
-                Description
+                {t("description")}
               </h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
@@ -289,10 +289,10 @@ export default function ProductDetails({ product }: IProps) {
             variants={itemVariants as Variants}
           >
             <div>
-              <h3 className="text-sm font-medium text-gray-500">Category</h3>
+              <h3 className="text-sm font-medium text-gray-500">{t("category")}</h3>
               <p className="mt-1 text-gray-900">{product.category}</p>
               {product.subCategory && (
-                <p className="mt-1 text-gray-700">Sub: {product.subCategory}</p>
+                <p className="mt-1 text-gray-700">{t("sub")}: {product.subCategory}</p>
               )}
             </div>
             {product.brand && (
@@ -310,7 +310,7 @@ export default function ProductDetails({ product }: IProps) {
             <div className="flex items-center gap-2 mb-2">
               <ShieldIcon className="w-5 h-5 text-[#DC3173]" />
               <h2 className="text-lg font-semibold text-gray-900">
-                Vendor Information
+                {t("vendor_information")}
               </h2>
             </div>
             <div className="flex justify-between items-center">
@@ -333,13 +333,13 @@ export default function ProductDetails({ product }: IProps) {
               <div className="flex items-center gap-2 mb-2">
                 <TruckIcon className="w-5 h-5 text-[#DC3173]" />
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Delivery Information
+                  {t("delivery_information")}
                 </h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">
-                    Delivery Type
+                    {t("delivery_type")}
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-gray-900">
@@ -357,7 +357,7 @@ export default function ProductDetails({ product }: IProps) {
                   {product.deliveryInfo.deliveryCharge !== undefined && (
                     <div className="text-sm">
                       <span className="font-medium text-gray-500">
-                        Delivery Charge:{" "}
+                        {t("delivery_charge")}:{" "}
                       </span>
                       <span className="text-gray-900">
                         {product.pricing.currency}{" "}
@@ -367,7 +367,7 @@ export default function ProductDetails({ product }: IProps) {
                   )}
                   {product.deliveryInfo.freeDeliveryAbove !== undefined && (
                     <div className="text-sm mt-1 text-green-600">
-                      Free delivery above {product.pricing.currency}{" "}
+                      {t("free_delivery_above")} {product.pricing.currency}{" "}
                       {product.deliveryInfo.freeDeliveryAbove.toFixed(2)}
                     </div>
                   )}
@@ -380,7 +380,7 @@ export default function ProductDetails({ product }: IProps) {
             <motion.div variants={itemVariants as Variants}>
               <div className="flex items-center gap-2 mb-2">
                 <TagIcon className="w-5 h-5 text-[#DC3173]" />
-                <h2 className="text-lg font-semibold text-gray-900">Tags</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t("tags")}</h2>
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.tags.map((tag, index) => (
@@ -406,7 +406,7 @@ export default function ProductDetails({ product }: IProps) {
               <div className="flex items-center gap-2 mb-2">
                 <StarIcon className="w-5 h-5 text-[#DC3173]" />
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Ratings & Reviews
+                  {t("ratings_reviews")}
                 </h2>
               </div>
               <div className="flex items-center gap-4">
@@ -418,20 +418,19 @@ export default function ProductDetails({ product }: IProps) {
                     {[...Array(5)].map((_, i) => (
                       <StarIcon
                         key={i}
-                        className={`w-5 h-5 ${
-                          i < Math.floor(product?.rating?.average || 0)
-                            ? "text-amber-400 fill-amber-400"
-                            : i < (product?.rating?.average || 0)
-                              ? "text-amber-400 fill-amber-400 opacity-50"
-                              : "text-gray-300"
-                        }`}
+                        className={`w-5 h-5 ${i < Math.floor(product?.rating?.average || 0)
+                          ? "text-amber-400 fill-amber-400"
+                          : i < (product?.rating?.average || 0)
+                            ? "text-amber-400 fill-amber-400 opacity-50"
+                            : "text-gray-300"
+                          }`}
                       />
                     ))}
                   </div>
                 </div>
                 <span className="text-gray-500">
-                  Based on {product.rating.totalReviews}{" "}
-                  {product.rating.totalReviews === 1 ? "review" : "reviews"}
+                  {t("based_on")} {product.rating.totalReviews}{" "}
+                  {product.rating.totalReviews === 1 ? t("review") : t("reviews")}
                 </span>
               </div>
             </motion.div>
@@ -444,24 +443,23 @@ export default function ProductDetails({ product }: IProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p>
-                  Status:{" "}
+                  {t("status")}:{" "}
                   <span
-                    className={`font-medium ${
-                      product.isDeleted
-                        ? "text-red-600"
-                        : product.meta.status === "ACTIVE"
-                          ? "text-green-600"
-                          : "text-yellow-600"
-                    }`}
+                    className={`font-medium ${product.isDeleted
+                      ? "text-red-600"
+                      : product.meta.status === "ACTIVE"
+                        ? "text-green-600"
+                        : "text-yellow-600"
+                      }`}
                   >
                     {product.isDeleted ? "DELETED" : product.meta.status}
                   </span>
                 </p>
-                {product.meta.origin && <p>Origin: {product.meta.origin}</p>}
+                {product.meta.origin && <p>{t("origin")}: {product.meta.origin}</p>}
               </div>
               <div>
-                <p>Created: {format(product.meta.createdAt, "do MMM yyyy")}</p>
-                <p>Updated: {format(product.meta.updatedAt, "do MMM yyyy")}</p>
+                <p>{t("created")}: {format(product.meta.createdAt, "do MMM yyyy")}</p>
+                <p>{t("updated")}: {format(product.meta.updatedAt, "do MMM yyyy")}</p>
               </div>
             </div>
           </motion.div>

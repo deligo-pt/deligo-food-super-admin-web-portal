@@ -29,7 +29,8 @@ import {
   Legend,
 } from "recharts";
 
-import { Download, TrendingUp, Users, Clock, AlertOctagon } from "lucide-react";
+import { Download, TrendingUp } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 const DELIGO = "#DC3173";
 
@@ -48,6 +49,7 @@ type Rider = {
 
 // ---------------------- Component ----------------------
 export default function FleetPerformancePage() {
+  const { t } = useTranslation();
   // filters
   const [range, setRange] = useState<"7" | "30" | "custom">("7");
   const [customStart, setCustomStart] = useState<string>(getISODateDaysAgo(30));
@@ -63,10 +65,17 @@ export default function FleetPerformancePage() {
   const [openDrill, setOpenDrill] = useState(false);
   const [drillRider, setDrillRider] = useState<Rider | null>(null);
 
+  // heatmap data state
+  const [heatmapData, setHeatmapData] = useState<Array<{ hour: number; count: number }>>([]);
+
   // load mock data
   useEffect(() => {
     setDaily(mockDaily(30));
     setRiders(mockRiders(12));
+    setHeatmapData(Array.from({ length: 24 }).map((_, hour) => ({
+      hour,
+      count: Math.floor(Math.random() * 80),
+    })));
   }, []);
 
   // selected date range computed
@@ -75,7 +84,7 @@ export default function FleetPerformancePage() {
     endDate: new Date(),
     dailyFiltered: daily,
   });
-  const { startDate, endDate, dailyFiltered } = rangeState;
+  const { dailyFiltered } = rangeState;
 
   useEffect(() => {
     // compute current time inside effect (impure calls allowed here)
@@ -132,7 +141,7 @@ export default function FleetPerformancePage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `fleet_performance_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `fleet_performance_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -146,15 +155,15 @@ export default function FleetPerformancePage() {
   return (
     <div className="min-h-screen p-6 bg-slate-50">
       <motion.h1 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <TrendingUp className="w-8 h-8" /> Fleet Performance
+        <TrendingUp className="w-8 h-8" /> {t("fleet_performance")}
       </motion.h1>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex items-center gap-2">
-          <Button size="sm" variant={range === "7" ? "default" : "ghost" as any} onClick={() => setRange("7")}>Last 7 days</Button>
-          <Button size="sm" variant={range === "30" ? "default" : "ghost" as any} onClick={() => setRange("30")}>Last 30 days</Button>
-          <Button size="sm" variant={range === "custom" ? "default" : "ghost" as any} onClick={() => setRange("custom")}>Custom</Button>
+          <Button size="sm" variant={range === "7" ? "default" : "ghost" as any} onClick={() => setRange("7")}>{t("last_7_days")}</Button>
+          <Button size="sm" variant={range === "30" ? "default" : "ghost" as any} onClick={() => setRange("30")}>{t("last_30_days")}</Button>
+          <Button size="sm" variant={range === "custom" ? "default" : "ghost" as any} onClick={() => setRange("custom")}>{t("custom")}</Button>
         </div>
 
         {range === "custom" && (
@@ -165,54 +174,54 @@ export default function FleetPerformancePage() {
         )}
 
         <select className="px-3 py-2 border rounded-md bg-white" value={selectedZone} onChange={(e) => setSelectedZone(e.target.value)}>
-          <option value="all">All Zones</option>
+          <option value="all">{t('all_zones')}</option>
           <option value="Lisbon Central">Lisbon Central</option>
           <option value="Porto Downtown">Porto Downtown</option>
           <option value="Braga West">Braga West</option>
         </select>
 
         <select className="px-3 py-2 border rounded-md bg-white" value={selectedManager} onChange={(e) => setSelectedManager(e.target.value)}>
-          <option value="all">All Managers</option>
+          <option value="all">{t("all_managers")}</option>
           <option value="João Silva">João Silva</option>
           <option value="Maria Fernandes">Maria Fernandes</option>
         </select>
 
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" onClick={exportCSV}><Download className="w-4 h-4" /> Export CSV</Button>
+          <Button variant="outline" onClick={exportCSV}><Download className="w-4 h-4" /> {t("export_csv")}</Button>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <Card className="p-5">
-          <p className="text-xs text-slate-500">Total Deliveries</p>
+          <p className="text-xs text-slate-500">{t("total_deliveries")}</p>
           <h3 className="text-2xl font-bold mt-1">{kpis.totalDeliveries.toLocaleString()}</h3>
-          <p className="text-xs text-slate-500 mt-1">{kpis.totalEarnings.toLocaleString()} € earnings</p>
+          <p className="text-xs text-slate-500 mt-1">{kpis.totalEarnings.toLocaleString()} € {t("earnings")}</p>
         </Card>
 
         <Card className="p-5">
-          <p className="text-xs text-slate-500">Avg Delivery Time</p>
-          <h3 className="text-2xl font-bold mt-1">{kpis.avgTime} min</h3>
-          <p className="text-xs text-slate-500 mt-1">On-time {kpis.onTimePct}%</p>
+          <p className="text-xs text-slate-500">{t("avg_delivery_time")}</p>
+          <h3 className="text-2xl font-bold mt-1">{kpis.avgTime} {t("min")}</h3>
+          <p className="text-xs text-slate-500 mt-1">{t("on_time")} {kpis.onTimePct}%</p>
         </Card>
 
         <Card className="p-5">
-          <p className="text-xs text-slate-500">Cancel Rate</p>
+          <p className="text-xs text-slate-500">{t("cancel_rate")}</p>
           <h3 className="text-2xl font-bold mt-1">{kpis.cancelRate}%</h3>
-          <p className="text-xs text-slate-500 mt-1">Fleet health</p>
+          <p className="text-xs text-slate-500 mt-1">{t("fleet_health")}</p>
         </Card>
 
         <Card className="p-5">
-          <p className="text-xs text-slate-500">Active Riders</p>
+          <p className="text-xs text-slate-500">{t("active_riders")}</p>
           <h3 className="text-2xl font-bold mt-1">{riders.length}</h3>
-          <p className="text-xs text-slate-500 mt-1">Average rating {avgRating(riders)}</p>
+          <p className="text-xs text-slate-500 mt-1">{t("average_rating")} {avgRating(riders)}</p>
         </Card>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-4 h-80 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">Deliveries & Earnings Trend</h4>
+          <h4 className="font-semibold mb-2">{t("deliveries_nd_earnings_trend")}</h4>
           <ResponsiveContainer width="100%" height="85%">
             <LineChart data={dailyFiltered} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -228,7 +237,7 @@ export default function FleetPerformancePage() {
         </Card>
 
         <Card className="p-4 h-80 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">Earnings Area (last period)</h4>
+          <h4 className="font-semibold mb-2">{t("earnings_area_last_period")}</h4>
           <ResponsiveContainer width="100%" height="85%">
             <AreaChart data={dailyFiltered} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -243,19 +252,19 @@ export default function FleetPerformancePage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
         <Card className="p-4 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">Rider Performance (Top 5)</h4>
+          <h4 className="font-semibold mb-2">{t("rider_performance")} {t("top_5")}</h4>
           <div className="space-y-2">
             {leaderboard.slice(0, 5).map((r) => (
               <div key={r.id} className="flex items-center justify-between p-2 rounded-md bg-slate-50">
                 <div>
                   <div className="font-medium">{r.name}</div>
-                  <div className="text-xs text-slate-500">Deliveries: {r.deliveries} • On-time {r.onTimePct}%</div>
+                  <div className="text-xs text-slate-500">{t("deliveries")}: {r.deliveries} • {t("on_time")} {r.onTimePct}%</div>
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-semibold">{r.rating} ⭐</div>
                   <div className="text-xs">€ {r.earnings}</div>
                   <div>
-                    <Button size="sm" variant="ghost" onClick={() => openRiderDrill(r)}>View</Button>
+                    <Button size="sm" variant="ghost" onClick={() => openRiderDrill(r)}>{t("view")}</Button>
                   </div>
                 </div>
               </div>
@@ -264,7 +273,7 @@ export default function FleetPerformancePage() {
         </Card>
 
         <Card className="p-4 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">Rider Comparison (Deliveries)</h4>
+          <h4 className="font-semibold mb-2">{t("rider_comparison")}</h4>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={leaderboard.slice(0, 6)} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -277,7 +286,7 @@ export default function FleetPerformancePage() {
         </Card>
 
         <Card className="p-4 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">Order Type Distribution</h4>
+          <h4 className="font-semibold mb-2">{t("order_type_distribution")}</h4>
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie data={mockOrderTypes()} dataKey="value" nameKey="name" innerRadius={40} outerRadius={60} label>
@@ -293,10 +302,9 @@ export default function FleetPerformancePage() {
 
       {/* Heatmap (simple) */}
       <Card className="p-4 mb-6">
-        <h4 className="font-semibold mb-3">Peak Hour Heatmap (Orders)</h4>
+        <h4 className="font-semibold mb-3">{t("peak_hour_heatmap")}</h4>
         <div className="grid grid-cols-12 gap-1 text-xs">
-          {Array.from({ length: 24 }).map((_, hour) => {
-            const count = Math.floor(Math.random() * 80);
+          {heatmapData.map(({ hour, count }) => {
             const intensity = Math.min(1, count / 80);
             const bg = `rgba(220,49,115,${0.08 + intensity * 0.7})`;
             return (
@@ -307,92 +315,91 @@ export default function FleetPerformancePage() {
       </Card>
 
       {/* Leaderboard Table */}
-          <Card className="p-6 bg-white shadow-sm rounded-2xl">
-  <h4 className="font-semibold text-xl mb-4">Fleet Manager Performance</h4>
+      <Card className="p-6 bg-white shadow-sm rounded-2xl">
+        <h4 className="font-semibold text-xl mb-4">{t("fleet_manager_performance")}</h4>
 
-  <Table className="table-fixed w-full">
-    <TableHead>
-      <TableRow className="bg-slate-100/70">
-        <TableCell className="w-12 text-center font-semibold">#</TableCell>
-        <TableCell className="w-56 font-semibold">Manager</TableCell>
-        <TableCell className="w-24 text-center font-semibold">Deliveries</TableCell>
-        <TableCell className="w-32 text-center font-semibold">On-time</TableCell>
-        <TableCell className="w-28 text-center font-semibold">Avg Time</TableCell>
-        <TableCell className="w-28 text-center font-semibold">Cancel %</TableCell>
-        <TableCell className="w-32 text-center font-semibold">Earnings</TableCell>
-        <TableCell className="w-24 text-right font-semibold">Actions</TableCell>
-      </TableRow>
-    </TableHead>
+        <Table className="table-fixed w-full">
+          <TableHead>
+            <TableRow className="bg-slate-100/70">
+              <TableCell className="w-12 text-center font-semibold">#</TableCell>
+              <TableCell className="w-56 font-semibold">{t("manager")}</TableCell>
+              <TableCell className="w-24 text-center font-semibold">{t("deliveries")}</TableCell>
+              <TableCell className="w-32 text-center font-semibold">{t("on_time")}</TableCell>
+              <TableCell className="w-28 text-center font-semibold">{t("avg_time")}</TableCell>
+              <TableCell className="w-28 text-center font-semibold">{t("cencel")} %</TableCell>
+              <TableCell className="w-32 text-center font-semibold">{t("earnings")}</TableCell>
+              <TableCell className="w-24 text-right font-semibold">{t("actions")}</TableCell>
+            </TableRow>
+          </TableHead>
 
-    <TableBody>
-      {leaderboard.map((r, idx) => (
-        <TableRow key={r.id} className="hover:bg-slate-50">
-          
-          {/* Index */}
-          <TableCell className="text-center">{idx + 1}</TableCell>
+          <TableBody>
+            {leaderboard.map((r, idx) => (
+              <TableRow key={r.id} className="hover:bg-slate-50">
 
-          {/* Manager */}
-          <TableCell className="text-left">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center font-semibold">
-                {r.name.split(" ").map((n) => n[0]).join("")}
-              </div>
-              <div>
-                <p className="font-medium text-slate-800">{r.name}</p>
-                <p className="text-xs text-slate-500">Rating: {r.rating} ⭐</p>
-              </div>
-            </div>
-          </TableCell>
+                {/* Index */}
+                <TableCell className="text-center">{idx + 1}</TableCell>
 
-          {/* Deliveries */}
-          <TableCell className="text-center font-semibold">{r.deliveries}</TableCell>
+                {/* Manager */}
+                <TableCell className="text-left">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center font-semibold">
+                      {r.name.split(" ").map((n) => n[0]).join("")}
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-800">{r.name}</p>
+                      <p className="text-xs text-slate-500">{t("rating")}: {r.rating} ⭐</p>
+                    </div>
+                  </div>
+                </TableCell>
 
-          {/* On-time */}
-          <TableCell className="text-center">
-            <p className="font-semibold">{r.onTimePct}%</p>
-            <div className="h-2 w-full bg-slate-200 rounded-full mt-1 overflow-hidden">
-              <div
-                className="h-full bg-emerald-500 rounded-full"
-                style={{ width: `${r.onTimePct}%` }}
-              />
-            </div>
-          </TableCell>
+                {/* Deliveries */}
+                <TableCell className="text-center font-semibold">{r.deliveries}</TableCell>
 
-          {/* Avg Time */}
-          <TableCell className="text-center font-semibold">
-            {r.avgTime} min
-          </TableCell>
+                {/* On-time */}
+                <TableCell className="text-center">
+                  <p className="font-semibold">{r.onTimePct}%</p>
+                  <div className="h-2 w-full bg-slate-200 rounded-full mt-1 overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full"
+                      style={{ width: `${r.onTimePct}%` }}
+                    />
+                  </div>
+                </TableCell>
 
-          {/* Cancel Rate */}
-          <TableCell className="text-center">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                r.cancelRate > 2
-                  ? "bg-red-100 text-red-600"
-                  : "bg-emerald-100 text-emerald-600"
-              }`}
-            >
-              {r.cancelRate}%
-            </span>
-          </TableCell>
+                {/* Avg Time */}
+                <TableCell className="text-center font-semibold">
+                  {r.avgTime} {t("min")}
+                </TableCell>
 
-          {/* Earnings */}
-          <TableCell className="text-center font-bold text-emerald-600">
-            € {r.earnings.toLocaleString()}
-          </TableCell>
+                {/* Cancel Rate */}
+                <TableCell className="text-center">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${r.cancelRate > 2
+                      ? "bg-red-100 text-red-600"
+                      : "bg-emerald-100 text-emerald-600"
+                      }`}
+                  >
+                    {r.cancelRate}%
+                  </span>
+                </TableCell>
 
-          {/* Actions */}
-          <TableCell className="text-right">
-            <Button size="sm" variant="ghost" onClick={() => openRiderDrill(r)}>
-              View
-            </Button>
-          </TableCell>
+                {/* Earnings */}
+                <TableCell className="text-center font-bold text-emerald-600">
+                  € {r.earnings.toLocaleString()}
+                </TableCell>
 
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-</Card>
+                {/* Actions */}
+                <TableCell className="text-right">
+                  <Button size="sm" variant="ghost" onClick={() => openRiderDrill(r)}>
+                    {t("view")}
+                  </Button>
+                </TableCell>
+
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
 
 
 
@@ -401,26 +408,26 @@ export default function FleetPerformancePage() {
       <Dialog open={openDrill} onOpenChange={() => setOpenDrill(false)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Rider Performance — {drillRider?.name}</DialogTitle>
+            <DialogTitle>{t("rider_performance")} — {drillRider?.name}</DialogTitle>
           </DialogHeader>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card className="p-4">
-              <h5 className="font-semibold">KPI</h5>
+              <h5 className="font-semibold">{t("kpi")}</h5>
               {drillRider ? (
                 <div className="mt-2 space-y-2">
-                  <div>Total Deliveries: <strong>{drillRider.deliveries}</strong></div>
-                  <div>On-time: <strong>{drillRider.onTimePct}%</strong></div>
-                  <div>Avg Time: <strong>{drillRider.avgTime} min</strong></div>
-                  <div>Cancel Rate: <strong>{drillRider.cancelRate}%</strong></div>
-                  <div>Rating: <strong>{drillRider.rating}</strong></div>
-                  <div>Earnings: <strong>€ {drillRider.earnings}</strong></div>
+                  <div>{t("total_deliveries")}: <strong>{drillRider.deliveries}</strong></div>
+                  <div>{t("on_time")}: <strong>{drillRider.onTimePct}%</strong></div>
+                  <div>{t("avg_time")}: <strong>{drillRider.avgTime} {t("min")}</strong></div>
+                  <div>{t("cancel_rate")}: <strong>{drillRider.cancelRate}%</strong></div>
+                  <div>{t("rating")}: <strong>{drillRider.rating}</strong></div>
+                  <div>{t("earnings")}: <strong>€ {drillRider.earnings}</strong></div>
                 </div>
               ) : null}
             </Card>
 
             <Card className="p-4">
-              <h5 className="font-semibold">Recent Trend (last 14 days)</h5>
+              <h5 className="font-semibold">{t("recent_trend_last_14_days")}</h5>
               <ResponsiveContainer width="100%" height={160}>
                 <LineChart data={mockDailyForRider()}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -436,8 +443,8 @@ export default function FleetPerformancePage() {
           <Separator className="my-4" />
 
           <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setOpenDrill(false)}>Close</Button>
-            <Button style={{ background: DELIGO }} className="ml-2">Export Report</Button>
+            <Button variant="outline" onClick={() => setOpenDrill(false)}>{t("close")}</Button>
+            <Button style={{ background: DELIGO }} className="ml-2">{t("export_report")}</Button>
           </div>
         </DialogContent>
       </Dialog>

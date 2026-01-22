@@ -2,6 +2,7 @@
 
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
@@ -13,13 +14,13 @@ interface IProps {
   ordersResult: { data: TOrder[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
-
 export default function CancelledOrders({ ordersResult }: IProps) {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<TOrder | null>(null);
+  const sortOptions = [
+    { label: t("newest_first"), value: "-createdAt" },
+    { label: t("oldest_first"), value: "createdAt" },
+  ];
 
   const exportCSV = () => {
     const header = [
@@ -68,11 +69,10 @@ export default function CancelledOrders({ ordersResult }: IProps) {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-[#DC3173] flex items-center gap-2">
-              <AlertTriangle className="text-[#DC3173]" /> Cancelled Orders
+              <AlertTriangle className="text-[#DC3173]" /> {t("cancelled_orders")}
             </h1>
             <p className="text-slate-500 text-sm">
-              Encomendas canceladas — monitorize motivos e parceiros para
-              reduzir churn.
+              {t("cancelled_orders_desc")}
             </p>
           </div>
 
@@ -81,7 +81,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
               onClick={() => exportCSV()}
               className="bg-[#DC3173] text-white px-4 py-2 rounded-lg flex gap-2 items-center"
             >
-              <Download /> Export
+              <Download /> {t("export")}
             </button>
           </div>
         </div>
@@ -99,13 +99,13 @@ export default function CancelledOrders({ ordersResult }: IProps) {
               <table className="min-w-[1100px] w-full text-sm">
                 <thead>
                   <tr className="text-left text-slate-500">
-                    <th className="p-3">Order</th>
-                    <th className="p-3">Customer</th>
-                    <th className="p-3">Delivery Partner</th>
-                    <th className="p-3">Amount</th>
-                    <th className="p-3">Cancelled At</th>
-                    <th className="p-3">Reason</th>
-                    <th className="p-3">Actions</th>
+                    <th className="p-3">{t("order")}</th>
+                    <th className="p-3">{t("customer")}</th>
+                    <th className="p-3">{t("delivery_partner")}</th>
+                    <th className="p-3">{t("amount")}</th>
+                    <th className="p-3">{t("cancelled_at")}</th>
+                    <th className="p-3">{t("reason")}</th>
+                    <th className="p-3">{t("actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -118,40 +118,40 @@ export default function CancelledOrders({ ordersResult }: IProps) {
                         exit={{ opacity: 0 }}
                         className="border-t hover:bg-[#DC317310] transition cursor-pointer"
                       >
-                        <td className="p-3 align-top whitespace-nowrap max-w-[240px] overflow-hidden text-ellipsis">
+                        <td className="p-3 align-top whitespace-nowrap max-w-60 overflow-hidden text-ellipsis">
                           <div className="text-xs text-slate-400">
                             {o.orderId}
                           </div>
                         </td>
-                        <td className="p-3 align-top whitespace-nowrap max-w-[240px] overflow-hidden text-ellipsis">
+                        <td className="p-3 align-top whitespace-nowrap max-w-60 overflow-hidden text-ellipsis">
                           {o.customerId?.name?.firstName}{" "}
                           {o.customerId?.name?.lastName}
                           <div className="text-xs text-slate-400">
                             {o.customerId?.address?.city}
                           </div>
                         </td>
-                        <td className="p-3 align-top whitespace-nowrap max-w-[240px] overflow-hidden text-ellipsis">
+                        <td className="p-3 align-top whitespace-nowrap max-w-60 overflow-hidden text-ellipsis">
                           <span className="px-3 py-1 rounded-full bg-[#DC317320] text-[#DC3173] text-xs font-medium">
                             {o.deliveryPartnerId?.name?.firstName}{" "}
                             {o.deliveryPartnerId?.name?.lastName}
                           </span>
                         </td>
-                        <td className="p-3 align-top whitespace-nowrap max-w-[240px] overflow-hidden text-ellipsis">
+                        <td className="p-3 align-top whitespace-nowrap max-w-60 overflow-hidden text-ellipsis">
                           € {o.totalPrice.toLocaleString()}
                         </td>
-                        <td className="p-3 align-top whitespace-nowrap max-w-[240px] overflow-hidden text-ellipsis">
+                        <td className="p-3 align-top whitespace-nowrap max-w-60 overflow-hidden text-ellipsis">
                           {format(o.updatedAt, "dd/MM/yyyy")}
                         </td>
-                        <td className="p-3 align-top text-slate-600 max-w-[240px] overflow-hidden text-ellipsis whitespace-nowrap">
+                        <td className="p-3 align-top text-slate-600 max-w-60 overflow-hidden text-ellipsis whitespace-nowrap">
                           {o.cancelReason}
                         </td>
-                        <td className="p-3 align-top whitespace-nowrap max-w-[240px] overflow-hidden text-ellipsis">
+                        <td className="p-3 align-top whitespace-nowrap max-w-60 overflow-hidden text-ellipsis">
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => setSelected(o)}
                               className="px-3 py-1 rounded border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition"
                             >
-                              Details
+                              {t("details")}
                             </button>
                           </div>
                         </td>
@@ -163,7 +163,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
                           colSpan={11}
                           className="py-8 text-center text-slate-500"
                         >
-                          No orders found.
+                          {t("no_orders_found")}
                         </td>
                       </tr>
                     )}
@@ -201,7 +201,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
                           onClick={() => setSelected(o)}
                           className="px-3 py-1 rounded border border-[#DC3173] text-[#DC3173]"
                         >
-                          Details
+                          {t("details")}
                         </button>
                       </div>
                     </div>
@@ -211,7 +211,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
               {ordersResult?.meta?.total === 0 && (
                 <div>
                   <div className="py-8 text-center text-slate-500">
-                    No orders found.
+                    {t("no_orders_found")}
                   </div>
                 </div>
               )}
@@ -265,7 +265,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
 
               <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-slate-500">Customer</div>
+                  <div className="text-sm text-slate-500">{t("customer")}</div>
                   <div className="font-medium">
                     {selected.customerId?.name?.firstName}{" "}
                     {selected.customerId?.name?.lastName}
@@ -275,7 +275,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
                   </div>
 
                   <div className="mt-4 text-sm text-slate-500">
-                    Delivery Partner
+                    {t("delivery_partner")}
                   </div>
                   <div className="inline-block px-3 py-1 mt-1 rounded bg-[#DC317320] text-[#DC3173] text-sm font-medium">
                     {selected.deliveryPartnerId?.name?.firstName}{" "}
@@ -283,7 +283,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
                   </div>
 
                   <div className="mt-4 text-sm text-slate-500">
-                    Payment (EUR)
+                    {t("payment_eur")}
                   </div>
                   <div className="font-medium">
                     {selected.paymentMethod} · €{" "}
@@ -292,12 +292,12 @@ export default function CancelledOrders({ ordersResult }: IProps) {
                 </div>
 
                 <div>
-                  <div className="text-sm text-slate-500">Cancelled At</div>
+                  <div className="text-sm text-slate-500">{t("cancelled_at")}</div>
                   <div className="font-medium">
                     {format(selected.updatedAt, "dd/MM/yyyy")}
                   </div>
 
-                  <div className="mt-4 text-sm text-slate-500">Reason</div>
+                  <div className="mt-4 text-sm text-slate-500">{t("reason")}</div>
                   <div className="font-medium text-slate-700">
                     {selected.cancelReason}
                   </div>
@@ -306,7 +306,7 @@ export default function CancelledOrders({ ordersResult }: IProps) {
 
               <div className="p-4 border-t flex items-center justify-between">
                 <div className="text-sm text-slate-500">
-                  Order ID:{" "}
+                  {t("order_id")}:{" "}
                   <span className="text-slate-700">{selected.orderId}</span>
                 </div>
               </div>
