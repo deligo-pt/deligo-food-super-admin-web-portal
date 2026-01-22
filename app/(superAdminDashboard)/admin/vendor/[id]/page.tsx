@@ -1,5 +1,8 @@
 import { VendorDetails } from "@/components/AllVendors/VendorDetails";
-import { cookies } from "next/headers";
+import { serverRequest } from "@/lib/serverFetch";
+import { TMeta, TResponse } from "@/types";
+import { TOffer } from "@/types/offer.type";
+import { TVendor } from "@/types/user.type";
 
 export default async function VendorDetailsPage({
   params,
@@ -7,14 +10,33 @@ export default async function VendorDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const accessToken = (await cookies())?.get("accessToken")?.value;
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/vendors/${id}`,
-    { headers: { authorization: accessToken || "" } }
-  );
-  const result = await res.json();
-  const data = result.data;
+  let vendorData: TVendor = {} as TVendor;
+  let offerData: TOffer[] = [];
 
-  return <VendorDetails vendor={data} />;
+  try {
+    const result = (await serverRequest.get(
+      `/vendors/${id}`,
+    )) as TResponse<TVendor>;
+
+    if (result?.success) {
+      vendorData = result.data;
+    }
+  } catch (err) {
+    console.log("Server fetch error:", err);
+  }
+
+  try {
+    const result = (await serverRequest.get("/offers", {
+      params: { vendorId: vendorData._id, limit: 4, page: 1 },
+    })) as TResponse<{ data: TOffer[]; meta?: TMeta }>;
+
+    if (result?.success) {
+      offerData = result.data.data;
+    }
+  } catch (err) {
+    console.log("Server fetch error:", err);
+  }
+
+  return <VendorDetails vendor={vendorData} offerData={offerData} />;
 }
