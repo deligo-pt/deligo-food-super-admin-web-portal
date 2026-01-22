@@ -115,19 +115,13 @@ export default function DeliveryPartners({
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader
-        title={title}
-        subtitle={subtitle}
-        // buttonInfo={{
-        //   text: "Add Partner",
-        //   onClick: () => router.push("/admin/add-partner"),
-        // }}
-      />
+      <TitleHeader title={title} subtitle={subtitle} />
 
       {/* Filters */}
-      {showFilters && (
-        <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
-      )}
+      <AllFilters
+        sortOptions={sortOptions}
+        {...(showFilters && { filterOptions })}
+      />
 
       {/* Partner Table */}
       <DeliveryPartnerTable

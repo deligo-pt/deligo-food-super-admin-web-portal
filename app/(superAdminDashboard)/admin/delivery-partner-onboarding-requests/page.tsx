@@ -1,4 +1,4 @@
-import DeliveryPartnerOnboardingRequests from "@/components/DeliveryPartnerOnboardingRequests/DeliveryPartnerOnboardingRequests";
+import DeliveryPartners from "@/components/Dashboard/DeliveryPartners/DeliveryPartners";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
@@ -7,7 +7,7 @@ type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function SuspendedDeliveryPartnersPage({
+export default async function SubmittedDeliveryPartnersPage({
   searchParams,
 }: IProps) {
   const queries = (await searchParams) || {};
@@ -30,7 +30,7 @@ export default async function SuspendedDeliveryPartnersPage({
   try {
     const result = (await serverRequest.get("/delivery-partners", {
       params: query,
-    })) as unknown as TResponse<TDeliveryPartner[]>;
+    })) as TResponse<TDeliveryPartner[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -40,5 +40,11 @@ export default async function SuspendedDeliveryPartnersPage({
     console.log("Server fetch error:", err);
   }
 
-  return <DeliveryPartnerOnboardingRequests partnersResult={initialData} />;
+  return (
+    <DeliveryPartners
+      partnersResult={initialData}
+      title="Delivery Partner Onboarding Requests"
+      subtitle="All Requested Delivery Partners for Onboarding"
+    />
+  );
 }

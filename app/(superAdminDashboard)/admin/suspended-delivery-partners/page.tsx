@@ -1,4 +1,4 @@
-import SuspendedDeliveryPartners from "@/components/SuspendedPartners/SuspendedPartners";
+import DeliveryPartners from "@/components/Dashboard/DeliveryPartners/DeliveryPartners";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
@@ -30,7 +30,7 @@ export default async function SuspendedDeliveryPartnersPage({
   try {
     const result = (await serverRequest.get("/delivery-partners", {
       params: query,
-    })) as unknown as TResponse<TDeliveryPartner[]>;
+    })) as TResponse<TDeliveryPartner[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -40,5 +40,11 @@ export default async function SuspendedDeliveryPartnersPage({
     console.log("Server fetch error:", err);
   }
 
-  return <SuspendedDeliveryPartners partnersResult={initialData} />;
+  return (
+    <DeliveryPartners
+      partnersResult={initialData}
+      title="Suspended Delivery Partners"
+      subtitle="All blocked delivery partners from the platform"
+    />
+  );
 }

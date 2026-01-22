@@ -1,4 +1,4 @@
-import BlockedCustomers from "@/components/BlockedCustomers/BlockedCustomers";
+import Customers from "@/components/Dashboard/Customers/Customers";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TCustomer } from "@/types/user.type";
@@ -28,7 +28,7 @@ export default async function BlockedCustomersPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/customers", {
       params: query,
-    })) as unknown as TResponse<TCustomer[]>;
+    })) as TResponse<TCustomer[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -38,5 +38,11 @@ export default async function BlockedCustomersPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <BlockedCustomers customersResult={initialData} />;
+  return (
+    <Customers
+      customersResult={initialData}
+      title="Active Customers"
+      subtitle="All active customers in the system"
+    />
+  );
 }

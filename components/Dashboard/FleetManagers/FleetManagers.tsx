@@ -128,9 +128,10 @@ export default function FleetManagers({
       />
 
       {/* Filters */}
-      {showFilters && (
-        <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
-      )}
+      <AllFilters
+        sortOptions={sortOptions}
+        {...(showFilters && { filterOptions })}
+      />
 
       {/* Fleet Manager Table */}
       <FleetManagerTable

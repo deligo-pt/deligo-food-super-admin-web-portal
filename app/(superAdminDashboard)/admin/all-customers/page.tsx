@@ -7,7 +7,7 @@ type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function AllVendorsPage({ searchParams }: IProps) {
+export default async function AllCustomersPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);

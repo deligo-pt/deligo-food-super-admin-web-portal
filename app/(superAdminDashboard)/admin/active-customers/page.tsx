@@ -1,4 +1,4 @@
-import ActiveCustomers from "@/components/ActiveCustomers/ActiveCustomers";
+import Customers from "@/components/Dashboard/Customers/Customers";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TCustomer } from "@/types/user.type";
@@ -7,7 +7,7 @@ type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function ActiveVendorsPage({ searchParams }: IProps) {
+export default async function ActiveCustomersPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -28,7 +28,7 @@ export default async function ActiveVendorsPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/customers", {
       params: query,
-    })) as unknown as TResponse<TCustomer[]>;
+    })) as TResponse<TCustomer[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -38,5 +38,11 @@ export default async function ActiveVendorsPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <ActiveCustomers customersResult={initialData} />;
+  return (
+    <Customers
+      customersResult={initialData}
+      title="Active Customers"
+      subtitle="All active customers in the system"
+    />
+  );
 }

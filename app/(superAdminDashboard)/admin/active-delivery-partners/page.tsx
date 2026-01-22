@@ -1,4 +1,4 @@
-import ActiveDeliveryPartners from "@/components/ActivePartners/ActivePartners";
+import DeliveryPartners from "@/components/Dashboard/DeliveryPartners/DeliveryPartners";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
@@ -30,7 +30,7 @@ export default async function ActiveDeliveryPartnersPage({
   try {
     const result = (await serverRequest.get("/delivery-partners", {
       params: query,
-    })) as unknown as TResponse<TDeliveryPartner[]>;
+    })) as TResponse<TDeliveryPartner[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -40,5 +40,11 @@ export default async function ActiveDeliveryPartnersPage({
     console.log("Server fetch error:", err);
   }
 
-  return <ActiveDeliveryPartners partnersResult={initialData} />;
+  return (
+    <DeliveryPartners
+      partnersResult={initialData}
+      title="Active Delivery Partners"
+      subtitle="All active delivery partners in the system"
+    />
+  );
 }

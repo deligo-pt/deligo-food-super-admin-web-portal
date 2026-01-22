@@ -41,7 +41,6 @@ export default async function AllFleetManagersPage({ searchParams }: IProps) {
   return (
     <FleetManagers
       agentsResult={initialData}
-      showFilters={true}
       title="Suspended Fleet Managers"
       subtitle="All blocked fleet managers from the system"
     />
