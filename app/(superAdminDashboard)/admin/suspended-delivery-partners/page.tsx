@@ -37,7 +37,7 @@ export default async function SuspendedDeliveryPartnersPage({
       initialData.meta = result.meta;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <SuspendedDeliveryPartners partnersResult={initialData} />;

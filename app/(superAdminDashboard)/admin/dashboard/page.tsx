@@ -19,7 +19,7 @@ export default async function DashboardPage() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    console.error("Server fetch error:", err?.response?.data || err);
+    console.log("Server fetch error:", err?.response?.data || err);
   }
 
   return <Dashboard analyticsData={analyticsData} />;

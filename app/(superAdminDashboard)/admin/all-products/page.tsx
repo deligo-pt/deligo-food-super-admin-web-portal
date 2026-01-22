@@ -35,7 +35,7 @@ export default async function ProductsPage({ searchParams }: IProps) {
       initialData.meta = result.meta;
     }
   } catch (err) {
-    console.error("Server fetchProducts error:", err);
+    console.log("Server fetchProducts error:", err);
   }
 
   return <AllProducts initialData={initialData} />;

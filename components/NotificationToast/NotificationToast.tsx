@@ -14,7 +14,7 @@ export default function NotificationToast() {
     const unsub = onMessage(messaging, (payload: MessagePayload) => {
       console.log("Foreground message:", payload);
       audioRef.current?.play().catch((error) => {
-        console.error("Error playing audio:", error);
+        console.log("Error playing audio:", error);
       });
 
       // Show notification with more details

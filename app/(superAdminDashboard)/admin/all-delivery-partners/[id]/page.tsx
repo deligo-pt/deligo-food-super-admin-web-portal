@@ -14,14 +14,14 @@ export default async function DeliveryPartnerDetailsPage({
 
   try {
     const result = (await serverRequest.get(
-      `/delivery-partners/${id}`
+      `/delivery-partners/${id}`,
     )) as unknown as TResponse<TDeliveryPartner>;
 
     if (result?.success) {
       initialData = result.data;
     }
   } catch (err) {
-    console.error("Server fetchProducts error:", err);
+    console.log("Server fetchProducts error:", err);
   }
   return (
     <div className="p-4 md:p-6">

@@ -1,22 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
 import {
-  Search,
-  Filter,
   AlertTriangle,
+  Calendar,
   CheckCircle,
-  Clock,
   ChevronDown,
   ChevronUp,
+  Clock,
   Download,
-  Calendar,
+  Filter,
+  Search,
   X,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/use-translation";
+import { useEffect, useMemo, useState } from "react";
 
 // ---------------------- Types ----------------------
 type DisputeRow = {
@@ -33,21 +32,31 @@ type DisputeRow = {
 };
 
 // ---------------------- Sample Data (client-only placeholder) ----------------------
-const statuses = ["Open", "Resolved", "Pending Vendor", "Pending Customer"] as const;
+const statuses = [
+  "Open",
+  "Resolved",
+  "Pending Vendor",
+  "Pending Customer",
+] as const;
 
 const sampleRows: DisputeRow[] = Array.from({ length: 42 }).map((_, i) => ({
   id: `DP-${4000 + i}`,
   date: `2025-11-${((i % 28) + 1).toString().padStart(2, "0")}`,
   orderId: `ORD-${2000 + i}`,
-  vendor: `Vendor ${((i % 6) + 1)}`,
-  customer: `Customer ${((i % 10) + 1)}`,
-  reason: ["Wrong item delivered", "Food cold", "Extra charge complaint", "Late delivery"][i % 4],
-  details: "Customer reported wrong item. Vendor claims packed correctly. Photos attached.",
+  vendor: `Vendor ${(i % 6) + 1}`,
+  customer: `Customer ${(i % 10) + 1}`,
+  reason: [
+    "Wrong item delivered",
+    "Food cold",
+    "Extra charge complaint",
+    "Late delivery",
+  ][i % 4],
+  details:
+    "Customer reported wrong item. Vendor claims packed correctly. Photos attached.",
   attachments: [],
   amount: Math.round((Math.random() * 50 + 5) * 100) / 100,
-  status: statuses[i % 4],   // ← NOW it's literal union, NOT string
+  status: statuses[i % 4], // ← NOW it's literal union, NOT string
 }));
-
 
 // ---------------------- Helpers ----------------------
 const formatCurrency = (v: number) => `€${v.toFixed(2)}`;
@@ -70,8 +79,12 @@ export default function PaymentDisputesPage() {
   // UI controls
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounced(query, 280);
-  const [statusFilter, setStatusFilter] = useState<"all" | DisputeRow["status"]>("all");
-  const [from, setFrom] = useState<string>(() => toISO(new Date(new Date().setDate(new Date().getDate() - 30))));
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | DisputeRow["status"]
+  >("all");
+  const [from, setFrom] = useState<string>(() =>
+    toISO(new Date(new Date().setDate(new Date().getDate() - 30))),
+  );
   const [to, setTo] = useState<string>(() => toISO(new Date()));
   const [preset, setPreset] = useState<string>("Last 30 days");
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
@@ -82,17 +95,27 @@ export default function PaymentDisputesPage() {
 
   // Drawer + modal state
   const [selected, setSelected] = useState<DisputeRow | null>(null);
-  const [confirmAction, setConfirmAction] = useState<{ open: boolean; action: "resolve" | "reject" | null }>(
-    { open: false, action: null }
-  );
+  const [confirmAction, setConfirmAction] = useState<{
+    open: boolean;
+    action: "resolve" | "reject" | null;
+  }>({ open: false, action: null });
   const [processingId, setProcessingId] = useState<string | null>(null);
 
   // apply preset
   useEffect(() => {
     const now = new Date();
-    if (preset === "Last 7 days") setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)));
-    if (preset === "Last 30 days") setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30)));
-    if (preset === "Last 90 days") setFrom(toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 90)));
+    if (preset === "Last 7 days")
+      setFrom(
+        toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)),
+      );
+    if (preset === "Last 30 days")
+      setFrom(
+        toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30)),
+      );
+    if (preset === "Last 90 days")
+      setFrom(
+        toISO(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 90)),
+      );
     if (preset === "Year to date") setFrom(`${now.getFullYear()}-01-01`);
     setTo(toISO(now));
   }, [preset]);
@@ -116,7 +139,8 @@ export default function PaymentDisputesPage() {
 
     const sorted = [...arr].sort((a, b) => {
       let val = 0;
-      if (sortBy === "date") val = new Date(a.date).getTime() - new Date(b.date).getTime();
+      if (sortBy === "date")
+        val = new Date(a.date).getTime() - new Date(b.date).getTime();
       if (sortBy === "amount") val = a.amount - b.amount;
       return sortDir === "asc" ? val : -val;
     });
@@ -126,19 +150,26 @@ export default function PaymentDisputesPage() {
   // pagination
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / perPage));
-  useEffect(() => { if (page > totalPages) setPage(1); }, [totalPages]);
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [totalPages]);
   const paginated = useMemo(() => {
     const start = (page - 1) * perPage;
     return filtered.slice(start, start + perPage);
   }, [filtered, page, perPage]);
 
   // summary counts
-  const counts = useMemo(() => ({
-    open: filtered.filter(r => r.status === 'Open').length,
-    resolved: filtered.filter(r => r.status === 'Resolved').length,
-    pendingVendor: filtered.filter(r => r.status === 'Pending Vendor').length,
-    pendingCustomer: filtered.filter(r => r.status === 'Pending Customer').length,
-  }), [filtered]);
+  const counts = useMemo(
+    () => ({
+      open: filtered.filter((r) => r.status === "Open").length,
+      resolved: filtered.filter((r) => r.status === "Resolved").length,
+      pendingVendor: filtered.filter((r) => r.status === "Pending Vendor")
+        .length,
+      pendingCustomer: filtered.filter((r) => r.status === "Pending Customer")
+        .length,
+    }),
+    [filtered],
+  );
 
   // CSV export
   const exportCSV = () => {
@@ -153,28 +184,41 @@ export default function PaymentDisputesPage() {
   };
 
   // API placeholders for Resolve / Reject
-  const performAction = async (id: string, action: 'resolve' | 'reject') => {
+  const performAction = async (id: string, action: "resolve" | "reject") => {
     setProcessingId(id);
     try {
       // simulate network delay
-      await new Promise(res => setTimeout(res, 800));
+      await new Promise((res) => setTimeout(res, 800));
 
       // optimistic update locally — in real app, call your API and refresh from server
-      setAllRows(prev => prev.map(r => r.id === id ? { ...r, status: action === 'resolve' ? 'Resolved' : 'Open' } : r));
+      setAllRows((prev) =>
+        prev.map((r) =>
+          r.id === id
+            ? { ...r, status: action === "resolve" ? "Resolved" : "Open" }
+            : r,
+        ),
+      );
 
       // close modal + drawer if it was the selected
       setConfirmAction({ open: false, action: null });
-      if (selected?.id === id) setSelected(prev => prev ? { ...prev, status: action === 'resolve' ? 'Resolved' : 'Open' } : prev);
+      if (selected?.id === id)
+        setSelected((prev) =>
+          prev
+            ? { ...prev, status: action === "resolve" ? "Resolved" : "Open" }
+            : prev,
+        );
     } catch (err) {
-      console.error('action failed', err);
-      alert('Action failed — try again');
+      console.log("action failed", err);
+      alert("Action failed — try again");
     } finally {
       setProcessingId(null);
     }
   };
 
   // open detail
-  const openDetail = (r: DisputeRow) => { setSelected(r); }
+  const openDetail = (r: DisputeRow) => {
+    setSelected(r);
+  };
 
   return (
     <div className="p-6 lg:p-10 space-y-6 overflow-x-hidden min-h-screen">
@@ -227,9 +271,19 @@ export default function PaymentDisputesPage() {
           </div>
 
           <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border">
-            <input type="date" className="text-sm outline-none bg-transparent" value={from} onChange={(e) => setFrom(e.target.value)} />
+            <input
+              type="date"
+              className="text-sm outline-none bg-transparent"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
             <span className="text-gray-300">—</span>
-            <input type="date" className="text-sm outline-none bg-transparent" value={to} onChange={(e) => setTo(e.target.value)} />
+            <input
+              type="date"
+              className="text-sm outline-none bg-transparent"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
           </div>
         </div>
 
@@ -272,13 +326,21 @@ export default function PaymentDisputesPage() {
               {paginated.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50">
                   <td className="py-3 px-3 whitespace-nowrap">{r.date}</td>
-                  <td className="py-3 px-3 font-medium text-gray-800 whitespace-nowrap">{r.id}</td>
+                  <td className="py-3 px-3 font-medium text-gray-800 whitespace-nowrap">
+                    {r.id}
+                  </td>
                   <td className="py-3 px-3 whitespace-nowrap">{r.orderId}</td>
                   <td className="py-3 px-3 whitespace-nowrap">{r.vendor}</td>
                   <td className="py-3 px-3 whitespace-nowrap">{r.customer}</td>
-                  <td className="py-3 px-3 max-w-xs truncate text-gray-600">{r.reason}</td>
-                  <td className="py-3 px-3 font-semibold text-[#DC3173] whitespace-nowrap">{formatCurrency(r.amount)}</td>
-                  <td className="py-3 px-3 whitespace-nowrap"><StatusBadge status={r.status} /></td>
+                  <td className="py-3 px-3 max-w-xs truncate text-gray-600">
+                    {r.reason}
+                  </td>
+                  <td className="py-3 px-3 font-semibold text-[#DC3173] whitespace-nowrap">
+                    {formatCurrency(r.amount)}
+                  </td>
+                  <td className="py-3 px-3 whitespace-nowrap">
+                    <StatusBadge status={r.status} />
+                  </td>
                   <td className="py-3 px-3 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <button onClick={() => openDetail(r)} className="px-3 py-1 rounded-md border text-sm">{t("view")}</button>
@@ -304,6 +366,18 @@ export default function PaymentDisputesPage() {
                             {t("reject")}
                           </button>
 
+                          <button
+                            onClick={() => {
+                              setConfirmAction({
+                                open: true,
+                                action: "reject",
+                              });
+                              setSelected(r);
+                            }}
+                            className="px-3 py-1 rounded-md bg-red-50 text-red-800 text-sm"
+                          >
+                            Reject
+                          </button>
                         </>
                       )}
                     </div>
@@ -328,7 +402,10 @@ export default function PaymentDisputesPage() {
       {/* Mobile stacked cards */}
       <div className="md:hidden space-y-4">
         {paginated.map((r) => (
-          <article key={r.id} className="bg-white p-4 rounded-2xl shadow border space-y-2">
+          <article
+            key={r.id}
+            className="bg-white p-4 rounded-2xl shadow border space-y-2"
+          >
             <div className="flex items-center justify-between text-sm text-gray-600">
               <div>{r.date}</div>
               <div className="flex items-center gap-2">
@@ -356,14 +433,21 @@ export default function PaymentDisputesPage() {
       {/* Detail Drawer */}
       {selected && (
         <div className="fixed inset-0 z-50 flex">
-          <div className="flex-1" onClick={() => setSelected(null)} aria-hidden />
+          <div
+            className="flex-1"
+            onClick={() => setSelected(null)}
+            aria-hidden
+          />
           <aside className="w-full sm:w-96 bg-white p-6 overflow-auto border-l shadow-xl">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold">{selected.id}</h2>
                 <p className="text-sm text-gray-500">{t("order")} {selected.orderId} — {selected.date}</p>
               </div>
-              <button onClick={() => setSelected(null)} className="p-2 rounded-md border">
+              <button
+                onClick={() => setSelected(null)}
+                className="p-2 rounded-md border"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -377,7 +461,7 @@ export default function PaymentDisputesPage() {
               <div><span className="text-xs text-gray-500">{t("status")}</span><div className="mt-1"><StatusBadge status={selected.status} /></div></div>
 
               <div className="pt-4 flex gap-2">
-                {selected.status !== 'Resolved' && (
+                {selected.status !== "Resolved" && (
                   <>
                     <button onClick={() => setConfirmAction({ open: true, action: 'resolve' })} className="px-4 py-2 rounded-md bg-green-600 text-white">{t("resolve")}</button>
                     <button onClick={() => setConfirmAction({ open: true, action: 'reject' })} className="px-4 py-2 rounded-md bg-red-600 text-white">{t("reject")}</button>
@@ -393,7 +477,10 @@ export default function PaymentDisputesPage() {
       {/* Confirm Modal */}
       {confirmAction.open && selected && (
         <div className="fixed inset-0 z-60 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmAction({ open: false, action: null })} />
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setConfirmAction({ open: false, action: null })}
+          />
           <div className="bg-white rounded-2xl p-6 z-70 w-full max-w-lg">
             <h3 className="text-lg font-semibold">{t("confirm")} {confirmAction.action === 'resolve' ? t("resolve") : t("reject")}</h3>
             <p className="text-sm text-gray-600 mt-2">{t("are_you_sure_want_to")} {confirmAction.action === 'resolve' ? t("mark_this_dispute_resolved") : t("reject_this_dispute_will_remain_open")}? {t("this_action_is_audit_logged")}</p>
@@ -406,7 +493,6 @@ export default function PaymentDisputesPage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
@@ -414,7 +500,10 @@ export default function PaymentDisputesPage() {
 // ---------------------- Small components ----------------------
 function SummaryCard({ title, value, icon, color, onClick }: any) {
   return (
-    <button onClick={onClick} className={`rounded-2xl p-4 shadow-sm border flex items-center justify-between ${color} hover:shadow-md transition`}>
+    <button
+      onClick={onClick}
+      className={`rounded-2xl p-4 shadow-sm border flex items-center justify-between ${color} hover:shadow-md transition`}
+    >
       <div>
         <p className="text-xs text-gray-500">{title}</p>
         <p className="text-xl font-semibold">{value}</p>
@@ -431,15 +520,32 @@ function StatusBadge({ status }: { status: string }) {
     "Pending Vendor": "bg-blue-100 text-blue-800",
     "Pending Customer": "bg-orange-100 text-orange-800",
   };
-  return <span className={`px-3 py-1 rounded-full text-xs font-medium ${map[status]}`}>{status}</span>;
+  return (
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-medium ${map[status]}`}
+    >
+      {status}
+    </span>
+  );
 }
 
 function ThSortable({ label, active, dir, onClick }: any) {
   return (
-    <th onClick={onClick} className="py-3 px-3 text-left cursor-pointer select-none whitespace-nowrap">
+    <th
+      onClick={onClick}
+      className="py-3 px-3 text-left cursor-pointer select-none whitespace-nowrap"
+    >
       <span className="inline-flex items-center gap-1 text-gray-700 font-medium">
         {label}
-        {active ? (dir === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />) : <ChevronDown className="w-3 h-3 opacity-40" />}
+        {active ? (
+          dir === "asc" ? (
+            <ChevronUp className="w-3 h-3" />
+          ) : (
+            <ChevronDown className="w-3 h-3" />
+          )
+        ) : (
+          <ChevronDown className="w-3 h-3 opacity-40" />
+        )}
       </span>
     </th>
   );

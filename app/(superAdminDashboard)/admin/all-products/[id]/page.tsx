@@ -14,15 +14,15 @@ export default async function ProductDetailsPage({
 
   try {
     const result = (await serverRequest.get(
-      `/products/${id}`
+      `/products/${id}`,
     )) as unknown as TResponse<TProduct>;
 
     if (result?.success) {
       initialData = result.data;
     }
   } catch (err) {
-    console.error("Server fetchProducts error:", err);
+    console.log("Server fetchProducts error:", err);
   }
-  
+
   return <ProductDetails product={initialData} />;
 }

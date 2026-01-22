@@ -69,7 +69,7 @@ export function AddBusinessCategoryForm() {
       id: toastId,
     });
     setIsSubmitting(false);
-    console.error(result);
+    console.log(result);
   };
 
   return (

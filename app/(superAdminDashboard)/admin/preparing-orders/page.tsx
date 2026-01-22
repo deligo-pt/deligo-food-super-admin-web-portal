@@ -34,7 +34,7 @@ export default async function PreparingOrdersPage({ searchParams }: IProps) {
       initialData.meta = result.meta as TMeta;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <PreparingOrders ordersResult={initialData} />;

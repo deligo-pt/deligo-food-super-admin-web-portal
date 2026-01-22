@@ -103,6 +103,7 @@ export type TAgent = {
   // Security & Access
   // ---------------------------------------------
   twoFactorEnabled?: boolean;
+  lastLoginAt?: Date;
 
   // ---------------------------------------------
   // Admin Workflow / Audit

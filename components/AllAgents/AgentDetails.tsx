@@ -11,6 +11,7 @@ import { TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
 import { deleteData } from "@/utils/requests";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
@@ -58,7 +59,7 @@ export const AgentDetails = ({ agent }: IProps) => {
 
         {
           headers: { authorization: getCookie("accessToken") },
-        }
+        },
       )) as unknown as TResponse<null>;
       if (result?.success) {
         setShowDeleteModal(false);
@@ -72,7 +73,7 @@ export const AgentDetails = ({ agent }: IProps) => {
         error?.response?.data?.message || "Fleet Manager delete failed",
         {
           id: toastId,
-        }
+        },
       );
     }
   };
@@ -135,7 +136,7 @@ export const AgentDetails = ({ agent }: IProps) => {
           >
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                agent?.status
+                agent?.status,
               )}`}
             >
               {agent?.status}
@@ -334,6 +335,54 @@ export const AgentDetails = ({ agent }: IProps) => {
             ) : (
               <p className="text-gray-500 italic">No bank details provided</p>
             )}
+          </Section>
+          <Section
+            title="Activity Logs"
+            icon={<BriefcaseIcon size={20} />}
+            defaultOpen={true}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Registered On</p>
+                <p className="font-medium">
+                  {format(agent?.createdAt, "do MMM yyyy")}
+                </p>
+              </div>
+              {agent?.submittedForApprovalAt && (
+                <div>
+                  <p className="text-sm text-gray-500">Submitted On</p>
+                  <p className="font-medium">
+                    {format(agent?.submittedForApprovalAt, "do MMM yyyy")}
+                  </p>
+                </div>
+              )}
+              {(agent?.status === "APPROVED" ||
+                agent?.status === "REJECTED" ||
+                agent?.status === "BLOCKED") &&
+                agent?.approvedOrRejectedOrBlockedAt && (
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      {agent?.status.charAt(0).toUpperCase() +
+                        agent?.status.slice(1)}{" "}
+                      On
+                    </p>
+                    <p className="font-medium">
+                      {format(
+                        agent?.approvedOrRejectedOrBlockedAt,
+                        "do MMM yyyy",
+                      )}
+                    </p>
+                  </div>
+                )}
+              {agent?.lastLoginAt && (
+                <div>
+                  <p className="text-sm text-gray-500">Last logged On</p>
+                  <p className="font-medium">
+                    {format(agent?.lastLoginAt, "do MMM yyyy")}
+                  </p>
+                </div>
+              )}
+            </div>
           </Section>
           <Section
             title="Documents"

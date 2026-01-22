@@ -22,7 +22,7 @@ export default async function BusinessCategoryDetailsPage({
       initialData = result?.data || {};
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <BusinessCategoryDetails category={initialData} />;

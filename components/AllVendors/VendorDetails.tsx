@@ -8,6 +8,7 @@ import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { USER_STATUS } from "@/consts/user.const";
 import { TResponse } from "@/types";
+import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
 import { getCookie } from "@/utils/cookies";
 import { deleteData } from "@/utils/requests";
@@ -21,20 +22,23 @@ import {
   CheckIcon,
   FileTextIcon,
   MapPinIcon,
+  TicketIcon,
   TrashIcon,
   UserIcon,
   XIcon,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 interface IProps {
   vendor: TVendor;
+  offerData: TOffer[];
 }
 
-export const VendorDetails = ({ vendor }: IProps) => {
+export const VendorDetails = ({ vendor, offerData }: IProps) => {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
@@ -440,6 +444,41 @@ export const VendorDetails = ({ vendor }: IProps) => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-6">
               <VendorDetailsDoc documents={vendor?.documents} />
+            </div>
+          </AgentOrVendorSection>
+          <AgentOrVendorSection
+            title="Created Offers"
+            icon={<TicketIcon size={20} />}
+            defaultOpen={true}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {offerData?.map((offer) => (
+                <div
+                  key={offer._id}
+                  className="flex flex-col gap-2 border rounded-md p-4"
+                >
+                  <p className="text-gray-500">{offer.title}</p>
+                  {offer.offerType === "BOGO" && <p>BOGO Offer</p>}
+                  {offer.offerType === "PERCENT" && (
+                    <p>Percentage Offer ({offer.discountValue}% Off)</p>
+                  )}
+                  {offer.offerType === "FLAT" && (
+                    <p>Flat Offer (€{offer.discountValue} Off)</p>
+                  )}
+                  <p className="text-xs">
+                    {format(offer.startDate, "dd/MM/yyyy")} -{" "}
+                    {format(offer.endDate, "dd/MM/yyyy")}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-2">
+              <Link
+                className="text-[#DC3173] text-sm font-medium hover:underline"
+                href={`/admin/vendor/offers/${vendor.userId}`}
+              >
+                View all
+              </Link>
             </div>
           </AgentOrVendorSection>
         </div>

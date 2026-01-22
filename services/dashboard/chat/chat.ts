@@ -35,7 +35,7 @@ export const openConversationReq = async ({
     return { success: false, data: result.error, message: result.message };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
     return {
       success: false,
       data: err?.response?.data || err,

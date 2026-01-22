@@ -35,7 +35,7 @@ export default async function BlockedCustomersPage({ searchParams }: IProps) {
       initialData.meta = result.meta;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return <BlockedCustomers customersResult={initialData} />;

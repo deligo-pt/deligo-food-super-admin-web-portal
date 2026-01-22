@@ -11,14 +11,14 @@ export default async function page() {
   try {
     const result = (await serverRequest.get(
       "/categories/businessCategory",
-      {}
+      {},
     )) as unknown as TResponse<{ data: TBusinessCategory[] }>;
 
     if (result?.success) {
       initialData = result?.data?.data || [];
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return (

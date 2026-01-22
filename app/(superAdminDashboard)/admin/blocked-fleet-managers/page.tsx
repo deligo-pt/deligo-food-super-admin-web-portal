@@ -35,7 +35,7 @@ export default async function AllFleetManagersPage({ searchParams }: IProps) {
       initialData.meta = result.meta;
     }
   } catch (err) {
-    console.error("Server fetch error:", err);
+    console.log("Server fetch error:", err);
   }
 
   return (
