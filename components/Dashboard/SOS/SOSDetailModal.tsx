@@ -1,7 +1,6 @@
 "use client";
 
 import SOSActions from "@/components/Dashboard/SOS/SOSActions";
-import LocationMap from "@/components/LocationMap/LocationMap";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { TMeta } from "@/types";
@@ -207,12 +206,12 @@ export function SOSDetailModal({
                             </span>
                           </div>
 
-                          <div className="h-52">
+                          {/* <div className="h-52">
                             <LocationMap
                               lat={sos?.location?.coordinates?.[0]}
                               lng={sos?.location?.coordinates?.[1]}
                             />
-                          </div>
+                          </div> */}
                         </div>
 
                         <SOSActions
