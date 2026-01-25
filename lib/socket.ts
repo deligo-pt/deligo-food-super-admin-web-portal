@@ -2,6 +2,7 @@ import { io, Socket } from "socket.io-client";
 
 let socket: Socket | null = null;
 let adminSocket: Socket | null = null;
+let SOSSocket: Socket | null = null;
 
 export const getSocket = (token: string) => {
   if (!socket) {
@@ -23,6 +24,17 @@ export const getAdminSocket = (token: string) => {
     });
   }
   return adminSocket;
+};
+
+export const getSOSSocket = (token: string) => {
+  if (!SOSSocket) {
+    SOSSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
+      auth: { token },
+      withCredentials: true,
+      transports: ["websocket"],
+    });
+  }
+  return SOSSocket;
 };
 
 export const disconnectSocket = () => {

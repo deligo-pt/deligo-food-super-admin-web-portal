@@ -1,10 +1,8 @@
 import { USER_ROLE } from "@/consts/user.const";
 import { TAdmin } from "@/types/admin.type";
-import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TOrder } from "@/types/order.type";
-import { TAgent, TVendor } from "@/types/user.type";
 
-export type SOSType = "vendor" | "fleet" | "partner";
+export type SOSType = "VENDOR" | "FLEET_MANAGER" | "DELIVERY_PARTNER";
 
 export type SOSPriority = "critical" | "high" | "medium";
 
@@ -38,7 +36,11 @@ export type TSosIssue =
   | "Other";
 
 export type TSOS = {
-  userId: TVendor | TAgent | TDeliveryPartner;
+  _id: string;
+  userId: {
+    id: { name: { firstName: string; lastName: string } };
+    userId: string;
+  };
   orderId?: TOrder;
   role: keyof typeof USER_ROLE;
   status: TSosStatus;

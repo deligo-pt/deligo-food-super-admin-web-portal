@@ -1,4 +1,3 @@
-import { SOSType } from "@/types/sos.type";
 import { motion } from "framer-motion";
 import { ArrowRight, LucideIcon } from "lucide-react";
 import { SOSBadge } from "./SOSBadge";
@@ -8,9 +7,7 @@ interface IProps {
   description: string;
   icon: LucideIcon;
   count: number;
-  buttonText?: string;
-  sectionType: SOSType;
-  onClick: (type: SOSType) => void;
+  onClick: () => void;
 }
 
 export function SOSCard({
@@ -18,8 +15,6 @@ export function SOSCard({
   description,
   icon: Icon,
   count,
-  buttonText = "View Alerts",
-  sectionType,
   onClick,
 }: IProps) {
   return (
@@ -73,10 +68,10 @@ export function SOSCard({
           whileTap={{
             scale: 0.98,
           }}
-          onClick={() => onClick(sectionType)}
+          onClick={() => onClick()}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#DC3173] py-3 px-4 text-sm font-semibold text-white shadow-md transition-colors hover:bg-[#b0275c] focus:outline-none focus:ring-2 focus:ring-[#DC3173] focus:ring-offset-2"
         >
-          {buttonText}
+          View Alerts
           <ArrowRight size={16} />
         </motion.button>
       </div>

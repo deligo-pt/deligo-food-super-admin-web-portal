@@ -22,7 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { createOffer } from "@/services/dashboard/offers/offers";
+import { createOfferReq } from "@/services/dashboard/offers/offers";
 import { TMeta } from "@/types";
 import { TProduct } from "@/types/product.type";
 import { offerValidation } from "@/validations/offer/offer.validation";
@@ -70,27 +70,18 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
   const onSubmit = async (data: TOfferForm) => {
     const toastId = toast.loading("Creating offer...");
 
-    try {
-      const result = await createOffer(data);
+    const result = await createOfferReq(data);
 
-      if (result.success) {
-        toast.success(result.message || "Offer created successfully!", {
-          id: toastId,
-        });
-        form.reset();
-        return;
-      }
-
-      toast.error(result.message || "Offer creation failed", { id: toastId });
-      console.log(result);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error.response);
-      toast.error(error?.response?.data?.message || "Password Update Failed", {
+    if (result.success) {
+      toast.success(result.message || "Offer created successfully!", {
         id: toastId,
       });
+      form.reset();
+      return;
     }
+
+    toast.error(result.message || "Offer creation failed", { id: toastId });
+    console.log(result);
   };
 
   return (
@@ -167,7 +158,9 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                               <SelectTrigger
                                 className={cn(
                                   "w-full h-12",
-                                  fieldState.invalid ? "border-destructive" : ""
+                                  fieldState.invalid
+                                    ? "border-destructive"
+                                    : "",
                                 )}
                               >
                                 <SelectValue placeholder="Select type" />
@@ -257,7 +250,9 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                                 value={field.value}
                               >
                                 <SelectTrigger className="w-full h-12">
-                                  <SelectValue placeholder={t("choose_an_item")} />
+                                  <SelectValue
+                                    placeholder={t("choose_an_item")}
+                                  />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {itemsResult?.data.map((item: TProduct) => (

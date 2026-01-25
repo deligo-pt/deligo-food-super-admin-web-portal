@@ -1,8 +1,12 @@
 "use client";
 
-import { SOSCard } from "@/components/SOS/SOSCard";
-import { SOSDetailModal } from "@/components/SOS/SOSDetailModal";
-import { SOSItem, SOSType } from "@/types/sos.type";
+import { SOSCard } from "@/components/Dashboard/SOS/SOSCard";
+import { SOSDetailModal } from "@/components/Dashboard/SOS/SOSDetailModal";
+import { USER_ROLE } from "@/consts/user.const";
+import { useSOSSocket } from "@/hooks/use-sos-socket";
+import { getAllSOSReq } from "@/services/dashboard/SOS/SOS";
+import { TMeta } from "@/types";
+import { SOSItem, SOSType, TSOS } from "@/types/sos.type";
 import { motion, Variants } from "framer-motion";
 import {
   Activity,
@@ -12,13 +16,18 @@ import {
   Truck,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+
+interface IProps {
+  accessToken: string;
+}
 
 // Mock Data
 const MOCK_EMERGENCIES: SOSItem[] = [
   // Vendor Issues
   {
     id: "v1",
-    type: "vendor",
+    type: "VENDOR",
     timestamp: new Date(Date.now() - 1000 * 60 * 5),
     status: "active",
     priority: "critical",
@@ -31,7 +40,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   },
   {
     id: "v2",
-    type: "vendor",
+    type: "VENDOR",
     timestamp: new Date(Date.now() - 1000 * 60 * 45),
     status: "active",
     priority: "high",
@@ -44,7 +53,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   },
   {
     id: "v3",
-    type: "vendor",
+    type: "VENDOR",
     timestamp: new Date(Date.now() - 1000 * 60 * 120),
     status: "in-progress",
     priority: "medium",
@@ -58,7 +67,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   // Fleet Issues
   {
     id: "f1",
-    type: "fleet",
+    type: "FLEET_MANAGER",
     timestamp: new Date(Date.now() - 1000 * 60 * 15),
     status: "active",
     priority: "high",
@@ -72,7 +81,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   // Partner Issues
   {
     id: "p1",
-    type: "partner",
+    type: "DELIVERY_PARTNER",
     timestamp: new Date(Date.now() - 1000 * 60 * 2),
     status: "active",
     priority: "critical",
@@ -85,7 +94,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   },
   {
     id: "p2",
-    type: "partner",
+    type: "DELIVERY_PARTNER",
     timestamp: new Date(Date.now() - 1000 * 60 * 10),
     status: "active",
     priority: "high",
@@ -98,7 +107,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   },
   {
     id: "p3",
-    type: "partner",
+    type: "DELIVERY_PARTNER",
     timestamp: new Date(Date.now() - 1000 * 60 * 30),
     status: "active",
     priority: "high",
@@ -111,7 +120,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   },
   {
     id: "p4",
-    type: "partner",
+    type: "DELIVERY_PARTNER",
     timestamp: new Date(Date.now() - 1000 * 60 * 60),
     status: "in-progress",
     priority: "medium",
@@ -124,7 +133,7 @@ const MOCK_EMERGENCIES: SOSItem[] = [
   },
   {
     id: "p5",
-    type: "partner",
+    type: "DELIVERY_PARTNER",
     timestamp: new Date(Date.now() - 1000 * 60 * 90),
     status: "in-progress",
     priority: "medium",
@@ -165,10 +174,14 @@ const headerVariants = {
   },
 };
 
-export function SOS() {
+export function SOS({ accessToken }: IProps) {
+  const [SOSData, setSOSData] = useState<{ data: TSOS[]; meta?: TMeta }>({
+    data: [],
+  });
   const [selectedSection, setSelectedSection] = useState<SOSType | null>(null);
 
-  const handleCardClick = (type: SOSType) => {
+  const handleCardClick = async (type: SOSType) => {
+    await getSOSes({ role: type });
     setSelectedSection(type);
   };
 
@@ -176,22 +189,41 @@ export function SOS() {
     setSelectedSection(null);
   };
 
-  const filteredEmergencies = selectedSection
-    ? MOCK_EMERGENCIES.filter((item) => item.type === selectedSection)
-    : [];
-
   // Calculate counts dynamically
   const vendorCount = MOCK_EMERGENCIES.filter(
-    (i) => i.type === "vendor" && i.status !== "resolved"
+    (i) => i.type === "VENDOR" && i.status !== "resolved",
   ).length;
   const fleetCount = MOCK_EMERGENCIES.filter(
-    (i) => i.type === "fleet" && i.status !== "resolved"
+    (i) => i.type === "FLEET_MANAGER" && i.status !== "resolved",
   ).length;
   const partnerCount = MOCK_EMERGENCIES.filter(
-    (i) => i.type === "partner" && i.status !== "resolved"
+    (i) => i.type === "DELIVERY_PARTNER" && i.status !== "resolved",
   ).length;
 
   const totalActive = vendorCount + fleetCount + partnerCount;
+
+  const getSOSes = async ({ limit = 10, role = "VENDOR" }) => {
+    const query = {
+      limit,
+      role,
+    };
+
+    const result = await getAllSOSReq(query);
+
+    if (result?.success) {
+      setSOSData({ data: result.data.result, meta: result.data.meta });
+    } else {
+      console.log("Server fetch error:", result);
+    }
+  };
+
+  useSOSSocket({
+    token: accessToken,
+    onNewSOSAlert: async ({ message, data }) => {
+      toast.info(message || "New SOS Alert");
+      await getSOSes({ limit: SOSData.meta?.limit, role: data.role });
+    },
+  });
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900 font-sans">
@@ -279,9 +311,7 @@ export function SOS() {
             description="Critical issues reported by restaurants and merchants. Includes kitchen fires, stock outages, or device failures."
             icon={ShoppingBag}
             count={vendorCount}
-            buttonText="Manage Vendors"
-            sectionType="vendor"
-            onClick={handleCardClick}
+            onClick={() => handleCardClick(USER_ROLE.VENDOR)}
           />
 
           <SOSCard
@@ -289,9 +319,7 @@ export function SOS() {
             description="Operational emergencies from logistics hubs. Vehicle breakdowns, accident reports, and route blockages."
             icon={Truck}
             count={fleetCount}
-            buttonText="View Logistics"
-            sectionType="fleet"
-            onClick={handleCardClick}
+            onClick={() => handleCardClick(USER_ROLE.FLEET_MANAGER)}
           />
 
           <SOSCard
@@ -299,9 +327,7 @@ export function SOS() {
             description="Urgent safety alerts from riders on the road. Medical emergencies, harassment, or severe weather conditions."
             icon={Bike}
             count={partnerCount}
-            buttonText="Assist Riders"
-            sectionType="partner"
-            onClick={handleCardClick}
+            onClick={() => handleCardClick(USER_ROLE.DELIVERY_PARTNER)}
           />
         </motion.div>
       </main>
@@ -311,7 +337,8 @@ export function SOS() {
         isOpen={!!selectedSection}
         onClose={handleCloseModal}
         sectionType={selectedSection}
-        emergencies={filteredEmergencies}
+        SOSData={SOSData}
+        getSOSes={getSOSes}
       />
     </div>
   );

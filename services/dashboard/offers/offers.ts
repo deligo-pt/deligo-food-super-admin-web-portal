@@ -1,26 +1,33 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
 import { TOffer } from "@/types/offer.type";
+import { catchAsync } from "@/utils/catchAsync";
 
-export const createOffer = async (payload: Partial<TOffer>) => {
-  try {
-    const result = (await serverRequest.post("/offers/create-offer", {
-      data: payload,
-    })) as TResponse<null>;
+export const createOfferReq = async (data: Partial<TOffer>) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.post("/offers/create-offer", {
+      data,
+    });
+  });
+};
 
-    if (result.success) {
-      return { success: true, data: result.data, message: result.message };
-    }
-    return { success: false, data: result.error, message: result.message };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log(error);
-    return {
-      success: false,
-      data: error?.response?.data || null,
-      message: error?.response?.data?.message || "Offer creation failed",
-    };
-  }
+export const toggleOfferStatusReq = async (id: string) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.patch(`/offers/toggle-status/${id}`);
+  });
+};
+
+export const updateOfferReq = async (id: string, data: Partial<TOffer>) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.patch(`/offers/${id}`, {
+      data,
+    });
+  });
+};
+
+export const deleteOfferReq = async (id: string) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.delete(`/offers/soft-delete/${id}`);
+  });
 };
