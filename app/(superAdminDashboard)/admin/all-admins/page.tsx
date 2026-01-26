@@ -1,4 +1,4 @@
-import AllAdmins from "@/components/AllAdmins/AllAdmins";
+import Admins from "@/components/Dashboard/Admins/Admins";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TAdmin } from "@/types/admin.type";
@@ -29,15 +29,22 @@ export default async function AllAdminsPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/admins", {
       params: query,
-    })) as unknown as TResponse<TAdmin[]>;
+    })) as TResponse<TAdmin[]>;
 
     if (result?.success) {
       initialData.data = result.data;
-      initialData.meta = result.meta as TMeta;
+      initialData.meta = result.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  return <AllAdmins adminsResult={initialData} />;
+  return (
+    <Admins
+      adminsResult={initialData}
+      showFilters={true}
+      title="All Admins"
+      subtitle="Manage all the existing admins"
+    />
+  );
 }
