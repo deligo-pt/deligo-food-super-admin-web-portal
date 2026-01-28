@@ -71,29 +71,38 @@ export default function OrderDetailsSheet({
               </div>
             </div>
 
-            <Separator />
-
             {/* Partner */}
-            <div className="flex items-center gap-3">
-              <Avatar className="w-14 h-14">
-                <AvatarImage
-                  src={selectedOrder?.deliveryPartnerId?.profilePhoto}
-                />
-                <AvatarFallback>
-                  {selectedOrder?.deliveryPartnerId?.name?.firstName?.charAt(0)}{" "}
-                  {selectedOrder?.deliveryPartnerId?.name?.lastName?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-semibold text-lg">
-                  {selectedOrder?.deliveryPartnerId?.name?.firstName}{" "}
-                  {selectedOrder?.deliveryPartnerId?.name?.lastName}
-                </p>
-                <p className="text-xs text-slate-500">
-                  {selectedOrder?.deliveryPartnerId?.address?.city}
-                </p>
-              </div>
-            </div>
+            {(selectedOrder?.deliveryPartnerId?.name?.firstName ||
+              selectedOrder?.deliveryPartnerId?.name?.lastName) && (
+              <>
+                <Separator />
+
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-14 h-14">
+                    <AvatarImage
+                      src={selectedOrder?.deliveryPartnerId?.profilePhoto}
+                    />
+                    <AvatarFallback>
+                      {selectedOrder?.deliveryPartnerId?.name?.firstName?.charAt(
+                        0,
+                      )}
+                      {selectedOrder?.deliveryPartnerId?.name?.lastName?.charAt(
+                        0,
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-lg">
+                      {selectedOrder?.deliveryPartnerId?.name?.firstName}{" "}
+                      {selectedOrder?.deliveryPartnerId?.name?.lastName}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {selectedOrder?.deliveryPartnerId?.address?.city}
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
 
             <Separator />
 
@@ -133,17 +142,20 @@ export default function OrderDetailsSheet({
                   • {t("created")}:{" "}
                   {format(selectedOrder?.createdAt, "Do MMM yyyy")}
                 </li>
-                <li>
-                  • {t("rider")}:{" "}
-                  {selectedOrder?.deliveryPartnerId?.name?.firstName}{" "}
-                  {selectedOrder?.deliveryPartnerId?.name?.lastName}
-                </li>
-                <li>
-                  • {t("delivered")}:{" "}
-                  {selectedOrder?.deliveredAt
-                    ? format(selectedOrder?.deliveredAt, "Do MMM yyyy")
-                    : "—"}
-                </li>
+                {(selectedOrder?.deliveryPartnerId?.name?.firstName ||
+                  selectedOrder?.deliveryPartnerId?.name?.lastName) && (
+                  <li>
+                    • {t("rider")}:{" "}
+                    {selectedOrder?.deliveryPartnerId?.name?.firstName}{" "}
+                    {selectedOrder?.deliveryPartnerId?.name?.lastName}
+                  </li>
+                )}
+                {selectedOrder?.deliveredAt && (
+                  <li>
+                    • {t("delivered")}:{" "}
+                    {format(selectedOrder?.deliveredAt, "Do MMM yyyy")}
+                  </li>
+                )}
               </ul>
             </div>
 
