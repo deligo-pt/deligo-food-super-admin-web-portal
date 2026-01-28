@@ -12,8 +12,8 @@ export default function DeliveryPartnerPayoutsPage() {
   return (
     <DeliveryPartnerPayouts
       deliveryPartnerPayoutsResult={mockData}
-      title="Vendor Payouts"
-      subtitle=" Manage all vendor payouts here"
+      title="Delivery Partner Payouts"
+      subtitle=" Manage all delivery partner payouts here"
     />
   );
 }
