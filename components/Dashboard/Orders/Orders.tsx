@@ -35,7 +35,10 @@ export default function Orders({ ordersResult, title, subtitle }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Order Table */}
-      <OrderTable orders={ordersResult?.data || []} />
+      <OrderTable
+        orders={ordersResult?.data || []}
+        viewOrder={(order) => setSelected(order)}
+      />
 
       {/* Pagination */}
       {!!ordersResult?.meta?.totalPage && (

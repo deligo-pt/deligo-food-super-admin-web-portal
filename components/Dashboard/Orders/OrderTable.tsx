@@ -25,9 +25,10 @@ import {
 
 interface IProps {
   orders: TOrder[];
+  viewOrder: (order: TOrder) => void;
 }
 
-export default function OrderTable({ orders }: IProps) {
+export default function OrderTable({ orders, viewOrder }: IProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -119,6 +120,7 @@ export default function OrderTable({ orders }: IProps) {
               <TableCell>{format(order.createdAt, "Do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 <Button
+                  onClick={() => viewOrder(order)}
                   size="sm"
                   className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90"
                 >
