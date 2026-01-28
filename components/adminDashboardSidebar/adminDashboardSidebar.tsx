@@ -29,9 +29,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import TopbarIcons from "@/components/adminTopbar/TopbarIcons";
+import { useTranslation } from "@/hooks/use-translation";
 import { TAdmin } from "@/types/admin.type";
 import Image from "next/image";
-import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
   open?: boolean;
@@ -71,12 +71,19 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       items: [
         { name: t("all_fleet_managers"), path: "/admin/all-fleet-managers" },
         { name: t("add_new_fleet_manager"), path: "/admin/add-fleet-manager" },
-        { name: t("fleet_manager_wallet"), path: "/admin/fleet-manager-wallet" },
-        { name: t("payout_requests"), path: "/admin/fleet-manager-withdrawals" },
+        {
+          name: t("fleet_manager_wallet"),
+          path: "/admin/fleet-manager-wallet",
+        },
+        {
+          name: t("payout_requests"),
+          path: "/admin/fleet-manager-withdrawals",
+        },
         { name: t("zones_and_coverage_areas"), path: "/admin/fleet-zones" },
-        { name: t("fleet_performance_analytics"), path: "/admin/fleet-performance" },
-        { name: t("fleet_activity_logs"), path: "/admin/fleet-activity-logs" },
-        { name: t("in_app_notifications"), path: "/admin/send-notification-fleet" },
+        {
+          name: t("fleet_performance_analytics"),
+          path: "/admin/fleet-performance",
+        },
         {
           name: t("suspended_blocked_fleet_managers"),
           path: "/admin/blocked-fleet-managers",
@@ -99,7 +106,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("delivery_partners"),
       icon: <Bike size={18} />,
       items: [
-        { name: t("all_delivery_partners"), path: "/admin/all-delivery-partners" },
+        {
+          name: t("all_delivery_partners"),
+          path: "/admin/all-delivery-partners",
+        },
         {
           name: t("delivery_partner_onboarding_requests"),
           path: "/admin/delivery-partner-onboarding-requests",
@@ -135,7 +145,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("add_business_categories"),
           path: "/admin/business-categories/add",
         },
-        { name: t("all_business_categories"), path: "/admin/business-categories" },
+        {
+          name: t("all_business_categories"),
+          path: "/admin/business-categories",
+        },
       ],
     },
     {
@@ -147,7 +160,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("add_product_categories"),
           path: "/admin/product-categories/add",
         },
-        { name: t("all_product_categories"), path: "/admin/product-categories" },
+        {
+          name: t("all_product_categories"),
+          path: "/admin/product-categories",
+        },
       ],
     },
     {
@@ -175,6 +191,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("transaction_history"), path: "/admin/transaction-history" },
         { name: t("payment_disputes"), path: "/admin/payment-disputes" },
         { name: t("tax_management"), path: "/admin/tax-management" },
+        {
+          name: "Sponsorships",
+          path: "/admin/sponsorships",
+        },
+        { name: "Add Sponsorship", path: "/admin/add-sponsorship" },
       ],
     },
     {
@@ -219,6 +240,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/email-notification-settings",
         },
         { name: t("maintenance_mode"), path: "/admin/maintenance-mode" },
+        {
+          name: t("in_app_notifications"),
+          path: "/admin/send-notification-fleet",
+        },
       ],
     },
     {
@@ -261,7 +286,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("vendor_report"), path: "/admin/vendor-report" },
       ],
     },
-
     {
       id: "settings",
       title: t("settings"),
@@ -270,7 +294,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("business_info"), path: "/admin/business-info" },
         { name: t("branding_and_theme"), path: "/admin/branding-theme" },
         { name: t("localization"), path: "/admin/localization" },
-        { name: t("notification_preferences"), path: "/admin/notification-preferences" },
+        {
+          name: t("notification_preferences"),
+          path: "/admin/notification-preferences",
+        },
         { name: t("legal_documents"), path: "/admin/legal-documents" },
         { name: t("global_settings"), path: "/admin/global-settings" },
       ],
@@ -279,9 +306,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       id: "sos",
       title: t("sos_emergency"),
       icon: <AlertCircle size={18} />,
-      items: [
-        { name: t("critical_alerts"), path: "/admin/critical-alerts" },
-      ],
+      items: [{ name: t("critical_alerts"), path: "/admin/critical-alerts" }],
     },
   ];
 
@@ -426,10 +451,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                           <Link
                             key={sub.name}
                             href={sub.path}
-                            className={`text-sm px-2 py-1 rounded-md transition-all duration-300 ${pathname === sub.path
-                              ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                              : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
-                              }`}
+                            className={`text-sm px-2 py-1 rounded-md transition-all duration-300 ${
+                              pathname === sub.path
+                                ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                                : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
+                            }`}
                           >
                             {sub.name}
                           </Link>
@@ -484,10 +510,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                     <Link
                       href={menu.path}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-2 py-2 ${pathname === menu.path
-                        ? "text-pink-700 font-semibold"
-                        : "text-gray-800 hover:text-pink-600"
-                        }`}
+                      className={`flex items-center gap-2 py-2 ${
+                        pathname === menu.path
+                          ? "text-pink-700 font-semibold"
+                          : "text-gray-800 hover:text-pink-600"
+                      }`}
                     >
                       <div className="text-pink-600">{menu.icon}</div>
                       <span>{menu.title}</span>
@@ -504,8 +531,9 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                         </div>
                         <ChevronDown
                           size={16}
-                          className={`transition-transform ${expanded[menu.id] ? "rotate-180" : ""
-                            }`}
+                          className={`transition-transform ${
+                            expanded[menu.id] ? "rotate-180" : ""
+                          }`}
                         />
                       </button>
 
@@ -522,10 +550,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                                 key={sub.name}
                                 href={sub.path}
                                 onClick={() => setMobileOpen(false)}
-                                className={`text-sm py-1 transition-all ${pathname === sub.path
-                                  ? "text-pink-700 font-semibold"
-                                  : "text-gray-600 hover:text-pink-600"
-                                  }`}
+                                className={`text-sm py-1 transition-all ${
+                                  pathname === sub.path
+                                    ? "text-pink-700 font-semibold"
+                                    : "text-gray-600 hover:text-pink-600"
+                                }`}
                               >
                                 {sub.name}
                               </Link>

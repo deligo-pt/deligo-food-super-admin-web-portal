@@ -55,22 +55,6 @@ export default function SettingsInput({
       {description && !fieldState?.invalid && (
         <p className="mt-1.5 text-xs text-gray-500">{description}</p>
       )}
-
-      {/* {error && (
-        <motion.p
-          initial={{
-            opacity: 0,
-            y: -10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          className="mt-1.5 text-xs text-red-600 font-medium"
-        >
-          {error}
-        </motion.p>
-      )} */}
     </div>
   );
 }
