@@ -4,6 +4,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import EditTaxModal from "@/components/Tax/AllTaxes/EditTaxModal";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,14 +21,12 @@ import {
 import { deleteTaxReq, updateTaxReq } from "@/services/dashboard/tax/tax";
 import { TMeta } from "@/types";
 import { TTax } from "@/types/tax.type";
-import { motion } from "framer-motion";
 import {
   CheckCircle,
   MoreVerticalIcon,
   PlusCircle,
   XCircle,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -97,25 +96,15 @@ export default function AllTaxes({ taxesResult }: IProps) {
 
   return (
     <div className="min-h-screen p-6 bg-slate-50">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between gap-3 mb-6"
-      >
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#DC3173]">All Taxes</h1>
-          <p className="mt-1 text-sm text-gray-600">Manage your all taxes</p>
-        </div>
-        <Link href="/admin/create-tax">
-          <motion.button
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-[#DC3173] to-[#e84b93] text-white font-semibold shadow-lg transform hover:-translate-y-0.5 transition"
-          >
-            <PlusCircle size={18} /> Create
-          </motion.button>
-        </Link>
-      </motion.div>
+      <TitleHeader
+        title="All Taxes"
+        subtitle="Manage all the taxes in the system"
+        buttonInfo={{
+          text: "Create",
+          icon: PlusCircle,
+          onClick: () => router.push("/admin/create-tax"),
+        }}
+      />
 
       <AllFilters sortOptions={sortOptions} />
 

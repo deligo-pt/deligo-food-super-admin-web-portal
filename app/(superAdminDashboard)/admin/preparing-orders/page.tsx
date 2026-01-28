@@ -1,4 +1,4 @@
-import PreparingOrders from "@/components/PreparingOrders/PreparingOrders";
+import Orders from "@/components/Dashboard/Orders/Orders";
 import { ORDER_STATUS } from "@/consts/order.const";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
@@ -20,22 +20,29 @@ export default async function PreparingOrdersPage({ searchParams }: IProps) {
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
+    orderStatus: ORDER_STATUS.PREPARING,
   };
 
   const initialData: { data: TOrder[]; meta?: TMeta } = { data: [] };
 
   try {
     const result = (await serverRequest.get("/orders", {
-      params: { ...query, orderStatus: ORDER_STATUS.PREPARING },
-    })) as unknown as TResponse<TOrder[]>;
+      params: query,
+    })) as TResponse<TOrder[]>;
 
     if (result?.success) {
       initialData.data = result.data;
-      initialData.meta = result.meta as TMeta;
+      initialData.meta = result.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  return <PreparingOrders ordersResult={initialData} />;
+  return (
+    <Orders
+      ordersResult={initialData}
+      title="Preparing Orders"
+      subtitle="All preparing orders in the system"
+    />
+  );
 }

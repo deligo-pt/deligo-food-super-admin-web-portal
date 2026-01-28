@@ -2,7 +2,7 @@
 
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
-import { TSOS } from "@/types/sos.type";
+import { TSOS, TSOSStats } from "@/types/sos.type";
 import { catchAsync } from "@/utils/catchAsync";
 
 export const getAllSOSReq = async (
@@ -10,6 +10,12 @@ export const getAllSOSReq = async (
 ) => {
   return catchAsync<{ result: TSOS[]; meta?: TMeta }>(async () => {
     return await serverRequest.get("/sos", { params });
+  });
+};
+
+export const getSOSStatReq = async () => {
+  return catchAsync<TSOSStats>(async () => {
+    return await serverRequest.get("/sos/stats");
   });
 };
 

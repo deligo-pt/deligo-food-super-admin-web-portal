@@ -64,3 +64,10 @@ export type TSOS = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type TSOSStats = {
+  Vendor: number;
+  FleetManager: number;
+  DeliveryPartner: number;
+  total: number;
+};

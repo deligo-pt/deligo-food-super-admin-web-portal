@@ -1,4 +1,4 @@
-import PendingOrders from "@/components/PendingOrders/PendingOrders";
+import Orders from "@/components/Dashboard/Orders/Orders";
 import { ORDER_STATUS } from "@/consts/order.const";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
@@ -20,22 +20,29 @@ export default async function PendingOrdersPage({ searchParams }: IProps) {
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
+    orderStatus: ORDER_STATUS.PENDING,
   };
 
   const initialData: { data: TOrder[]; meta?: TMeta } = { data: [] };
 
   try {
     const result = (await serverRequest.get("/orders", {
-      params: { ...query, orderStatus: ORDER_STATUS.PENDING },
-    })) as unknown as TResponse<TOrder[]>;
+      params: query,
+    })) as TResponse<TOrder[]>;
 
     if (result?.success) {
       initialData.data = result.data;
-      initialData.meta = result.meta as TMeta;
+      initialData.meta = result.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  return <PendingOrders ordersResult={initialData} />;
+  return (
+    <Orders
+      ordersResult={initialData}
+      title="Pending Orders"
+      subtitle="All pending orders in the system"
+    />
+  );
 }

@@ -1,4 +1,4 @@
-import AllOrders from "@/components/AllOrders/AllOrders";
+import Orders from "@/components/Dashboard/Orders/Orders";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TOrder } from "@/types/order.type";
@@ -13,14 +13,14 @@ export default async function AllOrdersPage({ searchParams }: IProps) {
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
-  const orderStatus = queries.orderStatus || "";
+  // const orderStatus = queries.orderStatus || "";
 
   const query = {
     limit,
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(orderStatus ? { orderStatus: orderStatus } : {}),
+    // ...(orderStatus ? { orderStatus: orderStatus } : {}),
   };
 
   const initialData: { data: TOrder[]; meta?: TMeta } = { data: [] };
@@ -28,15 +28,21 @@ export default async function AllOrdersPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/orders", {
       params: query,
-    })) as unknown as TResponse<TOrder[]>;
+    })) as TResponse<TOrder[]>;
 
     if (result?.success) {
       initialData.data = result.data;
-      initialData.meta = result.meta as TMeta;
+      initialData.meta = result.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  return <AllOrders ordersResult={initialData} />;
+  return (
+    <Orders
+      ordersResult={initialData}
+      title="All Orders"
+      subtitle="Manage all orders here"
+    />
+  );
 }

@@ -1,4 +1,4 @@
-import CancelledOrders from "@/components/CancelledOrders/CancelOrders";
+import Orders from "@/components/Dashboard/Orders/Orders";
 import { ORDER_STATUS } from "@/consts/order.const";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
@@ -20,22 +20,29 @@ export default async function CancelledOrdersPage({ searchParams }: IProps) {
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
+    orderStatus: ORDER_STATUS.CANCELED,
   };
 
   const initialData: { data: TOrder[]; meta?: TMeta } = { data: [] };
 
   try {
     const result = (await serverRequest.get("/orders", {
-      params: { ...query, orderStatus: ORDER_STATUS.CANCELED },
-    })) as unknown as TResponse<TOrder[]>;
+      params: query,
+    })) as TResponse<TOrder[]>;
 
     if (result?.success) {
       initialData.data = result.data;
-      initialData.meta = result.meta as TMeta;
+      initialData.meta = result.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  return <CancelledOrders ordersResult={initialData} />;
+  return (
+    <Orders
+      ordersResult={initialData}
+      title="Cancelled Orders"
+      subtitle="All cancelled orders"
+    />
+  );
 }
