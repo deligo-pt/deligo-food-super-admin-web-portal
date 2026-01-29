@@ -197,10 +197,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("payment_disputes"), path: "/admin/payment-disputes" },
         { name: t("tax_management"), path: "/admin/tax-management" },
         {
-          name: "Sponsorships",
-          path: "/admin/sponsorships",
+          name: "All Taxes",
+          path: "/admin/all-taxes",
         },
-        { name: "Add Sponsorship", path: "/admin/add-sponsorship" },
+        { name: "Create tax", path: "/admin/create-tax" },
       ],
     },
     {
@@ -221,6 +221,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("active_campaigns"), path: "/admin/active-campaigns" },
         { name: t("create_new_offer"), path: "/admin/create-new-offer" },
         { name: t("coupon_analytics"), path: "/admin/coupon-analytics" },
+        {
+          name: "Sponsorships",
+          path: "/admin/sponsorships",
+        },
+        { name: "Add Sponsorship", path: "/admin/add-sponsorship" },
       ],
     },
     {

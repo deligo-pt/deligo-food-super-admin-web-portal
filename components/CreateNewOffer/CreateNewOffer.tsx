@@ -175,6 +175,9 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                                 <SelectItem value="BOGO">
                                   {t("buy_1_get_1")}
                                 </SelectItem>
+                                <SelectItem value="FREE_DELIVERY">
+                                  Free Delivery
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -356,7 +359,7 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="isAutoApply"
                     render={({ field }) => (
@@ -383,7 +386,7 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                 </div>
 
                 {/* PROMO CODE */}
@@ -397,7 +400,7 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                       <FormItem>
                         <FormControl>
                           <Input
-                            placeholder={t("enter_promo_code_optional")}
+                            placeholder={t("enter_promo_code")}
                             className="h-12 text-base uppercase"
                             {...field}
                           />
