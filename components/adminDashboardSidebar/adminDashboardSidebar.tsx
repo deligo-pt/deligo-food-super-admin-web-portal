@@ -195,7 +195,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("driver_payouts"), path: "/admin/driver-payouts" },
         { name: t("transaction_history"), path: "/admin/transaction-history" },
         { name: t("payment_disputes"), path: "/admin/payment-disputes" },
-        { name: t("tax_management"), path: "/admin/tax-management" },
         {
           name: "All Taxes",
           path: "/admin/all-taxes",
