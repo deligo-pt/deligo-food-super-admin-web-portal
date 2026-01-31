@@ -29,18 +29,16 @@ import Image from "next/image";
 
 interface IProps {
   sponsorships: TSponsorship[];
-  handleStatusInfo: (
-    sponsorshipId: string,
-    sponsorshipName: string,
-    isActive: boolean,
-  ) => void;
   handleDeleteId: (id: string) => void;
+  handleOpenViewModal: (sponsorship: TSponsorship) => void;
+  handleOpenEditModal: (sponsorship: TSponsorship) => void;
 }
 
 export default function SponsorshipTable({
   sponsorships,
-  handleStatusInfo,
   handleDeleteId,
+  handleOpenViewModal,
+  handleOpenEditModal,
 }: IProps) {
   return (
     <motion.div
@@ -65,6 +63,12 @@ export default function SponsorshipTable({
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
+                <Building2 className="w-4" />
+                Type
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
                 Status
               </div>
@@ -72,7 +76,7 @@ export default function SponsorshipTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Date
+                Period
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
@@ -96,19 +100,21 @@ export default function SponsorshipTable({
             <TableRow key={sponsorship._id}>
               <TableCell>
                 <Image
-                  src={sponsorship.banner}
-                  alt={sponsorship.name}
+                  src={sponsorship.bannerImage}
+                  alt={sponsorship.sponsorName}
                   width={50}
                   height={50}
                   className="rounded-lg w-32 h-16 object-cover"
                 />
               </TableCell>
-              <TableCell>{sponsorship.name}</TableCell>
+              <TableCell>{sponsorship.sponsorName}</TableCell>
+              <TableCell>{sponsorship.sponsorType}</TableCell>
               <TableCell>
                 {sponsorship.isActive ? "Active" : "Inactive"}
               </TableCell>
               <TableCell>
-                {format(sponsorship.createdAt, "do MMM yyyy")}
+                {format(sponsorship.startDate, "do MMM yyyy")} -{" "}
+                {format(sponsorship.endDate, "do MMM yyyy")}
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -116,32 +122,16 @@ export default function SponsorshipTable({
                     <MoreVertical className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    {sponsorship.isActive && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(
-                            sponsorship._id,
-                            sponsorship.name,
-                            false,
-                          )
-                        }
-                      >
-                        Deactivate
-                      </DropdownMenuItem>
-                    )}
-                    {!sponsorship.isActive && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(
-                            sponsorship._id,
-                            sponsorship.name,
-                            true,
-                          )
-                        }
-                      >
-                        Activate
-                      </DropdownMenuItem>
-                    )}
+                    <DropdownMenuItem
+                      onClick={() => handleOpenViewModal(sponsorship)}
+                    >
+                      View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleOpenEditModal(sponsorship)}
+                    >
+                      Edit
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => handleDeleteId(sponsorship._id)}

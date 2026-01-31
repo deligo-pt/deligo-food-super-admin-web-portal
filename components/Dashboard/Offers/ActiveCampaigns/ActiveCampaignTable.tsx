@@ -17,14 +17,7 @@ import {
 import { TOffer } from "@/types/offer.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
-import {
-  CircleCheckBig,
-  Cog,
-  IdCard,
-  Mail,
-  MoreVertical,
-  Phone,
-} from "lucide-react";
+import { CircleCheckBig, Cog, IdCard, Mail, MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface IProps {
@@ -32,7 +25,7 @@ interface IProps {
   handleStatusInfo: (
     offerId: string,
     offerName: string,
-    status: string,
+    status: boolean,
   ) => void;
   handleDeleteId: (id: string) => void;
 }
@@ -43,8 +36,6 @@ export default function CampaignTable({
   handleDeleteId,
 }: IProps) {
   const router = useRouter();
-
-  console.log(handleStatusInfo);
 
   return (
     <motion.div
@@ -58,19 +49,13 @@ export default function CampaignTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <IdCard className="w-4" />
-                Offer
+                Title
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Mail className="w-4" />
                 Type
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <Phone className="w-4" />
-                Vendor
               </div>
             </TableHead>
             <TableHead>
@@ -112,11 +97,12 @@ export default function CampaignTable({
             <TableRow key={offer._id}>
               <TableCell>{offer.title}</TableCell>
               <TableCell>{offer.offerType}</TableCell>
-              <TableCell>{offer.description}</TableCell>
               <TableCell>
-                {offer.offerType === "PERCENT" && `${offer.discountValue}%`}
-                {offer.offerType === "BOGO" && "BOGO"}
-                {offer.offerType === "FLAT" && `€${offer.discountValue}`}
+                {offer.offerType === "PERCENT"
+                  ? `${offer.discountValue}%`
+                  : offer.offerType === "FLAT"
+                    ? `€${offer.discountValue}`
+                    : "N/A"}
               </TableCell>
               <TableCell>
                 {format(offer.startDate, "yyyy-MM-dd")} to{" "}
@@ -137,6 +123,24 @@ export default function CampaignTable({
                     >
                       View
                     </DropdownMenuItem>
+                    {offer.isActive && (
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleStatusInfo(offer._id, offer.title, false)
+                        }
+                      >
+                        Deactivate
+                      </DropdownMenuItem>
+                    )}
+                    {!offer.isActive && (
+                      <DropdownMenuItem
+                        onClick={() =>
+                          handleStatusInfo(offer._id, offer.title, true)
+                        }
+                      >
+                        Activate
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => handleDeleteId(offer._id)}

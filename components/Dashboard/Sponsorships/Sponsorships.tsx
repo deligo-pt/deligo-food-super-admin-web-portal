@@ -1,15 +1,19 @@
 "use client";
 
+import EditSponsorshipModal from "@/components/Dashboard/Sponsorships/EditSponsorshipModal";
 import SponsorshipTable from "@/components/Dashboard/Sponsorships/SponsorshipTable";
+import ViewSponsorshipModal from "@/components/Dashboard/Sponsorships/ViewSponsorshipModal";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { deleteSponsorshipReq } from "@/services/dashboard/sponsorships/sponsorships";
 import { TMeta } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   sponsorshipsResult: { data: TSponsorship[]; meta?: TMeta };
@@ -44,24 +48,22 @@ const filterOptions = [
 
 export default function Sponsorships({
   sponsorshipsResult,
-  showFilters = false,
   title,
   subtitle,
 }: IProps) {
   const router = useRouter();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [statusInfo, setStatusInfo] = useState({
-    sponsorshipId: "",
-    sponsorshipName: "",
-    isActive: true,
-  });
-  const [deleteId, setDeleteId] = useState("");
 
-  const handleStatusInfo = (
-    sponsorshipId: string,
-    sponsorshipName: string,
-    isActive: boolean,
-  ) => setStatusInfo({ sponsorshipId, sponsorshipName, isActive });
+  const [deleteId, setDeleteId] = useState("");
+  const [selectedSponsorship, setSelectedSponsorship] = useState<{
+    sponsorship: TSponsorship;
+    action: "view" | "edit";
+  } | null>(null);
+
+  const handleOpenViewModal = (sponsorship: TSponsorship) =>
+    setSelectedSponsorship({ sponsorship, action: "view" });
+
+  const handleOpenEditModal = (sponsorship: TSponsorship) =>
+    setSelectedSponsorship({ sponsorship, action: "edit" });
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -72,7 +74,21 @@ export default function Sponsorships({
   const handleDeleteId = (id: string) => setDeleteId(id);
 
   const deleteSponsorship = async () => {
-    console.log("delete sponsorship", deleteId);
+    const toastId = toast.loading("Deleting Sponsorship...");
+
+    const result = await deleteSponsorshipReq(deleteId);
+
+    if (result.success) {
+      toast.success(result.message || "Sponsorship deleted successfully!", {
+        id: toastId,
+      });
+      router.refresh();
+      closeDeleteModal(false);
+      return;
+    }
+
+    toast.error(result.message || "Sponsorship delete failed", { id: toastId });
+    console.log(result);
   };
 
   return (
@@ -88,16 +104,14 @@ export default function Sponsorships({
       />
 
       {/* Filters */}
-      <AllFilters
-        sortOptions={sortOptions}
-        {...(showFilters && { filterOptions })}
-      />
+      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
       {/* Vendor Table */}
       <SponsorshipTable
         sponsorships={sponsorshipsResult?.data || []}
-        handleStatusInfo={handleStatusInfo}
         handleDeleteId={handleDeleteId}
+        handleOpenViewModal={handleOpenViewModal}
+        handleOpenEditModal={handleOpenEditModal}
       />
 
       {/* Pagination */}
@@ -111,6 +125,24 @@ export default function Sponsorships({
             totalPages={sponsorshipsResult?.meta?.totalPage as number}
           />
         </motion.div>
+      )}
+
+      {/* View Modal */}
+      {selectedSponsorship && selectedSponsorship.action === "view" && (
+        <ViewSponsorshipModal
+          open={!!selectedSponsorship}
+          onOpenChange={(open) => !open && setSelectedSponsorship(null)}
+          sponsorship={selectedSponsorship.sponsorship as TSponsorship}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {selectedSponsorship && selectedSponsorship.action === "edit" && (
+        <EditSponsorshipModal
+          open={!!selectedSponsorship}
+          onOpenChange={(open) => !open && setSelectedSponsorship(null)}
+          prevValues={selectedSponsorship.sponsorship as TSponsorship}
+        />
       )}
 
       {/* Delete Modal */}

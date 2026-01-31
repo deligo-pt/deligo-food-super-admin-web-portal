@@ -6,16 +6,16 @@ import React, { useRef, useState } from "react";
 
 interface IProps {
   value?: string;
-  onChange: (value: string) => void;
+  onChange: (file: File | undefined) => void;
   label?: string;
-  error?: string;
+  isInvalid: boolean;
 }
 
 export default function ImageUpload({
   value,
   onChange,
   label = "Banner Image",
-  error,
+  isInvalid,
 }: IProps) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,28 +34,28 @@ export default function ImageUpload({
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
-      processFile(file);
+      onChange(file);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      processFile(file);
+      onChange(file);
     }
   };
 
-  const processFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      onChange(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
+  // const processFile = (file: File) => {
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     onChange(reader.result as string);
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
 
   const clearImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange("");
+    onChange(undefined);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -74,7 +74,7 @@ export default function ImageUpload({
         onDrop={handleDrop}
         className={`
           relative group cursor-pointer overflow-hidden rounded-xl border-2 border-dashed transition-all duration-200
-          ${isDragging ? "border-brand-500 bg-brand-50" : error ? "border-red-300 bg-red-50 hover:bg-red-100/50" : "border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-brand-300"}
+          ${isDragging ? "border-brand-500 bg-brand-50" : isInvalid ? "border-red-300 bg-red-50 hover:bg-red-100/50" : "border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-brand-300"}
           ${value ? "h-48" : "h-32"}
         `}
       >
@@ -104,11 +104,14 @@ export default function ImageUpload({
                 src={value}
                 alt="Banner preview"
                 className="h-full w-full object-cover"
+                width={300}
+                height={300}
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <p className="text-white font-medium">Click to change</p>
               </div>
               <Button
+                type="button"
                 onClick={clearImage}
                 className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-gray-600 hover:text-red-500 hover:bg-white transition-colors shadow-sm"
               >
@@ -146,22 +149,6 @@ export default function ImageUpload({
           )}
         </AnimatePresence>
       </div>
-
-      {error && (
-        <motion.p
-          initial={{
-            opacity: 0,
-            y: -10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          className="mt-1.5 text-xs text-red-600 font-medium"
-        >
-          {error}
-        </motion.p>
-      )}
     </div>
   );
 }

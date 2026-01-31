@@ -1,49 +1,46 @@
 import Sponsorships from "@/components/Dashboard/Sponsorships/Sponsorships";
+import { serverRequest } from "@/lib/serverFetch";
+import { TMeta, TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
 
-const initialSponsorships: TSponsorship[] = [
-  {
-    _id: "1",
-    name: "AB Company",
-    banner: "https://images.pexels.com/photos/842519/pexels-photo-842519.jpeg",
-    isActive: true,
-    type: "ADS",
-    startDate: new Date("2026-01-25"),
-    endDate: new Date("2026-08-30"),
-    createdAt: new Date("2026-01-22"),
-    updatedAt: new Date("2026-01-22"),
-  },
-  {
-    _id: "2",
-    name: "SpyX Company",
-    banner: "https://images.pexels.com/photos/842519/pexels-photo-842519.jpeg",
-    isActive: true,
-    type: "ADS",
-    startDate: new Date("2026-01-25"),
-    endDate: new Date("2026-04-30"),
-    createdAt: new Date("2026-01-20"),
-    updatedAt: new Date("2026-01-20"),
-  },
-  {
-    _id: "3",
-    name: "XYZ Company",
-    banner: "https://images.pexels.com/photos/842519/pexels-photo-842519.jpeg",
-    isActive: false,
-    type: "ADS",
-    startDate: new Date("2026-01-01"),
-    endDate: new Date("2026-06-30"),
-    createdAt: new Date("2026-01-01"),
-    updatedAt: new Date("2026-01-01"),
-  },
-];
+type IProps = {
+  searchParams?: Promise<Record<string, string | undefined>>;
+};
 
-export default function SponsorshipPage() {
+export default async function SponsorshipPage({ searchParams }: IProps) {
+  const queries = (await searchParams) || {};
+  const limit = Number(queries?.limit || 10);
+  const page = Number(queries.page || 1);
+  const searchTerm = queries.searchTerm || "";
+  const sortBy = queries.sortBy || "-createdAt";
+  const status = queries.status || "";
+
+  const query = {
+    limit,
+    page,
+    sortBy,
+    ...(searchTerm ? { searchTerm: searchTerm } : {}),
+    ...(status ? { status: status } : {}),
+    isDeleted: false,
+  };
+
+  const initialData: { data: TSponsorship[]; meta?: TMeta } = { data: [] };
+
+  try {
+    const result = (await serverRequest.get("/sponsorships", {
+      params: query,
+    })) as TResponse<TSponsorship[]>;
+
+    if (result?.success) {
+      initialData.data = result.data;
+      initialData.meta = result.meta;
+    }
+  } catch (err) {
+    console.log("Server fetch error:", err);
+  }
   return (
     <Sponsorships
-      sponsorshipsResult={{
-        data: initialSponsorships,
-        meta: { limit: 10, page: 1, total: 3, totalPage: 1 },
-      }}
+      sponsorshipsResult={initialData}
       title="All Sponsorships"
       subtitle=" Manage all sponsorships here"
     />

@@ -5,14 +5,11 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TMeta, TResponse } from "@/types";
+import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 
 interface IProps {
   offersResult: { data: TOffer[]; meta?: TMeta };
@@ -24,44 +21,10 @@ interface IProps {
 const sortOptions = [
   { label: "Newest First", value: "-createdAt" },
   { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
 ];
 
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
-
-export default function Campaigns({
+export default function ActiveCampaigns({
   offersResult,
-  showFilters = false,
   title,
   subtitle,
 }: IProps) {
@@ -71,7 +34,7 @@ export default function Campaigns({
   const handleStatusInfo = (
     offerId: string,
     offerName: string,
-    status: string,
+    status: boolean,
   ) => {
     console.log(offerId, offerName, status);
   };
@@ -84,29 +47,7 @@ export default function Campaigns({
 
   const handleDeleteId = (id: string) => setDeleteId(id);
 
-  const handleDeleteCampaign = async () => {
-    const toastId = toast.loading("Deleting offer...");
-
-    try {
-      const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<null>;
-
-      if (result?.success) {
-        router.refresh();
-        setDeleteId("");
-        toast.success(result.message || "Campaign deleted successfully!", {
-          id: toastId,
-        });
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Campaign delete failed", {
-        id: toastId,
-      });
-    }
-  };
+  const handleDeleteCampaign = async () => {};
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-full">
@@ -114,10 +55,7 @@ export default function Campaigns({
       <TitleHeader title={title} subtitle={subtitle} />
 
       {/* Filters */}
-      <AllFilters
-        sortOptions={sortOptions}
-        {...(showFilters && { filterOptions })}
-      />
+      <AllFilters sortOptions={sortOptions} />
 
       {/* Campaign Table */}
       <CampaignTable

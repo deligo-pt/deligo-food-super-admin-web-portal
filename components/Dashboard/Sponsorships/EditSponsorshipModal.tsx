@@ -1,10 +1,16 @@
 "use client";
 
 import ImageUpload from "@/components/Dashboard/Sponsorships/ImageUpload";
-import SettingsCard from "@/components/GlobalSettings/SettingsCard";
 import SettingsInput from "@/components/GlobalSettings/SettingsInput";
 import SettingsToggle from "@/components/GlobalSettings/SettingsToggle";
-import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -24,12 +30,11 @@ import { TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { catchAsync } from "@/utils/catchAsync";
 import { getCookie } from "@/utils/cookies";
-import { postData } from "@/utils/requests";
+import { updateData } from "@/utils/requests";
 import { sponsorshipValidation } from "@/validations/sponsorship/sponsorship.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,26 +42,37 @@ import z from "zod";
 
 type TSponsorshipForm = z.infer<typeof sponsorshipValidation>;
 
-export default function AddSponsorship() {
+interface IProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  prevValues: TSponsorship;
+}
+
+export default function EditSponsorshipModal({
+  open,
+  onOpenChange,
+  prevValues,
+}: IProps) {
+  const router = useRouter();
   const form = useForm<TSponsorshipForm>({
     resolver: zodResolver(sponsorshipValidation),
     defaultValues: {
-      sponsorName: "",
-      sponsorType: "Ads",
-      startDate: new Date(),
-      endDate: new Date(),
-      isActive: true,
-      sponsorBanner: { file: null, url: "" },
+      sponsorName: prevValues?.sponsorName || "",
+      sponsorType: prevValues?.sponsorType || "Ads",
+      startDate: new Date(prevValues?.startDate) || new Date(),
+      endDate: new Date(prevValues?.endDate) || new Date(),
+      isActive: prevValues?.isActive || true,
+      sponsorBanner: { file: null, url: prevValues?.bannerImage || "" },
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sponsorBannerPreview, setSponsorBannerPreview] = useState<
     string | undefined
-  >(undefined);
+  >(prevValues?.bannerImage);
 
   const onSubmit = async (data: TSponsorshipForm) => {
     setIsSubmitting(true);
-    const toastId = toast.loading("Adding Sponsorship...");
+    const toastId = toast.loading("Updating Sponsorship...");
 
     const payload = {
       sponsorName: data.sponsorName,
@@ -73,46 +89,51 @@ export default function AddSponsorship() {
       formData.append("file", data.sponsorBanner.file as Blob);
 
     const result = await catchAsync<TSponsorship>(async () => {
-      return (await postData("/sponsorships/create-sponsorship", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${getCookie("accessToken")}`,
+      return (await updateData(
+        `/sponsorships/update-sponsorship/${prevValues._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${getCookie("accessToken")}`,
+          },
         },
-      })) as unknown as Promise<TResponse<TSponsorship>>;
+      )) as unknown as Promise<TResponse<TSponsorship>>;
     });
 
     if (result.success) {
-      toast.success(result.message || "Sponsorship added successfully!", {
+      toast.success(result.message || "Sponsorship updated successfully!", {
         id: toastId,
       });
       form.reset();
       setSponsorBannerPreview(undefined);
       setIsSubmitting(false);
+      onOpenChange(false);
+      router.refresh();
       return;
     }
 
-    toast.error(result.message || "Failed to add Sponsorship", { id: toastId });
+    toast.error(result.message || "Failed to update Sponsorship", {
+      id: toastId,
+    });
     console.log(result);
     setIsSubmitting(false);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-      {/* Header */}
-      <TitleHeader
-        title="Add Sponsorship"
-        subtitle="Add banner ads and sponsored content"
-      />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogTitle className="text-2xl font-medium">
+          Edit Sponsorship
+        </DialogTitle>
 
-      {/* Add Form */}
-      <SettingsCard
-        title="Add Sponsorship"
-        description="Create a new banner campaign"
-        icon={Plus}
-        className="sticky top-8"
-      >
+        {/* Edit Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <form
+            id="editSponsorship"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-5"
+          >
             <FormField
               control={form.control}
               name="sponsorName"
@@ -248,31 +269,31 @@ export default function AddSponsorship() {
                 </FormItem>
               )}
             />
-            <motion.button
-              whileHover={{
-                scale: 1.02,
-              }}
-              whileTap={{
-                scale: 0.98,
-              }}
-              disabled={isSubmitting}
-              className={cn(
-                "w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white bg-[#DC3173] shadow-lg transition-all",
-                isSubmitting ? "cursor-wait" : "hover:bg-[#DC3173]/90",
-              )}
-            >
-              {isSubmitting ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Plus size={20} />
-                  Create Sponsorship
-                </>
-              )}
-            </motion.button>
           </form>
         </Form>
-      </SettingsCard>
-    </div>
+
+        <DialogFooter>
+          <Button
+            disabled={isSubmitting}
+            className={cn(
+              "inline-flex items-center justify-center gap-2 text-white bg-[#DC3173]",
+              isSubmitting ? "cursor-wait" : "hover:bg-[#DC3173]/90",
+            )}
+            form="editSponsorship"
+          >
+            {isSubmitting ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              "Update"
+            )}
+          </Button>
+          <DialogClose asChild>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
