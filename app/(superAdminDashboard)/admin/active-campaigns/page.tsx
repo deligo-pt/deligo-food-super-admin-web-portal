@@ -13,13 +13,15 @@ export default async function ActiveCampaignsPage({ searchParams }: IProps) {
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const status = queries.status;
 
   const params = {
     limit,
     page,
     sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    // isActive: true,
+    ...(searchTerm ? { searchTerm } : {}),
+    ...(status ? { isActive: status === "ACTIVE" } : {}),
+    isDeleted: false,
   };
 
   const initialData: { data: TOffer[]; meta?: TMeta } = { data: [] };
@@ -28,8 +30,6 @@ export default async function ActiveCampaignsPage({ searchParams }: IProps) {
     const result = (await serverRequest.get("/offers", {
       params,
     })) as TResponse<{ data: TOffer[]; meta?: TMeta }>;
-
-    console.log(result.data);
 
     if (result?.success) {
       initialData.data = result.data.data;
@@ -42,7 +42,6 @@ export default async function ActiveCampaignsPage({ searchParams }: IProps) {
   return (
     <ActiveCampaigns
       offersResult={initialData}
-      showFilters={true}
       title="Active Campaigns"
       subtitle="Manage all offers here"
     />

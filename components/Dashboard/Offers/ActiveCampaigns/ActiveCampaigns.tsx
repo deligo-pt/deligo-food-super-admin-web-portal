@@ -1,19 +1,25 @@
 "use client";
 
 import CampaignTable from "@/components/Dashboard/Offers/ActiveCampaigns/ActiveCampaignTable";
+import EditOfferModal from "@/components/Dashboard/Offers/ActiveCampaigns/EditOfferModal";
+import OfferStatusUpdateModal from "@/components/Dashboard/Offers/ActiveCampaigns/OfferStatusUpdateModal";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import {
+  deleteOfferReq,
+  updateOfferReq,
+} from "@/services/dashboard/offers/offers";
 import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   offersResult: { data: TOffer[]; meta?: TMeta };
-  showFilters?: boolean;
   title: string;
   subtitle?: string;
 }
@@ -23,6 +29,25 @@ const sortOptions = [
   { label: "Oldest First", value: "createdAt" },
 ];
 
+const filterOptions = [
+  {
+    label: "Active Status",
+    key: "status",
+    placeholder: "Select Status",
+    type: "select",
+    items: [
+      {
+        label: "Active",
+        value: "ACTIVE",
+      },
+      {
+        label: "Inactive",
+        value: "INACTIVE",
+      },
+    ],
+  },
+];
+
 export default function ActiveCampaigns({
   offersResult,
   title,
@@ -30,13 +55,49 @@ export default function ActiveCampaigns({
 }: IProps) {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState("");
+  const [selectedOffer, setSelectedOffer] = useState<TOffer | null>(null);
+  const [statusInfo, setStatusInfo] = useState({
+    offerId: "",
+    offerName: "",
+    status: false,
+  });
 
   const handleStatusInfo = (
     offerId: string,
     offerName: string,
     status: boolean,
-  ) => {
-    console.log(offerId, offerName, status);
+  ) => setStatusInfo({ offerId, offerName, status });
+
+  const handleOpenEditModal = (offer: TOffer) => setSelectedOffer(offer);
+
+  const closeStatusUpdateModal = (open: boolean) => {
+    if (!open) {
+      setStatusInfo({
+        offerId: "",
+        offerName: "",
+        status: false,
+      });
+    }
+  };
+
+  const handleUpdateStatus = async () => {
+    const toastId = toast.loading("Updating offer...");
+
+    const result = await updateOfferReq(statusInfo.offerId, {
+      isActive: statusInfo.status,
+    });
+
+    if (result.success) {
+      toast.success(result.message || "Offer updated successfully!", {
+        id: toastId,
+      });
+      closeStatusUpdateModal(false);
+      router.refresh();
+      return;
+    }
+
+    toast.error(result.message || "Offer update failed", { id: toastId });
+    console.log(result);
   };
 
   const closeDeleteModal = (open: boolean) => {
@@ -47,7 +108,23 @@ export default function ActiveCampaigns({
 
   const handleDeleteId = (id: string) => setDeleteId(id);
 
-  const handleDeleteCampaign = async () => {};
+  const handleDeleteCampaign = async () => {
+    const toastId = toast.loading("Deleting Offer...");
+
+    const result = await deleteOfferReq(deleteId);
+
+    if (result.success) {
+      toast.success(result.message || "Offer deleted successfully!", {
+        id: toastId,
+      });
+      router.refresh();
+      closeDeleteModal(false);
+      return;
+    }
+
+    toast.error(result.message || "Offer delete failed", { id: toastId });
+    console.log(result);
+  };
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-full">
@@ -55,12 +132,13 @@ export default function ActiveCampaigns({
       <TitleHeader title={title} subtitle={subtitle} />
 
       {/* Filters */}
-      <AllFilters sortOptions={sortOptions} />
+      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
       {/* Campaign Table */}
       <CampaignTable
         offers={offersResult?.data || []}
         handleStatusInfo={handleStatusInfo}
+        handleOpenEditModal={handleOpenEditModal}
         handleDeleteId={handleDeleteId}
       />
 
@@ -75,6 +153,25 @@ export default function ActiveCampaigns({
             totalPages={offersResult?.meta?.totalPage as number}
           />
         </motion.div>
+      )}
+
+      {/* Edit Modal */}
+      {selectedOffer && (
+        <EditOfferModal
+          open={!!selectedOffer}
+          onOpenChange={(open) => !open && setSelectedOffer(null)}
+          prevValues={selectedOffer}
+        />
+      )}
+
+      {/* Status Update Modal */}
+      {statusInfo.offerId && (
+        <OfferStatusUpdateModal
+          open={!!statusInfo.offerId}
+          onOpenChange={closeStatusUpdateModal}
+          onConfirm={handleUpdateStatus}
+          statusInfo={statusInfo}
+        />
       )}
 
       {/* Delete Modal */}

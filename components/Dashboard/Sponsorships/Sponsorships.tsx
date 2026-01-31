@@ -2,7 +2,6 @@
 
 import EditSponsorshipModal from "@/components/Dashboard/Sponsorships/EditSponsorshipModal";
 import SponsorshipTable from "@/components/Dashboard/Sponsorships/SponsorshipTable";
-import ViewSponsorshipModal from "@/components/Dashboard/Sponsorships/ViewSponsorshipModal";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
@@ -54,16 +53,11 @@ export default function Sponsorships({
   const router = useRouter();
 
   const [deleteId, setDeleteId] = useState("");
-  const [selectedSponsorship, setSelectedSponsorship] = useState<{
-    sponsorship: TSponsorship;
-    action: "view" | "edit";
-  } | null>(null);
-
-  const handleOpenViewModal = (sponsorship: TSponsorship) =>
-    setSelectedSponsorship({ sponsorship, action: "view" });
+  const [selectedSponsorship, setSelectedSponsorship] =
+    useState<TSponsorship | null>(null);
 
   const handleOpenEditModal = (sponsorship: TSponsorship) =>
-    setSelectedSponsorship({ sponsorship, action: "edit" });
+    setSelectedSponsorship(sponsorship);
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -110,7 +104,6 @@ export default function Sponsorships({
       <SponsorshipTable
         sponsorships={sponsorshipsResult?.data || []}
         handleDeleteId={handleDeleteId}
-        handleOpenViewModal={handleOpenViewModal}
         handleOpenEditModal={handleOpenEditModal}
       />
 
@@ -127,21 +120,12 @@ export default function Sponsorships({
         </motion.div>
       )}
 
-      {/* View Modal */}
-      {selectedSponsorship && selectedSponsorship.action === "view" && (
-        <ViewSponsorshipModal
-          open={!!selectedSponsorship}
-          onOpenChange={(open) => !open && setSelectedSponsorship(null)}
-          sponsorship={selectedSponsorship.sponsorship as TSponsorship}
-        />
-      )}
-
       {/* Edit Modal */}
-      {selectedSponsorship && selectedSponsorship.action === "edit" && (
+      {selectedSponsorship && (
         <EditSponsorshipModal
           open={!!selectedSponsorship}
           onOpenChange={(open) => !open && setSelectedSponsorship(null)}
-          prevValues={selectedSponsorship.sponsorship as TSponsorship}
+          prevValues={selectedSponsorship}
         />
       )}
 

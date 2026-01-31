@@ -26,20 +26,21 @@ import {
   MoreVertical,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   sponsorships: TSponsorship[];
   handleDeleteId: (id: string) => void;
-  handleOpenViewModal: (sponsorship: TSponsorship) => void;
   handleOpenEditModal: (sponsorship: TSponsorship) => void;
 }
 
 export default function SponsorshipTable({
   sponsorships,
   handleDeleteId,
-  handleOpenViewModal,
   handleOpenEditModal,
 }: IProps) {
+  const router = useRouter();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -123,7 +124,9 @@ export default function SponsorshipTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      onClick={() => handleOpenViewModal(sponsorship)}
+                      onClick={() =>
+                        router.push(`/admin/sponsorships/${sponsorship._id}`)
+                      }
                     >
                       View
                     </DropdownMenuItem>

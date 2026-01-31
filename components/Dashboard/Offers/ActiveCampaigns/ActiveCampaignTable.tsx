@@ -27,12 +27,14 @@ interface IProps {
     offerName: string,
     status: boolean,
   ) => void;
+  handleOpenEditModal: (offer: TOffer) => void;
   handleDeleteId: (id: string) => void;
 }
 
 export default function CampaignTable({
   offers,
   handleStatusInfo,
+  handleOpenEditModal,
   handleDeleteId,
 }: IProps) {
   const router = useRouter();
@@ -116,12 +118,16 @@ export default function CampaignTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      className=""
                       onClick={() =>
-                        router.push("/admin/all-delivery-offers/" + offer._id)
+                        router.push("/admin/active-campaigns/" + offer._id)
                       }
                     >
                       View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleOpenEditModal(offer)}
+                    >
+                      Edit
                     </DropdownMenuItem>
                     {offer.isActive && (
                       <DropdownMenuItem

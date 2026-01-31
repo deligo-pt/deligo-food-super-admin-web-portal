@@ -38,6 +38,7 @@ export default async function SponsorshipPage({ searchParams }: IProps) {
   } catch (err) {
     console.log("Server fetch error:", err);
   }
+
   return (
     <Sponsorships
       sponsorshipsResult={initialData}
