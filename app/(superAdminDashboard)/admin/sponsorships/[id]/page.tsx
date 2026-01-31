@@ -16,8 +16,6 @@ export default async function SponsorshipDetailsPage({
       `/sponsorships/${id}`,
     )) as TResponse<TSponsorship>;
 
-    console.log(result.data);
-
     if (result?.success) {
       sponsorshipData = result.data;
     }
