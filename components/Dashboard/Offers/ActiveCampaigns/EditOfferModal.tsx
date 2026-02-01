@@ -67,7 +67,7 @@ export default function EditOfferModal({
       maxDiscountAmount: prevValues.maxDiscountAmount || 0,
       buyQty: prevValues.bogo?.buyQty || 1,
       getQty: prevValues.bogo?.getQty || 1,
-      itemId: prevValues.bogo?.itemId || "",
+      productId: prevValues.bogo?.productId || "",
       startDate: new Date(prevValues.startDate) || new Date(),
       endDate: new Date(prevValues.endDate) || new Date(),
       minOrderAmount: prevValues.minOrderAmount || 0,
@@ -90,7 +90,21 @@ export default function EditOfferModal({
     setIsSubmitting(true);
     const toastId = toast.loading("Updating offer...");
 
-    const result = await updateOfferReq(prevValues._id, data);
+    const offerData: Partial<TOffer> = {
+      ...data,
+      isAutoApply: false,
+      ...(data.offerType === "BOGO"
+        ? {
+            bogo: {
+              buyQty: data.buyQty as number,
+              getQty: data.getQty as number,
+              productId: data.productId as string,
+            },
+          }
+        : {}),
+    };
+
+    const result = await updateOfferReq(prevValues._id, offerData);
 
     if (result.success) {
       toast.success(result.message || "Offer updated successfully!", {
@@ -267,7 +281,7 @@ export default function EditOfferModal({
               {watchOfferType === "BOGO" && (
                 <FormField
                   control={form.control}
-                  name="itemId"
+                  name="productId"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>

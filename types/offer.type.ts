@@ -12,7 +12,7 @@ export type TOffer = {
   bogo?: {
     buyQty: number;
     getQty: number;
-    itemId: string;
+    productId: string;
   };
 
   // Validity period

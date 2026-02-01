@@ -24,6 +24,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { createOfferReq } from "@/services/dashboard/offers/offers";
 import { TMeta } from "@/types";
+import { TOffer } from "@/types/offer.type";
 import { TProduct } from "@/types/product.type";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,7 +54,7 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
       maxDiscountAmount: 0,
       buyQty: 1,
       getQty: 1,
-      itemId: "",
+      productId: "",
       startDate: new Date(),
       endDate: new Date(),
       minOrderAmount: 0,
@@ -70,7 +71,21 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
   const onSubmit = async (data: TOfferForm) => {
     const toastId = toast.loading("Creating offer...");
 
-    const result = await createOfferReq(data);
+    const offerData: Partial<TOffer> = {
+      ...data,
+      isAutoApply: false,
+      ...(data.offerType === "BOGO"
+        ? {
+            bogo: {
+              buyQty: data.buyQty as number,
+              getQty: data.getQty as number,
+              productId: data.productId as string,
+            },
+          }
+        : {}),
+    };
+
+    const result = await createOfferReq(offerData);
 
     if (result.success) {
       toast.success(result.message || "Offer created successfully!", {
@@ -243,7 +258,7 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                   {watchOfferType === "BOGO" && (
                     <FormField
                       control={form.control}
-                      name="itemId"
+                      name="productId"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>

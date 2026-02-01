@@ -600,7 +600,7 @@ export default function OfferDetails({ offer }: IProps) {
               </div>
             </div>
             <p className="text-sm text-slate-500 mt-4 text-center">
-              Item ID: <span className="font-mono">{offer.bogo.itemId}</span>
+              Item ID: <span className="font-mono">{offer.bogo.productId}</span>
             </p>
           </motion.div>
         )}

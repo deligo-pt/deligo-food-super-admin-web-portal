@@ -12,7 +12,7 @@ export const offerValidation = z
 
     offerType: z.enum(
       ["PERCENT", "FLAT", "FREE_DELIVERY", "BOGO"],
-      "Offer type must be one of the following: PERCENT, FLAT, FREE_DELIVERY, BOGO"
+      "Offer type must be one of the following: PERCENT, FLAT, FREE_DELIVERY, BOGO",
     ),
 
     discountValue: z
@@ -31,7 +31,7 @@ export const offerValidation = z
 
     getQty: z.number("Get quantity must be a number").optional(),
 
-    itemId: z.string().optional(),
+    productId: z.string().optional(),
 
     startDate: z.date("Start date must be a valid date"),
     endDate: z.date("End date must be a valid date"),
@@ -46,13 +46,13 @@ export const offerValidation = z
   })
   .refine(
     (data) => {
-      if (data.offerType === "BOGO" && !data.itemId) {
+      if (data.offerType === "BOGO" && !data.productId) {
         return false;
       }
       return true;
     },
     {
       message: "Item id is required",
-      path: ["itemId"],
-    }
+      path: ["productId"],
+    },
   );
