@@ -35,6 +35,7 @@ import { formatTime } from "@/utils/formatTime";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
 import {
   BadgeCheck,
   Banknote,
@@ -133,7 +134,7 @@ export default function AddVendor({
         "Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
         {
           id: toastId,
-        }
+        },
       );
 
     try {
@@ -186,30 +187,24 @@ export default function AddVendor({
 
   const verifyOtp = async () => {
     const toastId = toast.loading("Verifying OTP...");
-    try {
-      const result = await verifyOtpReq({
-        email,
-        otp,
-      });
 
-      if (result.success) {
-        toast.success(result.message || "OTP verified successfully!", {
-          id: toastId,
-        });
-        setVendorId(result.data as string);
-        setEmailVerified(true);
-        return;
-      }
+    const result = await verifyOtpReq({
+      email,
+      otp,
+    });
 
-      toast.error(result.message || "OTP verification failed", { id: toastId });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "OTP verification failed", {
+    if (result.success) {
+      toast.success(result.message || "OTP verified successfully!", {
         id: toastId,
       });
+      const decoded = jwtDecode(result.data.accessToken) as { userId: string };
+      setVendorId(decoded.userId);
+      setEmailVerified(true);
+      return;
     }
+
+    toast.error(result.message || "OTP verification failed", { id: toastId });
+    console.log(result);
   };
 
   const onSubmit = async (data: TVendorForm) => {
@@ -393,7 +388,8 @@ export default function AddVendor({
                           onClick={verifyOtp}
                           className="w-32"
                         >
-                          <BadgeCheck className="w-4 h-4 mr-2" /> {t("verify_otp")}
+                          <BadgeCheck className="w-4 h-4 mr-2" />{" "}
+                          {t("verify_otp")}
                         </Button>
                       </div>
                     </div>
@@ -477,7 +473,7 @@ export default function AddVendor({
                               onChange={(e) => {
                                 const onlyDigits = e.target.value.replace(
                                   /\D/g,
-                                  ""
+                                  "",
                                 );
                                 field.onChange(onlyDigits);
                               }}
@@ -518,7 +514,10 @@ export default function AddVendor({
                             <FormItem>
                               <FormLabel>{t("business_name")}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t('business_name')} {...field} />
+                                <Input
+                                  placeholder={t("business_name")}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -539,10 +538,14 @@ export default function AddVendor({
                                   <SelectTrigger
                                     className={cn(
                                       "w-full",
-                                      fieldState.invalid ? "border-red-500" : ""
+                                      fieldState.invalid
+                                        ? "border-red-500"
+                                        : "",
                                     )}
                                   >
-                                    <SelectValue placeholder={t("select_business_type")} />
+                                    <SelectValue
+                                      placeholder={t("select_business_type")}
+                                    />
                                   </SelectTrigger>
                                   <SelectContent>
                                     {businessCategories?.map((category) => (
@@ -566,7 +569,9 @@ export default function AddVendor({
                           name="businessLicenseNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("business_license_number")}</FormLabel>
+                              <FormLabel>
+                                {t("business_license_number")}
+                              </FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("license_number")}
@@ -676,16 +681,17 @@ export default function AddVendor({
                                         field.onChange(
                                           field.value?.includes(day)
                                             ? field.value?.filter(
-                                              (d) => d !== day
-                                            )
-                                            : [...field.value, day]
+                                                (d) => d !== day,
+                                              )
+                                            : [...field.value, day],
                                         );
                                       }}
                                       whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
-                                        ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                        : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                        }`}
+                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
+                                        field.value.includes(day)
+                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                      }`}
                                     >
                                       {day}
                                     </motion.button>
@@ -714,7 +720,8 @@ export default function AddVendor({
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <Banknote className="w-5 h-5" /> 3. {t("bank_nd_payment_information")}
+                        <Banknote className="w-5 h-5" /> 3.{" "}
+                        {t("bank_nd_payment_information")}
                       </h2>
 
                       <div className="space-y-4">
@@ -725,7 +732,10 @@ export default function AddVendor({
                             <FormItem>
                               <FormLabel>{t("bank_name")}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t("bank_name")}{...field} />
+                                <Input
+                                  placeholder={t("bank_name")}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -770,7 +780,10 @@ export default function AddVendor({
                             <FormItem>
                               <FormLabel>{t("swift_code")}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t("swift_code")} {...field} />
+                                <Input
+                                  placeholder={t("swift_code")}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -802,7 +815,8 @@ export default function AddVendor({
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <Banknote className="w-5 h-5" /> 4. {t("business_location_information")}
+                      <Banknote className="w-5 h-5" /> 4.{" "}
+                      {t("business_location_information")}
                     </h2>
 
                     <BusinessLocationMap
@@ -826,7 +840,8 @@ export default function AddVendor({
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <FileText className="w-5 h-5" /> 5. {t("documents_nd_verification")}
+                      <FileText className="w-5 h-5" /> 5.{" "}
+                      {t("documents_nd_verification")}
                     </h2>
 
                     <UploadVendorDocuments vendorId={vendorId} />

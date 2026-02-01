@@ -26,6 +26,7 @@ import { formatTime } from "@/utils/formatTime";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
 import {
   BadgeCheck,
   Banknote,
@@ -106,7 +107,7 @@ export default function AddFleetManager() {
         "Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
         {
           id: toastId,
-        }
+        },
       );
 
     try {
@@ -159,30 +160,24 @@ export default function AddFleetManager() {
 
   const verifyOtp = async () => {
     const toastId = toast.loading("Verifying OTP...");
-    try {
-      const result = await verifyOtpReq({
-        email,
-        otp,
-      });
 
-      if (result.success) {
-        toast.success(result.message || "OTP verified successfully!", {
-          id: toastId,
-        });
-        setFleetManagerId(result.data as string);
-        setEmailVerified(true);
-        return;
-      }
+    const result = await verifyOtpReq({
+      email,
+      otp,
+    });
 
-      toast.error(result.message || "OTP verification failed", { id: toastId });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "OTP verification failed", {
+    if (result.success) {
+      toast.success(result.message || "OTP verified successfully!", {
         id: toastId,
       });
+      const decoded = jwtDecode(result.data.accessToken) as { userId: string };
+      setFleetManagerId(decoded.userId);
+      setEmailVerified(true);
+      return;
     }
+
+    toast.error(result.message || "OTP verification failed", { id: toastId });
+    console.log(result);
   };
 
   const onSubmit = async (data: TFleetManagerForm) => {
@@ -217,7 +212,7 @@ export default function AddFleetManager() {
 
       const result = await updateFleetManagerDataReq(
         fleetManagerId,
-        fleetManagerData
+        fleetManagerData,
       );
 
       if (result.success) {
@@ -239,7 +234,7 @@ export default function AddFleetManager() {
         error?.response?.data?.message || "Failed to add fleet manager",
         {
           id: toastId,
-        }
+        },
       );
     }
   };
@@ -262,7 +257,8 @@ export default function AddFleetManager() {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-extrabold mb-6 flex items-center gap-3"
         >
-          <Store className="w-8 h-8 text-slate-800" /> {t("add_new_fleet_manager")}
+          <Store className="w-8 h-8 text-slate-800" />{" "}
+          {t("add_new_fleet_manager")}
         </motion.h1>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -368,7 +364,8 @@ export default function AddFleetManager() {
                           onClick={verifyOtp}
                           className="w-32"
                         >
-                          <BadgeCheck className="w-4 h-4 mr-2" /> {t("verify_otp")}
+                          <BadgeCheck className="w-4 h-4 mr-2" />{" "}
+                          {t("verify_otp")}
                         </Button>
                       </div>
                     </div>
@@ -452,7 +449,7 @@ export default function AddFleetManager() {
                               onChange={(e) => {
                                 const onlyDigits = e.target.value.replace(
                                   /\D/g,
-                                  ""
+                                  "",
                                 );
                                 field.onChange(onlyDigits);
                               }}
@@ -493,7 +490,10 @@ export default function AddFleetManager() {
                             <FormItem>
                               <FormLabel>{t("business_name")}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t('business_name')} {...field} />
+                                <Input
+                                  placeholder={t("business_name")}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -505,7 +505,9 @@ export default function AddFleetManager() {
                           name="businessLicenseNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("business_license_number")}</FormLabel>
+                              <FormLabel>
+                                {t("business_license_number")}
+                              </FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("license_number")}
@@ -534,7 +536,8 @@ export default function AddFleetManager() {
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <Banknote className="w-5 h-5" /> 3. {t("bank_nd_payment_information")}
+                        <Banknote className="w-5 h-5" /> 3.{" "}
+                        {t("bank_nd_payment_information")}
                       </h2>
 
                       <div className="space-y-4">
@@ -545,7 +548,10 @@ export default function AddFleetManager() {
                             <FormItem>
                               <FormLabel>{t("bank_name")}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t("bank_name")} {...field} />
+                                <Input
+                                  placeholder={t("bank_name")}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -590,7 +596,10 @@ export default function AddFleetManager() {
                             <FormItem>
                               <FormLabel>{t("swift_code")}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t("swift_code")} {...field} />
+                                <Input
+                                  placeholder={t("swift_code")}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -624,7 +633,8 @@ export default function AddFleetManager() {
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                       {/* <Banknote className="w-5 h-5" /> 4. Bank & Payment
                       Information */}
-                      <Banknote className="w-5 h-5" /> 4. {t("business_location_information")}
+                      <Banknote className="w-5 h-5" /> 4.{" "}
+                      {t("business_location_information")}
                     </h2>
 
                     <BusinessLocationMap
@@ -648,7 +658,8 @@ export default function AddFleetManager() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <FileText className="w-5 h-5" /> 5. {t("documents_nd_verification")}
+                      <FileText className="w-5 h-5" /> 5.{" "}
+                      {t("documents_nd_verification")}
                     </h2>
 
                     <UploadFleetManagerDocuments

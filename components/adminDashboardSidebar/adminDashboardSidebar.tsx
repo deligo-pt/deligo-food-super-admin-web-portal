@@ -128,6 +128,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/suspended-delivery-partners",
         },
         {
+          name: "Add New Delivery Partner",
+          path: "/admin/add-delivery-partner",
+        },
+        {
           name: t("delivery_partner_performance"),
           path: "/admin/delivery-partner-performance",
         },

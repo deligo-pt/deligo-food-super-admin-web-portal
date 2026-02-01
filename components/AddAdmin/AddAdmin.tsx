@@ -24,6 +24,7 @@ import { formatTime } from "@/utils/formatTime";
 import { addAdminValidation } from "@/validations/add-admin/add-admin.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
 import {
   BadgeCheck,
   CheckCircle,
@@ -95,7 +96,7 @@ export default function AddAdmin() {
         "Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
         {
           id: toastId,
-        }
+        },
       );
 
     try {
@@ -148,30 +149,24 @@ export default function AddAdmin() {
 
   const verifyOtp = async () => {
     const toastId = toast.loading("Verifying OTP...");
-    try {
-      const result = await verifyOtpReq({
-        email,
-        otp,
-      });
 
-      if (result.success) {
-        toast.success(result.message || "OTP verified successfully!", {
-          id: toastId,
-        });
-        setAdminId(result.data as string);
-        setEmailVerified(true);
-        return;
-      }
+    const result = await verifyOtpReq({
+      email,
+      otp,
+    });
 
-      toast.error(result.message || "OTP verification failed", { id: toastId });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "OTP verification failed", {
+    if (result.success) {
+      toast.success(result.message || "OTP verified successfully!", {
         id: toastId,
       });
+      const decoded = jwtDecode(result.data.accessToken) as { userId: string };
+      setAdminId(decoded.userId);
+      setEmailVerified(true);
+      return;
     }
+
+    toast.error(result.message || "OTP verification failed", { id: toastId });
+    console.log(result);
   };
 
   const onSubmit = async (data: TAdminForm) => {
@@ -424,7 +419,7 @@ export default function AddAdmin() {
                               onChange={(e) => {
                                 const onlyDigits = e.target.value.replace(
                                   /\D/g,
-                                  ""
+                                  "",
                                 );
                                 field.onChange(onlyDigits);
                               }}
