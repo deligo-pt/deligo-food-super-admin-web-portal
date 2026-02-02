@@ -80,7 +80,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
 
     try {
       const result = (await deleteDeliveryPartner(
-        partner.userId
+        partner.userId,
       )) as TResponse<null>;
 
       if (result.success) {
@@ -93,7 +93,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
       console.log(error);
       toast.error(
         error?.response?.data?.message || "Delivery Partner deletion failed",
-        { id: toastId }
+        { id: toastId },
       );
     }
   };
@@ -228,10 +228,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("email_verified")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${partner.isEmailVerified
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                      }`}
+                    className={`px-2 py-0.5 rounded text-xs ${
+                      partner.isEmailVerified
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
                   >
                     {partner.isEmailVerified ? t("yes") : t("no")}
                   </span>
@@ -251,10 +252,16 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("street")}
                 value={partner.address?.street || "N/A"}
               />
-              <InfoRow label={t("city")} value={partner.address?.city || "N/A"} />
+              <InfoRow
+                label={t("city")}
+                value={partner.address?.city || "N/A"}
+              />
             </div>
             <div>
-              <InfoRow label={t("state")} value={partner.address?.state || "N/A"} />
+              <InfoRow
+                label={t("state")}
+                value={partner.address?.state || "N/A"}
+              />
               <InfoRow
                 label={t("country")}
                 value={partner.address?.country || "N/A"}
@@ -351,10 +358,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("criminal_record_certification")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${partner.criminalRecord?.certificate
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-800"
-                      }`}
+                    className={`px-2 py-0.5 rounded text-xs ${
+                      partner.criminalRecord?.certificate
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
                   >
                     {partner.criminalRecord?.certificate
                       ? t("provided")
@@ -367,63 +375,82 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         </Section>
         <Section title={t("documents")} icon={<FileText />}>
           <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6">
-            {partner.documents?.idDocumentFront && (
-              <div>
-                <div className="mb-2 text-gray-500 text-sm">{t("id_proof_front")}</div>
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">
+                {t("id_proof_front")}
+              </div>
+              {partner.documents?.idDocumentFront ? (
                 <ImagePreview
                   url={partner.documents.idDocumentFront}
                   alt="ID Proof Front"
                 />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">
+                {t("id_proof_back")}
               </div>
-            )}
-            {partner.documents?.idDocumentBack && (
-              <div>
-                <div className="mb-2 text-gray-500 text-sm">{t("id_proof_back")}</div>
+              {partner.documents?.idDocumentBack ? (
                 <ImagePreview
                   url={partner.documents.idDocumentBack}
                   alt="ID Proof Back"
                 />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">
+                {t("driving_license")}
               </div>
-            )}
-            {partner.documents?.drivingLicense && (
-              <div>
-                <div className="mb-2 text-gray-500 text-sm">
-                  {t("driving_license")}
-                </div>
+              {partner.documents?.drivingLicense ? (
                 <ImagePreview
                   url={partner.documents.drivingLicense}
                   alt="Driving License"
                 />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">
+                {t("vehicle_registration")}
               </div>
-            )}
-            {partner.documents?.vehicleRegistration && (
-              <div>
-                <div className="mb-2 text-gray-500 text-sm">
-                  {t("vehicle_registration")}
-                </div>
+              {partner.documents?.vehicleRegistration ? (
                 <ImagePreview
                   url={partner.documents.vehicleRegistration}
                   alt="Vehicle Registration"
                 />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">
+                {t("criminal_record_certificate")}
               </div>
-            )}
-            {partner.documents?.criminalRecordCertificate && (
-              <div>
-                <div className="mb-2 text-gray-500 text-sm">
-                  {t("criminal_record_certificate")}
-                </div>
+              {partner.documents?.criminalRecordCertificate ? (
                 <ImagePreview
                   url={partner.documents.criminalRecordCertificate}
                   alt="Criminal Record"
                 />
-              </div>
-            )}
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
           </div>
         </Section>
         <Section title={t("operational_date")} icon={<Package />}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-              <div className="text-gray-500 text-xs mb-1">{t("total_deliveries")}</div>
+              <div className="text-gray-500 text-xs mb-1">
+                {t("total_deliveries")}
+              </div>
               <div className="text-2xl font-bold text-gray-900">
                 {partner.operationalData?.totalDeliveries || 0}
               </div>
@@ -447,7 +474,8 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 <Star className="w-4 h-4 ml-1" fill="currentColor" />
               </div>
               <div className="text-xs text-gray-500">
-                {partner.operationalData?.rating?.totalReviews || 0} {t("reviews")}
+                {partner.operationalData?.rating?.totalReviews || 0}{" "}
+                {t("reviews")}
               </div>
             </div>
           </div>
@@ -519,30 +547,37 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.isothermalBag
-                      ? "bg-[#DC3173]"
-                      : "bg-gray-300"
-                      }`}
+                    className={`w-4 h-4 rounded-full ${
+                      partner.workPreferences?.hasEquipment?.isothermalBag
+                        ? "bg-[#DC3173]"
+                        : "bg-gray-300"
+                    }`}
                   ></div>
-                  <span className="text-sm text-gray-700">{t("isothermal_bag")}</span>
+                  <span className="text-sm text-gray-700">
+                    {t("isothermal_bag")}
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.helmet
-                      ? "bg-[#DC3173]"
-                      : "bg-gray-300"
-                      }`}
+                    className={`w-4 h-4 rounded-full ${
+                      partner.workPreferences?.hasEquipment?.helmet
+                        ? "bg-[#DC3173]"
+                        : "bg-gray-300"
+                    }`}
                   ></div>
                   <span className="text-sm text-gray-700">{t("helmet")}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.powerBank
-                      ? "bg-[#DC3173]"
-                      : "bg-gray-300"
-                      }`}
+                    className={`w-4 h-4 rounded-full ${
+                      partner.workPreferences?.hasEquipment?.powerBank
+                        ? "bg-[#DC3173]"
+                        : "bg-gray-300"
+                    }`}
                   ></div>
-                  <span className="text-sm text-gray-700">{t("power_bank")}</span>
+                  <span className="text-sm text-gray-700">
+                    {t("power_bank")}
+                  </span>
                 </div>
               </div>
             </div>

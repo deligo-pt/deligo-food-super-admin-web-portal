@@ -1,32 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useMemo, useState, useCallback, useEffect, JSX } from "react";
 import { motion } from "framer-motion";
-import {
-  Truck,
-  Search,
-  DownloadCloud,
-  ChevronLeft,
-  ChevronRight,
+import { ChevronLeft, ChevronRight, DownloadCloud, Search } from "lucide-react";
+import React, { JSX, useCallback, useEffect, useMemo, useState } from "react";
 
-} from "lucide-react";
-
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import {
-  ResponsiveContainer,
-  AreaChart,
   Area,
+  AreaChart,
+  Bar,
+  CartesianGrid,
+  Cell,
+  Pie,
+  BarChart as ReBarChart,
+  PieChart as RePieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  CartesianGrid,
-  BarChart as ReBarChart,
-  Bar,
-  PieChart as RePieChart,
-  Pie,
-  Cell,
 } from "recharts";
-import { useTranslation } from "@/hooks/use-translation";
 
 /**
  * Drivers Performance Report - White background version (single-file)
@@ -96,11 +89,31 @@ const ISSUE_DATA = [
 ];
 
 // ----------------- UI PRIMITIVES -----------------
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`bg-white border border-gray-200 shadow-sm rounded-2xl p-5 ${className}`}>{children}</div>;
+function Card({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`bg-white border border-gray-200 shadow-sm rounded-2xl p-5 ${className}`}
+    >
+      {children}
+    </div>
+  );
 }
 
-function Metric({ label, value, sub }: { label: string; value: React.ReactNode; sub?: React.ReactNode }) {
+function Metric({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: React.ReactNode;
+  sub?: React.ReactNode;
+}) {
   return (
     <div>
       <p className="text-xs text-gray-500">{label}</p>
@@ -113,15 +126,15 @@ function Metric({ label, value, sub }: { label: string; value: React.ReactNode; 
 }
 
 // small status pill for generic reuse
-function StatusPill({ status }: { status: string }) {
-  const cls =
-    status === "Completed"
-      ? "bg-green-100 text-green-700"
-      : status === "Canceled"
-        ? "bg-red-100 text-red-700"
-        : "bg-yellow-100 text-yellow-700";
-  return <span className={`px-2 py-1 rounded-full text-xs ${cls}`}>{status}</span>;
-}
+// function StatusPill({ status }: { status: string }) {
+//   const cls =
+//     status === "Completed"
+//       ? "bg-green-100 text-green-700"
+//       : status === "Canceled"
+//         ? "bg-red-100 text-red-700"
+//         : "bg-yellow-100 text-yellow-700";
+//   return <span className={`px-2 py-1 rounded-full text-xs ${cls}`}>{status}</span>;
+// }
 
 // ----------------- MAIN PAGE -----------------
 export default function DriversPerformanceReport(): JSX.Element {
@@ -132,7 +145,10 @@ export default function DriversPerformanceReport(): JSX.Element {
   const PAGE = 6;
 
   // zones list
-  const zones = useMemo(() => Array.from(new Set(SAMPLE_DRIVERS.map((d) => d.zone))), []);
+  const zones = useMemo(
+    () => Array.from(new Set(SAMPLE_DRIVERS.map((d) => d.zone))),
+    [],
+  );
 
   // filtered drivers
   const filtered = useMemo(() => {
@@ -146,26 +162,57 @@ export default function DriversPerformanceReport(): JSX.Element {
 
   // paging
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE));
-  const paged = useMemo(() => filtered.slice((page - 1) * PAGE, page * PAGE), [filtered, page]);
+  const paged = useMemo(
+    () => filtered.slice((page - 1) * PAGE, page * PAGE),
+    [filtered, page],
+  );
 
   // leaderboard: score-based
   const leaderboard = useMemo(() => {
     return [...SAMPLE_DRIVERS]
       .map((d) => ({
         ...d,
-        score: +(d.rating * 20 + (100 - d.avgDeliveryMin) + d.acceptRate / 2 - d.lateDeliveries * 5).toFixed(1),
+        score: +(
+          d.rating * 20 +
+          (100 - d.avgDeliveryMin) +
+          d.acceptRate / 2 -
+          d.lateDeliveries * 5
+        ).toFixed(1),
       }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 6);
   }, []);
 
   // KPIs
-  const totalDeliveries = useMemo(() => SAMPLE_DRIVERS.reduce((s, d) => s + d.deliveries, 0), []);
-  const avgRating = useMemo(() => +(SAMPLE_DRIVERS.reduce((s, d) => s + d.rating, 0) / SAMPLE_DRIVERS.length).toFixed(2), []);
-  const avgDelivery = useMemo(() => +(SAMPLE_DRIVERS.reduce((s, d) => s + d.avgDeliveryMin, 0) / SAMPLE_DRIVERS.length).toFixed(1), []);
+  const totalDeliveries = useMemo(
+    () => SAMPLE_DRIVERS.reduce((s, d) => s + d.deliveries, 0),
+    [],
+  );
+  const avgRating = useMemo(
+    () =>
+      +(
+        SAMPLE_DRIVERS.reduce((s, d) => s + d.rating, 0) / SAMPLE_DRIVERS.length
+      ).toFixed(2),
+    [],
+  );
+  const avgDelivery = useMemo(
+    () =>
+      +(
+        SAMPLE_DRIVERS.reduce((s, d) => s + d.avgDeliveryMin, 0) /
+        SAMPLE_DRIVERS.length
+      ).toFixed(1),
+    [],
+  );
 
   // charts: zone and revenue-by-day like data
-  const zoneChart = useMemo(() => zones.map((z) => ({ name: z, value: filtered.filter((o) => o.zone === z).length })), [zones, filtered]);
+  const zoneChart = useMemo(
+    () =>
+      zones.map((z) => ({
+        name: z,
+        value: filtered.filter((o) => o.zone === z).length,
+      })),
+    [zones, filtered],
+  );
 
   /*  const revenueByDay = useMemo(() => {
      const map: Record<string, number> = {};
@@ -177,9 +224,15 @@ export default function DriversPerformanceReport(): JSX.Element {
 
   // CSV export
   const exportCSV = useCallback(() => {
-    const header = "id,name,deliveries,acceptRate,avgDeliveryMin,rating,lateDeliveries,zone";
-    const rows = SAMPLE_DRIVERS.map((d) => `${d.id},${d.name},${d.deliveries},${d.acceptRate},${d.avgDeliveryMin},${d.rating},${d.lateDeliveries},${d.zone}`);
-    const blob = new Blob([header + "\n" + rows.join("\n")], { type: "text/csv" });
+    const header =
+      "id,name,deliveries,acceptRate,avgDeliveryMin,rating,lateDeliveries,zone";
+    const rows = SAMPLE_DRIVERS.map(
+      (d) =>
+        `${d.id},${d.name},${d.deliveries},${d.acceptRate},${d.avgDeliveryMin},${d.rating},${d.lateDeliveries},${d.zone}`,
+    );
+    const blob = new Blob([header + "\n" + rows.join("\n")], {
+      type: "text/csv",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -193,7 +246,6 @@ export default function DriversPerformanceReport(): JSX.Element {
     Promise.resolve().then(() => setPage(1));
   }, [query, zoneFilter]);
 
-
   // animation variants (framer-motion)
   /*   const barVariants = {
       hidden: { width: 0 },
@@ -204,59 +256,67 @@ export default function DriversPerformanceReport(): JSX.Element {
     <div className="min-h-screen p-6 md:p-10 bg-gray-50 text-gray-900">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-              <span className="inline-flex items-center justify-center rounded-full w-10 h-10 bg-[linear-gradient(90deg,#ff6584,#dc3173)] shadow text-white">
-                <Truck className="w-5 h-5" />
-              </span>
-              {t("drivers_performance")}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">{t("performance_score_deliveries_ratings")}</p>
+        <TitleHeader
+          title={t("drivers_performance")}
+          subtitle={t("performance_score_deliveries_ratings")}
+        />
+        <div className="flex items-center gap-3 mb-6">
+          <div className="hidden md:flex items-center bg-white border px-3 py-2 rounded-xl shadow-sm">
+            <Search className="w-4 h-4 text-gray-400" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("search_drivers")}
+              className="ml-2 bg-transparent outline-none text-sm"
+            />
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center bg-white border px-3 py-2 rounded-xl shadow-sm">
-              <Search className="w-4 h-4 text-gray-400" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("search_drivers")}
-                className="ml-2 bg-transparent outline-none text-sm"
-              />
-            </div>
+          <select
+            value={zoneFilter}
+            onChange={(e) => setZoneFilter(e.target.value)}
+            className="px-3 py-2 rounded-xl border bg-white text-sm"
+          >
+            <option value="All">{t("all_zones")}</option>
+            {zones.map((z) => (
+              <option key={z} value={z}>
+                {z}
+              </option>
+            ))}
+          </select>
 
-            <select
-              value={zoneFilter}
-              onChange={(e) => setZoneFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl border bg-white text-sm"
-            >
-              <option value="All">{t("all_zones")}</option>
-              {zones.map((z) => (
-                <option key={z} value={z}>
-                  {z}
-                </option>
-              ))}
-            </select>
-
-            <button onClick={exportCSV} className="px-4 py-2 rounded-xl text-white shadow" style={{ background: PRIMARY }}>
-              <DownloadCloud className="w-4 h-4 inline mr-1" /> {t("export")}
-            </button>
-          </div>
-        </header>
+          <button
+            onClick={exportCSV}
+            className="px-4 py-2 rounded-xl text-white shadow"
+            style={{ background: PRIMARY }}
+          >
+            <DownloadCloud className="w-4 h-4 inline mr-1" /> {t("export")}
+          </button>
+        </div>
 
         {/* KPI Cards */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
-            <Metric label={t("total_deliveries")} value={totalDeliveries} sub="Last 30 days" />
+            <Metric
+              label={t("total_deliveries")}
+              value={totalDeliveries}
+              sub="Last 30 days"
+            />
           </Card>
 
           <Card>
-            <Metric label={t("average_rating")} value={`${avgRating}/5`} sub="Customer reviews" />
+            <Metric
+              label={t("average_rating")}
+              value={`${avgRating}/5`}
+              sub="Customer reviews"
+            />
           </Card>
 
           <Card>
-            <Metric label={t("avg_delivery_time")} value={`${avgDelivery} min`} sub="Across drivers" />
+            <Metric
+              label={t("avg_delivery_time")}
+              value={`${avgDelivery} min`}
+              sub="Across drivers"
+            />
           </Card>
 
           <Card>
@@ -281,9 +341,19 @@ export default function DriversPerformanceReport(): JSX.Element {
               <div style={{ width: 140, height: 140 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <RePieChart>
-                    <Pie data={ISSUE_DATA} dataKey="value" nameKey="name" outerRadius={60} innerRadius={30} label>
+                    <Pie
+                      data={ISSUE_DATA}
+                      dataKey="value"
+                      nameKey="name"
+                      outerRadius={60}
+                      innerRadius={30}
+                      label
+                    >
                       {ISSUE_DATA.map((entry, i) => (
-                        <Cell key={i} fill={ISSUE_COLORS[i % ISSUE_COLORS.length]} />
+                        <Cell
+                          key={i}
+                          fill={ISSUE_COLORS[i % ISSUE_COLORS.length]}
+                        />
                       ))}
                     </Pie>
                   </RePieChart>
@@ -292,16 +362,29 @@ export default function DriversPerformanceReport(): JSX.Element {
 
               <div className="flex-1">
                 {ISSUE_DATA.map((it) => (
-                  <div key={it.name} className="flex items-center justify-between text-sm mb-2">
+                  <div
+                    key={it.name}
+                    className="flex items-center justify-between text-sm mb-2"
+                  >
                     <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full" style={{ background: ISSUE_COLORS[ISSUE_DATA.indexOf(it) % ISSUE_COLORS.length] }} />
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          background:
+                            ISSUE_COLORS[
+                              ISSUE_DATA.indexOf(it) % ISSUE_COLORS.length
+                            ],
+                        }}
+                      />
                       <span className="text-sm">{it.name}</span>
                     </div>
                     <div className="text-sm text-gray-600">{it.value}</div>
                   </div>
                 ))}
                 <div className="mt-3">
-                  <button className="w-full px-3 py-2 rounded-lg bg-white border text-sm">{t("open_quality_panel")}</button>
+                  <button className="w-full px-3 py-2 rounded-lg bg-white border text-sm">
+                    {t("open_quality_panel")}
+                  </button>
                 </div>
               </div>
             </div>
@@ -340,14 +423,23 @@ export default function DriversPerformanceReport(): JSX.Element {
                   <defs>
                     <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
                       <stop offset="5%" stopColor={PRIMARY} stopOpacity={0.6} />
-                      <stop offset="95%" stopColor={PRIMARY} stopOpacity={0.05} />
+                      <stop
+                        offset="95%"
+                        stopColor={PRIMARY}
+                        stopOpacity={0.05}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip />
-                  <Area type="monotone" dataKey="avgMin" stroke={PRIMARY} fill="url(#g1)" />
+                  <Area
+                    type="monotone"
+                    dataKey="avgMin"
+                    stroke={PRIMARY}
+                    fill="url(#g1)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -362,8 +454,12 @@ export default function DriversPerformanceReport(): JSX.Element {
               <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-semibold">{t("drivers")}</h3>
                 <div className="flex items-center gap-3">
-                  <div className="text-sm text-gray-600">{t("showing")} {filtered.length} {t("drivers_sm")}</div>
-                  <div className="text-xs text-gray-500">Page {page} / {totalPages}</div>
+                  <div className="text-sm text-gray-600">
+                    {t("showing")} {filtered.length} {t("drivers_sm")}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Page {page} / {totalPages}
+                  </div>
                 </div>
               </div>
 
@@ -396,8 +492,12 @@ export default function DriversPerformanceReport(): JSX.Element {
                         <td className="p-3">{d.zone}</td>
                         <td className="p-3">
                           <div className="flex items-center gap-2">
-                            <button className="px-2 py-1 rounded bg-white border text-sm">{t("profile")}</button>
-                            <button className="px-2 py-1 rounded bg-white border text-sm">{t("details")}</button>
+                            <button className="px-2 py-1 rounded bg-white border text-sm">
+                              {t("profile")}
+                            </button>
+                            <button className="px-2 py-1 rounded bg-white border text-sm">
+                              {t("details")}
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -405,7 +505,10 @@ export default function DriversPerformanceReport(): JSX.Element {
 
                     {paged.length === 0 && (
                       <tr>
-                        <td colSpan={8} className="p-6 text-center text-gray-500">
+                        <td
+                          colSpan={8}
+                          className="p-6 text-center text-gray-500"
+                        >
                           {t("no_drivers_found")}
                         </td>
                       </tr>
@@ -416,14 +519,25 @@ export default function DriversPerformanceReport(): JSX.Element {
 
               <div className="p-4 flex items-center justify-between border-t border-gray-100">
                 <div className="text-xs text-gray-600">
-                  {t("showing")} {Math.min((page - 1) * PAGE + 1, filtered.length)} - {Math.min(page * PAGE, filtered.length)} {t("of")} {filtered.length}
+                  {t("showing")}{" "}
+                  {Math.min((page - 1) * PAGE + 1, filtered.length)} -{" "}
+                  {Math.min(page * PAGE, filtered.length)} {t("of")}{" "}
+                  {filtered.length}
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-2 rounded bg-white border">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="px-3 py-2 rounded bg-white border"
+                  >
                     <ChevronLeft />
                   </button>
-                  <div className="px-3 py-1 bg-white border rounded text-sm">{page} / {totalPages}</div>
-                  <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} className="px-3 py-2 rounded bg-white border">
+                  <div className="px-3 py-1 bg-white border rounded text-sm">
+                    {page} / {totalPages}
+                  </div>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="px-3 py-2 rounded bg-white border"
+                  >
                     <ChevronRight />
                   </button>
                 </div>
@@ -453,7 +567,9 @@ export default function DriversPerformanceReport(): JSX.Element {
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="text-sm font-medium">{d.name}</div>
-                            <div className="text-xs text-gray-500">{d.zone} • {d.deliveries} {t("deliveries_sm")}</div>
+                            <div className="text-xs text-gray-500">
+                              {d.zone} • {d.deliveries} {t("deliveries_sm")}
+                            </div>
                           </div>
 
                           <div className="text-sm font-semibold">{d.score}</div>
@@ -462,7 +578,9 @@ export default function DriversPerformanceReport(): JSX.Element {
                         <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
                           <motion.div
                             className="h-2 rounded-full"
-                            style={{ background: `linear-gradient(90deg, ${PRIMARY}, ${ACCENT})` }}
+                            style={{
+                              background: `linear-gradient(90deg, ${PRIMARY}, ${ACCENT})`,
+                            }}
                             initial={{ width: 0 }}
                             animate={{ width: `${percent}%` }}
                             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -484,7 +602,10 @@ export default function DriversPerformanceReport(): JSX.Element {
 
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} className={`p-2 rounded text-center ${i % 3 === 0 ? "bg-yellow-50" : "bg-gray-50"}`}>
+                    <div
+                      key={i}
+                      className={`p-2 rounded text-center ${i % 3 === 0 ? "bg-yellow-50" : "bg-gray-50"}`}
+                    >
                       {8 + i}:00 - {8 + i + 1}:00
                     </div>
                   ))}
@@ -497,8 +618,12 @@ export default function DriversPerformanceReport(): JSX.Element {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <button className="w-full px-3 py-2 rounded bg-white border">{t("message_low_rated_drivers")}</button>
-                  <button className="w-full px-3 py-2 rounded bg-white border">{t("open_quality_panel")}</button>
+                  <button className="w-full px-3 py-2 rounded bg-white border">
+                    {t("message_low_rated_drivers")}
+                  </button>
+                  <button className="w-full px-3 py-2 rounded bg-white border">
+                    {t("open_quality_panel")}
+                  </button>
                 </div>
               </Card>
             </div>
@@ -508,5 +633,3 @@ export default function DriversPerformanceReport(): JSX.Element {
     </div>
   );
 }
-
-

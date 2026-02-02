@@ -79,12 +79,6 @@ export const deliveryPartnerValidation = z
       .min(1, "Postal code must be at least 1 characters")
       .max(10, "Postal code must be at most 10 characters"),
 
-    state: z
-      .string()
-      .nonempty("State is required")
-      .min(2, "State must be at least 2 characters")
-      .max(50, "State must be at most 50 characters"),
-
     country: z
       .string()
       .nonempty("Country is required")

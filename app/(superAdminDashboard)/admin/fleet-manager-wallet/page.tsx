@@ -1,46 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+"use client";
 
-'use client';
-
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "@/hooks/use-translation";
+import { motion } from "framer-motion";
 import {
-  Wallet,
-  TrendingUp,
   ArrowDownCircle,
   ArrowUpCircle,
-  Search,
-  Filter,
   Download,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useTranslation } from '@/hooks/use-translation';
+  Filter,
+  Search,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
-const DELIGO = '#DC3173';
+const DELIGO = "#DC3173";
 
 // ---------------------- Types ----------------------
 type Transaction = {
   id: string;
-  type: 'credit' | 'debit';
+  type: "credit" | "debit";
   amount: number;
   date: string;
   fleetManager: string;
   reason: string;
   status: "pending" | "completed" | "failed" | "success" | "rejected";
-  method: 'bank_transfer' | 'wallet_adjustment' | 'bonus' | 'deduction';
+  method: "bank_transfer" | "wallet_adjustment" | "bonus" | "deduction";
 };
 
 export default function FleetManagerWalletPage() {
   const { t } = useTranslation();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [query, setQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterType, setFilterType] = useState('all');
+  const [query, setQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterType, setFilterType] = useState("all");
 
   useEffect(() => {
     Promise.resolve().then(() => {
@@ -48,27 +48,40 @@ export default function FleetManagerWalletPage() {
     });
   }, []);
 
-
   const filtered = transactions.filter((t) => {
-    const matchesQuery = [t.fleetManager, t.id, t.reason].join(' ').toLowerCase().includes(query.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || t.status === filterStatus;
-    const matchesType = filterType === 'all' || t.type === filterType;
+    const matchesQuery = [t.fleetManager, t.id, t.reason]
+      .join(" ")
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    const matchesStatus = filterStatus === "all" || t.status === filterStatus;
+    const matchesType = filterType === "all" || t.type === filterType;
     return matchesQuery && matchesStatus && matchesType;
   });
 
-  const totalBalance = filtered.reduce((s, t) => s + (t.type === 'credit' ? t.amount : -t.amount), 0);
+  const totalBalance = filtered.reduce(
+    (s, t) => s + (t.type === "credit" ? t.amount : -t.amount),
+    0,
+  );
 
   return (
     <div className="min-h-screen p-6 bg-slate-50">
-      <motion.h1 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <Wallet className="w-8 h-8" style={{ color: DELIGO }} /> {t("fleet_manager_wallet")}
-      </motion.h1>
+      <TitleHeader
+        title={t("fleet_manager_wallet")}
+        subtitle="Manage fleet manager wallets"
+      />
 
       {/* Search + Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <Input placeholder={t("search_fleet_manager_id_reason")} value={query} onChange={(e) => setQuery(e.target.value)} className="max-w-xs" />
+        <Input
+          placeholder={t("search_fleet_manager_id_reason")}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="max-w-xs"
+        />
 
-        <Button style={{ background: DELIGO }}><Search className="w-4 h-4" /></Button>
+        <Button style={{ background: DELIGO }}>
+          <Search className="w-4 h-4" />
+        </Button>
 
         {/* Filter by status */}
         <select
@@ -108,22 +121,27 @@ export default function FleetManagerWalletPage() {
 
         <SummaryCard
           title={t("total_credit")}
-          value={`€ ${filtered.filter((t) => t.type === 'credit').reduce((s, t) => s + t.amount, 0).toLocaleString()}`}
+          value={`€ ${filtered
+            .filter((t) => t.type === "credit")
+            .reduce((s, t) => s + t.amount, 0)
+            .toLocaleString()}`}
           icon={<TrendingUp className="w-6 h-6 text-green-600" />}
         />
 
         <SummaryCard
           title={t("total_debit")}
-          value={`€ ${filtered.filter((t) => t.type === 'debit').reduce((s, t) => s + t.amount, 0).toLocaleString()}`}
+          value={`€ ${filtered
+            .filter((t) => t.type === "debit")
+            .reduce((s, t) => s + t.amount, 0)
+            .toLocaleString()}`}
           icon={<TrendingUp className="w-6 h-6 text-red-600" />}
         />
 
         <SummaryCard
           title={t("pending_transactions")}
-          value={`${filtered.filter((t) => t.status === 'pending').length}`}
+          value={`${filtered.filter((t) => t.status === "pending").length}`}
           icon={<Filter className="w-6 h-6" style={{ color: DELIGO }} />}
         />
-
       </div>
 
       {/* Transactions */}
@@ -133,9 +151,13 @@ export default function FleetManagerWalletPage() {
 
         <div className="space-y-4">
           {filtered.map((trx) => (
-            <motion.div key={trx.id} whileHover={{ scale: 1.01 }} className="p-4 bg-slate-50 rounded-xl border flex items-center justify-between">
+            <motion.div
+              key={trx.id}
+              whileHover={{ scale: 1.01 }}
+              className="p-4 bg-slate-50 rounded-xl border flex items-center justify-between"
+            >
               <div className="flex items-center gap-4">
-                {trx.type === 'credit' ? (
+                {trx.type === "credit" ? (
                   <ArrowUpCircle className="w-7 h-7 text-green-600" />
                 ) : (
                   <ArrowDownCircle className="w-7 h-7 text-red-600" />
@@ -152,11 +174,18 @@ export default function FleetManagerWalletPage() {
               </div>
 
               <div className="text-right">
-                <div className={`text-lg font-bold ${trx.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                  {trx.type === 'credit' ? '+' : '-'} € {trx.amount.toLocaleString()}
+                <div
+                  className={`text-lg font-bold ${trx.type === "credit" ? "text-green-600" : "text-red-600"}`}
+                >
+                  {trx.type === "credit" ? "+" : "-"} €{" "}
+                  {trx.amount.toLocaleString()}
                 </div>
-                <div className="text-xs text-slate-500">{new Date(trx.date).toLocaleString()}</div>
-                <div className="text-xs text-slate-400 italic">{t("method")}: {trx.method}</div>
+                <div className="text-xs text-slate-500">
+                  {new Date(trx.date).toLocaleString()}
+                </div>
+                <div className="text-xs text-slate-400 italic">
+                  {t("method")}: {trx.method}
+                </div>
               </div>
             </motion.div>
           ))}
@@ -179,15 +208,34 @@ function SummaryCard({ title, value, icon }: any) {
 }
 
 function badgeVariant(status: string) {
-  return status === 'completed' ? 'default' : status === 'pending' ? 'secondary' : 'destructive';
+  return status === "completed"
+    ? "default"
+    : status === "pending"
+      ? "secondary"
+      : "destructive";
 }
 
 // ---------------------- Mock Wallet Data ----------------------
 function mockWallet(): Transaction[] {
-  const statuses = ['completed', 'pending', 'failed'] as const;
-  const managers = ['João Silva', 'Maria Fernandes', 'Rui Costa', 'Ana Pereira'] as const;
-  const reasons = ['Weekly Bonus', 'Penalty Deduction', 'Fuel Compensation', 'Payout Adjustment'] as const;
-  const methods = ['bank_transfer', 'wallet_adjustment', 'bonus', 'deduction'] as const;
+  const statuses = ["completed", "pending", "failed"] as const;
+  const managers = [
+    "João Silva",
+    "Maria Fernandes",
+    "Rui Costa",
+    "Ana Pereira",
+  ] as const;
+  const reasons = [
+    "Weekly Bonus",
+    "Penalty Deduction",
+    "Fuel Compensation",
+    "Payout Adjustment",
+  ] as const;
+  const methods = [
+    "bank_transfer",
+    "wallet_adjustment",
+    "bonus",
+    "deduction",
+  ] as const;
 
   return Array.from({ length: 20 }).map((_, i) => ({
     id: `TRX-${2000 + i}`,

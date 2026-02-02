@@ -2,6 +2,7 @@
 
 import UploadFleetManagerDocuments from "@/components/AddFleetManager/UploadFleetManagerDocuments";
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -35,7 +36,6 @@ import {
   EyeOff,
   FileText,
   Mail,
-  Store,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -252,14 +252,10 @@ export default function AddFleetManager() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="min-h-screen p-6 bg-slate-50"
       >
-        <motion.h1
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-extrabold mb-6 flex items-center gap-3"
-        >
-          <Store className="w-8 h-8 text-slate-800" />{" "}
-          {t("add_new_fleet_manager")}
-        </motion.h1>
+        <TitleHeader
+          title={t("add_new_fleet_manager")}
+          subtitle="Add a new fleet manager here"
+        />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Left Section - Registration Data */}

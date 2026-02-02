@@ -1,6 +1,8 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
+import UploadPartnerDocuments from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -21,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approveOrReject";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
@@ -40,10 +43,11 @@ import {
   Eye,
   EyeOff,
   Mail,
-  Truck,
+  PlusIcon,
+  XIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { toast } from "sonner";
@@ -52,6 +56,30 @@ import z from "zod";
 const DELIGO = "#DC3173";
 
 type TDeliveryPartnerForm = z.infer<typeof deliveryPartnerValidation>;
+
+const permitTypes = [
+  "D2 Visa",
+  "D4 Student Visa",
+  "Temporary Residence",
+  "Permanent Residence",
+  "EU Citizen",
+  "Other",
+];
+
+const equipment = [
+  {
+    id: "isothermalBag",
+    label: "Isothermal Bag",
+  },
+  {
+    id: "helmet",
+    label: "Helmet",
+  },
+  {
+    id: "powerBank",
+    label: "Power Bank",
+  },
+];
 
 function isValidEmail(email: string) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -73,6 +101,7 @@ export default function AddDeliveryPartner() {
   const [password, setPassword] = useState("");
   const [partnerId, setPartnerId] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [zone, setZone] = useState("");
   const [timer, setTimer] = useState(300);
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
@@ -96,7 +125,6 @@ export default function AddDeliveryPartner() {
       street: "",
       city: "",
       postalCode: "",
-      state: "",
       country: "",
       vehicleType: "SCOOTER",
       brand: "",
@@ -124,6 +152,26 @@ export default function AddDeliveryPartner() {
       issueDate: "",
     },
   });
+
+  const [watchZones] = useWatch({
+    control: form.control,
+    name: ["preferredZones"],
+  });
+
+  const addZone = () => {
+    if (zone && !form?.getValues("preferredZones")?.includes(zone)) {
+      const newZones = [...form?.getValues("preferredZones"), zone];
+      form.setValue("preferredZones", newZones);
+    }
+    setZone("");
+  };
+
+  const removeZone = (zoneToRemove: string) => {
+    const newZones = form
+      ?.getValues("preferredZones")
+      ?.filter((t) => t !== zoneToRemove);
+    form.setValue("preferredZones", newZones);
+  };
 
   const sendOtp = async () => {
     if (!email || !password) return;
@@ -196,6 +244,8 @@ export default function AddDeliveryPartner() {
       const decoded = jwtDecode(result.data.accessToken) as { userId: string };
       setPartnerId(decoded.userId);
       setEmailVerified(true);
+      setOtpSent(false);
+      setOtp("");
       return;
     }
 
@@ -216,7 +266,6 @@ export default function AddDeliveryPartner() {
         street: data.street,
         city: data.city,
         postalCode: data.postalCode,
-        state: data.state,
         country: data.country,
         latitude: locationCoordinates.latitude,
         longitude: locationCoordinates.longitude,
@@ -225,30 +274,30 @@ export default function AddDeliveryPartner() {
         dateOfBirth: new Date(data.dateOfBirth),
         gender: data.gender,
         nationality: data.nationality,
-        nifNumber: data.nifNumber,
-        citizenCardNumber: data.citizenCardNumber,
-        passportNumber: data.passportNumber,
+        nifNumber: data.nifNumber?.toUpperCase(),
+        citizenCardNumber: data.citizenCardNumber?.toUpperCase(),
+        passportNumber: data.passportNumber?.toUpperCase(),
         idExpiryDate: new Date(data.idExpiryDate),
       },
       legalStatus: {
-        residencePermitType: z.string().optional(),
-        residencePermitNumber: z.string().optional(),
-        residencePermitExpiry: z.string().optional(),
+        residencePermitType: data.residencePermitType,
+        residencePermitNumber: data.residencePermitNumber?.toUpperCase(),
+        residencePermitExpiry: new Date(data.residencePermitExpiry),
       },
       bankDetails: {
         bankName: data.bankName,
         accountHolderName: data.accountHolderName,
-        iban: data.iban,
-        swiftCode: data.swiftCode,
+        iban: data.iban?.toUpperCase(),
+        swiftCode: data.swiftCode?.toUpperCase(),
       },
       vehicleInfo: {
         vehicleType: data.vehicleType,
         brand: data.brand,
         model: data.model,
-        licensePlate: data.licensePlate,
-        drivingLicenseNumber: data.drivingLicenseNumber,
+        licensePlate: data.licensePlate?.toUpperCase(),
+        drivingLicenseNumber: data.drivingLicenseNumber?.toUpperCase(),
         drivingLicenseExpiry: data.drivingLicenseExpiry,
-        insurancePolicyNumber: data.insurancePolicyNumber,
+        insurancePolicyNumber: data.insurancePolicyNumber?.toUpperCase(),
         insuranceExpiry: new Date(data.insuranceExpiry),
       },
       criminalRecord: {
@@ -280,6 +329,8 @@ export default function AddDeliveryPartner() {
       });
       if (approveResult.success) {
         form.reset();
+        setPartnerId("");
+        setEmailVerified(false);
         toast.success(
           result.message || "Delivery partner added successfully!",
           {
@@ -288,6 +339,7 @@ export default function AddDeliveryPartner() {
         );
         return;
       }
+
       toast.error(approveResult.message || "Delivery partner approved failed", {
         id: toastId,
       });
@@ -313,13 +365,10 @@ export default function AddDeliveryPartner() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="min-h-screen p-6 bg-slate-50"
       >
-        <motion.h1
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-extrabold mb-6 flex items-center gap-3"
-        >
-          <Truck className="w-8 h-8 text-slate-800" /> Add New Delivery Partner
-        </motion.h1>
+        <TitleHeader
+          title="Add New Delivery Partner"
+          subtitle="Create a new delivery partner with the form below"
+        />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Left Section*/}
@@ -568,7 +617,7 @@ export default function AddDeliveryPartner() {
                                   onValueChange={field.onChange}
                                   defaultValue={field.value}
                                 >
-                                  <SelectTrigger>
+                                  <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select a Gender" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -607,7 +656,7 @@ export default function AddDeliveryPartner() {
                               <FormLabel>NIF Number</FormLabel>
                               <FormControl>
                                 <Input
-                                  className="uppercase"
+                                  className="uppercase placeholder:capitalize"
                                   placeholder="NIF Number"
                                   {...field}
                                 />
@@ -625,7 +674,7 @@ export default function AddDeliveryPartner() {
                               <FormLabel>Citizen Card Number</FormLabel>
                               <FormControl>
                                 <Input
-                                  className="uppercase"
+                                  className="uppercase placeholder:capitalize"
                                   placeholder="Citizen Card Number"
                                   {...field}
                                 />
@@ -643,7 +692,7 @@ export default function AddDeliveryPartner() {
                               <FormLabel>Passport Number</FormLabel>
                               <FormControl>
                                 <Input
-                                  className="uppercase"
+                                  className="uppercase placeholder:capitalize"
                                   placeholder="Passport Number"
                                   {...field}
                                 />
@@ -753,7 +802,11 @@ export default function AddDeliveryPartner() {
                             <FormItem>
                               <FormLabel>{t("iban")}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t("iban")} {...field} />
+                                <Input
+                                  className="uppercase placeholder:capitalize"
+                                  placeholder={t("iban")}
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -768,6 +821,7 @@ export default function AddDeliveryPartner() {
                               <FormLabel>{t("swift_code")}</FormLabel>
                               <FormControl>
                                 <Input
+                                  className="uppercase placeholder:capitalize"
                                   placeholder={t("swift_code")}
                                   {...field}
                                 />
@@ -812,10 +866,21 @@ export default function AddDeliveryPartner() {
                           <FormItem>
                             <FormLabel>Residence Permit Type</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="Residence Permit Type"
-                                {...field}
-                              />
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select a permit type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {permitTypes.map((type) => (
+                                    <SelectItem key={type} value={type}>
+                                      {type}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -830,7 +895,7 @@ export default function AddDeliveryPartner() {
                             <FormLabel>Residence Permit Number</FormLabel>
                             <FormControl>
                               <Input
-                                className="uppercase"
+                                className="uppercase placeholder:capitalize"
                                 placeholder="Residence Permit Number"
                                 {...field}
                               />
@@ -885,7 +950,7 @@ export default function AddDeliveryPartner() {
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger className="w-full">
                                   <SelectValue placeholder="Select a vehicle type" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -900,7 +965,8 @@ export default function AddDeliveryPartner() {
                                       key={vehicleType}
                                       value={vehicleType}
                                     >
-                                      {vehicleType}
+                                      {vehicleType[0] +
+                                        vehicleType.slice(1).toLowerCase()}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -947,7 +1013,7 @@ export default function AddDeliveryPartner() {
                             <FormLabel>License Plate</FormLabel>
                             <FormControl>
                               <Input
-                                className="uppercase"
+                                className="uppercase placeholder:capitalize"
                                 placeholder="License Plate"
                                 {...field}
                               />
@@ -965,7 +1031,7 @@ export default function AddDeliveryPartner() {
                             <FormLabel>Driving License Number</FormLabel>
                             <FormControl>
                               <Input
-                                className="uppercase"
+                                className="uppercase placeholder:capitalize"
                                 placeholder="Driving License Number"
                                 {...field}
                               />
@@ -997,7 +1063,7 @@ export default function AddDeliveryPartner() {
                             <FormLabel>Insurance Policy Number</FormLabel>
                             <FormControl>
                               <Input
-                                className="uppercase"
+                                className="uppercase placeholder:capitalize"
                                 placeholder="Insurance Policy Number"
                                 {...field}
                               />
@@ -1050,14 +1116,19 @@ export default function AddDeliveryPartner() {
                               Have Criminal Record Certificate?
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                type="checkbox"
-                                placeholder="Residence Permit Type"
-                                checked={field.value}
-                                onChange={(e) =>
-                                  field.onChange(e.target.checked)
-                                }
-                              />
+                              <FormLabel
+                                htmlFor="haveCriminalRecordCertificate"
+                                className="text-sm text-gray-700 flex items-center"
+                              >
+                                <Input
+                                  type="checkbox"
+                                  id="haveCriminalRecordCertificate"
+                                  checked={!!field.value}
+                                  onChange={field.onChange}
+                                  className="h-4 w-4"
+                                />
+                                Yes
+                              </FormLabel>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1098,17 +1169,175 @@ export default function AddDeliveryPartner() {
                     </h2>
 
                     <div className="space-y-4 items-start">
+                      <div className="space-y-2">
+                        <Label className="">Preferred Working Zones</Label>
+                        {watchZones?.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-1">
+                            {watchZones?.map((zone) => (
+                              <motion.div
+                                key={zone}
+                                initial={{
+                                  scale: 0,
+                                }}
+                                animate={{
+                                  scale: 1,
+                                }}
+                                className="flex items-center bg-[#DC3173] bg-opacity-10 text-white px-3 py-1 rounded-full"
+                              >
+                                <span>{zone}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeZone(zone)}
+                                  className="ml-2 text-white hover:text-[#CCC]"
+                                >
+                                  <XIcon className="h-4 w-4" />
+                                </button>
+                              </motion.div>
+                            ))}
+                          </div>
+                        )}
+                        <FormField
+                          control={form.control}
+                          name="preferredZones"
+                          render={() => (
+                            <FormItem className="gap-1">
+                              <FormControl>
+                                <div className="relative">
+                                  <Input
+                                    type="text"
+                                    value={zone}
+                                    onChange={(e) => setZone(e.target.value)}
+                                    placeholder="Add a zone"
+                                    onKeyUp={(e) => {
+                                      if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        addZone();
+                                      }
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={addZone}
+                                    className="bg-[#DC3173] text-white px-4 py-2 rounded-e-md hover:bg-[#B02458] transition-colors absolute top-0 right-0 h-full"
+                                  >
+                                    <PlusIcon className="h-5 w-5" />
+                                  </button>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
                       <FormField
                         control={form.control}
-                        name="residencePermitType"
+                        name="preferredHours"
+                        render={({ field, fieldState }) => (
+                          <FormItem>
+                            <FormLabel>Preferred Working Hours</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={(value) =>
+                                  field.onChange([value])
+                                }
+                                value={field.value?.[0]}
+                              >
+                                <SelectTrigger
+                                  className={cn(
+                                    "w-full ",
+                                    fieldState.invalid
+                                      ? "border-red-500"
+                                      : "border-gray-300",
+                                  )}
+                                >
+                                  <SelectValue placeholder="Select Preferred Hours" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="morning">
+                                    Morning (8AM-12PM)
+                                  </SelectItem>
+                                  <SelectItem value="afternoon">
+                                    Afternoon (12PM-6PM)
+                                  </SelectItem>
+                                  <SelectItem value="evening">
+                                    Evening (6PM-10PM)
+                                  </SelectItem>
+                                  <SelectItem value="night">
+                                    Night (10PM-12AM)
+                                  </SelectItem>
+                                  <SelectItem value="fullday">
+                                    Full Day
+                                  </SelectItem>
+                                  <SelectItem value="flexible">
+                                    Flexible
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-4 items-start">
+                        <Label className="">Delivery equipments</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {equipment.map((item) => (
+                            <FormField
+                              key={item.id}
+                              control={form.control}
+                              name={
+                                item.id as
+                                  | "isothermalBag"
+                                  | "helmet"
+                                  | "powerBank"
+                              }
+                              render={({ field }) => (
+                                <FormItem className="content-start">
+                                  <FormControl>
+                                    <FormLabel
+                                      htmlFor={item.id}
+                                      className="text-sm text-gray-700 flex items-center"
+                                    >
+                                      <Input
+                                        type="checkbox"
+                                        id={item.id}
+                                        checked={!!field.value}
+                                        onChange={field.onChange}
+                                        className="h-4 w-4"
+                                      />
+                                      {item.label}
+                                    </FormLabel>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="workedWithOtherPlatform"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Type</FormLabel>
+                            <FormLabel>Worked With Other Platforms</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="Residence Permit Type"
-                                {...field}
-                              />
+                              <FormLabel
+                                htmlFor="workedWithOtherPlatform"
+                                className="text-sm text-gray-700 flex items-center"
+                              >
+                                <Input
+                                  type="checkbox"
+                                  id="workedWithOtherPlatform"
+                                  checked={!!field.value}
+                                  onChange={field.onChange}
+                                  className="h-4 w-4"
+                                />
+                                Yes
+                              </FormLabel>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1117,30 +1346,17 @@ export default function AddDeliveryPartner() {
 
                       <FormField
                         control={form.control}
-                        name="residencePermitNumber"
+                        name="otherPlatformName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Number</FormLabel>
+                            <FormLabel>
+                              Other Platform Name (If Applicable)
+                            </FormLabel>
                             <FormControl>
                               <Input
-                                className="uppercase"
-                                placeholder="Residence Permit Number"
+                                placeholder="Other Platform Name"
                                 {...field}
                               />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="residencePermitExpiry"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Residence Permit Expiry</FormLabel>
-                            <FormControl>
-                              <Input type="date" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1167,7 +1383,7 @@ export default function AddDeliveryPartner() {
                       9. {t("documents_nd_verification")}
                     </h2>
 
-                    {/* <UploadPartnerDocuments partnerId={partnerId} /> */}
+                    <UploadPartnerDocuments partnerId={partnerId} />
                   </Card>
                 </motion.div>
               </div>

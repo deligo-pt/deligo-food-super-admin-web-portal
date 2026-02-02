@@ -2,6 +2,7 @@
 
 import { ColorPicker } from "@/components/ColorPicker/ColorPicker";
 import { FileUpload } from "@/components/FileUpload/FileUpload";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/use-translation";
@@ -24,28 +25,11 @@ export function BrandingTheme() {
 
   return (
     <div className="space-y-8 p-4 md:p-6">
-      <div className="mb-8">
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: -10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
-        >
-          <h1 className="text-2xl font-bold text-[#DC3173]">
-            {t("branding_and_theme")}
-          </h1>
-          <p className="text-gray-500 mt-1">
-            {t("manage_logos_colors_typography")}
-          </p>
-        </motion.div>
-      </div>
+      <TitleHeader
+        title={t("branding_and_theme")}
+        subtitle={t("manage_logos_colors_typography")}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Settings */}
         <div className="lg:col-span-2 space-y-8">
@@ -62,8 +46,14 @@ export function BrandingTheme() {
 
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FileUpload label={t("main_logo_light_mode")} accept="image/*" />
-                  <FileUpload label={t("main_logo_dark_mode")} accept="image/*" />
+                  <FileUpload
+                    label={t("main_logo_light_mode")}
+                    accept="image/*"
+                  />
+                  <FileUpload
+                    label={t("main_logo_dark_mode")}
+                    accept="image/*"
+                  />
                 </div>
 
                 <FileUpload
@@ -94,12 +84,12 @@ export function BrandingTheme() {
                 <ColorPicker
                   label={t("success_color")}
                   color="#10B981"
-                  onChange={() => { }}
+                  onChange={() => {}}
                 />
                 <ColorPicker
                   label={t("error_color")}
                   color="#EF4444"
-                  onChange={() => { }}
+                  onChange={() => {}}
                 />
               </div>
             </CardContent>
@@ -146,7 +136,7 @@ export function BrandingTheme() {
                       fontFamily: font,
                     }}
                   >
-                   {t("abcdef")}
+                    {t("abcdef")}
                   </p>
                 </div>
               </div>

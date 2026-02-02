@@ -1,41 +1,57 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
-import { motion } from "framer-motion";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@/components/ui/table";
+import { useEffect, useMemo, useState } from "react";
 
 // charts
 import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  BarChart,
-  Bar,
-  AreaChart,
   Area,
-  PieChart,
-  Pie,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
   Cell,
   Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 
-import { Download, TrendingUp } from "lucide-react";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
+import { Download } from "lucide-react";
 
 const DELIGO = "#DC3173";
 
 // ---------------------- Types ----------------------
-type DailyPoint = { date: string; deliveries: number; earnings: number; avgTime: number };
+type DailyPoint = {
+  date: string;
+  deliveries: number;
+  earnings: number;
+  avgTime: number;
+};
 type Rider = {
   id: string;
   name: string;
@@ -66,20 +82,29 @@ export default function FleetPerformancePage() {
   const [drillRider, setDrillRider] = useState<Rider | null>(null);
 
   // heatmap data state
-  const [heatmapData, setHeatmapData] = useState<Array<{ hour: number; count: number }>>([]);
+  const [heatmapData, setHeatmapData] = useState<
+    Array<{ hour: number; count: number }>
+  >([]);
 
   // load mock data
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDaily(mockDaily(30));
     setRiders(mockRiders(12));
-    setHeatmapData(Array.from({ length: 24 }).map((_, hour) => ({
-      hour,
-      count: Math.floor(Math.random() * 80),
-    })));
+    setHeatmapData(
+      Array.from({ length: 24 }).map((_, hour) => ({
+        hour,
+        count: Math.floor(Math.random() * 80),
+      })),
+    );
   }, []);
 
   // selected date range computed
-  const [rangeState, setRangeState] = useState<{ startDate: Date; endDate: Date; dailyFiltered: DailyPoint[] }>({
+  const [rangeState, setRangeState] = useState<{
+    startDate: Date;
+    endDate: Date;
+    dailyFiltered: DailyPoint[];
+  }>({
     startDate: new Date(),
     endDate: new Date(),
     dailyFiltered: daily,
@@ -96,17 +121,27 @@ export default function FleetPerformancePage() {
     } else if (range === "30") {
       start = new Date(now - 29 * 24 * 3600 * 1000);
     } else {
-      start = customStart ? new Date(customStart) : new Date(now - 29 * 24 * 3600 * 1000);
+      start = customStart
+        ? new Date(customStart)
+        : new Date(now - 29 * 24 * 3600 * 1000);
       end = customEnd ? new Date(customEnd) : new Date();
     }
     // normalize end to end of day
-    end = new Date(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59);
+    end = new Date(
+      end.getFullYear(),
+      end.getMonth(),
+      end.getDate(),
+      23,
+      59,
+      59,
+    );
 
     const filtered = daily.filter((d) => {
       const dt = new Date(d.date);
       return dt >= start && dt <= end;
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRangeState({ startDate: start, endDate: end, dailyFiltered: filtered });
   }, [range, customStart, customEnd, daily]);
 
@@ -114,11 +149,24 @@ export default function FleetPerformancePage() {
   const kpis = useMemo(() => {
     const totalDeliveries = dailyFiltered.reduce((s, d) => s + d.deliveries, 0);
     const totalEarnings = dailyFiltered.reduce((s, d) => s + d.earnings, 0);
-    const avgTime = dailyFiltered.length ? Math.round(dailyFiltered.reduce((s, d) => s + d.avgTime, 0) / dailyFiltered.length) : 0;
+    const avgTime = dailyFiltered.length
+      ? Math.round(
+          dailyFiltered.reduce((s, d) => s + d.avgTime, 0) /
+            dailyFiltered.length,
+        )
+      : 0;
 
     // compute on-time % roughly from riders
-    const onTimePct = riders.length ? Math.round(riders.reduce((s, r) => s + r.onTimePct, 0) / riders.length) : 0;
-    const cancelRate = riders.length ? Number((riders.reduce((s, r) => s + r.cancelRate, 0) / riders.length).toFixed(1)) : 0;
+    const onTimePct = riders.length
+      ? Math.round(riders.reduce((s, r) => s + r.onTimePct, 0) / riders.length)
+      : 0;
+    const cancelRate = riders.length
+      ? Number(
+          (
+            riders.reduce((s, r) => s + r.cancelRate, 0) / riders.length
+          ).toFixed(1),
+        )
+      : 0;
 
     return {
       totalDeliveries,
@@ -130,13 +178,25 @@ export default function FleetPerformancePage() {
   }, [dailyFiltered, riders]);
 
   // leaderboard sorted
-  const leaderboard = useMemo(() => [...riders].sort((a, b) => b.deliveries - a.deliveries), [riders]);
+  const leaderboard = useMemo(
+    () => [...riders].sort((a, b) => b.deliveries - a.deliveries),
+    [riders],
+  );
 
   // export CSV
   function exportCSV() {
     const rows = [["date", "deliveries", "earnings", "avgTime"]];
-    dailyFiltered.forEach((d) => rows.push([d.date, String(d.deliveries), String(d.earnings), String(d.avgTime)]));
-    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    dailyFiltered.forEach((d) =>
+      rows.push([
+        d.date,
+        String(d.deliveries),
+        String(d.earnings),
+        String(d.avgTime),
+      ]),
+    );
+    const csv = rows
+      .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -154,40 +214,77 @@ export default function FleetPerformancePage() {
 
   return (
     <div className="min-h-screen p-6 bg-slate-50">
-      <motion.h1 initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-extrabold mb-6 flex items-center gap-3">
-        <TrendingUp className="w-8 h-8" /> {t("fleet_performance")}
-      </motion.h1>
+      <TitleHeader
+        title={t("fleet_performance")}
+        subtitle="Performance analytics for fleet manager"
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex items-center gap-2">
-          <Button size="sm" variant={range === "7" ? "default" : "ghost" as any} onClick={() => setRange("7")}>{t("last_7_days")}</Button>
-          <Button size="sm" variant={range === "30" ? "default" : "ghost" as any} onClick={() => setRange("30")}>{t("last_30_days")}</Button>
-          <Button size="sm" variant={range === "custom" ? "default" : "ghost" as any} onClick={() => setRange("custom")}>{t("custom")}</Button>
+          <Button
+            size="sm"
+            variant={range === "7" ? "default" : ("ghost" as any)}
+            onClick={() => setRange("7")}
+          >
+            {t("last_7_days")}
+          </Button>
+          <Button
+            size="sm"
+            variant={range === "30" ? "default" : ("ghost" as any)}
+            onClick={() => setRange("30")}
+          >
+            {t("last_30_days")}
+          </Button>
+          <Button
+            size="sm"
+            variant={range === "custom" ? "default" : ("ghost" as any)}
+            onClick={() => setRange("custom")}
+          >
+            {t("custom")}
+          </Button>
         </div>
 
         {range === "custom" && (
           <div className="flex items-center gap-2">
-            <Input type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} />
-            <Input type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} />
+            <Input
+              type="date"
+              value={customStart}
+              onChange={(e) => setCustomStart(e.target.value)}
+            />
+            <Input
+              type="date"
+              value={customEnd}
+              onChange={(e) => setCustomEnd(e.target.value)}
+            />
           </div>
         )}
 
-        <select className="px-3 py-2 border rounded-md bg-white" value={selectedZone} onChange={(e) => setSelectedZone(e.target.value)}>
-          <option value="all">{t('all_zones')}</option>
+        <select
+          className="px-3 py-2 border rounded-md bg-white"
+          value={selectedZone}
+          onChange={(e) => setSelectedZone(e.target.value)}
+        >
+          <option value="all">{t("all_zones")}</option>
           <option value="Lisbon Central">Lisbon Central</option>
           <option value="Porto Downtown">Porto Downtown</option>
           <option value="Braga West">Braga West</option>
         </select>
 
-        <select className="px-3 py-2 border rounded-md bg-white" value={selectedManager} onChange={(e) => setSelectedManager(e.target.value)}>
+        <select
+          className="px-3 py-2 border rounded-md bg-white"
+          value={selectedManager}
+          onChange={(e) => setSelectedManager(e.target.value)}
+        >
           <option value="all">{t("all_managers")}</option>
           <option value="João Silva">João Silva</option>
           <option value="Maria Fernandes">Maria Fernandes</option>
         </select>
 
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="outline" onClick={exportCSV}><Download className="w-4 h-4" /> {t("export_csv")}</Button>
+          <Button variant="outline" onClick={exportCSV}>
+            <Download className="w-4 h-4" /> {t("export_csv")}
+          </Button>
         </div>
       </div>
 
@@ -195,14 +292,22 @@ export default function FleetPerformancePage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <Card className="p-5">
           <p className="text-xs text-slate-500">{t("total_deliveries")}</p>
-          <h3 className="text-2xl font-bold mt-1">{kpis.totalDeliveries.toLocaleString()}</h3>
-          <p className="text-xs text-slate-500 mt-1">{kpis.totalEarnings.toLocaleString()} € {t("earnings")}</p>
+          <h3 className="text-2xl font-bold mt-1">
+            {kpis.totalDeliveries.toLocaleString()}
+          </h3>
+          <p className="text-xs text-slate-500 mt-1">
+            {kpis.totalEarnings.toLocaleString()} € {t("earnings")}
+          </p>
         </Card>
 
         <Card className="p-5">
           <p className="text-xs text-slate-500">{t("avg_delivery_time")}</p>
-          <h3 className="text-2xl font-bold mt-1">{kpis.avgTime} {t("min")}</h3>
-          <p className="text-xs text-slate-500 mt-1">{t("on_time")} {kpis.onTimePct}%</p>
+          <h3 className="text-2xl font-bold mt-1">
+            {kpis.avgTime} {t("min")}
+          </h3>
+          <p className="text-xs text-slate-500 mt-1">
+            {t("on_time")} {kpis.onTimePct}%
+          </p>
         </Card>
 
         <Card className="p-5">
@@ -214,37 +319,69 @@ export default function FleetPerformancePage() {
         <Card className="p-5">
           <p className="text-xs text-slate-500">{t("active_riders")}</p>
           <h3 className="text-2xl font-bold mt-1">{riders.length}</h3>
-          <p className="text-xs text-slate-500 mt-1">{t("average_rating")} {avgRating(riders)}</p>
+          <p className="text-xs text-slate-500 mt-1">
+            {t("average_rating")} {avgRating(riders)}
+          </p>
         </Card>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-4 h-80 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">{t("deliveries_nd_earnings_trend")}</h4>
+          <h4 className="font-semibold mb-2">
+            {t("deliveries_nd_earnings_trend")}
+          </h4>
           <ResponsiveContainer width="100%" height="85%">
-            <LineChart data={dailyFiltered} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <LineChart
+              data={dailyFiltered}
+              margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis yAxisId="left" />
               <YAxis yAxisId="right" orientation="right" />
               <Tooltip />
               <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="deliveries" stroke={DELIGO} strokeWidth={2} dot={false} />
-              <Line yAxisId="right" type="monotone" dataKey="earnings" stroke="#2563EB" strokeWidth={2} dot={false} />
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="deliveries"
+                stroke={DELIGO}
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="earnings"
+                stroke="#2563EB"
+                strokeWidth={2}
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </Card>
 
         <Card className="p-4 h-80 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">{t("earnings_area_last_period")}</h4>
+          <h4 className="font-semibold mb-2">
+            {t("earnings_area_last_period")}
+          </h4>
           <ResponsiveContainer width="100%" height="85%">
-            <AreaChart data={dailyFiltered} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <AreaChart
+              data={dailyFiltered}
+              margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Area type="monotone" dataKey="earnings" stroke="#10B981" fill="#10B981" fillOpacity={0.12} />
+              <Area
+                type="monotone"
+                dataKey="earnings"
+                stroke="#10B981"
+                fill="#10B981"
+                fillOpacity={0.12}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </Card>
@@ -252,19 +389,33 @@ export default function FleetPerformancePage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
         <Card className="p-4 bg-white shadow-sm">
-          <h4 className="font-semibold mb-2">{t("rider_performance")} {t("top_5")}</h4>
+          <h4 className="font-semibold mb-2">
+            {t("rider_performance")} {t("top_5")}
+          </h4>
           <div className="space-y-2">
             {leaderboard.slice(0, 5).map((r) => (
-              <div key={r.id} className="flex items-center justify-between p-2 rounded-md bg-slate-50">
+              <div
+                key={r.id}
+                className="flex items-center justify-between p-2 rounded-md bg-slate-50"
+              >
                 <div>
                   <div className="font-medium">{r.name}</div>
-                  <div className="text-xs text-slate-500">{t("deliveries")}: {r.deliveries} • {t("on_time")} {r.onTimePct}%</div>
+                  <div className="text-xs text-slate-500">
+                    {t("deliveries")}: {r.deliveries} • {t("on_time")}{" "}
+                    {r.onTimePct}%
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-semibold">{r.rating} ⭐</div>
                   <div className="text-xs">€ {r.earnings}</div>
                   <div>
-                    <Button size="sm" variant="ghost" onClick={() => openRiderDrill(r)}>{t("view")}</Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => openRiderDrill(r)}
+                    >
+                      {t("view")}
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -275,7 +426,10 @@ export default function FleetPerformancePage() {
         <Card className="p-4 bg-white shadow-sm">
           <h4 className="font-semibold mb-2">{t("rider_comparison")}</h4>
           <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={leaderboard.slice(0, 6)} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
+            <BarChart
+              data={leaderboard.slice(0, 6)}
+              margin={{ top: 5, right: 5, left: -10, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
@@ -289,9 +443,19 @@ export default function FleetPerformancePage() {
           <h4 className="font-semibold mb-2">{t("order_type_distribution")}</h4>
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>
-              <Pie data={mockOrderTypes()} dataKey="value" nameKey="name" innerRadius={40} outerRadius={60} label>
+              <Pie
+                data={mockOrderTypes()}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={40}
+                outerRadius={60}
+                label
+              >
                 {mockOrderTypes().map((entry, idx) => (
-                  <Cell key={`cell-${idx}`} fill={['#60A5FA', '#F97316', DELIGO, '#34D399'][idx % 4]} />
+                  <Cell
+                    key={`cell-${idx}`}
+                    fill={["#60A5FA", "#F97316", DELIGO, "#34D399"][idx % 4]}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -308,7 +472,13 @@ export default function FleetPerformancePage() {
             const intensity = Math.min(1, count / 80);
             const bg = `rgba(220,49,115,${0.08 + intensity * 0.7})`;
             return (
-              <div key={hour} className="p-3 text-center rounded" style={{ background: bg }}>{hour}:00</div>
+              <div
+                key={hour}
+                className="p-3 text-center rounded"
+                style={{ background: bg }}
+              >
+                {hour}:00
+              </div>
             );
           })}
         </div>
@@ -316,26 +486,43 @@ export default function FleetPerformancePage() {
 
       {/* Leaderboard Table */}
       <Card className="p-6 bg-white shadow-sm rounded-2xl">
-        <h4 className="font-semibold text-xl mb-4">{t("fleet_manager_performance")}</h4>
+        <h4 className="font-semibold text-xl mb-4">
+          {t("fleet_manager_performance")}
+        </h4>
 
         <Table className="table-fixed w-full">
           <TableHead>
             <TableRow className="bg-slate-100/70">
-              <TableCell className="w-12 text-center font-semibold">#</TableCell>
-              <TableCell className="w-56 font-semibold">{t("manager")}</TableCell>
-              <TableCell className="w-24 text-center font-semibold">{t("deliveries")}</TableCell>
-              <TableCell className="w-32 text-center font-semibold">{t("on_time")}</TableCell>
-              <TableCell className="w-28 text-center font-semibold">{t("avg_time")}</TableCell>
-              <TableCell className="w-28 text-center font-semibold">{t("cencel")} %</TableCell>
-              <TableCell className="w-32 text-center font-semibold">{t("earnings")}</TableCell>
-              <TableCell className="w-24 text-right font-semibold">{t("actions")}</TableCell>
+              <TableCell className="w-12 text-center font-semibold">
+                #
+              </TableCell>
+              <TableCell className="w-56 font-semibold">
+                {t("manager")}
+              </TableCell>
+              <TableCell className="w-24 text-center font-semibold">
+                {t("deliveries")}
+              </TableCell>
+              <TableCell className="w-32 text-center font-semibold">
+                {t("on_time")}
+              </TableCell>
+              <TableCell className="w-28 text-center font-semibold">
+                {t("avg_time")}
+              </TableCell>
+              <TableCell className="w-28 text-center font-semibold">
+                {t("cencel")} %
+              </TableCell>
+              <TableCell className="w-32 text-center font-semibold">
+                {t("earnings")}
+              </TableCell>
+              <TableCell className="w-24 text-right font-semibold">
+                {t("actions")}
+              </TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {leaderboard.map((r, idx) => (
               <TableRow key={r.id} className="hover:bg-slate-50">
-
                 {/* Index */}
                 <TableCell className="text-center">{idx + 1}</TableCell>
 
@@ -343,17 +530,24 @@ export default function FleetPerformancePage() {
                 <TableCell className="text-left">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-linear-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center font-semibold">
-                      {r.name.split(" ").map((n) => n[0]).join("")}
+                      {r.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </div>
                     <div>
                       <p className="font-medium text-slate-800">{r.name}</p>
-                      <p className="text-xs text-slate-500">{t("rating")}: {r.rating} ⭐</p>
+                      <p className="text-xs text-slate-500">
+                        {t("rating")}: {r.rating} ⭐
+                      </p>
                     </div>
                   </div>
                 </TableCell>
 
                 {/* Deliveries */}
-                <TableCell className="text-center font-semibold">{r.deliveries}</TableCell>
+                <TableCell className="text-center font-semibold">
+                  {r.deliveries}
+                </TableCell>
 
                 {/* On-time */}
                 <TableCell className="text-center">
@@ -374,10 +568,11 @@ export default function FleetPerformancePage() {
                 {/* Cancel Rate */}
                 <TableCell className="text-center">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${r.cancelRate > 2
-                      ? "bg-red-100 text-red-600"
-                      : "bg-emerald-100 text-emerald-600"
-                      }`}
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      r.cancelRate > 2
+                        ? "bg-red-100 text-red-600"
+                        : "bg-emerald-100 text-emerald-600"
+                    }`}
                   >
                     {r.cancelRate}%
                   </span>
@@ -390,25 +585,27 @@ export default function FleetPerformancePage() {
 
                 {/* Actions */}
                 <TableCell className="text-right">
-                  <Button size="sm" variant="ghost" onClick={() => openRiderDrill(r)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => openRiderDrill(r)}
+                  >
                     {t("view")}
                   </Button>
                 </TableCell>
-
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Card>
 
-
-
-
       {/* Drilldown dialog */}
       <Dialog open={openDrill} onOpenChange={() => setOpenDrill(false)}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{t("rider_performance")} — {drillRider?.name}</DialogTitle>
+            <DialogTitle>
+              {t("rider_performance")} — {drillRider?.name}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -416,18 +613,37 @@ export default function FleetPerformancePage() {
               <h5 className="font-semibold">{t("kpi")}</h5>
               {drillRider ? (
                 <div className="mt-2 space-y-2">
-                  <div>{t("total_deliveries")}: <strong>{drillRider.deliveries}</strong></div>
-                  <div>{t("on_time")}: <strong>{drillRider.onTimePct}%</strong></div>
-                  <div>{t("avg_time")}: <strong>{drillRider.avgTime} {t("min")}</strong></div>
-                  <div>{t("cancel_rate")}: <strong>{drillRider.cancelRate}%</strong></div>
-                  <div>{t("rating")}: <strong>{drillRider.rating}</strong></div>
-                  <div>{t("earnings")}: <strong>€ {drillRider.earnings}</strong></div>
+                  <div>
+                    {t("total_deliveries")}:{" "}
+                    <strong>{drillRider.deliveries}</strong>
+                  </div>
+                  <div>
+                    {t("on_time")}: <strong>{drillRider.onTimePct}%</strong>
+                  </div>
+                  <div>
+                    {t("avg_time")}:{" "}
+                    <strong>
+                      {drillRider.avgTime} {t("min")}
+                    </strong>
+                  </div>
+                  <div>
+                    {t("cancel_rate")}:{" "}
+                    <strong>{drillRider.cancelRate}%</strong>
+                  </div>
+                  <div>
+                    {t("rating")}: <strong>{drillRider.rating}</strong>
+                  </div>
+                  <div>
+                    {t("earnings")}: <strong>€ {drillRider.earnings}</strong>
+                  </div>
                 </div>
               ) : null}
             </Card>
 
             <Card className="p-4">
-              <h5 className="font-semibold">{t("recent_trend_last_14_days")}</h5>
+              <h5 className="font-semibold">
+                {t("recent_trend_last_14_days")}
+              </h5>
               <ResponsiveContainer width="100%" height={160}>
                 <LineChart data={mockDailyForRider()}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -443,8 +659,12 @@ export default function FleetPerformancePage() {
           <Separator className="my-4" />
 
           <div className="flex justify-end">
-            <Button variant="outline" onClick={() => setOpenDrill(false)}>{t("close")}</Button>
-            <Button style={{ background: DELIGO }} className="ml-2">{t("export_report")}</Button>
+            <Button variant="outline" onClick={() => setOpenDrill(false)}>
+              {t("close")}
+            </Button>
+            <Button style={{ background: DELIGO }} className="ml-2">
+              {t("export_report")}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -472,7 +692,18 @@ function mockDaily(days = 30): DailyPoint[] {
 }
 
 function mockRiders(count = 10): Rider[] {
-  const names = ["João Silva", "Maria Fernandes", "Rui Costa", "Ana Pereira", "Carlos Sousa", "Pedro Alves", "Sofia Gomes", "Miguel Rocha", "Inês Duarte", "Tiago Martins"];
+  const names = [
+    "João Silva",
+    "Maria Fernandes",
+    "Rui Costa",
+    "Ana Pereira",
+    "Carlos Sousa",
+    "Pedro Alves",
+    "Sofia Gomes",
+    "Miguel Rocha",
+    "Inês Duarte",
+    "Tiago Martins",
+  ];
   return Array.from({ length: count }).map((_, i) => {
     const deliveries = Math.floor(200 + Math.random() * 400);
     const onTimePct = Math.floor(80 + Math.random() * 20);
@@ -503,7 +734,10 @@ function mockOrderTypes() {
 }
 
 function mockDailyForRider() {
-  return Array.from({ length: 14 }).map((_, i) => ({ date: getISODateDaysAgo(13 - i), deliveries: Math.floor(5 + Math.random() * 10) }));
+  return Array.from({ length: 14 }).map((_, i) => ({
+    date: getISODateDaysAgo(13 - i),
+    deliveries: Math.floor(5 + Math.random() * 10),
+  }));
 }
 
 function avgRating(riders: Rider[]) {

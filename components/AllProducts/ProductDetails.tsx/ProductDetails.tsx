@@ -117,23 +117,6 @@ export default function ProductDetails({ product }: IProps) {
         >
           {t("product_details")}
         </motion.h1>
-        {/* <motion.div
-          variants={itemVariants as Variants}
-          whileHover={{
-            scale: 1.05,
-          }}
-          whileTap={{
-            scale: 0.95,
-          }}
-        >
-          <button
-            className="flex items-center gap-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-md transition-all"
-            aria-label="Delete product"
-          >
-            <Trash2Icon className="w-5 h-5" />
-            <span>Delete</span>
-          </button>
-        </motion.div> */}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
         {/* Product Images */}
@@ -164,8 +147,9 @@ export default function ProductDetails({ product }: IProps) {
               {product.images.map((image, index) => (
                 <motion.div
                   key={index}
-                  className={`aspect-square rounded-md overflow-hidden cursor-pointer ${index === currentImageIndex ? "ring-2 ring-[#DC3173]" : ""
-                    }`}
+                  className={`aspect-square rounded-md overflow-hidden cursor-pointer ${
+                    index === currentImageIndex ? "ring-2 ring-[#DC3173]" : ""
+                  }`}
                   onClick={() => setCurrentImageIndex(index)}
                   whileHover={{
                     scale: 1.05,
@@ -191,15 +175,18 @@ export default function ProductDetails({ product }: IProps) {
           <motion.div variants={itemVariants as Variants}>
             <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
             <div className="flex items-center mt-2 space-x-4">
-              <span className="text-sm text-gray-500">{t("sku")}: {product.sku}</span>
+              <span className="text-sm text-gray-500">
+                {t("sku")}: {product.sku}
+              </span>
               <span className="text-sm text-gray-500">
                 {t("id")}: {product.productId}
               </span>
               <div
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isApproved
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-                  }`}
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  product.isApproved
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
               >
                 {product.isApproved ? t("approved") : t("not_approved")}
               </div>
@@ -289,10 +276,14 @@ export default function ProductDetails({ product }: IProps) {
             variants={itemVariants as Variants}
           >
             <div>
-              <h3 className="text-sm font-medium text-gray-500">{t("category")}</h3>
+              <h3 className="text-sm font-medium text-gray-500">
+                {t("category")}
+              </h3>
               <p className="mt-1 text-gray-900">{product.category}</p>
               {product.subCategory && (
-                <p className="mt-1 text-gray-700">{t("sub")}: {product.subCategory}</p>
+                <p className="mt-1 text-gray-700">
+                  {t("sub")}: {product.subCategory}
+                </p>
               )}
             </div>
             {product.brand && (
@@ -380,7 +371,9 @@ export default function ProductDetails({ product }: IProps) {
             <motion.div variants={itemVariants as Variants}>
               <div className="flex items-center gap-2 mb-2">
                 <TagIcon className="w-5 h-5 text-[#DC3173]" />
-                <h2 className="text-lg font-semibold text-gray-900">{t("tags")}</h2>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {t("tags")}
+                </h2>
               </div>
               <div className="flex flex-wrap gap-2">
                 {product.tags.map((tag, index) => (
@@ -418,19 +411,22 @@ export default function ProductDetails({ product }: IProps) {
                     {[...Array(5)].map((_, i) => (
                       <StarIcon
                         key={i}
-                        className={`w-5 h-5 ${i < Math.floor(product?.rating?.average || 0)
-                          ? "text-amber-400 fill-amber-400"
-                          : i < (product?.rating?.average || 0)
-                            ? "text-amber-400 fill-amber-400 opacity-50"
-                            : "text-gray-300"
-                          }`}
+                        className={`w-5 h-5 ${
+                          i < Math.floor(product?.rating?.average || 0)
+                            ? "text-amber-400 fill-amber-400"
+                            : i < (product?.rating?.average || 0)
+                              ? "text-amber-400 fill-amber-400 opacity-50"
+                              : "text-gray-300"
+                        }`}
                       />
                     ))}
                   </div>
                 </div>
                 <span className="text-gray-500">
                   {t("based_on")} {product.rating.totalReviews}{" "}
-                  {product.rating.totalReviews === 1 ? t("review") : t("reviews")}
+                  {product.rating.totalReviews === 1
+                    ? t("review")
+                    : t("reviews")}
                 </span>
               </div>
             </motion.div>
@@ -445,21 +441,32 @@ export default function ProductDetails({ product }: IProps) {
                 <p>
                   {t("status")}:{" "}
                   <span
-                    className={`font-medium ${product.isDeleted
-                      ? "text-red-600"
-                      : product.meta.status === "ACTIVE"
-                        ? "text-green-600"
-                        : "text-yellow-600"
-                      }`}
+                    className={`font-medium ${
+                      product.isDeleted
+                        ? "text-red-600"
+                        : product.meta.status === "ACTIVE"
+                          ? "text-green-600"
+                          : "text-yellow-600"
+                    }`}
                   >
                     {product.isDeleted ? "DELETED" : product.meta.status}
                   </span>
                 </p>
-                {product.meta.origin && <p>{t("origin")}: {product.meta.origin}</p>}
+                {product.meta.origin && (
+                  <p>
+                    {t("origin")}: {product.meta.origin}
+                  </p>
+                )}
               </div>
               <div>
-                <p>{t("created")}: {format(product.meta.createdAt, "do MMM yyyy")}</p>
-                <p>{t("updated")}: {format(product.meta.updatedAt, "do MMM yyyy")}</p>
+                <p>
+                  {t("created")}:{" "}
+                  {format(product.meta.createdAt, "do MMM yyyy")}
+                </p>
+                <p>
+                  {t("updated")}:{" "}
+                  {format(product.meta.updatedAt, "do MMM yyyy")}
+                </p>
               </div>
             </div>
           </motion.div>

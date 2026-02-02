@@ -1,5 +1,6 @@
 "use client";
 
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
@@ -71,16 +72,10 @@ export default function CreateTax() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
+        <TitleHeader title="Create Tax" subtitle="Create a new tax rule" />
         <Card className="py-0">
-          <CardContent className="space-y-10 bg-white shadow-xl p-6 rounded-xl">
-            <div>
-              <h1 className="text-3xl font-extrabold text-[#DC3173]">
-                Create Tax
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Create a new tax rule
-              </p>
-            </div>
+          <CardContent className="space-y-6 bg-white shadow-xl p-6 rounded-xl">
+            <h1 className="text-3xl font-extrabold text-[#DC3173]">Tax Form</h1>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleCreateTax)}

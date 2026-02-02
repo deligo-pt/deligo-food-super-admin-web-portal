@@ -1,5 +1,6 @@
 "use client";
 
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -23,9 +24,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { createOfferReq } from "@/services/dashboard/offers/offers";
-import { TMeta } from "@/types";
-import { TOffer } from "@/types/offer.type";
-import { TProduct } from "@/types/product.type";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -38,11 +36,7 @@ const BG = "#FFF1F7";
 
 type TOfferForm = z.infer<typeof offerValidation>;
 
-interface IProps {
-  itemsResult: { data: TProduct[]; meta?: TMeta };
-}
-
-export default function CreateNewOffer({ itemsResult }: IProps) {
+export default function CreateNewOffer() {
   const { t } = useTranslation();
   const form = useForm<TOfferForm>({
     resolver: zodResolver(offerValidation),
@@ -52,9 +46,6 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
       offerType: "PERCENT",
       discountValue: 0,
       maxDiscountAmount: 0,
-      buyQty: 1,
-      getQty: 1,
-      productId: "",
       startDate: new Date(),
       endDate: new Date(),
       minOrderAmount: 0,
@@ -71,21 +62,7 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
   const onSubmit = async (data: TOfferForm) => {
     const toastId = toast.loading("Creating offer...");
 
-    const offerData: Partial<TOffer> = {
-      ...data,
-      isAutoApply: false,
-      ...(data.offerType === "BOGO"
-        ? {
-            bogo: {
-              buyQty: data.buyQty as number,
-              getQty: data.getQty as number,
-              productId: data.productId as string,
-            },
-          }
-        : {}),
-    };
-
-    const result = await createOfferReq(offerData);
+    const result = await createOfferReq(data);
 
     if (result.success) {
       toast.success(result.message || "Offer created successfully!", {
@@ -102,12 +79,10 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
   return (
     <div className="min-h-screen p-6 md:p-10" style={{ background: BG }}>
       <div className="max-w-[900px] mx-auto space-y-10">
-        <h1 className="text-4xl font-extrabold" style={{ color: PRIMARY }}>
-          {t("create_new_offer")}
-        </h1>
-        <p className="text-gray-600 text-sm">
-          {t("add_promotion_boost_restuarant_sales")}
-        </p>
+        <TitleHeader
+          title={t("create_new_offer")}
+          subtitle={t("add_promotion_boost_restuarant_sales")}
+        />
 
         <Card className="rounded-3xl bg-white border shadow-lg">
           <CardContent className="p-0">
@@ -187,9 +162,6 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                                 <SelectItem value="FLAT">
                                   {t("flat_amount_off")}
                                 </SelectItem>
-                                <SelectItem value="BOGO">
-                                  {t("buy_1_get_1")}
-                                </SelectItem>
                                 <SelectItem value="FREE_DELIVERY">
                                   Free Delivery
                                 </SelectItem>
@@ -248,42 +220,6 @@ export default function CreateNewOffer({ itemsResult }: IProps) {
                                 field.onChange(Number(e.target.value))
                               }
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-
-                  {watchOfferType === "BOGO" && (
-                    <FormField
-                      control={form.control}
-                      name="productId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="space-y-2">
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                              >
-                                <SelectTrigger className="w-full h-12">
-                                  <SelectValue
-                                    placeholder={t("choose_an_item")}
-                                  />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {itemsResult?.data.map((item: TProduct) => (
-                                    <SelectItem
-                                      key={item._id}
-                                      value={item.productId}
-                                    >
-                                      {item.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>

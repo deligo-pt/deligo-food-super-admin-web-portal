@@ -3,6 +3,7 @@
 import KPICard from "@/components/BusinessInfo/KPICard";
 import OperationalMetrics from "@/components/BusinessInfo/OperationalMetrics";
 import RevenueChart from "@/components/BusinessInfo/RevenueChart";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { Clock, DollarSign, ShoppingBag, TrendingUp } from "lucide-react";
@@ -14,26 +15,10 @@ export function BusinessInfo() {
     <div className="min-h-screen bg-gray-50/50 font-sans text-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: -10,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.5,
-            }}
-          >
-            <h1 className="text-2xl font-bold text-[#DC3173]">{t("business_info")}</h1>
-            <p className="text-gray-500 mt-1">
-              {t("real_time_overview_deligo_performance")}
-            </p>
-          </motion.div>
-        </div>
+        <TitleHeader
+          title={t("business_info")}
+          subtitle={t("real_time_overview_deligo_performance")}
+        />
 
         {/* KPI Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -159,10 +144,11 @@ export function BusinessInfo() {
                       {zone.revenue}
                     </p>
                     <p
-                      className={`text-xs font-medium ${zone.growth.startsWith("+")
+                      className={`text-xs font-medium ${
+                        zone.growth.startsWith("+")
                           ? "text-green-600"
                           : "text-red-500"
-                        }`}
+                      }`}
                     >
                       {zone.growth}
                     </p>

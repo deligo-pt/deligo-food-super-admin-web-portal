@@ -1,8 +1,9 @@
-"use client"
-import React, { useMemo, useState } from "react";
-import { Search, Clock, User, Download, Eye } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+"use client";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
+import { AnimatePresence, motion } from "framer-motion";
+import { Clock, Download, Eye, Search, User } from "lucide-react";
+import React, { useMemo, useState } from "react";
 
 // Mock log data
 interface LogEntry {
@@ -16,12 +17,60 @@ interface LogEntry {
 }
 
 const initialLogs: LogEntry[] = [
-  { id: "l1", admin: "Mariana Silva", email: "mariana@deligo.pt", action: "Created new admin", target: "Tiago", timestamp: "2025-01-12 10:21", type: "info" },
-  { id: "l2", admin: "Tiago Fernandes", email: "tiago@deligo.pt", action: "Updated permissions", target: "Moderator Role", timestamp: "2025-01-12 09:43", type: "warning" },
-  { id: "l3", admin: "Rita Gomes", email: "rita@deligo.pt", action: "Removed user", target: "User #4032", timestamp: "2025-01-11 21:12", type: "danger" },
-  { id: "l4", admin: "Mariana Silva", email: "mariana@deligo.pt", action: "Suspended vendor", target: "Vendor #202", timestamp: "2025-01-11 20:27", type: "warning" },
-  { id: "l5", admin: "João Pereira", email: "joao@deligo.pt", action: "Viewed payout details", target: "Vendor #322", timestamp: "2025-01-11 18:52", type: "info" },
-  { id: "l6", admin: "Inês Costa", email: "ines@deligo.pt", action: "Edited delivery zone", target: "Lisbon District", timestamp: "2025-01-11 17:05", type: "info" },
+  {
+    id: "l1",
+    admin: "Mariana Silva",
+    email: "mariana@deligo.pt",
+    action: "Created new admin",
+    target: "Tiago",
+    timestamp: "2025-01-12 10:21",
+    type: "info",
+  },
+  {
+    id: "l2",
+    admin: "Tiago Fernandes",
+    email: "tiago@deligo.pt",
+    action: "Updated permissions",
+    target: "Moderator Role",
+    timestamp: "2025-01-12 09:43",
+    type: "warning",
+  },
+  {
+    id: "l3",
+    admin: "Rita Gomes",
+    email: "rita@deligo.pt",
+    action: "Removed user",
+    target: "User #4032",
+    timestamp: "2025-01-11 21:12",
+    type: "danger",
+  },
+  {
+    id: "l4",
+    admin: "Mariana Silva",
+    email: "mariana@deligo.pt",
+    action: "Suspended vendor",
+    target: "Vendor #202",
+    timestamp: "2025-01-11 20:27",
+    type: "warning",
+  },
+  {
+    id: "l5",
+    admin: "João Pereira",
+    email: "joao@deligo.pt",
+    action: "Viewed payout details",
+    target: "Vendor #322",
+    timestamp: "2025-01-11 18:52",
+    type: "info",
+  },
+  {
+    id: "l6",
+    admin: "Inês Costa",
+    email: "ines@deligo.pt",
+    action: "Edited delivery zone",
+    target: "Lisbon District",
+    timestamp: "2025-01-11 17:05",
+    type: "info",
+  },
 ];
 
 export default function ActivityLogsPage() {
@@ -34,7 +83,11 @@ export default function ActivityLogsPage() {
   const filteredLogs = useMemo(() => {
     const q = query.trim().toLowerCase();
     return logs.filter((l) => {
-      const matchQuery = !q || l.admin.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.action.toLowerCase().includes(q);
+      const matchQuery =
+        !q ||
+        l.admin.toLowerCase().includes(q) ||
+        l.email.toLowerCase().includes(q) ||
+        l.action.toLowerCase().includes(q);
       const matchType = filterType === "all" || filterType === l.type;
       return matchQuery && matchType;
     });
@@ -42,8 +95,12 @@ export default function ActivityLogsPage() {
 
   const typeBadge = (type: LogEntry["type"]) => {
     const base = "px-2 py-0.5 text-xs rounded-full font-medium";
-    if (type === "info") return <span className={`${base} bg-blue-50 text-blue-700`}>Info</span>;
-    if (type === "warning") return <span className={`${base} bg-yellow-50 text-yellow-700`}>Warning</span>;
+    if (type === "info")
+      return <span className={`${base} bg-blue-50 text-blue-700`}>Info</span>;
+    if (type === "warning")
+      return (
+        <span className={`${base} bg-yellow-50 text-yellow-700`}>Warning</span>
+      );
     return <span className={`${base} bg-red-50 text-red-700`}>Critical</span>;
   };
 
@@ -51,10 +108,10 @@ export default function ActivityLogsPage() {
     <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{t("activity_logs")}</h1>
-          <p className="text-gray-600 mt-1">{t("track_every_important_action_inside")}</p>
-        </div>
+        <TitleHeader
+          title={t("activity_logs")}
+          subtitle={t("track_every_important_action_inside")}
+        />
 
         {/* SEARCH + FILTERS */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -114,7 +171,9 @@ export default function ActivityLogsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.04 }}
                     className="hover:bg-gray-50 transition cursor-pointer"
-                    onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
+                    onClick={() =>
+                      setExpandedId(expandedId === log.id ? null : log.id)
+                    }
                   >
                     <td className="p-4 flex items-center gap-3 whitespace-nowrap">
                       <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-600">
@@ -128,10 +187,13 @@ export default function ActivityLogsPage() {
 
                     <td className="p-4 whitespace-nowrap">{log.action}</td>
 
-                    <td className="p-4 whitespace-nowrap text-gray-600">{log.target || "—"}</td>
+                    <td className="p-4 whitespace-nowrap text-gray-600">
+                      {log.target || "—"}
+                    </td>
 
                     <td className="p-4 whitespace-nowrap text-gray-600 flex items-center gap-1">
-                      <Clock size={14} className="text-gray-400" /> {log.timestamp}
+                      <Clock size={14} className="text-gray-400" />{" "}
+                      {log.timestamp}
                     </td>
 
                     <td className="p-4 text-center">{typeBadge(log.type)}</td>
@@ -152,16 +214,46 @@ export default function ActivityLogsPage() {
                         exit={{ opacity: 0, height: 0 }}
                         className="bg-gray-50"
                       >
-                        <td colSpan={6} className="p-5 border-t text-sm text-gray-700">
+                        <td
+                          colSpan={6}
+                          className="p-5 border-t text-sm text-gray-700"
+                        >
                           <div className="flex items-start gap-4">
                             <User className="text-[#DC3173]" />
                             <div>
-                              <div className="font-semibold text-gray-800 mb-1">{t("detailed_info")}</div>
-                              <p><span className="font-medium">{t("admin")}:</span> {log.admin}</p>
-                              <p><span className="font-medium">{t("email")}:</span> {log.email}</p>
-                              <p><span className="font-medium">{t("action")}:</span> {log.action}</p>
-                              <p><span className="font-medium">{t("target")}:</span> {log.target || "N/A"}</p>
-                              <p><span className="font-medium">{t("timestamp")}:</span> {log.timestamp}</p>
+                              <div className="font-semibold text-gray-800 mb-1">
+                                {t("detailed_info")}
+                              </div>
+                              <p>
+                                <span className="font-medium">
+                                  {t("admin")}:
+                                </span>{" "}
+                                {log.admin}
+                              </p>
+                              <p>
+                                <span className="font-medium">
+                                  {t("email")}:
+                                </span>{" "}
+                                {log.email}
+                              </p>
+                              <p>
+                                <span className="font-medium">
+                                  {t("action")}:
+                                </span>{" "}
+                                {log.action}
+                              </p>
+                              <p>
+                                <span className="font-medium">
+                                  {t("target")}:
+                                </span>{" "}
+                                {log.target || "N/A"}
+                              </p>
+                              <p>
+                                <span className="font-medium">
+                                  {t("timestamp")}:
+                                </span>{" "}
+                                {log.timestamp}
+                              </p>
                             </div>
                           </div>
                         </td>
