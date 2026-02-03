@@ -29,15 +29,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { updateOfferReq } from "@/services/dashboard/offers/offers";
-import { getAllProductsReq } from "@/services/dashboard/product/product";
-import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
-import { TProduct } from "@/types/product.type";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -62,12 +59,11 @@ export default function EditOfferModal({
     defaultValues: {
       title: prevValues.title || "",
       description: prevValues.description || "",
-      offerType: prevValues.offerType || "PERCENT",
+      offerType:
+        (prevValues.offerType as "PERCENT" | "FLAT" | "FREE_DELIVERY") ||
+        "PERCENT",
       discountValue: prevValues.discountValue || 0,
       maxDiscountAmount: prevValues.maxDiscountAmount || 0,
-      buyQty: prevValues.bogo?.buyQty || 1,
-      getQty: prevValues.bogo?.getQty || 1,
-      productId: prevValues.bogo?.productId || "",
       startDate: new Date(prevValues.startDate) || new Date(),
       endDate: new Date(prevValues.endDate) || new Date(),
       minOrderAmount: prevValues.minOrderAmount || 0,
@@ -76,10 +72,6 @@ export default function EditOfferModal({
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [itemsResult, setItemsResult] = useState<{
-    data: TProduct[];
-    meta?: TMeta;
-  }>({ data: [] });
 
   const watchOfferType = useWatch({
     control: form.control,
@@ -93,15 +85,6 @@ export default function EditOfferModal({
     const offerData: Partial<TOffer> = {
       ...data,
       isAutoApply: false,
-      ...(data.offerType === "BOGO"
-        ? {
-            bogo: {
-              buyQty: data.buyQty as number,
-              getQty: data.getQty as number,
-              productId: data.productId as string,
-            },
-          }
-        : {}),
     };
 
     const result = await updateOfferReq(prevValues._id, offerData);
@@ -121,15 +104,6 @@ export default function EditOfferModal({
     console.log(result);
     setIsSubmitting(false);
   };
-
-  const fetchProduct = async (limit = 10) => {
-    const result = await getAllProductsReq({ limit });
-    setItemsResult({ data: result.data, meta: result.meta });
-  };
-
-  useEffect(() => {
-    (() => fetchProduct(10))();
-  }, []);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -271,40 +245,6 @@ export default function EditOfferModal({
                             field.onChange(Number(e.target.value))
                           }
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {watchOfferType === "BOGO" && (
-                <FormField
-                  control={form.control}
-                  name="productId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="space-y-2">
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <SelectTrigger className="w-full h-12">
-                              <SelectValue placeholder={t("choose_an_item")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {itemsResult?.data.map((item: TProduct) => (
-                                <SelectItem
-                                  key={item._id}
-                                  value={item.productId}
-                                >
-                                  {item.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

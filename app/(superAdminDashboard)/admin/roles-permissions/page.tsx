@@ -1,8 +1,9 @@
-"use client"
-import React, { useState } from "react";
-import { ShieldCheck, Check, X, PenLine } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+"use client";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, PenLine, ShieldCheck, X } from "lucide-react";
+import React, { useState } from "react";
 
 // Types
 interface PermissionGroup {
@@ -60,13 +61,21 @@ export default function RolesPermissionsPage() {
       id: "r-super",
       name: t("super_admin"),
       color: "#DC3173",
-      permissions: permissionGroups.flatMap((pg) => pg.permissions.map((p) => p.id)),
+      permissions: permissionGroups.flatMap((pg) =>
+        pg.permissions.map((p) => p.id),
+      ),
     },
     {
       id: "r-admin",
       name: t("admin"),
       color: "#3b82f6",
-      permissions: ["p-user-view", "p-user-edit", "p-order-view", "p-order-update", "p-admin-view"],
+      permissions: [
+        "p-user-view",
+        "p-user-edit",
+        "p-order-view",
+        "p-order-update",
+        "p-admin-view",
+      ],
     },
     {
       id: "r-moderator",
@@ -85,13 +94,13 @@ export default function RolesPermissionsPage() {
       prev.map((r) =>
         r.id === roleId
           ? {
-            ...r,
-            permissions: r.permissions.includes(permId)
-              ? r.permissions.filter((p) => p !== permId)
-              : [...r.permissions, permId],
-          }
-          : r
-      )
+              ...r,
+              permissions: r.permissions.includes(permId)
+                ? r.permissions.filter((p) => p !== permId)
+                : [...r.permissions, permId],
+            }
+          : r,
+      ),
     );
   };
 
@@ -109,11 +118,10 @@ export default function RolesPermissionsPage() {
     <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
-        <div className="mb-8">
-
-          <h1 className="text-3xl font-bold tracking-tight">{t("roles_and_permissions")}</h1>
-          <p className="text-gray-600 mt-1">{t("control_access_levels_permissions")}</p>
-        </div>
+        <TitleHeader
+          title={t("roles_and_permissions")}
+          subtitle={t("control_access_levels_permissions")}
+        />
 
         {/* ROLES LIST */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -127,7 +135,11 @@ export default function RolesPermissionsPage() {
             >
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full" style={{ background: role.color }} /> {role.name}
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ background: role.color }}
+                  />{" "}
+                  {role.name}
                 </h2>
                 <button
                   onClick={() => openEdit(role)}
@@ -137,7 +149,9 @@ export default function RolesPermissionsPage() {
                 </button>
               </div>
 
-              <div className="text-sm text-gray-500 mb-2">{t("permissions")}:</div>
+              <div className="text-sm text-gray-500 mb-2">
+                {t("permissions")}:
+              </div>
 
               <div className="flex flex-wrap gap-2">
                 {role.permissions.map((pid) => (
@@ -165,7 +179,9 @@ export default function RolesPermissionsPage() {
                 <tr>
                   <th className="p-4 text-left">{t("permission")}</th>
                   {roles.map((r) => (
-                    <th key={r.id} className="p-4 text-center">{r.name}</th>
+                    <th key={r.id} className="p-4 text-center">
+                      {r.name}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -173,7 +189,10 @@ export default function RolesPermissionsPage() {
                 {permissionGroups.map((pg) => (
                   <React.Fragment key={pg.id}>
                     <tr className="bg-gray-100">
-                      <td colSpan={roles.length + 1} className="p-3 font-medium text-gray-700">
+                      <td
+                        colSpan={roles.length + 1}
+                        className="p-3 font-medium text-gray-700"
+                      >
                         {pg.title}
                       </td>
                     </tr>
@@ -185,12 +204,17 @@ export default function RolesPermissionsPage() {
                           <td key={role.id} className="text-center p-4">
                             <button
                               onClick={() => togglePermission(role.id, perm.id)}
-                              className={`mx-auto w-8 h-8 flex items-center justify-center rounded-md border transition ${role.permissions.includes(perm.id)
-                                ? "bg-[#DC3173] border-[#DC3173] text-white"
-                                : "bg-white border-gray-300 text-gray-400 hover:bg-gray-100"
-                                }`}
+                              className={`mx-auto w-8 h-8 flex items-center justify-center rounded-md border transition ${
+                                role.permissions.includes(perm.id)
+                                  ? "bg-[#DC3173] border-[#DC3173] text-white"
+                                  : "bg-white border-gray-300 text-gray-400 hover:bg-gray-100"
+                              }`}
                             >
-                              {role.permissions.includes(perm.id) ? <Check size={16} /> : <X size={16} />}
+                              {role.permissions.includes(perm.id) ? (
+                                <Check size={16} />
+                              ) : (
+                                <X size={16} />
+                              )}
                             </button>
                           </td>
                         ))}
@@ -212,7 +236,10 @@ export default function RolesPermissionsPage() {
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 flex items-center justify-center"
             >
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+              <div
+                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                onClick={() => setShowModal(false)}
+              />
 
               <motion.div
                 initial={{ scale: 0.95, y: 10 }}
@@ -221,20 +248,28 @@ export default function RolesPermissionsPage() {
                 transition={{ duration: 0.2 }}
                 className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 z-10"
               >
-                <h2 className="text-xl font-semibold mb-3">{t("edit_role")} - {editingRole.name}</h2>
+                <h2 className="text-xl font-semibold mb-3">
+                  {t("edit_role")} - {editingRole.name}
+                </h2>
 
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     const form = e.target as HTMLFormElement;
-                    const name = (form.elements.namedItem("name") as HTMLInputElement).value;
-                    const color = (form.elements.namedItem("color") as HTMLInputElement).value;
+                    const name = (
+                      form.elements.namedItem("name") as HTMLInputElement
+                    ).value;
+                    const color = (
+                      form.elements.namedItem("color") as HTMLInputElement
+                    ).value;
                     saveRole({ ...editingRole, name, color });
                   }}
                   className="space-y-4"
                 >
                   <div>
-                    <label className="text-sm font-medium">{t("role_name")}</label>
+                    <label className="text-sm font-medium">
+                      {t("role_name")}
+                    </label>
                     <input
                       name="name"
                       defaultValue={editingRole.name}
@@ -243,7 +278,9 @@ export default function RolesPermissionsPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium">{t("role_color")}</label>
+                    <label className="text-sm font-medium">
+                      {t("role_color")}
+                    </label>
                     <input
                       name="color"
                       type="color"

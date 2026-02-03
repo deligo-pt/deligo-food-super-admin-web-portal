@@ -2,10 +2,10 @@
 
 import { CurrencyInput } from "@/components/Localization/CurrencyInput";
 import { Switch } from "@/components/Switch/Switch";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/use-translation";
-import { motion } from "framer-motion";
 import { BadgeEuro, Check, Clock, Globe, Search } from "lucide-react";
 import { useState } from "react";
 
@@ -57,36 +57,21 @@ export function Localization() {
       languages.map((lang) =>
         lang.code === code && !lang.default
           ? {
-            ...lang,
-            enabled: !lang.enabled,
-          }
-          : lang
-      )
+              ...lang,
+              enabled: !lang.enabled,
+            }
+          : lang,
+      ),
     );
   };
 
   return (
     <div className="space-y-8 p-4 md:p-6">
-      <div className="mb-8">
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: -10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
-        >
-          <h1 className="text-2xl font-bold text-[#DC3173]">{t("localization")}</h1>
-          <p className="text-gray-500 mt-1">
-            {t("languages_currencies_timezones")}
-          </p>
-        </motion.div>
-      </div>
+      <TitleHeader
+        title={t("localization")}
+        subtitle={t("languages_currencies_timezones")}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Language Settings */}
         <Card className="lg:col-span-2">
@@ -111,20 +96,22 @@ export function Localization() {
                   key={lang.code}
                   className={`
                   flex items-center justify-between p-4 rounded-xl border transition-all duration-200
-                  ${lang.enabled
+                  ${
+                    lang.enabled
                       ? "border-[#DC3173] bg-pink-50/30"
                       : "border-gray-200 bg-white opacity-70"
-                    }
+                  }
                 `}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`
                     w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold uppercase
-                    ${lang.enabled
-                          ? "bg-[#DC3173] text-white"
-                          : "bg-gray-100 text-gray-500"
-                        }
+                    ${
+                      lang.enabled
+                        ? "bg-[#DC3173] text-white"
+                        : "bg-gray-100 text-gray-500"
+                    }
                   `}
                     >
                       {lang.code}
@@ -147,7 +134,9 @@ export function Localization() {
               ))}
 
               <button className="flex items-center justify-center p-4 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50 transition-all">
-                <span className="text-sm font-medium">+ {t("add_new_language")}</span>
+                <span className="text-sm font-medium">
+                  + {t("add_new_language")}
+                </span>
               </button>
             </div>
           </CardContent>

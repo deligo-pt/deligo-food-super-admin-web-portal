@@ -2,6 +2,7 @@
 
 import { CurrencyInput } from "@/components/Localization/CurrencyInput";
 import { Switch } from "@/components/Switch/Switch";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/use-translation";
@@ -17,7 +18,6 @@ import {
 import { useState } from "react";
 
 type TActiveTab = "customer" | "vendor" | "driver";
-
 
 export function NotificationPreferences() {
   const { t } = useTranslation();
@@ -75,30 +75,17 @@ export function NotificationPreferences() {
     },
     {
       id: "promo",
-      label: t("promotional")
+      label: t("promotional"),
     },
   ];
 
   return (
     <div className="space-y-8 p-4 md:p-6">
-      <div className="mb-8">
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: -10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
-        >
-          <h1 className="text-2xl font-bold text-[#DC3173]">{t("notifications")}</h1>
-          <p className="text-gray-500 mt-1">{t("configure_alerts_templates")}</p>
-        </motion.div>
-      </div>
+      <TitleHeader
+        title={t("notifications")}
+        subtitle={t("configure_alerts_templates")}
+      />
+
       {/* User Type Tabs */}
       <div className="flex p-1 bg-gray-100 rounded-xl w-fit">
         {userTypes.map((type) => (
@@ -107,9 +94,10 @@ export function NotificationPreferences() {
             onClick={() => setActiveTab(type.id as TActiveTab)}
             className={`
               relative flex items-center gap-2 px-6 py-2.5 text-sm font-medium rounded-lg transition-all
-              ${activeTab === type.id
-                ? "text-gray-900"
-                : "text-gray-500 hover:text-gray-700"
+              ${
+                activeTab === type.id
+                  ? "text-gray-900"
+                  : "text-gray-500 hover:text-gray-700"
               }
             `}
           >
@@ -159,7 +147,7 @@ export function NotificationPreferences() {
                         {channel.label}
                       </span>
                     </div>
-                    <Switch checked={true} onCheckedChange={() => { }} />
+                    <Switch checked={true} onCheckedChange={() => {}} />
                   </div>
                 ))}
               </div>
@@ -178,10 +166,11 @@ export function NotificationPreferences() {
                     onClick={() => setActiveTemplate(event.id)}
                     className={`
                     w-full flex items-center justify-between px-4 py-3 text-sm rounded-lg transition-colors
-                    ${activeTemplate === event.id
+                    ${
+                      activeTemplate === event.id
                         ? "bg-pink-50 text-[#DC3173] font-medium"
                         : "text-gray-600 hover:bg-gray-50"
-                      }
+                    }
                   `}
                   >
                     {event.label}
@@ -246,7 +235,7 @@ export function NotificationPreferences() {
                           >
                             {tool}
                           </button>
-                        )
+                        ),
                       )}
                       <div className="w-px h-4 bg-gray-300 mx-1 self-center" />
                       <button className="px-2 py-1 text-xs font-medium text-[#DC3173] bg-pink-50 hover:bg-pink-100 rounded">

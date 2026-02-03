@@ -1,29 +1,19 @@
-"use client"
+"use client";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
+import { ChevronDown, ChevronUp, Download, Flame, Timer } from "lucide-react";
 import { useState } from "react";
 import {
-
-  Flame,
-  Timer,
-
-  Download,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
+  Bar,
+  BarChart,
   CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  BarChart,
-  Bar,
-
 } from "recharts";
-import { useTranslation } from "@/hooks/use-translation";
-
-
 
 const PRIMARY = "#DC3173";
 
@@ -71,8 +61,12 @@ export default function PeakHoursAnalysisPage() {
   const [range, setRange] = useState("Last 7 days");
   const [expanded, setExpanded] = useState(false);
 
-  const bestHour = hourlyData.reduce((max, h) => (h.orders > max.orders ? h : max));
-  const worstHour = hourlyData.reduce((min, h) => (h.orders < min.orders ? h : min));
+  const bestHour = hourlyData.reduce((max, h) =>
+    h.orders > max.orders ? h : max,
+  );
+  const worstHour = hourlyData.reduce((min, h) =>
+    h.orders < min.orders ? h : min,
+  );
 
   function exportCSV() {
     const headers = ["Hour", "Orders"];
@@ -90,33 +84,31 @@ export default function PeakHoursAnalysisPage() {
     <div className="min-h-screen p-6 bg-gray-50 text-gray-800">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold">{t("peak_hours_analysis")}</h1>
-            <p className="text-sm text-gray-500 mt-1">{t("real_time_demand_spikes_hourly_order")}</p>
-          </div>
+        <TitleHeader
+          title={t("peak_hours_analysis")}
+          subtitle={t("real_time_demand_spikes_hourly_order")}
+        />
 
-          <div className="flex items-center gap-3">
-            <select
-              value={range}
-              onChange={(e) => setRange(e.target.value)}
-              className="px-3 py-2 rounded-md border text-sm shadow-sm focus:outline-none focus:ring-2"
-              style={{ borderColor: PRIMARY }}
-            >
-               <option>{t("last_7_days")}</option>
-              <option>{t("last_30_days")}</option>
-              <option>{t("last_90_days")}</option>
-              <option>{t("current_week")}</option>
-            </select>
+        <div className="flex items-center gap-3 mb-6">
+          <select
+            value={range}
+            onChange={(e) => setRange(e.target.value)}
+            className="px-3 py-2 rounded-md border text-sm shadow-sm focus:outline-none focus:ring-2"
+            style={{ borderColor: PRIMARY }}
+          >
+            <option>{t("last_7_days")}</option>
+            <option>{t("last_30_days")}</option>
+            <option>{t("last_90_days")}</option>
+            <option>{t("current_week")}</option>
+          </select>
 
-            <button
-              onClick={exportCSV}
-              className="flex items-center gap-2 px-3 py-2 rounded-md bg-white text-sm border shadow-sm hover:shadow transition"
-            >
-              <Download size={16} /> {t("export")}
-            </button>
-          </div>
-        </header>
+          <button
+            onClick={exportCSV}
+            className="flex items-center gap-2 px-3 py-2 rounded-md bg-white text-sm border shadow-sm hover:shadow transition"
+          >
+            <Download size={16} /> {t("export")}
+          </button>
+        </div>
 
         {/* Overview cards */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -124,10 +116,17 @@ export default function PeakHoursAnalysisPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm text-gray-500">{t("peak_hour")}</h3>
-                <p className="text-2xl font-semibold mt-1">{bestHour.hour}:00</p>
-                <p className="text-xs text-gray-500">{bestHour.orders} {t("orders")}</p>
+                <p className="text-2xl font-semibold mt-1">
+                  {bestHour.hour}:00
+                </p>
+                <p className="text-xs text-gray-500">
+                  {bestHour.orders} {t("orders")}
+                </p>
               </div>
-              <div className="p-3 rounded-lg" style={{ background: `${PRIMARY}11` }}>
+              <div
+                className="p-3 rounded-lg"
+                style={{ background: `${PRIMARY}11` }}
+              >
                 <Flame color={PRIMARY} size={26} />
               </div>
             </div>
@@ -137,10 +136,17 @@ export default function PeakHoursAnalysisPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm text-gray-500">{t("lowest_hour")}</h3>
-                <p className="text-2xl font-semibold mt-1">{worstHour.hour}:00</p>
-                <p className="text-xs text-gray-500">{worstHour.orders} {t("orders")}</p>
+                <p className="text-2xl font-semibold mt-1">
+                  {worstHour.hour}:00
+                </p>
+                <p className="text-xs text-gray-500">
+                  {worstHour.orders} {t("orders")}
+                </p>
               </div>
-              <div className="p-3 rounded-lg" style={{ background: `${PRIMARY}11` }}>
+              <div
+                className="p-3 rounded-lg"
+                style={{ background: `${PRIMARY}11` }}
+              >
                 <Timer color={PRIMARY} size={26} />
               </div>
             </div>
@@ -158,15 +164,21 @@ export default function PeakHoursAnalysisPage() {
             <div>
               <h3 className="text-sm text-gray-500">{t("weekly_volume")}</h3>
               <p className="text-2xl font-semibold mt-1">52.4k</p>
-              <p className="text-xs text-gray-500">{t("total_orders_this_week")}</p>
+              <p className="text-xs text-gray-500">
+                {t("total_orders_this_week")}
+              </p>
             </div>
           </div>
         </section>
 
         {/* Hourly Line Chart */}
         <section className="bg-white p-5 rounded-2xl shadow mb-6">
-          <h2 className="font-semibold text-lg mb-1">{t("hourly_order_flow")}</h2>
-          <p className="text-sm text-gray-500 mb-4">{t("shows_which_hours_experience_maximum_demand")}</p>
+          <h2 className="font-semibold text-lg mb-1">
+            {t("hourly_order_flow")}
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            {t("shows_which_hours_experience_maximum_demand")}
+          </p>
 
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -175,7 +187,13 @@ export default function PeakHoursAnalysisPage() {
                 <XAxis dataKey="hour" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="orders" stroke={PRIMARY} strokeWidth={3} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="orders"
+                  stroke={PRIMARY}
+                  strokeWidth={3}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -183,8 +201,12 @@ export default function PeakHoursAnalysisPage() {
 
         {/* Weekday Bar Chart */}
         <section className="bg-white p-5 rounded-2xl shadow mb-6">
-          <h2 className="font-semibold text-lg mb-1">{t("demand_by_day_of_week")}</h2>
-          <p className="text-sm text-gray-500 mb-4">{t("average_total_daily_order_volume")}</p>
+          <h2 className="font-semibold text-lg mb-1">
+            {t("demand_by_day_of_week")}
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            {t("average_total_daily_order_volume")}
+          </p>
 
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -205,21 +227,28 @@ export default function PeakHoursAnalysisPage() {
             onClick={() => setExpanded(!expanded)}
             className="flex items-center justify-between w-full text-left"
           >
-            <h3 className="font-semibold text-lg">{t("ai_generated_insights")}</h3>
+            <h3 className="font-semibold text-lg">
+              {t("ai_generated_insights")}
+            </h3>
             {expanded ? <ChevronUp /> : <ChevronDown />}
           </button>
 
           {expanded && (
             <div className="mt-4 text-sm text-gray-700 space-y-3 animate-fadeIn">
               <p>
-                • <span className="font-semibold">20:00–21:00</span> is the strongest demand window. Promotions placed 30 minutes before this
-                spike historically perform 16% better.
+                • <span className="font-semibold">20:00–21:00</span> is the
+                strongest demand window. Promotions placed 30 minutes before
+                this spike historically perform 16% better.
               </p>
               <p>
-                • Morning mini‑spike at <span className="font-semibold">10:00–11:00</span> is driven by office deliveries.
+                • Morning mini‑spike at{" "}
+                <span className="font-semibold">10:00–11:00</span> is driven by
+                office deliveries.
               </p>
               <p>
-                • Lowest engagement at <span className="font-semibold">03:00–05:00</span>. Ideal window for maintenance.
+                • Lowest engagement at{" "}
+                <span className="font-semibold">03:00–05:00</span>. Ideal window
+                for maintenance.
               </p>
               <p>
                 • Fridays and Saturdays show significantly higher volatility.
@@ -228,7 +257,10 @@ export default function PeakHoursAnalysisPage() {
           )}
         </section>
 
-        <footer className="mt-6 text-xs text-gray-400 text-center pb-10">Last updated: Oct 07, 2025 — mock data for demo. Connect your analytics API for real values.</footer>
+        <footer className="mt-6 text-xs text-gray-400 text-center pb-10">
+          Last updated: Oct 07, 2025 — mock data for demo. Connect your
+          analytics API for real values.
+        </footer>
       </div>
     </div>
   );

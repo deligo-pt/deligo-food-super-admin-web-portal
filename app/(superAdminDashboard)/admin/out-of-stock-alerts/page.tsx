@@ -1,8 +1,7 @@
-"use client"
+"use client";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
-import React, { useEffect, useState, useMemo } from "react";
-
-
+import { useEffect, useMemo, useState } from "react";
 
 export type StockItem = {
   id: string;
@@ -16,14 +15,47 @@ export type StockItem = {
 
 // Placeholder sample data
 const sampleItems: StockItem[] = [
-  { id: "1", name: "Classic Burger", vendor: "Burger House", category: "Burgers", inventory: 0, threshold: 5, updatedAt: new Date().toISOString() },
-  { id: "2", name: "Hot Wings", vendor: "Fire Grill", category: "Snacks", inventory: 3, threshold: 10, updatedAt: new Date().toISOString() },
-  { id: "3", name: "Fanta Orange", vendor: "Drinks Corner", category: "Drinks", inventory: 12, threshold: 10, updatedAt: new Date().toISOString() },
-  { id: "4", name: "Family Pizza", vendor: "Pizza Magic", category: "Pizza", inventory: 0, threshold: 2, updatedAt: new Date().toISOString() },
+  {
+    id: "1",
+    name: "Classic Burger",
+    vendor: "Burger House",
+    category: "Burgers",
+    inventory: 0,
+    threshold: 5,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "2",
+    name: "Hot Wings",
+    vendor: "Fire Grill",
+    category: "Snacks",
+    inventory: 3,
+    threshold: 10,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "3",
+    name: "Fanta Orange",
+    vendor: "Drinks Corner",
+    category: "Drinks",
+    inventory: 12,
+    threshold: 10,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "4",
+    name: "Family Pizza",
+    vendor: "Pizza Magic",
+    category: "Pizza",
+    inventory: 0,
+    threshold: 2,
+    updatedAt: new Date().toISOString(),
+  },
 ];
 
 export default function OutOfStockAlertsPage() {
   const { t } = useTranslation();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [items, setItems] = useState<StockItem[]>(sampleItems);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -45,7 +77,9 @@ export default function OutOfStockAlertsPage() {
       const matchFilter =
         filter === "all" ||
         (filter === "out" && item.inventory === 0) ||
-        (filter === "low" && item.inventory > 0 && item.inventory <= item.threshold);
+        (filter === "low" &&
+          item.inventory > 0 &&
+          item.inventory <= item.threshold);
 
       return matchText && matchFilter;
     });
@@ -54,39 +88,53 @@ export default function OutOfStockAlertsPage() {
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-5">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">{t("out_of_stock_alerts")}</h1>
-          <p className="text-gray-600 mt-1 text-sm">{t("live_stock_monitoring_acroos_all_vendors")}</p>
-        </div>
+      <TitleHeader
+        title={t("out_of_stock_alerts")}
+        subtitle={t("live_stock_monitoring_acroos_all_vendors")}
+      />
 
-        <div className="flex flex-wrap gap-3 items-center">
-          <input
-            placeholder={t("search_item_vendor_category")}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="border rounded-xl px-4 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
-          />
+      <div className="flex flex-wrap gap-3 items-center mb-6">
+        <input
+          placeholder={t("search_item_vendor_category")}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="border rounded-xl px-4 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
+        />
 
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="border rounded-xl px-4 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
-          >
-            <option value="all">{t("all")}</option>
-            <option value="out">{t("Out of Stock")}</option>
-            <option value="low">{t("low_stock")}</option>
-          </select>
-        </div>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="border rounded-xl px-4 py-2 text-sm shadow-sm bg-white focus:ring-2 focus:ring-[#DC3173]/40 outline-none"
+        >
+          <option value="all">{t("all")}</option>
+          <option value="out">{t("Out of Stock")}</option>
+          <option value="low">{t("low_stock")}</option>
+        </select>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-8">
-        <StatCard title={t("total_alerts")} value={filtered.length} gradient="from-[#DC3173] to-pink-500" />
+        <StatCard
+          title={t("total_alerts")}
+          value={filtered.length}
+          gradient="from-[#DC3173] to-pink-500"
+        />
 
-        <StatCard title={t("Out of Stock")} value={filtered.filter((x) => x.inventory === 0).length} gradient="from-red-600 to-red-400" />
+        <StatCard
+          title={t("Out of Stock")}
+          value={filtered.filter((x) => x.inventory === 0).length}
+          gradient="from-red-600 to-red-400"
+        />
 
-        <StatCard title={t("low_stock")} value={filtered.filter((x) => x.inventory > 0 && x.inventory <= x.threshold).length} gradient="from-yellow-500 to-amber-400" />
+        <StatCard
+          title={t("low_stock")}
+          value={
+            filtered.filter(
+              (x) => x.inventory > 0 && x.inventory <= x.threshold,
+            ).length
+          }
+          gradient="from-yellow-500 to-amber-400"
+        />
       </div>
 
       {/* Table */}
@@ -129,7 +177,15 @@ export default function OutOfStockAlertsPage() {
 
 // ======================= COMPONENTS =======================
 
-function StatCard({ title, value, gradient }: { title: string; value: number; gradient: string }) {
+function StatCard({
+  title,
+  value,
+  gradient,
+}: {
+  title: string;
+  value: number;
+  gradient: string;
+}) {
   return (
     <div
       className={`rounded-2xl p-6 text-white shadow-lg bg-linear-to-br ${gradient} transform hover:scale-[1.02] transition`}
@@ -143,30 +199,49 @@ function StatCard({ title, value, gradient }: { title: string; value: number; gr
 function StockRow({ item }: { item: StockItem }) {
   const status =
     item.inventory === 0
-      ? { label: "Out of Stock", className: "bg-red-100 text-red-600 border-red-300" }
+      ? {
+          label: "Out of Stock",
+          className: "bg-red-100 text-red-600 border-red-300",
+        }
       : item.inventory <= item.threshold
-        ? { label: "Low Stock", className: "bg-amber-100 text-amber-700 border-amber-300" }
-        : { label: "In Stock", className: "bg-green-100 text-green-700 border-green-300" };
+        ? {
+            label: "Low Stock",
+            className: "bg-amber-100 text-amber-700 border-amber-300",
+          }
+        : {
+            label: "In Stock",
+            className: "bg-green-100 text-green-700 border-green-300",
+          };
 
   return (
     <tr className="border-b hover:bg-gray-50 transition-all duration-150">
       <td className="p-4 font-medium">{item.name}</td>
 
       <td className="p-4">
-        <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 text-xs font-medium border">{item.vendor}</span>
+        <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 text-xs font-medium border">
+          {item.vendor}
+        </span>
       </td>
 
       <td className="p-4">
-        <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 text-xs font-medium border">{item.category}</span>
+        <span className="px-3 py-1 rounded-xl bg-gray-100 text-gray-700 text-xs font-medium border">
+          {item.category}
+        </span>
       </td>
 
       <td className="p-4 font-semibold">{item.inventory}</td>
 
       <td className="p-4">
-        <span className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${status.className} shadow-sm`}>{status.label}</span>
+        <span
+          className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${status.className} shadow-sm`}
+        >
+          {status.label}
+        </span>
       </td>
 
-      <td className="p-4 text-gray-500 text-xs">{new Date(item.updatedAt).toLocaleString()}</td>
+      <td className="p-4 text-gray-500 text-xs">
+        {new Date(item.updatedAt).toLocaleString()}
+      </td>
     </tr>
   );
 }

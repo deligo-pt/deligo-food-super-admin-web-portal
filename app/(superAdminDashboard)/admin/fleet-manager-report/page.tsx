@@ -1,13 +1,13 @@
-import VendorReport from "@/components/Dashboard/Reports/VendorReport/VendorReport";
+import FleetManagerReport from "@/components/Dashboard/Reports/FleetManagerReport/FleetManagersReport";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { TAgent } from "@/types/user.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function VendorReportPage({ searchParams }: IProps) {
+export default async function FleetManagerReportPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -24,12 +24,12 @@ export default async function VendorReportPage({ searchParams }: IProps) {
     isDeleted: false,
   };
 
-  const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };
+  const initialData: { data: TAgent[]; meta?: TMeta } = { data: [] };
 
   try {
-    const result = (await serverRequest.get("/vendors", {
+    const result = (await serverRequest.get("/fleet-managers", {
       params: query,
-    })) as TResponse<TVendor[]>;
+    })) as TResponse<TAgent[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -39,5 +39,5 @@ export default async function VendorReportPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <VendorReport vendorsData={initialData} />;
+  return <FleetManagerReport fleetManagersData={initialData} />;
 }

@@ -1,12 +1,20 @@
-
+/* eslint-disable react-hooks/purity */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { JSX, useMemo, useState } from "react";
-import { Download, Calendar, DollarSign, TrendingUp, Users, Search, BarChart3, BadgeEuroIcon } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
+import {
+  BadgeEuroIcon,
+  Calendar,
+  Download,
+  Search,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { JSX, useMemo, useState } from "react";
+import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
 
 // ----------------------------------------------------------------------
 // Types
@@ -85,12 +93,30 @@ export default function PlatformEarningsPage(): JSX.Element {
   const totalPlatform = filtered.reduce((s, r) => s + r.platformFee, 0);
 
   const exportCSV = () => {
-    const header = ["id", "date", "orderId", "vendor", "region", "gross", "platformFee", "status"];
+    const header = [
+      "id",
+      "date",
+      "orderId",
+      "vendor",
+      "region",
+      "gross",
+      "platformFee",
+      "status",
+    ];
     const csv = [header.join(",")]
       .concat(
         filtered.map((r) =>
-          [r.id, r.date, r.orderId, r.vendor, r.region, r.gross, r.platformFee, r.status].join(",")
-        )
+          [
+            r.id,
+            r.date,
+            r.orderId,
+            r.vendor,
+            r.region,
+            r.gross,
+            r.platformFee,
+            r.status,
+          ].join(","),
+        ),
       )
       .join("");
 
@@ -104,48 +130,43 @@ export default function PlatformEarningsPage(): JSX.Element {
 
   return (
     <div className="p-6 lg:p-10 space-y-6 overflow-x-hidden">
-
       {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900">
-            <BarChart3 className="w-7 h-7 text-[#DC3173]" /> {t("platform_earnings")}
-          </h1>
-          <p className="text-sm text-gray-500">{t("track_platform_revenue_fees_simple")}</p>
-        </div>
+      <TitleHeader
+        title={t("platform_earnings")}
+        subtitle={t("track_platform_revenue_fees_simple")}
+      />
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl shadow-sm border border-gray-100">
-            <Calendar className="w-4 h-4 text-[#DC3173]" />
-            <select
-              value={range}
-              onChange={(e) => setRange(e.target.value)}
-              className="bg-transparent outline-none text-sm"
-            >
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Last 90 days</option>
-              <option>Year to date</option>
-            </select>
-          </div>
-
-          <div className="flex items-center bg-white px-3 py-2 rounded-xl shadow-sm border border-gray-100 w-full sm:w-64">
-            <Search className="w-4 h-4 text-gray-400" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("search_order_vendor_region")}
-              className="ml-2 bg-transparent outline-none text-sm w-full"
-            />
-          </div>
-
-          <button
-            onClick={exportCSV}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#DC3173] text-white shadow hover:opacity-90"
+      <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-6">
+        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl shadow-sm border border-gray-100">
+          <Calendar className="w-4 h-4 text-[#DC3173]" />
+          <select
+            value={range}
+            onChange={(e) => setRange(e.target.value)}
+            className="bg-transparent outline-none text-sm"
           >
-            <Download className="w-4 h-4" /> {t("export")}
-          </button>
+            <option>Last 7 days</option>
+            <option>Last 30 days</option>
+            <option>Last 90 days</option>
+            <option>Year to date</option>
+          </select>
         </div>
+
+        <div className="flex items-center bg-white px-3 py-2 rounded-xl shadow-sm border border-gray-100 w-full sm:w-64">
+          <Search className="w-4 h-4 text-gray-400" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("search_order_vendor_region")}
+            className="ml-2 bg-transparent outline-none text-sm w-full"
+          />
+        </div>
+
+        <button
+          onClick={exportCSV}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#DC3173] text-white shadow hover:opacity-90"
+        >
+          <Download className="w-4 h-4" /> {t("export")}
+        </button>
       </div>
 
       {/* SUMMARY + CHART */}
@@ -158,13 +179,17 @@ export default function PlatformEarningsPage(): JSX.Element {
               </div>
               <div>
                 <p className="text-xs text-gray-500">{t("total_gross")}</p>
-                <h2 className="text-2xl font-bold">{formatCurrency(totalGross)}</h2>
+                <h2 className="text-2xl font-bold">
+                  {formatCurrency(totalGross)}
+                </h2>
               </div>
             </div>
 
             <div className="text-right">
               <p className="text-xs text-gray-500">{t("platform_fees")}</p>
-              <h2 className="text-xl font-semibold text-[#DC3173]">{formatCurrency(totalPlatform)}</h2>
+              <h2 className="text-xl font-semibold text-[#DC3173]">
+                {formatCurrency(totalPlatform)}
+              </h2>
             </div>
           </div>
 
@@ -178,7 +203,13 @@ export default function PlatformEarningsPage(): JSX.Element {
                   </linearGradient>
                 </defs>
                 <Tooltip />
-                <Area type="monotone" dataKey="earnings" stroke="#DC3173" strokeWidth={2} fill="url(#grad)" />
+                <Area
+                  type="monotone"
+                  dataKey="earnings"
+                  stroke="#DC3173"
+                  strokeWidth={2}
+                  fill="url(#grad)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -191,7 +222,9 @@ export default function PlatformEarningsPage(): JSX.Element {
             </div>
             <div>
               <p className="text-xs text-gray-500">{t("active_vendors")}</p>
-              <h3 className="text-xl font-semibold">{Math.floor(20 + Math.random() * 50)}</h3>
+              <h3 className="text-xl font-semibold">
+                {Math.floor(20 + Math.random() * 50)}
+              </h3>
             </div>
           </div>
 
@@ -199,7 +232,9 @@ export default function PlatformEarningsPage(): JSX.Element {
             <TrendingUp className="w-4 h-4" /> {t("growth")} +12.4%
           </div>
 
-          <p className="text-sm text-gray-500 leading-relaxed">{t("platform_vendor_activity")}</p>
+          <p className="text-sm text-gray-500 leading-relaxed">
+            {t("platform_vendor_activity")}
+          </p>
         </div>
       </div>
 
@@ -222,19 +257,26 @@ export default function PlatformEarningsPage(): JSX.Element {
               {paginated.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50">
                   <td className="py-3 px-3 whitespace-nowrap">{r.date}</td>
-                  <td className="py-3 px-3 font-medium whitespace-nowrap">{r.orderId}</td>
+                  <td className="py-3 px-3 font-medium whitespace-nowrap">
+                    {r.orderId}
+                  </td>
                   <td className="py-3 px-3 whitespace-nowrap">{r.vendor}</td>
                   <td className="py-3 px-3 whitespace-nowrap">{r.region}</td>
-                  <td className="py-3 px-3 whitespace-nowrap">{formatCurrency(r.gross)}</td>
-                  <td className="py-3 px-3 text-[#DC3173] whitespace-nowrap">{formatCurrency(r.platformFee)}</td>
+                  <td className="py-3 px-3 whitespace-nowrap">
+                    {formatCurrency(r.gross)}
+                  </td>
+                  <td className="py-3 px-3 text-[#DC3173] whitespace-nowrap">
+                    {formatCurrency(r.platformFee)}
+                  </td>
                   <td className="py-3 px-3 whitespace-nowrap">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${r.status === "Paid"
-                        ? "bg-green-100 text-green-700"
-                        : r.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-red-100 text-red-700"
-                        }`}
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        r.status === "Paid"
+                          ? "bg-green-100 text-green-700"
+                          : r.status === "Pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                      }`}
                     >
                       {r.status}
                     </span>

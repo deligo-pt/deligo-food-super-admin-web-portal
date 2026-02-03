@@ -1,9 +1,9 @@
 "use client";
 
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/use-translation";
-import { motion } from "framer-motion";
 import { Calendar, FileText, History } from "lucide-react";
 import { useState } from "react";
 
@@ -40,24 +40,11 @@ export function LegalDocuments() {
 
   return (
     <div className="space-y-8 p-4 md:p-6">
-      <div className="mb-8">
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: -10,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.5,
-          }}
-        >
-          <h1 className="text-2xl font-bold text-[#DC3173]">{t("legal_documents")}</h1>
-          <p className="text-gray-500 mt-1">{t("terms_privacy_agreements")}</p>
-        </motion.div>
-      </div>
+      <TitleHeader
+        title={t("legal_documents")}
+        subtitle={t("terms_privacy_agreements")}
+      />
+
       <div className="grid grid-cols-12 gap-6 h-[calc(100vh-12rem)]">
         {/* Sidebar List */}
         <div className="col-span-12 lg:col-span-3 flex flex-col gap-4">
@@ -67,27 +54,30 @@ export function LegalDocuments() {
               onClick={() => setActiveDoc(doc.id)}
               className={`
                 group flex items-start gap-3 p-4 rounded-xl text-left transition-all duration-200 border
-                ${activeDoc === doc.id
-                  ? "bg-white border-[#DC3173] shadow-md"
-                  : "bg-white border-transparent hover:border-gray-200 hover:shadow-sm"
+                ${
+                  activeDoc === doc.id
+                    ? "bg-white border-[#DC3173] shadow-md"
+                    : "bg-white border-transparent hover:border-gray-200 hover:shadow-sm"
                 }
               `}
             >
               <div
                 className={`
                 p-2 rounded-lg shrink-0
-                ${activeDoc === doc.id
+                ${
+                  activeDoc === doc.id
                     ? "bg-pink-50 text-[#DC3173]"
                     : "bg-gray-100 text-gray-500"
-                  }
+                }
               `}
               >
                 <FileText className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <p
-                  className={`font-medium truncate ${activeDoc === doc.id ? "text-gray-900" : "text-gray-700"
-                    }`}
+                  className={`font-medium truncate ${
+                    activeDoc === doc.id ? "text-gray-900" : "text-gray-700"
+                  }`}
                 >
                   {doc.label}
                 </p>
@@ -95,10 +85,11 @@ export function LegalDocuments() {
                   <span
                     className={`
                     text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded
-                    ${doc.status === "published"
+                    ${
+                      doc.status === "published"
                         ? "bg-green-100 text-green-700"
                         : "bg-yellow-100 text-yellow-700"
-                      }
+                    }
                   `}
                   >
                     {doc.status}
