@@ -296,8 +296,13 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("driver_performance_report"),
           path: "/admin/drivers-performance-report",
         },
+        { name: "Customer Report", path: "/admin/customer-report" },
         { name: t("vendor_report"), path: "/admin/vendor-report" },
         { name: "Fleet Manager Report", path: "/admin/fleet-manager-report" },
+        {
+          name: "Delivery Partner Report",
+          path: "/admin/delivery-partner-report",
+        },
       ],
     },
     {

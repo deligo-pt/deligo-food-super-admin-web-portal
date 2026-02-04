@@ -11,26 +11,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TAgent } from "@/types/user.type";
+import { TCustomer } from "@/types/user.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
-  BikeIcon,
+  CalendarIcon,
   CircleCheckBig,
   Cog,
   ContactRoundIcon,
+  EuroIcon,
   EyeIcon,
-  PackageCheckIcon,
-  StarIcon,
+  GiftIcon,
+  ShoppingBagIcon,
   UserPlus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface IProps {
-  fleetManagers: TAgent[];
+  customers: TCustomer[];
 }
 
-export default function FleetManagerReportTable({ fleetManagers }: IProps) {
+export default function CustomerReportTable({ customers }: IProps) {
   const router = useRouter();
 
   return (
@@ -45,25 +46,31 @@ export default function FleetManagerReportTable({ fleetManagers }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ContactRoundIcon className="w-4" />
-                Fleet Manager
+                Customer
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <BikeIcon className="w-4" />
-                Drivers
+                <ShoppingBagIcon className="w-4" />
+                Orders
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <PackageCheckIcon className="w-4" />
-                Deliveries
+                <EuroIcon className="w-4" />
+                Total Spent
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <StarIcon className="w-4" />
-                Rating
+                <GiftIcon className="w-4" />
+                Points
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
+                <CalendarIcon className="w-4" />
+                Last Ordered
               </div>
             </TableHead>
             <TableHead>
@@ -85,56 +92,65 @@ export default function FleetManagerReportTable({ fleetManagers }: IProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {fleetManagers?.length === 0 && (
+          {customers?.length === 0 && (
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={7}
+                colSpan={8}
               >
-                No fleet managers found
+                No delivery partner found
               </TableCell>
             </TableRow>
           )}
-          {fleetManagers?.map((f) => (
-            <TableRow key={f._id}>
+          {customers?.map((c) => (
+            <TableRow key={c._id}>
               <TableCell className="flex items-center gap-3">
                 <div>
                   <Avatar>
                     <AvatarImage
-                      src={f.profilePhoto}
-                      alt={`${f.name?.firstName} ${f.name?.lastName}`}
+                      src={c.profilePhoto}
+                      alt={`${c.name?.firstName} ${c.name?.lastName}`}
                     />
                     <AvatarFallback>
-                      {f.name?.firstName?.charAt(0)}
-                      {f.name?.lastName?.charAt(0)}
+                      {c.name?.firstName?.charAt(0)}
+                      {c.name?.lastName?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    {f.name?.firstName} {f.name?.lastName}
-                    {!f.name?.firstName && !f.name?.lastName && "N/A"}
+                    {c.name?.firstName} {c.name?.lastName}
+                    {!c.name?.firstName && !c.name?.lastName && "N/A"}
                   </h3>
-                  <p className="text-sm text-gray-700">{f.email}</p>
+                  <p className="text-sm text-gray-700">{c.email}</p>
                 </div>
               </TableCell>
-              <TableCell>{f.operationalData?.totalDrivers || 0}</TableCell>
-              <TableCell>{f.operationalData?.totalDeliveries || 0}</TableCell>
+              <TableCell>{c.orders?.totalOrders || 0}</TableCell>
+              <TableCell>€{c.orders?.totalSpent || 0}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <StarIcon className="w-4 text-yellow-500" />
-                  <span>{f.operationalData?.rating?.average || 0}</span>
+                  <GiftIcon className="w-4 text-yellow-500" />
+                  <span>{c.loyaltyPoints || 0}</span>
                 </div>
               </TableCell>
               <TableCell>
-                <ReportStatusBadge status={f.status} />
+                {c.orders?.lastOrderDate
+                  ? format(c.orders?.lastOrderDate, "do MMM yyyy")
+                  : "N/A"}
               </TableCell>
-              <TableCell>{format(f.createdAt, "do MMM yyyy")}</TableCell>
+              <TableCell>
+                {format(c.createdAt as Date, "do MMM yyyy")}
+              </TableCell>
+              <TableCell>
+                <ReportStatusBadge status={c.status} />
+              </TableCell>
               <TableCell className="text-right">
-                {!f.isDeleted && (
+                {!c.isDeleted && (
                   <Button
                     variant="ghost"
-                    onClick={() => router.push("/admin/agent/" + f.userId)}
+                    onClick={() =>
+                      router.push("/admin/all-delivery-customers/" + c.userId)
+                    }
                   >
                     <EyeIcon />
                   </Button>

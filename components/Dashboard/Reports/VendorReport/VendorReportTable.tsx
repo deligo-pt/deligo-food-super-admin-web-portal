@@ -1,6 +1,7 @@
 "use client";
 
 import ReportStatusBadge from "@/components/Dashboard/Reports/ReportStatusBadge/ReportStatusBadge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -96,17 +97,31 @@ export default function VendorReportTable({ vendors }: IProps) {
           )}
           {vendors?.map((vendor) => (
             <TableRow key={vendor._id}>
-              <TableCell>
-                <h3 className="font-medium">
-                  {vendor.businessDetails?.businessName || "N/A"}
-                </h3>
-                <p className="text-sm text-gray-700">
-                  {vendor.businessDetails?.businessType
-                    ?.charAt(0)
-                    .toUpperCase()}
-                  {vendor.businessDetails?.businessType?.slice(1)}
-                  {!vendor.businessDetails?.businessType && "N/A"}
-                </p>
+              <TableCell className="flex items-center gap-3">
+                <div>
+                  <Avatar>
+                    <AvatarImage
+                      src={vendor.profilePhoto}
+                      alt={`${vendor.name?.firstName} ${vendor.name?.lastName}`}
+                    />
+                    <AvatarFallback>
+                      {vendor.name?.firstName?.charAt(0)}
+                      {vendor.name?.lastName?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div>
+                  <h3 className="font-medium">
+                    {vendor.businessDetails?.businessName || "N/A"}
+                  </h3>
+                  <p className="text-sm text-gray-700">
+                    {vendor.businessDetails?.businessType?.charAt(0)}
+                    {vendor.businessDetails?.businessType
+                      ?.toLowerCase()
+                      ?.slice(1)}
+                    {!vendor.businessDetails?.businessType && "N/A"}
+                  </p>
+                </div>
               </TableCell>
               <TableCell>
                 <h3 className="font-medium">

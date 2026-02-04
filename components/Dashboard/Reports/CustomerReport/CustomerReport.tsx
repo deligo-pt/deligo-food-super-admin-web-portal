@@ -2,17 +2,17 @@
 
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
-import VendorReportTable from "@/components/Dashboard/Reports/VendorReport/VendorReportTable";
+import CustomerReportTable from "@/components/Dashboard/Reports/CustomerReport/CustomerReportTable";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { TCustomer } from "@/types/user.type";
 import { motion } from "framer-motion";
-import { CheckCircle, Clock, Download, Store, XCircle } from "lucide-react";
+import { Download, EuroIcon, Heart, ShoppingBag, User } from "lucide-react";
 
 interface IProps {
-  vendorsData: { data: TVendor[]; meta?: TMeta };
+  customersData: { data: TCustomer[]; meta?: TMeta };
 }
 
 const sortOptions = [
@@ -34,16 +34,8 @@ const filterOptions = [
         value: "PENDING",
       },
       {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
         label: "Approved",
         value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
       },
       {
         label: "Blocked",
@@ -55,24 +47,14 @@ const filterOptions = [
 
 const statusDistribution = [
   {
-    name: "Approved",
-    value: 4,
+    name: "Active",
+    value: 6,
     color: "#DC3173",
   },
   {
     name: "Pending",
     value: 1,
     color: "#f59e0b",
-  },
-  {
-    name: "Submitted",
-    value: 1,
-    color: "#3b82f6",
-  },
-  {
-    name: "Rejected",
-    value: 1,
-    color: "#ef4444",
   },
   {
     name: "Blocked",
@@ -84,47 +66,53 @@ const statusDistribution = [
 const monthlySignups = [
   {
     name: "Jan",
-    vendors: 2,
+    customers: 45,
   },
   {
     name: "Feb",
-    vendors: 3,
+    customers: 62,
   },
   {
     name: "Mar",
-    vendors: 1,
+    customers: 58,
   },
   {
     name: "Apr",
-    vendors: 2,
+    customers: 71,
   },
   {
     name: "May",
-    vendors: 2,
+    customers: 89,
   },
   {
     name: "Jun",
-    vendors: 1,
+    customers: 95,
   },
 ];
 
-export default function VendorReport({ vendorsData }: IProps) {
+export function CustomerReport({ customersData }: IProps) {
   const stats = {
-    total: vendorsData.meta?.total || 0,
-    approved: vendorsData.data?.filter((v) => v.status === "APPROVED").length,
-    pending: vendorsData.data?.filter((v) => v.status === "SUBMITTED").length,
-    blocked: vendorsData.data?.filter(
-      (v) => v.status === "BLOCKED" || v.status === "REJECTED",
-    ).length,
+    total: customersData.meta?.total || 0,
+    active: customersData.data?.filter((c) => c.status === "APPROVED").length,
+    totalSpent: customersData.data?.reduce(
+      (sum, c) => sum + (c.orders?.totalSpent || 0),
+      0,
+    ),
+    totalOrders: customersData.data?.reduce(
+      (sum, c) => sum + (c.orders?.totalOrders || 0),
+      0,
+    ),
   };
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
+      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-brand-50/80 to-transparent -z-10" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         {/* Header */}
         <TitleHeader
-          title="Vendor Report"
-          subtitle="Overview of all registered vendors and their status"
+          title="Customer Report"
+          subtitle="Overview of all registered customers and their activity"
           buttonInfo={{
             text: "Export",
             icon: Download,
@@ -135,29 +123,29 @@ export default function VendorReport({ vendorsData }: IProps) {
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatsCard
-            title="Total Vendors"
+            title="Total Customers"
             value={stats.total}
-            icon={Store}
+            icon={User}
             delay={0}
           />
           <StatsCard
-            title="Approved Vendors"
-            value={stats.approved}
-            icon={CheckCircle}
+            title="Active Customers"
+            value={stats.active}
+            icon={Heart}
             delay={0.1}
           />
           <StatsCard
-            title="Submitted Vendors"
-            value={stats.pending}
-            icon={Clock}
+            title="Total Orders"
+            value={stats.totalOrders}
+            icon={ShoppingBag}
             delay={0.2}
           />
           <StatsCard
-            title="Blocked/Rejected Vendors"
-            value={stats.blocked}
-            icon={XCircle}
+            title="Total Revenue"
+            value={`€${stats.totalSpent.toLocaleString()}`}
+            icon={EuroIcon}
             delay={0.3}
           />
         </div>
@@ -179,15 +167,15 @@ export default function VendorReport({ vendorsData }: IProps) {
             className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
           >
             <h3 className="text-lg font-bold text-gray-900 mb-2">
-              Monthly Signups
+              Customer Growth
             </h3>
             <p className="text-sm text-gray-500 mb-6">
-              New vendor registrations over time
+              New customer registrations over time
             </p>
             <AnalyticsChart
               data={monthlySignups}
-              type="bar"
-              dataKey="vendors"
+              type="area"
+              dataKey="customers"
               height={200}
             />
           </motion.div>
@@ -231,7 +219,7 @@ export default function VendorReport({ vendorsData }: IProps) {
           </motion.div>
         </div>
 
-        {/* Filters & Table */}
+        {/* Table */}
         <motion.div
           initial={{
             opacity: 0,
@@ -246,29 +234,33 @@ export default function VendorReport({ vendorsData }: IProps) {
           }}
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-[#DC3173]/10 rounded-lg text-[#DC3173]">
-              <Store size={20} />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">All Vendors</h2>
-              <p className="text-sm text-gray-500">
-                {vendorsData.meta?.total || 0} vendors
-              </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-[#DC3173]/10 rounded-lg text-[#DC3173]">
+                <User size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  All Customers
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {customersData.meta?.total || 0} customers
+                </p>
+              </div>
             </div>
           </div>
 
           <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
-          <VendorReportTable vendors={vendorsData.data} />
+          <CustomerReportTable customers={customersData?.data} />
 
-          {!!vendorsData?.meta?.totalPage && (
+          {!!customersData?.meta?.totalPage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <PaginationComponent
-                totalPages={vendorsData?.meta?.totalPage as number}
+                totalPages={customersData?.meta?.totalPage as number}
               />
             </motion.div>
           )}

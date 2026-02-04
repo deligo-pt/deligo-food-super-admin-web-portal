@@ -1,5 +1,6 @@
 "use client";
 
+import VehicleIcon from "@/components/Dashboard/Reports/DeliveryPartnerReport/VehicleIcon";
 import ReportStatusBadge from "@/components/Dashboard/Reports/ReportStatusBadge/ReportStatusBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TAgent } from "@/types/user.type";
+import { TDeliveryPartner, TVehicleType } from "@/types/delivery-partner.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -19,6 +20,7 @@ import {
   CircleCheckBig,
   Cog,
   ContactRoundIcon,
+  Euro,
   EyeIcon,
   PackageCheckIcon,
   StarIcon,
@@ -27,10 +29,10 @@ import {
 import { useRouter } from "next/navigation";
 
 interface IProps {
-  fleetManagers: TAgent[];
+  partners: TDeliveryPartner[];
 }
 
-export default function FleetManagerReportTable({ fleetManagers }: IProps) {
+export default function DeliveryPartnerReportTable({ partners }: IProps) {
   const router = useRouter();
 
   return (
@@ -45,13 +47,13 @@ export default function FleetManagerReportTable({ fleetManagers }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ContactRoundIcon className="w-4" />
-                Fleet Manager
+                Delivery Partner
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <BikeIcon className="w-4" />
-                Drivers
+                Vehicle
               </div>
             </TableHead>
             <TableHead>
@@ -64,6 +66,12 @@ export default function FleetManagerReportTable({ fleetManagers }: IProps) {
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <StarIcon className="w-4" />
                 Rating
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
+                <Euro className="w-4" />
+                Earnings
               </div>
             </TableHead>
             <TableHead>
@@ -85,56 +93,77 @@ export default function FleetManagerReportTable({ fleetManagers }: IProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {fleetManagers?.length === 0 && (
+          {partners?.length === 0 && (
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={7}
+                colSpan={8}
               >
-                No fleet managers found
+                No delivery partner found
               </TableCell>
             </TableRow>
           )}
-          {fleetManagers?.map((f) => (
-            <TableRow key={f._id}>
+          {partners?.map((dp) => (
+            <TableRow key={dp._id}>
               <TableCell className="flex items-center gap-3">
                 <div>
                   <Avatar>
                     <AvatarImage
-                      src={f.profilePhoto}
-                      alt={`${f.name?.firstName} ${f.name?.lastName}`}
+                      src={dp.profilePhoto}
+                      alt={`${dp.name?.firstName} ${dp.name?.lastName}`}
                     />
                     <AvatarFallback>
-                      {f.name?.firstName?.charAt(0)}
-                      {f.name?.lastName?.charAt(0)}
+                      {dp.name?.firstName?.charAt(0)}
+                      {dp.name?.lastName?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 <div>
                   <h3 className="font-medium">
-                    {f.name?.firstName} {f.name?.lastName}
-                    {!f.name?.firstName && !f.name?.lastName && "N/A"}
+                    {dp.name?.firstName} {dp.name?.lastName}
+                    {!dp.name?.firstName && !dp.name?.lastName && "N/A"}
                   </h3>
-                  <p className="text-sm text-gray-700">{f.email}</p>
+                  <p className="text-sm text-gray-700">{dp.email}</p>
                 </div>
               </TableCell>
-              <TableCell>{f.operationalData?.totalDrivers || 0}</TableCell>
-              <TableCell>{f.operationalData?.totalDeliveries || 0}</TableCell>
+              <TableCell>
+                {dp.vehicleInfo?.vehicleType ? (
+                  <div className="flex items-center gap-2">
+                    <VehicleIcon
+                      type={dp.vehicleInfo?.vehicleType as TVehicleType}
+                    />
+                    {dp.vehicleInfo?.vehicleType}
+                  </div>
+                ) : (
+                  "N/A"
+                )}
+              </TableCell>
+              <TableCell>
+                <span>{dp.operationalData?.completedDeliveries || 0}</span>
+                <span className="text-gray-500">
+                  /{dp.operationalData?.totalDeliveries || 0}
+                </span>
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <StarIcon className="w-4 text-yellow-500" />
-                  <span>{f.operationalData?.rating?.average || 0}</span>
+                  <span>{dp.operationalData?.rating?.average || 0}</span>
                 </div>
               </TableCell>
+              <TableCell>€{dp.earnings?.totalEarnings || 0}</TableCell>
               <TableCell>
-                <ReportStatusBadge status={f.status} />
+                {format(dp.createdAt as Date, "do MMM yyyy")}
               </TableCell>
-              <TableCell>{format(f.createdAt, "do MMM yyyy")}</TableCell>
+              <TableCell>
+                <ReportStatusBadge status={dp.status} />
+              </TableCell>
               <TableCell className="text-right">
-                {!f.isDeleted && (
+                {!dp.isDeleted && (
                   <Button
                     variant="ghost"
-                    onClick={() => router.push("/admin/agent/" + f.userId)}
+                    onClick={() =>
+                      router.push("/admin/all-delivery-partners/" + dp.userId)
+                    }
                   >
                     <EyeIcon />
                   </Button>
