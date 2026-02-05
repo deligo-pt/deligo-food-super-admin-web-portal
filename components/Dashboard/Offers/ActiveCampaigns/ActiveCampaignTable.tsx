@@ -107,8 +107,8 @@ export default function CampaignTable({
                     : "N/A"}
               </TableCell>
               <TableCell>
-                {format(offer.startDate, "yyyy-MM-dd")} to{" "}
-                {format(offer.endDate, "yyyy-MM-dd")}
+                {format(offer.validFrom, "yyyy-MM-dd")} to{" "}
+                {format(offer.expiresAt, "yyyy-MM-dd")}
               </TableCell>
               <TableCell>{offer?.isActive ? "Active" : "Inactive"}</TableCell>
               <TableCell className="text-right">

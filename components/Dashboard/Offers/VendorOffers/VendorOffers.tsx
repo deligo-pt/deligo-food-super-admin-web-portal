@@ -91,7 +91,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
 
                         <div className="flex items-center gap-2 mt-2 text-gray-600 text-sm">
                           <CalendarClock size={14} /> Valid till:{" "}
-                          {format(offer.endDate, "dd MMM, yyyy")}
+                          {format(offer.expiresAt, "dd MMM, yyyy")}
                         </div>
                       </div>
                     </div>

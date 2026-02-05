@@ -99,8 +99,8 @@ export default function OfferDetails({ offer }: IProps) {
     : 0;
 
   const now = new Date();
-  const start = new Date(offer.startDate);
-  const end = new Date(offer.endDate);
+  const start = new Date(offer.validFrom);
+  const end = new Date(offer.expiresAt);
   const totalDuration = end.getTime() - start.getTime();
   const elapsed = now.getTime() - start.getTime();
   const timeProgress = Math.min(
@@ -419,7 +419,7 @@ export default function OfferDetails({ offer }: IProps) {
             {
               icon: UsersIcon,
               label: "Limit/User",
-              value: offer.limitPerUser || "Unlimited",
+              value: offer.userUsageLimit || "Unlimited",
             },
             {
               icon: TrendingUpIcon,

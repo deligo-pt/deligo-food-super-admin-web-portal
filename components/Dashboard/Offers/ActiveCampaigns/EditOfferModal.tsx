@@ -64,8 +64,8 @@ export default function EditOfferModal({
         "PERCENT",
       discountValue: prevValues.discountValue || 0,
       maxDiscountAmount: prevValues.maxDiscountAmount || 0,
-      startDate: new Date(prevValues.startDate) || new Date(),
-      endDate: new Date(prevValues.endDate) || new Date(),
+      validFrom: new Date(prevValues.validFrom) || new Date(),
+      expiresAt: new Date(prevValues.expiresAt) || new Date(),
       minOrderAmount: prevValues.minOrderAmount || 0,
       code: prevValues.code || "",
       isAutoApply: prevValues.isAutoApply || false,
@@ -261,7 +261,7 @@ export default function EditOfferModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="startDate"
+                  name="validFrom"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
@@ -285,7 +285,7 @@ export default function EditOfferModal({
                 />
                 <FormField
                   control={form.control}
-                  name="endDate"
+                  name="expiresAt"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>

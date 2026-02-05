@@ -16,8 +16,8 @@ export type TOffer = {
   };
 
   // Validity period
-  startDate: Date;
-  endDate: Date;
+  validFrom: Date;
+  expiresAt: Date;
 
   // Eligibility
   vendorId?: string | null; // null = global offer
@@ -30,7 +30,9 @@ export type TOffer = {
   // Usage control
   maxUsageCount?: number;
   usageCount?: number;
-  limitPerUser?: number;
+  userUsageLimit?: number;
+
+  isGlobal: boolean;
 
   // Status
   isActive: boolean;

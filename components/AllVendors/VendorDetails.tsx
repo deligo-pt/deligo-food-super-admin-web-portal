@@ -466,8 +466,8 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
                     <p>Flat Offer (€{offer.discountValue} Off)</p>
                   )}
                   <p className="text-xs">
-                    {format(offer.startDate, "dd/MM/yyyy")} -{" "}
-                    {format(offer.endDate, "dd/MM/yyyy")}
+                    {format(offer.validFrom, "dd/MM/yyyy")} -{" "}
+                    {format(offer.expiresAt, "dd/MM/yyyy")}
                   </p>
                 </div>
               ))}
