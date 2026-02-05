@@ -3,7 +3,7 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
 import CustomerReportTable from "@/components/Dashboard/Reports/CustomerReport/CustomerReportTable";
-import ExportPopover from "@/components/ExportDropdown/ExportPopover";
+import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
@@ -99,7 +99,7 @@ export function CustomerReport({ customersData }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
-    documentTitle: ` customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
+    documentTitle: `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
   });
 
   const stats = {
@@ -148,7 +148,7 @@ export function CustomerReport({ customersData }: IProps) {
                   stats: stats,
                   monthlySignups,
                   statusDistribution,
-                  customer: customersData.data,
+                  customers: customersData.data,
                 })
               }
             />

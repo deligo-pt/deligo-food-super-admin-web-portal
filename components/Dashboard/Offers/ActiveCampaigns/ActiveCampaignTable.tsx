@@ -17,7 +17,16 @@ import {
 import { TOffer } from "@/types/offer.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
-import { CircleCheckBig, Cog, IdCard, Mail, MoreVertical } from "lucide-react";
+import {
+  CircleCheckBig,
+  Clock,
+  Cog,
+  Hourglass,
+  IdCard,
+  Mail,
+  MoreVertical,
+  TagIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface IProps {
@@ -62,20 +71,26 @@ export default function CampaignTable({
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <CircleCheckBig className="w-4" />
+                <TagIcon className="w-4" />
                 Discount
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <CircleCheckBig className="w-4" />
+                <Clock className="w-4" />
                 Duration
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Status
+                Active Status
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
+                <Hourglass className="w-4" />
+                Expire Status
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
@@ -107,10 +122,16 @@ export default function CampaignTable({
                     : "N/A"}
               </TableCell>
               <TableCell>
-                {format(offer.validFrom, "yyyy-MM-dd")} to{" "}
-                {format(offer.expiresAt, "yyyy-MM-dd")}
+                {offer.validFrom && offer.expiresAt
+                  ? `${format(offer.validFrom, "yyyy-MM-dd")} to ${format(offer.expiresAt, "yyyy-MM-dd")}`
+                  : "N/A"}
               </TableCell>
               <TableCell>{offer?.isActive ? "Active" : "Inactive"}</TableCell>
+              <TableCell>
+                {new Date(offer.expiresAt).getTime() - new Date().getTime() > 0
+                  ? "Active"
+                  : "Expired"}
+              </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger>
@@ -119,7 +140,7 @@ export default function CampaignTable({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        router.push("/admin/active-campaigns/" + offer._id)
+                        router.push("/admin/all-offers/" + offer._id)
                       }
                     >
                       View

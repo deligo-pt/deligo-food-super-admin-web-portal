@@ -3,13 +3,18 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
 import VendorReportTable from "@/components/Dashboard/Reports/VendorReport/VendorReportTable";
+import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
+import { exportVendorReportCSV } from "@/utils/exportVendorReportCSV";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
-import { CheckCircle, Clock, Download, Store, XCircle } from "lucide-react";
+import { CheckCircle, Clock, Store, XCircle } from "lucide-react";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   vendorsData: { data: TVendor[]; meta?: TMeta };
@@ -109,6 +114,12 @@ const monthlySignups = [
 ];
 
 export default function VendorReport({ vendorsData }: IProps) {
+  const reportRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: reportRef,
+    documentTitle: `vendor_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
+  });
+
   const stats = {
     total: vendorsData.meta?.total || 0,
     approved: vendorsData.data?.filter((v) => v.status === "APPROVED").length,
@@ -119,23 +130,44 @@ export default function VendorReport({ vendorsData }: IProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+    <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 print:pt-4">
+        {/* Logo for print */}
+        <div className="hidden print:flex items-center gap-2 mb-4">
+          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/deligoLogo.png"
+              alt="DeliGo Logo"
+              width={36}
+              height={36}
+              className="object-cover"
+            />
+          </div>
+          <h1 className="font-bold text-xl text-[#DC3173]">DeliGo</h1>
+        </div>
+
         {/* Header */}
         <TitleHeader
           title="Vendor Report"
           subtitle="Overview of all registered vendors and their status"
-          buttonInfo={{
-            text: "Export",
-            icon: Download,
-            onClick: () => {
-              console.log("Export clicked");
-            },
-          }}
+          extraComponent={
+            <ExportPopover
+              onPDFClick={() => handlePrint()}
+              onCSVClick={() =>
+                exportVendorReportCSV({
+                  stats: stats,
+                  monthlySignups,
+                  statusDistribution,
+                  vendors: vendorsData.data,
+                })
+              }
+            />
+          }
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Vendors"
             value={stats.total}
@@ -163,7 +195,7 @@ export default function VendorReport({ vendorsData }: IProps) {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
           <motion.div
             initial={{
               opacity: 0,

@@ -7,20 +7,22 @@ type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function ActiveCampaignsPage({ searchParams }: IProps) {
+export default async function AllOffersPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const activeStatus = queries.activeStatus;
+  const validStatus = queries.validStatus;
 
   const params = {
     limit,
     page,
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
-    isExpired: false,
-    isActive: true,
+    ...(activeStatus ? { isActive: activeStatus !== "ACTIVE" } : {}),
+    ...(validStatus ? { isExpired: validStatus !== "VALID" } : {}),
     isDeleted: false,
   };
 
@@ -42,8 +44,9 @@ export default async function ActiveCampaignsPage({ searchParams }: IProps) {
   return (
     <ActiveCampaigns
       offersResult={initialData}
-      title="Active Campaigns"
-      subtitle="List of all active offers"
+      showFilters={true}
+      title="All Offers"
+      subtitle="Manage all offers here"
     />
   );
 }

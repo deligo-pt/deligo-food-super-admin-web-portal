@@ -126,10 +126,10 @@ export default function FleetManagerReportTable({ fleetManagers }: IProps) {
                   <span>{f.operationalData?.rating?.average || 0}</span>
                 </div>
               </TableCell>
+              <TableCell>{format(f.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>
                 <ReportStatusBadge status={f.status} />
               </TableCell>
-              <TableCell>{format(f.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 {!f.isDeleted && (
                   <Button

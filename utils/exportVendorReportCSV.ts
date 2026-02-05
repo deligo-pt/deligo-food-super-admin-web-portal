@@ -1,30 +1,30 @@
-import { TCustomer } from "@/types/user.type";
+import { TVendor } from "@/types/user.type";
 import { format } from "date-fns";
 
-export function exportCustomerReportCSV({
+export function exportVendorReportCSV({
   statusDistribution,
   monthlySignups,
   stats,
-  customers,
+  vendors,
 }: {
   statusDistribution: { name: string; value: number }[];
-  monthlySignups: { name: string; customers: number }[];
+  monthlySignups: { name: string; vendors: number }[];
   stats: {
     total: number;
-    active: number;
-    totalOrders: number;
-    totalSpent: number;
+    approved: number;
+    pending: number;
+    blocked: number;
   };
-  customers: TCustomer[];
+  vendors: TVendor[];
 }) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Customers", String(stats.total)]);
-  rows.push(["Active Customers", String(stats.active)]);
-  rows.push(["Total Orders", String(stats.totalOrders)]);
-  rows.push(["Total Revenue", String(stats.totalSpent)]);
+  rows.push(["Total Vendors", String(stats.total)]);
+  rows.push(["Approved Vendors", String(stats.approved)]);
+  rows.push(["Submitted Vendors", String(stats.pending)]);
+  rows.push(["Blocked/Rejected Vendors", String(stats.blocked)]);
   rows.push([]); // spacer row
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====
@@ -39,41 +39,39 @@ export function exportCustomerReportCSV({
   rows.push(["--- MONTHLY SIGNUPS ---"]);
   rows.push(["Month", "Customers"]);
   monthlySignups.forEach((item) => {
-    rows.push([item.name, String(item.customers)]);
+    rows.push([item.name, String(item.vendors)]);
   });
   rows.push([]);
 
-  // ===== SECTION 4: CUSTOMERS TABLE =====
-  rows.push(["--- CUSTOMERS ---"]);
+  // ===== SECTION 4: VENDORS TABLE =====
+  rows.push(["--- VENDORS ---"]);
   rows.push([
-    "Customer ID",
-    "Name",
+    "Vendor ID",
+    "Business Name",
+    "Business Type",
+    "Owner",
     "Email",
-    "Profile Photo",
+    "Vendor Photo",
     "Orders",
-    "Total Spent",
-    "Points",
-    "Last Ordered Date",
+    "Rating",
     "Joined Date",
     "Status",
   ]);
 
-  customers.forEach((c) => {
+  vendors.forEach((v) => {
     rows.push([
-      c.userId,
-      c.name?.firstName && c.name?.lastName
-        ? `${c.name?.firstName} ${c.name?.lastName}`
+      v.userId,
+      v.businessDetails?.businessName || "N/A",
+      v.businessDetails?.businessType || "N/A",
+      v.name?.firstName && v.name?.lastName
+        ? `${v.name?.firstName} ${v.name?.lastName}`
         : "N/A",
-      c.email || "N/A",
-      c.profilePhoto || "N/A",
-      c.orders?.totalOrders || 0,
-      c.orders?.totalSpent || 0,
-      c.loyaltyPoints || 0,
-      c.orders?.lastOrderDate
-        ? format(c.orders?.lastOrderDate, "yyyy-MM-dd")
-        : "N/A",
-      format(c.createdAt as Date, "yyyy-MM-dd"),
-      c.status,
+      v.email || "N/A",
+      v.profilePhoto || "N/A",
+      v.totalOrders || 0,
+      v.rating?.average || 0,
+      format(v.createdAt as Date, "yyyy-MM-dd"),
+      v.status,
     ]);
   });
 
@@ -87,7 +85,7 @@ export function exportCustomerReportCSV({
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}.csv`;
+  a.download = `vendor_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}.csv`;
   a.click();
 
   URL.revokeObjectURL(url);

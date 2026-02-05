@@ -3,13 +3,18 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
 import DeliveryPartnerReportTable from "@/components/Dashboard/Reports/DeliveryPartnerReport/DeliveryPartnerReportTable";
+import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { exportDeliveryPartnerReportCSV } from "@/utils/exportDeliveryPartnerReportCSV ";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
-import { Bike, CheckCircle, Download, EuroIcon, Package } from "lucide-react";
+import { Bike, CheckCircle, EuroIcon, Package } from "lucide-react";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   partnersData: { data: TDeliveryPartner[]; meta?: TMeta };
@@ -104,6 +109,12 @@ const monthlySignups = [
 ];
 
 export default function DeliveryPartnerReport({ partnersData }: IProps) {
+  const reportRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: reportRef,
+    documentTitle: `delivery_partner_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
+  });
+
   const stats = {
     total: partnersData.meta?.total || 0,
     approved: partnersData.data?.filter((p) => p.status === "APPROVED").length,
@@ -118,25 +129,44 @@ export default function DeliveryPartnerReport({ partnersData }: IProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-brand-50/80 to-transparent -z-10" />
+    <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 print:pt-4">
+        {/* Logo for print */}
+        <div className="hidden print:flex items-center gap-2 mb-4">
+          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/deligoLogo.png"
+              alt="DeliGo Logo"
+              width={36}
+              height={36}
+              className="object-cover"
+            />
+          </div>
+          <h1 className="font-bold text-xl text-[#DC3173]">DeliGo</h1>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         {/* Header */}
         <TitleHeader
           title="Delivery Partner Report"
           subtitle="Overview of all delivery partners and their performance"
-          buttonInfo={{
-            text: "Export",
-            icon: Download,
-            onClick: () => {
-              console.log("Export clicked");
-            },
-          }}
+          extraComponent={
+            <ExportPopover
+              onPDFClick={() => handlePrint()}
+              onCSVClick={() =>
+                exportDeliveryPartnerReportCSV({
+                  stats: stats,
+                  monthlySignups,
+                  vehicleDistribution,
+                  deliveryPartners: partnersData.data,
+                })
+              }
+            />
+          }
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Partners"
             value={stats.total}
@@ -164,7 +194,7 @@ export default function DeliveryPartnerReport({ partnersData }: IProps) {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
           <motion.div
             initial={{
               opacity: 0,

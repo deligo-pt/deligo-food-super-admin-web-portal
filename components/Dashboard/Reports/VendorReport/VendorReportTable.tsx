@@ -137,10 +137,10 @@ export default function VendorReportTable({ vendors }: IProps) {
                 </div>
               </TableCell>
               <TableCell>{vendor.totalOrders || 0}</TableCell>
+              <TableCell>{format(vendor.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>
                 <ReportStatusBadge status={vendor.status} />
               </TableCell>
-              <TableCell>{format(vendor.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 {!vendor.isDeleted && (
                   <Button

@@ -465,10 +465,12 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
                   {offer.offerType === "FLAT" && (
                     <p>Flat Offer (€{offer.discountValue} Off)</p>
                   )}
-                  <p className="text-xs">
-                    {format(offer.validFrom, "dd/MM/yyyy")} -{" "}
-                    {format(offer.expiresAt, "dd/MM/yyyy")}
-                  </p>
+                  {offer.validFrom && offer.expiresAt && (
+                    <p className="text-xs">
+                      {format(offer.validFrom, "dd/MM/yyyy")} -{" "}
+                      {format(offer.expiresAt, "dd/MM/yyyy")}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

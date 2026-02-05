@@ -22,7 +22,7 @@ export default function ExportPopover({ onPDFClick, onCSVClick }: IProps) {
       </PopoverTrigger>
       <PopoverContent className="w-fit p-2">
         {onPDFClick && (
-          <div onClick={onPDFClick}>
+          <div>
             <Button
               variant="ghost"
               className="flex gap-2 text-[#DC3173]"
@@ -34,7 +34,7 @@ export default function ExportPopover({ onPDFClick, onCSVClick }: IProps) {
           </div>
         )}
         {onCSVClick && (
-          <div onClick={onCSVClick}>
+          <div>
             <Button
               variant="ghost"
               className="flex gap-2 text-[#DC3173]"

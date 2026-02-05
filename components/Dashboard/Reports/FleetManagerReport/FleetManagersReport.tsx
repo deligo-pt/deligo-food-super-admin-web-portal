@@ -3,19 +3,18 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
 import FleetManagerReportTable from "@/components/Dashboard/Reports/FleetManagerReport/FleetManagerReportTable";
+import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TAgent } from "@/types/user.type";
+import { exportFleetManagerReportCSV } from "@/utils/exportFleetManagerReportCSV";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
-import {
-  Bike,
-  CheckCircle,
-  Download,
-  PackageCheckIcon,
-  Users,
-} from "lucide-react";
+import { Bike, CheckCircle, PackageCheckIcon, Users } from "lucide-react";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   fleetManagersData: { data: TAgent[]; meta?: TMeta };
@@ -110,6 +109,12 @@ const monthlySignups = [
 ];
 
 export default function FleetManagerReport({ fleetManagersData }: IProps) {
+  const reportRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: reportRef,
+    documentTitle: `fleet_manager_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
+  });
+
   const stats = {
     total: fleetManagersData.meta?.total || 0,
     approved: fleetManagersData.data?.filter((m) => m.status === "APPROVED")
@@ -125,23 +130,44 @@ export default function FleetManagerReport({ fleetManagersData }: IProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+    <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 print:pt-4">
+        {/* Logo for print */}
+        <div className="hidden print:flex items-center gap-2 mb-4">
+          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/deligoLogo.png"
+              alt="DeliGo Logo"
+              width={36}
+              height={36}
+              className="object-cover"
+            />
+          </div>
+          <h1 className="font-bold text-xl text-[#DC3173]">DeliGo</h1>
+        </div>
+
         {/* Header */}
         <TitleHeader
           title="Fleet Manager Report"
           subtitle="Overview of all fleet managers and their operations"
-          buttonInfo={{
-            text: "Export",
-            icon: Download,
-            onClick: () => {
-              console.log("Export clicked");
-            },
-          }}
+          extraComponent={
+            <ExportPopover
+              onPDFClick={() => handlePrint()}
+              onCSVClick={() =>
+                exportFleetManagerReportCSV({
+                  stats: stats,
+                  monthlySignups,
+                  statusDistribution,
+                  fleetManagers: fleetManagersData.data,
+                })
+              }
+            />
+          }
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Managers"
             value={stats.total}
@@ -169,7 +195,7 @@ export default function FleetManagerReport({ fleetManagersData }: IProps) {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
           <motion.div
             initial={{
               opacity: 0,

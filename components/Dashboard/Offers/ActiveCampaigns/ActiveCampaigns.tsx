@@ -22,6 +22,7 @@ interface IProps {
   offersResult: { data: TOffer[]; meta?: TMeta };
   title: string;
   subtitle?: string;
+  showFilters?: boolean;
 }
 
 const sortOptions = [
@@ -32,7 +33,7 @@ const sortOptions = [
 const filterOptions = [
   {
     label: "Active Status",
-    key: "status",
+    key: "activeStatus",
     placeholder: "Select Status",
     type: "select",
     items: [
@@ -46,10 +47,27 @@ const filterOptions = [
       },
     ],
   },
+  {
+    label: "Validity Status",
+    key: "validStatus",
+    placeholder: "Select Status",
+    type: "select",
+    items: [
+      {
+        label: "Valid",
+        value: "VALID",
+      },
+      {
+        label: "Expired",
+        value: "EXPIRED",
+      },
+    ],
+  },
 ];
 
 export default function ActiveCampaigns({
   offersResult,
+  showFilters,
   title,
   subtitle,
 }: IProps) {
@@ -132,7 +150,10 @@ export default function ActiveCampaigns({
       <TitleHeader title={title} subtitle={subtitle} />
 
       {/* Filters */}
-      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
+      <AllFilters
+        sortOptions={sortOptions}
+        {...(showFilters && { filterOptions })}
+      />
 
       {/* Campaign Table */}
       <CampaignTable

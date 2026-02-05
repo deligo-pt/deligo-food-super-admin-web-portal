@@ -99,8 +99,8 @@ export default function OfferDetails({ offer }: IProps) {
     : 0;
 
   const now = new Date();
-  const start = new Date(offer.validFrom);
-  const end = new Date(offer.expiresAt);
+  const start = offer.validFrom ? new Date(offer.validFrom) : new Date();
+  const end = offer.expiresAt ? new Date(offer.expiresAt) : new Date();
   const totalDuration = end.getTime() - start.getTime();
   const elapsed = now.getTime() - start.getTime();
   const timeProgress = Math.min(

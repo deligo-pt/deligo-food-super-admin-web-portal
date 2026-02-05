@@ -217,11 +217,13 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       ],
     },
     {
-      id: "promotions-and-coupons",
-      title: t("promotions_and_coupons"),
+      id: "promotions-and-offers",
+      title: "Promotions & Offers",
       icon: <Ticket size={18} />,
       items: [
+        { name: "All Offers", path: "/admin/all-offers" },
         { name: t("active_campaigns"), path: "/admin/active-campaigns" },
+        { name: "Expired Offers", path: "/admin/expired-offers" },
         { name: t("create_new_offer"), path: "/admin/create-new-offer" },
         { name: t("coupon_analytics"), path: "/admin/coupon-analytics" },
         {
