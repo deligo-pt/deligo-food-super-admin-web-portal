@@ -46,8 +46,8 @@ export default function CreateNewOffer() {
       offerType: "PERCENT",
       discountValue: 0,
       maxDiscountAmount: 0,
-      startDate: new Date(),
-      endDate: new Date(),
+      validFrom: new Date(),
+      expiresAt: new Date(),
       minOrderAmount: 0,
       code: "",
       isAutoApply: false,
@@ -236,7 +236,7 @@ export default function CreateNewOffer() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="startDate"
+                      name="validFrom"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
@@ -260,7 +260,7 @@ export default function CreateNewOffer() {
                     />
                     <FormField
                       control={form.control}
-                      name="endDate"
+                      name="expiresAt"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>

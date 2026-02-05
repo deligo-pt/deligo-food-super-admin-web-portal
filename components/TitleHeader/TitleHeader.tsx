@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { LucideIcon, PlusIcon } from "lucide-react";
+import { ReactNode } from "react";
 
 interface IProps {
   title: string;
@@ -12,9 +13,15 @@ interface IProps {
     onClick: () => void;
     icon?: LucideIcon;
   };
+  extraComponent?: ReactNode;
 }
 
-export default function TitleHeader({ title, subtitle, buttonInfo }: IProps) {
+export default function TitleHeader({
+  title,
+  subtitle,
+  buttonInfo,
+  extraComponent,
+}: IProps) {
   return (
     <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
       <div className="bg-linear-to-r from-[#DC3173] to-[#FF6CAB] p-6 rounded-lg mb-6 shadow-lg">
@@ -28,7 +35,7 @@ export default function TitleHeader({ title, subtitle, buttonInfo }: IProps) {
           <div>
             {buttonInfo && (
               <Button
-                className="bg-white text-[#DC3173] hover:bg-slate-100 hover:text-[#DC3173]/90 px-4 py-2 rounded-md font-medium flex items-center gap-2 cursor-pointer"
+                className="bg-white text-[#DC3173] hover:bg-slate-100 hover:text-[#DC3173]/90 px-4 py-2 rounded-md font-medium flex items-center gap-2 cursor-pointer print:hidden"
                 onClick={buttonInfo.onClick}
               >
                 {buttonInfo.icon ? (
@@ -39,6 +46,7 @@ export default function TitleHeader({ title, subtitle, buttonInfo }: IProps) {
                 {buttonInfo.text}
               </Button>
             )}
+            {extraComponent ? extraComponent : null}
           </div>
         </div>
       </div>

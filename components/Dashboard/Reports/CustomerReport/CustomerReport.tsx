@@ -3,13 +3,18 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
 import CustomerReportTable from "@/components/Dashboard/Reports/CustomerReport/CustomerReportTable";
+import ExportPopover from "@/components/ExportDropdown/ExportPopover";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
+import { exportCustomerReportCSV } from "@/utils/exportCustomerReportCSV";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
-import { Download, EuroIcon, Heart, ShoppingBag, User } from "lucide-react";
+import { EuroIcon, Heart, ShoppingBag, User } from "lucide-react";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   customersData: { data: TCustomer[]; meta?: TMeta };
@@ -91,6 +96,12 @@ const monthlySignups = [
 ];
 
 export function CustomerReport({ customersData }: IProps) {
+  const reportRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: reportRef,
+    documentTitle: ` customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
+  });
+
   const stats = {
     total: customersData.meta?.total || 0,
     active: customersData.data?.filter((c) => c.status === "APPROVED").length,
@@ -105,25 +116,47 @@ export function CustomerReport({ customersData }: IProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-brand-50/80 to-transparent -z-10" />
+    <div
+      ref={reportRef}
+      className="print-container min-h-screen bg-gray-50/50 pb-20"
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 print:pt-4">
+        {/* Logo for print */}
+        <div className="hidden print:flex items-center gap-2 mb-4">
+          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/deligoLogo.png"
+              alt="DeliGo Logo"
+              width={36}
+              height={36}
+              className="object-cover"
+            />
+          </div>
+          <h1 className="font-bold text-xl text-[#DC3173]">DeliGo</h1>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         {/* Header */}
         <TitleHeader
           title="Customer Report"
           subtitle="Overview of all registered customers and their activity"
-          buttonInfo={{
-            text: "Export",
-            icon: Download,
-            onClick: () => {
-              console.log("Export clicked");
-            },
-          }}
+          extraComponent={
+            <ExportPopover
+              onPDFClick={() => handlePrint()}
+              onCSVClick={() =>
+                exportCustomerReportCSV({
+                  stats: stats,
+                  monthlySignups,
+                  statusDistribution,
+                  customer: customersData.data,
+                })
+              }
+            />
+          }
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Customers"
             value={stats.total}
@@ -151,7 +184,7 @@ export function CustomerReport({ customersData }: IProps) {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
           <motion.div
             initial={{
               opacity: 0,
