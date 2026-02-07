@@ -12,21 +12,24 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/use-translation";
-import { TVendor } from "@/types/user.type";
-import { Mail, Store, UserCircle } from "lucide-react";
+import { TMeta } from "@/types";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { Bike, Mail, Phone } from "lucide-react";
 
 interface IProps {
-  vendors: TVendor[];
+  driversData: { data: TDeliveryPartner[]; meta?: TMeta };
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onClick: (v: TVendor) => void;
+  onClick: (v: TDeliveryPartner) => void;
+  getDrivers: ({ limit }: { limit?: number }) => void;
 }
 
-export default function SelectVendorModal({
+export default function SelectDriverModal({
   open,
   onOpenChange,
   onClick,
-  vendors,
+  driversData,
+  getDrivers,
 }: IProps) {
   const { t } = useTranslation();
 
@@ -35,48 +38,57 @@ export default function SelectVendorModal({
       <form>
         <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{t("start_a_conversation")}</DialogTitle>
+            <DialogTitle>Start a conversation</DialogTitle>
             <DialogDescription>
-              {t("select_vendor_to_start_conversation")}
+              Select a driver to start a conversation
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            {vendors?.map((vendor) => (
+            {driversData?.data?.map((driver) => (
               <div
                 className="w-full bg-[#DC3173]/20 text-[#DC3173] hover:bg-[#DC3173] hover:text-white flex items-center gap-3 p-4 rounded-lg group transition-colors cursor-pointer"
-                key={vendor._id}
-                onClick={() => onClick(vendor)}
+                key={driver._id}
+                onClick={() => onClick(driver)}
               >
                 <Avatar className="w-10 h-10">
                   <AvatarImage
-                    src={vendor?.profilePhoto}
-                    alt={vendor?.businessDetails?.businessName}
+                    src={driver?.profilePhoto}
+                    alt={`${driver?.name?.firstName} ${driver?.name?.lastName}`}
                   />
                   <AvatarFallback className="bg-[#DC3173] text-white group-hover:bg-white/30 transition-colors">
-                    {vendor?.businessDetails?.businessName
-                      .split(" ")
-                      .map((name) => name?.charAt(0))
-                      .join("")}
+                    {driver?.name?.firstName?.charAt(0)}
+                    {driver?.name?.lastName?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-black group-hover:text-white transition-colors">
                   <h3 className="text-lg font-bold flex items-center gap-1">
-                    <Store size={22} />
-                    {vendor?.businessDetails?.businessName}
+                    <Bike size={22} />
+                    {driver?.name?.firstName} {driver?.name?.lastName}
                   </h3>
-                  <span className="text-sm text-gray-700 group-hover:text-gray-200 transition-colors flex items-center gap-1">
-                    <UserCircle size={14} />
-                    {vendor?.name?.firstName} {vendor?.name?.lastName}
-                  </span>
                   <p className="text-sm text-gray-700 group-hover:text-gray-200 transition-colors flex items-center gap-1">
                     <Mail size={14} />
-                    {vendor?.email}
+                    {driver?.email}
+                  </p>
+                  <p className="text-sm text-gray-700 group-hover:text-gray-200 transition-colors flex items-center gap-1">
+                    <Phone size={14} />
+                    {driver?.contactNumber}
                   </p>
                 </div>
               </div>
             ))}
           </div>
           <DialogFooter>
+            {(driversData?.meta?.limit || 10) <
+              (driversData?.meta?.total || 0) && (
+              <Button
+                onClick={() =>
+                  getDrivers({ limit: (driversData?.meta?.limit || 0) + 10 })
+                }
+                className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+              >
+                Show more
+              </Button>
+            )}
             <DialogClose asChild>
               <Button variant="outline">{t("cancel")}</Button>
             </DialogClose>

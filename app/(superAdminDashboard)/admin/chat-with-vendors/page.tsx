@@ -1,4 +1,4 @@
-import ChatWithVendors from "@/components/Chat/ChatWithVendors/ChatWithVendors";
+import ChatWithVendors from "@/components/Dashboard/Chat/ChatWithVendors/ChatWithVendors";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TConversation } from "@/types/chat.type";

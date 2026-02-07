@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import SelectVendorModal from "@/components/Chat/ChatWithVendors/SelectVendorModal";
+
+import SelectVendorModal from "@/components/Dashboard/Chat/ChatWithVendors/SelectVendorModal";
 import { Button } from "@/components/ui/button";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
@@ -15,6 +15,7 @@ import { formatDistanceToNow } from "date-fns";
 import {
   Camera,
   Check,
+  Edit2,
   Mic,
   MoreVertical,
   Paperclip,
@@ -23,86 +24,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
-type Message = {
-  id: string;
-  from: "vendor" | "admin";
-  text?: string;
-  images?: string[];
-  audio?: string | null;
-  at: string;
-  status?: "sent" | "delivered" | "read";
-};
-
-type Vendor = {
-  id: string;
-  name: string;
-  store?: string;
-  avatar?: string;
-  lastSeen?: string;
-  typing?: boolean;
-  unread?: number;
-  pinned?: boolean;
-  messages: Message[];
-};
-
-// const SAMPLE = "/mnt/data/Screenshot from 2025-11-22 23-47-09.png";
-
-// const INITIAL_VENDORS: Vendor[] = [
-//   {
-//     id: "v1",
-//     name: "Padaria Lisboa",
-//     store: "Padaria Lisboa — Lisbon",
-//     avatar: SAMPLE,
-//     lastSeen: new Date().toISOString(),
-//     unread: 2,
-//     pinned: true,
-//     typing: false,
-//     messages: [
-//       {
-//         id: "m1",
-//         from: "vendor",
-//         text: "Hi! Order #123 will be 10 min late.",
-//         at: new Date().toISOString(),
-//         status: "delivered",
-//       },
-//     ],
-//   },
-//   {
-//     id: "v2",
-//     name: "Mercearia Porto",
-//     store: "Mercearia Porto — Porto",
-//     avatar: undefined,
-//     lastSeen: new Date().toISOString(),
-//     typing: true,
-//     messages: [
-//       {
-//         id: "m2",
-//         from: "vendor",
-//         text: "Uploaded the receipt.",
-//         images: [SAMPLE],
-//         at: new Date().toISOString(),
-//         status: "read",
-//       },
-//     ],
-//   },
-//   {
-//     id: "v3",
-//     name: "Restaurante Gaia",
-//     avatar: undefined,
-//     lastSeen: new Date().toISOString(),
-//     typing: false,
-//     messages: [
-//       {
-//         id: "m3",
-//         from: "vendor",
-//         text: "Obrigado!",
-//         at: new Date().toISOString(),
-//         status: "read",
-//       },
-//     ],
-//   },
-// ];
 
 interface IProps {
   conversationsData: { data: TConversation[]; meta?: TMeta };
@@ -116,17 +37,18 @@ export default function ChatWithVendors({
   decoded,
 }: IProps) {
   const { t } = useTranslation();
-  const [vendorMessages, setVendorMessages] = useState<Vendor[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
   const [audioFile, setAudioFile] = useState<string | null>(null);
   const [messages, setMessages] = useState<TMessage[]>([]);
-  const [status, setStatus] = useState("DISCONNECTED");
   const [conversations, setConversations] = useState<TConversation[]>(
-    conversationsData?.data || []
+    conversationsData?.data || [],
   );
-  const [vendors, setVendors] = useState<TVendor[]>([]);
+  const [vendorsData, setVendorsData] = useState<{
+    data: TVendor[];
+    meta?: TMeta;
+  }>({ data: [] });
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [typingInfo, setTypingInfo] = useState<{
     userId: string;
@@ -199,7 +121,7 @@ export default function ChatWithVendors({
           return [newConversation, ...prev];
         }
         const filteredConversations = prev.filter(
-          (c) => c.room !== message.room
+          (c) => c.room !== message.room,
         );
         console.log(message);
 
@@ -218,14 +140,13 @@ export default function ChatWithVendors({
         msg as unknown as {
           message: TMessage;
           room: string;
-        }
+        },
       ),
-    onClosed: () => setStatus("CLOSED"),
+    onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
 
   const { sendMessage, makeTyping } = useChatSocket({
-    // const { sendMessage, closeConversation } = useChatSocket({
     room: selectedId,
     token: accessToken as string,
     onMessage: (msg) => {
@@ -249,7 +170,7 @@ export default function ChatWithVendors({
         });
       }, 3000);
     },
-    onClosed: () => setStatus("CLOSED"),
+    onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
 
@@ -311,11 +232,11 @@ export default function ChatWithVendors({
     e.currentTarget.value = "";
   }
 
-  const getVendors = async ({ page = 1, limit = 10 }) => {
-    const result = await getAllVendorsReq({ page, limit });
+  const getVendors = async ({ limit = 10 }) => {
+    const result = await getAllVendorsReq({ limit });
 
     if (result.success) {
-      setVendors(result.data);
+      setVendorsData({ data: result.data, meta: result.meta });
     }
   };
 
@@ -324,8 +245,8 @@ export default function ChatWithVendors({
     // check if conversation already exists
     const existingConversation = conversations.find((c) =>
       c.participants?.some(
-        (p) => p.userId === vendor.userId && p.role === "VENDOR"
-      )
+        (p) => p.userId === vendor.userId && p.role === "VENDOR",
+      ),
     );
     if (existingConversation && existingConversation.type === "VENDOR_CHAT") {
       setSelectedId(existingConversation.room);
@@ -350,7 +271,7 @@ export default function ChatWithVendors({
   };
 
   useEffect(() => {
-    (() => getVendors({ page: 1, limit: 20 }))();
+    (() => getVendors({ limit: 20 }))();
   }, []);
 
   useEffect(() => {
@@ -373,9 +294,21 @@ export default function ChatWithVendors({
           className="w-[360px] max-w-[360px] min-w-[360px] backdrop-blur-md border border-white/40 rounded-3xl p-4 shadow-xl overflow-hidden h-full! max-h-full! min-h-full! bg-white"
           aria-label="Vendors (floating card)"
         >
-          <div>
-            <h3 className="text-lg font-bold">{t("vendors")}</h3>
-            <p className="text-xs text-gray-600/80">{t("active_conversations")}</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-bold">{t("vendors")}</h3>
+              <p className="text-xs text-gray-600/80">
+                {t("active_conversations")}
+              </p>
+            </div>
+            <div>
+              <Button
+                onClick={() => setShowSelectModal(true)}
+                className="flex justify-center items-center bg-[#DC3173] hover:bg-[#DC3173]/90 w-8 h-8 rounded-full"
+              >
+                <Edit2 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
           <div className="hidden sm:flex items-center bg-white/60 rounded-lg px-3 py-2 border border-white/30 shadow-sm mt-3">
             <Search className="w-4 h-4 text-gray-500 mr-2" />
@@ -392,22 +325,25 @@ export default function ChatWithVendors({
             className="space-y-3 max-h-[68vh] overflow-auto px-1 custom-scroll min-h-full mt-4"
             role="list"
           >
-            <div className="mb-2 text-center">
-              <Button
-                onClick={() => setShowSelectModal(true)}
-                className="bg-[#DC3173] hover:bg-[#DC3173]/90"
-              >
-                {t("start_new_conversation")}
-              </Button>
-            </div>
+            {conversations?.length === 0 && (
+              <div className="mb-2 text-center">
+                <Button
+                  onClick={() => setShowSelectModal(true)}
+                  className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+                >
+                  {t("start_new_conversation")}
+                </Button>
+              </div>
+            )}
             {conversations?.map((c, i) => (
               <div
                 key={c._id}
                 role="listitem"
-                className={`flex items-center gap-3 p-3 rounded-2xl transition ${selectedId === c.room
-                  ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
-                  : "hover:bg-white/40"
-                  }`}
+                className={`flex items-center gap-3 p-3 rounded-2xl transition ${
+                  selectedId === c.room
+                    ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
+                    : "hover:bg-white/40"
+                }`}
               >
                 <button
                   onClick={() => setSelectedId(c.room)}
@@ -457,8 +393,9 @@ export default function ChatWithVendors({
                   {c.unreadCount?.[decoded?.userId] > 0 ? (
                     <div
                       className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
-                      aria-label={`${c.unreadCount?.[decoded?.userId]
-                        } unread messages`}
+                      aria-label={`${
+                        c.unreadCount?.[decoded?.userId]
+                      } unread messages`}
                     >
                       {c.unreadCount?.[decoded?.userId]}
                     </div>
@@ -529,21 +466,23 @@ export default function ChatWithVendors({
                   {messages.map((m) => (
                     <article
                       key={m._id}
-                      className={`max-w-[78%] p-3 rounded-2xl border ${m.senderRole === "ADMIN" ||
+                      className={`max-w-[78%] p-3 rounded-2xl border ${
+                        m.senderRole === "ADMIN" ||
                         m.senderRole === "SUPER_ADMIN"
-                        ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
-                        : "bg-gray-50 border-gray-100"
-                        }`}
-                      aria-label={`${m.senderRole === "ADMIN" ||
+                          ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
+                          : "bg-gray-50 border-gray-100"
+                      }`}
+                      aria-label={`${
+                        m.senderRole === "ADMIN" ||
                         m.senderRole === "SUPER_ADMIN"
-                        ? "You"
-                        : selected?.name
-                        } message`}
+                          ? "You"
+                          : selected?.name
+                      } message`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <div className="text-xs text-gray-400">
                           {m.senderRole === "ADMIN" ||
-                            m.senderRole === "SUPER_ADMIN"
+                          m.senderRole === "SUPER_ADMIN"
                             ? "You"
                             : selected?.name}{" "}
                           •{" "}
@@ -728,7 +667,8 @@ export default function ChatWithVendors({
           open={showSelectModal}
           onOpenChange={(open) => !open && setShowSelectModal(open)}
           onClick={(vendor: TVendor) => selectVendor(vendor)}
-          vendors={vendors}
+          vendorsData={vendorsData}
+          getVendors={getVendors}
         />
       </div>
 

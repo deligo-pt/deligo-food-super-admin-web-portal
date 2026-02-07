@@ -1,4 +1,4 @@
-import ChatWithFleetManagers from "@/components/Chat/ChatWithFleetManagers/ChatWithFleetManagers";
+import ChatWithFleetManagers from "@/components/Dashboard/Chat/ChatWithFleetManagers/ChatWithFleetManagers";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TConversation } from "@/types/chat.type";
