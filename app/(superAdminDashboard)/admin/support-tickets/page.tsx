@@ -9,13 +9,11 @@ export default async function SupportTicketsPage() {
   try {
     const conversationsResult = (await serverRequest.get(
       "/support/conversations",
-      { params: { type: "SUPPORT" } }
+      { params: { type: "SUPPORT" } },
     )) as TResponse<TConversation[]>;
 
     initialData.data = conversationsResult.data;
     initialData.meta = conversationsResult.meta;
-
-    console.log(conversationsResult.data);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log(error?.response?.data, error.message);

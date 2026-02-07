@@ -2,6 +2,7 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { Button } from "@/components/ui/button";
 import { USER_ROLE } from "@/consts/user.const";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
@@ -17,6 +18,7 @@ import { getCookie } from "@/utils/cookies";
 import { fetchData } from "@/utils/requests";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowRight, MessageCircle, Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 // Status Styling
@@ -33,16 +35,24 @@ interface IProps {
 
 export default function SupportTickets({ conversationsData }: IProps) {
   const { t } = useTranslation();
+  const router = useRouter();
+
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<TConversationStatus>("OPEN");
+
   const [conversation, setConversation] = useState<TConversation | null>(null);
   const [conversations, setConversations] = useState<TConversation[]>(
     conversationsData?.data || [],
   );
+
   const textRef = useRef<HTMLTextAreaElement | null>(null);
+  const endRef = useRef<HTMLDivElement | null>(null);
 
   const accessToken = getCookie("accessToken");
+
+  const scrollToBottom = () => {
+    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  };
 
   const sendReply = async (e: FormEvent) => {
     e.preventDefault();
@@ -56,13 +66,22 @@ export default function SupportTickets({ conversationsData }: IProps) {
     textRef.current?.focus();
   };
 
+  const handleCloseConversation = async () => {
+    setConversations((prev) => {
+      const currentConversationIndex = prev.findIndex(
+        (c) => c.room === conversation?.room,
+      );
+      prev[currentConversationIndex].status = "CLOSED";
+      return prev;
+    });
+    setConversation(null);
+  };
+
   const getConversation = async (room: string) => {
     try {
       const result = (await fetchData(`/support/conversations/${room}`, {
         headers: { authorization: accessToken },
       })) as TResponse<TConversation>;
-
-      console.log(result);
 
       if (result.success) {
         return {
@@ -102,34 +121,33 @@ export default function SupportTickets({ conversationsData }: IProps) {
         return [newConversation, ...prev];
       }
       const filteredConversations = prev.filter((c) => c.room !== message.room);
-      console.log(message);
 
       isConversationExist!.lastMessage = message.messagePreview;
       // isConversationExist!.lastMessageTime = message.message
       //   ?.createdAt as unknown as string;
-      return [isConversationExist, ...filteredConversations];
+      return [newConversation, ...filteredConversations];
     });
   };
 
   useAdminChatSocket({
     token: accessToken as string,
     onMessage: (msg) => getNewConversation(msg as TAdminSupportMessage),
-    onClosed: () => setStatus("CLOSED"),
+    onClosed: () => console.log("CLOSED"),
     onError: (msg) => console.log(msg),
   });
 
-  const { sendMessage } = useChatSocket({
+  const { sendMessage, closeConversation } = useChatSocket({
     room: conversation?.room as string,
     token: accessToken as string,
     onMessage: (msg) => {
       if (msg.room === conversation?.room) {
         setMessages((prev) => [...prev, msg]);
+        scrollToBottom();
       }
     },
     onTyping: (data) => {},
-    onClosed: () => setStatus("CLOSED"),
+    onClosed: () => handleCloseConversation(),
     onError: (msg) => console.log(msg),
-    // onNewTicket: (message) => getNewConversation(message),
   });
 
   useEffect(() => {
@@ -143,6 +161,10 @@ export default function SupportTickets({ conversationsData }: IProps) {
       });
     }
   }, [conversation]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">
@@ -265,7 +287,7 @@ export default function SupportTickets({ conversationsData }: IProps) {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-end z-50">
           <div className="w-full sm:w-[420px] h-full bg-white rounded-l-3xl p-6 flex flex-col shadow-xl animate-slide-in">
             {/* Top */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="text-xl font-semibold w-10/12 leading-tight">
                 {conversation.ticketId}
               </h2>
@@ -277,18 +299,32 @@ export default function SupportTickets({ conversationsData }: IProps) {
               </button>
             </div>
 
-            {/* User */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center text-lg">
-                {conversation?.participants?.[0]?.name?.[0]}
+            <div className="flex justify-between gap-3">
+              {/* User */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center text-lg">
+                  {conversation?.participants?.[0]?.name?.[0]}
+                </div>
+                <div>
+                  <p className="font-medium">
+                    {conversation?.participants?.[0]?.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {conversation?.participants?.[0]?.role}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-medium">
-                  {conversation?.participants?.[0]?.name}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {conversation?.participants?.[0]?.role}
-                </p>
+
+              {/* Close Conversation Button */}
+              <div className="text-center">
+                <Button
+                  onClick={closeConversation}
+                  size="sm"
+                  variant="ghost"
+                  className="border border-gray-200 py-1"
+                >
+                  Close Ticket
+                </Button>
               </div>
             </div>
 
@@ -315,6 +351,8 @@ export default function SupportTickets({ conversationsData }: IProps) {
                   {m.message}
                 </div>
               ))}
+
+              <div ref={endRef} />
             </div>
 
             {/* Reply */}
@@ -358,46 +396,6 @@ export default function SupportTickets({ conversationsData }: IProps) {
           `}</style>
         </div>
       )}
-
-      {/* <Dialog
-        open={!!newMessageContent}
-        onOpenChange={(open) => !open && setNewMessageContent(null)}
-      >
-        <form>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-[#DC3173]">
-                <Mail className="w-5 h-5" /> New message
-              </DialogTitle>
-              <DialogDescription>
-                Got a new message from {newMessageContent?.senderId}
-              </DialogDescription>
-            </DialogHeader>
-            <div>
-              <p className="text-sm leading-relaxed">
-                {newMessageContent?.message}
-              </p>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button
-                className="bg-[#DC3173] hover:bg-[#DC3173]/90"
-                type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // openDrawer(newMessageContent!);
-                }}
-              >
-                Open
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </form>
-      </Dialog> */}
     </div>
   );
 }
