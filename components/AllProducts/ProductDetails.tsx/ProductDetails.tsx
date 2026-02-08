@@ -209,19 +209,20 @@ export default function ProductDetails({ product }: IProps) {
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-[#DC3173]">
                 {product.pricing.currency}{" "}
-                {product.pricing.finalPrice.toFixed(2)}
+                {new Intl.NumberFormat("de-DE", {
+                  minimumFractionDigits: 2,
+                }).format(product.pricing.finalPrice)}
               </span>
               {product?.pricing?.discount ? (
                 <>
                   <span className="text-lg text-gray-500 line-through">
                     {product.pricing.currency}{" "}
-                    {product.pricing.price.toFixed(2)}
+                    {new Intl.NumberFormat("de-DE", {
+                      minimumFractionDigits: 2,
+                    }).format(product.pricing.price)}
                   </span>
                   <span className="text-sm font-medium text-green-600">
-                    {Math.round(
-                      (product.pricing.discount / product.pricing.price) * 100,
-                    )}
-                    % {t("off")}
+                    {product.pricing.discount}% {t("off")}
                   </span>
                 </>
               ) : (
@@ -279,7 +280,7 @@ export default function ProductDetails({ product }: IProps) {
               <h3 className="text-sm font-medium text-gray-500">
                 {t("category")}
               </h3>
-              <p className="mt-1 text-gray-900">{product.category}</p>
+              <p className="mt-1 text-gray-900">{product.category?.name}</p>
               {product.subCategory && (
                 <p className="mt-1 text-gray-700">
                   {t("sub")}: {product.subCategory}
@@ -293,6 +294,55 @@ export default function ProductDetails({ product }: IProps) {
               </div>
             )}
           </motion.div>
+          {/* Variations */}
+          {product.variations?.length > 0 && (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <PackageIcon className="w-5 h-5 text-[#DC3173]" />
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Variations
+                </h2>
+              </div>
+              {product.variations?.map((v, i) => (
+                <div key={i}>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium">Name: </span>
+                      <span>{v.name}</span>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <h4 className="font-semibold w-[200px]">
+                        Variation Options
+                      </h4>
+                      <div className="mt-0.5 flex-1">
+                        {v.options.map((option, index) => (
+                          <div
+                            key={index}
+                            className="flex justify-between items-start gap-3 text-sm"
+                          >
+                            <div>
+                              <span className="font-semibold">Label: </span>
+                              <span>{option.label}</span>
+                            </div>
+                            <div className="flex items-start gap-3">
+                              <div>
+                                <span className="font-semibold">Price: </span>
+                                <span>€{option.price}</span>
+                              </div>
+                              <div>
+                                <span className="font-semibold">Stock: </span>
+                                <span>{option.stockQuantity}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
           {/* Vendor */}
           <motion.div
             className="border border-gray-200 rounded-lg p-4"

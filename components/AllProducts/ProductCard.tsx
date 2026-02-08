@@ -69,8 +69,9 @@ export default function ProductCard({ product, onDelete }: IProps) {
           </div>
         )}
         <div
-          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[product.isDeleted ? "DELETED" : product.meta.status]
-            }`}
+          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${
+            statusColors[product.isDeleted ? "DELETED" : product.meta.status]
+          }`}
         >
           {product.isDeleted ? "DELETED" : product.meta.status}
         </div>
@@ -92,7 +93,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
         </div>
         <div className="flex items-center text-sm text-gray-500 mb-2">
           <Tag className="h-4 w-4 mr-1" />
-          <span>{product.category}</span>
+          <span>{product.category?.name}</span>
           {product.brand && (
             <span className="ml-2 text-gray-400">| {product.brand}</span>
           )}
@@ -110,15 +111,19 @@ export default function ProductCard({ product, onDelete }: IProps) {
             </span>
             {product?.pricing?.discount ? (
               <span className="text-xs line-through text-gray-400 ml-2">
-                {product.pricing.currency} {product?.pricing?.price?.toFixed(2)}
+                {product.pricing.currency}{" "}
+                {new Intl.NumberFormat("de-DE", {
+                  minimumFractionDigits: 2,
+                }).format(product.pricing.price)}
               </span>
             ) : (
               ""
             )}
           </div>
           <div
-            className={`text-xs px-2 py-1 rounded-full ${availabilityColors[product.stock.availabilityStatus]
-              }`}
+            className={`text-xs px-2 py-1 rounded-full ${
+              availabilityColors[product.stock.availabilityStatus]
+            }`}
           >
             {product.stock.availabilityStatus}
           </div>
