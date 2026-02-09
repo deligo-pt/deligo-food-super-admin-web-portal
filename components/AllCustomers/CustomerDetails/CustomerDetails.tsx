@@ -1,5 +1,6 @@
 "use client";
 
+import CustomerOrdersSection from "@/components/AllCustomers/CustomerDetails/CustomerOrdersSection";
 import InfoRow from "@/components/AllCustomers/CustomerDetails/InfoRow";
 import Section from "@/components/AllCustomers/CustomerDetails/Section";
 import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/StatusBadge";
@@ -7,6 +8,7 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
+import { TOrder } from "@/types/order.type";
 import { TCustomer } from "@/types/user.type";
 import { motion } from "framer-motion";
 import {
@@ -16,17 +18,20 @@ import {
   Check,
   Mail,
   MapPin,
+  Package,
   Phone,
   Trash2,
   User,
   X,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface IProps {
   customer: TCustomer;
+  orders: TOrder[];
 }
 
 const formatDate = (date: Date | undefined) => {
@@ -34,14 +39,15 @@ const formatDate = (date: Date | undefined) => {
   return new Date(date).toLocaleDateString();
 };
 
-export const CustomerDetails = ({ customer }: IProps) => {
+export const CustomerDetails = ({ customer, orders }: IProps) => {
   const { t } = useTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const router = useRouter();
   const fullName =
-    `${customer.name?.firstName || ""} ${customer.name?.lastName || ""
-      }`.trim() || t("no_name_provided");
+    `${customer.name?.firstName || ""} ${
+      customer.name?.lastName || ""
+    }`.trim() || t("no_name_provided");
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -154,7 +160,11 @@ export const CustomerDetails = ({ customer }: IProps) => {
         </div>
       </motion.div>
       <div className="bg-gray-50 p-6 rounded-b-lg">
-        <Section title={t("personal_details")} icon={<User />} defaultOpen={true}>
+        <Section
+          title={t("personal_details")}
+          icon={<User />}
+          defaultOpen={true}
+        >
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow label={t("full_name")} value={fullName} />
@@ -173,10 +183,16 @@ export const CustomerDetails = ({ customer }: IProps) => {
                 label={t("street")}
                 value={customer.address?.street || "N/A"}
               />
-              <InfoRow label={t("city")} value={customer.address?.city || "N/A"} />
+              <InfoRow
+                label={t("city")}
+                value={customer.address?.city || "N/A"}
+              />
             </div>
             <div>
-              <InfoRow label={t("state")} value={customer.address?.state || "N/A"} />
+              <InfoRow
+                label={t("state")}
+                value={customer.address?.state || "N/A"}
+              />
               <InfoRow
                 label={t("country")}
                 value={customer.address?.country || "N/A"}
@@ -186,6 +202,17 @@ export const CustomerDetails = ({ customer }: IProps) => {
                 value={customer.address?.postalCode || "N/A"}
               />
             </div>
+          </div>
+        </Section>
+        <Section title="Orders" icon={<Package />}>
+          <CustomerOrdersSection orders={orders} />
+          <div className="text-center my-3">
+            <Link
+              className="text-[#DC3173] hover:underline text-sm cursor-pointer font-semibold"
+              href={`/admin/all-orders/customer/${customer.userId}`}
+            >
+              Show All
+            </Link>
           </div>
         </Section>
         <Section title={t("account_information")} icon={<CalendarClock />}>

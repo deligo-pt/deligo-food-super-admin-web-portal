@@ -1,6 +1,7 @@
 import { CustomerDetails } from "@/components/AllCustomers/CustomerDetails/CustomerDetails";
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";
+import { TOrder } from "@/types/order.type";
 import { TCustomer } from "@/types/user.type";
 
 export default async function CustomersDetailsPage({
@@ -10,19 +11,34 @@ export default async function CustomersDetailsPage({
 }) {
   const { id } = await params;
 
-  let initialData: TCustomer = {} as TCustomer;
+  let customer: TCustomer = {} as TCustomer;
+  let orders: TOrder[] = [];
 
   try {
-    const result = (await serverRequest.get(
+    const customerResult = (await serverRequest.get(
       `/customers/${id}`,
-    )) as unknown as TResponse<TCustomer>;
+    )) as TResponse<TCustomer>;
 
-    if (result?.success) {
-      initialData = result.data;
+    if (customerResult?.success) {
+      customer = customerResult.data;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  return <CustomerDetails customer={initialData} />;
+  if (customer?._id) {
+    try {
+      const ordersResult = (await serverRequest.get("/orders", {
+        params: { customerId: customer._id, limit: 5 },
+      })) as TResponse<TOrder[]>;
+
+      if (ordersResult?.success) {
+        orders = ordersResult.data;
+      }
+    } catch (err) {
+      console.log("Server fetch error:", err);
+    }
+  }
+
+  return <CustomerDetails customer={customer} orders={orders} />;
 }
