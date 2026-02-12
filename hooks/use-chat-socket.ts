@@ -24,8 +24,8 @@ interface Props {
 interface AdminProps {
   token: string;
   onMessage: (msg: TAdminSupportMessage) => void;
-  onClosed: () => void;
-  onError: (msg: string) => void;
+  onClosed?: () => void;
+  onError?: (msg: string) => void;
 }
 
 export function useAdminChatSocket({
@@ -43,19 +43,20 @@ export function useAdminChatSocket({
     socket.emit("join-conversation", "admin-notifications-room");
 
     socket.on("incoming-notification", onMessage);
-    socket.on("conversation-closed", onClosed);
-    socket.on("chat-error", (e) => onError(e.message));
+    socket.on("conversation-closed", onClosed || (() => {}));
+    socket.on("chat-error", (e) => onError && onError(e.message));
 
-    return () => {
-      socket.off("new-message");
-      socket.off("conversation-closed");
-      socket.off("chat-error");
-      socket.off("incoming-notification");
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return null;
+  const turnOffEvents = () => {
+    socketRef.current?.off("new-message");
+    socketRef.current?.off("conversation-closed");
+    socketRef.current?.off("chat-error");
+    socketRef.current?.off("incoming-notification");
+  };
+
+  return { turnOffEvents };
 }
 
 export function useChatSocket({

@@ -1,23 +1,28 @@
 "use client";
 
+import TopbarMessageIcon from "@/components/adminTopbar/TopbarMessageIcon";
 import TopbarNotification from "@/components/adminTopbar/TopbarNotification";
+import { useStore } from "@/store/store";
 import { TAdmin } from "@/types/admin.type";
 import { removeCookie } from "@/utils/cookies";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
   ChevronDown,
-  Globe,
   LogOut,
-  MessageSquare,
   User,
   UserIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { useStore } from "@/store/store";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const PRIMARY = "#DC3173";
 
@@ -58,22 +63,22 @@ export default function TopbarIcons({ admin }: IProps) {
     <>
       {/* Language */}
 
-        <div className="relative hidden sm:block z-1002">
-          <Select
-            value={lang}
-            onValueChange={(value: 'en' | 'pt') => {
-              setLang(value)
-            }}
-          >
-            <SelectTrigger className="w-[70px] hover:border hover:border-[#DC3173]">
-              <SelectValue placeholder="Language" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="en">EN</SelectItem>
-              <SelectItem value="pt">PT</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="relative hidden sm:block z-1002">
+        <Select
+          value={lang}
+          onValueChange={(value: "en" | "pt") => {
+            setLang(value);
+          }}
+        >
+          <SelectTrigger className="w-[70px] hover:border hover:border-[#DC3173]">
+            <SelectValue placeholder="Language" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="en">EN</SelectItem>
+            <SelectItem value="pt">PT</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* SOS */}
       <motion.button
@@ -99,12 +104,7 @@ export default function TopbarIcons({ admin }: IProps) {
       <TopbarNotification />
 
       {/* Messages */}
-      <motion.button
-        whileHover={{ scale: 1.06 }}
-        className="p-2 rounded-lg hover:bg-pink-50 transition hidden sm:block shrink-0"
-      >
-        <MessageSquare size={18} className="text-gray-700" />
-      </motion.button>
+      <TopbarMessageIcon />
 
       {/* Profile */}
       <div className="relative shrink-0 z-3000">
@@ -116,7 +116,7 @@ export default function TopbarIcons({ admin }: IProps) {
           className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-pink-50 transition"
         >
           {admin?.profilePhoto &&
-            admin?.profilePhoto !== "<admin_profile_photo_url>" ? (
+          admin?.profilePhoto !== "<admin_profile_photo_url>" ? (
             <Image
               src={admin?.profilePhoto}
               alt="avatar"
@@ -131,8 +131,9 @@ export default function TopbarIcons({ admin }: IProps) {
           )}
           <ChevronDown
             size={16}
-            className={`text-gray-700 hidden sm:inline transition-transform ${profileOpen ? "rotate-180" : ""
-              }`}
+            className={`text-gray-700 hidden sm:inline transition-transform ${
+              profileOpen ? "rotate-180" : ""
+            }`}
           />
         </button>
 

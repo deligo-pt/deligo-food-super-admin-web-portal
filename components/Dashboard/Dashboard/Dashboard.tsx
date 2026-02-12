@@ -14,10 +14,10 @@ import {
   XCircleIcon,
 } from "lucide-react";
 import DashboardHeader from "./DashboardHeader";
-import StatCard from "./StatCard";
-import StatusCard from "./StatusCard";
 import PopularCategories from "./PopularCategories";
 import RecentOrders from "./RecentOrders";
+import StatCard from "./StatCard";
+import StatusCard from "./StatusCard";
 import TopProducts from "./TopProducts";
 
 const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
