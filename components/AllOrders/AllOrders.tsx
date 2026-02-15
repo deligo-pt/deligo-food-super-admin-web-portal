@@ -19,10 +19,10 @@ import { BadgeEuro, Download, Eye, MapPin } from "lucide-react";
 
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
-import { useTranslation } from "@/hooks/use-translation";
 
 // Brand color
 const DELIGO = "#DC3173";
@@ -30,7 +30,6 @@ const DELIGO = "#DC3173";
 interface IProps {
   ordersResult: { data: TOrder[]; meta?: TMeta };
 }
-
 
 export default function AllOrders({ ordersResult }: IProps) {
   const { t } = useTranslation();
@@ -61,22 +60,22 @@ export default function AllOrders({ ordersResult }: IProps) {
       o.orderId,
       o.customerId?.name?.firstName + " " + o.customerId?.name?.lastName,
       o.deliveryPartnerId?.name?.firstName +
-      " " +
-      o.deliveryPartnerId?.name?.lastName,
+        " " +
+        o.deliveryPartnerId?.name?.lastName,
       o.finalAmount?.toLocaleString(),
       o.orderStatus,
       o.deliveryAddress?.city,
       o.items?.map((i) => i.productId?.name + " x " + i.quantity).join(" | "),
       o.paymentStatus,
-      format(o.createdAt, "Do MMM yyyy"),
+      format(o.createdAt, "do MMM yyyy"),
       o.deliveredAt ?? "-",
       o.deliveryAddress?.street +
-      ", " +
-      o.deliveryAddress?.postalCode +
-      ", " +
-      o.deliveryAddress?.city +
-      ", " +
-      o.deliveryAddress?.country,
+        ", " +
+        o.deliveryAddress?.postalCode +
+        ", " +
+        o.deliveryAddress?.city +
+        ", " +
+        o.deliveryAddress?.country,
     ]);
 
     const csv = [head, ...rows]
@@ -127,11 +126,10 @@ export default function AllOrders({ ordersResult }: IProps) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-extrabold flex items-center gap-3">
-              <BadgeEuro className="w-8 h-8" style={{ color: DELIGO }} /> {t("all_orders")}
+              <BadgeEuro className="w-8 h-8" style={{ color: DELIGO }} />{" "}
+              {t("all_orders")}
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              {t("")}
-            </p>
+            <p className="text-sm text-slate-500 mt-1">{t("")}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -184,17 +182,29 @@ export default function AllOrders({ ordersResult }: IProps) {
           <table className="w-full text-sm max-w-full">
             <thead className="bg-slate-100 text-slate-700 font-semibold">
               <tr>
-                <th className="px-4 py-2 text-left w-[140px]">{t("order_id")}</th>
-                <th className="px-4 py-2 text-left w-[260px]">{t("customer")}</th>
+                <th className="px-4 py-2 text-left w-[140px]">
+                  {t("order_id")}
+                </th>
+                <th className="px-4 py-2 text-left w-[260px]">
+                  {t("customer")}
+                </th>
                 {/* <th className="px-4 py-2 text-left w-[260px]">Partner</th> */}
-                <th className="px-4 py-2 text-center w-[100px]">{t("amount")}</th>
-                <th className="px-4 py-2 text-center w-[120px]">{t("status")}</th>
+                <th className="px-4 py-2 text-center w-[100px]">
+                  {t("amount")}
+                </th>
+                <th className="px-4 py-2 text-center w-[120px]">
+                  {t("status")}
+                </th>
                 {/* <th className="px-4 py-2 text-center w-[120px]">City</th> */}
                 <th className="px-4 py-2 text-center w-[80px]">{t("items")}</th>
                 {/* <th className="px-4 py-2 text-center w-[120px]">Payment</th> */}
-                <th className="px-4 py-2 text-center w-[160px]">{t("created")}</th>
+                <th className="px-4 py-2 text-center w-[160px]">
+                  {t("created")}
+                </th>
                 {/* <th className="px-4 py-2 text-center w-[160px]">Delivered</th> */}
-                <th className="px-4 py-2 text-center w-[120px]">{t("actions")}</th>
+                <th className="px-4 py-2 text-center w-[120px]">
+                  {t("actions")}
+                </th>
               </tr>
             </thead>
 
@@ -470,19 +480,23 @@ export default function AllOrders({ ordersResult }: IProps) {
               <Separator />
 
               <div>
-                <p className="text-sm text-slate-500">{t("delivery_timeline")}</p>
+                <p className="text-sm text-slate-500">
+                  {t("delivery_timeline")}
+                </p>
                 <ul className="mt-2 text-sm space-y-2">
                   <li>
-                    • {t("created")}: {format(selected.createdAt, "Do MMM yyyy")}
+                    • {t("created")}:{" "}
+                    {format(selected.createdAt, "do MMM yyyy")}
                   </li>
                   <li>
-                    • {t("rider")}: {selected.deliveryPartnerId?.name?.firstName}{" "}
+                    • {t("rider")}:{" "}
+                    {selected.deliveryPartnerId?.name?.firstName}{" "}
                     {selected.deliveryPartnerId?.name?.lastName}
                   </li>
                   <li>
                     • {t("delivered")}:{" "}
                     {selected.deliveredAt
-                      ? format(selected.deliveredAt, "Do MMM yyyy")
+                      ? format(selected.deliveredAt, "do MMM yyyy")
                       : "—"}
                   </li>
                 </ul>

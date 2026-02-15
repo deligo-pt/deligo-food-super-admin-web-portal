@@ -140,7 +140,7 @@ export default function OrderDetailsSheet({
               <ul className="mt-2 text-sm space-y-2">
                 <li>
                   • {t("created")}:{" "}
-                  {format(selectedOrder?.createdAt, "Do MMM yyyy")}
+                  {format(selectedOrder?.createdAt, "do MMM yyyy")}
                 </li>
                 {(selectedOrder?.deliveryPartnerId?.name?.firstName ||
                   selectedOrder?.deliveryPartnerId?.name?.lastName) && (
@@ -153,7 +153,7 @@ export default function OrderDetailsSheet({
                 {selectedOrder?.deliveredAt && (
                   <li>
                     • {t("delivered")}:{" "}
-                    {format(selectedOrder?.deliveredAt, "Do MMM yyyy")}
+                    {format(selectedOrder?.deliveredAt, "do MMM yyyy")}
                   </li>
                 )}
               </ul>

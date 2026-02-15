@@ -68,7 +68,7 @@ export default function CustomerOrdersSection({ orders }: IProps) {
                   ))}
                 </TableCell>
                 <TableCell> €{order.totalPrice?.toLocaleString()}</TableCell>
-                <TableCell>{format(order.createdAt, "Do MMM yyyy")}</TableCell>
+                <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -117,7 +117,7 @@ export default function OrderTable({ orders, viewOrder }: IProps) {
                 ))}
               </TableCell>
               <TableCell> €{order.totalPrice?.toLocaleString()}</TableCell>
-              <TableCell>{format(order.createdAt, "Do MMM yyyy")}</TableCell>
+              <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 <Button
                   onClick={() => viewOrder(order)}
