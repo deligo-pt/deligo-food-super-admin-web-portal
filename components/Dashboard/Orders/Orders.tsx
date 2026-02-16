@@ -1,6 +1,5 @@
 "use client";
 
-import OrderDetailsSheet from "@/components/Dashboard/Orders/OrderDetailsSheet";
 import OrderTable from "@/components/Dashboard/Orders/OrderTable";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
@@ -9,7 +8,6 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 interface IProps {
   ordersResult: { data: TOrder[]; meta?: TMeta };
@@ -20,7 +18,7 @@ interface IProps {
 
 export default function Orders({ ordersResult, title, subtitle }: IProps) {
   const { t } = useTranslation();
-  const [selected, setSelected] = useState<TOrder | null>(null);
+
   const sortOptions = [
     { label: t("newest_first"), value: "-createdAt" },
     { label: t("oldest_first"), value: "createdAt" },
@@ -35,10 +33,7 @@ export default function Orders({ ordersResult, title, subtitle }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Order Table */}
-      <OrderTable
-        orders={ordersResult?.data || []}
-        viewOrder={(order) => setSelected(order)}
-      />
+      <OrderTable orders={ordersResult?.data || []} />
 
       {/* Pagination */}
       {!!ordersResult?.meta?.totalPage && (
@@ -52,13 +47,6 @@ export default function Orders({ ordersResult, title, subtitle }: IProps) {
           />
         </motion.div>
       )}
-
-      {/* Order details sheet */}
-      <OrderDetailsSheet
-        open={!!selected}
-        onOpenChange={(open) => !open && setSelected(null)}
-        selectedOrder={selected}
-      />
     </div>
   );
 }

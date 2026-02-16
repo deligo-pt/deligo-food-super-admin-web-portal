@@ -22,13 +22,15 @@ import {
   PackageIcon,
   UserIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   orders: TOrder[];
-  viewOrder: (order: TOrder) => void;
 }
 
-export default function OrderTable({ orders, viewOrder }: IProps) {
+export default function OrderTable({ orders }: IProps) {
+  const router = useRouter();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -118,11 +120,13 @@ export default function OrderTable({ orders, viewOrder }: IProps) {
               </TableCell>
               <TableCell> €{order.totalPrice?.toLocaleString()}</TableCell>
               <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
-              <TableCell className="text-right">
+              <TableCell>
                 <Button
-                  onClick={() => viewOrder(order)}
+                  onClick={() =>
+                    router.push(`/admin/all-orders/${order.orderId}`)
+                  }
                   size="sm"
-                  className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90"
+                  className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"
                 >
                   <EyeIcon />
                   View

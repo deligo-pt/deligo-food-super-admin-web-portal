@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { LucideIcon, PlusIcon } from "lucide-react";
+import { ArrowLeftIcon, LucideIcon, PlusIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 interface IProps {
@@ -14,6 +14,7 @@ interface IProps {
     icon?: LucideIcon;
   };
   extraComponent?: ReactNode;
+  onBackClick?: () => void;
 }
 
 export default function TitleHeader({
@@ -21,16 +22,29 @@ export default function TitleHeader({
   subtitle,
   buttonInfo,
   extraComponent,
+  onBackClick,
 }: IProps) {
   return (
     <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
       <div className="bg-linear-to-r from-[#DC3173] to-[#FF6CAB] p-6 rounded-lg mb-6 shadow-lg">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">
-              {title}
-            </h1>
-            {subtitle && <p className="text-pink-100 mt-1">{subtitle}</p>}
+          <div className="flex gap-3">
+            {onBackClick && (
+              <div>
+                <Button
+                  onClick={onBackClick}
+                  className="w-8 h-8 flex justify-center items-center bg-white/30 hover:bg-white/20 rounded-full transition-colors mt-1"
+                >
+                  <ArrowLeftIcon className="w-5 h-5" />
+                </Button>
+              </div>
+            )}
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
+                {title}
+              </h1>
+              {subtitle && <p className="text-pink-100 mt-1">{subtitle}</p>}
+            </div>
           </div>
           <div>
             {buttonInfo && (

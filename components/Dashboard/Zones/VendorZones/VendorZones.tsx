@@ -1,6 +1,6 @@
 "use client";
 
-import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
+import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ZoneCard from "@/components/Dashboard/Zones/ZoneCard/ZoneCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TZone } from "@/types/zone.type";
@@ -173,7 +173,7 @@ export default function VendorZones() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-brand-50/80 to-transparent -z-10" />
+      <div className="absolute top-0 left-0 w-full h-64 bg-linear-to-b from-brand-50/80 to-transparent -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         {/* Header */}

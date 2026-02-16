@@ -1,7 +1,7 @@
 "use client";
 
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
-import StatsCard from "@/components/Dashboard/Performance/VendorPerformance/StatsCard";
+import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import FleetManagerReportTable from "@/components/Dashboard/Reports/FleetManagerReport/FleetManagerReportTable";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import AllFilters from "@/components/Filtering/AllFilters";
