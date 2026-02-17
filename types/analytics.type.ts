@@ -21,6 +21,7 @@ export type TRecentOrder = {
 
 export type TTopRatedDeliveryPartner = {
   _id: string;
+  userId: string;
   name: {
     firstName: string;
     lastName: string;

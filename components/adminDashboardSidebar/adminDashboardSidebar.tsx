@@ -186,7 +186,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("on_the_way_orders"), path: "/admin/on-the-way-orders" },
         { name: t("delivered_orders"), path: "/admin/delivered-orders" },
         { name: t("cancelled_orders"), path: "/admin/cancelled-orders" },
-        { name: t("refund_requests"), path: "/admin/refund-requests" },
       ],
     },
     {
