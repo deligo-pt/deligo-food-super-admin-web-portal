@@ -1,14 +1,13 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
-import { TMeta } from "@/types";
 import { TSOS, TSOSStats } from "@/types/sos.type";
 import { catchAsync } from "@/utils/catchAsync";
 
 export const getAllSOSReq = async (
   params: Record<string, string | number | object>,
 ) => {
-  return catchAsync<{ result: TSOS[]; meta?: TMeta }>(async () => {
+  return catchAsync<TSOS[]>(async () => {
     return await serverRequest.get("/sos", { params });
   });
 };

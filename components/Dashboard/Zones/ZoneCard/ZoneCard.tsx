@@ -1,26 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Edit2, Euro, MapIcon, MapPin, Trash2 } from "lucide-react";
+import { MapIcon, MapPin } from "lucide-react";
 
 interface IProps {
   name: string;
-  district: string;
-  minDeliveryFee: number;
+  totalVendors: number;
   isOperational: boolean;
-  onEdit?: () => void;
-  onDelete?: () => void;
   delay?: number;
 }
 
 export default function ZoneCard({
   name,
-  district,
-  minDeliveryFee,
+  totalVendors,
   isOperational,
-  onEdit,
-  onDelete,
   delay = 0,
 }: IProps) {
   return (
@@ -73,14 +66,15 @@ export default function ZoneCard({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-500 mb-1">District</p>
-            <div className="flex items-center gap-1.5">
-              <MapIcon size={16} className="text-[#DC3173]" />
-              <p className="font-semibold text-gray-800">{district}</p>
-            </div>
+        <div className="bg-gray-50 rounded-lg p-3">
+          <p className="text-xs text-gray-500 mb-1">Vendors</p>
+          <div className="flex items-center gap-1.5">
+            <MapIcon size={16} className="text-[#DC3173]" />
+            <p className="font-semibold text-gray-800">{totalVendors}</p>
           </div>
+        </div>
+
+        {/* <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-xs text-gray-500 mb-1">Minimum Delivery Fee</p>
             <div className="flex items-center gap-1.5">
@@ -90,9 +84,9 @@ export default function ZoneCard({
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Button
             variant="outline"
             onClick={onEdit}
@@ -109,7 +103,7 @@ export default function ZoneCard({
             <Trash2 size={14} />
             Delete
           </Button>
-        </div>
+        </div> */}
       </div>
     </motion.div>
   );

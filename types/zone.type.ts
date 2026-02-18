@@ -7,16 +7,16 @@ export type TZoneBoundary = {
 export type TZone = {
   _id: string;
   zoneId: string;
-  district: string;
+  // district: string;
   zoneName: string;
 
-  boundary: TZoneBoundary;
+  // boundary: TZoneBoundary;
 
   isOperational: boolean;
-  minDeliveryFee: number;
-  maxDeliveryDistanceKm: number;
+  // minDeliveryFee: number;
+  // maxDeliveryDistanceKm: number;
 
-  isDeleted: boolean;
+  totalVendors: number;
 
   createdAt: Date;
   updatedAt: Date;

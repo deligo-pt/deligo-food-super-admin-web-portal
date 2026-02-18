@@ -44,7 +44,7 @@ export function SOS({ accessToken, SOSStats }: IProps) {
     const result = await getAllSOSReq(query);
 
     if (result?.success) {
-      setSOSData({ data: result.data.result, meta: result.data.meta });
+      setSOSData({ data: result.data, meta: result.data.meta });
     } else {
       console.log("Server fetch error:", result);
     }
