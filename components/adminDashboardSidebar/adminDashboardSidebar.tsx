@@ -311,14 +311,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("settings"),
       icon: <Settings size={18} />,
       items: [
-        { name: t("business_info"), path: "/admin/business-info" },
-        { name: t("branding_and_theme"), path: "/admin/branding-theme" },
-        { name: t("localization"), path: "/admin/localization" },
         {
           name: t("notification_preferences"),
           path: "/admin/notification-preferences",
         },
-        { name: t("legal_documents"), path: "/admin/legal-documents" },
         { name: t("global_settings"), path: "/admin/global-settings" },
       ],
     },
