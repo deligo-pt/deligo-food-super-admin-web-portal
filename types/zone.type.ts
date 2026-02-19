@@ -16,7 +16,7 @@ export type TZone = {
   // minDeliveryFee: number;
   // maxDeliveryDistanceKm: number;
 
-  totalVendors: number;
+  totalUsers: number;
 
   createdAt: Date;
   updatedAt: Date;

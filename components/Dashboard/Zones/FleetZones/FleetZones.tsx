@@ -4,6 +4,7 @@ import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ZoneCard from "@/components/Dashboard/Zones/ZoneCard/ZoneCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { USER_ROLE } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TZone } from "@/types/zone.type";
 import { CircleCheckBig, CircleOff, MapPin } from "lucide-react";
@@ -12,7 +13,9 @@ interface IProps {
   zonesData: { data: TZone[]; meta?: TMeta };
 }
 
-export default function VendorZones({ zonesData }: IProps) {
+export default function FleetZones({ zonesData }: IProps) {
+  const { t } = useTranslation();
+
   const operationalZones = zonesData.data?.filter(
     (z) => z.isOperational,
   ).length;
@@ -28,8 +31,8 @@ export default function VendorZones({ zonesData }: IProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         {/* Header */}
         <TitleHeader
-          title="Vendor Zones & Coverage"
-          subtitle="Manage service areas for vendor operations"
+          title={t("fleet_zones")}
+          subtitle="Manage zones of fleet managers"
         />
 
         {/* Stats */}
@@ -61,7 +64,7 @@ export default function VendorZones({ zonesData }: IProps) {
               key={zone._id}
               name={zone.zoneName}
               total={zone.totalUsers}
-              userType={USER_ROLE.VENDOR}
+              userType={USER_ROLE.FLEET_MANAGER}
               isOperational={zone.isOperational}
               delay={index * 0.1}
             />

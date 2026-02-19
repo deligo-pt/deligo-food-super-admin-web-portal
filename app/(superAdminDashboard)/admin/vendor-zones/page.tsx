@@ -51,12 +51,12 @@ export default async function VendorZonesPage({ searchParams }: IProps) {
           zoneName: city,
           isOperational: true,
           zoneId: city.replace(" ", "-").toLowerCase(),
-          totalVendors: 1,
+          totalUsers: 1,
           createdAt: vendor.createdAt,
           updatedAt: vendor.updatedAt,
         });
       } else if (city) {
-        acc.data[vendorIndex].totalVendors++;
+        acc.data[vendorIndex].totalUsers++;
       }
 
       return acc;
