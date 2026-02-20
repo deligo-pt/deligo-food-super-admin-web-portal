@@ -218,7 +218,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             <div>
               <InfoRow
                 label={t("date_of_birth")}
-                value={formatDate(partner.personalInfo?.dateOfBirth)}
+                value={
+                  partner.personalInfo?.dateOfBirth
+                    ? formatDate(partner.personalInfo?.dateOfBirth)
+                    : "N/A"
+                }
               />
               <InfoRow
                 label={t("nationality")}
@@ -240,7 +244,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               />
               <InfoRow
                 label={t("id_expiry_date")}
-                value={formatDate(partner.personalInfo?.idExpiryDate)}
+                value={
+                  partner.personalInfo?.idExpiryDate
+                    ? formatDate(partner.personalInfo?.idExpiryDate)
+                    : "N/A"
+                }
               />
             </div>
           </div>
@@ -300,7 +308,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               />
               <InfoRow
                 label={t("license_expiry")}
-                value={formatDate(partner.vehicleInfo?.drivingLicenseExpiry)}
+                value={
+                  partner.vehicleInfo?.drivingLicenseExpiry
+                    ? formatDate(partner.vehicleInfo?.drivingLicenseExpiry)
+                    : "N/A"
+                }
               />
               <InfoRow
                 label={t("insurance_policy_number")}
@@ -308,7 +320,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               />
               <InfoRow
                 label={t("insurance_expiry")}
-                value={formatDate(partner.vehicleInfo?.insuranceExpiry)}
+                value={
+                  partner.vehicleInfo?.insuranceExpiry
+                    ? formatDate(partner.vehicleInfo?.insuranceExpiry)
+                    : "N/A"
+                }
               />
             </div>
           </div>
@@ -352,7 +368,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             <div>
               <InfoRow
                 label={t("permit_expiry_date")}
-                value={formatDate(partner.legalStatus?.residencePermitExpiry)}
+                value={
+                  partner.legalStatus?.residencePermitExpiry
+                    ? formatDate(partner.legalStatus?.residencePermitExpiry)
+                    : "N/A"
+                }
               />
               <InfoRow
                 label={t("criminal_record_certification")}
@@ -596,13 +616,21 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               />
               <InfoRow
                 label={t("submitted_for_approval")}
-                value={formatDate(partner.submittedForApprovalAt)}
+                value={
+                  partner.submittedForApprovalAt
+                    ? formatDate(partner.submittedForApprovalAt)
+                    : "N/A"
+                }
               />
             </div>
             <div>
               <InfoRow
                 label={t("approved_rejected_blocked_at")}
-                value={formatDate(partner.approvedOrRejectedOrBlockedAt)}
+                value={
+                  partner.approvedOrRejectedOrBlockedAt
+                    ? formatDate(partner.approvedOrRejectedOrBlockedAt)
+                    : "N/A"
+                }
               />
               {partner.remarks && (
                 <InfoRow label={t("remarks")} value={partner.remarks} />
