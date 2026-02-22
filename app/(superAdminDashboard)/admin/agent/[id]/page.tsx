@@ -11,7 +11,7 @@ export default async function VendorDetailsPage({
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/fleet-managers/${id}`,
-    { headers: { authorization: accessToken || "" } }
+    { headers: { authorization: accessToken || "" } },
   );
   const result = await res.json();
   const data = result.data;

@@ -6,7 +6,7 @@ import RevenueChart from "@/components/BusinessInfo/RevenueChart";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
-import { Clock, DollarSign, ShoppingBag, TrendingUp } from "lucide-react";
+import { Clock, EuroIcon, ShoppingBag, TrendingUp } from "lucide-react";
 
 export function BusinessInfo() {
   const { t } = useTranslation();
@@ -26,7 +26,7 @@ export function BusinessInfo() {
             title={t("total_revenue")}
             value="147,031"
             prefix="€ "
-            icon={DollarSign}
+            icon={EuroIcon}
             trend={12.5}
             delay={0.1}
           />
