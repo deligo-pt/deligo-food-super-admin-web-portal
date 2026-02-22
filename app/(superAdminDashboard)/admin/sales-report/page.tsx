@@ -111,27 +111,7 @@ const revenueData = [
 export default function SalesReportPage(): JSX.Element {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
-  const [showCanceled, setShowCanceled] = useState(true);
   const [range, setRange] = useState("Last 7 days");
-  const [page, setPage] = useState(1);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return sampleOrders
-      .filter((o) => (showCanceled ? true : o.status !== "Canceled"))
-      .filter((o) => {
-        if (!q) return true;
-        return (
-          o.restaurant.toLowerCase().includes(q) ||
-          o.id.toLowerCase().includes(q) ||
-          o.status.toLowerCase().includes(q)
-        );
-      });
-  }, [query, showCanceled]);
-
-  const pageSize = 5;
-  const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   const totals = useMemo(() => {
     const totalRevenue = sampleOrders.reduce((s, o) => s + o.amount, 0);
@@ -286,32 +266,16 @@ export default function SalesReportPage(): JSX.Element {
           </motion.div>
         </div>
 
-        {/* Main grid: Chart + Right column */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Chart area */}
+        {/* Chart area */}
+        <div className="">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-5 shadow"
+            className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow"
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium">{t("revenue")}</h2>
-              <div className="flex items-center gap-3">
-                <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded p-2">
-                  <Search className="w-4 h-4 text-gray-600" />
-                  <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={t("search_orders_restaurants")}
-                    className="bg-transparent outline-none text-sm w-56"
-                  />
-                </div>
-                <button className="inline-flex items-center gap-2 px-2 py-1 rounded-md bg-white dark:bg-gray-700 shadow-sm hover:shadow-md transition">
-                  <Eye className="w-4 h-4" />
-                  <span className="text-sm">{t("preview")}</span>
-                </button>
-              </div>
             </div>
 
             <div style={{ height: 300 }}>
@@ -369,130 +333,6 @@ export default function SalesReportPage(): JSX.Element {
                     ).date
                   }
                 </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Right column: Orders table & quick filters */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.14 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-medium">{t("recent_orders")}</h3>
-              <div className="flex items-center gap-2">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={showCanceled}
-                    onChange={() => setShowCanceled((s) => !s)}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-xs text-gray-500">
-                    {t("show_cancelled")}
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="text-xs text-gray-500">
-                    <th className="pb-2">{t("id")}</th>
-                    <th className="pb-2">{t("restaurant")}</th>
-                    <th className="pb-2">{t("date")}</th>
-                    <th className="pb-2">{t("amount")}</th>
-                    <th className="pb-2">{t("status")}</th>
-                    <th className="pb-2">{t("action")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paged.map((o) => (
-                    <tr
-                      key={o.id}
-                      className="border-t border-gray-100 dark:border-gray-700"
-                    >
-                      <td className="py-3">{o.id}</td>
-                      <td className="py-3 font-medium">{o.restaurant}</td>
-                      <td className="py-3 text-gray-500">{o.date}</td>
-                      <td className="py-3">€{o.amount.toFixed(2)}</td>
-                      <td className="py-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            o.status === "Completed"
-                              ? "bg-green-100 dark:bg-green-900/30 text-green-700"
-                              : o.status === "Canceled"
-                                ? "bg-red-100 dark:bg-red-900/30 text-red-700"
-                                : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700"
-                          }`}
-                        >
-                          {o.status}
-                        </span>
-                      </td>
-                      <td className="py-3">
-                        <div className="flex items-center gap-2">
-                          <button
-                            title="View"
-                            className="p-2 rounded-md bg-gray-50 dark:bg-gray-900/40 hover:shadow"
-                          >
-                            {" "}
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            title="Export"
-                            className="p-2 rounded-md bg-white dark:bg-gray-800 hover:bg-gray-50"
-                          >
-                            {" "}
-                            <DownloadCloud className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-
-                  {paged.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="py-6 text-center text-sm text-gray-500"
-                      >
-                        {t("no_orders_found")}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="mt-4 flex items-center justify-between">
-              <div className="text-xs text-gray-500">
-                {t("showing")}{" "}
-                {Math.min((page - 1) * pageSize + 1, filtered.length)} -{" "}
-                {Math.min(page * pageSize, filtered.length)} {t("of")}{" "}
-                {filtered.length}
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="p-2 rounded-md bg-gray-100 dark:bg-gray-700"
-                  title="Previous"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <div className="px-3 py-1 rounded-md bg-white dark:bg-gray-800 border">
-                  {page} / {pages}
-                </div>
-                <button
-                  onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                  className="p-2 rounded-md bg-gray-100 dark:bg-gray-700"
-                  title="Next"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
               </div>
             </div>
           </motion.div>

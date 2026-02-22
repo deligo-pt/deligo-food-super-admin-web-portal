@@ -6,11 +6,9 @@ import {
   ChevronLeft,
   ChevronRight,
   DownloadCloud,
-  Eye,
   Filter,
   PieChart,
   Search,
-  X,
 } from "lucide-react";
 import React, { JSX, useCallback, useMemo, useState } from "react";
 
@@ -21,10 +19,7 @@ import {
   AreaChart,
   Bar,
   CartesianGrid,
-  Cell,
-  Pie,
   BarChart as ReBarChart,
-  PieChart as RePieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -33,11 +28,6 @@ import {
 
 // ---- Constants ----
 const DELIGO = "#DC3173";
-const STATUS_COLORS: Record<string, string> = {
-  Completed: "#22c55e",
-  Pending: "#eab308",
-  Canceled: "#ef4444",
-};
 
 // ---- Sample Data (DEV) ----
 // Replace ORDERS with server-side data in production or fetch from API.
@@ -136,118 +126,12 @@ function Pagination({
   );
 }
 
-function FiltersDrawer({
-  open,
-  onClose,
-  statusFilter,
-  setStatusFilter,
-  zoneFilter,
-  setZoneFilter,
-  zones,
-}: {
-  open: boolean;
-  onClose: () => void;
-  statusFilter: string | "All";
-  setStatusFilter: (v: any) => void;
-  zoneFilter: string | "All";
-  setZoneFilter: (v: any) => void;
-  zones: string[];
-}) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex">
-      <div className="flex-1" onClick={onClose} />
-      <aside className="w-full max-w-md bg-white dark:bg-gray-800 p-6 shadow-lg">
-        <div className="flex items-center justify-between mb-4">
-          <h4 className="font-semibold">Filters</h4>
-          <button onClick={onClose} className="p-2 rounded-md">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs text-gray-500">Status</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full mt-2 p-2 rounded bg-gray-50 dark:bg-gray-900"
-            >
-              <option value="All">All</option>
-              <option value="Completed">Completed</option>
-              <option value="Pending">Pending</option>
-              <option value="Canceled">Canceled</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs text-gray-500">Zone</label>
-            <select
-              value={zoneFilter}
-              onChange={(e) => setZoneFilter(e.target.value)}
-              className="w-full mt-2 p-2 rounded bg-gray-50 dark:bg-gray-900"
-            >
-              <option value="All">All</option>
-              {zones.map((z) => (
-                <option key={z} value={z}>
-                  {z}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs text-gray-500">Courier</label>
-            <input
-              placeholder="Courier name"
-              className="w-full mt-2 p-2 rounded bg-gray-50 dark:bg-gray-900"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs text-gray-500">Date range</label>
-            <div className="flex gap-2 mt-2">
-              <input
-                type="date"
-                className="p-2 rounded bg-gray-50 dark:bg-gray-900 w-1/2"
-              />
-              <input
-                type="date"
-                className="p-2 rounded bg-gray-50 dark:bg-gray-900 w-1/2"
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 rounded bg-white dark:bg-gray-800"
-            >
-              Apply
-            </button>
-            <button
-              onClick={() => {
-                setStatusFilter("All");
-                setZoneFilter("All");
-              }}
-              className="px-4 py-2 rounded bg-gray-50"
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-      </aside>
-    </div>
-  );
-}
-
 // ---- Main Page ----
 export default function OrderReportPage(): JSX.Element {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | "All">("All");
   const [zoneFilter, setZoneFilter] = useState<string | "All">("All");
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
@@ -277,15 +161,6 @@ export default function OrderReportPage(): JSX.Element {
   const paged = useMemo(
     () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
     [filtered, page],
-  );
-
-  const statusData = useMemo(
-    () =>
-      Object.keys(STATUS_COLORS).map((s) => ({
-        name: s,
-        value: filtered.filter((o) => o.status === s).length,
-      })),
-    [filtered],
   );
 
   const zoneChart = useMemo(
@@ -377,7 +252,6 @@ export default function OrderReportPage(): JSX.Element {
           </div>
 
           <button
-            onClick={() => setDrawerOpen(true)}
             className="px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-2"
           >
             <Filter className="w-4 h-4" /> {t("filters")}
@@ -393,7 +267,7 @@ export default function OrderReportPage(): JSX.Element {
         </div>
 
         {/* Metrics */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <MetricCard
             label={t("total_revenue")}
             value={`€${totalRevenue.toFixed(2)}`}
@@ -409,13 +283,6 @@ export default function OrderReportPage(): JSX.Element {
           />
 
           <MetricCard
-            label={t("unique_zones")}
-            value={zones.length}
-            subtitle={t("operational_regions")}
-            icon={<Eye className="w-5 h-5" />}
-          />
-
-          <MetricCard
             label={t("avg_order")}
             value={`€${avgOrder}`}
             subtitle={t("order_level_average")}
@@ -424,31 +291,7 @@ export default function OrderReportPage(): JSX.Element {
         </section>
 
         {/* Charts grid */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Pie - Status distribution */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <PieChart className="w-4 h-4" /> {t("status_distribution")}
-            </h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <RePieChart>
-                  <Pie
-                    data={statusData}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={90}
-                    label
-                  >
-                    {statusData.map((entry, idx) => (
-                      <Cell key={idx} fill={STATUS_COLORS[entry.name]} />
-                    ))}
-                  </Pie>
-                </RePieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
+        <section className="grid grid-cols-1 gap-6">
           {/* Bar - Zone counts */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
@@ -502,9 +345,9 @@ export default function OrderReportPage(): JSX.Element {
         </section>
 
         {/* Table + right analytics */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 gap-6">
           {/* Table */}
-          <section className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-4 shadow">
+          <section className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow">
             <div className="overflow-x-auto">
               <table
                 className="w-full text-sm"
@@ -522,7 +365,6 @@ export default function OrderReportPage(): JSX.Element {
                     <th className="pb-2">{t("zone")}</th>
                     <th className="pb-2">{t("amount")}</th>
                     <th className="pb-2">{t("status")}</th>
-                    <th className="pb-2">{t("action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -545,16 +387,6 @@ export default function OrderReportPage(): JSX.Element {
                       <td className="py-3">€{o.amount.toFixed(2)}</td>
                       <td className="py-3">
                         <StatusPill status={o.status} />
-                      </td>
-                      <td className="py-3">
-                        <div className="flex items-center gap-2">
-                          <button className="px-2 py-1 rounded bg-white dark:bg-gray-900/40">
-                            {t("view")}
-                          </button>
-                          <button className="px-2 py-1 rounded bg-white dark:bg-gray-900/40">
-                            {t("details")}
-                          </button>
-                        </div>
                       </td>
                     </tr>
                   ))}
@@ -595,18 +427,6 @@ export default function OrderReportPage(): JSX.Element {
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-medium">{t("zone_analytics")}</h3>
               <div className="text-sm text-gray-500">{t("last_30_days")}</div>
-            </div>
-
-            <div style={{ height: 220 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <ReBarChart data={zoneChart}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" fill={DELIGO} />
-                </ReBarChart>
-              </ResponsiveContainer>
             </div>
 
             <div className="mt-4">
@@ -660,16 +480,6 @@ export default function OrderReportPage(): JSX.Element {
             </div>
           </aside>
         </section>
-
-        <FiltersDrawer
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          statusFilter={statusFilter}
-          setStatusFilter={(v: any) => setStatusFilter(v)}
-          zoneFilter={zoneFilter}
-          setZoneFilter={(v: any) => setZoneFilter(v)}
-          zones={zones}
-        />
       </div>
     </div>
   );
