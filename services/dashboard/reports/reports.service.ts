@@ -79,3 +79,29 @@ export const getFleetManagerReportAnalytics = async () => {
         };
     }
 };
+
+export const getDeliverPartnerReportAnalytics = async () => {
+    try {
+        const res = await serverFetch.get(`/analytics/admin-delivery-partner-report-analytics`, {
+            next: {
+                revalidate: 30
+            }
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.message || "Failed to fetch delivery partner analytics");
+        }
+
+        const result = await res.json();
+
+        return result?.data || {};
+
+    } catch (error: any) {
+        console.log(error);
+        return {
+            success: false,
+            message: `${process.env.NODE_ENV === 'development' ? error?.message : 'Something went wrong in delivery partner analytics fetching.'}`
+        };
+    }
+};

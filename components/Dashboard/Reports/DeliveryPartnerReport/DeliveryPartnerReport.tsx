@@ -9,6 +9,7 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { IDeliveryPartnerReportAnalytics } from "@/types/report.type";
 import { exportDeliveryPartnerReportCSV } from "@/utils/exportDeliveryPartnerReportCSV ";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -18,7 +19,8 @@ import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   partnersData: { data: TDeliveryPartner[]; meta?: TMeta };
-}
+  deliveryPartnerReportAnalytics: IDeliveryPartnerReportAnalytics;
+};
 
 const sortOptions = [
   { label: "Newest First", value: "-createdAt" },
@@ -108,7 +110,33 @@ const monthlySignups = [
   },
 ];
 
-export default function DeliveryPartnerReport({ partnersData }: IProps) {
+const VehicleTypes = ({ name, value, partnersData }: { name: string, value: number, partnersData: { data: TDeliveryPartner[]; meta?: TMeta }; }) => {
+  return (
+    <div
+      key={name}
+      className="flex items-center justify-between"
+    >
+      <span className="text-sm text-gray-600">{name}</span>
+      <div className="flex items-center gap-2">
+        <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-[#DC3173] rounded-full"
+            style={{
+              width: !!partnersData?.meta?.total
+                ? `${(value / (partnersData?.meta?.total || 1)) * 100}%`
+                : 0,
+            }}
+          />
+        </div>
+        <span className="font-bold text-gray-900 w-6 text-right">
+          {value}
+        </span>
+      </div>
+    </div>
+  )
+};
+
+export default function DeliveryPartnerReport({ partnersData, deliveryPartnerReportAnalytics }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
@@ -169,104 +197,106 @@ export default function DeliveryPartnerReport({ partnersData }: IProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Partners"
-            value={stats.total}
+            value={deliveryPartnerReportAnalytics.cards.totalPartners || 0}
             icon={Bike}
             delay={0}
           />
           <StatsCard
             title="Active Partners"
-            value={stats.approved}
+            value={deliveryPartnerReportAnalytics.cards.activePartners || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
             title="Total Deliveries"
-            value={stats.totalDeliveries.toLocaleString()}
+            value={deliveryPartnerReportAnalytics.cards.totalDeliveries || 0}
             icon={Package}
             delay={0.2}
           />
           <StatsCard
             title="Total Earnings"
-            value={`€${stats.totalEarnings.toLocaleString()}`}
+            value={`${(deliveryPartnerReportAnalytics.cards.totalEarnings || "€0.00")}`}
             icon={EuroIcon}
             delay={0.3}
           />
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.2,
-            }}
-            className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              Partner Growth
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              New partner registrations over time
-            </p>
-            <AnalyticsChart
-              data={monthlySignups}
-              type="area"
-              dataKey="partners"
-              height={200}
-            />
-          </motion.div>
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.2,
+          }}
+          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            Partner Growth
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">
+            New partner registrations over time
+          </p>
+          <AnalyticsChart
+            data={deliveryPartnerReportAnalytics?.partnerGrowth || []}
+            type="area"
+            dataKey="value"
+            xKey="label"
+            height={200}
+          />
+        </motion.div>
 
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.3,
-            }}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Vehicle Types
-            </h3>
-            <div className="space-y-3">
-              {vehicleDistribution.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between"
-                >
-                  <span className="text-sm text-gray-600">{item.name}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#DC3173] rounded-full"
-                        style={{
-                          width: !!partnersData?.meta?.total
-                            ? `${(item.value / (partnersData?.meta?.total || 1)) * 100}%`
-                            : 0,
-                        }}
-                      />
-                    </div>
-                    <span className="font-bold text-gray-900 w-6 text-right">
-                      {item.value}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+        {/* vehicle types */}
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.3,
+          }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Vehicle Types
+          </h3>
+          <div className="space-y-3">
+            <VehicleTypes
+              name="Motorbike"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.motorbike || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="E-Bike"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.eBike || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="Car"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.car || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="Scooter"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.scooter || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="Bicycle"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.bicycle || 0}
+              partnersData={partnersData}
+            />
+          </div>
+        </motion.div>
 
         {/* Table */}
         <motion.div

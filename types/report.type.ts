@@ -56,3 +56,23 @@ export interface IFleetManagerReportAnalytics {
         rejected: number;
     },
 }
+
+export interface IDeliveryPartnerReportAnalytics {
+    cards: {
+        activePartners: number;
+        totalDeliveries: number;
+        totalPartners: number;
+        totalEarnings: number | string;
+    },
+    partnerGrowth: {
+        label: string;
+        value: number;
+    }[],
+    vehicleTypes: {
+        bicycle: number;
+        motorbike: number;
+        car: number;
+        eBike: number;
+        scooter: number;
+    }
+}
