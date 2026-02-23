@@ -17,3 +17,23 @@ export interface ICustomerReportAnalytics {
         pending: number;
     },
 }
+
+export interface IVendorReportAnalytics {
+    cards: {
+        totalVendors: number;
+        approvedVendors: number;
+        submittedVendors: number;
+        blockedOrRejectedVendors: number;
+    },
+    monthlySignups: {
+        label: string;
+        value: number;
+    }[],
+    statusDistribution: {
+        approved: number;
+        blocked: number;
+        pending: number;
+        rejected: number;
+        submitted: number;
+    },
+}
