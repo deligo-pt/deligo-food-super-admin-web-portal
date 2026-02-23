@@ -1,6 +1,6 @@
+import CustomerInsights from "@/components/Dashboard/Analytics/CustomerInsights/CustomerInsights";
 import { serverRequest } from "@/lib/serverFetch";
-import CustomerInsights from "@/src/components/Dashboard/Analytics/CustomerInsights/CustomerInsights";
-import { TCustomerInsights } from "@/src/types/analytics.type";
+import { TCustomerInsights } from "@/types/analytics.type";
 
 export default async function CustomerInsightsPage() {
   let data: TCustomerInsights = {} as TCustomerInsights;
