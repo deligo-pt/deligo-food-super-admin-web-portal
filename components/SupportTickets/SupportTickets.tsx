@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+import AllFilters from "@/components/Filtering/AllFilters";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { USER_ROLE } from "@/consts/user.const";
@@ -17,7 +19,7 @@ import {
 import { getCookie } from "@/utils/cookies";
 import { fetchData } from "@/utils/requests";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowRight, MessageCircle, Search, X } from "lucide-react";
+import { ArrowRight, MessageCircle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
@@ -36,6 +38,10 @@ interface IProps {
 export default function SupportTickets({ conversationsData }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = [
+    { label: t("newest_first"), value: "-createdAt" },
+    { label: t("oldest_first"), value: "createdAt" },
+  ];
 
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [query, setQuery] = useState("");
@@ -171,15 +177,7 @@ export default function SupportTickets({ conversationsData }: IProps) {
       {/* Header */}
       <TitleHeader title={t("support_tickets")} subtitle={t("manage_issues")} />
 
-      <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-xl border shadow-sm mb-6">
-        <Search className="w-4 h-4 text-gray-400" />
-        <input
-          placeholder={t("search_tickets")}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="outline-none text-sm"
-        />
-      </div>
+      <AllFilters sortOptions={sortOptions} />
 
       {/* Card Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -238,48 +236,6 @@ export default function SupportTickets({ conversationsData }: IProps) {
             </div>
           </div>
         ))}
-        {/* {filtered.map((t) => (
-          <div
-            key={t.id}
-            onClick={() => setDrawer(t)}
-            className="cursor-pointer bg-white rounded-3xl p-5 shadow-sm border hover:shadow-lg transition group"
-          > */}
-        {/* Header */}
-        {/* <div className="flex items-center justify-between mb-4">
-              <span
-                className={`px-3 py-1 text-xs rounded-full ${STATUS[t.status]}`}
-              >
-                {t.status.replace("_", " ")}
-              </span>
-
-              <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
-            </div> */}
-
-        {/* Subject */}
-        {/* <h2 className="text-lg font-semibold leading-tight group-hover:text-[#DC3173] transition">
-              {t.subject}
-            </h2> */}
-
-        {/* User */}
-        {/* <div className="flex items-center gap-3 mt-4">
-              <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center">
-                {t.user[0]}
-              </div>
-              <div className="text-sm">
-                <p className="font-medium">{t.user}</p>
-                <p className="text-xs text-gray-500">
-                  {formatDate(t.createdAt)}
-                </p>
-              </div>
-            </div> */}
-
-        {/* Footer */}
-        {/* <div className="flex items-center justify-between mt-5 pt-4 border-t">
-              <p className="text-xs text-gray-500">ID: {t.id}</p>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
-            </div> */}
-        {/* </div>
-        ))} */}
       </div>
 
       {/* Drawer */}
@@ -394,6 +350,15 @@ export default function SupportTickets({ conversationsData }: IProps) {
               border-radius: 999px;
             }
           `}</style>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!!conversationsData?.meta?.totalPage && (
+        <div className="my-4">
+          <PaginationComponent
+            totalPages={conversationsData?.meta?.totalPage as number}
+          />
         </div>
       )}
     </div>

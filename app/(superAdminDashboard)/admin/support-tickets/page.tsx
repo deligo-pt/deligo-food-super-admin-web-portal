@@ -9,7 +9,7 @@ export default async function SupportTicketsPage() {
   try {
     const conversationsResult = (await serverRequest.get(
       "/support/conversations",
-      { params: { type: "SUPPORT" } },
+      { params: { type: "SUPPORT", limit: 12 } },
     )) as TResponse<TConversation[]>;
 
     initialData.data = conversationsResult.data;

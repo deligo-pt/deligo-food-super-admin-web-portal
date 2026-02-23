@@ -326,7 +326,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       id: "sos",
       title: t("sos_emergency"),
       icon: <AlertCircle size={18} />,
-      items: [{ name: t("critical_alerts"), path: "/admin/critical-alerts" }],
+      items: [{ name: "All SOS", path: "/admin/sos" }],
     },
   ];
 
