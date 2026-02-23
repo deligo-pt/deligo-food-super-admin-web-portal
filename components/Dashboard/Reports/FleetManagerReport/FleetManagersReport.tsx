@@ -1,5 +1,6 @@
 "use client";
 
+import StatusDistributionCard from "@/components/common/StatusDistributionCard";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import FleetManagerReportTable from "@/components/Dashboard/Reports/FleetManagerReport/FleetManagerReportTable";
@@ -8,6 +9,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
+import { IFleetManagerReportAnalytics } from "@/types/report.type";
 import { TAgent } from "@/types/user.type";
 import { exportFleetManagerReportCSV } from "@/utils/exportFleetManagerReportCSV";
 import { format } from "date-fns";
@@ -18,6 +20,7 @@ import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   fleetManagersData: { data: TAgent[]; meta?: TMeta };
+  fleetReportAnalytics: IFleetManagerReportAnalytics;
 }
 
 const sortOptions = [
@@ -108,7 +111,7 @@ const monthlySignups = [
   },
 ];
 
-export default function FleetManagerReport({ fleetManagersData }: IProps) {
+export default function FleetManagerReport({ fleetManagersData, fleetReportAnalytics }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
@@ -170,99 +173,102 @@ export default function FleetManagerReport({ fleetManagersData }: IProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Managers"
-            value={stats.total}
+            value={fleetReportAnalytics?.cards?.totalFleetManagers || 0}
             icon={Users}
             delay={0}
           />
           <StatsCard
             title="Approved Managers"
-            value={stats.approved}
+            value={fleetReportAnalytics?.cards?.approvedFleetManagers || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
-            title="Total Drivers"
-            value={stats.totalDrivers}
+            title="Submitted Managers"
+            value={fleetReportAnalytics?.cards?.submittedFleetManagers || 0}
             icon={Bike}
             delay={0.2}
           />
           <StatsCard
-            title="Total Deliveries"
-            value={stats.totalDeliveries.toLocaleString()}
+            title="Blocked/Rejected Managers"
+            value={fleetReportAnalytics?.cards?.blockedOrRejectedFleetManagers || 0}
             icon={PackageCheckIcon}
             delay={0.3}
           />
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.2,
-            }}
-            className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              Monthly Registrations
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              New fleet manager signups over time
-            </p>
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.2,
+          }}
+          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            Monthly Registrations
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">
+            New fleet manager signups over time
+          </p>
 
-            <AnalyticsChart
-              data={monthlySignups}
-              type="area"
-              dataKey="managers"
-              height={200}
+          <AnalyticsChart
+            data={fleetReportAnalytics?.monthlySignups || []}
+            type="area"
+            dataKey="value"
+            xKey="label"
+            height={200}
+          />
+        </motion.div>
+
+        {/* status distribution */}
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.3,
+          }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Status Distribution
+          </h3>
+          <div className="space-y-3">
+            <StatusDistributionCard
+              name="Approved"
+              value={fleetReportAnalytics.statusDistribution.approved || 0}
+              color="#DC3173"
             />
-          </motion.div>
-
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.3,
-            }}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Status Distribution
-            </h3>
-            <div className="space-y-3">
-              {statusDistribution.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{
-                        backgroundColor: item.color,
-                      }}
-                    />
-                    <span className="text-sm text-gray-600">{item.name}</span>
-                  </div>
-                  <span className="font-bold text-gray-900">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+            <StatusDistributionCard
+              name="Pending"
+              value={fleetReportAnalytics.statusDistribution.pending || 0}
+              color="#f59e0b"
+            />
+            <StatusDistributionCard
+              name="Rejected"
+              value={fleetReportAnalytics.statusDistribution.rejected || 0}
+              color="#6b7280"
+            />
+            <StatusDistributionCard
+              name="Blocked"
+              value={fleetReportAnalytics.statusDistribution.blocked || 0}
+              color="#ef4444"
+            />
+          </div>
+        </motion.div>
 
         {/* Table */}
         <motion.div

@@ -264,12 +264,12 @@ export default function VendorReport({ vendorsData, vendorReportAnalytics }: IPr
             <StatusDistributionCard
               name="Rejected"
               value={vendorReportAnalytics.statusDistribution.rejected || 0}
-              color="#ef4444"
+              color="#6b7280"
             />
             <StatusDistributionCard
               name="Blocked"
               value={vendorReportAnalytics.statusDistribution.blocked || 0}
-              color="#FF6B6B"
+              color="#ef4444"
             />
           </div>
         </motion.div>

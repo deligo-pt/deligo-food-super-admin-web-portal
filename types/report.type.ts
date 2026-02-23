@@ -37,3 +37,22 @@ export interface IVendorReportAnalytics {
         submitted: number;
     },
 }
+
+export interface IFleetManagerReportAnalytics {
+    cards: {
+        totalFleetManagers: number;
+        approvedFleetManagers: number;
+        submittedFleetManagers: number;
+        blockedOrRejectedFleetManagers: number;
+    },
+    monthlySignups: {
+        label: string;
+        value: number;
+    }[],
+    statusDistribution: {
+        approved: number;
+        blocked: number;
+        pending: number;
+        rejected: number;
+    },
+}
