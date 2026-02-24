@@ -53,51 +53,6 @@ const filterOptions = [
   },
 ];
 
-const statusDistribution = [
-  {
-    name: "Active",
-    value: 6,
-    color: "#DC3173",
-  },
-  {
-    name: "Pending",
-    value: 1,
-    color: "#f59e0b",
-  },
-  {
-    name: "Blocked",
-    value: 1,
-    color: "#6b7280",
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    customers: 45,
-  },
-  {
-    name: "Feb",
-    customers: 62,
-  },
-  {
-    name: "Mar",
-    customers: 58,
-  },
-  {
-    name: "Apr",
-    customers: 71,
-  },
-  {
-    name: "May",
-    customers: 89,
-  },
-  {
-    name: "Jun",
-    customers: 95,
-  },
-];
-
 export function CustomerReport({ customersData, customerReportAnalytics }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
@@ -149,8 +104,8 @@ export function CustomerReport({ customersData, customerReportAnalytics }: IProp
               onCSVClick={() =>
                 exportCustomerReportCSV({
                   stats: stats,
-                  monthlySignups,
-                  statusDistribution,
+                  monthlySignups: customerReportAnalytics.customerGrowth,
+                  statusDistribution: customerReportAnalytics.statusDistribution,
                   customers: customersData.data,
                 })
               }
