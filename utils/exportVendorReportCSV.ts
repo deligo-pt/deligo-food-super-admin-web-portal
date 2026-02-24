@@ -7,8 +7,8 @@ export function exportVendorReportCSV({
   stats,
   vendors,
 }: {
-  statusDistribution: { name: string; value: number }[];
-  monthlySignups: { name: string; vendors: number }[];
+  statusDistribution: Record<string, number>;
+  monthlySignups: { label: string; value: number }[];
   stats: {
     total: number;
     approved: number;
@@ -30,16 +30,21 @@ export function exportVendorReportCSV({
   // ===== SECTION 2: STATUS DISTRIBUTION =====
   rows.push(["--- STATUS DISTRIBUTION ---"]);
   rows.push(["Status", "Count"]);
-  statusDistribution.forEach((item) => {
-    rows.push([item.name, String(item.value)]);
+
+  Object.entries(statusDistribution).forEach(([status, count]) => {
+    rows.push([
+      status.replace(/_/g, " ").toUpperCase(), // optional formatting
+      count,
+    ]);
   });
+  
   rows.push([]);
 
   // ===== SECTION 3: MONTHLY SIGNUPS =====
   rows.push(["--- MONTHLY SIGNUPS ---"]);
   rows.push(["Month", "Customers"]);
   monthlySignups.forEach((item) => {
-    rows.push([item.name, String(item.vendors)]);
+    rows.push([item.label, String(item.value)]);
   });
   rows.push([]);
 

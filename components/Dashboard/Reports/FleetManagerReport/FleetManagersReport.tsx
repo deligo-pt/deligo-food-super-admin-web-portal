@@ -61,56 +61,6 @@ const filterOptions = [
   },
 ];
 
-const statusDistribution = [
-  {
-    name: "Approved",
-    value: 3,
-    color: "#DC3173",
-  },
-  {
-    name: "Pending",
-    value: 1,
-    color: "#f59e0b",
-  },
-  {
-    name: "Submitted",
-    value: 1,
-    color: "#3b82f6",
-  },
-  {
-    name: "Rejected",
-    value: 1,
-    color: "#ef4444",
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    managers: 1,
-  },
-  {
-    name: "Feb",
-    managers: 2,
-  },
-  {
-    name: "Mar",
-    managers: 5,
-  },
-  {
-    name: "Apr",
-    managers: 3,
-  },
-  {
-    name: "May",
-    managers: 1,
-  },
-  {
-    name: "Jun",
-    managers: 2,
-  },
-];
-
 export default function FleetManagerReport({ fleetManagersData, fleetReportAnalytics }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
@@ -122,14 +72,8 @@ export default function FleetManagerReport({ fleetManagersData, fleetReportAnaly
     total: fleetManagersData.meta?.total || 0,
     approved: fleetManagersData.data?.filter((m) => m.status === "APPROVED")
       .length,
-    totalDrivers: fleetManagersData.data?.reduce(
-      (sum, m) => sum + (m.operationalData?.totalDrivers || 0),
-      0,
-    ),
-    totalDeliveries: fleetManagersData.data?.reduce(
-      (sum, m) => sum + (m.operationalData?.totalDeliveries || 0),
-      0,
-    ),
+    submitted: fleetManagersData.data?.filter((m) => m.status === "SUBMITTED").length,
+    blocked_rejected: fleetManagersData.data?.filter((m) => m.status === "BLOCKED" || m.status === "REJECTED").length,
   };
 
   return (
@@ -160,8 +104,8 @@ export default function FleetManagerReport({ fleetManagersData, fleetReportAnaly
               onCSVClick={() =>
                 exportFleetManagerReportCSV({
                   stats: stats,
-                  monthlySignups,
-                  statusDistribution,
+                  monthlySignups: fleetReportAnalytics?.monthlySignups || [],
+                  statusDistribution: fleetReportAnalytics?.statusDistribution || {},
                   fleetManagers: fleetManagersData.data,
                 })
               }

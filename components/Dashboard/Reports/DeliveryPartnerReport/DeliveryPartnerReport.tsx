@@ -60,56 +60,6 @@ const filterOptions = [
   },
 ];
 
-const vehicleDistribution = [
-  {
-    name: "Motorbike",
-    value: 2,
-  },
-  {
-    name: "E-Bike",
-    value: 2,
-  },
-  {
-    name: "Scooter",
-    value: 2,
-  },
-  {
-    name: "Bicycle",
-    value: 1,
-  },
-  {
-    name: "Car",
-    value: 1,
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    partners: 12,
-  },
-  {
-    name: "Feb",
-    partners: 18,
-  },
-  {
-    name: "Mar",
-    partners: 15,
-  },
-  {
-    name: "Apr",
-    partners: 22,
-  },
-  {
-    name: "May",
-    partners: 28,
-  },
-  {
-    name: "Jun",
-    partners: 25,
-  },
-];
-
 const VehicleTypes = ({ name, value, partnersData }: { name: string, value: number, partnersData: { data: TDeliveryPartner[]; meta?: TMeta }; }) => {
   return (
     <div
@@ -184,8 +134,8 @@ export default function DeliveryPartnerReport({ partnersData, deliveryPartnerRep
               onCSVClick={() =>
                 exportDeliveryPartnerReportCSV({
                   stats: stats,
-                  monthlySignups,
-                  vehicleDistribution,
+                  monthlySignups: deliveryPartnerReportAnalytics.partnerGrowth || [],
+                  vehicleDistribution: deliveryPartnerReportAnalytics.vehicleTypes || {},
                   deliveryPartners: partnersData.data,
                 })
               }

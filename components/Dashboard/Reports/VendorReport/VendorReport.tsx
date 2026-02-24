@@ -61,61 +61,6 @@ const filterOptions = [
   },
 ];
 
-const statusDistribution = [
-  {
-    name: "Approved",
-    value: 4,
-    color: "#DC3173",
-  },
-  {
-    name: "Pending",
-    value: 1,
-    color: "#f59e0b",
-  },
-  {
-    name: "Submitted",
-    value: 1,
-    color: "#3b82f6",
-  },
-  {
-    name: "Rejected",
-    value: 1,
-    color: "#ef4444",
-  },
-  {
-    name: "Blocked",
-    value: 1,
-    color: "#6b7280",
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    vendors: 2,
-  },
-  {
-    name: "Feb",
-    vendors: 3,
-  },
-  {
-    name: "Mar",
-    vendors: 1,
-  },
-  {
-    name: "Apr",
-    vendors: 2,
-  },
-  {
-    name: "May",
-    vendors: 2,
-  },
-  {
-    name: "Jun",
-    vendors: 1,
-  },
-];
-
 export default function VendorReport({ vendorsData, vendorReportAnalytics }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
@@ -160,8 +105,8 @@ export default function VendorReport({ vendorsData, vendorReportAnalytics }: IPr
               onCSVClick={() =>
                 exportVendorReportCSV({
                   stats: stats,
-                  monthlySignups,
-                  statusDistribution,
+                  monthlySignups: vendorReportAnalytics.monthlySignups || [],
+                  statusDistribution: vendorReportAnalytics.statusDistribution || {},
                   vendors: vendorsData.data,
                 })
               }
