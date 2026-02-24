@@ -1,4 +1,27 @@
 
+export interface ISalesReportAnalytics {
+    summary: {
+        totalRevenue: string,
+        completedOrders: number,
+        cancelledOrders: number,
+        avgOrderValue: string
+    },
+    revenueCards: {
+        thisWeek: string,
+        thisMonth: string,
+        topEarningDay: string;
+    },
+    charts: {
+        revenueTrend: {
+            date: string;
+            revenue: number;
+        }[],
+        earningsByDay: {
+            date: string;
+            revenue: number;
+        }[];
+    }
+};
 
 export interface ICustomerReportAnalytics {
     cards: {

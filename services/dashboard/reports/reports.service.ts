@@ -2,6 +2,32 @@
 import { serverFetch } from "@/lib/fetchHelper";
 
 
+export const getSalesReportAnalytics = async (queryString?: string) => {
+    try {
+        const res = await serverFetch.get(`/analytics/admin-sales-report-analytics${queryString ? `?${queryString}` : ""}`, {
+            next: {
+                revalidate: 30
+            }
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.message || "Failed to fetch sales analytics");
+        }
+
+        const result = await res.json();
+
+        return result?.data || {};
+
+    } catch (error: any) {
+        console.log(error);
+        return {
+            success: false,
+            message: `${process.env.NODE_ENV === 'development' ? error?.message : 'Something went wrong in sales analytics fetching.'}`
+        };
+    }
+};
+
 export const getCustomerReportAnalytics = async () => {
     try {
         const res = await serverFetch.get(`/analytics/admin-customer-report-analytics`, {
