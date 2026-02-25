@@ -205,23 +205,6 @@ export function CustomerReport({ customersData, customerReportAnalytics }: IProp
               value={customerReportAnalytics.statusDistribution.blocked || 0}
               color="#FF6B6B"
             />
-            {/* {statusDistribution.map((item) => (
-              <div
-                key={item.name}
-                className="flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{
-                      backgroundColor: item.color,
-                    }}
-                  />
-                  <span className="text-sm text-gray-600">{item.name}</span>
-                </div>
-                <span className="font-bold text-gray-900">{item.value}</span>
-              </div>
-            ))} */}
           </div>
         </motion.div>
 

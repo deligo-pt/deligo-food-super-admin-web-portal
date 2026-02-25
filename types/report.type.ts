@@ -23,6 +23,27 @@ export interface ISalesReportAnalytics {
     }
 };
 
+export interface IOrderReportAnalytics {
+    summary: {
+        avgOrderValue: string;
+        totalOrders: number;
+        totalRevenue: string,
+    },
+    ordersByZone: {
+        zone: string;
+        orders: number;
+    }[],
+    revenueTrend: {
+        date: string;
+        revenue: number;
+    }[],
+    zoneHeatmap: {
+        zone: string;
+        hour: number;
+        orderCount: number;
+    }[]
+}
+
 export interface ICustomerReportAnalytics {
     cards: {
         totalCustomers: number;
