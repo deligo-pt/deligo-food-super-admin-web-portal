@@ -149,7 +149,7 @@ export default function CustomerReportTable({ customers }: IProps) {
                   <Button
                     variant="ghost"
                     onClick={() =>
-                      router.push("/admin/all-delivery-customers/" + c.userId)
+                      router.push("/admin/all-customers/" + c.userId)
                     }
                   >
                     <EyeIcon />

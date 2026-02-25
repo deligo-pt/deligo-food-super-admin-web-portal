@@ -213,6 +213,9 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_items"), path: "/admin/all-products" },
         { name: t("out_of_stock_alerts"), path: "/admin/out-of-stock-alerts" },
         { name: t("restricted_items"), path: "/admin/restricted-items" },
+        { name: "All Ingredients", path: "/admin/all-ingredients" },
+        { name: "Add Ingredient", path: "/admin/add-ingredient" },
+        { name: "Ingredient Orders", path: "/admin/ingredient-orders" },
       ],
     },
     {
