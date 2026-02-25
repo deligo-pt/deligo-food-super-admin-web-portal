@@ -53,7 +53,7 @@ export default function OrderDetails({ order }: IProps) {
   };
 
   return (
-    <div className="p-6">
+    <div className="">
       <motion.div
         className="bg-white rounded-xl shadow-xl overflow-hidden min-h-screen md:min-h-0"
         variants={containerVariants}

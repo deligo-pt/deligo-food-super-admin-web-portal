@@ -129,7 +129,7 @@ export default function DriverPayoutsPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <TitleHeader
         title={t("driver_payouts")}
         subtitle="Manage all driver payouts here"

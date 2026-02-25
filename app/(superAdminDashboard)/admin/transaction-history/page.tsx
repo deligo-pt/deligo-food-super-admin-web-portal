@@ -215,7 +215,7 @@ export default function TransactionHistoryPage(): JSX.Element {
   };
 
   return (
-    <div className="p-6 lg:p-10 space-y-6 overflow-x-hidden">
+    <div className="space-y-6 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
