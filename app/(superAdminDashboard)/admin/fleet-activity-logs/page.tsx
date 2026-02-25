@@ -72,7 +72,7 @@ export default function FleetActivityLogsPage() {
   });
 
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <TitleHeader
         title={t("fleet_activity_logs")}
         subtitle="Fleet Manager Activity Logs"

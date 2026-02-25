@@ -66,7 +66,7 @@ const OrderReport = ({ orderReportAnalytics, ordersData }: IProps) => {
     return (
         <div ref={reportRef}
             className="print-container min-h-screen bg-gray-50/50 pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 print:pt-4">
+            <div className="print:pt-4">
                 {/* Logo for print */}
                 <div className="hidden print:flex items-center gap-2 mb-4">
                     <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
