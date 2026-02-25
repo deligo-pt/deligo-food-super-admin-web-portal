@@ -186,7 +186,7 @@ export default function SendNotificationFleetPage() {
   ];
 
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <TitleHeader
         title={t("send_notification_to_fleet")}
         subtitle="Send Custom Notification to Fleet Managers"
