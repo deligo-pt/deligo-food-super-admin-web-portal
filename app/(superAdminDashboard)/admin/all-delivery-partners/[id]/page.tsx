@@ -24,7 +24,7 @@ export default async function DeliveryPartnerDetailsPage({
     console.log("Server fetchProducts error:", err);
   }
   return (
-    <div className="p-4 md:p-6">
+    <div>
       <DeliveryPartnerDetails partner={initialData} />
     </div>
   );

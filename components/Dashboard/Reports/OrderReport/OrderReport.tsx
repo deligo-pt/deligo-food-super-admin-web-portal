@@ -60,7 +60,7 @@ const OrderReport = ({ orderReportAnalytics, ordersData }: IProps) => {
         contentRef: reportRef,
         documentTitle: `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
     });
-
+    console.log(ordersData);
     const isMobile = window.innerWidth < 640;
 
     return (
