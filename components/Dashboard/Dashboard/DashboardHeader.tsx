@@ -1,5 +1,6 @@
 "use client";
 
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 
@@ -20,12 +21,10 @@ const DashboardHeader = () => {
         duration: 0.5,
       }}
     >
-      <h1 className="text-3xl font-bold">
-        {t("hello")}, <span className="text-[#DC3173]">Administrator</span>
-      </h1>
-      <p className="text-gray-500 mt-1">
-        {t("welcome_food_delivery_dashboard_overview")}
-      </p>
+      <TitleHeader
+        title={`${t("hello")}, Administrator`}
+        subtitle={t("welcome_food_delivery_dashboard_overview")}
+      />
     </motion.div>
   );
 };

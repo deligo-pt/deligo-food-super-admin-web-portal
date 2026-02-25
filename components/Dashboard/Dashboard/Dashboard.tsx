@@ -24,10 +24,10 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen">
       <DashboardHeader />
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6"
         initial={{
           opacity: 0,
           y: 20,
@@ -96,7 +96,7 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
         />
       </motion.div>
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6"
         initial={{
           opacity: 0,
           y: 20,

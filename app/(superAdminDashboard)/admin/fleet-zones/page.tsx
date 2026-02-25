@@ -134,7 +134,7 @@ export default function FleetZonesPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <TitleHeader
         title={t("fleet_zones")}
         subtitle="Manage zones of fleet managers"

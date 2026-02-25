@@ -366,9 +366,9 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
 
       {/* Desktop Sidebar */}
       <motion.aside
-        animate={{ width: open ? 280 : 80 }}
+        animate={{ width: open ? "100%" : 80 }}
         transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="hidden md:flex h-screen bg-linear-to-b from-pink-50 via-white to-pink-100 shadow-xl flex-col border-r border-pink-200 overflow-hidden fixed left-0 top-0 z-40"
+        className="h-screen bg-linear-to-b from-pink-50 via-white to-pink-100 shadow-xl hidden md:flex flex-col border-r border-pink-200 overflow-hidden relative w-full"
       >
         <div className="flex items-center justify-between px-4 py-4 border-b border-pink-200">
           <div className="flex items-center gap-2">
@@ -414,8 +414,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                 <Link
                   href={menu.path}
                   className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${pathname === menu.path
-                      ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                      : "hover:bg-pink-100"
+                    ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                    : "hover:bg-pink-100"
                     } ${!open ? "justify-center" : ""}`}
                 >
                   <div className="flex items-center gap-3">
@@ -463,8 +463,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                             key={sub.name}
                             href={sub.path}
                             className={`text-sm px-2 py-1 rounded-md transition-all duration-300 ${pathname === sub.path
-                                ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                                : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
+                              ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                              : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
                               }`}
                           >
                             {sub.name}
@@ -521,8 +521,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                       href={menu.path}
                       onClick={() => setMobileOpen(false)}
                       className={`flex items-center gap-2 py-2 ${pathname === menu.path
-                          ? "text-pink-700 font-semibold"
-                          : "text-gray-800 hover:text-pink-600"
+                        ? "text-pink-700 font-semibold"
+                        : "text-gray-800 hover:text-pink-600"
                         }`}
                     >
                       <div className="text-pink-600">{menu.icon}</div>
@@ -559,8 +559,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                                 href={sub.path}
                                 onClick={() => setMobileOpen(false)}
                                 className={`text-sm py-1 transition-all ${pathname === sub.path
-                                    ? "text-pink-700 font-semibold"
-                                    : "text-gray-600 hover:text-pink-600"
+                                  ? "text-pink-700 font-semibold"
+                                  : "text-gray-600 hover:text-pink-600"
                                   }`}
                               >
                                 {sub.name}
