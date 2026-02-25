@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import ReportStatusBadge from "@/components/Dashboard/Reports/ReportStatusBadge/ReportStatusBadge";
 import {
     Table,
     TableBody,
@@ -21,6 +20,7 @@ import {
     ShoppingBagIcon,
     UserPlus,
 } from "lucide-react";
+import OrderStatusBadge from "./OrderStatusBadge";
 
 interface IProps {
     orders: any[];
@@ -124,8 +124,7 @@ export default function OrderReportTable({ orders }: IProps) {
 
                             {/* Status */}
                             <TableCell>
-                                {/* <ReportStatusBadge status={order.orderStatus} /> */}
-                                {order?.orderStatus || "N/A"}
+                                <OrderStatusBadge status={order.orderStatus || "N/A"} />
                             </TableCell>
                         </TableRow>
                     ))}
