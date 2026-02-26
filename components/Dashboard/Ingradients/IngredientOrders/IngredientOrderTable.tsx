@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TIngredientOrder } from "@/types/ingredient.type";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
   CalendarIcon,
@@ -170,6 +171,7 @@ export default function IngredientOrderTable({
               </TableCell>
               <TableCell>€{order.totalPrice}</TableCell>
               <TableCell>{getStatusBadge(order.status)}</TableCell>
+              <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger>

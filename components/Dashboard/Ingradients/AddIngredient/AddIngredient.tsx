@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Save } from "lucide-react";
 import { useState } from "react";
@@ -23,12 +24,16 @@ import z from "zod";
 type TIngredientForm = z.infer<typeof ingredientSchema>;
 
 export default function AddIngredients() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm<TIngredientForm>({
+    resolver: zodResolver(ingredientSchema),
     defaultValues: {
       name: "",
       category: "",
       price: 0,
       stock: 0,
+      minOrder: 1,
       description: "",
       image: {
         url: "",
@@ -36,7 +41,6 @@ export default function AddIngredients() {
       },
     },
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: TIngredientForm) => {
     setIsSubmitting(true);
@@ -70,7 +74,7 @@ export default function AddIngredients() {
         <div className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 {/* Name */}
                 <FormField
                   control={form.control}
@@ -111,6 +115,7 @@ export default function AddIngredients() {
                         <Input
                           placeholder="e.g. 2.50"
                           type="number"
+                          step="any"
                           min={0}
                           {...field}
                           value={String(field.value)}
@@ -147,6 +152,30 @@ export default function AddIngredients() {
                     </FormItem>
                   )}
                 />
+
+                {/* Minimum Order */}
+                <FormField
+                  control={form.control}
+                  name="minOrder"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Minimum Order</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. 100"
+                          type="number"
+                          min={1}
+                          {...field}
+                          value={String(field.value)}
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               {/* Description */}
@@ -172,6 +201,7 @@ export default function AddIngredients() {
                   <FormItem>
                     <FormControl>
                       <ImageUpload
+                        label="Image"
                         value={field.value.url}
                         onChange={(file) => {
                           const url = file ? URL.createObjectURL(file) : "";

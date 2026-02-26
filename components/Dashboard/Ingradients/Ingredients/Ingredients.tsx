@@ -27,43 +27,41 @@ export default function Ingredients({ ingredientsData }: IProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-        {/* Header */}
-        <TitleHeader
-          title="All Ingredients"
-          subtitle="Inventory management for packaging and supplies"
-        />
+    <div className="min-h-screen p-6">
+      {/* Header */}
+      <TitleHeader
+        title="All Ingredients"
+        subtitle="Inventory management for packaging and supplies"
+      />
 
-        {/* Filters */}
-        <AllFilters sortOptions={sortOptions} />
+      {/* Filters */}
+      <AllFilters sortOptions={sortOptions} />
 
-        {/* Ingredients Table */}
-        <IngredientTable
-          ingredients={ingredientsData.data || []}
-          onDelete={(id: string) => setDeleteId(id)}
-        />
+      {/* Ingredients Table */}
+      <IngredientTable
+        ingredients={ingredientsData.data || []}
+        onDelete={(id: string) => setDeleteId(id)}
+      />
 
-        {/* Pagination */}
-        {!!ingredientsData.meta?.total && ingredientsData.meta?.total > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-4 md:px-6"
-          >
-            <PaginationComponent
-              totalPages={ingredientsData?.meta?.totalPage as number}
-            />
-          </motion.div>
-        )}
+      {/* Pagination */}
+      {!!ingredientsData.meta?.total && ingredientsData.meta?.total > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-4 md:px-6"
+        >
+          <PaginationComponent
+            totalPages={ingredientsData?.meta?.totalPage as number}
+          />
+        </motion.div>
+      )}
 
-        {/* Delete Modal */}
-        <DeleteModal
-          open={!!deleteId}
-          onOpenChange={(open) => !open && setDeleteId(null)}
-          onConfirm={handleDeleteIngredient}
-        />
-      </div>
+      {/* Delete Modal */}
+      <DeleteModal
+        open={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDeleteIngredient}
+      />
     </div>
   );
 }

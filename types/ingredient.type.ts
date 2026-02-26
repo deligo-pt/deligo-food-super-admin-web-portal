@@ -6,9 +6,11 @@ export type TIngredient = {
 
   name: string;
   category: string;
+  description?: string;
 
   price: number;
   stock: number;
+  minOrder?: number;
 
   image: string;
 
@@ -28,4 +30,10 @@ export type TIngredientOrder = {
 
   createdAt: string;
   updatedAt: string;
+
+  timeline?: {
+    status: string;
+    date: string;
+    completed: boolean;
+  }[];
 };
