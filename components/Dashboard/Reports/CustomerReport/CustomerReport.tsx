@@ -52,7 +52,7 @@ const filterOptions = [
 ];
 
 export function CustomerReport({ customersData, customerReportAnalytics }: IProps) {
-
+  console.log("customer analytics", customerReportAnalytics);
   const stats = {
     total: customersData.meta?.total || 0,
     active: customersData.data?.filter((c) => c.status === "APPROVED").length,

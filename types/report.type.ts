@@ -49,7 +49,7 @@ export interface ICustomerReportAnalytics {
         totalCustomers: number;
         activeCustomers: number;
         totalOrders: number;
-        totalRevenue: number;
+        totalRevenue: string;
     },
     customerGrowth: {
         label: string;
