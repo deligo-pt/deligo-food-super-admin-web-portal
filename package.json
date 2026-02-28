@@ -33,6 +33,7 @@
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.7",
     "jwt-decode": "^4.0.0",
     "libphonenumber-js": "^1.12.31",
     "lucide-react": "^0.548.0",

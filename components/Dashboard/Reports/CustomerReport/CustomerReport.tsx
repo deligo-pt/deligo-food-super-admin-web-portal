@@ -12,11 +12,9 @@ import { TMeta } from "@/types";
 import { ICustomerReportAnalytics } from "@/types/report.type";
 import { TCustomer } from "@/types/user.type";
 import { exportCustomerReportCSV } from "@/utils/exportCustomerReportCSV";
-import { format } from "date-fns";
+import { generateCustomerReportPDF } from "@/utils/pdf/customerReportPdf";
 import { motion } from "framer-motion";
 import { EuroIcon, Heart, ShoppingBag, User } from "lucide-react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   customersData: { data: TCustomer[]; meta?: TMeta };
@@ -54,11 +52,6 @@ const filterOptions = [
 ];
 
 export function CustomerReport({ customersData, customerReportAnalytics }: IProps) {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    contentRef: reportRef,
-    documentTitle: `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
-  });
 
   const stats = {
     total: customersData.meta?.total || 0,
@@ -75,7 +68,6 @@ export function CustomerReport({ customersData, customerReportAnalytics }: IProp
 
   return (
     <div
-      ref={reportRef}
       className="print-container min-h-screen bg-gray-50/50 pb-20"
     >
       <div className="print:pt-4">
@@ -100,7 +92,9 @@ export function CustomerReport({ customersData, customerReportAnalytics }: IProp
           subtitle="Overview of all registered customers and their activity"
           extraComponent={
             <ExportPopover
-              onPDFClick={() => handlePrint()}
+              onPDFClick={() =>
+                generateCustomerReportPDF(customersData?.data)
+              }
               onCSVClick={() =>
                 exportCustomerReportCSV({
                   stats: stats,
