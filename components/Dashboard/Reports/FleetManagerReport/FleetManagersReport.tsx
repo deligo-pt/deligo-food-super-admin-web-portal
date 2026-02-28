@@ -12,11 +12,9 @@ import { TMeta } from "@/types";
 import { IFleetManagerReportAnalytics } from "@/types/report.type";
 import { TAgent } from "@/types/user.type";
 import { exportFleetManagerReportCSV } from "@/utils/exportFleetManagerReportCSV";
-import { format } from "date-fns";
+import { generateFleetManagerReportPDF } from "@/utils/pdf/fleetManagerReportPdf";
 import { motion } from "framer-motion";
 import { Bike, CheckCircle, PackageCheckIcon, Users } from "lucide-react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   fleetManagersData: { data: TAgent[]; meta?: TMeta };
@@ -62,11 +60,6 @@ const filterOptions = [
 ];
 
 export default function FleetManagerReport({ fleetManagersData, fleetReportAnalytics }: IProps) {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    contentRef: reportRef,
-    documentTitle: `fleet_manager_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
-  });
 
   const stats = {
     total: fleetManagersData.meta?.total || 0,
@@ -77,7 +70,7 @@ export default function FleetManagerReport({ fleetManagersData, fleetReportAnaly
   };
 
   return (
-    <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
+    <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="print:pt-4">
         {/* Logo for print */}
         <div className="hidden print:flex items-center gap-2 mb-4">
@@ -100,7 +93,9 @@ export default function FleetManagerReport({ fleetManagersData, fleetReportAnaly
           subtitle="Overview of all fleet managers and their operations"
           extraComponent={
             <ExportPopover
-              onPDFClick={() => handlePrint()}
+              onPDFClick={() =>
+                generateFleetManagerReportPDF(fleetManagersData?.data || [])
+              }
               onCSVClick={() =>
                 exportFleetManagerReportCSV({
                   stats: stats,

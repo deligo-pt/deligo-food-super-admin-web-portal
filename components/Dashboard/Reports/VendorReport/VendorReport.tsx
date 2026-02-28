@@ -12,11 +12,9 @@ import { TMeta } from "@/types";
 import { IVendorReportAnalytics } from "@/types/report.type";
 import { TVendor } from "@/types/user.type";
 import { exportVendorReportCSV } from "@/utils/exportVendorReportCSV";
-import { format } from "date-fns";
+import { generateVendorReportPDF } from "@/utils/pdf/vendorReportPdf";
 import { motion } from "framer-motion";
 import { CheckCircle, Clock, Store, XCircle } from "lucide-react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   vendorsData: { data: TVendor[]; meta?: TMeta };
@@ -62,11 +60,6 @@ const filterOptions = [
 ];
 
 export default function VendorReport({ vendorsData, vendorReportAnalytics }: IProps) {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    contentRef: reportRef,
-    documentTitle: `vendor_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
-  });
 
   const stats = {
     total: vendorsData.meta?.total || 0,
@@ -78,7 +71,7 @@ export default function VendorReport({ vendorsData, vendorReportAnalytics }: IPr
   };
 
   return (
-    <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
+    <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="print:pt-4">
         {/* Logo for print */}
         <div className="hidden print:flex items-center gap-2 mb-4">
@@ -101,7 +94,9 @@ export default function VendorReport({ vendorsData, vendorReportAnalytics }: IPr
           subtitle="Overview of all registered vendors and their status"
           extraComponent={
             <ExportPopover
-              onPDFClick={() => handlePrint()}
+              onPDFClick={() =>
+                generateVendorReportPDF(vendorsData?.data || [])
+              }
               onCSVClick={() =>
                 exportVendorReportCSV({
                   stats: stats,
