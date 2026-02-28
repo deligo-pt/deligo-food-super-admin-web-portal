@@ -149,6 +149,21 @@ export function SOSDetailModal({
                   animate="visible"
                   className="space-y-4"
                 >
+                  {SOSData?.data?.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500">
+                      <CheckCircle
+                        size={48}
+                        className="mb-4 text-green-500 opacity-50"
+                      />
+                      <p className="text-lg font-medium">
+                        No active emergencies
+                      </p>
+                      <p className="text-sm">
+                        All systems operational in this sector.
+                      </p>
+                    </div>
+                  )}
+
                   {SOSData?.data?.map((sos) => (
                     <motion.div
                       key={sos._id}
@@ -222,21 +237,6 @@ export function SOSDetailModal({
                       </div>
                     </motion.div>
                   ))}
-
-                  {SOSData?.meta?.total === 0 && (
-                    <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500">
-                      <CheckCircle
-                        size={48}
-                        className="mb-4 text-green-500 opacity-50"
-                      />
-                      <p className="text-lg font-medium">
-                        No active emergencies
-                      </p>
-                      <p className="text-sm">
-                        All systems operational in this sector.
-                      </p>
-                    </div>
-                  )}
                 </motion.div>
               </div>
             </motion.div>

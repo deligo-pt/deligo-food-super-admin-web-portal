@@ -4,7 +4,7 @@ export type TAgent = {
   // ---------------------------------------------
   // Core Identifiers
   // ---------------------------------------------
-  _id?: string;
+  _id: string;
   userId: string;
   role: "FLEET_MANAGER";
   email: string;

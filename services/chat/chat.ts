@@ -3,11 +3,12 @@
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
+import { catchAsync } from "@/utils/catchAsync";
 
 export const getConversationByRoom = async (room: string) => {
   try {
     const result = (await serverRequest.get(
-      `/support/conversations/${room}`
+      `/support/conversations/${room}`,
     )) as TResponse<TConversation>;
 
     console.log(result);
@@ -39,7 +40,7 @@ export const getMessagesByRoom = async (room: string) => {
   try {
     const result = (await serverRequest.get(
       `/support/conversations/${room}/messages`,
-      { params: { limit: 50, sortBy: "-createdAt" } }
+      { params: { limit: 50, sortBy: "-createdAt" } },
     )) as TResponse<TMessage[]>;
 
     if (result.success) {
@@ -64,4 +65,10 @@ export const getMessagesByRoom = async (room: string) => {
       message: error?.response?.data?.message || "Get messages failed",
     };
   }
+};
+
+export const getUnreadCountReq = async () => {
+  return catchAsync<number>(async () => {
+    return await serverRequest.get("/support/unread-count");
+  });
 };

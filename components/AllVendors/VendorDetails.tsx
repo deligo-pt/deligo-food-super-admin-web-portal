@@ -49,6 +49,8 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
     }
   };
 
+  console.log("vendor", vendor);
+
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
       setShowDeleteModal(false);
@@ -277,33 +279,41 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
                   {vendor?.businessDetails?.totalBranches || "N/A"}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Opening Hours</p>
-                <p className="font-medium">
-                  {vendor?.businessDetails?.openingHours
-                    ? format(
-                        parse(
+              {vendor?.businessDetails?.openingHours && (
+                <div>
+                  <p className="text-sm text-gray-500">Opening Hours</p>
+                  <p className="font-medium">
+                    {vendor?.businessDetails?.openingHours
+                      ? /\b(AM|PM)\b/i.test(
                           vendor?.businessDetails?.openingHours,
-                          "HH:mm",
-                          new Date(),
-                        ),
-                        "hh:mm a",
-                      )
-                    : "N/A"}
-                </p>
-              </div>
+                        )
+                        ? vendor?.businessDetails?.openingHours
+                        : format(
+                            parse(
+                              vendor?.businessDetails?.openingHours,
+                              "HH:mm",
+                              new Date(),
+                            ),
+                            "hh:mm a",
+                          )
+                      : "N/A"}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-500">Closing Hours</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.closingHours
-                    ? format(
-                        parse(
-                          vendor?.businessDetails?.closingHours,
-                          "HH:mm",
-                          new Date(),
-                        ),
-                        "hh:mm a",
-                      )
+                    ? /\b(AM|PM)\b/i.test(vendor?.businessDetails?.closingHours)
+                      ? vendor?.businessDetails?.closingHours
+                      : format(
+                          parse(
+                            vendor?.businessDetails?.closingHours,
+                            "HH:mm",
+                            new Date(),
+                          ),
+                          "hh:mm a",
+                        )
                     : "N/A"}
                 </p>
               </div>
@@ -398,14 +408,18 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
               <div>
                 <p className="text-sm text-gray-500">Registered On</p>
                 <p className="font-medium">
-                  {format(vendor?.createdAt, "do MMM yyyy")}
+                  {vendor?.createdAt
+                    ? format(vendor?.createdAt, "do MMM yyyy")
+                    : "N/A"}
                 </p>
               </div>
               {vendor?.submittedForApprovalAt && (
                 <div>
                   <p className="text-sm text-gray-500">Submitted On</p>
                   <p className="font-medium">
-                    {format(vendor?.submittedForApprovalAt, "do MMM yyyy")}
+                    {vendor?.submittedForApprovalAt
+                      ? format(vendor?.submittedForApprovalAt, "do MMM yyyy")
+                      : "N/A"}
                   </p>
                 </div>
               )}
@@ -420,10 +434,12 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
                       On
                     </p>
                     <p className="font-medium">
-                      {format(
-                        vendor?.approvedOrRejectedOrBlockedAt,
-                        "do MMM yyyy",
-                      )}
+                      {vendor?.approvedOrRejectedOrBlockedAt
+                        ? format(
+                            vendor?.approvedOrRejectedOrBlockedAt,
+                            "do MMM yyyy",
+                          )
+                        : "N/A"}
                     </p>
                   </div>
                 )}
@@ -431,7 +447,9 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
                 <div>
                   <p className="text-sm text-gray-500">Last logged On</p>
                   <p className="font-medium">
-                    {format(vendor?.lastLoginAt, "do MMM yyyy")}
+                    {vendor?.lastLoginAt
+                      ? format(vendor?.lastLoginAt, "do MMM yyyy")
+                      : "N/A"}
                   </p>
                 </div>
               )}
@@ -465,12 +483,15 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
                   {offer.offerType === "FLAT" && (
                     <p>Flat Offer (€{offer.discountValue} Off)</p>
                   )}
-                  {offer.validFrom && offer.expiresAt && (
-                    <p className="text-xs">
-                      {format(offer.validFrom, "dd/MM/yyyy")} -{" "}
-                      {format(offer.expiresAt, "dd/MM/yyyy")}
-                    </p>
-                  )}
+                  <p className="text-xs">
+                    {offer.validFrom
+                      ? format(offer.validFrom, "dd/MM/yyyy")
+                      : "N/A"}
+                    {" - "}
+                    {offer.expiresAt
+                      ? format(offer.expiresAt, "dd/MM/yyyy")
+                      : "N/A"}
+                  </p>
                 </div>
               ))}
             </div>

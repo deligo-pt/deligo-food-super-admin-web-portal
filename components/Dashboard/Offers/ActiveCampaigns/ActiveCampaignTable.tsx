@@ -22,10 +22,10 @@ import {
   Clock,
   Cog,
   Hourglass,
-  IdCard,
-  Mail,
   MoreVertical,
-  TagIcon,
+  PercentIcon,
+  StoreIcon,
+  TagsIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -59,19 +59,19 @@ export default function CampaignTable({
           <TableRow>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <IdCard className="w-4" />
+                <StoreIcon className="w-4" />
                 Title
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <Mail className="w-4" />
+                <TagsIcon className="w-4" />
                 Type
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <TagIcon className="w-4" />
+                <PercentIcon className="w-4" />
                 Discount
               </div>
             </TableHead>

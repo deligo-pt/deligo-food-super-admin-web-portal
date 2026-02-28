@@ -230,7 +230,11 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
             <div>
               <InfoRow
                 label={t("approved_rejected_blocked_at")}
-                value={formatDate(customer.approvedOrRejectedOrBlockedAt)}
+                value={
+                  customer.approvedOrRejectedOrBlockedAt
+                    ? formatDate(customer.approvedOrRejectedOrBlockedAt)
+                    : "N/A"
+                }
               />
               {customer.remarks && (
                 <InfoRow label={t("remarks")} value={customer.remarks} />

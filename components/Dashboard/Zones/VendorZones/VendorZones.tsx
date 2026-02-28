@@ -3,173 +3,23 @@
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ZoneCard from "@/components/Dashboard/Zones/ZoneCard/ZoneCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { USER_ROLE } from "@/consts/user.const";
+import { TMeta } from "@/types";
 import { TZone } from "@/types/zone.type";
 import { CircleCheckBig, CircleOff, MapPin } from "lucide-react";
-import { useState } from "react";
 
-const initialZones: TZone[] = [
-  {
-    _id: "65a1f1b2c3d4e5f6a7b8c901",
-    zoneId: "Z-LIS-001",
-    district: "Lisboa",
-    zoneName: "Lisbon City Center",
-    boundary: {
-      _id: "b-001",
-      type: "Polygon",
-      coordinates: [
-        [
-          [-9.15, 38.71],
-          [-9.13, 38.71],
-          [-9.13, 38.73],
-          [-9.15, 38.73],
-          [-9.15, 38.71],
-        ],
-      ],
-    },
-    isOperational: true,
-    minDeliveryFee: 2.5,
-    maxDeliveryDistanceKm: 8,
-    isDeleted: false,
-    createdAt: new Date("2024-01-01T10:00:00Z"),
-    updatedAt: new Date("2024-01-15T12:30:00Z"),
-  },
-  {
-    _id: "65a1f1b2c3d4e5f6a7b8c902",
-    zoneId: "Z-OPO-002",
-    district: "Porto",
-    zoneName: "Porto Riverside",
-    boundary: {
-      _id: "b-002",
-      type: "Polygon",
-      coordinates: [
-        [
-          [-8.63, 41.14],
-          [-8.6, 41.14],
-          [-8.6, 41.16],
-          [-8.63, 41.16],
-          [-8.63, 41.14],
-        ],
-      ],
-    },
-    isOperational: true,
-    minDeliveryFee: 3.0,
-    maxDeliveryDistanceKm: 6,
-    isDeleted: false,
-    createdAt: new Date("2024-01-02T09:00:00Z"),
-    updatedAt: new Date("2024-01-02T09:00:00Z"),
-  },
-  {
-    _id: "65a1f1b2c3d4e5f6a7b8c903",
-    zoneId: "Z-FAO-003",
-    district: "Faro",
-    zoneName: "Algarve Coastal Hub",
-    boundary: {
-      _id: "b-003",
-      type: "Polygon",
-      coordinates: [
-        [
-          [-7.95, 37.01],
-          [-7.91, 37.01],
-          [-7.91, 37.04],
-          [-7.95, 37.04],
-          [-7.95, 37.01],
-        ],
-      ],
-    },
-    isOperational: true,
-    minDeliveryFee: 4.5,
-    maxDeliveryDistanceKm: 15,
-    isDeleted: false,
-    createdAt: new Date("2024-02-10T14:20:00Z"),
-    updatedAt: new Date("2024-02-10T14:20:00Z"),
-  },
-  {
-    _id: "65a1f1b2c3d4e5f6a7b8c904",
-    zoneId: "Z-BRG-004",
-    district: "Braga",
-    zoneName: "Braga University District",
-    boundary: {
-      _id: "b-004",
-      type: "Polygon",
-      coordinates: [
-        [
-          [-8.41, 41.54],
-          [-8.38, 41.54],
-          [-8.38, 41.56],
-          [-8.41, 41.56],
-          [-8.41, 41.54],
-        ],
-      ],
-    },
-    isOperational: false,
-    minDeliveryFee: 2.0,
-    maxDeliveryDistanceKm: 5,
-    isDeleted: false,
-    createdAt: new Date("2024-03-05T08:45:00Z"),
-    updatedAt: new Date("2024-03-12T11:00:00Z"),
-  },
-  {
-    _id: "65a1f1b2c3d4e5f6a7b8c905",
-    zoneId: "Z-COI-005",
-    district: "Coimbra",
-    zoneName: "Mondego Valley",
-    boundary: {
-      _id: "b-005",
-      type: "Polygon",
-      coordinates: [
-        [
-          [-8.44, 40.2],
-          [-8.41, 40.2],
-          [-8.41, 40.22],
-          [-8.44, 40.22],
-          [-8.44, 40.2],
-        ],
-      ],
-    },
-    isOperational: true,
-    minDeliveryFee: 2.75,
-    maxDeliveryDistanceKm: 10,
-    isDeleted: false,
-    createdAt: new Date("2024-04-20T16:00:00Z"),
-    updatedAt: new Date("2024-04-20T16:00:00Z"),
-  },
-  {
-    _id: "65a1f1b2c3d4e5f6a7b8c906",
-    zoneId: "Z-SET-006",
-    district: "Setúbal",
-    zoneName: "Arrábida Industrial",
-    boundary: {
-      _id: "b-006",
-      type: "Polygon",
-      coordinates: [
-        [
-          [-8.9, 38.52],
-          [-8.87, 38.52],
-          [-8.87, 38.55],
-          [-8.9, 38.55],
-          [-8.9, 38.52],
-        ],
-      ],
-    },
-    isOperational: true,
-    minDeliveryFee: 5.0,
-    maxDeliveryDistanceKm: 20,
-    isDeleted: true,
-    createdAt: new Date("2023-11-15T09:00:00Z"),
-    updatedAt: new Date("2024-01-05T15:30:00Z"),
-  },
-];
+interface IProps {
+  zonesData: { data: TZone[]; meta?: TMeta };
+}
 
-export default function VendorZones() {
-  const [zones, setZones] = useState(initialZones);
-  const handleDelete = (id: string) => {
-    if (window.confirm("Delete this zone?")) {
-      setZones(zones.filter((z) => z._id !== id));
-    }
-  };
+export default function VendorZones({ zonesData }: IProps) {
+  const operationalZones = zonesData.data?.filter(
+    (z) => z.isOperational,
+  ).length;
 
-  const operationalZones = zones.filter((z) => z.isOperational).length;
-  const notOperationalZones = zones.filter((z) => z.isOperational).length;
+  const notOperationalZones = zonesData.data?.filter(
+    (z) => !z.isOperational,
+  ).length;
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -186,7 +36,7 @@ export default function VendorZones() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <StatsCard
             title="Total Zones"
-            value={zones.length}
+            value={zonesData.data?.length}
             icon={MapPin}
             delay={0}
           />
@@ -206,19 +56,20 @@ export default function VendorZones() {
 
         {/* Zones Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {zones.map((zone, index) => (
+          {zonesData.data?.map((zone, index) => (
             <ZoneCard
               key={zone._id}
               name={zone.zoneName}
-              district={zone.district}
-              minDeliveryFee={zone.minDeliveryFee}
+              total={zone.totalUsers}
+              userType={USER_ROLE.VENDOR}
               isOperational={zone.isOperational}
-              onEdit={() => console.log("Edit zone")}
-              onDelete={() => handleDelete(zone._id)}
               delay={index * 0.1}
             />
           ))}
         </div>
+        {zonesData.data?.length === 0 && (
+          <div className="text-center text-gray-500">No zones found</div>
+        )}
       </div>
     </div>
   );

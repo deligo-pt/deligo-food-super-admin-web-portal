@@ -61,3 +61,62 @@ export type TAnalytics = {
   topRatedDeliveryPartners: TTopRatedDeliveryPartner[];
   topRatedItems: TTopRatedItems[];
 };
+
+type TWeeklyTrend = {
+  day: string;
+  total: number;
+};
+
+type TTOpSellingItem = {
+  id: string;
+  name: string;
+  sold: number;
+};
+
+export type TSalesAnalytics = {
+  totalSales: string;
+  bestPerformingDay: string;
+  slowestDay: string;
+  weeklyTrend: TWeeklyTrend[];
+  topSellingItems: TTOpSellingItem[];
+};
+
+type TDemographic = {
+  name: string;
+  value: number;
+};
+
+type TCustomerValueSegment = {
+  segment: string;
+  avgOrder: string;
+};
+
+type TOrderHeatmap = {
+  day: number;
+  hour: number;
+  orderCount: number;
+};
+
+export type TCustomerInsights = {
+  summaryCards: {
+    totalCustomers: {
+      value: number;
+      subValue: string;
+    };
+    returningCustomers: {
+      value: number;
+      subValue: string;
+    };
+    topCity: {
+      value: string;
+      subValue: string;
+    };
+    retentionRate: {
+      value: string;
+      subValue: string;
+    };
+  };
+  demographics: TDemographic[];
+  customerValue: TCustomerValueSegment[];
+  heatmap: TOrderHeatmap[];
+};

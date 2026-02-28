@@ -1,4 +1,5 @@
 "use client";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { TAnalytics } from "@/types/analytics.type";
 import { motion } from "framer-motion";
@@ -13,7 +14,6 @@ import {
   UsersIcon,
   XCircleIcon,
 } from "lucide-react";
-import DashboardHeader from "./DashboardHeader";
 import PopularCategories from "./PopularCategories";
 import RecentOrders from "./RecentOrders";
 import StatCard from "./StatCard";
@@ -24,8 +24,13 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen">
-      <DashboardHeader />
+    <div className="p-6">
+      {/* Header */}
+      <TitleHeader
+        title={`${t("hello")}, Administrator`}
+        subtitle={t("welcome_food_delivery_dashboard_overview")}
+      />
+
       <motion.div
         className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6"
         initial={{

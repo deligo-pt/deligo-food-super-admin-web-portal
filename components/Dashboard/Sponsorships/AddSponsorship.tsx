@@ -97,7 +97,7 @@ export default function AddSponsorship() {
   };
 
   return (
-    <div>
+    <div className="p-6">
       {/* Header */}
       <TitleHeader
         title="Add Sponsorship"
