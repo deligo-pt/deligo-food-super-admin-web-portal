@@ -3,7 +3,6 @@ import Image from "next/image";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
-import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
     BarChart2,
@@ -11,13 +10,12 @@ import {
     FileText,
     X,
 } from "lucide-react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ISalesReportAnalytics } from "@/types/report.type";
 import StatsCard from "../../Performance/StatsCard/StatsCard";
 import SelectFilter from "@/components/Filtering/SelectFilter";
 import { exportSalesReportCSV } from "@/utils/exportSalesReportCSV";
+import { generateSalesReportPDF } from "@/utils/pdf/salesReportPdf";
 
 const DELIGO = "#DC3173";
 
@@ -33,15 +31,10 @@ interface IProps {
 
 const SalesReport = ({ salesReportAnalytics }: IProps) => {
     const { t } = useTranslation();
-    const reportRef = useRef<HTMLDivElement>(null);
-    const handlePrint = useReactToPrint({
-        contentRef: reportRef,
-        documentTitle: `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
-    });
+
 
     return (
         <div
-            ref={reportRef}
             className="print-container min-h-screen bg-gray-50/50 pb-20">
             <div className="print:pt-4">
                 {/* Logo for print */}
@@ -64,7 +57,9 @@ const SalesReport = ({ salesReportAnalytics }: IProps) => {
                     subtitle={t("overview_revenue_orders_metrics")}
                     extraComponent={
                         <ExportPopover
-                            onPDFClick={() => handlePrint()}
+                            onPDFClick={() =>
+                                generateSalesReportPDF(salesReportAnalytics || {})
+                            }
                             onCSVClick={() =>
                                 exportSalesReportCSV(salesReportAnalytics)
                             }

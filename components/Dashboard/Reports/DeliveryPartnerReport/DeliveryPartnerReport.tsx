@@ -11,11 +11,9 @@ import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { IDeliveryPartnerReportAnalytics } from "@/types/report.type";
 import { exportDeliveryPartnerReportCSV } from "@/utils/exportDeliveryPartnerReportCSV ";
-import { format } from "date-fns";
+import { generateDeliveryPartnerReportPDF } from "@/utils/pdf/deliveryPartnerReportPdf";
 import { motion } from "framer-motion";
 import { Bike, CheckCircle, EuroIcon, Package } from "lucide-react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 
 interface IProps {
   partnersData: { data: TDeliveryPartner[]; meta?: TMeta };
@@ -87,11 +85,6 @@ const VehicleTypes = ({ name, value, partnersData }: { name: string, value: numb
 };
 
 export default function DeliveryPartnerReport({ partnersData, deliveryPartnerReportAnalytics }: IProps) {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    contentRef: reportRef,
-    documentTitle: `delivery_partner_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
-  });
 
   const stats = {
     total: partnersData.meta?.total || 0,
@@ -107,7 +100,7 @@ export default function DeliveryPartnerReport({ partnersData, deliveryPartnerRep
   };
 
   return (
-    <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
+    <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="print:pt-4">
         {/* Logo for print */}
         <div className="hidden print:flex items-center gap-2 mb-4">
@@ -130,7 +123,9 @@ export default function DeliveryPartnerReport({ partnersData, deliveryPartnerRep
           subtitle="Overview of all delivery partners and their performance"
           extraComponent={
             <ExportPopover
-              onPDFClick={() => handlePrint()}
+              onPDFClick={() =>
+                generateDeliveryPartnerReportPDF(partnersData?.data || [])
+              }
               onCSVClick={() =>
                 exportDeliveryPartnerReportCSV({
                   stats: stats,
