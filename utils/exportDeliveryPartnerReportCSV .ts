@@ -7,8 +7,8 @@ export function exportDeliveryPartnerReportCSV({
   stats,
   deliveryPartners,
 }: {
-  vehicleDistribution: { name: string; value: number }[];
-  monthlySignups: { name: string; partners: number }[];
+  vehicleDistribution: Record<string, number>;
+  monthlySignups: { label: string; value: number }[];
   stats: {
     total: number;
     approved: number;
@@ -30,16 +30,21 @@ export function exportDeliveryPartnerReportCSV({
   // ===== SECTION 2: VEHICLE TYPE DISTRIBUTION =====
   rows.push(["--- VEHICLE TYPE DISTRIBUTION ---"]);
   rows.push(["Status", "Count"]);
-  vehicleDistribution.forEach((item) => {
-    rows.push([item.name, String(item.value)]);
+
+  Object.entries(vehicleDistribution).forEach(([status, count]) => {
+    rows.push([
+      status.replace(/_/g, " ").toUpperCase(), // optional formatting
+      count,
+    ]);
   });
+
   rows.push([]);
 
   // ===== SECTION 3: MONTHLY SIGNUPS =====
   rows.push(["--- MONTHLY SIGNUPS ---"]);
   rows.push(["Month", "Customers"]);
   monthlySignups.forEach((item) => {
-    rows.push([item.name, String(item.partners)]);
+    rows.push([item.label, String(item.value)]);
   });
   rows.push([]);
 

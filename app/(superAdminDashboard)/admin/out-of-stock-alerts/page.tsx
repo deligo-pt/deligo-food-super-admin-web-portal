@@ -86,7 +86,7 @@ export default function OutOfStockAlertsPage() {
   }, [items, query, filter]);
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto">
+    <div className="">
       {/* Header */}
       <TitleHeader
         title={t("out_of_stock_alerts")}

@@ -249,7 +249,7 @@ export default function PaymentDisputesPage() {
   };
 
   return (
-    <div className="p-6 lg:p-10 space-y-6 overflow-x-hidden min-h-screen">
+    <div className="space-y-6 overflow-x-hidden min-h-screen">
       {/* Header */}
       <TitleHeader
         title={t("payment_disputes")}
@@ -656,8 +656,8 @@ export default function PaymentDisputesPage() {
                 <button
                   onClick={() => {
                     /* placeholder for contacting vendor */ alert(
-                      "Open chat / email to vendor (placeholder)",
-                    );
+                    "Open chat / email to vendor (placeholder)",
+                  );
                   }}
                   className="px-4 py-2 rounded-md border"
                 >

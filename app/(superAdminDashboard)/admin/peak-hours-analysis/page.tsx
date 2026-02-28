@@ -81,8 +81,8 @@ export default function PeakHoursAnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50 text-gray-800">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
+      <div className="">
         {/* Header */}
         <TitleHeader
           title={t("peak_hours_analysis")}

@@ -106,10 +106,10 @@ export default function RestrictedItemsPage(): JSX.Element {
         prev.map((p) =>
           p.id === editing.id
             ? ({
-                ...p,
-                ...payload,
-                updatedAt: new Date().toISOString(),
-              } as RestrictedItem)
+              ...p,
+              ...payload,
+              updatedAt: new Date().toISOString(),
+            } as RestrictedItem)
             : p,
         ),
       );
@@ -161,7 +161,7 @@ export default function RestrictedItemsPage(): JSX.Element {
   };
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto">
+    <div className="">
       {/* Header */}
       <TitleHeader
         title={t("restricted_items")}

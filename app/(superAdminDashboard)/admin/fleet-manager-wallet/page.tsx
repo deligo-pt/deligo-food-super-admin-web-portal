@@ -64,7 +64,7 @@ export default function FleetManagerWalletPage() {
   );
 
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <TitleHeader
         title={t("fleet_manager_wallet")}
         subtitle="Manage fleet manager wallets"

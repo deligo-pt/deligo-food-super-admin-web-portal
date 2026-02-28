@@ -21,7 +21,7 @@ export default function DesktopSidebar({
       <div
         className={cn(
           "h-screen fixed top-0 left-0 z-50 bg-white border-r",
-          open ? "w-[280px]" : "w-20",
+          open ? "lg:w-[20%] md:w-60" : "w-20"
         )}
       >
         <Sidebar open={open} setOpen={setOpen} admin={adminData} />
@@ -31,7 +31,7 @@ export default function DesktopSidebar({
       <div
         className={cn(
           "flex-1 flex flex-col overflow-hidden",
-          open ? "md:ml-[280px]" : "md:ml-20",
+          open ? "lg:ml-[20%] md:ml-60" : "md:ml-20"
         )}
       >
         {/* Topbar sticky */}
@@ -40,7 +40,7 @@ export default function DesktopSidebar({
         </div>
 
         {/* Page content */}
-        <main className="flex-1 p-4 overflow-y-auto">{children}</main>
+        <main className="flex-1 min-w-0 overflow-x-hidden p-4 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

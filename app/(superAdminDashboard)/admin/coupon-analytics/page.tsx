@@ -61,7 +61,7 @@ export default function CouponAnalyticsPage() {
     : 0;
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto">
+    <div className="">
       {/* Header */}
       <TitleHeader
         title={t("coupon_analytics")}

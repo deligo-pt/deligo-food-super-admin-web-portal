@@ -221,8 +221,8 @@ export default function TopVendorsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen p-6 bg-linear-to-b from-white to-gray-50 text-gray-800">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-linear-to-b from-white to-gray-50 text-gray-800">
+      <div className="">
         <TitleHeader
           title={t("top_vendors")}
           subtitle={t("curated_ranking_the_best_performing_restaurants")}

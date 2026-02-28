@@ -66,7 +66,7 @@ export default function CreateTax() {
   };
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

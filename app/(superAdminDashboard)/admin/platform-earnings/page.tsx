@@ -129,7 +129,7 @@ export default function PlatformEarningsPage(): JSX.Element {
   };
 
   return (
-    <div className="p-6 lg:p-10 space-y-6 overflow-x-hidden">
+    <div className="space-y-6 overflow-x-hidden">
       {/* HEADER */}
       <TitleHeader
         title={t("platform_earnings")}

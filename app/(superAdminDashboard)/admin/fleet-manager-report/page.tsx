@@ -1,5 +1,6 @@
 import FleetManagerReport from "@/components/Dashboard/Reports/FleetManagerReport/FleetManagersReport";
 import { serverRequest } from "@/lib/serverFetch";
+import { getFleetManagerReportAnalytics } from "@/services/dashboard/reports/reports.service";
 import { TMeta, TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
 
@@ -8,6 +9,7 @@ type IProps = {
 };
 
 export default async function FleetManagerReportPage({ searchParams }: IProps) {
+  const fleetManagerReportAnalytics = await getFleetManagerReportAnalytics();
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -39,5 +41,5 @@ export default async function FleetManagerReportPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <FleetManagerReport fleetManagersData={initialData} />;
+  return <FleetManagerReport fleetManagersData={initialData} fleetReportAnalytics={fleetManagerReportAnalytics} />;
 }

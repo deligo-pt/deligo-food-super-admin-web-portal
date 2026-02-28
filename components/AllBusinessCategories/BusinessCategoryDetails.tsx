@@ -94,7 +94,7 @@ export default function BusinessCategoryDetails({
   };
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="">
       <motion.div
         initial={{
           opacity: 0,
