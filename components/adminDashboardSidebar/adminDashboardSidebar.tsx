@@ -81,8 +81,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/fleet-manager-wallet",
         },
         {
-          name: t("payout_requests"),
-          path: "/admin/fleet-manager-withdrawals",
+          name: "Fleet Manager Payouts",
+          path: "/admin/fleet-manager-payouts",
         },
         { name: t("zones_and_coverage_areas"), path: "/admin/fleet-zones" },
         {

@@ -1,13 +1,13 @@
-import DeliveryPartnerPayouts from "@/components/Dashboard/Payouts/DeliveryPartnerPayouts/DeliveryPartnerPayouts";
+import FleetManagerPayouts from "@/components/Dashboard/Payouts/FleetManagerPayouts/FleetManagerPayouts";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import { TDeliveryPartnerPayout } from "@/types/payout.type";
+import { TFleetManagerPayout } from "@/types/payout.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function DeliveryPartnerPayoutsPage({
+export default async function FleetManagerPayoutsPage({
   searchParams,
 }: IProps) {
   const queries = (await searchParams) || {};
@@ -21,17 +21,17 @@ export default async function DeliveryPartnerPayoutsPage({
     page,
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
-    userModel: "DeliveryPartner",
+    userModel: "FleetManager",
   };
 
-  const initialData: { data: TDeliveryPartnerPayout[]; meta?: TMeta } = {
+  const initialData: { data: TFleetManagerPayout[]; meta?: TMeta } = {
     data: [],
   };
 
   try {
     const result = (await serverRequest.get("/payouts", {
       params: query,
-    })) as TResponse<TDeliveryPartnerPayout[]>;
+    })) as TResponse<TFleetManagerPayout[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -42,10 +42,10 @@ export default async function DeliveryPartnerPayoutsPage({
   }
 
   return (
-    <DeliveryPartnerPayouts
-      deliveryPartnerPayoutsResult={initialData}
-      title="Delivery Partner Payouts"
-      subtitle=" Manage all delivery partner payouts here"
+    <FleetManagerPayouts
+      fleetManagerPayoutsResult={initialData}
+      title="Fleet Manager Payouts"
+      subtitle=" Manage all fleet manager payouts here"
     />
   );
 }

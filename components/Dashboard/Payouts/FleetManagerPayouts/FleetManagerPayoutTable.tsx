@@ -27,20 +27,17 @@ import {
   MoreVertical,
   Store,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   fleetManagerPayouts: TFleetManagerPayout[];
-  handleStatusInfo: (
-    fleetManagerPayoutId: string,
-    fleetManagerPayoutName: string,
-    status: string,
-  ) => void;
 }
 
 export default function FleetManagerPayoutTable({
   fleetManagerPayouts,
-  handleStatusInfo,
 }: IProps) {
+  const router = useRouter();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -91,7 +88,7 @@ export default function FleetManagerPayoutTable({
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={5}
+                colSpan={6}
               >
                 No fleet manager payouts found
               </TableCell>
@@ -103,11 +100,11 @@ export default function FleetManagerPayoutTable({
                 <div className="flex items-center gap-3">
                   <Avatar>
                     <AvatarImage
-                      src={payout?.fleetManager?.profilePhoto}
-                      alt={payout?.fleetManager?.businessDetails?.businessName}
+                      src={payout?.userId?.profilePhoto}
+                      alt={payout?.userId?.businessDetails?.businessName}
                     />
                     <AvatarFallback>
-                      {payout?.fleetManager?.businessDetails?.businessName
+                      {payout?.userId?.businessDetails?.businessName
                         ?.split(" ")
                         .map((name) => name.charAt(0))
                         .join("")}
@@ -115,16 +112,16 @@ export default function FleetManagerPayoutTable({
                   </Avatar>
                   <div>
                     <div className="font-semibold">
-                      {payout?.fleetManager?.businessDetails?.businessName}
+                      {payout?.userId?.businessDetails?.businessName}
                     </div>
                     <div className="text-xs text-slate-400">
-                      {payout?.fleetManager?.userId}
+                      {payout?.userId?.userId}
                     </div>
                   </div>
                 </div>
               </TableCell>
-              <TableCell>{payout.amount}</TableCell>
-              <TableCell>{payout.payoutMethod}</TableCell>
+              <TableCell>€{payout.amount}</TableCell>
+              <TableCell>{payout.paymentMethod}</TableCell>
               <TableCell>{format(payout.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>{payout.status}</TableCell>
               <TableCell className="text-right">
@@ -134,41 +131,14 @@ export default function FleetManagerPayoutTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      className=""
-                      // onClick={() =>
-
-                      // }
+                      onClick={() =>
+                        router.push(
+                          `/admin/fleet-manager-payouts/${payout.payoutId}`,
+                        )
+                      }
                     >
                       View
                     </DropdownMenuItem>
-                    {payout.status === "SUBMITTED" && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(
-                            payout._id as string,
-                            payout?.fleetManager?.businessDetails
-                              ?.businessName as string,
-                            "APPROVED",
-                          )
-                        }
-                      >
-                        Approve
-                      </DropdownMenuItem>
-                    )}
-                    {payout.status === "SUBMITTED" && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(
-                            payout._id as string,
-                            payout?.fleetManager?.businessDetails
-                              ?.businessName as string,
-                            "REJECTED",
-                          )
-                        }
-                      >
-                        Reject
-                      </DropdownMenuItem>
-                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

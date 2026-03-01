@@ -79,6 +79,11 @@ const statusDistribution = [
     value: 1,
     color: "#ef4444",
   },
+  {
+    name: "Blocked",
+    value: 1,
+    color: "#6b7280",
+  },
 ];
 
 const monthlySignups = [

@@ -7,11 +7,9 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TFleetManagerPayout } from "@/types/payout.type";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 interface IProps {
   fleetManagerPayoutsResult: { data: TFleetManagerPayout[]; meta?: TMeta };
-  showFilters?: boolean;
   title: string;
   subtitle?: string;
 }
@@ -21,63 +19,22 @@ const sortOptions = [
   { label: "Oldest First", value: "createdAt" },
 ];
 
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-    ],
-  },
-];
-
 export default function FleetManagerPayouts({
   fleetManagerPayoutsResult,
-  showFilters = false,
   title,
   subtitle,
 }: IProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [statusInfo, setStatusInfo] = useState({
-    fleetManagerPayoutId: "",
-    fleetManagerPayoutName: "",
-    status: "",
-  });
-
-  const handleStatusInfo = (
-    fleetManagerPayoutId: string,
-    fleetManagerPayoutName: string,
-    status: string,
-  ) => setStatusInfo({ fleetManagerPayoutId, fleetManagerPayoutName, status });
-
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader title={title} subtitle={subtitle} />
 
       {/* Filters */}
-      <AllFilters
-        sortOptions={sortOptions}
-        {...(showFilters && { filterOptions })}
-      />
+      <AllFilters sortOptions={sortOptions} />
 
       {/* VendorPayouts Table */}
       <FleetManagerPayoutTable
         fleetManagerPayouts={fleetManagerPayoutsResult?.data || []}
-        handleStatusInfo={handleStatusInfo}
       />
 
       {/* Pagination */}

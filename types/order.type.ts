@@ -22,6 +22,10 @@ export type TOrder = {
     quantity: number;
     price: number;
     subtotal: number;
+    itemSummary?: {
+      grandTotal: number;
+      quantity: number;
+    };
   }[];
 
   // Pricing & Payment
@@ -63,6 +67,11 @@ export type TOrder = {
     latitude?: number;
     longitude?: number;
     geoAccuracy?: number; // meters
+  };
+
+  // Price
+  payoutSummary?: {
+    grandTotal: number;
   };
 
   // Delivery Details
