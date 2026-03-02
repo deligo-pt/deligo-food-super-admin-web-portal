@@ -67,6 +67,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/vendor-performance",
         },
         { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
+        { name: "Vendor Wallets", path: "/admin/vendor-wallets" },
       ],
     },
     {
@@ -78,7 +79,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("add_new_fleet_manager"), path: "/admin/add-fleet-manager" },
         {
           name: t("fleet_manager_wallet"),
-          path: "/admin/fleet-manager-wallet",
+          path: "/admin/fleet-manager-wallets",
         },
         {
           name: "Fleet Manager Payouts",
@@ -103,6 +104,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_customers"), path: "/admin/all-customers" },
         { name: t("active_customers"), path: "/admin/active-customers" },
         { name: t("blocked_customers"), path: "/admin/blocked-customers" },
+        { name: "Customer Wallets", path: "/admin/customer-wallets" },
         { name: t("customer_feedback"), path: "/admin/customer-feedback" },
       ],
     },
@@ -138,6 +140,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         {
           name: t("delivery_partner_payouts"),
           path: "/admin/delivery-partner-payouts",
+        },
+        {
+          name: "Delivery Partner Wallets",
+          path: "/admin/delivery-partner-wallets",
         },
         {
           name: t("delivery_partner_analytics"),
