@@ -141,7 +141,7 @@ export default function WalletDetails({ wallet }: IProps) {
                 {wallet.userModel === "Customer" && "Customer"} Information
               </h3>
             </div>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-6 space-y-4">
               <div>
                 <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">
                   Full Name

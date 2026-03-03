@@ -4,109 +4,17 @@ import TopProducts from "@/components/Dashboard/Dashboard/TopProducts";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TTopRatedItems } from "@/types/analytics.type";
-import { TVendorPerformance } from "@/types/performance.type";
+import { TVendorPerformanceDetailsData } from "@/types/performance.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import { Clock, EuroIcon, ShoppingBag, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const vendor: TVendorPerformance = {
-  _id: "1",
-  email: "fry.express@mail.com",
-  status: "APPROVED",
-  userId: "V-12skdb",
-  businessDetails: {
-    businessName: "Fry Express",
-    businessType: "Fast Food",
-    totalBranches: 5,
-  },
-  businessLocation: {
-    street: "Narsingdi, Bangladesh",
-    city: "Dhaka",
-    state: "Dhaka",
-    country: "Bangladesh",
-    postalCode: "1216",
-  },
-  name: {
-    firstName: "Fry",
-    lastName: "Express",
-  },
-  rating: { average: 4.3, totalReviews: 120 },
-  profilePhoto: "",
-  totalItems: 200,
-  totalOrders: 245,
-  totalRevenue: 15200,
-};
+interface IProps {
+  performanceData: TVendorPerformanceDetailsData;
+}
 
-const weeklyOrdersData = [
-  {
-    name: "Mon",
-    orders: 245,
-    revenue: 8500,
-  },
-  {
-    name: "Tue",
-    orders: 312,
-    revenue: 10200,
-  },
-  {
-    name: "Wed",
-    orders: 287,
-    revenue: 9400,
-  },
-  {
-    name: "Thu",
-    orders: 356,
-    revenue: 11800,
-  },
-  {
-    name: "Fri",
-    orders: 428,
-    revenue: 14200,
-  },
-  {
-    name: "Sat",
-    orders: 512,
-    revenue: 17500,
-  },
-  {
-    name: "Sun",
-    orders: 389,
-    revenue: 12800,
-  },
-];
-
-const topRatedItems: TTopRatedItems[] = [
-  {
-    _id: "1",
-    name: "Burger",
-    images: ["https://admin-food.deligo.pt/deligoLogo.png"],
-    rating: {
-      average: 4.7,
-    },
-    totalOrders: 50,
-  },
-  {
-    _id: "2",
-    name: "Pizza",
-    images: ["https://admin-food.deligo.pt/deligoLogo.png"],
-    rating: {
-      average: 4.9,
-    },
-    totalOrders: 36,
-  },
-  {
-    _id: "3",
-    name: "Sandwich",
-    images: ["https://admin-food.deligo.pt/deligoLogo.png"],
-    rating: {
-      average: 4.5,
-    },
-    totalOrders: 12,
-  },
-];
-
-export function VendorPerformanceDetails() {
+export function VendorPerformanceDetails({ performanceData }: IProps) {
   const router = useRouter();
 
   return (
@@ -122,25 +30,25 @@ export function VendorPerformanceDetails() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatsCard
           title="Total Revenue"
-          value={`€${vendor.totalRevenue?.toLocaleString()}`}
+          value={`€${formatPrice(performanceData.vendorPerformance?.totalRevenue || 0)}`}
           icon={EuroIcon}
           delay={0}
         />
         <StatsCard
           title="Total Orders"
-          value={vendor.totalOrders || 0}
+          value={performanceData.vendorPerformance?.totalOrders || 0}
           icon={ShoppingBag}
           delay={0.1}
         />
         <StatsCard
           title="Avg Rating"
-          value={vendor.rating?.average || 0.0}
+          value={performanceData.vendorPerformance?.rating?.average || 0.0}
           icon={Star}
           delay={0.2}
         />
         <StatsCard
           title="Total Products"
-          value={vendor.totalItems || 0}
+          value={performanceData.vendorPerformance?.totalItems || 0}
           icon={Clock}
           delay={0.3}
         />
@@ -178,15 +86,16 @@ export function VendorPerformanceDetails() {
           </div>
         </div>
         <AnalyticsChart
-          data={weeklyOrdersData}
+          data={performanceData.vendorMonthlyPerformance}
           type="bar"
-          dataKey="orders"
+          dataKey="totalOrders"
+          xKey="month"
           height={300}
         />
       </motion.div>
 
       {/* Top Rated Items */}
-      <TopProducts topRatedItems={topRatedItems} />
+      <TopProducts topRatedItems={performanceData?.topRatedItems} />
     </div>
   );
 }

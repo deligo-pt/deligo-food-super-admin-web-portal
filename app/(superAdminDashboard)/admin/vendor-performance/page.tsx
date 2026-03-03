@@ -1,5 +1,48 @@
 import { VendorPerformance } from "@/components/Dashboard/Performance/VendorPerformance/VendorPerformance";
+import { serverRequest } from "@/lib/serverFetch";
+import { TMeta, TResponse } from "@/types";
+import { TVendorPerformanceData } from "@/types/performance.type";
 
-export default function VendorPerformancePage() {
-  return <VendorPerformance />;
+type IProps = {
+  searchParams?: Promise<Record<string, string | undefined>>;
+};
+
+export default async function VendorPerformancePage({ searchParams }: IProps) {
+  const queries = (await searchParams) || {};
+  const limit = Number(queries?.limit || 10);
+  const page = Number(queries.page || 1);
+  const searchTerm = queries.searchTerm || "";
+  const sortBy = queries.sortBy || "-createdAt";
+  const status = queries.status || "";
+
+  const query = {
+    limit,
+    page,
+    sortBy,
+    ...(searchTerm ? { searchTerm: searchTerm } : {}),
+    ...(status ? { status: status } : {}),
+    isDeleted: false,
+  };
+
+  const initialData: { data: TVendorPerformanceData; meta?: TMeta } = {
+    data: {} as TVendorPerformanceData,
+  };
+
+  try {
+    const result = (await serverRequest.get(
+      "/analytics/admin/vendor-performance-analytics",
+      {
+        params: query,
+      },
+    )) as TResponse<TVendorPerformanceData>;
+
+    if (result?.success) {
+      initialData.data = result.data;
+      initialData.meta = result.meta;
+    }
+  } catch (err) {
+    console.log("Server fetch error:", err);
+  }
+
+  return <VendorPerformance vendorPerformanceData={initialData} />;
 }
