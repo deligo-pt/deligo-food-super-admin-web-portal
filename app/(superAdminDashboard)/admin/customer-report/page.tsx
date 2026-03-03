@@ -1,7 +1,7 @@
 import { CustomerReport } from "@/components/Dashboard/Reports/CustomerReport/CustomerReport";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import { TCustomer } from "@/types/user.type";
+import { TCustomerReport } from "@/types/report.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -24,12 +24,17 @@ export default async function CustomerReportPage({ searchParams }: IProps) {
     isDeleted: false,
   };
 
-  const initialData: { data: TCustomer[]; meta?: TMeta } = { data: [] };
+  const initialData: { data: TCustomerReport; meta?: TMeta } = {
+    data: {} as TCustomerReport,
+  };
 
   try {
-    const result = (await serverRequest.get("/customers", {
-      params: query,
-    })) as TResponse<TCustomer[]>;
+    const result = (await serverRequest.get(
+      "/analytics/admin-customer-report-analytics",
+      {
+        params: query,
+      },
+    )) as TResponse<TCustomerReport>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -39,5 +44,5 @@ export default async function CustomerReportPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <CustomerReport customersData={initialData} />;
+  return <CustomerReport reportData={initialData} />;
 }

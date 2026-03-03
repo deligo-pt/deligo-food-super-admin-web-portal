@@ -8,7 +8,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
-import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { TDeliveryPartnerReport } from "@/types/report.type";
 import { exportDeliveryPartnerReportCSV } from "@/utils/exportDeliveryPartnerReportCSV ";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -17,7 +17,7 @@ import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
 interface IProps {
-  partnersData: { data: TDeliveryPartner[]; meta?: TMeta };
+  reportData: { data: TDeliveryPartnerReport; meta?: TMeta };
 }
 
 const sortOptions = [
@@ -58,75 +58,51 @@ const filterOptions = [
   },
 ];
 
-const vehicleDistribution = [
-  {
-    name: "Motorbike",
-    value: 2,
-  },
-  {
-    name: "E-Bike",
-    value: 2,
-  },
-  {
-    name: "Scooter",
-    value: 2,
-  },
-  {
-    name: "Bicycle",
-    value: 1,
-  },
-  {
-    name: "Car",
-    value: 1,
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    partners: 12,
-  },
-  {
-    name: "Feb",
-    partners: 18,
-  },
-  {
-    name: "Mar",
-    partners: 15,
-  },
-  {
-    name: "Apr",
-    partners: 22,
-  },
-  {
-    name: "May",
-    partners: 28,
-  },
-  {
-    name: "Jun",
-    partners: 25,
-  },
-];
-
-export default function DeliveryPartnerReport({ partnersData }: IProps) {
+export default function DeliveryPartnerReport({ reportData }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
     documentTitle: `delivery_partner_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
   });
 
+  console.log(reportData);
+
+  const {
+    stats: dStats,
+    partners,
+    monthlySignups,
+    vehicleDistribution: dVehicleDistribution,
+  } = reportData.data || {};
+
   const stats = {
-    total: partnersData.meta?.total || 0,
-    approved: partnersData.data?.filter((p) => p.status === "APPROVED").length,
-    totalDeliveries: partnersData.data?.reduce(
-      (sum, p) => sum + (p.operationalData?.totalDeliveries || 0),
-      0,
-    ),
-    totalEarnings: partnersData.data?.reduce(
-      (sum, p) => sum + (p.earnings?.totalEarnings || 0),
-      0,
-    ),
+    total: dStats?.totalPartners || 0,
+    approved: dStats?.approvedPartners || 0,
+    totalDeliveries: dStats?.totalDeliveries || 0,
+    totalEarnings: dStats?.totalEarnings || 0,
   };
+
+  const vehicleDistribution = [
+    {
+      name: "Motorbike",
+      value: dVehicleDistribution?.MOTORBIKE || 0,
+    },
+    {
+      name: "E-Bike",
+      value: dVehicleDistribution?.["E-BIKE"] || 0,
+    },
+    {
+      name: "Scooter",
+      value: dVehicleDistribution?.SCOOTER || 0,
+    },
+    {
+      name: "Bicycle",
+      value: dVehicleDistribution?.BICYCLE || 0,
+    },
+    {
+      name: "Car",
+      value: dVehicleDistribution?.CAR || 0,
+    },
+  ];
 
   return (
     <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
@@ -158,7 +134,7 @@ export default function DeliveryPartnerReport({ partnersData }: IProps) {
                   stats: stats,
                   monthlySignups,
                   vehicleDistribution,
-                  deliveryPartners: partnersData.data,
+                  deliveryPartners: partners,
                 })
               }
             />
@@ -252,8 +228,8 @@ export default function DeliveryPartnerReport({ partnersData }: IProps) {
                       <div
                         className="h-full bg-[#DC3173] rounded-full"
                         style={{
-                          width: !!partnersData?.meta?.total
-                            ? `${(item.value / (partnersData?.meta?.total || 1)) * 100}%`
+                          width: !!reportData?.meta?.total
+                            ? `${(item.value / (reportData?.meta?.total || 1)) * 100}%`
                             : 0,
                         }}
                       />
@@ -293,7 +269,7 @@ export default function DeliveryPartnerReport({ partnersData }: IProps) {
                   All Delivery Partners
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {partnersData?.meta?.total || 0} partners
+                  {reportData?.meta?.total || 0} partners
                 </p>
               </div>
             </div>
@@ -301,15 +277,15 @@ export default function DeliveryPartnerReport({ partnersData }: IProps) {
 
           <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
-          <DeliveryPartnerReportTable partners={partnersData?.data} />
+          <DeliveryPartnerReportTable partners={partners} />
 
-          {!!partnersData?.meta?.totalPage && (
+          {!!reportData?.meta?.totalPage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <PaginationComponent
-                totalPages={partnersData?.meta?.totalPage as number}
+                totalPages={reportData?.meta?.totalPage as number}
               />
             </motion.div>
           )}

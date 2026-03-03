@@ -8,7 +8,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
-import { TCustomer } from "@/types/user.type";
+import { TCustomerReport } from "@/types/report.type";
 import { exportCustomerReportCSV } from "@/utils/exportCustomerReportCSV";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -17,7 +17,7 @@ import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
 interface IProps {
-  customersData: { data: TCustomer[]; meta?: TMeta };
+  reportData: { data: TCustomerReport; meta?: TMeta };
 }
 
 const sortOptions = [
@@ -50,70 +50,41 @@ const filterOptions = [
   },
 ];
 
-const statusDistribution = [
-  {
-    name: "Active",
-    value: 6,
-    color: "#DC3173",
-  },
-  {
-    name: "Pending",
-    value: 1,
-    color: "#f59e0b",
-  },
-  {
-    name: "Blocked",
-    value: 1,
-    color: "#6b7280",
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    customers: 45,
-  },
-  {
-    name: "Feb",
-    customers: 62,
-  },
-  {
-    name: "Mar",
-    customers: 58,
-  },
-  {
-    name: "Apr",
-    customers: 71,
-  },
-  {
-    name: "May",
-    customers: 89,
-  },
-  {
-    name: "Jun",
-    customers: 95,
-  },
-];
-
-export function CustomerReport({ customersData }: IProps) {
+export function CustomerReport({ reportData }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
     documentTitle: `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
   });
 
+  console.log(reportData);
+
+  const {
+    stats: cStats,
+    customers,
+    monthlySignups,
+    statusDistribution: cStatusDistribution,
+  } = reportData.data || {};
+
   const stats = {
-    total: customersData.meta?.total || 0,
-    active: customersData.data?.filter((c) => c.status === "APPROVED").length,
-    totalSpent: customersData.data?.reduce(
-      (sum, c) => sum + (c.orders?.totalSpent || 0),
-      0,
-    ),
-    totalOrders: customersData.data?.reduce(
-      (sum, c) => sum + (c.orders?.totalOrders || 0),
-      0,
-    ),
+    total: cStats?.totalCustomers || 0,
+    active: cStats?.activeCustomers || 0,
+    totalSpent: cStats?.totalSpent || 0,
+    totalOrders: cStats?.totalOrders || 0,
   };
+
+  const statusDistribution = [
+    {
+      name: "Active",
+      value: cStatusDistribution?.active || 0,
+      color: "#DC3173",
+    },
+    {
+      name: "Blocked",
+      value: cStatusDistribution?.blocked || 0,
+      color: "#6b7280",
+    },
+  ];
 
   return (
     <div
@@ -148,7 +119,7 @@ export function CustomerReport({ customersData }: IProps) {
                   stats: stats,
                   monthlySignups,
                   statusDistribution,
-                  customers: customersData.data,
+                  customers,
                 })
               }
             />
@@ -176,7 +147,7 @@ export function CustomerReport({ customersData }: IProps) {
             delay={0.2}
           />
           <StatsCard
-            title="Total Revenue"
+            title="Total Spent"
             value={`€${stats.totalSpent.toLocaleString()}`}
             icon={EuroIcon}
             delay={0.3}
@@ -277,7 +248,7 @@ export function CustomerReport({ customersData }: IProps) {
                   All Customers
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {customersData.meta?.total || 0} customers
+                  {reportData.meta?.total || 0} customers
                 </p>
               </div>
             </div>
@@ -285,15 +256,15 @@ export function CustomerReport({ customersData }: IProps) {
 
           <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
-          <CustomerReportTable customers={customersData?.data} />
+          <CustomerReportTable customers={customers} />
 
-          {!!customersData?.meta?.totalPage && (
+          {!!reportData?.meta?.totalPage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <PaginationComponent
-                totalPages={customersData?.meta?.totalPage as number}
+                totalPages={reportData?.meta?.totalPage as number}
               />
             </motion.div>
           )}

@@ -1,7 +1,7 @@
 import FleetManagerReport from "@/components/Dashboard/Reports/FleetManagerReport/FleetManagersReport";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import { TAgent } from "@/types/user.type";
+import { TFleetManagerReport } from "@/types/report.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -24,12 +24,17 @@ export default async function FleetManagerReportPage({ searchParams }: IProps) {
     isDeleted: false,
   };
 
-  const initialData: { data: TAgent[]; meta?: TMeta } = { data: [] };
+  const initialData: { data: TFleetManagerReport; meta?: TMeta } = {
+    data: {} as TFleetManagerReport,
+  };
 
   try {
-    const result = (await serverRequest.get("/fleet-managers", {
-      params: query,
-    })) as TResponse<TAgent[]>;
+    const result = (await serverRequest.get(
+      "/analytics/admin-fleet-manager-report-analytics",
+      {
+        params: query,
+      },
+    )) as TResponse<TFleetManagerReport>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -39,5 +44,5 @@ export default async function FleetManagerReportPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <FleetManagerReport fleetManagersData={initialData} />;
+  return <FleetManagerReport reportData={initialData} />;
 }

@@ -1,7 +1,7 @@
 import VendorReport from "@/components/Dashboard/Reports/VendorReport/VendorReport";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { TVendorReport } from "@/types/report.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -24,12 +24,17 @@ export default async function VendorReportPage({ searchParams }: IProps) {
     isDeleted: false,
   };
 
-  const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };
+  const initialData: { data: TVendorReport; meta?: TMeta } = {
+    data: {} as TVendorReport,
+  };
 
   try {
-    const result = (await serverRequest.get("/vendors", {
-      params: query,
-    })) as TResponse<TVendor[]>;
+    const result = (await serverRequest.get(
+      "/analytics/admin-vendor-report-analytics",
+      {
+        params: query,
+      },
+    )) as TResponse<TVendorReport>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -39,5 +44,5 @@ export default async function VendorReportPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <VendorReport vendorsData={initialData} />;
+  return <VendorReport reportData={initialData} />;
 }

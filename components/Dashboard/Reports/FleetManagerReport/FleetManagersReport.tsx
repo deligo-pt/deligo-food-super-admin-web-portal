@@ -8,7 +8,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
-import { TAgent } from "@/types/user.type";
+import { TFleetManagerReport } from "@/types/report.type";
 import { exportFleetManagerReportCSV } from "@/utils/exportFleetManagerReportCSV";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -17,7 +17,7 @@ import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
 interface IProps {
-  fleetManagersData: { data: TAgent[]; meta?: TMeta };
+  reportData: { data: TFleetManagerReport; meta?: TMeta };
 }
 
 const sortOptions = [
@@ -58,81 +58,56 @@ const filterOptions = [
   },
 ];
 
-const statusDistribution = [
-  {
-    name: "Approved",
-    value: 3,
-    color: "#DC3173",
-  },
-  {
-    name: "Pending",
-    value: 1,
-    color: "#f59e0b",
-  },
-  {
-    name: "Submitted",
-    value: 1,
-    color: "#3b82f6",
-  },
-  {
-    name: "Rejected",
-    value: 1,
-    color: "#ef4444",
-  },
-  {
-    name: "Blocked",
-    value: 1,
-    color: "#6b7280",
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    managers: 1,
-  },
-  {
-    name: "Feb",
-    managers: 2,
-  },
-  {
-    name: "Mar",
-    managers: 5,
-  },
-  {
-    name: "Apr",
-    managers: 3,
-  },
-  {
-    name: "May",
-    managers: 1,
-  },
-  {
-    name: "Jun",
-    managers: 2,
-  },
-];
-
-export default function FleetManagerReport({ fleetManagersData }: IProps) {
+export default function FleetManagerReport({ reportData }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
     documentTitle: `fleet_manager_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
   });
 
+  console.log(reportData);
+
+  const {
+    stats: fStats,
+    fleetManagers,
+    monthlySignups,
+    statusDistribution: fStatusDistribution,
+  } = reportData.data || {};
+
   const stats = {
-    total: fleetManagersData.meta?.total || 0,
-    approved: fleetManagersData.data?.filter((m) => m.status === "APPROVED")
-      .length,
-    totalDrivers: fleetManagersData.data?.reduce(
-      (sum, m) => sum + (m.operationalData?.totalDrivers || 0),
-      0,
-    ),
-    totalDeliveries: fleetManagersData.data?.reduce(
-      (sum, m) => sum + (m.operationalData?.totalDeliveries || 0),
-      0,
-    ),
+    total: fStats?.totalManagers || 0,
+    approved: fStats?.approvedManagers || 0,
+    totalDrivers: fStats?.totalDrivers || 0,
+    totalDeliveries: fStats?.totalDeliveries || 0,
   };
+
+  const statusDistribution = [
+    {
+      name: "Approved",
+      value: fStatusDistribution?.approved || 0,
+      color: "#DC3173",
+    },
+    {
+      name: "Pending",
+      value: fStatusDistribution?.pending || 0,
+      color: "#f59e0b",
+    },
+    {
+      name: "Submitted",
+      value: fStatusDistribution?.submitted || 0,
+      color: "#3b82f6",
+    },
+    {
+      name: "Rejected",
+      value: fStatusDistribution?.rejected || 0,
+      color: "#ef4444",
+    },
+    {
+      name: "Blocked",
+      value: fStatusDistribution?.blocked || 0,
+      color: "#6b7280",
+    },
+  ];
 
   return (
     <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
@@ -164,7 +139,7 @@ export default function FleetManagerReport({ fleetManagersData }: IProps) {
                   stats: stats,
                   monthlySignups,
                   statusDistribution,
-                  fleetManagers: fleetManagersData.data,
+                  fleetManagers,
                 })
               }
             />
@@ -293,22 +268,22 @@ export default function FleetManagerReport({ fleetManagersData }: IProps) {
                 All Fleet Managers
               </h2>
               <p className="text-sm text-gray-500">
-                {fleetManagersData.meta?.total} managers
+                {reportData.meta?.total} managers
               </p>
             </div>
           </div>
 
           <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
-          <FleetManagerReportTable fleetManagers={fleetManagersData?.data} />
+          <FleetManagerReportTable fleetManagers={fleetManagers} />
 
-          {!!fleetManagersData?.meta?.totalPage && (
+          {!!reportData?.meta?.totalPage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <PaginationComponent
-                totalPages={fleetManagersData?.meta?.totalPage as number}
+                totalPages={reportData?.meta?.totalPage as number}
               />
             </motion.div>
           )}

@@ -8,7 +8,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { TVendorReport } from "@/types/report.type";
 import { exportVendorReportCSV } from "@/utils/exportVendorReportCSV";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -17,7 +17,7 @@ import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
 interface IProps {
-  vendorsData: { data: TVendor[]; meta?: TMeta };
+  reportData: { data: TVendorReport; meta?: TMeta };
 }
 
 const sortOptions = [
@@ -58,76 +58,56 @@ const filterOptions = [
   },
 ];
 
-const statusDistribution = [
-  {
-    name: "Approved",
-    value: 4,
-    color: "#DC3173",
-  },
-  {
-    name: "Pending",
-    value: 1,
-    color: "#f59e0b",
-  },
-  {
-    name: "Submitted",
-    value: 1,
-    color: "#3b82f6",
-  },
-  {
-    name: "Rejected",
-    value: 1,
-    color: "#ef4444",
-  },
-  {
-    name: "Blocked",
-    value: 1,
-    color: "#6b7280",
-  },
-];
-
-const monthlySignups = [
-  {
-    name: "Jan",
-    vendors: 2,
-  },
-  {
-    name: "Feb",
-    vendors: 3,
-  },
-  {
-    name: "Mar",
-    vendors: 1,
-  },
-  {
-    name: "Apr",
-    vendors: 2,
-  },
-  {
-    name: "May",
-    vendors: 2,
-  },
-  {
-    name: "Jun",
-    vendors: 1,
-  },
-];
-
-export default function VendorReport({ vendorsData }: IProps) {
+export default function VendorReport({ reportData }: IProps) {
   const reportRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     contentRef: reportRef,
     documentTitle: `vendor_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
   });
 
+  console.log(reportData);
+
+  const {
+    stats: vStats,
+    vendors,
+    monthlySignups,
+    statusDistribution: vStatusDistribution,
+  } = reportData?.data || {};
+
   const stats = {
-    total: vendorsData.meta?.total || 0,
-    approved: vendorsData.data?.filter((v) => v.status === "APPROVED").length,
-    pending: vendorsData.data?.filter((v) => v.status === "SUBMITTED").length,
-    blocked: vendorsData.data?.filter(
-      (v) => v.status === "BLOCKED" || v.status === "REJECTED",
-    ).length,
+    total: vStats?.totalVendors || 0,
+    approved: vStats?.approvedVendors || 0,
+    pending: vStats?.pendingVendors || 0,
+    blocked: vStats?.blockedVendors || 0,
   };
+
+  const statusDistribution = [
+    {
+      name: "Approved",
+      value: vStatusDistribution?.approved || 0,
+      color: "#DC3173",
+    },
+    {
+      name: "Pending",
+      value: vStatusDistribution?.pending || 0,
+      color: "#f59e0b",
+    },
+    {
+      name: "Submitted",
+      value: vStatusDistribution?.submitted || 0,
+      color: "#3b82f6",
+    },
+    {
+      name: "Rejected",
+      value: vStatusDistribution?.rejected || 0,
+      color: "#ef4444",
+    },
+    {
+      name: "Blocked",
+      value: vStatusDistribution?.blocked || 0,
+      color: "#6b7280",
+    },
+  ];
 
   return (
     <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
@@ -159,7 +139,7 @@ export default function VendorReport({ vendorsData }: IProps) {
                   stats: stats,
                   monthlySignups,
                   statusDistribution,
-                  vendors: vendorsData.data,
+                  vendors,
                 })
               }
             />
@@ -285,22 +265,22 @@ export default function VendorReport({ vendorsData }: IProps) {
             <div>
               <h2 className="text-lg font-bold text-gray-900">All Vendors</h2>
               <p className="text-sm text-gray-500">
-                {vendorsData.meta?.total || 0} vendors
+                {reportData.meta?.total || 0} vendors
               </p>
             </div>
           </div>
 
           <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
-          <VendorReportTable vendors={vendorsData.data} />
+          <VendorReportTable vendors={vendors} />
 
-          {!!vendorsData?.meta?.totalPage && (
+          {!!reportData?.meta?.totalPage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <PaginationComponent
-                totalPages={vendorsData?.meta?.totalPage as number}
+                totalPages={reportData?.meta?.totalPage as number}
               />
             </motion.div>
           )}
