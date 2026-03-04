@@ -1,5 +1,5 @@
-import { VendorPerformanceDetails } from "@/components/Dashboard/Performance/VendorPerformance/VendorPerformanceDetails";
+import { FleetManagerPerformanceDetails } from "@/components/Dashboard/Performance/FleetManagerPerformance/FleetManagerPerformanceDetails";
 
-export default function VendorPerformanceDetailsPage() {
-  return <VendorPerformanceDetails />;
+export default function fleetPerformanceDetailsPage() {
+  return <FleetManagerPerformanceDetails />;
 }

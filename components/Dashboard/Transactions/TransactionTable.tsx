@@ -91,16 +91,12 @@ export default function TransactionTable({ transactions }: IProps) {
               <TableCell>{p.transactionId}</TableCell>
               <TableCell>{p.description}</TableCell>
               <TableCell className="capitalize">{p.type}</TableCell>
-              <TableCell
-                className={p.positive ? "text-green-500" : "text-red-500"}
-              >
-                {p.positive ? "+" : "-"}€{p.amount}
-              </TableCell>
+              <TableCell>€{p.amount}</TableCell>
               <TableCell>{format(p.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 <Button
                   onClick={() =>
-                    router.push(`/vendor/transactions/${p.transactionId}`)
+                    router.push(`/admin/transaction-history/${p.transactionId}`)
                   }
                   size="sm"
                   className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"

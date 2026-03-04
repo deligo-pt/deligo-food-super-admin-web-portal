@@ -23,8 +23,6 @@ interface IProps {
 export default function OrderDetails({ order }: IProps) {
   const router = useRouter();
 
-  console.log(order);
-
   const containerVariants = {
     hidden: {
       opacity: 0,

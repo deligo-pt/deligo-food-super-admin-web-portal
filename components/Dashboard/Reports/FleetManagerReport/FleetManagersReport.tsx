@@ -69,6 +69,7 @@ export default function FleetManagerReport({ fleetManagersData, fleetReportAnaly
     blocked_rejected: fleetManagersData.data?.filter((m) => m.status === "BLOCKED" || m.status === "REJECTED").length,
   };
 
+
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="print:pt-4">

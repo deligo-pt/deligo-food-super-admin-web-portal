@@ -9,7 +9,6 @@ import {
   ArrowLeftIcon,
   ArrowUpRightIcon,
   CheckCircle2Icon,
-  ReceiptIcon,
   ShoppingBagIcon,
   TagIcon,
   UserIcon,
@@ -17,53 +16,53 @@ import {
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const transaction: TTransaction = {
-  _id: "1",
-  transactionId: "T-2402",
-  type: "earning",
-  description: "Order #DG-9031 Completed",
-  amount: "12.90",
-  positive: true,
-  status: "settled",
-  orderId: "DG-9031",
-  orderTotal: "15.90",
-  platformFee: "3.00",
-  netEarning: "12.90",
-  customer: "João Silva",
-  customerOrders: 8,
-  paymentMethod: "Card",
-  deliveryAddress: "Rua Augusta 45, Lisboa, 1100-048",
-  items: [
-    {
-      name: "Burger Combo Deluxe",
-      qty: 1,
-      price: "12.50",
-    },
-    {
-      name: "Cola 33cl",
-      qty: 1,
-      price: "3.40",
-    },
-  ],
-  relatedTransactions: [
-    {
-      id: "T-2401",
-      desc: "Weekly Payout (SEPA)",
-      amount: "84.50",
-      date: "2025-11-08",
-      positive: true,
-    },
-    {
-      id: "T-2403",
-      desc: "Platform Service Fee",
-      amount: "2.50",
-      date: "2025-11-07",
-      positive: false,
-    },
-  ],
-  createdAt: "2025-11-08T09:30:00Z",
-  updatedAt: "2025-11-08T09:30:00Z",
-};
+// const transaction: TTransaction = {
+//   _id: "1",
+//   transactionId: "T-2402",
+//   type: "earning",
+//   description: "Order #DG-9031 Completed",
+//   amount: "12.90",
+//   positive: true,
+//   status: "settled",
+//   orderId: "DG-9031",
+//   orderTotal: "15.90",
+//   platformFee: "3.00",
+//   netEarning: "12.90",
+//   customer: "João Silva",
+//   customerOrders: 8,
+//   paymentMethod: "Card",
+//   deliveryAddress: "Rua Augusta 45, Lisboa, 1100-048",
+//   items: [
+//     {
+//       name: "Burger Combo Deluxe",
+//       qty: 1,
+//       price: "12.50",
+//     },
+//     {
+//       name: "Cola 33cl",
+//       qty: 1,
+//       price: "3.40",
+//     },
+//   ],
+//   relatedTransactions: [
+//     {
+//       id: "T-2401",
+//       desc: "Weekly Payout (SEPA)",
+//       amount: "84.50",
+//       date: "2025-11-08",
+//       positive: true,
+//     },
+//     {
+//       id: "T-2403",
+//       desc: "Platform Service Fee",
+//       amount: "2.50",
+//       date: "2025-11-07",
+//       positive: false,
+//     },
+//   ],
+//   createdAt: "2025-11-08T09:30:00Z",
+//   updatedAt: "2025-11-08T09:30:00Z",
+// };
 
 const typeConfig: Record<
   string,
@@ -94,7 +93,11 @@ const typeConfig: Record<
   },
 };
 
-export default function TransactionDetails() {
+export default function TransactionDetails({
+  transaction,
+}: {
+  transaction: TTransaction;
+}) {
   const router = useRouter();
 
   const config = typeConfig[transaction.type] || typeConfig.earning;
@@ -346,59 +349,6 @@ export default function TransactionDetails() {
               +€{transaction.netEarning}
             </span>
           </div>
-        </div>
-      </motion.div>
-
-      {/* Related Transactions */}
-      <motion.div
-        variants={itemVariants}
-        className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
-      >
-        <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
-          <ReceiptIcon className="w-4 h-4 text-[#DC3173]" />
-          Related Transactions
-        </h3>
-        <div className="space-y-3">
-          {transaction.relatedTransactions?.map((t, i) => (
-            <motion.div
-              key={t.id}
-              initial={{
-                opacity: 0,
-                x: -10,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              transition={{
-                delay: 0.4 + i * 0.08,
-              }}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${t.positive ? "bg-green-100" : "bg-red-100"}`}
-                >
-                  {t.positive ? (
-                    <ArrowUpRightIcon className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <ArrowDownLeftIcon className="w-4 h-4 text-red-500" />
-                  )}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{t.desc}</p>
-                  <p className="text-xs text-gray-400">
-                    {t.date} · {t.id}
-                  </p>
-                </div>
-              </div>
-              <span
-                className={`font-bold text-sm ${t.positive ? "text-green-500" : "text-red-500"}`}
-              >
-                {t.positive ? "+" : "-"}€{t.amount}
-              </span>
-            </motion.div>
-          ))}
         </div>
       </motion.div>
     </motion.div>

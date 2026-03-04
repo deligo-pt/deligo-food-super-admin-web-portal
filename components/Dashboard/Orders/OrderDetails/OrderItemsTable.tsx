@@ -1,6 +1,7 @@
 "use client";
 
 import { TOrder } from "@/types/order.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { motion, Variants } from "framer-motion";
 import { ShoppingBagIcon } from "lucide-react";
 
@@ -79,14 +80,11 @@ export default function OrderItemsTable({ items }: IProps) {
                 </td>
                 <td className="px-6 py-4 text-center">
                   <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                    x{item.quantity}
+                    x{item.itemSummary?.quantity}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right font-medium text-gray-900">
-                  €
-                  {new Intl.NumberFormat("de-DE", {
-                    minimumFractionDigits: 2,
-                  }).format(item.price)}
+                  €{formatPrice(item.itemSummary?.grandTotal || 0)}
                 </td>
               </motion.tr>
             ))}

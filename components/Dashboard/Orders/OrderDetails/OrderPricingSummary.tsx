@@ -1,4 +1,5 @@
 import { TOrder } from "@/types/order.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import { CreditCardIcon, EuroIcon, SmartphoneIcon } from "lucide-react";
 
@@ -7,7 +8,7 @@ interface IProps {
 }
 
 export default function OrderPricingSummary({ order }: IProps) {
-  const { totalPrice, paymentMethod, paymentStatus } = order;
+  const { payoutSummary, paymentMethod, paymentStatus } = order;
 
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
@@ -68,10 +69,7 @@ export default function OrderPricingSummary({ order }: IProps) {
           <div className="flex justify-between items-end">
             <span className="text-gray-900 font-semibold">Total Amount</span>
             <span className="text-3xl font-bold text-[#DC3173]">
-              €
-              {new Intl.NumberFormat("de-DE", {
-                minimumFractionDigits: 2,
-              }).format(totalPrice)}
+              €{formatPrice(payoutSummary?.grandTotal || 0)}
             </span>
           </div>
           <p className="text-xs text-gray-400 text-right mt-1">

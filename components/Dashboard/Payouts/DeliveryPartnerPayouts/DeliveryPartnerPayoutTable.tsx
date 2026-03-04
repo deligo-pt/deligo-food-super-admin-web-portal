@@ -27,20 +27,17 @@ import {
   MoreVertical,
   Store,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   deliveryPartnerPayouts: TDeliveryPartnerPayout[];
-  handleStatusInfo: (
-    deliveryPartnerPayoutId: string,
-    deliveryPartnerPayoutName: string,
-    status: string,
-  ) => void;
 }
 
 export default function DeliveryPartnerPayoutTable({
   deliveryPartnerPayouts,
-  handleStatusInfo,
 }: IProps) {
+  const router = useRouter();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -91,7 +88,7 @@ export default function DeliveryPartnerPayoutTable({
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={5}
+                colSpan={6}
               >
                 No delivery partner payouts found
               </TableCell>
@@ -103,27 +100,27 @@ export default function DeliveryPartnerPayoutTable({
                 <div className="flex items-center gap-3">
                   <Avatar>
                     <AvatarImage
-                      src={payout?.deliveryPartner?.profilePhoto}
-                      alt={`${payout?.deliveryPartner?.name?.firstName} ${payout?.deliveryPartner?.name?.lastName}`}
+                      src={payout?.userId?.profilePhoto}
+                      alt={`${payout?.userId?.name?.firstName} ${payout?.userId?.name?.lastName}`}
                     />
                     <AvatarFallback>
-                      {payout?.deliveryPartner?.name?.firstName?.charAt(0)}
-                      {payout?.deliveryPartner?.name?.lastName?.charAt(0)}
+                      {payout?.userId?.name?.firstName?.charAt(0)}
+                      {payout?.userId?.name?.lastName?.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-semibold">
-                      {payout?.deliveryPartner?.name?.firstName}{" "}
-                      {payout?.deliveryPartner?.name?.lastName}
+                      {payout?.userId?.name?.firstName}{" "}
+                      {payout?.userId?.name?.lastName}
                     </div>
                     <div className="text-xs text-slate-400">
-                      {payout?.deliveryPartner?.userId}
+                      {payout?.userId?.userId}
                     </div>
                   </div>
                 </div>
               </TableCell>
-              <TableCell>{payout.amount}</TableCell>
-              <TableCell>{payout.payoutMethod}</TableCell>
+              <TableCell>€{payout.amount}</TableCell>
+              <TableCell>{payout.paymentMethod}</TableCell>
               <TableCell>{format(payout.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>{payout.status}</TableCell>
               <TableCell className="text-right">
@@ -133,39 +130,14 @@ export default function DeliveryPartnerPayoutTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      className=""
-                      // onClick={() =>
-
-                      // }
+                      onClick={() =>
+                        router.push(
+                          `/admin/delivery-partner-payouts/${payout.payoutId}`,
+                        )
+                      }
                     >
                       View
                     </DropdownMenuItem>
-                    {payout.status === "SUBMITTED" && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(
-                            payout._id as string,
-                            `${payout?.deliveryPartner?.name?.firstName} ${payout?.deliveryPartner?.name?.lastName}`,
-                            "APPROVED",
-                          )
-                        }
-                      >
-                        Approve
-                      </DropdownMenuItem>
-                    )}
-                    {payout.status === "SUBMITTED" && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(
-                            payout._id as string,
-                            `${payout?.deliveryPartner?.name?.firstName} ${payout?.deliveryPartner?.name?.lastName}`,
-                            "REJECTED",
-                          )
-                        }
-                      >
-                        Reject
-                      </DropdownMenuItem>
-                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

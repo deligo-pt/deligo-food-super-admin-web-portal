@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TOrder } from "@/types/order.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -114,11 +115,13 @@ export default function OrderTable({ orders }: IProps) {
               <TableCell>
                 {order.items?.map((i, index) => (
                   <span key={index}>
-                    {i.productId?.name} x {i.quantity}
+                    {i.productId?.name} x {i.itemSummary?.quantity}
                   </span>
                 ))}
               </TableCell>
-              <TableCell> €{order.totalPrice?.toLocaleString()}</TableCell>
+              <TableCell>
+                €{formatPrice(order.payoutSummary?.grandTotal || 0)}
+              </TableCell>
               <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>
                 <Button

@@ -10,7 +10,7 @@ export default async function DashboardPage() {
 
   try {
     const result = (await serverRequest.get(
-      "/analytics/admin-dashboard-analytics",
+      "/analytics/admin/dashboard-analytics",
     )) as unknown as TResponse<TAnalytics>;
 
     if (result?.success) {

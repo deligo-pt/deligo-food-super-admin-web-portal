@@ -70,6 +70,7 @@ export default function VendorReport({ vendorsData, vendorReportAnalytics }: IPr
     ).length,
   };
 
+
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="print:pt-4">

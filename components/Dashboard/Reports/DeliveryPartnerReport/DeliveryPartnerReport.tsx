@@ -99,6 +99,7 @@ export default function DeliveryPartnerReport({ partnersData, deliveryPartnerRep
     ),
   };
 
+
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="print:pt-4">

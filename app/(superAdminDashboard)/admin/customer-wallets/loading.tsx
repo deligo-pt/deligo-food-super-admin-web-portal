@@ -1,5 +1,5 @@
 import TablePaginationSkeleton from "@/components/Skeletons/common/TablePaginationSkeleton";
 
 export default function Loading() {
-  return <TablePaginationSkeleton cols={6} />;
+  return <TablePaginationSkeleton cols={5} />;
 }

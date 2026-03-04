@@ -1,60 +1,44 @@
-export type TVendorPayout = {
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { TAgent, TVendor } from "@/types/user.type";
+
+export type TPayout = {
   _id: string;
-  // vendor: TVendor;
-  vendor: {
-    userId: string;
-    profilePhoto?: string;
-    businessDetails: {
-      businessName: string;
-      city: string;
-    };
+  payoutId: string;
+
+  amount: string;
+
+  bankDetails: {
+    iban: string;
+    accountHolderName: string;
+    bankName: string;
+    swiftCode: string;
   };
-  amount: number;
-  payoutMethod: string;
-  status: string;
-  accountHolder?: string;
-  iban?: string;
-  note?: string;
-  createdAt: Date;
-  updatedAt: Date;
+
+  status: "PENDING" | "PROCESSING" | "PAID" | "FAILED";
+  paymentMethod: "BANK_TRANSFER" | "MOBILE_BANKING" | "CASH";
+
+  bankReferenceId: string;
+
+  payoutCategory: string;
+  remarks: string;
+
+  payoutProof: string;
+
+  userId: unknown;
+  userModel: "Vendor" | "DeliveryPartner" | "FleetManager";
+
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type TFleetManagerPayout = {
-  _id: string;
-  fleetManager: {
-    userId: string;
-    profilePhoto?: string;
-    businessDetails: {
-      businessName: string;
-      city: string;
-    };
-  };
-  amount: number;
-  payoutMethod: string;
-  status: string;
-  accountHolder?: string;
-  iban?: string;
-  note?: string;
-  createdAt: Date;
-  updatedAt: Date;
+export type TVendorPayout = TPayout & {
+  userId: TVendor;
 };
 
-export type TDeliveryPartnerPayout = {
-  _id: string;
-  deliveryPartner: {
-    userId: string;
-    profilePhoto?: string;
-    name: {
-      firstName: string;
-      lastName: string;
-    };
-  };
-  amount: number;
-  payoutMethod: string;
-  status: string;
-  accountHolder?: string;
-  iban?: string;
-  note?: string;
-  createdAt: Date;
-  updatedAt: Date;
+export type TFleetManagerPayout = TPayout & {
+  userId: TAgent;
+};
+
+export type TDeliveryPartnerPayout = TPayout & {
+  userId: TDeliveryPartner;
 };

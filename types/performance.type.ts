@@ -33,7 +33,7 @@ export type TVendorPerformanceStat = {
     vendorPhoto: string;
     rating: {
       average: number;
-      totalRatings: number;
+      totalReviews: number;
     };
   };
   highestRevenue: {
@@ -57,13 +57,10 @@ export type TTopVendorPerformers = {
 };
 
 export type TVendorPerformanceData = {
-  data: {
-    vendorPerformance: TVendorPerformance[];
-    vendorPerformanceStat: TVendorPerformanceStat;
-    vendorMonthlyPerformance: TVendorMonthlyPerformance[];
-    topVendorPerformers: TTopVendorPerformers[];
-  };
-  meta: TMeta;
+  vendorPerformance: TVendorPerformance[];
+  vendorPerformanceStat: TVendorPerformanceStat;
+  vendorMonthlyPerformance: TVendorMonthlyPerformance[];
+  topVendorPerformers: TTopVendorPerformers[];
 };
 
 export type TVendorPerformanceDetailsData = {

@@ -5,133 +5,17 @@ import VendorPerformanceTable from "@/components/Dashboard/Performance/VendorPer
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TVendorPerformance } from "@/types/performance.type";
+import { TMeta } from "@/types";
+import { TVendorPerformanceData } from "@/types/performance.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import { Award, EuroIcon, Star, TrendingUp } from "lucide-react";
 
-const topVendors: TVendorPerformance[] = [
-  {
-    _id: "1",
-    email: "fry.express@mail.com",
-    status: "APPROVED",
-    userId: "V-12skdb",
-    businessDetails: {
-      businessName: "Fry Express",
-      businessType: "Fast Food",
-      totalBranches: 5,
-    },
-    businessLocation: {
-      street: "Narsingdi, Bangladesh",
-      city: "Dhaka",
-      state: "Dhaka",
-      country: "Bangladesh",
-      postalCode: "1216",
-    },
-    name: {
-      firstName: "Fry",
-      lastName: "Express",
-    },
-    rating: { average: 4.3, totalReviews: 120 },
-    profilePhoto: "",
-    totalItems: 200,
-    totalOrders: 245,
-    totalRevenue: 15200,
-  },
-  {
-    _id: "2",
-    email: "pizza@mail.com",
-    status: "APPROVED",
-    userId: "V-21skdb",
-    businessDetails: {
-      businessName: "Pizza Express",
-      businessType: "Fast Food",
-      totalBranches: 5,
-    },
-    businessLocation: {
-      street: "Narsingdi, Bangladesh",
-      city: "Dhaka",
-      state: "Dhaka",
-      country: "Bangladesh",
-      postalCode: "1216",
-    },
-    name: {
-      firstName: "Pizza",
-      lastName: "Express",
-    },
-    rating: { average: 4.9, totalReviews: 400 },
-    profilePhoto: "",
-    totalItems: 150,
-    totalOrders: 500,
-    totalRevenue: 30000,
-  },
-  {
-    _id: "3",
-    email: "burger@mail.com",
-    status: "APPROVED",
-    userId: "V-33skdb",
-    businessDetails: {
-      businessName: "Burger Barn",
-      businessType: "Fast Food",
-      totalBranches: 5,
-    },
-    businessLocation: {
-      street: "Narsingdi, Bangladesh",
-      city: "Dhaka",
-      state: "Dhaka",
-      country: "Bangladesh",
-      postalCode: "1216",
-    },
-    name: {
-      firstName: "Fry",
-      lastName: "Express",
-    },
-    rating: { average: 4.7, totalReviews: 120 },
-    profilePhoto: "",
-    totalItems: 100,
-    totalOrders: 300,
-    totalRevenue: 20000,
-  },
-];
+interface IProps {
+  vendorPerformanceData: { data: TVendorPerformanceData; meta?: TMeta };
+}
 
-const weeklyOrdersData = [
-  {
-    name: "Mon",
-    orders: 245,
-    revenue: 8500,
-  },
-  {
-    name: "Tue",
-    orders: 312,
-    revenue: 10200,
-  },
-  {
-    name: "Wed",
-    orders: 287,
-    revenue: 9400,
-  },
-  {
-    name: "Thu",
-    orders: 356,
-    revenue: 11800,
-  },
-  {
-    name: "Fri",
-    orders: 428,
-    revenue: 14200,
-  },
-  {
-    name: "Sat",
-    orders: 512,
-    revenue: 17500,
-  },
-  {
-    name: "Sun",
-    orders: 389,
-    revenue: 12800,
-  },
-];
-
-export function VendorPerformance() {
+export function VendorPerformance({ vendorPerformanceData }: IProps) {
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
@@ -165,15 +49,30 @@ export function VendorPerformance() {
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
-                  src="https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=76&q=80"
-                  alt="Avatar"
+                  src={
+                    vendorPerformanceData.data?.vendorPerformanceStat
+                      ?.mostOrders?.vendorPhoto
+                  }
+                  alt="Vendor Photo"
                 />
-                <AvatarFallback>AT</AvatarFallback>
+                <AvatarFallback>
+                  {vendorPerformanceData.data?.vendorPerformanceStat?.mostOrders?.vendorName?.charAt(
+                    0,
+                  )}
+                </AvatarFallback>
               </Avatar>
             </div>
             <div>
-              <p className="text-gray-800 font-semibold">ABC Town Town</p>
-              <p className="text-[#DC3173] text-sm">1,520 orders this month</p>
+              <p className="text-gray-800 font-semibold">
+                {
+                  vendorPerformanceData.data?.vendorPerformanceStat?.mostOrders
+                    ?.vendorName
+                }
+              </p>
+              <p className="text-[#DC3173] text-sm">
+                {vendorPerformanceData.data?.vendorPerformanceStat?.mostOrders?.ordersCount?.toLocaleString()}{" "}
+                orders this month
+              </p>
             </div>
           </div>
         </motion.div>
@@ -201,15 +100,37 @@ export function VendorPerformance() {
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
-                  src="https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=76&q=80"
-                  alt="Avatar"
+                  src={
+                    vendorPerformanceData.data?.vendorPerformanceStat
+                      ?.highestRating?.vendorPhoto
+                  }
+                  alt={
+                    vendorPerformanceData.data?.vendorPerformanceStat
+                      ?.highestRating?.vendorName
+                  }
                 />
-                <AvatarFallback>PH</AvatarFallback>
+                <AvatarFallback>
+                  {vendorPerformanceData.data?.vendorPerformanceStat?.highestRating?.vendorPhoto?.charAt(
+                    0,
+                  )}
+                </AvatarFallback>
               </Avatar>
             </div>
             <div>
-              <p className="text-gray-800 font-bold">Pizza Hut</p>
-              <p className="text-[#DC3173] text-sm">4.9 stars (780 reviews)</p>
+              <p className="text-gray-800 font-bold">
+                {
+                  vendorPerformanceData.data?.vendorPerformanceStat
+                    ?.highestRating?.vendorName
+                }
+              </p>
+              <p className="text-[#DC3173] text-sm">
+                {vendorPerformanceData.data?.vendorPerformanceStat
+                  ?.highestRating?.rating?.average || 0}{" "}
+                stars (
+                {vendorPerformanceData.data?.vendorPerformanceStat
+                  ?.highestRating?.rating?.totalReviews || 0}{" "}
+                reviews)
+              </p>
             </div>
           </div>
         </motion.div>
@@ -237,15 +158,36 @@ export function VendorPerformance() {
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
-                  src="https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=76&q=80"
-                  alt="Avatar"
+                  src={
+                    vendorPerformanceData.data?.vendorPerformanceStat
+                      ?.highestRevenue?.vendorPhoto
+                  }
+                  alt={
+                    vendorPerformanceData.data?.vendorPerformanceStat
+                      ?.highestRevenue?.vendorName
+                  }
                 />
-                <AvatarFallback>AT</AvatarFallback>
+                <AvatarFallback>
+                  {vendorPerformanceData.data?.vendorPerformanceStat?.highestRevenue?.vendorName?.charAt(
+                    0,
+                  )}
+                </AvatarFallback>
               </Avatar>
             </div>
             <div>
-              <p className="text-gray-800 font-bold">Kawan Dreams</p>
-              <p className="text-[#DC3173] text-sm">€15,200</p>
+              <p className="text-gray-800 font-bold">
+                {
+                  vendorPerformanceData.data?.vendorPerformanceStat
+                    ?.highestRevenue?.vendorName
+                }
+              </p>
+              <p className="text-[#DC3173] text-sm">
+                €
+                {formatPrice(
+                  vendorPerformanceData.data?.vendorPerformanceStat
+                    ?.highestRevenue?.revenue || 0,
+                )}
+              </p>
             </div>
           </div>
         </motion.div>
@@ -273,7 +215,7 @@ export function VendorPerformance() {
                 Orders & Revenue Trend
               </h3>
               <p className="text-sm text-gray-500">
-                Daily performance over the past week
+                Daily performance over the past months
               </p>
             </div>
             <div className="flex items-center gap-4 text-sm">
@@ -284,9 +226,10 @@ export function VendorPerformance() {
             </div>
           </div>
           <AnalyticsChart
-            data={weeklyOrdersData}
+            data={vendorPerformanceData.data?.vendorMonthlyPerformance}
             type="bar"
-            dataKey="orders"
+            dataKey="totalOrders"
+            xKey="month"
             height={250}
           />
         </motion.div>
@@ -311,13 +254,11 @@ export function VendorPerformance() {
             <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
           </div>
           <div className="space-y-4">
-            {topVendors
-              .sort(
-                (a, b) => (b.rating?.average || 0) - (a.rating?.average || 0),
-              )
+            {vendorPerformanceData.data?.topVendorPerformers
+              ?.sort((a, b) => (b.rating || 0) - (a.rating || 0))
               .map((vendor, index) => (
                 <div
-                  key={vendor._id}
+                  key={index}
                   className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
                 >
                   <div
@@ -328,30 +269,25 @@ export function VendorPerformance() {
                   <div>
                     <Avatar className="w-8 h-8">
                       <AvatarImage
-                        src={vendor.profilePhoto}
-                        alt={vendor.businessDetails?.businessName}
+                        src={vendor.vendorPhoto}
+                        alt={vendor.vendorName}
                       />
                       <AvatarFallback>
-                        {vendor.businessDetails?.businessName
-                          ?.split(" ")
-                          .map((name) => name.charAt(0))
-                          .join("")}
+                        {vendor.vendorName?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 truncate">
-                      {vendor.businessDetails?.businessName}
+                      {vendor.vendorName}
                     </p>
                     <p className="text-xs text-gray-500">
-                      €{vendor.totalRevenue.toLocaleString()} revenue
+                      €{formatPrice(vendor.totalRevenue || 0)} revenue
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-sm">
                     <Star size={12} className="text-amber-400 fill-amber-400" />
-                    <span className="font-medium">
-                      {vendor.rating?.average}
-                    </span>
+                    <span className="font-medium">{vendor.rating}</span>
                   </div>
                 </div>
               ))}
@@ -360,21 +296,22 @@ export function VendorPerformance() {
       </div>
 
       {/* Vendor Performance Table */}
-      <VendorPerformanceTable vendors={topVendors} />
+      <VendorPerformanceTable
+        vendors={vendorPerformanceData.data?.vendorPerformance}
+      />
 
       {/* Pagination */}
-      {/* {!!vendorsResult?.meta?.totalPage && ( */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="px-4 md:px-6"
-      >
-        <PaginationComponent
-          totalPages={3}
-          // totalPages={vendorsResult?.meta?.totalPage as number}
-        />
-      </motion.div>
-      {/* )} */}
+      {!!vendorPerformanceData?.meta?.totalPage && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-4 md:px-6"
+        >
+          <PaginationComponent
+            totalPages={vendorPerformanceData.meta?.totalPage || 0}
+          />
+        </motion.div>
+      )}
     </div>
   );
 }
