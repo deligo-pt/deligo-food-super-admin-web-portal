@@ -104,7 +104,7 @@ export default function ProductDetails({ product }: IProps) {
 
   return (
     <motion.div
-      className="bg-white rounded-lg shadow-xl max-w-6xl mx-auto overflow-hidden"
+      className="bg-white rounded-lg shadow-xl overflow-hidden"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

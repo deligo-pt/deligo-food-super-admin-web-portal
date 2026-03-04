@@ -1,99 +1,122 @@
-import { TDeliveryPartner } from "@/types/delivery-partner.type";
-import { TAgent, TCustomer, TVendor } from "@/types/user.type";
 
-export type TCustomerReport = {
-  stats: {
-    totalCustomers: number;
-    activeCustomers: number;
-    totalSpent: number;
-    totalOrders: number;
-  };
-
-  monthlySignups: {
-    name: string; // Jan
-    customers: number; // 10
-  }[]; // based on last 6 months
-
-  statusDistribution: {
-    active: number; // approved
-    blocked: number;
-  };
-
-  //   All customers
-  customers: TCustomer[];
+export interface ISalesReportAnalytics {
+    summary: {
+        totalRevenue: string,
+        completedOrders: number,
+        cancelledOrders: number,
+        avgOrderValue: string
+    },
+    revenueCards: {
+        thisWeek: string,
+        thisMonth: string,
+        topEarningDay: string;
+    },
+    charts: {
+        revenueTrend: {
+            date: string;
+            revenue: number;
+        }[],
+        earningsByDay: {
+            date: string;
+            revenue: number;
+        }[];
+    }
 };
 
-export type TVendorReport = {
-  stats: {
-    totalVendors: number;
-    approvedVendors: number;
-    pendingVendors: number;
-    blockedVendors: number;
-  };
+export interface IOrderReportAnalytics {
+    summary: {
+        avgOrderValue: string;
+        totalOrders: number;
+        totalRevenue: string,
+    },
+    ordersByZone: {
+        zone: string;
+        orders: number;
+    }[],
+    revenueTrend: {
+        date: string;
+        revenue: number;
+    }[],
+    zoneHeatmap: {
+        zone: string;
+        hour: number;
+        orderCount: number;
+    }[]
+}
 
-  monthlySignups: {
-    name: string; // Jan
-    vendors: number; // 10
-  }[]; // based on last 6 months
+export interface ICustomerReportAnalytics {
+    cards: {
+        totalCustomers: number;
+        activeCustomers: number;
+        totalOrders: number;
+        totalRevenue: string;
+    },
+    customerGrowth: {
+        label: string;
+        value: number;
+    }[],
+    statusDistribution: {
+        approved: number;
+        blocked: number;
+        pending: number;
+    },
+}
 
-  statusDistribution: {
-    approved: number;
-    pending: number;
-    submitted: number;
-    rejected: number;
-    blocked: number;
-  };
+export interface IVendorReportAnalytics {
+    cards: {
+        totalVendors: number;
+        approvedVendors: number;
+        submittedVendors: number;
+        blockedOrRejectedVendors: number;
+    },
+    monthlySignups: {
+        label: string;
+        value: number;
+    }[],
+    statusDistribution: {
+        approved: number;
+        blocked: number;
+        pending: number;
+        rejected: number;
+        submitted: number;
+    },
+}
 
-  //   All vendors
-  vendors: TVendor[];
-};
+export interface IFleetManagerReportAnalytics {
+    cards: {
+        totalFleetManagers: number;
+        approvedFleetManagers: number;
+        submittedFleetManagers: number;
+        blockedOrRejectedFleetManagers: number;
+    },
+    monthlySignups: {
+        label: string;
+        value: number;
+    }[],
+    statusDistribution: {
+        approved: number;
+        blocked: number;
+        pending: number;
+        rejected: number;
+    },
+}
 
-export type TFleetManagerReport = {
-  stats: {
-    totalManagers: number;
-    approvedManagers: number;
-    totalDrivers: number;
-    totalDeliveries: number;
-  };
-
-  monthlySignups: {
-    name: string; // Jan
-    managers: number; // 10
-  }[]; // based on last 6 months
-
-  statusDistribution: {
-    approved: number;
-    pending: number;
-    submitted: number;
-    rejected: number;
-    blocked: number;
-  };
-
-  //   All Fleet Managers
-  fleetManagers: TAgent[];
-};
-
-export type TDeliveryPartnerReport = {
-  stats: {
-    totalPartners: number;
-    approvedPartners: number;
-    totalDeliveries: number;
-    totalEarnings: number;
-  };
-
-  monthlySignups: {
-    name: string; // Jan
-    partners: number; // 10
-  }[]; // based on last 6 months
-
-  vehicleDistribution: {
-    "E-BIKE": number;
-    BICYCLE: number;
-    SCOOTER: number;
-    MOTORBIKE: number;
-    CAR: number;
-  };
-
-  //   All Delivery Partners
-  partners: TDeliveryPartner[];
-};
+export interface IDeliveryPartnerReportAnalytics {
+    cards: {
+        activePartners: number;
+        totalDeliveries: number;
+        totalPartners: number;
+        totalEarnings: number | string;
+    },
+    partnerGrowth: {
+        label: string;
+        value: number;
+    }[],
+    vehicleTypes: {
+        bicycle: number;
+        motorbike: number;
+        car: number;
+        eBike: number;
+        scooter: number;
+    }
+}

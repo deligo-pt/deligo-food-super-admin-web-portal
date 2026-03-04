@@ -105,8 +105,8 @@ export default function ActivityLogsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-linear-to-b from-white via-gray-50 to-gray-100">
+      <div className="">
         {/* HEADER */}
         <TitleHeader
           title={t("activity_logs")}

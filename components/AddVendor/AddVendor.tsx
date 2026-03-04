@@ -275,7 +275,7 @@ export default function AddVendor({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="min-h-screen p-6 bg-slate-50"
+        className="min-h-screen bg-slate-50"
       >
         <TitleHeader
           title={t("add_new_vendor")}

@@ -224,7 +224,7 @@ export default function DeliveryPartnerPerformancePage() {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <TitleHeader
         title={t("delivery_partner_performance")}

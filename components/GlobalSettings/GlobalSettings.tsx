@@ -139,11 +139,10 @@ export function GlobalSettings({
                 disabled={isSaving}
                 className={`
               relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-white shadow-lg shadow-[#DC3173]/30 transition-all
-              ${
-                isSaving
-                  ? "bg-[#DC3173]/50 cursor-wait"
-                  : "bg-[#DC3173] hover:bg-[#DC3173]/90 hover:shadow-[#DC3173]/40"
-              }
+              ${isSaving
+                    ? "bg-[#DC3173]/50 cursor-wait"
+                    : "bg-[#DC3173] hover:bg-[#DC3173]/90 hover:shadow-[#DC3173]/40"
+                  }
             `}
               >
                 {isSaving ? (
@@ -184,11 +183,10 @@ export function GlobalSettings({
                 }}
                 className={`
                 relative overflow-hidden rounded-2xl border transition-all duration-300
-                ${
-                  watchIsPlatformLive
+                ${watchIsPlatformLive
                     ? "bg-white border-gray-200 shadow-sm"
                     : "bg-gray-900 border-gray-800 shadow-xl"
-                }
+                  }
               `}
               >
                 <div className="absolute top-0 right-0 p-32 bg-[#DC3173]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
@@ -198,29 +196,26 @@ export function GlobalSettings({
                     <div
                       className={`
                     p-4 rounded-2xl transition-colors duration-300
-                    ${
-                      watchIsPlatformLive
-                        ? "bg-green-100 text-green-600"
-                        : "bg-gray-800 text-gray-400"
-                    }
+                    ${watchIsPlatformLive
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-800 text-gray-400"
+                        }
                   `}
                     >
                       <Activity size={32} strokeWidth={2.5} />
                     </div>
                     <div>
                       <h2
-                        className={`text-2xl font-bold ${
-                          watchIsPlatformLive ? "text-gray-900" : "text-white"
-                        }`}
+                        className={`text-2xl font-bold ${watchIsPlatformLive ? "text-gray-900" : "text-white"
+                          }`}
                       >
                         {t("platform_status")}
                       </h2>
                       <p
-                        className={`mt-1 font-medium ${
-                          watchIsPlatformLive
+                        className={`mt-1 font-medium ${watchIsPlatformLive
                             ? "text-gray-500"
                             : "text-gray-400"
-                        }`}
+                          }`}
                       >
                         {watchIsPlatformLive
                           ? t("your_platform_currently_live")
@@ -231,9 +226,8 @@ export function GlobalSettings({
 
                   <div className="flex items-center gap-4">
                     <span
-                      className={`text-sm font-bold uppercase tracking-wider ${
-                        watchIsPlatformLive ? "text-green-600" : "text-gray-400"
-                      }`}
+                      className={`text-sm font-bold uppercase tracking-wider ${watchIsPlatformLive ? "text-green-600" : "text-gray-400"
+                        }`}
                     >
                       {watchIsPlatformLive ? t("live") : t("maintenance")}
                     </span>

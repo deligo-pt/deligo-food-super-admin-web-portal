@@ -80,7 +80,7 @@ export function NotificationPreferences() {
   ];
 
   return (
-    <div className="space-y-8 p-4 md:p-6">
+    <div className="space-y-8">
       <TitleHeader
         title={t("notifications")}
         subtitle={t("configure_alerts_templates")}

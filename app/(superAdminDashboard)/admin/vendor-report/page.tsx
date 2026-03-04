@@ -1,13 +1,15 @@
 import VendorReport from "@/components/Dashboard/Reports/VendorReport/VendorReport";
 import { serverRequest } from "@/lib/serverFetch";
+import { getVendorReportAnalytics } from "@/services/dashboard/reports/reports.service";
 import { TMeta, TResponse } from "@/types";
-import { TVendorReport } from "@/types/report.type";
+import { TVendor } from "@/types/user.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
 export default async function VendorReportPage({ searchParams }: IProps) {
+  const vendorReportAnalytics = await getVendorReportAnalytics();
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -24,17 +26,12 @@ export default async function VendorReportPage({ searchParams }: IProps) {
     isDeleted: false,
   };
 
-  const initialData: { data: TVendorReport; meta?: TMeta } = {
-    data: {} as TVendorReport,
-  };
+  const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };
 
   try {
-    const result = (await serverRequest.get(
-      "/analytics/admin-vendor-report-analytics",
-      {
-        params: query,
-      },
-    )) as TResponse<TVendorReport>;
+    const result = (await serverRequest.get("/vendors", {
+      params: query,
+    })) as TResponse<TVendor[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -44,5 +41,5 @@ export default async function VendorReportPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <VendorReport reportData={initialData} />;
+  return <VendorReport vendorsData={initialData} vendorReportAnalytics={vendorReportAnalytics} />;
 }

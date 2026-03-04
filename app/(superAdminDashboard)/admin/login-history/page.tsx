@@ -199,8 +199,8 @@ export default function LoginHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-linear-to-b from-white via-gray-50 to-gray-100">
+      <div className="">
         <TitleHeader
           title={t("login_history")}
           subtitle={t("see_recent_sign_ins_failed_attempts")}

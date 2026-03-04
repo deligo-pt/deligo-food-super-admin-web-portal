@@ -157,7 +157,7 @@ export default function OfferDetails({ offer }: IProps) {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100 p-4 md:p-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100">
       <motion.div
         initial={{
           opacity: 0,

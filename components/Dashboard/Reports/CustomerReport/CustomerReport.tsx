@@ -1,5 +1,6 @@
 "use client";
 
+import StatusDistributionCard from "@/components/common/StatusDistributionCard";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import CustomerReportTable from "@/components/Dashboard/Reports/CustomerReport/CustomerReportTable";
@@ -8,16 +9,16 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
-import { TCustomerReport } from "@/types/report.type";
+import { ICustomerReportAnalytics } from "@/types/report.type";
+import { TCustomer } from "@/types/user.type";
 import { exportCustomerReportCSV } from "@/utils/exportCustomerReportCSV";
-import { format } from "date-fns";
+import { generateCustomerReportPDF } from "@/utils/pdf/customerReportPdf";
 import { motion } from "framer-motion";
 import { EuroIcon, Heart, ShoppingBag, User } from "lucide-react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 
 interface IProps {
-  reportData: { data: TCustomerReport; meta?: TMeta };
+  customersData: { data: TCustomer[]; meta?: TMeta };
+  customerReportAnalytics: ICustomerReportAnalytics;
 }
 
 const sortOptions = [
@@ -50,48 +51,26 @@ const filterOptions = [
   },
 ];
 
-export function CustomerReport({ reportData }: IProps) {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    contentRef: reportRef,
-    documentTitle: `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
-  });
-
-  console.log(reportData);
-
-  const {
-    stats: cStats,
-    customers,
-    monthlySignups,
-    statusDistribution: cStatusDistribution,
-  } = reportData.data || {};
+export function CustomerReport({ customersData, customerReportAnalytics }: IProps) {
 
   const stats = {
-    total: cStats?.totalCustomers || 0,
-    active: cStats?.activeCustomers || 0,
-    totalSpent: cStats?.totalSpent || 0,
-    totalOrders: cStats?.totalOrders || 0,
+    total: customersData.meta?.total || 0,
+    active: customersData.data?.filter((c) => c.status === "APPROVED").length,
+    totalSpent: customersData.data?.reduce(
+      (sum, c) => sum + (c.orders?.totalSpent || 0),
+      0,
+    ),
+    totalOrders: customersData.data?.reduce(
+      (sum, c) => sum + (c.orders?.totalOrders || 0),
+      0,
+    ),
   };
-
-  const statusDistribution = [
-    {
-      name: "Active",
-      value: cStatusDistribution?.active || 0,
-      color: "#DC3173",
-    },
-    {
-      name: "Blocked",
-      value: cStatusDistribution?.blocked || 0,
-      color: "#6b7280",
-    },
-  ];
 
   return (
     <div
-      ref={reportRef}
       className="print-container min-h-screen bg-gray-50/50 pb-20"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 print:pt-4">
+      <div className="print:pt-4">
         {/* Logo for print */}
         <div className="hidden print:flex items-center gap-2 mb-4">
           <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
@@ -113,13 +92,15 @@ export function CustomerReport({ reportData }: IProps) {
           subtitle="Overview of all registered customers and their activity"
           extraComponent={
             <ExportPopover
-              onPDFClick={() => handlePrint()}
+              onPDFClick={() =>
+                generateCustomerReportPDF(customersData?.data)
+              }
               onCSVClick={() =>
                 exportCustomerReportCSV({
                   stats: stats,
-                  monthlySignups,
-                  statusDistribution,
-                  customers,
+                  monthlySignups: customerReportAnalytics.customerGrowth,
+                  statusDistribution: customerReportAnalytics.statusDistribution,
+                  customers: customersData.data,
                 })
               }
             />
@@ -130,98 +111,97 @@ export function CustomerReport({ reportData }: IProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Customers"
-            value={stats.total}
+            value={customerReportAnalytics.cards.totalCustomers || 0}
             icon={User}
             delay={0}
           />
           <StatsCard
             title="Active Customers"
-            value={stats.active}
+            value={customerReportAnalytics.cards.activeCustomers || 0}
             icon={Heart}
             delay={0.1}
           />
           <StatsCard
             title="Total Orders"
-            value={stats.totalOrders}
+            value={customerReportAnalytics.cards.totalOrders || 0}
             icon={ShoppingBag}
             delay={0.2}
           />
           <StatsCard
-            title="Total Spent"
-            value={`€${stats.totalSpent.toLocaleString()}`}
+            title="Total Revenue"
+            value={`${customerReportAnalytics.cards.totalRevenue || "€0.00"}`}
             icon={EuroIcon}
             delay={0.3}
           />
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.2,
-            }}
-            className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              Customer Growth
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              New customer registrations over time
-            </p>
-            <AnalyticsChart
-              data={monthlySignups}
-              type="area"
-              dataKey="customers"
-              height={200}
-            />
-          </motion.div>
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.2,
+          }}
+          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            Customer Growth
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">
+            New customer registrations over time
+          </p>
+          <AnalyticsChart
+            data={customerReportAnalytics.customerGrowth || []}
+            type="area"
+            dataKey="value"
+            xKey="label"
+            height={200}
+          />
+        </motion.div>
 
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.3,
-            }}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Status Distribution
-            </h3>
-            <div className="space-y-3">
-              {statusDistribution.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{
-                        backgroundColor: item.color,
-                      }}
-                    />
-                    <span className="text-sm text-gray-600">{item.name}</span>
-                  </div>
-                  <span className="font-bold text-gray-900">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+        {/* status distribution */}
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.3,
+          }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Status Distribution
+          </h3>
+          <div className="space-y-3">
+            <StatusDistributionCard
+              name="Active"
+              value={customerReportAnalytics.statusDistribution.approved || 0}
+              color="#DC3173"
+            />
+            <StatusDistributionCard
+              name="Pending"
+              value={customerReportAnalytics.statusDistribution.pending || 0}
+              color="#FFA500"
+            />
+            <StatusDistributionCard
+              name="Blocked"
+              value={customerReportAnalytics.statusDistribution.blocked || 0}
+              color="#FF6B6B"
+            />
+          </div>
+        </motion.div>
+
 
         {/* Table */}
         <motion.div
@@ -248,7 +228,7 @@ export function CustomerReport({ reportData }: IProps) {
                   All Customers
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {reportData.meta?.total || 0} customers
+                  {customersData.meta?.total || 0} customers
                 </p>
               </div>
             </div>
@@ -256,15 +236,15 @@ export function CustomerReport({ reportData }: IProps) {
 
           <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
-          <CustomerReportTable customers={customers} />
+          <CustomerReportTable customers={customersData?.data} />
 
-          {!!reportData?.meta?.totalPage && (
+          {!!customersData?.meta?.totalPage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <PaginationComponent
-                totalPages={reportData?.meta?.totalPage as number}
+                totalPages={customersData?.meta?.totalPage as number}
               />
             </motion.div>
           )}

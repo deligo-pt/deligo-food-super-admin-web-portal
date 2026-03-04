@@ -17,7 +17,7 @@ export default async function ProductCategoryDetailsPage({
   const data = result.data;
 
   return (
-    <div className="p-4 md:p-6">
+    <div>
       <ProductCategoryDetails category={data} />
     </div>
   );
