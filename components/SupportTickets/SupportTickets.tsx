@@ -173,14 +173,14 @@ export default function SupportTickets({ conversationsData }: IProps) {
   }, [messages]);
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <TitleHeader title={t("support_tickets")} subtitle={t("manage_issues")} />
 
       <AllFilters sortOptions={sortOptions} />
 
       {/* Card Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {conversations?.map((c) => (
           <div
             key={c._id}

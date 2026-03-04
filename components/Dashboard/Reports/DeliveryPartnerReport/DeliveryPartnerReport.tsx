@@ -8,17 +8,17 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
-import { TDeliveryPartnerReport } from "@/types/report.type";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { IDeliveryPartnerReportAnalytics } from "@/types/report.type";
 import { exportDeliveryPartnerReportCSV } from "@/utils/exportDeliveryPartnerReportCSV ";
-import { format } from "date-fns";
+import { generateDeliveryPartnerReportPDF } from "@/utils/pdf/deliveryPartnerReportPdf";
 import { motion } from "framer-motion";
 import { Bike, CheckCircle, EuroIcon, Package } from "lucide-react";
-import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 
 interface IProps {
-  reportData: { data: TDeliveryPartnerReport; meta?: TMeta };
-}
+  partnersData: { data: TDeliveryPartner[]; meta?: TMeta };
+  deliveryPartnerReportAnalytics: IDeliveryPartnerReportAnalytics;
+};
 
 const sortOptions = [
   { label: "Newest First", value: "-createdAt" },
@@ -58,55 +58,51 @@ const filterOptions = [
   },
 ];
 
-export default function DeliveryPartnerReport({ reportData }: IProps) {
-  const reportRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    contentRef: reportRef,
-    documentTitle: `delivery_partner_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}`,
-  });
+const VehicleTypes = ({ name, value, partnersData }: { name: string, value: number, partnersData: { data: TDeliveryPartner[]; meta?: TMeta }; }) => {
+  return (
+    <div
+      key={name}
+      className="flex items-center justify-between"
+    >
+      <span className="text-sm text-gray-600">{name}</span>
+      <div className="flex items-center gap-2">
+        <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-[#DC3173] rounded-full"
+            style={{
+              width: !!partnersData?.meta?.total
+                ? `${(value / (partnersData?.meta?.total || 1)) * 100}%`
+                : 0,
+            }}
+          />
+        </div>
+        <span className="font-bold text-gray-900 w-6 text-right">
+          {value}
+        </span>
+      </div>
+    </div>
+  )
+};
 
-  console.log(reportData);
-
-  const {
-    stats: dStats,
-    partners,
-    monthlySignups,
-    vehicleDistribution: dVehicleDistribution,
-  } = reportData.data || {};
+export default function DeliveryPartnerReport({ partnersData, deliveryPartnerReportAnalytics }: IProps) {
 
   const stats = {
-    total: dStats?.totalPartners || 0,
-    approved: dStats?.approvedPartners || 0,
-    totalDeliveries: dStats?.totalDeliveries || 0,
-    totalEarnings: dStats?.totalEarnings || 0,
+    total: partnersData.meta?.total || 0,
+    approved: partnersData.data?.filter((p) => p.status === "APPROVED").length,
+    totalDeliveries: partnersData.data?.reduce(
+      (sum, p) => sum + (p.operationalData?.totalDeliveries || 0),
+      0,
+    ),
+    totalEarnings: partnersData.data?.reduce(
+      (sum, p) => sum + (p.earnings?.totalEarnings || 0),
+      0,
+    ),
   };
 
-  const vehicleDistribution = [
-    {
-      name: "Motorbike",
-      value: dVehicleDistribution?.MOTORBIKE || 0,
-    },
-    {
-      name: "E-Bike",
-      value: dVehicleDistribution?.["E-BIKE"] || 0,
-    },
-    {
-      name: "Scooter",
-      value: dVehicleDistribution?.SCOOTER || 0,
-    },
-    {
-      name: "Bicycle",
-      value: dVehicleDistribution?.BICYCLE || 0,
-    },
-    {
-      name: "Car",
-      value: dVehicleDistribution?.CAR || 0,
-    },
-  ];
 
   return (
-    <div ref={reportRef} className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 print:pt-4">
+    <div className="min-h-screen bg-gray-50/50 pb-20">
+      <div className="print:pt-4">
         {/* Logo for print */}
         <div className="hidden print:flex items-center gap-2 mb-4">
           <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
@@ -128,13 +124,15 @@ export default function DeliveryPartnerReport({ reportData }: IProps) {
           subtitle="Overview of all delivery partners and their performance"
           extraComponent={
             <ExportPopover
-              onPDFClick={() => handlePrint()}
+              onPDFClick={() =>
+                generateDeliveryPartnerReportPDF(partnersData?.data || [])
+              }
               onCSVClick={() =>
                 exportDeliveryPartnerReportCSV({
                   stats: stats,
-                  monthlySignups,
-                  vehicleDistribution,
-                  deliveryPartners: partners,
+                  monthlySignups: deliveryPartnerReportAnalytics.partnerGrowth || [],
+                  vehicleDistribution: deliveryPartnerReportAnalytics.vehicleTypes || {},
+                  deliveryPartners: partnersData.data,
                 })
               }
             />
@@ -145,104 +143,106 @@ export default function DeliveryPartnerReport({ reportData }: IProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Partners"
-            value={stats.total}
+            value={deliveryPartnerReportAnalytics.cards.totalPartners || 0}
             icon={Bike}
             delay={0}
           />
           <StatsCard
             title="Active Partners"
-            value={stats.approved}
+            value={deliveryPartnerReportAnalytics.cards.activePartners || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
             title="Total Deliveries"
-            value={stats.totalDeliveries.toLocaleString()}
+            value={deliveryPartnerReportAnalytics.cards.totalDeliveries || 0}
             icon={Package}
             delay={0.2}
           />
           <StatsCard
             title="Total Earnings"
-            value={`€${stats.totalEarnings.toLocaleString()}`}
+            value={`${(deliveryPartnerReportAnalytics.cards.totalEarnings || "€0.00")}`}
             icon={EuroIcon}
             delay={0.3}
           />
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 print:mb-4">
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.2,
-            }}
-            className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
-              Partner Growth
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              New partner registrations over time
-            </p>
-            <AnalyticsChart
-              data={monthlySignups}
-              type="area"
-              dataKey="partners"
-              height={200}
-            />
-          </motion.div>
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.2,
+          }}
+          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            Partner Growth
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">
+            New partner registrations over time
+          </p>
+          <AnalyticsChart
+            data={deliveryPartnerReportAnalytics?.partnerGrowth || []}
+            type="area"
+            dataKey="value"
+            xKey="label"
+            height={200}
+          />
+        </motion.div>
 
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.3,
-            }}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Vehicle Types
-            </h3>
-            <div className="space-y-3">
-              {vehicleDistribution.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between"
-                >
-                  <span className="text-sm text-gray-600">{item.name}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#DC3173] rounded-full"
-                        style={{
-                          width: !!reportData?.meta?.total
-                            ? `${(item.value / (reportData?.meta?.total || 1)) * 100}%`
-                            : 0,
-                        }}
-                      />
-                    </div>
-                    <span className="font-bold text-gray-900 w-6 text-right">
-                      {item.value}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
+        {/* vehicle types */}
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.3,
+          }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Vehicle Types
+          </h3>
+          <div className="space-y-3">
+            <VehicleTypes
+              name="Motorbike"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.motorbike || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="E-Bike"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.eBike || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="Car"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.car || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="Scooter"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.scooter || 0}
+              partnersData={partnersData}
+            />
+            <VehicleTypes
+              name="Bicycle"
+              value={deliveryPartnerReportAnalytics?.vehicleTypes?.bicycle || 0}
+              partnersData={partnersData}
+            />
+          </div>
+        </motion.div>
 
         {/* Table */}
         <motion.div
@@ -269,7 +269,7 @@ export default function DeliveryPartnerReport({ reportData }: IProps) {
                   All Delivery Partners
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {reportData?.meta?.total || 0} partners
+                  {partnersData?.meta?.total || 0} partners
                 </p>
               </div>
             </div>
@@ -277,15 +277,15 @@ export default function DeliveryPartnerReport({ reportData }: IProps) {
 
           <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
-          <DeliveryPartnerReportTable partners={partners} />
+          <DeliveryPartnerReportTable partners={partnersData?.data} />
 
-          {!!reportData?.meta?.totalPage && (
+          {!!partnersData?.meta?.totalPage && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <PaginationComponent
-                totalPages={reportData?.meta?.totalPage as number}
+                totalPages={partnersData?.meta?.totalPage as number}
               />
             </motion.div>
           )}

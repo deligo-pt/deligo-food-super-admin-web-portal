@@ -2,7 +2,7 @@ import { AddBusinessCategoryForm } from "@/components/AllBusinessCategories/AddB
 
 export default function page() {
   return (
-    <div className="p-4 md:p-6">
+    <div className="">
       <AddBusinessCategoryForm />
     </div>
   );

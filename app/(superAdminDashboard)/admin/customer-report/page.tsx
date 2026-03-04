@@ -1,13 +1,15 @@
 import { CustomerReport } from "@/components/Dashboard/Reports/CustomerReport/CustomerReport";
 import { serverRequest } from "@/lib/serverFetch";
+import { getCustomerReportAnalytics } from "@/services/dashboard/reports/reports.service";
 import { TMeta, TResponse } from "@/types";
-import { TCustomerReport } from "@/types/report.type";
+import { TCustomer } from "@/types/user.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
 export default async function CustomerReportPage({ searchParams }: IProps) {
+  const customerReportAnalytics = await getCustomerReportAnalytics();
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -24,17 +26,12 @@ export default async function CustomerReportPage({ searchParams }: IProps) {
     isDeleted: false,
   };
 
-  const initialData: { data: TCustomerReport; meta?: TMeta } = {
-    data: {} as TCustomerReport,
-  };
+  const initialData: { data: TCustomer[]; meta?: TMeta } = { data: [] };
 
   try {
-    const result = (await serverRequest.get(
-      "/analytics/admin-customer-report-analytics",
-      {
-        params: query,
-      },
-    )) as TResponse<TCustomerReport>;
+    const result = (await serverRequest.get("/customers", {
+      params: query,
+    })) as TResponse<TCustomer[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -44,5 +41,5 @@ export default async function CustomerReportPage({ searchParams }: IProps) {
     console.log("Server fetch error:", err);
   }
 
-  return <CustomerReport reportData={initialData} />;
+  return <CustomerReport customersData={initialData} customerReportAnalytics={customerReportAnalytics} />;
 }

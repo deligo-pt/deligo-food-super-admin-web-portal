@@ -287,8 +287,8 @@ export default function ChatWithVendors({
   }, [selectedId]);
 
   return (
-    <div className="p-6 h-full">
-      <div className="max-w-7xl mx-auto flex gap-6 items-start h-full">
+    <div className="h-full">
+      <div className="flex gap-6 items-start h-full">
         {/* Floating glass card sidebar (360px) */}
         <aside
           className="w-[360px] max-w-[360px] min-w-[360px] backdrop-blur-md border border-white/40 rounded-3xl p-4 shadow-xl overflow-hidden h-full! max-h-full! min-h-full! bg-white"

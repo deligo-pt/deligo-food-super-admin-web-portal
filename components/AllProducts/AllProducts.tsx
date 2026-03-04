@@ -95,7 +95,7 @@ export default function Products({
   };
 
   return (
-    <div className="w-full p-4 md:p-6">
+    <div className="w-full">
       <div className="bg-linear-to-r from-[#DC3173] to-[#FF6CAB] p-6 rounded-lg mb-6 shadow-lg">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>

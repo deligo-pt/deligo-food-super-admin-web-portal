@@ -94,11 +94,11 @@ export default function RolesPermissionsPage() {
       prev.map((r) =>
         r.id === roleId
           ? {
-              ...r,
-              permissions: r.permissions.includes(permId)
-                ? r.permissions.filter((p) => p !== permId)
-                : [...r.permissions, permId],
-            }
+            ...r,
+            permissions: r.permissions.includes(permId)
+              ? r.permissions.filter((p) => p !== permId)
+              : [...r.permissions, permId],
+          }
           : r,
       ),
     );
@@ -115,8 +115,8 @@ export default function RolesPermissionsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 lg:p-10 bg-linear-to-b from-white via-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-linear-to-b from-white via-gray-50 to-gray-100">
+      <div>
         {/* HEADER */}
         <TitleHeader
           title={t("roles_and_permissions")}
@@ -204,11 +204,10 @@ export default function RolesPermissionsPage() {
                           <td key={role.id} className="text-center p-4">
                             <button
                               onClick={() => togglePermission(role.id, perm.id)}
-                              className={`mx-auto w-8 h-8 flex items-center justify-center rounded-md border transition ${
-                                role.permissions.includes(perm.id)
+                              className={`mx-auto w-8 h-8 flex items-center justify-center rounded-md border transition ${role.permissions.includes(perm.id)
                                   ? "bg-[#DC3173] border-[#DC3173] text-white"
                                   : "bg-white border-gray-300 text-gray-400 hover:bg-gray-100"
-                              }`}
+                                }`}
                             >
                               {role.permissions.includes(perm.id) ? (
                                 <Check size={16} />

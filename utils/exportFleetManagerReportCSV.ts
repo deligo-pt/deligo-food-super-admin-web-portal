@@ -7,13 +7,13 @@ export function exportFleetManagerReportCSV({
   stats,
   fleetManagers,
 }: {
-  statusDistribution: { name: string; value: number }[];
-  monthlySignups: { name: string; managers: number }[];
+  statusDistribution: Record<string, number>;
+  monthlySignups: { label: string; value: number }[];
   stats: {
     total: number;
     approved: number;
-    totalDrivers: number;
-    totalDeliveries: number;
+    submitted: number;
+    blocked_rejected: number;
   };
   fleetManagers: TAgent[];
 }) {
@@ -21,25 +21,30 @@ export function exportFleetManagerReportCSV({
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Vendors", String(stats.total)]);
-  rows.push(["Approved Vendors", String(stats.approved)]);
-  rows.push(["Submitted Vendors", String(stats.totalDrivers)]);
-  rows.push(["Total Deliveries", String(stats.totalDeliveries)]);
+  rows.push(["Total Managers", String(stats.total)]);
+  rows.push(["Approved Managers", String(stats.approved)]);
+  rows.push(["Submitted Managers", String(stats.submitted)]);
+  rows.push(["Blocked/Rejected Managers", String(stats.blocked_rejected)]);
   rows.push([]); // spacer row
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====
   rows.push(["--- STATUS DISTRIBUTION ---"]);
   rows.push(["Status", "Count"]);
-  statusDistribution.forEach((item) => {
-    rows.push([item.name, String(item.value)]);
+
+  Object.entries(statusDistribution).forEach(([status, count]) => {
+    rows.push([
+      status.replace(/_/g, " ").toUpperCase(), // optional formatting
+      count,
+    ]);
   });
+
   rows.push([]);
 
   // ===== SECTION 3: MONTHLY SIGNUPS =====
   rows.push(["--- MONTHLY SIGNUPS ---"]);
-  rows.push(["Month", "Customers"]);
+  rows.push(["Month", "Managers"]);
   monthlySignups.forEach((item) => {
-    rows.push([item.name, String(item.managers)]);
+    rows.push([item.label, String(item.value)]);
   });
   rows.push([]);
 

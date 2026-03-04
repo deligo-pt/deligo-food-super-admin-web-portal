@@ -98,7 +98,7 @@ export default function CustomerReportTable({ customers }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={8}
               >
-                No delivery partner found
+                No customer found
               </TableCell>
             </TableRow>
           )}

@@ -67,8 +67,8 @@ export default function DeliveryInsightsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50 text-gray-800">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
+      <div className="">
         <TitleHeader
           title={t("delivery_insights")}
           subtitle={t("driver_performance_sla_heat_zones")}

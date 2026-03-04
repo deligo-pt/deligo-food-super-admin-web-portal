@@ -95,7 +95,7 @@ export default function AllTaxes({ taxesResult }: IProps) {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-slate-50">
+    <div className="min-h-screen bg-slate-50">
       <TitleHeader
         title="All Taxes"
         subtitle="Manage all the taxes in the system"

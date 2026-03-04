@@ -1,7 +1,8 @@
 import DeliveryPartnerReport from "@/components/Dashboard/Reports/DeliveryPartnerReport/DeliveryPartnerReport";
 import { serverRequest } from "@/lib/serverFetch";
+import { getDeliverPartnerReportAnalytics } from "@/services/dashboard/reports/reports.service";
 import { TMeta, TResponse } from "@/types";
-import { TDeliveryPartnerReport } from "@/types/report.type";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -10,6 +11,7 @@ type IProps = {
 export default async function DeliveryPartnerReportPage({
   searchParams,
 }: IProps) {
+  const deliveryPartnerReportAnalytics = await getDeliverPartnerReportAnalytics();
   const queries = (await searchParams) || {};
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -26,17 +28,12 @@ export default async function DeliveryPartnerReportPage({
     isDeleted: false,
   };
 
-  const initialData: { data: TDeliveryPartnerReport; meta?: TMeta } = {
-    data: {} as TDeliveryPartnerReport,
-  };
+  const initialData: { data: TDeliveryPartner[]; meta?: TMeta } = { data: [] };
 
   try {
-    const result = (await serverRequest.get(
-      "/analytics/admin-delivery-partner-report-analytics",
-      {
-        params: query,
-      },
-    )) as TResponse<TDeliveryPartnerReport>;
+    const result = (await serverRequest.get("/delivery-partners", {
+      params: query,
+    })) as TResponse<TDeliveryPartner[]>;
 
     if (result?.success) {
       initialData.data = result.data;
@@ -46,5 +43,5 @@ export default async function DeliveryPartnerReportPage({
     console.log("Server fetch error:", err);
   }
 
-  return <DeliveryPartnerReport reportData={initialData} />;
+  return <DeliveryPartnerReport partnersData={initialData} deliveryPartnerReportAnalytics={deliveryPartnerReportAnalytics} />;
 }
