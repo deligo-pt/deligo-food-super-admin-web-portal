@@ -15,7 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { retryFailedPayoutReq } from "@/services/dashboard/payout/payout";
 import { TVendorPayout } from "@/types/payout.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -28,6 +30,7 @@ import {
   Store,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface IProps {
   vendorPayouts: TVendorPayout[];
@@ -35,6 +38,23 @@ interface IProps {
 
 export default function VendorPayoutTable({ vendorPayouts }: IProps) {
   const router = useRouter();
+
+  const retryFailedPayout = async (id: string) => {
+    const toastId = toast.loading("Retrying to Process Payout...");
+
+    const result = await retryFailedPayoutReq(id);
+
+    if (result.success) {
+      toast.success(result.message || "Payout retried successfully!", {
+        id: toastId,
+      });
+      router.push(`/admin/vendor-payouts/${id}/settle`);
+      return;
+    }
+
+    toast.error(result.message || "Payout retry failed", { id: toastId });
+    console.log(result);
+  };
 
   return (
     <motion.div
@@ -117,7 +137,7 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
                   </div>
                 </div>
               </TableCell>
-              <TableCell>€{payout.amount}</TableCell>
+              <TableCell>€{formatPrice(Number(payout.amount) || 0)}</TableCell>
               <TableCell>{payout.paymentMethod}</TableCell>
               <TableCell>{format(payout.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>{payout.status}</TableCell>
@@ -134,6 +154,35 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
                     >
                       View
                     </DropdownMenuItem>
+                    {payout.status === "PROCESSING" && (
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(
+                            `/admin/vendor-payouts/${payout.payoutId}/settle`,
+                          )
+                        }
+                      >
+                        Settle Payout
+                      </DropdownMenuItem>
+                    )}
+                    {payout.status === "PROCESSING" && (
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(
+                            `/admin/vendor-payouts/${payout.payoutId}/reject`,
+                          )
+                        }
+                      >
+                        Reject Payout
+                      </DropdownMenuItem>
+                    )}
+                    {payout.status === "FAILED" && (
+                      <DropdownMenuItem
+                        onClick={() => retryFailedPayout(payout.payoutId)}
+                      >
+                        Retry Payout
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

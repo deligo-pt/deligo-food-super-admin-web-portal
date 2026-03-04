@@ -164,7 +164,9 @@ export default function WalletDetails({ wallet }: IProps) {
                 <label className="text-[10px] uppercase font-bold text-gray-400 block">
                   Email
                 </label>
-                <p className="text-sm font-medium">{wallet.userId?.email}</p>
+                <p className="text-sm font-medium break-all">
+                  {wallet.userId?.email}
+                </p>
               </div>
             </div>
           </div>

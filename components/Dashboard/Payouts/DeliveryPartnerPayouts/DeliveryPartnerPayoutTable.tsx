@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TDeliveryPartnerPayout } from "@/types/payout.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -119,7 +120,7 @@ export default function DeliveryPartnerPayoutTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell>€{payout.amount}</TableCell>
+              <TableCell>€{formatPrice(Number(payout.amount) || 0)}</TableCell>
               <TableCell>{payout.paymentMethod}</TableCell>
               <TableCell>{format(payout.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>{payout.status}</TableCell>
