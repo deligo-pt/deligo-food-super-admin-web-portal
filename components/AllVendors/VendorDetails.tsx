@@ -49,8 +49,6 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
     }
   };
 
-  console.log("vendor", vendor);
-
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
       setShowDeleteModal(false);
@@ -60,13 +58,9 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
   const deleteVendor = async () => {
     const toastId = toast.loading("Deleting vendor...");
     try {
-      const result = (await deleteData(
-        `/auth/soft-delete/${vendor.userId}`,
-
-        {
-          headers: { authorization: getCookie("accessToken") },
-        },
-      )) as unknown as TResponse<null>;
+      const result = (await deleteData(`/auth/soft-delete/${vendor.userId}`, {
+        headers: { authorization: getCookie("accessToken") },
+      })) as unknown as TResponse<null>;
       if (result?.success) {
         setShowDeleteModal(false);
         toast.success("Vendor deleted successfully!", { id: toastId });

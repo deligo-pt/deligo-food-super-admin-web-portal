@@ -26,8 +26,6 @@ export default function CustomerFeedback({ feedbackResult }: IProps) {
     null,
   );
 
-  console.log(feedbackResult);
-
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}

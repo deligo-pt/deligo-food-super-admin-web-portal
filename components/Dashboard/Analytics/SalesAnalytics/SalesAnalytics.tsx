@@ -3,6 +3,7 @@
 import { AnimatedCounter } from "@/components/Dashboard/Analytics/AnimatedCounter/AnimatedCounter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TSalesAnalytics } from "@/types/analytics.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { motion, Variants } from "framer-motion";
 import {
   ArrowDownIcon,
@@ -29,7 +30,7 @@ interface IProps {
 
 export default function SalesAnalytics({ salesAnalytics }: IProps) {
   const maxSold = Math.max(
-    ...salesAnalytics.topSellingItems.map((i) => i.sold),
+    ...(salesAnalytics?.topSellingItems?.map((i) => i.sold) || [0]),
   );
 
   const containerVariants = {
@@ -97,7 +98,10 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
             Total Sales
           </h3>
           <div className="text-3xl font-bold text-[#DC3173]">
-            <AnimatedCounter value={salesAnalytics.totalSales} prefix="€" />
+            <AnimatedCounter
+              value={formatPrice(salesAnalytics.totalSales || 0)}
+              prefix="€"
+            />
           </div>
         </div>
 
@@ -115,7 +119,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
             Best Performing
           </h3>
           <div className="text-3xl font-bold text-gray-900">
-            {salesAnalytics.bestPerformingDay}
+            {salesAnalytics.bestPerformingDay || "N/A"}
           </div>
         </div>
 
@@ -133,7 +137,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
             Slowest Day
           </h3>
           <div className="text-3xl font-bold text-gray-900">
-            {salesAnalytics.slowestDay}
+            {salesAnalytics.slowestDay || "N/A"}
           </div>
         </div>
       </motion.div>
@@ -196,7 +200,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
                 radius={[8, 8, 0, 0]}
                 animationDuration={1500}
               >
-                {salesAnalytics.weeklyTrend.map((entry, index) => (
+                {salesAnalytics?.weeklyTrend?.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={entry.total > 0 ? "#DC3173" : "#E5E7EB"}
@@ -218,7 +222,13 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
           <h2 className="text-xl font-bold text-gray-900">Top Selling Items</h2>
         </div>
         <div className="space-y-4">
-          {salesAnalytics.topSellingItems.map((item, index) => (
+          {!salesAnalytics?.topSellingItems ||
+            (salesAnalytics?.topSellingItems?.length === 0 && (
+              <p className="text-gray-500 text-center">
+                No top selling items found.
+              </p>
+            ))}
+          {salesAnalytics?.topSellingItems?.map((item, index) => (
             <motion.div
               key={item.id}
               initial={{

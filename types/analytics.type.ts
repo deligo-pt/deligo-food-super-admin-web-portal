@@ -74,7 +74,7 @@ type TTOpSellingItem = {
 };
 
 export type TSalesAnalytics = {
-  totalSales: string;
+  totalSales: number;
   bestPerformingDay: string;
   slowestDay: string;
   weeklyTrend: TWeeklyTrend[];

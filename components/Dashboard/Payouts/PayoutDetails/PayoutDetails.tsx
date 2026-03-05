@@ -15,7 +15,6 @@ import {
   Calendar,
   CreditCard,
   ExternalLink,
-  Hash,
   ImageIcon,
   Landmark,
   RefreshCw,
@@ -296,19 +295,6 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   </p>
                   <p className="text-sm font-medium text-gray-900 mt-0.5">
                     {format(payout.updatedAt, "do MMM yyyy")}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-50 rounded-lg text-gray-500 shrink-0">
-                  <Hash size={16} />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Internal ID
-                  </p>
-                  <p className="text-sm font-mono text-gray-700 mt-0.5 break-all">
-                    {payout._id}
                   </p>
                 </div>
               </div>
