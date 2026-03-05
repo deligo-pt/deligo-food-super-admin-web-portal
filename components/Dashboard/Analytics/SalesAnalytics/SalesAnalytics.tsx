@@ -222,12 +222,17 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
           <h2 className="text-xl font-bold text-gray-900">Top Selling Items</h2>
         </div>
         <div className="space-y-4">
-          {!salesAnalytics?.topSellingItems ||
-            (salesAnalytics?.topSellingItems?.length === 0 && (
+          {!salesAnalytics?.topSellingItems && (
+            <p className="text-gray-500 text-center">
+              No top selling items found.
+            </p>
+          )}
+          {salesAnalytics?.topSellingItems &&
+            salesAnalytics?.topSellingItems?.length === 0 && (
               <p className="text-gray-500 text-center">
                 No top selling items found.
               </p>
-            ))}
+            )}
           {salesAnalytics?.topSellingItems?.map((item, index) => (
             <motion.div
               key={item.id}
