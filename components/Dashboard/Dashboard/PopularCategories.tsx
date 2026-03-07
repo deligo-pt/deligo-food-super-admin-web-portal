@@ -17,12 +17,12 @@ const PopularCategories = ({ popularCategories }: IProps) => {
     <div className="bg-white rounded-lg shadow p-6 border border-gray-100 h-full">
       <h3 className="text-lg font-semibold mb-4">{t("popular_categories")}</h3>
       <div className="space-y-4">
-        {popularCategories.length === 0 && (
+        {popularCategories?.length === 0 && (
           <div className="col-span-4 text-center text-gray-500">
             {t("no_popular_categories_found")}
           </div>
         )}
-        {popularCategories.map((category, index) => (
+        {popularCategories?.map((category, index) => (
           <div key={index}>
             <div className="flex justify-between mb-1">
               <span className="text-sm font-medium">{category.name}</span>

@@ -1,29 +1,110 @@
 "use client";
 
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
-import FleetManagerPerformanceTable from "@/components/Dashboard/Performance/FleetManagerPerformance/FleetManagerPerformanceTable";
+import DeliveryPartnerPerformanceTable from "@/components/Dashboard/Performance/DeliveryPartnerPerformance/DeliveryPartnerPerformanceTable";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TMeta } from "@/types";
-import { TFleetPerformanceData } from "@/types/performance.type";
+import {
+  TDeliveryPartnerPerformance,
+  TPartnerPerformanceData,
+} from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import { Award, EuroIcon, Star, TrendingUp } from "lucide-react";
 
+const partnerPerformance: TDeliveryPartnerPerformance[] = [
+  {
+    _id: "1",
+    email: "sk@gmail.com",
+    status: "APPROVED",
+    userId: "FM-12skdb",
+    name: {
+      firstName: "Sumon",
+      lastName: "Kaysar",
+    },
+    profilePhoto: "",
+    address: {
+      street: "Narsingdi, Bangladesh",
+      city: "Dhaka",
+      state: "Dhaka",
+      country: "Bangladesh",
+      postalCode: "1216",
+    },
+    operationalData: {
+      rating: {
+        average: 4.3,
+        totalReviews: 120,
+      },
+      totalDeliveries: 300,
+    },
+    totalEarnings: 20000,
+  },
+  {
+    _id: "2",
+    email: "hridoy@mail.com",
+    status: "APPROVED",
+    userId: "FM-21skdb",
+    name: {
+      firstName: "Hridoy",
+      lastName: "Khan",
+    },
+    address: {
+      street: "Narsingdi, Bangladesh",
+      city: "Dhaka",
+      state: "Dhaka",
+      country: "Bangladesh",
+      postalCode: "1216",
+    },
+    operationalData: {
+      rating: {
+        average: 4.9,
+        totalReviews: 26,
+      },
+      totalDeliveries: 105,
+    },
+    totalEarnings: 12000,
+  },
+  {
+    _id: "3",
+    email: "moin@mail.com",
+    status: "APPROVED",
+    userId: "FM-33skdb",
+    name: {
+      firstName: "Abc",
+      lastName: "Moin",
+    },
+    address: {
+      street: "Narsingdi, Bangladesh",
+      city: "Dhaka",
+      state: "Dhaka",
+      country: "Bangladesh",
+      postalCode: "1216",
+    },
+    operationalData: {
+      rating: {
+        average: 4.5,
+        totalReviews: 150,
+      },
+      totalDeliveries: 500,
+    },
+    totalEarnings: 18000,
+  },
+];
+
 interface IProps {
-  fleetPerformanceData: { data: TFleetPerformanceData; meta?: TMeta };
+  partnerPerformanceData: TPartnerPerformanceData;
 }
 
-export default function FleetManagerPerformance({
-  fleetPerformanceData,
+export default function DeliveryPartnerPerformance({
+  partnerPerformanceData,
 }: IProps) {
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title="Fleet Manager Performance Analytics"
-        subtitle="Comprehensive insights into fleet manager performance"
+        title="Delivery Partner Performance Analytics"
+        subtitle="Comprehensive insights into delivery partner performance"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -52,14 +133,14 @@ export default function FleetManagerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.topCards?.mostOrders?.fleetPhoto
+                    partnerPerformanceData?.topCards?.mostOrders?.partnerPhoto
                   }
                   alt={
-                    fleetPerformanceData?.data?.topCards?.mostOrders?.fleetName
+                    partnerPerformanceData?.topCards?.mostOrders?.partnerName
                   }
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.topCards?.mostOrders?.fleetName?.charAt(
+                  {partnerPerformanceData?.topCards?.mostOrders?.partnerName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -67,11 +148,11 @@ export default function FleetManagerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-semibold">
-                {fleetPerformanceData?.data?.topCards?.mostOrders?.fleetName ||
+                {partnerPerformanceData?.topCards?.mostOrders?.partnerName ||
                   "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {fleetPerformanceData?.data?.topCards?.mostOrders?.ordersCount?.toLocaleString()}{" "}
+                {partnerPerformanceData?.topCards?.mostOrders?.ordersCount?.toLocaleString()}{" "}
                 orders this month
               </p>
             </div>
@@ -102,16 +183,14 @@ export default function FleetManagerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.topCards?.highestRated
-                      ?.fleetPhoto
+                    partnerPerformanceData?.topCards?.highestRated?.partnerPhoto
                   }
                   alt={
-                    fleetPerformanceData?.data?.topCards?.highestRated
-                      ?.fleetName
+                    partnerPerformanceData?.topCards?.highestRated?.partnerName
                   }
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.topCards?.highestRated?.fleetName?.charAt(
+                  {partnerPerformanceData?.topCards?.highestRated?.partnerName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -119,14 +198,14 @@ export default function FleetManagerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {fleetPerformanceData?.data?.topCards?.highestRated
-                  ?.fleetName || "N/A"}
+                {partnerPerformanceData?.topCards?.highestRated?.partnerName ||
+                  "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {fleetPerformanceData?.data?.topCards?.highestRated?.rating
+                {partnerPerformanceData?.topCards?.highestRated?.rating
                   ?.average || 0}{" "}
                 stars (
-                {fleetPerformanceData?.data?.topCards?.highestRated?.rating
+                {partnerPerformanceData?.topCards?.highestRated?.rating
                   ?.totalRatings || 0}{" "}
                 reviews)
               </p>
@@ -158,16 +237,16 @@ export default function FleetManagerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.topCards?.highestEarnings
-                      ?.fleetPhoto
+                    partnerPerformanceData?.topCards?.highestEarnings
+                      ?.partnerPhoto
                   }
                   alt={
-                    fleetPerformanceData?.data?.topCards?.highestEarnings
-                      ?.fleetName
+                    partnerPerformanceData?.topCards?.highestEarnings
+                      ?.partnerName
                   }
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.topCards?.highestEarnings?.fleetName?.charAt(
+                  {partnerPerformanceData?.topCards?.highestEarnings?.partnerName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -175,14 +254,14 @@ export default function FleetManagerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {fleetPerformanceData?.data?.topCards?.highestEarnings
-                  ?.fleetName || "N/A"}
+                {partnerPerformanceData?.topCards?.highestEarnings
+                  ?.partnerName || "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
                 €
                 {formatPrice(
-                  fleetPerformanceData?.data?.topCards?.highestEarnings
-                    ?.earnings || 0,
+                  partnerPerformanceData?.topCards?.highestEarnings?.earnings ||
+                    0,
                 )}
               </p>
             </div>
@@ -223,7 +302,7 @@ export default function FleetManagerPerformance({
             </div>
           </div>
           <AnalyticsChart
-            data={fleetPerformanceData?.data?.earningsPerformance}
+            data={partnerPerformanceData?.earningsPerformance}
             type="bar"
             dataKey="earnings"
             xKey="name"
@@ -251,62 +330,56 @@ export default function FleetManagerPerformance({
             <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
           </div>
           <div className="space-y-4">
-            {fleetPerformanceData?.data?.topPerformers?.map(
-              (fleetManager, index) => (
+            {partnerPerformanceData?.topPerformers?.map((dp, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
+              >
                 <div
-                  key={index}
-                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? "bg-yellow-100 text-yellow-700" : index === 1 ? "bg-gray-200 text-gray-600" : "bg-amber-100 text-amber-700"}`}
                 >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? "bg-yellow-100 text-yellow-700" : index === 1 ? "bg-gray-200 text-gray-600" : "bg-amber-100 text-amber-700"}`}
-                  >
-                    {index + 1}
-                  </div>
-                  <div>
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage
-                        src={fleetManager.profilePhoto}
-                        alt={fleetManager?.name}
-                      />
-                      <AvatarFallback>{fleetManager?.initials}</AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">
-                      {fleetManager?.name}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      €{fleetManager.earnings?.toLocaleString()} earnings
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 text-sm">
-                    <Star size={12} className="text-amber-400 fill-amber-400" />
-                    <span className="font-medium">{fleetManager.rating}</span>
-                  </div>
+                  {index + 1}
                 </div>
-              ),
-            )}
+                <div>
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={dp.profilePhoto} alt={dp?.name} />
+                    <AvatarFallback>{dp?.initials}</AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 truncate">
+                    {dp?.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    €{dp.earnings?.toLocaleString()} earnings
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 text-sm">
+                  <Star size={12} className="text-amber-400 fill-amber-400" />
+                  <span className="font-medium">{dp.rating}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>
 
-      {/* Fleet Manager Performance Table */}
-      <FleetManagerPerformanceTable
-        fleetManagers={fleetPerformanceData?.data?.fleetPerformance}
-      />
+      {/* partner Performance Table */}
+      <DeliveryPartnerPerformanceTable partners={partnerPerformance} />
 
       {/* Pagination */}
-      {!!fleetPerformanceData?.meta?.totalPage && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="px-4 md:px-6"
-        >
-          <PaginationComponent
-            totalPages={fleetPerformanceData?.meta?.totalPage as number}
-          />
-        </motion.div>
-      )}
+      {/* {!!partnersResult?.meta?.totalPage && ( */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="px-4 md:px-6"
+      >
+        <PaginationComponent
+          totalPages={3}
+          // totalPages={partnersResult?.meta?.totalPage as number}
+        />
+      </motion.div>
+      {/* )} */}
     </div>
   );
 }

@@ -25,8 +25,16 @@ const RecentOrders = ({ recentOrders }: IProps) => {
 
   const STATUS_MAP = {
     PENDING: { label: t("pending"), color: "text-amber-500", icon: ClockIcon },
-    ACCEPTED: { label: t("accepted"), color: "text-blue-500", icon: ThumbsUpIcon },
-    REJECTED: { label: t("rejected"), color: "text-red-500", icon: XCircleIcon },
+    ACCEPTED: {
+      label: t("accepted"),
+      color: "text-blue-500",
+      icon: ThumbsUpIcon,
+    },
+    REJECTED: {
+      label: t("rejected"),
+      color: "text-red-500",
+      icon: XCircleIcon,
+    },
     PREPARING: {
       label: t("preparing"),
       color: "text-yellow-500",
@@ -62,7 +70,11 @@ const RecentOrders = ({ recentOrders }: IProps) => {
       color: "text-purple-500",
       icon: PackageCheckIcon,
     },
-    ON_THE_WAY: { label: t("on_the_way"), color: "text-sky-500", icon: TruckIcon },
+    ON_THE_WAY: {
+      label: t("on_the_way"),
+      color: "text-sky-500",
+      icon: TruckIcon,
+    },
     DELIVERED: {
       label: t("delivered"),
       color: "text-green-500",
@@ -103,12 +115,14 @@ const RecentOrders = ({ recentOrders }: IProps) => {
         initial="hidden"
         animate="show"
       >
-        {recentOrders.length === 0 && (
+        {recentOrders?.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-gray-500">{t("no_recent_orders_found")}</p>
+            <p className="text-sm text-gray-500">
+              {t("no_recent_orders_found")}
+            </p>
           </div>
         )}
-        {recentOrders.map((order, index) => (
+        {recentOrders?.map((order, index) => (
           <motion.div
             key={index}
             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"

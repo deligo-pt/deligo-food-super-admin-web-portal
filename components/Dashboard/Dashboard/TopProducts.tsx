@@ -17,12 +17,12 @@ const TopProducts = ({ topRatedItems }: IProps) => {
     <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
       <h3 className="text-lg font-semibold mb-4">{t("top_rated_items")}</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {topRatedItems.length === 0 && (
+        {topRatedItems?.length === 0 && (
           <div className="col-span-4 text-center text-gray-500">
             {t("no_top_rated_items_found")}
           </div>
         )}
-        {topRatedItems.map((item, index) => (
+        {topRatedItems?.map((item, index) => (
           <motion.div
             key={item._id}
             className="bg-gray-50 rounded-lg overflow-hidden"

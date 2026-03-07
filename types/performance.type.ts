@@ -1,8 +1,8 @@
-import { TMeta } from "@/types";
 import {
   TTopRatedDeliveryPartner,
   TTopRatedItems,
 } from "@/types/analytics.type";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TAgent, TVendor } from "@/types/user.type";
 
 export type TVendorPerformance = Pick<
@@ -89,7 +89,7 @@ export type TFleetPerformanceStat = {
     fleetPhoto: string;
     ordersCount: number;
   };
-  highestRating: {
+  highestRated: {
     fleetName: string;
     fleetPhoto: string;
     rating: {
@@ -111,24 +111,84 @@ export type TFleetMonthlyPerformance = {
 };
 
 export type TTopFleetPerformers = {
-  fleetName: string;
-  fleetPhoto: string;
+  earnings: number;
+  initials: string;
+  name: string;
   rating: number;
-  totalEarnings: number;
+  profilePhoto: string;
 };
 
 export type TFleetPerformanceData = {
-  data: {
-    fleetPerformance: TFleetManagerPerformance[];
-    fleetPerformanceStat: TFleetPerformanceStat;
-    fleetMonthlyPerformance: TFleetMonthlyPerformance[];
-    topFleetPerformers: TTopFleetPerformers[];
-  };
-  meta: TMeta;
+  fleetPerformance: TFleetManagerPerformance[];
+  topCards: TFleetPerformanceStat;
+  earningsPerformance: TFleetMonthlyPerformance[];
+  topPerformers: TTopFleetPerformers[];
 };
 
 export type TFleetPerformanceDetailsData = {
   fleetPerformance: TFleetManagerPerformance;
   fleetMonthlyPerformance: TFleetMonthlyPerformance[];
+  topRatedDrivers: TTopRatedDeliveryPartner[];
+};
+
+export type TDeliveryPartnerPerformance = Pick<
+  TDeliveryPartner,
+  | "_id"
+  | "profilePhoto"
+  | "userId"
+  | "email"
+  | "status"
+  | "name"
+  | "address"
+  | "earnings"
+  | "operationalData"
+> & {
+  totalEarnings: number;
+};
+
+export type TPartnerPerformanceStat = {
+  mostOrders: {
+    partnerName: string;
+    partnerPhoto: string;
+    ordersCount: number;
+  };
+  highestRated: {
+    partnerName: string;
+    partnerPhoto: string;
+    rating: {
+      average: number;
+      totalRatings: number;
+    };
+  };
+  highestEarnings: {
+    partnerName: string;
+    partnerPhoto: string;
+    earnings: number;
+  };
+};
+
+export type TPartnerMonthlyPerformance = {
+  month: string;
+  totalOrders: number;
+};
+
+export type TTopPartnerPerformers = {
+  earnings: number;
+  initials: string;
+  name: string;
+  rating: number;
+  profilePhoto: string;
+};
+
+export type TPartnerPerformanceData = {
+  partnerPerformance: TDeliveryPartnerPerformance[];
+  topCards: TPartnerPerformanceStat;
+  earningsPerformance: TPartnerMonthlyPerformance[];
+  topPerformers: TTopPartnerPerformers[];
+};
+
+export type TPartnerPerformanceDetailsData = {
+  partnerPerformance: TDeliveryPartnerPerformance;
+  partnerMonthlyPerformance: TPartnerMonthlyPerformance[];
   topRatedDrivers: TTopRatedDeliveryPartner[];
 };

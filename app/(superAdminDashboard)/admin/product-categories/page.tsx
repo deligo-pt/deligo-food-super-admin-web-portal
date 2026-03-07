@@ -46,7 +46,7 @@ export default async function BusinessCategoryPage({ searchParams }: IProps) {
   }
 
   return (
-    <div className="space-y-6 max-w-full">
+    <div className="space-y-6 max-w-full p-6">
       {/* Page Title */}
       <CategoriesTitle />
 

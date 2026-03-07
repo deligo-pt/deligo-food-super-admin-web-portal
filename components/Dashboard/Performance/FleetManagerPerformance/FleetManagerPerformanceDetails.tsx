@@ -1,87 +1,29 @@
 "use client";
 
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import TopRatedDeliveryPartners from "@/components/Dashboard/Performance/FleetManagerPerformance/TopDrivers";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TFleetManagerPerformance } from "@/types/performance.type";
+import { TFleetPerformanceDetailsData } from "@/types/performance.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import { Clock, EuroIcon, ShoppingBag, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const fleetManager: TFleetManagerPerformance = {
-  _id: "3",
-  email: "moin@mail.com",
-  status: "APPROVED",
-  userId: "FM-33skdb",
-  name: {
-    firstName: "Moin",
-    lastName: "Khan",
-  },
-  address: {
-    street: "Narsingdi, Bangladesh",
-    city: "Dhaka",
-    state: "Dhaka",
-    country: "Bangladesh",
-    postalCode: "1216",
-  },
-  operationalData: {
-    totalDrivers: 15,
-    activeVehicles: 12,
-    rating: {
-      average: 4.5,
-      totalReviews: 150,
-    },
-    totalDeliveries: 500,
-  },
-  totalEarnings: 18000,
-};
+interface IProps {
+  performanceData: TFleetPerformanceDetailsData;
+}
 
-const weeklyEarnings = [
-  {
-    name: "Mon",
-    orders: 245,
-    revenue: 8500,
-  },
-  {
-    name: "Tue",
-    orders: 312,
-    revenue: 10200,
-  },
-  {
-    name: "Wed",
-    orders: 287,
-    revenue: 9400,
-  },
-  {
-    name: "Thu",
-    orders: 356,
-    revenue: 11800,
-  },
-  {
-    name: "Fri",
-    orders: 428,
-    revenue: 14200,
-  },
-  {
-    name: "Sat",
-    orders: 512,
-    revenue: 17500,
-  },
-  {
-    name: "Sun",
-    orders: 389,
-    revenue: 12800,
-  },
-];
-
-export function FleetManagerPerformanceDetails() {
+export default function FleetManagerPerformanceDetails({
+  performanceData,
+}: IProps) {
   const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
       {/* Header */}
       <TitleHeader
-        title="Fry Express Performance"
+        title={`${performanceData?.fleetPerformance?.name?.firstName} ${performanceData?.fleetPerformance?.name?.lastName} Performance`}
         subtitle="Fleet Manager Performance Details"
         onBackClick={() => router.push("/admin/fleet-performance")}
       />
@@ -90,25 +32,34 @@ export function FleetManagerPerformanceDetails() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatsCard
           title="Total Earnings"
-          value={`€${fleetManager.totalEarnings?.toLocaleString()}`}
+          value={`€${formatPrice(performanceData?.fleetPerformance?.totalEarnings || 0)}`}
           icon={EuroIcon}
           delay={0}
         />
         <StatsCard
           title="Total Deliveries"
-          value={fleetManager.operationalData?.totalDeliveries || 0}
+          value={
+            performanceData?.fleetPerformance?.operationalData
+              ?.totalDeliveries || 0
+          }
           icon={ShoppingBag}
           delay={0.1}
         />
         <StatsCard
           title="Avg Rating"
-          value={fleetManager.operationalData?.rating?.average || 0.0}
+          value={
+            performanceData?.fleetPerformance?.operationalData?.rating
+              ?.average || 0.0
+          }
           icon={Star}
           delay={0.2}
         />
         <StatsCard
           title="Total Drivers"
-          value={fleetManager.operationalData?.totalDrivers || 0}
+          value={
+            performanceData?.fleetPerformance?.operationalData?.totalDrivers ||
+            0
+          }
           icon={Clock}
           delay={0.3}
         />
@@ -135,23 +86,26 @@ export function FleetManagerPerformanceDetails() {
               Earings Performance
             </h3>
             <p className="text-sm text-gray-500">
-              Daily performance over the past week
+              Monthly performance over the last 6 months
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-[#DC3173]" />
-              <span className="text-gray-600">Orders</span>
+              <span className="text-gray-600">Earnings</span>
             </div>
           </div>
         </div>
         <AnalyticsChart
-          data={weeklyEarnings}
+          data={performanceData?.fleetMonthlyPerformance}
           type="bar"
-          dataKey="revenue"
+          dataKey="totalEarnings"
+          xKey="month"
           height={300}
         />
       </motion.div>
+
+      <TopRatedDeliveryPartners partners={performanceData?.topRatedDrivers} />
     </div>
   );
 }
