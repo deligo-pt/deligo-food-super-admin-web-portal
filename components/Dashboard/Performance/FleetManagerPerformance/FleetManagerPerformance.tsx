@@ -52,14 +52,16 @@ export default function FleetManagerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.topCards?.mostOrders?.fleetPhoto
+                    fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
+                      ?.fleetPhoto
                   }
-                  alt={
-                    fleetPerformanceData?.data?.topCards?.mostOrders?.fleetName
-                  }
+                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.firstName} ${fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.lastName}`}
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.topCards?.mostOrders?.fleetName?.charAt(
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.firstName?.charAt(
+                    0,
+                  )}
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.lastName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -67,12 +69,23 @@ export default function FleetManagerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-semibold">
-                {fleetPerformanceData?.data?.topCards?.mostOrders?.fleetName ||
+                {
+                  fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
+                    ?.fleetName?.firstName
+                }{" "}
+                {
+                  fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
+                    ?.fleetName?.lastName
+                }
+                {!fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
+                  ?.fleetName?.firstName &&
+                  !fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
+                    ?.fleetName?.lastName &&
                   "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {fleetPerformanceData?.data?.topCards?.mostOrders?.ordersCount?.toLocaleString()}{" "}
-                orders this month
+                {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.ordersCount?.toLocaleString()}{" "}
+                orders
               </p>
             </div>
           </div>
@@ -102,16 +115,16 @@ export default function FleetManagerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.topCards?.highestRated
-                      ?.fleetPhoto
+                    fleetPerformanceData?.data?.fleetPerformanceStat
+                      ?.highestRating?.fleetPhoto
                   }
-                  alt={
-                    fleetPerformanceData?.data?.topCards?.highestRated
-                      ?.fleetName
-                  }
+                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.firstName} ${fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.lastName}`}
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.topCards?.highestRated?.fleetName?.charAt(
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.firstName?.charAt(
+                    0,
+                  )}
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.lastName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -119,16 +132,24 @@ export default function FleetManagerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {fleetPerformanceData?.data?.topCards?.highestRated
-                  ?.fleetName || "N/A"}
+                {
+                  fleetPerformanceData?.data?.fleetPerformanceStat
+                    ?.highestRating?.fleetName?.firstName
+                }{" "}
+                {
+                  fleetPerformanceData?.data?.fleetPerformanceStat
+                    ?.highestRating?.fleetName?.lastName
+                }
+                {!fleetPerformanceData?.data?.fleetPerformanceStat
+                  ?.highestRating?.fleetName?.firstName &&
+                  !fleetPerformanceData?.data?.fleetPerformanceStat
+                    ?.highestRating?.fleetName?.lastName &&
+                  "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {fleetPerformanceData?.data?.topCards?.highestRated?.rating
-                  ?.average || 0}{" "}
-                stars (
-                {fleetPerformanceData?.data?.topCards?.highestRated?.rating
-                  ?.totalRatings || 0}{" "}
-                reviews)
+                {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating
+                  ?.rating || 0}{" "}
+                stars
               </p>
             </div>
           </div>
@@ -158,16 +179,16 @@ export default function FleetManagerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.topCards?.highestEarnings
-                      ?.fleetPhoto
+                    fleetPerformanceData?.data?.fleetPerformanceStat
+                      ?.highestEarnings?.fleetPhoto
                   }
-                  alt={
-                    fleetPerformanceData?.data?.topCards?.highestEarnings
-                      ?.fleetName
-                  }
+                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.firstName} ${fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.lastName}`}
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.topCards?.highestEarnings?.fleetName?.charAt(
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.firstName?.charAt(
+                    0,
+                  )}
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.lastName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -175,14 +196,25 @@ export default function FleetManagerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {fleetPerformanceData?.data?.topCards?.highestEarnings
-                  ?.fleetName || "N/A"}
+                {
+                  fleetPerformanceData?.data?.fleetPerformanceStat
+                    ?.highestEarnings?.fleetName?.firstName
+                }{" "}
+                {
+                  fleetPerformanceData?.data?.fleetPerformanceStat
+                    ?.highestEarnings?.fleetName?.lastName
+                }
+                {!fleetPerformanceData?.data?.fleetPerformanceStat
+                  ?.highestEarnings?.fleetName?.firstName &&
+                  !fleetPerformanceData?.data?.fleetPerformanceStat
+                    ?.highestEarnings?.fleetName?.lastName &&
+                  "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
                 €
                 {formatPrice(
-                  fleetPerformanceData?.data?.topCards?.highestEarnings
-                    ?.earnings || 0,
+                  fleetPerformanceData?.data?.fleetPerformanceStat
+                    ?.highestEarnings?.earnings || 0,
                 )}
               </p>
             </div>
@@ -223,10 +255,10 @@ export default function FleetManagerPerformance({
             </div>
           </div>
           <AnalyticsChart
-            data={fleetPerformanceData?.data?.earningsPerformance}
+            data={fleetPerformanceData?.data?.fleetWeeklyPerformance}
             type="bar"
-            dataKey="earnings"
-            xKey="name"
+            dataKey="totalEarnings"
+            xKey="day"
             height={250}
           />
         </motion.div>
@@ -251,7 +283,7 @@ export default function FleetManagerPerformance({
             <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
           </div>
           <div className="space-y-4">
-            {fleetPerformanceData?.data?.topPerformers?.map(
+            {fleetPerformanceData?.data?.topFleetPerformers?.map(
               (fleetManager, index) => (
                 <div
                   key={index}
@@ -265,18 +297,25 @@ export default function FleetManagerPerformance({
                   <div>
                     <Avatar className="w-8 h-8">
                       <AvatarImage
-                        src={fleetManager.profilePhoto}
-                        alt={fleetManager?.name}
+                        src={fleetManager.fleetPhoto}
+                        alt={`${fleetManager?.fleetName?.firstName} ${fleetManager?.fleetName?.lastName}`}
                       />
-                      <AvatarFallback>{fleetManager?.initials}</AvatarFallback>
+                      <AvatarFallback>
+                        {fleetManager?.fleetName?.firstName?.charAt(0)}
+                        {fleetManager?.fleetName?.lastName?.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 truncate">
-                      {fleetManager?.name}
+                      {fleetManager?.fleetName?.firstName}{" "}
+                      {fleetManager?.fleetName?.lastName}
+                      {!fleetManager?.fleetName?.firstName &&
+                        !fleetManager?.fleetName?.lastName &&
+                        "N/A"}
                     </p>
                     <p className="text-xs text-gray-500">
-                      €{fleetManager.earnings?.toLocaleString()} earnings
+                      €{formatPrice(fleetManager.totalEarnings || 0)} earnings
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-sm">

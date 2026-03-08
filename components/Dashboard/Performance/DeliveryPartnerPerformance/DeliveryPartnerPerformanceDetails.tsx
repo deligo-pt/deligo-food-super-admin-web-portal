@@ -32,7 +32,14 @@ const deliveryPartner: TDeliveryPartnerPerformance = {
     },
     totalDeliveries: 500,
   },
+  totalDeliveries: 500,
   totalEarnings: 18000,
+  rating: 4.5,
+  earnings: {
+    pendingEarnings: 0,
+    totalEarnings: 18000,
+  },
+  profilePhoto: "",
 };
 
 const weeklyEarnings = [

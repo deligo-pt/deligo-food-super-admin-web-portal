@@ -63,6 +63,7 @@ export default function TopRatedDeliveryPartners({ partners }: IProps) {
                 </div>
               </div>
               <div className="flex justify-between items-center mt-6">
+                <span className="text-sm text-gray-600">Rating</span>
                 <div className="flex items-center">
                   <StarIcon
                     size={16}
@@ -71,9 +72,6 @@ export default function TopRatedDeliveryPartners({ partners }: IProps) {
                   />
                   <span className="text-sm">{partner?.rating}</span>
                 </div>
-                <span className="text-sm text-gray-600">
-                  {partner?.completedDeliveries || 0} Deliveries
-                </span>
               </div>
             </div>
           </motion.div>

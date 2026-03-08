@@ -28,11 +28,11 @@ export default async function ExpiredOffersPage({ searchParams }: IProps) {
   try {
     const result = (await serverRequest.get("/offers", {
       params,
-    })) as TResponse<{ data: TOffer[]; meta?: TMeta }>;
+    })) as TResponse<TOffer[]>;
 
     if (result?.success) {
-      initialData.data = result.data.data;
-      initialData.meta = result.data.meta;
+      initialData.data = result.data;
+      initialData.meta = result.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);

@@ -16,54 +16,6 @@ import {
 import { useRouter } from "next/navigation";
 import React from "react";
 
-// const transaction: TTransaction = {
-//   _id: "1",
-//   transactionId: "T-2402",
-//   type: "earning",
-//   description: "Order #DG-9031 Completed",
-//   amount: "12.90",
-//   positive: true,
-//   status: "settled",
-//   orderId: "DG-9031",
-//   orderTotal: "15.90",
-//   platformFee: "3.00",
-//   netEarning: "12.90",
-//   customer: "João Silva",
-//   customerOrders: 8,
-//   paymentMethod: "Card",
-//   deliveryAddress: "Rua Augusta 45, Lisboa, 1100-048",
-//   items: [
-//     {
-//       name: "Burger Combo Deluxe",
-//       qty: 1,
-//       price: "12.50",
-//     },
-//     {
-//       name: "Cola 33cl",
-//       qty: 1,
-//       price: "3.40",
-//     },
-//   ],
-//   relatedTransactions: [
-//     {
-//       id: "T-2401",
-//       desc: "Weekly Payout (SEPA)",
-//       amount: "84.50",
-//       date: "2025-11-08",
-//       positive: true,
-//     },
-//     {
-//       id: "T-2403",
-//       desc: "Platform Service Fee",
-//       amount: "2.50",
-//       date: "2025-11-07",
-//       positive: false,
-//     },
-//   ],
-//   createdAt: "2025-11-08T09:30:00Z",
-//   updatedAt: "2025-11-08T09:30:00Z",
-// };
-
 const typeConfig: Record<
   string,
   {
@@ -240,7 +192,7 @@ export default function TransactionDetails({
                 key={item.label}
                 className="flex justify-between items-start py-2 border-b border-gray-50 last:border-0 gap-4"
               >
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-semibold flex-shrink-0">
+                <span className="text-xs text-gray-400 uppercase tracking-wide font-semibold shrink-0">
                   {item.label}
                 </span>
                 <span
@@ -267,7 +219,10 @@ export default function TransactionDetails({
               <UserIcon className="w-6 h-6 text-[#DC3173]" />
             </div>
             <div>
-              <p className="font-bold text-gray-900">{transaction.customer}</p>
+              <p className="font-bold text-gray-900">
+                {transaction.customer?.name?.firstName}{" "}
+                {transaction.customer?.name?.lastName}
+              </p>
               <p className="text-sm text-gray-400">
                 {transaction.customerOrders} previous orders
               </p>

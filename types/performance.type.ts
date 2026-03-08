@@ -80,54 +80,69 @@ export type TFleetManagerPerformance = Pick<
   | "address"
   | "operationalData"
 > & {
+  totalDeliveries: number;
+  totalDrivers: number;
   totalEarnings: number;
+  rating: {
+    average: number;
+    totalReviews: number;
+  };
 };
 
 export type TFleetPerformanceStat = {
   mostOrders: {
-    fleetName: string;
+    fleetName: {
+      firstName: string;
+      lastName: string;
+    };
     fleetPhoto: string;
     ordersCount: number;
   };
-  highestRated: {
-    fleetName: string;
-    fleetPhoto: string;
-    rating: {
-      average: number;
-      totalRatings: number;
+  highestRating: {
+    fleetName: {
+      firstName: string;
+      lastName: string;
     };
+    fleetPhoto: string;
+    rating: number;
   };
   highestEarnings: {
-    fleetName: string;
+    fleetName: {
+      firstName: string;
+      lastName: string;
+    };
     fleetPhoto: string;
     earnings: number;
   };
 };
 
-export type TFleetMonthlyPerformance = {
-  month: string;
+export type TFleetWeeklyPerformance = {
+  day: string;
   totalOrders: number;
   totalEarnings: number;
 };
 
 export type TTopFleetPerformers = {
-  earnings: number;
-  initials: string;
-  name: string;
+  _id: string;
+  fleetName: {
+    firstName: string;
+    lastName: string;
+  };
+  fleetPhoto: string;
   rating: number;
-  profilePhoto: string;
+  totalEarnings: number;
 };
 
 export type TFleetPerformanceData = {
   fleetPerformance: TFleetManagerPerformance[];
-  topCards: TFleetPerformanceStat;
-  earningsPerformance: TFleetMonthlyPerformance[];
-  topPerformers: TTopFleetPerformers[];
+  fleetPerformanceStat: TFleetPerformanceStat;
+  fleetWeeklyPerformance: TFleetWeeklyPerformance[];
+  topFleetPerformers: TTopFleetPerformers[];
 };
 
 export type TFleetPerformanceDetailsData = {
   fleetPerformance: TFleetManagerPerformance;
-  fleetMonthlyPerformance: TFleetMonthlyPerformance[];
+  fleetWeeklyPerformance: TFleetWeeklyPerformance[];
   topRatedDrivers: TTopRatedDeliveryPartner[];
 };
 
@@ -143,6 +158,8 @@ export type TDeliveryPartnerPerformance = Pick<
   | "earnings"
   | "operationalData"
 > & {
+  totalDeliveries: number;
+  rating: number;
   totalEarnings: number;
 };
 
@@ -190,5 +207,4 @@ export type TPartnerPerformanceData = {
 export type TPartnerPerformanceDetailsData = {
   partnerPerformance: TDeliveryPartnerPerformance;
   partnerMonthlyPerformance: TPartnerMonthlyPerformance[];
-  topRatedDrivers: TTopRatedDeliveryPartner[];
 };

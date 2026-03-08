@@ -104,7 +104,7 @@ export default function CampaignTable({
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={5}
+                colSpan={7}
               >
                 No offers found
               </TableCell>

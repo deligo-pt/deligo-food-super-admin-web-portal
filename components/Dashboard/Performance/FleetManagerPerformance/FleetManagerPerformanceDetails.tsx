@@ -38,28 +38,19 @@ export default function FleetManagerPerformanceDetails({
         />
         <StatsCard
           title="Total Deliveries"
-          value={
-            performanceData?.fleetPerformance?.operationalData
-              ?.totalDeliveries || 0
-          }
+          value={performanceData?.fleetPerformance?.totalDeliveries || 0}
           icon={ShoppingBag}
           delay={0.1}
         />
         <StatsCard
           title="Avg Rating"
-          value={
-            performanceData?.fleetPerformance?.operationalData?.rating
-              ?.average || 0.0
-          }
+          value={performanceData?.fleetPerformance?.rating?.average || 0.0}
           icon={Star}
           delay={0.2}
         />
         <StatsCard
           title="Total Drivers"
-          value={
-            performanceData?.fleetPerformance?.operationalData?.totalDrivers ||
-            0
-          }
+          value={performanceData?.fleetPerformance?.totalDrivers || 0}
           icon={Clock}
           delay={0.3}
         />
@@ -86,7 +77,7 @@ export default function FleetManagerPerformanceDetails({
               Earings Performance
             </h3>
             <p className="text-sm text-gray-500">
-              Monthly performance over the last 6 months
+              Daily performance over the last week
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm">
@@ -97,10 +88,10 @@ export default function FleetManagerPerformanceDetails({
           </div>
         </div>
         <AnalyticsChart
-          data={performanceData?.fleetMonthlyPerformance}
+          data={performanceData?.fleetWeeklyPerformance}
           type="bar"
           dataKey="totalEarnings"
-          xKey="month"
+          xKey="day"
           height={300}
         />
       </motion.div>

@@ -88,7 +88,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
         className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 relative overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
+          <div className="h-1.5 w-full bg-linear-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-[#DC3173]/10 rounded-lg text-[#DC3173]">
               <TrendingUpIcon className="w-5 h-5" />
@@ -106,7 +106,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 relative overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-green-400 to-green-600 absolute top-0 left-0" />
+          <div className="h-1.5 w-full bg-linear-to-r from-green-400 to-green-600 absolute top-0 left-0" />
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-green-100 rounded-lg text-green-600">
               <ArrowUpIcon className="w-5 h-5" />
@@ -124,7 +124,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 relative overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-amber-600 absolute top-0 left-0" />
+          <div className="h-1.5 w-full bg-linear-to-r from-amber-400 to-amber-600 absolute top-0 left-0" />
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
               <ArrowDownIcon className="w-5 h-5" />
@@ -147,7 +147,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
         variants={itemVariants}
         className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 relative overflow-hidden"
       >
-        <div className="h-1.5 w-full bg-gradient-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
+        <div className="h-1.5 w-full bg-linear-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
         <div className="flex items-center gap-3 mb-6">
           <TrendingUpIcon className="w-6 h-6 text-[#DC3173]" />
           <h2 className="text-xl font-bold text-gray-900">
@@ -249,7 +249,7 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
               }}
               className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100"
             >
-              <div className="w-8 h-8 rounded-full bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] font-bold text-sm flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] font-bold text-sm shrink-0">
                 {index + 1}
               </div>
               <div className="flex-1 min-w-0">
@@ -257,13 +257,13 @@ export default function SalesAnalytics({ salesAnalytics }: IProps) {
                   <span className="font-medium text-gray-900 truncate">
                     {item.name}
                   </span>
-                  <span className="font-bold text-[#DC3173] ml-2 flex-shrink-0">
+                  <span className="font-bold text-[#DC3173] ml-2 shrink-0">
                     {item.sold} sold
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-[#DC3173] to-[#e45a92] rounded-full"
+                    className="h-full bg-linear-to-r from-[#DC3173] to-[#e45a92] rounded-full"
                     initial={{
                       width: 0,
                     }}

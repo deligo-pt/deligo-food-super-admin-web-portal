@@ -6,7 +6,9 @@ export default async function SalesAnalyticsPage() {
   let data: TSalesAnalytics = {} as TSalesAnalytics;
 
   try {
-    const result = await serverRequest.get("/analytics/vendor-sales-analytics");
+    const result = await serverRequest.get(
+      "/analytics/admin-vendor-sales-analytics",
+    );
 
     if (result?.success) {
       data = result?.data;

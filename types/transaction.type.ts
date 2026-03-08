@@ -14,7 +14,12 @@ export type TTransaction = {
   orderTotal?: string;
   platformFee?: string;
   netEarning?: string;
-  customer?: string;
+  customer?: {
+    name: {
+      firstName: string;
+      lastName: string;
+    };
+  };
   customerOrders?: number;
 
   paymentMethod?: string;

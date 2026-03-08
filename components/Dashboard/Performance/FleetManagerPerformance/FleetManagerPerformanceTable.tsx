@@ -22,7 +22,6 @@ import {
   EuroIcon,
   MoreVertical,
   PackageIcon,
-  StarIcon,
   StoreIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -69,12 +68,12 @@ export default function FleetManagerPerformanceTable({
                   Earnings
                 </div>
               </TableHead>
-              <TableHead>
+              {/* <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <StarIcon className="w-4" />
                   Rating
                 </div>
-              </TableHead>
+              </TableHead> */}
               <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
                 <Cog className="w-4" />
                 Actions
@@ -86,7 +85,7 @@ export default function FleetManagerPerformanceTable({
               <TableRow>
                 <TableCell
                   className="text-[#DC3173] text-lg text-center"
-                  colSpan={5}
+                  colSpan={4}
                 >
                   No fleet managers found
                 </TableCell>
@@ -113,13 +112,11 @@ export default function FleetManagerPerformanceTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
-                  {fm.operationalData?.totalDeliveries || 0}
-                </TableCell>
+                <TableCell>{fm.totalDeliveries || 0}</TableCell>
                 <TableCell>€{fm.totalEarnings || 0}</TableCell>
-                <TableCell>
+                {/* <TableCell>
                   {fm.operationalData?.rating?.average || 0}
-                </TableCell>
+                </TableCell> */}
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger>

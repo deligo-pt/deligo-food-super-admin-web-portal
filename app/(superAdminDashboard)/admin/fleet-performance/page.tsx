@@ -1,10 +1,7 @@
 import FleetManagerPerformance from "@/components/Dashboard/Performance/FleetManagerPerformance/FleetManagerPerformance";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
-import {
-  TFleetManagerPerformance,
-  TFleetPerformanceData,
-} from "@/types/performance.type";
+import { TFleetPerformanceData } from "@/types/performance.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -37,33 +34,15 @@ export default async function FleetPerformancePage({ searchParams }: IProps) {
       {
         params: query,
       },
-    )) as TResponse<TFleetPerformanceData>;
+    )) as TResponse<{ data: TFleetPerformanceData; meta: TMeta }>;
 
     if (result?.success) {
-      performanceData.data = result.data;
-      performanceData.meta = result.meta;
+      performanceData.data = result.data?.data;
+      performanceData.meta = result.data?.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
   }
 
-  try {
-    const result = (await serverRequest.get("/fleet-managers", {
-      params: query,
-    })) as TResponse<TFleetManagerPerformance[]>;
-
-    if (result?.success) {
-      performanceData.data.fleetPerformance = result.data;
-      performanceData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return (
-    <FleetManagerPerformance
-      fleetPerformanceData={performanceData}
-      // fleetData={fleetData}
-    />
-  );
+  return <FleetManagerPerformance fleetPerformanceData={performanceData} />;
 }
