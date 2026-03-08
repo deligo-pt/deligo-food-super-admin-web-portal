@@ -18,7 +18,7 @@ const partnerPerformance: TDeliveryPartnerPerformance[] = [
     _id: "1",
     email: "sk@gmail.com",
     status: "APPROVED",
-    userId: "FM-12skdb",
+    userId: "dp-12skdb",
     name: {
       firstName: "Sumon",
       lastName: "Kaysar",
@@ -38,13 +38,19 @@ const partnerPerformance: TDeliveryPartnerPerformance[] = [
       },
       totalDeliveries: 300,
     },
-    totalEarnings: 20000,
+    totalDeliveries: 500,
+    totalEarnings: 18000,
+    rating: 4.5,
+    earnings: {
+      pendingEarnings: 0,
+      totalEarnings: 18000,
+    },
   },
   {
     _id: "2",
     email: "hridoy@mail.com",
     status: "APPROVED",
-    userId: "FM-21skdb",
+    userId: "dp-21skdb",
     name: {
       firstName: "Hridoy",
       lastName: "Khan",
@@ -63,13 +69,19 @@ const partnerPerformance: TDeliveryPartnerPerformance[] = [
       },
       totalDeliveries: 105,
     },
-    totalEarnings: 12000,
+    totalDeliveries: 500,
+    totalEarnings: 18000,
+    rating: 4.5,
+    earnings: {
+      pendingEarnings: 0,
+      totalEarnings: 18000,
+    },
   },
   {
     _id: "3",
     email: "moin@mail.com",
     status: "APPROVED",
-    userId: "FM-33skdb",
+    userId: "dp-33skdb",
     name: {
       firstName: "Abc",
       lastName: "Moin",
@@ -88,7 +100,13 @@ const partnerPerformance: TDeliveryPartnerPerformance[] = [
       },
       totalDeliveries: 500,
     },
+    totalDeliveries: 500,
     totalEarnings: 18000,
+    rating: 4.5,
+    earnings: {
+      pendingEarnings: 0,
+      totalEarnings: 18000,
+    },
   },
 ];
 
