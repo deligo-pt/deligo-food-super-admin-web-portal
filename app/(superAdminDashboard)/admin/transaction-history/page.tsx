@@ -4,19 +4,6 @@ import { TMeta } from "@/types";
 import { TTransaction } from "@/types/transaction.type";
 import { catchAsync } from "@/utils/catchAsync";
 
-// const transactions: TTransaction[] = [
-//   {
-//     _id: "1",
-//     transactionId: "T-2401",
-//     type: "payout",
-//     description: "Weekly Payout (SEPA)",
-//     amount: "84.50",
-//     positive: true,
-//     createdAt: "2025-11-08T10:00:00Z",
-//     updatedAt: "2025-11-08T10:00:00Z",
-//   },
-// ];
-
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };

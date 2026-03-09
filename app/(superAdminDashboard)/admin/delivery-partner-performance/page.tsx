@@ -1,6 +1,6 @@
 import DeliveryPartnerPerformance from "@/components/Dashboard/Performance/DeliveryPartnerPerformance/DeliveryPartnerPerformance";
 import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { TMeta, TResponse } from "@/types";
 import { TPartnerPerformanceData } from "@/types/performance.type";
 
 type IProps = {
@@ -26,7 +26,9 @@ export default async function DeliveryPartnerPerformancePage({
     isDeleted: false,
   };
 
-  let initialData: TPartnerPerformanceData = {} as TPartnerPerformanceData;
+  const initialData: { data: TPartnerPerformanceData; meta?: TMeta } = {
+    data: {} as TPartnerPerformanceData,
+  };
 
   try {
     const result = (await serverRequest.get(
@@ -34,12 +36,11 @@ export default async function DeliveryPartnerPerformancePage({
       {
         params: query,
       },
-    )) as TResponse<TPartnerPerformanceData>;
-
-    console.log(result);
+    )) as TResponse<{ data: TPartnerPerformanceData; meta?: TMeta }>;
 
     if (result?.success) {
-      initialData = result.data;
+      initialData.data = result.data?.data;
+      initialData.meta = result.data?.meta;
     }
   } catch (err) {
     console.log("Server fetch error:", err);

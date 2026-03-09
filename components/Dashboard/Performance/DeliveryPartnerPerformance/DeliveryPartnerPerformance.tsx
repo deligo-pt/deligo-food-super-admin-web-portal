@@ -5,113 +5,14 @@ import DeliveryPartnerPerformanceTable from "@/components/Dashboard/Performance/
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  TDeliveryPartnerPerformance,
-  TPartnerPerformanceData,
-} from "@/types/performance.type";
+import { TMeta } from "@/types";
+import { TPartnerPerformanceData } from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import { Award, EuroIcon, Star, TrendingUp } from "lucide-react";
 
-const partnerPerformance: TDeliveryPartnerPerformance[] = [
-  {
-    _id: "1",
-    email: "sk@gmail.com",
-    status: "APPROVED",
-    userId: "dp-12skdb",
-    name: {
-      firstName: "Sumon",
-      lastName: "Kaysar",
-    },
-    profilePhoto: "",
-    address: {
-      street: "Narsingdi, Bangladesh",
-      city: "Dhaka",
-      state: "Dhaka",
-      country: "Bangladesh",
-      postalCode: "1216",
-    },
-    operationalData: {
-      rating: {
-        average: 4.3,
-        totalReviews: 120,
-      },
-      totalDeliveries: 300,
-    },
-    totalDeliveries: 500,
-    totalEarnings: 18000,
-    rating: 4.5,
-    earnings: {
-      pendingEarnings: 0,
-      totalEarnings: 18000,
-    },
-  },
-  {
-    _id: "2",
-    email: "hridoy@mail.com",
-    status: "APPROVED",
-    userId: "dp-21skdb",
-    name: {
-      firstName: "Hridoy",
-      lastName: "Khan",
-    },
-    address: {
-      street: "Narsingdi, Bangladesh",
-      city: "Dhaka",
-      state: "Dhaka",
-      country: "Bangladesh",
-      postalCode: "1216",
-    },
-    operationalData: {
-      rating: {
-        average: 4.9,
-        totalReviews: 26,
-      },
-      totalDeliveries: 105,
-    },
-    totalDeliveries: 500,
-    totalEarnings: 18000,
-    rating: 4.5,
-    earnings: {
-      pendingEarnings: 0,
-      totalEarnings: 18000,
-    },
-  },
-  {
-    _id: "3",
-    email: "moin@mail.com",
-    status: "APPROVED",
-    userId: "dp-33skdb",
-    name: {
-      firstName: "Abc",
-      lastName: "Moin",
-    },
-    address: {
-      street: "Narsingdi, Bangladesh",
-      city: "Dhaka",
-      state: "Dhaka",
-      country: "Bangladesh",
-      postalCode: "1216",
-    },
-    operationalData: {
-      rating: {
-        average: 4.5,
-        totalReviews: 150,
-      },
-      totalDeliveries: 500,
-    },
-    totalDeliveries: 500,
-    totalEarnings: 18000,
-    rating: 4.5,
-    earnings: {
-      pendingEarnings: 0,
-      totalEarnings: 18000,
-    },
-  },
-];
-
 interface IProps {
-  partnerPerformanceData: TPartnerPerformanceData;
+  partnerPerformanceData: { data: TPartnerPerformanceData; meta?: TMeta };
 }
 
 export default function DeliveryPartnerPerformance({
@@ -151,14 +52,22 @@ export default function DeliveryPartnerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    partnerPerformanceData?.topCards?.mostOrders?.partnerPhoto
+                    partnerPerformanceData?.data?.topCards?.mostOrders
+                      ?.partnerPhoto
                   }
-                  alt={
-                    partnerPerformanceData?.topCards?.mostOrders?.partnerName
-                  }
+                  alt={`${
+                    partnerPerformanceData?.data?.topCards?.mostOrders
+                      ?.partnerName?.firstName
+                  } ${
+                    partnerPerformanceData?.data?.topCards?.mostOrders
+                      ?.partnerName?.lastName
+                  }`}
                 />
                 <AvatarFallback>
-                  {partnerPerformanceData?.topCards?.mostOrders?.partnerName?.charAt(
+                  {partnerPerformanceData?.data?.topCards?.mostOrders?.partnerName?.firstName?.charAt(
+                    0,
+                  )}
+                  {partnerPerformanceData?.data?.topCards?.mostOrders?.partnerName?.lastName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -166,11 +75,17 @@ export default function DeliveryPartnerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-semibold">
-                {partnerPerformanceData?.topCards?.mostOrders?.partnerName ||
-                  "N/A"}
+                {
+                  partnerPerformanceData?.data?.topCards?.mostOrders
+                    ?.partnerName?.firstName
+                }{" "}
+                {
+                  partnerPerformanceData?.data?.topCards?.mostOrders
+                    ?.partnerName?.lastName
+                }
               </p>
               <p className="text-[#DC3173] text-sm">
-                {partnerPerformanceData?.topCards?.mostOrders?.ordersCount?.toLocaleString()}{" "}
+                {partnerPerformanceData?.data?.topCards?.mostOrders?.ordersCount?.toLocaleString()}{" "}
                 orders this month
               </p>
             </div>
@@ -201,14 +116,22 @@ export default function DeliveryPartnerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    partnerPerformanceData?.topCards?.highestRated?.partnerPhoto
+                    partnerPerformanceData?.data?.topCards?.highestRated
+                      ?.partnerPhoto
                   }
-                  alt={
-                    partnerPerformanceData?.topCards?.highestRated?.partnerName
-                  }
+                  alt={`${
+                    partnerPerformanceData?.data?.topCards?.highestRated
+                      ?.partnerName?.firstName
+                  } ${
+                    partnerPerformanceData?.data?.topCards?.highestRated
+                      ?.partnerName?.lastName
+                  }`}
                 />
                 <AvatarFallback>
-                  {partnerPerformanceData?.topCards?.highestRated?.partnerName?.charAt(
+                  {partnerPerformanceData?.data?.topCards?.highestRated?.partnerName?.firstName?.charAt(
+                    0,
+                  )}
+                  {partnerPerformanceData?.data?.topCards?.highestRated?.partnerName?.lastName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -216,14 +139,20 @@ export default function DeliveryPartnerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {partnerPerformanceData?.topCards?.highestRated?.partnerName ||
-                  "N/A"}
+                {
+                  partnerPerformanceData?.data?.topCards?.highestRated
+                    ?.partnerName?.firstName
+                }{" "}
+                {
+                  partnerPerformanceData?.data?.topCards?.highestRated
+                    ?.partnerName?.lastName
+                }
               </p>
               <p className="text-[#DC3173] text-sm">
-                {partnerPerformanceData?.topCards?.highestRated?.rating
+                {partnerPerformanceData?.data?.topCards?.highestRated?.rating
                   ?.average || 0}{" "}
                 stars (
-                {partnerPerformanceData?.topCards?.highestRated?.rating
+                {partnerPerformanceData?.data?.topCards?.highestRated?.rating
                   ?.totalRatings || 0}{" "}
                 reviews)
               </p>
@@ -255,16 +184,22 @@ export default function DeliveryPartnerPerformance({
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    partnerPerformanceData?.topCards?.highestEarnings
+                    partnerPerformanceData?.data?.topCards?.highestEarnings
                       ?.partnerPhoto
                   }
-                  alt={
-                    partnerPerformanceData?.topCards?.highestEarnings
-                      ?.partnerName
-                  }
+                  alt={`${
+                    partnerPerformanceData?.data?.topCards?.highestEarnings
+                      ?.partnerName?.firstName
+                  } ${
+                    partnerPerformanceData?.data?.topCards?.highestEarnings
+                      ?.partnerName?.lastName
+                  }`}
                 />
                 <AvatarFallback>
-                  {partnerPerformanceData?.topCards?.highestEarnings?.partnerName?.charAt(
+                  {partnerPerformanceData?.data?.topCards?.highestEarnings?.partnerName?.firstName?.charAt(
+                    0,
+                  )}
+                  {partnerPerformanceData?.data?.topCards?.highestEarnings?.partnerName?.lastName?.charAt(
                     0,
                   )}
                 </AvatarFallback>
@@ -272,14 +207,20 @@ export default function DeliveryPartnerPerformance({
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {partnerPerformanceData?.topCards?.highestEarnings
-                  ?.partnerName || "N/A"}
+                {
+                  partnerPerformanceData?.data?.topCards?.highestEarnings
+                    ?.partnerName?.firstName
+                }{" "}
+                {
+                  partnerPerformanceData?.data?.topCards?.highestEarnings
+                    ?.partnerName?.lastName
+                }
               </p>
               <p className="text-[#DC3173] text-sm">
                 €
                 {formatPrice(
-                  partnerPerformanceData?.topCards?.highestEarnings?.earnings ||
-                    0,
+                  partnerPerformanceData?.data?.topCards?.highestEarnings
+                    ?.earnings || 0,
                 )}
               </p>
             </div>
@@ -306,24 +247,24 @@ export default function DeliveryPartnerPerformance({
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-lg font-bold text-gray-900">
-                Earnings Performance
+                Orders Performance
               </h3>
               <p className="text-sm text-gray-500">
-                Daily performance over the last week
+                Monthly performance over the last 6 months
               </p>
             </div>
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#DC3173]" />
-                <span className="text-gray-600">Earnings</span>
+                <span className="text-gray-600">Orders</span>
               </div>
             </div>
           </div>
           <AnalyticsChart
-            data={partnerPerformanceData?.earningsPerformance}
+            data={partnerPerformanceData?.data?.earningsPerformance}
             type="bar"
-            dataKey="earnings"
-            xKey="name"
+            dataKey="totalOrders"
+            xKey="month"
             height={250}
           />
         </motion.div>
@@ -348,7 +289,7 @@ export default function DeliveryPartnerPerformance({
             <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
           </div>
           <div className="space-y-4">
-            {partnerPerformanceData?.topPerformers?.map((dp, index) => (
+            {partnerPerformanceData?.data?.topPerformers?.map((dp, index) => (
               <div
                 key={index}
                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
@@ -360,16 +301,19 @@ export default function DeliveryPartnerPerformance({
                 </div>
                 <div>
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={dp.profilePhoto} alt={dp?.name} />
+                    <AvatarImage
+                      src={dp.profilePhoto}
+                      alt={`${dp?.name?.firstName} ${dp?.name?.lastName}`}
+                    />
                     <AvatarFallback>{dp?.initials}</AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 truncate">
-                    {dp?.name}
+                    {dp?.name?.firstName} {dp?.name?.lastName}
                   </p>
                   <p className="text-xs text-gray-500">
-                    €{dp.earnings?.toLocaleString()} earnings
+                    €{formatPrice(dp?.totalEarnings || 0)} earnings
                   </p>
                 </div>
                 <div className="flex items-center gap-1 text-sm">
@@ -383,21 +327,22 @@ export default function DeliveryPartnerPerformance({
       </div>
 
       {/* partner Performance Table */}
-      <DeliveryPartnerPerformanceTable partners={partnerPerformance} />
+      <DeliveryPartnerPerformanceTable
+        partners={partnerPerformanceData?.data?.partnerPerformance}
+      />
 
       {/* Pagination */}
-      {/* {!!partnersResult?.meta?.totalPage && ( */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="px-4 md:px-6"
-      >
-        <PaginationComponent
-          totalPages={3}
-          // totalPages={partnersResult?.meta?.totalPage as number}
-        />
-      </motion.div>
-      {/* )} */}
+      {!!partnerPerformanceData?.meta?.totalPage && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="px-4 md:px-6"
+        >
+          <PaginationComponent
+            totalPages={partnerPerformanceData?.meta?.totalPage as number}
+          />
+        </motion.div>
+      )}
     </div>
   );
 }

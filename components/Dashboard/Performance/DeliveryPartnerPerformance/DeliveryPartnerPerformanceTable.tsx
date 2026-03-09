@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TDeliveryPartnerPerformance } from "@/types/performance.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import {
   BikeIcon,
@@ -114,7 +115,7 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
                 <TableCell>
                   {dp.operationalData?.totalDeliveries || 0}
                 </TableCell>
-                <TableCell>€{dp.totalEarnings || 0}</TableCell>
+                <TableCell>€{formatPrice(dp.totalEarnings || 0)}</TableCell>
                 <TableCell>
                   {dp.operationalData?.rating?.average || 0}
                 </TableCell>

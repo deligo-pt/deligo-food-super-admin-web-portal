@@ -3,91 +3,26 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TDeliveryPartnerPerformance } from "@/types/performance.type";
+import { TPartnerPerformanceDetailsData } from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
 import { BikeIcon, EuroIcon, Star, TruckIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const deliveryPartner: TDeliveryPartnerPerformance = {
-  _id: "3",
-  email: "moin@mail.com",
-  status: "APPROVED",
-  userId: "FM-33skdb",
-  name: {
-    firstName: "Moin",
-    lastName: "Khan",
-  },
-  address: {
-    street: "Narsingdi, Bangladesh",
-    city: "Dhaka",
-    state: "Dhaka",
-    country: "Bangladesh",
-    postalCode: "1216",
-  },
-  operationalData: {
-    rating: {
-      average: 4.5,
-      totalReviews: 150,
-    },
-    totalDeliveries: 500,
-  },
-  totalDeliveries: 500,
-  totalEarnings: 18000,
-  rating: 4.5,
-  earnings: {
-    pendingEarnings: 0,
-    totalEarnings: 18000,
-  },
-  profilePhoto: "",
-};
+interface IProps {
+  partnerPerformanceData: TPartnerPerformanceDetailsData;
+}
 
-const weeklyEarnings = [
-  {
-    name: "Mon",
-    orders: 245,
-    revenue: 8500,
-  },
-  {
-    name: "Tue",
-    orders: 312,
-    revenue: 10200,
-  },
-  {
-    name: "Wed",
-    orders: 287,
-    revenue: 9400,
-  },
-  {
-    name: "Thu",
-    orders: 356,
-    revenue: 11800,
-  },
-  {
-    name: "Fri",
-    orders: 428,
-    revenue: 14200,
-  },
-  {
-    name: "Sat",
-    orders: 512,
-    revenue: 17500,
-  },
-  {
-    name: "Sun",
-    orders: 389,
-    revenue: 12800,
-  },
-];
-
-export default function DeliveryPartnerPerformanceDetails() {
+export default function DeliveryPartnerPerformanceDetails({
+  partnerPerformanceData,
+}: IProps) {
   const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
       {/* Header */}
       <TitleHeader
-        title="Moin Hasan Performance"
+        title={`${partnerPerformanceData?.partnerPerformance?.name?.firstName}${partnerPerformanceData?.partnerPerformance?.name?.firstName && " "}${partnerPerformanceData?.partnerPerformance?.name?.lastName}${partnerPerformanceData?.partnerPerformance?.name?.lastName && " "}Performance`}
         subtitle="Delivery Partner Performance Details"
         onBackClick={() => router.push("/admin/delivery-partner-performance")}
       />
@@ -96,25 +31,29 @@ export default function DeliveryPartnerPerformanceDetails() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatsCard
           title="Total Deliveries"
-          value={deliveryPartner.operationalData?.totalDeliveries || 0}
+          value={
+            partnerPerformanceData?.partnerPerformance?.totalDeliveries || 0
+          }
           icon={TruckIcon}
           delay={0.1}
         />
         <StatsCard
           title="Completed Deliveries"
-          value={deliveryPartner.operationalData?.completedDeliveries || 0}
+          value={
+            partnerPerformanceData?.partnerPerformance?.completedDeliveries || 0
+          }
           icon={BikeIcon}
           delay={0.3}
         />
         <StatsCard
           title="Avg Rating"
-          value={deliveryPartner.operationalData?.rating?.average || 0.0}
+          value={partnerPerformanceData?.partnerPerformance?.rating || 0.0}
           icon={Star}
           delay={0.2}
         />
         <StatsCard
           title="Total Earnings"
-          value={`€${formatPrice(deliveryPartner.totalEarnings || 0)}`}
+          value={`€${formatPrice(partnerPerformanceData?.partnerPerformance?.totalEarnings || 0)}`}
           icon={EuroIcon}
           delay={0}
         />
@@ -141,7 +80,7 @@ export default function DeliveryPartnerPerformanceDetails() {
               Orders Performance
             </h3>
             <p className="text-sm text-gray-500">
-              Daily performance over the past week
+              Monthly performance over the last 6 months
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm">
@@ -152,9 +91,10 @@ export default function DeliveryPartnerPerformanceDetails() {
           </div>
         </div>
         <AnalyticsChart
-          data={weeklyEarnings}
+          data={partnerPerformanceData?.partnerMonthlyPerformance}
           type="bar"
-          dataKey="orders"
+          dataKey="totalOrders"
+          xKey="month"
           height={300}
         />
       </motion.div>

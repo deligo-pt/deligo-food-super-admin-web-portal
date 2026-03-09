@@ -80,7 +80,7 @@ export default function CustomerInsights({ insights }: IProps) {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
       >
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-blue-400 to-blue-600 absolute top-0 left-0" />
+          <div className="h-1.5 w-full bg-linear-to-r from-blue-400 to-blue-600 absolute top-0 left-0" />
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
               <UsersIcon className="w-5 h-5" />
@@ -98,7 +98,7 @@ export default function CustomerInsights({ insights }: IProps) {
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-purple-400 to-purple-600 absolute top-0 left-0" />
+          <div className="h-1.5 w-full bg-linear-to-r from-purple-400 to-purple-600 absolute top-0 left-0" />
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-purple-50 rounded-lg text-purple-600">
               <RepeatIcon className="w-5 h-5" />
@@ -114,7 +114,7 @@ export default function CustomerInsights({ insights }: IProps) {
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-amber-600 absolute top-0 left-0" />
+          <div className="h-1.5 w-full bg-linear-to-r from-amber-400 to-amber-600 absolute top-0 left-0" />
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
               <MapPinIcon className="w-5 h-5" />
@@ -130,7 +130,7 @@ export default function CustomerInsights({ insights }: IProps) {
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
+          <div className="h-1.5 w-full bg-linear-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-[#DC3173]/10 rounded-lg text-[#DC3173]">
               <UserPlusIcon className="w-5 h-5" />
@@ -158,7 +158,7 @@ export default function CustomerInsights({ insights }: IProps) {
               Demographics by City
             </h2>
           </div>
-          <div className="h-[240px] w-full">
+          <div className="h-60 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -275,7 +275,7 @@ export default function CustomerInsights({ insights }: IProps) {
               }}
               className="flex items-center gap-4 p-5 bg-[#DC3173]/5 rounded-2xl border border-[#DC3173]/15"
             >
-              <div className="w-12 h-12 rounded-xl bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] shrink-0">
                 <MapPinIcon className="w-6 h-6" />
               </div>
               <div>
