@@ -27,6 +27,7 @@ interface IProps {
   height?: number;
   showGrid?: boolean;
   showAxis?: boolean;
+  xInterval?: number;
 }
 
 const BRAND_COLOR = "#DC3173";
@@ -48,6 +49,7 @@ export default function AnalyticsChart({
   height = 200,
   showGrid = true,
   showAxis = true,
+  xInterval = 0,
 }: IProps) {
   return (
     <motion.div
@@ -116,6 +118,7 @@ export default function AnalyticsChart({
                   fontSize: 12,
                 }}
                 stroke="#94a3b8"
+                interval={xInterval}
               />
             )}
             {showAxis && (
