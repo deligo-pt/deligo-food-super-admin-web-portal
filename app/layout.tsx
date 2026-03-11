@@ -1,3 +1,4 @@
+import NumberInputStopScroll from "@/components/NumberInputStopScroll/NumberInputStopScroll";
 import SonnerToaster from "@/components/SonnerToaster/SonnerToaster";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className={`antialiased`}>
         {children}
         <SonnerToaster />
+        <NumberInputStopScroll />
       </body>
     </html>
   );
