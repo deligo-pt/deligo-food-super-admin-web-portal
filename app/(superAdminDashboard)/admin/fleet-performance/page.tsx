@@ -30,7 +30,7 @@ export default async function FleetPerformancePage({ searchParams }: IProps) {
 
   try {
     const result = (await serverRequest.get(
-      "/analytics/fleet-performance-analytics",
+      "/analytics/admin/fleet-performance-analytics",
       {
         params: query,
       },

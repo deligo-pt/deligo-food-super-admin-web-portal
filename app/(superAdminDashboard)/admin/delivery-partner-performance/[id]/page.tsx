@@ -14,7 +14,7 @@ export default async function DeliveryPartnerPerformanceDetailsPage({
 
   try {
     const result = (await serverRequest.get(
-      `/analytics/delivery-partner-performance-details-analytics/${id}`,
+      `/analytics/admin/delivery-partner-performance-details-analytics/${id}`,
     )) as TResponse<TPartnerPerformanceDetailsData>;
 
     if (result?.success) {

@@ -6,7 +6,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TPartnerPerformanceDetailsData } from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
-import { BikeIcon, EuroIcon, Star, TruckIcon } from "lucide-react";
+import { EuroIcon, Star, TruckIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface IProps {
@@ -28,7 +28,7 @@ export default function DeliveryPartnerPerformanceDetails({
       />
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatsCard
           title="Total Deliveries"
           value={
@@ -36,14 +36,6 @@ export default function DeliveryPartnerPerformanceDetails({
           }
           icon={TruckIcon}
           delay={0.1}
-        />
-        <StatsCard
-          title="Completed Deliveries"
-          value={
-            partnerPerformanceData?.partnerPerformance?.completedDeliveries || 0
-          }
-          icon={BikeIcon}
-          delay={0.3}
         />
         <StatsCard
           title="Avg Rating"

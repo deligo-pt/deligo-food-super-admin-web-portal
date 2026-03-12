@@ -7,7 +7,7 @@ export default async function SalesAnalyticsPage() {
 
   try {
     const result = await serverRequest.get(
-      "/analytics/admin-vendor-sales-analytics",
+      "/analytics/admin/vendor-sales-analytics",
     );
 
     if (result?.success) {

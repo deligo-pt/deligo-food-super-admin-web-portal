@@ -32,7 +32,7 @@ export default async function DeliveryPartnerPerformancePage({
 
   try {
     const result = (await serverRequest.get(
-      "/analytics/delivery-partner-performance-analytics",
+      "/analytics/admin/delivery-partner-performance-analytics",
       {
         params: query,
       },

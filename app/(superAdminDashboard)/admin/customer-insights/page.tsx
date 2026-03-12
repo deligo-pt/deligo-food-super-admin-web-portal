@@ -6,7 +6,9 @@ export default async function CustomerInsightsPage() {
   let data: TCustomerInsights = {} as TCustomerInsights;
 
   try {
-    const result = await serverRequest.get("/analytics/customer-insights");
+    const result = await serverRequest.get(
+      "/analytics/admin/customer-insights",
+    );
 
     if (result?.success) {
       data = result?.data;

@@ -14,7 +14,7 @@ export default async function fleetPerformanceDetailsPage({
 
   try {
     const result = (await serverRequest.get(
-      `/analytics/fleet-performance-details-analytics/${id}`,
+      `/analytics/admin/fleet-performance-details-analytics/${id}`,
     )) as TResponse<TFleetPerformanceDetailsData>;
 
     if (result?.success) {

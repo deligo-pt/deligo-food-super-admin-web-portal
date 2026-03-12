@@ -8,27 +8,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TPlaformEarningsData } from "@/types/payment.type";
 import { formatPrice } from "@/utils/formatPrice";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
+  CalendarIcon,
+  CircleCheckBig,
   EuroIcon,
+  FileTextIcon,
   HashIcon,
-  PercentIcon,
-  ShoppingBagIcon,
+  StoreIcon,
   UserIcon,
 } from "lucide-react";
 
 interface IProps {
-  commissions: TPlaformEarningsData["commissions"];
+  disputes: {
+    _id: string;
+    disputeId: string;
+    desc: string;
+    vendor: string;
+    customer: string;
+    amount: number;
+    status: string;
+
+    createdAt: string;
+    updatedAt: string;
+  }[];
 }
 
-export default function PlatformEarningsTable({ commissions }: IProps) {
+export default function PaymentDisputeTable({ disputes }: IProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white mb-2 overflow-x-auto"
+      className="mb-2 overflow-x-auto"
     >
       <Table className="max-w-full">
         <TableHeader>
@@ -36,7 +49,19 @@ export default function PlatformEarningsTable({ commissions }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Transaction ID
+                Dispute ID
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
+                <FileTextIcon className="w-4" />
+                Description
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
+                <StoreIcon className="w-4" />
+                Vendor
               </div>
             </TableHead>
             <TableHead>
@@ -47,44 +72,44 @@ export default function PlatformEarningsTable({ commissions }: IProps) {
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <ShoppingBagIcon className="w-4" />
-                Order ID
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
                 Amount
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <PercentIcon className="w-4" />
-                Platform Fee
+                <CircleCheckBig className="w-4" />
+                Status
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
+                <CalendarIcon className="w-4" />
+                Date
               </div>
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {commissions?.length === 0 && (
+          {disputes?.length === 0 && (
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={5}
+                colSpan={7}
               >
-                No commissions found
+                No disputes found
               </TableCell>
             </TableRow>
           )}
-          {commissions?.map((c) => (
-            <TableRow key={c._id}>
-              <TableCell>{c.transactionId}</TableCell>
-              <TableCell>
-                {c.customer?.name?.firstName} {c.customer?.name?.lastName}
-              </TableCell>
-              <TableCell>{c.orderId}</TableCell>
-              <TableCell>€{formatPrice(c.amount || 0)}</TableCell>
-              <TableCell>€{formatPrice(c.platformFee || 0)}</TableCell>
+          {disputes?.map((d) => (
+            <TableRow key={d._id}>
+              <TableCell>{d.disputeId}</TableCell>
+              <TableCell>{d.desc}</TableCell>
+              <TableCell>{d.vendor}</TableCell>
+              <TableCell>{d.customer}</TableCell>
+              <TableCell>€{formatPrice(d.amount || 0)}</TableCell>
+              <TableCell>{d.status}</TableCell>
+              <TableCell>{format(d.createdAt, "do MMM yyyy")}</TableCell>
             </TableRow>
           ))}
         </TableBody>
