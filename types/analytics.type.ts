@@ -82,13 +82,13 @@ export type TSalesAnalytics = {
 };
 
 type TDemographic = {
-  name: string;
-  value: number;
+  city: string;
+  percentage: string;
 };
 
-type TCustomerValueSegment = {
-  segment: string;
-  avgOrder: string;
+type TOrderFrequency = {
+  name: "weekly" | "biweekly" | "monthly";
+  orders: number;
 };
 
 type TOrderHeatmap = {
@@ -116,8 +116,8 @@ export type TCustomerInsights = {
       subValue: string;
     };
   };
+  orderFrequency: TOrderFrequency[];
   demographics: TDemographic[];
-  customerValue: TCustomerValueSegment[];
   heatmap: TOrderHeatmap[];
 };
 
@@ -136,4 +136,46 @@ export type TTopVendorData = {
     thisMonthTopRevenue: number;
   };
   topVendors: TTopVendor[];
+};
+
+export type TPeakHourData = {
+  stats: {
+    peakHour: string;
+    busiestDay: string;
+    avgOrdersPerHour: number;
+  };
+
+  weeklyHourlyOrders: {
+    day: string;
+    hourlyData: { hour: string; orders: number }[];
+  }[];
+
+  weeklyHourlyMaxOrdersCount: number;
+
+  prevDayDistribution: { hour: string; orders: number }[];
+
+  weekDaysOrders: {
+    day: string;
+    orders: number;
+  }[];
+};
+
+export type TDeliveryInsightsData = {
+  stats: {
+    totalDeliveries: number;
+    avgDeliveryTime: number;
+    onTimeRate: number;
+    deliveriesToday: number;
+  };
+  avgDeliveryTime: {
+    day: string;
+    time: number;
+  }[];
+  topRiders: {
+    name: string;
+    deliveries: number;
+    avgTime: string;
+    rating: number;
+    onTime: string;
+  }[];
 };

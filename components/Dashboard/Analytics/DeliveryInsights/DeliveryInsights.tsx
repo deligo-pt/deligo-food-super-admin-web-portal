@@ -3,6 +3,7 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { TDeliveryInsightsData } from "@/types/analytics.type";
 import { motion, Variants } from "framer-motion";
 import {
   CheckCircle2Icon,
@@ -13,83 +14,11 @@ import {
   UsersIcon,
 } from "lucide-react";
 
-const analyticsData = {
-  stats: {
-    totalDeliveries: 600,
-    avgDeliveryTime: 28,
-    onTimeRate: 95,
-    deliveriesToday: 20,
-  },
-  avgDeliveryTime: [
-    {
-      day: "Sun",
-      time: 18,
-    },
-    {
-      day: "Mon",
-      time: 27,
-    },
-    {
-      day: "Tue",
-      time: 9,
-    },
-    {
-      day: "Wed",
-      time: 32,
-    },
-    {
-      day: "Thu",
-      time: 35,
-    },
-    {
-      day: "Fri",
-      time: 10,
-    },
-    {
-      day: "Sat",
-      time: 26,
-    },
-  ],
-  topRiders: [
-    {
-      name: "Mike Chen",
-      deliveries: 48,
-      avgTime: "22 min",
-      rating: 4.9,
-      onTime: "98%",
-    },
-    {
-      name: "Sara Lopez",
-      deliveries: 42,
-      avgTime: "24 min",
-      rating: 4.8,
-      onTime: "96%",
-    },
-    {
-      name: "Ahmed Hassan",
-      deliveries: 39,
-      avgTime: "25 min",
-      rating: 4.7,
-      onTime: "95%",
-    },
-    {
-      name: "Lisa Park",
-      deliveries: 35,
-      avgTime: "26 min",
-      rating: 4.8,
-      onTime: "94%",
-    },
-    {
-      name: "Tom Wilson",
-      deliveries: 31,
-      avgTime: "28 min",
-      rating: 4.6,
-      onTime: "92%",
-    },
-  ],
-};
+interface IProps {
+  analyticsData: TDeliveryInsightsData;
+}
 
-export default function DeliveryInsights() {
+export default function DeliveryInsights({ analyticsData }: IProps) {
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -172,7 +101,7 @@ export default function DeliveryInsights() {
             Average Delivery Time
           </h3>
           <p className="text-sm text-gray-500 mb-6">
-            Last 7 days&lsquo; average delivery time
+            Last 7 days&lsquo; average delivery time in minutes
           </p>
           <AnalyticsChart
             data={analyticsData.avgDeliveryTime || []}

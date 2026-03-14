@@ -4,7 +4,9 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TCustomerInsights } from "@/types/analytics.type";
 import { motion, Variants } from "framer-motion";
 import {
-  CrownIcon,
+  CalendarCheckIcon,
+  CalendarDaysIcon,
+  CalendarSyncIcon,
   MapPinIcon,
   RepeatIcon,
   UserPlusIcon,
@@ -18,6 +20,12 @@ interface IProps {
 }
 
 const COLORS = ["#DC3173", "#e45a92", "#f9a8d4", "#fbcfe8"];
+
+const orderFrequencyColor = {
+  weekly: "#DC3173",
+  biweekly: "#2563EB",
+  monthly: "#D97706",
+};
 
 export default function CustomerInsights({ insights }: IProps) {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -158,17 +166,22 @@ export default function CustomerInsights({ insights }: IProps) {
               Demographics by City
             </h2>
           </div>
-          <div className="h-60 w-full">
+          <div className="h-[240px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={insights.demographics}
+                  data={
+                    insights.demographics?.map(({ city, percentage }) => ({
+                      city,
+                      percentage: Number(percentage?.replace("%", "")),
+                    })) || []
+                  }
                   cx="50%"
                   cy="50%"
                   innerRadius={65}
                   outerRadius={100}
                   paddingAngle={4}
-                  dataKey="value"
+                  dataKey="percentage"
                   animationBegin={0}
                   animationDuration={1200}
                 >
@@ -186,14 +199,19 @@ export default function CustomerInsights({ insights }: IProps) {
                     boxShadow: "0 4px 6px -1px rgba(0,0,0,0.07)",
                   }}
                   formatter={
-                    ((value: number) => [`${value}%`, "Share"]) as Formatter<
-                      number,
-                      "Share"
-                    >
+                    ((value: number, ...rest) => [
+                      `${value}%`,
+                      rest?.[1]?.payload?.city || "City",
+                    ]) as Formatter<number, "Share">
                   }
                 />
               </PieChart>
             </ResponsiveContainer>
+            {insights.demographics?.length === 0 && (
+              <div className="flex items-center justify-center text-sm text-gray-400 h-full">
+                No data available
+              </div>
+            )}
           </div>
           <div className="flex justify-center gap-6 mt-2">
             {insights.demographics?.map((entry, index) => (
@@ -204,9 +222,9 @@ export default function CustomerInsights({ insights }: IProps) {
                     backgroundColor: COLORS[index % COLORS.length],
                   }}
                 />
-                {entry.value && (
+                {entry.percentage && (
                   <span className="text-sm text-gray-600 font-medium">
-                    {entry.name} ({entry.value}%)
+                    {entry.city} ({entry.percentage})
                   </span>
                 )}
               </div>
@@ -214,38 +232,69 @@ export default function CustomerInsights({ insights }: IProps) {
           </div>
         </motion.div>
 
-        {/* Customer Value Segments */}
+        {/* Order Frequency */}
         <motion.div
           variants={itemVariants}
           className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8"
         >
           <div className="flex items-center gap-3 mb-6">
-            <CrownIcon className="w-6 h-6 text-[#DC3173]" />
-            <h2 className="text-xl font-bold text-gray-900">Customer Value</h2>
+            <RepeatIcon className="w-6 h-6 text-[#DC3173]" />
+            <h2 className="text-xl font-bold text-gray-900">Order Frequency</h2>
           </div>
           <div className="space-y-4">
-            {insights.customerValue?.map((segment, index) => (
-              <div
-                key={index}
-                className="bg-gray-50 rounded-xl p-4 border border-gray-100 flex justify-between items-center"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] font-bold text-sm">
-                    {index + 1}
+            {insights.orderFrequency?.map((item, index) => {
+              console.log(orderFrequencyColor?.[item.name]);
+              return (
+                <motion.div
+                  key={index}
+                  initial={{
+                    opacity: 0,
+                    x: -12,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                  }}
+                  transition={{
+                    delay: 0.2 + index * 0.12,
+                  }}
+                  className={`p-4 rounded-2xl border border-gray-100`}
+                  style={{
+                    backgroundColor: `${orderFrequencyColor?.[item.name]}0F`,
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">
+                        {item.name === "weekly" && "Weekly Orders"}
+                        {item.name === "biweekly" && "Bi-Weekly Orders"}
+                        {item.name === "monthly" && "Monthly Orders"}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {item.orders} orders
+                      </p>
+                    </div>
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center`}
+                      style={{
+                        backgroundColor: `${orderFrequencyColor?.[item.name]}1F`,
+                        color: orderFrequencyColor?.[item.name],
+                      }}
+                    >
+                      {item.name === "weekly" && <CalendarDaysIcon />}
+                      {item.name === "biweekly" && <CalendarSyncIcon />}
+                      {item.name === "monthly" && <CalendarCheckIcon />}
+                    </div>
                   </div>
-                  <span className="font-medium text-gray-900">
-                    {segment.segment}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs text-gray-400 mb-0.5">Avg Order</div>
-                  <div className="font-bold text-[#DC3173]">
-                    {segment.avgOrder}
-                  </div>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
+          {insights.orderFrequency?.length === 0 && (
+            <div className="flex items-center justify-center text-sm text-gray-400 h-full">
+              No data available
+            </div>
+          )}
         </motion.div>
       </div>
 
@@ -292,6 +341,9 @@ export default function CustomerInsights({ insights }: IProps) {
             </motion.div>
           ))}
         </div>
+        {insights.heatmap?.length === 0 && (
+          <p className="text-center text-gray-400">No data available</p>
+        )}
       </motion.div>
     </motion.div>
   );

@@ -5,7 +5,6 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
-import { USER_ROLE } from "@/consts/user.const";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
 import { getMessagesByRoom } from "@/services/chat/chat";
@@ -88,6 +87,8 @@ export default function SupportTickets({ conversationsData }: IProps) {
       const result = (await fetchData(`/support/conversations/${room}`, {
         headers: { authorization: accessToken },
       })) as TResponse<TConversation>;
+
+      console.log(result);
 
       if (result.success) {
         return {
@@ -213,11 +214,10 @@ export default function SupportTickets({ conversationsData }: IProps) {
                   {c.participants?.[0]?.name?.trim() || t("no_name_provided")}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {c.participants?.[0]?.role === USER_ROLE.VENDOR
-                    ? t("vendor")
-                    : c.participants?.[0]?.role === USER_ROLE.FLEET_MANAGER
-                      ? t("fleet_manager")
-                      : t("user")}
+                  {c.participants?.[0]?.role
+                    ?.split("_")
+                    .map((r) => r.charAt(0) + r.slice(1).toLowerCase())
+                    .join(" ")}
                 </p>
                 <p className="text-xs text-gray-500">
                   {formatDistanceToNow(c.createdAt as Date, {
