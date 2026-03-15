@@ -1,6 +1,10 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { Button } from "@/components/ui/button";
+import { USER_ROLE } from "@/consts/user.const";
+import { getAllUsersReq } from "@/services/dashboard/system-management/email-notification-settings";
+import { TMeta } from "@/types";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import {
   BellIcon,
@@ -9,6 +13,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   EyeIcon,
+  LoaderCircleIcon,
   MailIcon,
   SearchIcon,
   SendIcon,
@@ -20,115 +25,20 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
-const USERS_DATA = {
-  VENDOR: [
-    {
-      id: "v1",
-      name: "Fresh Bites Cafe",
-      email: "fresh@bites.com",
-    },
-    {
-      id: "v2",
-      name: "Pizza Palace",
-      email: "info@pizza.com",
-    },
-    {
-      id: "v3",
-      name: "Green Grocery",
-      email: "hello@green.com",
-    },
-    {
-      id: "v4",
-      name: "Sushi Express",
-      email: "sushi@express.com",
-    },
-    {
-      id: "v5",
-      name: "Burger Hub",
-      email: "contact@burger.com",
-    },
-  ],
-  CUSTOMER: [
-    {
-      id: "c1",
-      name: "Sarah Johnson",
-      email: "sarah.j@email.com",
-    },
-    {
-      id: "c2",
-      name: "Maria Santos",
-      email: "maria.s@email.com",
-    },
-    {
-      id: "c3",
-      name: "João Silva",
-      email: "joao@email.com",
-    },
-    {
-      id: "c4",
-      name: "Ana Costa",
-      email: "ana.c@email.com",
-    },
-    {
-      id: "c5",
-      name: "Pedro Lima",
-      email: "pedro@email.com",
-    },
-    {
-      id: "c6",
-      name: "Sofia Reis",
-      email: "sofia@email.com",
-    },
-  ],
-  DELIVERY_PARTNER: [
-    {
-      id: "d1",
-      name: "Mike Chen",
-      email: "mike@delivery.com",
-    },
-    {
-      id: "d2",
-      name: "Sara Lopez",
-      email: "sara@delivery.com",
-    },
-    {
-      id: "d3",
-      name: "Ahmed Hassan",
-      email: "ahmed@delivery.com",
-    },
-    {
-      id: "d4",
-      name: "Lisa Park",
-      email: "lisa@delivery.com",
-    },
-  ],
-  FLEET_MANAGER: [
-    {
-      id: "f1",
-      name: "James Wilson",
-      email: "james@fleet.com",
-    },
-    {
-      id: "f2",
-      name: "Emma Brown",
-      email: "emma@fleet.com",
-    },
-  ],
-  ADMIN: [
-    {
-      id: "a1",
-      name: "Super Admin",
-      email: "admin@platform.com",
-    },
-    {
-      id: "a2",
-      name: "Ops Manager",
-      email: "ops@platform.com",
-    },
-  ],
+type TUser = {
+  _id: string;
+  name: {
+    firstName: string;
+    lastName: string;
+  };
+  email: string;
+  contactNumber: string;
 };
 
-type RoleType = keyof typeof USERS_DATA;
+type RoleType = keyof Pick<
+  typeof USER_ROLE,
+  "ADMIN" | "CUSTOMER" | "FLEET_MANAGER" | "VENDOR" | "DELIVERY_PARTNER"
+>;
 
 const ROLES = [
   {
@@ -196,6 +106,15 @@ export default function BroadcastCenter() {
     FLEET_MANAGER: "all",
     ADMIN: "all",
   });
+  const [usersData, setUsersData] = useState<
+    Record<RoleType, { data: TUser[]; meta?: TMeta }>
+  >({
+    VENDOR: { data: [] },
+    CUSTOMER: { data: [] },
+    DELIVERY_PARTNER: { data: [] },
+    FLEET_MANAGER: { data: [] },
+    ADMIN: { data: [] },
+  });
   const [selectedUsers, setSelectedUsers] = useState<
     Record<RoleType, Set<string>>
   >({
@@ -205,15 +124,13 @@ export default function BroadcastCenter() {
     FLEET_MANAGER: new Set(),
     ADMIN: new Set(),
   });
-
-  //   const [searchQueries, setSearchQueries] = useState<Record<RoleType, string>>({
-  //     VENDOR: "",
-  //     CUSTOMER: "",
-  //     DELIVERY_PARTNER: "",
-  //     FLEET_MANAGER: "",
-  //     ADMIN: "",
-  //   });
-
+  const [searchQueries, setSearchQueries] = useState<Record<RoleType, string>>({
+    VENDOR: "",
+    CUSTOMER: "",
+    DELIVERY_PARTNER: "",
+    FLEET_MANAGER: "",
+    ADMIN: "",
+  });
   const [expandedPanels, setExpandedPanels] = useState<
     Record<RoleType, boolean>
   >({
@@ -228,6 +145,15 @@ export default function BroadcastCenter() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [userDataLoading, setUserDataLoading] = useState<
+    Record<RoleType, boolean>
+  >({
+    VENDOR: false,
+    CUSTOMER: false,
+    DELIVERY_PARTNER: false,
+    FLEET_MANAGER: false,
+    ADMIN: false,
+  });
 
   const toggleRole = (roleId: RoleType) => {
     setSelectedRoles((prev) =>
@@ -265,7 +191,22 @@ export default function BroadcastCenter() {
     },
   } as Variants;
 
-  const setTargetMode = (roleId: RoleType, mode: "all" | "specific") => {
+  const getUsers = async (roleId: RoleType, limit: number = 10) => {
+    const resultData = await getAllUsersReq({
+      limit,
+      role: roleId,
+      searchTerm: searchQueries[roleId],
+    });
+
+    setUsersData((prev) => ({
+      ...prev,
+      [roleId]: resultData,
+    }));
+
+    setUserDataLoading((prev) => ({ ...prev, [roleId]: false }));
+  };
+
+  const handleTargetMode = (roleId: RoleType, mode: "all" | "specific") => {
     setTargetModes((prev) => ({
       ...prev,
       [roleId]: mode,
@@ -275,6 +216,9 @@ export default function BroadcastCenter() {
         ...prev,
         [roleId]: true,
       }));
+
+      setUserDataLoading((prev) => ({ ...prev, [roleId]: true }));
+      getUsers(roleId);
     }
   };
 
@@ -532,7 +476,7 @@ export default function BroadcastCenter() {
                       const roleDef = ROLES.find((r) => r.id === roleId)!;
                       const colors = getColorClasses(roleDef.color);
                       const mode = targetModes[roleId];
-                      const users = USERS_DATA[roleId];
+                      const users = usersData?.[roleId] || [];
                       const filteredUsers = users;
                       const isExpanded = expandedPanels[roleId];
                       const selectedCount = selectedUsers[roleId].size;
@@ -575,14 +519,14 @@ export default function BroadcastCenter() {
 
                             <div className="flex bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
                               <button
-                                onClick={() => setTargetMode(roleId, "all")}
+                                onClick={() => handleTargetMode(roleId, "all")}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "all" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"}`}
                               >
                                 All Users
                               </button>
                               <button
                                 onClick={() =>
-                                  setTargetMode(roleId, "specific")
+                                  handleTargetMode(roleId, "specific")
                                 }
                                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "specific" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"}`}
                               >
@@ -613,13 +557,13 @@ export default function BroadcastCenter() {
                                       <input
                                         type="text"
                                         placeholder={`Search ${roleDef.label.toLowerCase()}...`}
-                                        // value={searchQueries[roleId]}
-                                        // onChange={(e) =>
-                                        //   setSearchQueries((prev) => ({
-                                        //     ...prev,
-                                        //     [roleId]: e.target.value,
-                                        //   }))
-                                        // }
+                                        value={searchQueries[roleId]}
+                                        onChange={(e) =>
+                                          setSearchQueries((prev) => ({
+                                            ...prev,
+                                            [roleId]: e.target.value,
+                                          }))
+                                        }
                                         className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
                                       />
                                     </div>
@@ -627,14 +571,16 @@ export default function BroadcastCenter() {
                                       onClick={() =>
                                         toggleAllUsers(
                                           roleId,
-                                          filteredUsers.map((u) => u.id),
+                                          filteredUsers?.data?.map(
+                                            (u) => u._id,
+                                          ),
                                         )
                                       }
                                       className="text-xs font-medium text-gray-600 hover:text-gray-900 px-3 py-2 bg-gray-100 rounded-lg"
                                     >
-                                      {filteredUsers.every((u) =>
-                                        selectedUsers[roleId].has(u.id),
-                                      ) && filteredUsers.length > 0
+                                      {filteredUsers?.data?.every((u) =>
+                                        selectedUsers[roleId].has(u._id),
+                                      ) && filteredUsers?.data?.length > 0
                                         ? "Deselect All"
                                         : "Select All"}
                                     </button>
@@ -656,62 +602,112 @@ export default function BroadcastCenter() {
                                   </div>
 
                                   <AnimatePresence>
-                                    {isExpanded && (
-                                      <motion.div
-                                        initial={{
-                                          opacity: 0,
-                                        }}
-                                        animate={{
-                                          opacity: 1,
-                                        }}
-                                        exit={{
-                                          opacity: 0,
-                                        }}
-                                        className="max-h-[240px] overflow-y-auto pr-2 space-y-1 custom-scrollbar"
-                                      >
-                                        {filteredUsers.length === 0 ? (
-                                          <p className="text-sm text-gray-500 text-center py-4">
-                                            No users found.
-                                          </p>
-                                        ) : (
-                                          filteredUsers.map((user) => {
-                                            const isUserSelected =
-                                              selectedUsers[roleId].has(
-                                                user.id,
-                                              );
-                                            return (
-                                              <div
-                                                key={user.id}
-                                                onClick={() =>
-                                                  toggleUser(roleId, user.id)
-                                                }
-                                                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${isUserSelected ? colors.lightBg : "hover:bg-gray-50"}`}
-                                              >
+                                    {isExpanded &&
+                                      (userDataLoading[roleId] ? (
+                                        <motion.div
+                                          initial={{
+                                            opacity: 0,
+                                          }}
+                                          animate={{
+                                            opacity: 1,
+                                          }}
+                                          exit={{
+                                            opacity: 0,
+                                          }}
+                                          className="max-h-[240px] flex justify-center items-center"
+                                        >
+                                          <LoaderCircleIcon className="w-6 h-6 text-gray-400 animate-spin" />
+                                        </motion.div>
+                                      ) : (
+                                        <motion.div
+                                          initial={{
+                                            opacity: 0,
+                                          }}
+                                          animate={{
+                                            opacity: 1,
+                                          }}
+                                          exit={{
+                                            opacity: 0,
+                                          }}
+                                          className="max-h-[240px] overflow-y-auto pr-2 space-y-1 custom-scrollbar"
+                                        >
+                                          {filteredUsers?.meta?.total === 0 ? (
+                                            <p className="text-sm text-gray-500 text-center py-4">
+                                              No users found.
+                                            </p>
+                                          ) : (
+                                            filteredUsers?.data?.map((user) => {
+                                              const isUserSelected =
+                                                selectedUsers[roleId].has(
+                                                  user._id,
+                                                );
+                                              return (
                                                 <div
-                                                  className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${isUserSelected ? `${colors.bg} border-transparent` : "border-gray-300 bg-white"}`}
+                                                  key={user._id}
+                                                  onClick={() =>
+                                                    toggleUser(roleId, user._id)
+                                                  }
+                                                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${isUserSelected ? colors.lightBg : "hover:bg-gray-50"}`}
                                                 >
-                                                  {isUserSelected && (
-                                                    <CheckIcon className="w-3 h-3 text-white" />
-                                                  )}
+                                                  <div
+                                                    className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${isUserSelected ? `${colors.bg} border-transparent` : "border-gray-300 bg-white"}`}
+                                                  >
+                                                    {isUserSelected && (
+                                                      <CheckIcon className="w-3 h-3 text-white" />
+                                                    )}
+                                                  </div>
+                                                  <Avatar
+                                                    name={`${user.name?.firstName} ${user.name?.lastName}`}
+                                                    colorClass={`${colors.lightBg} ${colors.text}`}
+                                                  />
+                                                  <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                                      {!user.name?.firstName &&
+                                                        !user.name?.lastName &&
+                                                        "N/A"}
+                                                      {user.name?.firstName}{" "}
+                                                      {user.name?.lastName}
+                                                    </p>
+                                                    {roleId === "CUSTOMER" ? (
+                                                      <p className="text-xs text-gray-500 truncate">
+                                                        {user.contactNumber ||
+                                                          user.email ||
+                                                          "-"}
+                                                      </p>
+                                                    ) : (
+                                                      <p className="text-xs text-gray-500 truncate">
+                                                        {user.email ||
+                                                          user.contactNumber ||
+                                                          "-"}
+                                                      </p>
+                                                    )}
+                                                  </div>
                                                 </div>
-                                                <Avatar
-                                                  name={user.name}
-                                                  colorClass={`${colors.lightBg} ${colors.text}`}
-                                                />
-                                                <div className="flex-1 min-w-0">
-                                                  <p className="text-sm font-medium text-gray-900 truncate">
-                                                    {user.name}
-                                                  </p>
-                                                  <p className="text-xs text-gray-500 truncate">
-                                                    {user.email}
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            );
-                                          })
-                                        )}
-                                      </motion.div>
-                                    )}
+                                              );
+                                            })
+                                          )}
+                                          {(usersData?.[roleId]?.meta?.limit ||
+                                            10) <
+                                            (usersData?.[roleId]?.meta?.total ||
+                                              0) && (
+                                            <div className="text-center mt-2">
+                                              <Button
+                                                onClick={() =>
+                                                  getUsers(
+                                                    roleId,
+                                                    (usersData?.[roleId]?.meta
+                                                      ?.limit || 10) + 10,
+                                                  )
+                                                }
+                                                size="sm"
+                                                className={`text-xs cursor-pointer hover:opacity-90 ${colors.bg} hover:${colors.bg} transition-colors`}
+                                              >
+                                                Show More
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </motion.div>
+                                      ))}
                                   </AnimatePresence>
                                 </div>
                               </motion.div>

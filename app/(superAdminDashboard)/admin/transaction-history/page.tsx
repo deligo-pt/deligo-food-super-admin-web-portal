@@ -24,15 +24,17 @@ export default async function TransactionsPage({ searchParams }: IProps) {
 
   const initialData: { data: TTransaction[]; meta?: TMeta } = { data: [] };
 
-  const result = await catchAsync<TTransaction[]>(async () => {
-    return await serverRequest.get("/transactions", {
-      params: query,
-    });
-  });
+  const result = await catchAsync<{ data: TTransaction[]; meta?: TMeta }>(
+    async () => {
+      return await serverRequest.get("/transactions", {
+        params: query,
+      });
+    },
+  );
 
   if (result?.success) {
-    initialData.data = result.data;
-    initialData.meta = result.meta;
+    initialData.data = result.data?.data;
+    initialData.meta = result.data?.meta;
   }
 
   return <Transactions transactionsResult={initialData} />;

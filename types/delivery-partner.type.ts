@@ -179,3 +179,21 @@ export type TDeliveryPartnersQueryParams = {
   sortBy?: string;
   status?: string;
 };
+
+export type TDeliveryPartnerActivityType =
+  | "pickup"
+  | "delivery"
+  | "online"
+  | "offline"
+  | "break"
+  | "location";
+
+export type TDeliveryPartnerActivity = {
+  _id: string;
+  type: TDeliveryPartnerActivityType;
+  description: string;
+  timestamp: Date;
+  location?: string;
+  createdAt: string;
+  updatedAt: string;
+};

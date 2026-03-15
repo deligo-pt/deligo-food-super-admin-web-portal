@@ -167,47 +167,48 @@ export default function CustomerInsights({ insights }: IProps) {
             </h2>
           </div>
           <div className="h-[240px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={
-                    insights.demographics?.map(({ city, percentage }) => ({
-                      city,
-                      percentage: Number(percentage?.replace("%", "")),
-                    })) || []
-                  }
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={65}
-                  outerRadius={100}
-                  paddingAngle={4}
-                  dataKey="percentage"
-                  animationBegin={0}
-                  animationDuration={1200}
-                >
-                  {insights.demographics?.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "1px solid #E5E7EB",
-                    boxShadow: "0 4px 6px -1px rgba(0,0,0,0.07)",
-                  }}
-                  formatter={
-                    ((value: number, ...rest) => [
-                      `${value}%`,
-                      rest?.[1]?.payload?.city || "City",
-                    ]) as Formatter<number, "Share">
-                  }
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            {insights.demographics?.length === 0 && (
+            {insights.demographics?.length !== 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={
+                      insights.demographics?.map(({ city, percentage }) => ({
+                        city,
+                        percentage: Number(percentage?.replace("%", "")),
+                      })) || []
+                    }
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={65}
+                    outerRadius={100}
+                    paddingAngle={4}
+                    dataKey="percentage"
+                    animationBegin={0}
+                    animationDuration={1200}
+                  >
+                    {insights.demographics?.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "12px",
+                      border: "1px solid #E5E7EB",
+                      boxShadow: "0 4px 6px -1px rgba(0,0,0,0.07)",
+                    }}
+                    formatter={
+                      ((value: number, ...rest) => [
+                        `${value}%`,
+                        rest?.[1]?.payload?.city || "City",
+                      ]) as Formatter<number, "Share">
+                    }
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
               <div className="flex items-center justify-center text-sm text-gray-400 h-full">
                 No data available
               </div>
