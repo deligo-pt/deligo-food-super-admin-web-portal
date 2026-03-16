@@ -399,9 +399,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               <div className="mb-2 text-gray-500 text-sm">
                 {t("id_proof_front")}
               </div>
-              {partner.documents?.idDocumentFront ? (
+              {partner.documents?.idProofFront ? (
                 <ImagePreview
-                  url={partner.documents.idDocumentFront}
+                  url={partner.documents.idProofFront}
                   alt="ID Proof Front"
                 />
               ) : (
@@ -413,9 +413,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               <div className="mb-2 text-gray-500 text-sm">
                 {t("id_proof_back")}
               </div>
-              {partner.documents?.idDocumentBack ? (
+              {partner.documents?.idProofBack ? (
                 <ImagePreview
-                  url={partner.documents.idDocumentBack}
+                  url={partner.documents.idProofBack}
                   alt="ID Proof Back"
                 />
               ) : (
@@ -425,17 +425,32 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
 
             <div>
               <div className="mb-2 text-gray-500 text-sm">
-                {t("driving_license")}
+                Driving License Front
               </div>
-              {partner.documents?.drivingLicense ? (
+              {partner.documents?.drivingLicenseFront ? (
                 <ImagePreview
-                  url={partner.documents.drivingLicense}
-                  alt="Driving License"
+                  url={partner.documents.drivingLicenseFront}
+                  alt="Driving License Front"
                 />
               ) : (
                 <p className="text-gray-700">N/A</p>
               )}
             </div>
+
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">
+                Driving License Back
+              </div>
+              {partner.documents?.drivingLicenseBack ? (
+                <ImagePreview
+                  url={partner.documents.drivingLicenseBack}
+                  alt="Driving License Back"
+                />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+
             <div>
               <div className="mb-2 text-gray-500 text-sm">
                 {t("vehicle_registration")}
@@ -459,6 +474,36 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                   url={partner.documents.criminalRecordCertificate}
                   alt="Criminal Record"
                 />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">Activity</div>
+              {partner.documents?.activity ? (
+                <ImagePreview url={partner.documents.activity} alt="Activity" />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">Insurance Policy</div>
+              {partner.documents?.insurancePolicy ? (
+                <ImagePreview
+                  url={partner.documents.insurancePolicy}
+                  alt="Insurance Policy"
+                />
+              ) : (
+                <p className="text-gray-700">N/A</p>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-2 text-gray-500 text-sm">My Photo</div>
+              {partner.documents?.myPhoto ? (
+                <ImagePreview url={partner.documents.myPhoto} alt="My Photo" />
               ) : (
                 <p className="text-gray-700">N/A</p>
               )}

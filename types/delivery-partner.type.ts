@@ -148,11 +148,15 @@ export type TDeliveryPartner = {
   // 9) Documents
   // -------------------------------------------------
   documents?: {
-    idDocumentFront?: string;
-    idDocumentBack?: string;
-    drivingLicense?: string;
+    idProofFront?: string;
+    idProofBack?: string;
+    drivingLicenseFront?: string;
+    drivingLicenseBack?: string;
     vehicleRegistration?: string;
     criminalRecordCertificate?: string;
+    activity?: string;
+    insurancePolicy?: string;
+    myPhoto?: string;
   };
 
   // -------------------------------------------------

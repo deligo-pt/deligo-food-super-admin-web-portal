@@ -17,7 +17,10 @@ type DocKey =
   | "drivingLicenseFront"
   | "drivingLicenseBack"
   | "vehicleRegistration"
-  | "criminalRecordCertificate";
+  | "criminalRecordCertificate"
+  | "activity"
+  | "insurancePolicy"
+  | "myPhoto";
 
 type FilePreview = {
   file: File | null;
@@ -38,6 +41,9 @@ export default function UploadPartnerDocuments({
     drivingLicenseBack: null,
     vehicleRegistration: null,
     criminalRecordCertificate: null,
+    activity: null,
+    insurancePolicy: null,
+    myPhoto: null,
   });
 
   const DOCUMENTS: {
@@ -73,6 +79,21 @@ export default function UploadPartnerDocuments({
     {
       key: "criminalRecordCertificate",
       label: t("criminal_record_certification"),
+      prefersImagePreview: true,
+    },
+    {
+      key: "activity",
+      label: "Activity",
+      prefersImagePreview: false,
+    },
+    {
+      key: "insurancePolicy",
+      label: "Insurance Policy",
+      prefersImagePreview: true,
+    },
+    {
+      key: "myPhoto",
+      label: "My Photo",
       prefersImagePreview: true,
     },
   ];

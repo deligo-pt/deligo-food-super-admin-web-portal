@@ -26,17 +26,19 @@ export default function ImagePreview({
         />
       )}
       <div className="absolute bottom-2 left-2">
-        <motion.button
+        <motion.a
           whileHover={{
             scale: 1.05,
           }}
           whileTap={{
             scale: 0.95,
           }}
+          href={url}
+          target="_blank"
           className="text-xs bg-white/80 backdrop-blur-sm text-[#DC3173] px-3 py-1 rounded-full"
         >
           View Full Image
-        </motion.button>
+        </motion.a>
       </div>
     </div>
   );
