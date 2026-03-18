@@ -2,7 +2,7 @@
 
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
 import AgentOrVendorSection from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
-import VendorDetailsDoc from "@/components/AllVendors/VendorDetailsDoc";
+import VendorDetailsDoc from "@/components/Dashboard/Vendors/VendorDetails/VendorDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ interface IProps {
   offerData: TOffer[];
 }
 
-export const VendorDetails = ({ vendor, offerData }: IProps) => {
+export default function VendorDetails({ vendor, offerData }: IProps) {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
@@ -516,4 +516,4 @@ export const VendorDetails = ({ vendor, offerData }: IProps) => {
       />
     </div>
   );
-};
+}

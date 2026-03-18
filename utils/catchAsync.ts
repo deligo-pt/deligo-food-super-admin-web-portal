@@ -8,25 +8,42 @@ export const catchAsync = async <T>(
   try {
     const result = await fn();
 
+    const response = {
+      statusCode: result.statusCode,
+      success: true,
+      data: null,
+      message: result.message || customSuccessMsg,
+      meta: undefined,
+      error: undefined,
+    };
+
     if (result.success) {
       return {
-        success: true,
+        ...response,
         data: result.data,
-        message: result.message || customSuccessMsg,
         meta: result.meta,
       };
     }
 
-    return { success: false, data: result.error, message: result.message };
+    console.log(result);
+    return {
+      ...response,
+      success: false,
+      message: result.message,
+      error: result.error,
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log(error?.response?.data);
 
     return {
+      statusCode: error?.response?.status,
       success: false,
       data: error?.response?.data || null,
       message: error?.response?.data?.message || customErrMsg,
+      error,
+      meta: undefined,
     };
   }
 };

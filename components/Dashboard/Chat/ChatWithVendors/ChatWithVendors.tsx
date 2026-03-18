@@ -6,7 +6,7 @@ import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
 import { getMessagesByRoom } from "@/services/chat/chat";
 import { openConversationReq } from "@/services/dashboard/chat/chat";
-import { getAllVendorsReq } from "@/services/dashboard/chat/chat-with-vendor";
+import { getAllVendorsReq } from "@/services/dashboard/vendor/vendor.service";
 import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
 import { TVendor } from "@/types/user.type";
@@ -233,11 +233,9 @@ export default function ChatWithVendors({
   }
 
   const getVendors = async ({ limit = 10 }) => {
-    const result = await getAllVendorsReq({ limit });
+    const result = await getAllVendorsReq({ limit: String(limit) });
 
-    if (result.success) {
-      setVendorsData({ data: result.data, meta: result.meta });
-    }
+    setVendorsData(result);
   };
 
   const selectVendor = async (vendor: TVendor) => {

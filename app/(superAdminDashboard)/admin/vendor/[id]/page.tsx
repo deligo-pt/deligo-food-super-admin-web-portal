@@ -1,4 +1,4 @@
-import { VendorDetails } from "@/components/AllVendors/VendorDetails";
+import VendorDetails from "@/components/Dashboard/Vendors/VendorDetails/VendorDetails";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta, TResponse } from "@/types";
 import { TOffer } from "@/types/offer.type";

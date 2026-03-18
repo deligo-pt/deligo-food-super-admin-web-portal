@@ -136,7 +136,7 @@ const RecentOrders = ({ recentOrders }: IProps) => {
               </p>
             </div>
             <div className="text-right">
-              <div className="flex items-center">
+              <div className="flex items-center justify-end">
                 {(() => {
                   const statusConfig =
                     STATUS_MAP[order.orderStatus] || STATUS_MAP.PENDING;
