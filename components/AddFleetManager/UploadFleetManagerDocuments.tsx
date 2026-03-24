@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { uploadFleetManagerDocumentsReq } from "@/services/dashboard/add-fleet-manager/add-fleet-manager";
-import { TResponse } from "@/types";
+import { uploadUserDocumentsReq } from "@/utils/uploadUserDocument";
 import { motion } from "framer-motion";
 import { Eye, File, FileText, ImageIcon, UploadCloud } from "lucide-react";
 import Image from "next/image";
@@ -52,33 +50,29 @@ export default function UploadFleetManagerDocuments({
     const url = URL.createObjectURL(f);
 
     const toastId = toast.loading("Uploading...");
-    try {
-      const result = (await uploadFleetManagerDocumentsReq(
-        fleetManagerId,
-        key,
-        f
-      )) as unknown as TResponse<any>;
 
-      if (result.success) {
-        toast.success("File uploaded successfully!", { id: toastId });
+    const result = await uploadUserDocumentsReq(
+      `/fleet-managers/${fleetManagerId}/docImage`,
+      key,
+      f,
+    );
 
-        const prev = previews[key];
-        if (prev && prev.url) URL.revokeObjectURL(prev.url);
+    if (result.success) {
+      toast.success("File uploaded successfully!", { id: toastId });
 
-        setPreviews((p) => ({ ...p, [key]: { file: f, url, isImage } }));
+      const prev = previews[key];
+      if (prev && prev.url) URL.revokeObjectURL(prev.url);
 
-        if (inputsRef.current[key]) {
-          inputsRef.current[key]!.value = "";
-        }
-        return;
+      setPreviews((p) => ({ ...p, [key]: { file: f, url, isImage } }));
+
+      if (inputsRef.current[key]) {
+        inputsRef.current[key]!.value = "";
       }
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "File upload failed", {
-        id: toastId,
-      });
       return;
     }
+
+    toast.error(result.message || "File upload failed", { id: toastId });
+    console.log(result);
   };
 
   const removeFile = (key: DocKey) => {
@@ -191,7 +185,7 @@ export default function UploadFleetManagerDocuments({
                 onChange={(e) =>
                   handleFileChange(
                     d.key,
-                    e.target.files ? e.target.files[0] : null
+                    e.target.files ? e.target.files[0] : null,
                   )
                 }
               />

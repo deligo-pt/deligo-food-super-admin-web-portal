@@ -7,7 +7,7 @@ import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
 import { getMessagesByRoom } from "@/services/chat/chat";
 import { openConversationReq } from "@/services/dashboard/chat/chat";
-import { getAllFleetManagersReq } from "@/services/dashboard/chat/chat-with-fleet-manager";
+import { getAllFleetManagersReq } from "@/services/dashboard/fleet-manager/fleet-manager.service";
 import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
 import { TAgent } from "@/types/user.type";
@@ -138,7 +138,7 @@ export default function ChatWithFleetManagers({
           room: string;
         },
       ),
-    onClosed: () => { },
+    onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
 
@@ -166,7 +166,7 @@ export default function ChatWithFleetManagers({
         });
       }, 3000);
     },
-    onClosed: () => { },
+    onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
 
@@ -214,11 +214,9 @@ export default function ChatWithFleetManagers({
   }
 
   const getFleetManagers = async ({ limit = 10 }) => {
-    const result = await getAllFleetManagersReq({ limit });
+    const result = await getAllFleetManagersReq({ limit: String(limit) });
 
-    if (result.success) {
-      setFleetManagersData({ data: result.data, meta: result.meta });
-    }
+    setFleetManagersData(result);
   };
 
   const selectFleetManager = async (fleetManager: TAgent) => {
@@ -325,10 +323,11 @@ export default function ChatWithFleetManagers({
               <div
                 key={c._id}
                 role="listitem"
-                className={`flex items-center gap-3 p-3 rounded-2xl transition ${selectedId === c.room
+                className={`flex items-center gap-3 p-3 rounded-2xl transition ${
+                  selectedId === c.room
                     ? "ring-2 ring-[#DC3173]/20 bg-[#DC3173]/6"
                     : "hover:bg-white/40"
-                  }`}
+                }`}
               >
                 <button
                   onClick={() => setSelectedId(c.room)}
@@ -365,8 +364,9 @@ export default function ChatWithFleetManagers({
                   {c.unreadCount?.[decoded?.userId] > 0 ? (
                     <div
                       className="bg-[#DC3173] text-white text-xs px-2 py-1 rounded-full"
-                      aria-label={`${c.unreadCount?.[decoded?.userId]
-                        } unread messages`}
+                      aria-label={`${
+                        c.unreadCount?.[decoded?.userId]
+                      } unread messages`}
                     >
                       {c.unreadCount?.[decoded?.userId]}
                     </div>
@@ -420,21 +420,23 @@ export default function ChatWithFleetManagers({
                   {messages.map((m) => (
                     <article
                       key={m._id}
-                      className={`max-w-[78%] p-3 rounded-2xl border ${m.senderRole === "ADMIN" ||
-                          m.senderRole === "SUPER_ADMIN"
+                      className={`max-w-[78%] p-3 rounded-2xl border ${
+                        m.senderRole === "ADMIN" ||
+                        m.senderRole === "SUPER_ADMIN"
                           ? "ml-auto bg-[#DC3173]/15 border-[#DC3173]/20"
                           : "bg-gray-50 border-gray-100"
-                        }`}
-                      aria-label={`${m.senderRole === "ADMIN" ||
-                          m.senderRole === "SUPER_ADMIN"
+                      }`}
+                      aria-label={`${
+                        m.senderRole === "ADMIN" ||
+                        m.senderRole === "SUPER_ADMIN"
                           ? "You"
                           : selected?.name
-                        } message`}
+                      } message`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <div className="text-xs text-gray-400">
                           {m.senderRole === "ADMIN" ||
-                            m.senderRole === "SUPER_ADMIN"
+                          m.senderRole === "SUPER_ADMIN"
                             ? "You"
                             : selected?.name}{" "}
                           •{" "}

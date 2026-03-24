@@ -1,7 +1,5 @@
 import DeliveryPartners from "@/components/Dashboard/DeliveryPartners/DeliveryPartners";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { getAllDeliveryPartnersReq } from "@/services/dashboard/delivery-partner/delivery-partner.service";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -11,39 +9,11 @@ export default async function AllDeliveryPartnersPage({
   searchParams,
 }: IProps) {
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-  const status = queries.status || "";
-
-  const query = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(status ? { status: status } : {}),
-    isDeleted: false,
-  };
-
-  const initialData: { data: TDeliveryPartner[]; meta?: TMeta } = { data: [] };
-
-  try {
-    const result = (await serverRequest.get("/delivery-partners", {
-      params: query,
-    })) as TResponse<TDeliveryPartner[]>;
-
-    if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
+  const partnersResult = await getAllDeliveryPartnersReq(queries);
 
   return (
     <DeliveryPartners
-      partnersResult={initialData}
+      partnersResult={partnersResult}
       showFilters={true}
       title="All Delivery Partners"
       subtitle="Manage all registered delivery partners"

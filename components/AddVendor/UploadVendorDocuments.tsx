@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { motion } from "framer-motion";
@@ -6,10 +5,9 @@ import { Eye, File, FileText, ImageIcon, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-import { uploadVendorDocumentsReq } from "@/services/dashboard/add-vendor/add-vendor";
-import { TResponse } from "@/types";
-import { toast } from "sonner";
 import { useTranslation } from "@/hooks/use-translation";
+import { uploadUserDocumentsReq } from "@/utils/uploadUserDocument";
+import { toast } from "sonner";
 
 type DocKey =
   | "businessLicenseDoc"
@@ -43,16 +41,16 @@ export default function UploadVendorDocuments({
     label: string;
     prefersImagePreview: boolean;
   }[] = [
-      {
-        key: "businessLicenseDoc",
-        label: t("business_license"),
-        prefersImagePreview: false,
-      },
-      { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
-      { key: "idProof", label: t("id_proof"), prefersImagePreview: true },
-      { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
-      { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
-    ];
+    {
+      key: "businessLicenseDoc",
+      label: t("business_license"),
+      prefersImagePreview: false,
+    },
+    { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
+    { key: "idProof", label: t("id_proof"), prefersImagePreview: true },
+    { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
+    { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
+  ];
 
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -67,33 +65,31 @@ export default function UploadVendorDocuments({
     const url = URL.createObjectURL(f);
 
     const toastId = toast.loading("Uploading...");
-    try {
-      const result = (await uploadVendorDocumentsReq(
-        vendorId,
-        key,
-        f
-      )) as unknown as TResponse<any>;
 
-      if (result.success) {
-        toast.success("File uploaded successfully!", { id: toastId });
+    const result = await uploadUserDocumentsReq(
+      `/vendors/${vendorId}/docImage`,
+      key,
+      f,
+    );
 
-        const prev = previews[key];
-        if (prev && prev.url) URL.revokeObjectURL(prev.url);
-
-        setPreviews((p) => ({ ...p, [key]: { file: f, url, isImage } }));
-
-        if (inputsRef.current[key]) {
-          inputsRef.current[key]!.value = "";
-        }
-        return;
-      }
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "File upload failed", {
+    if (result.success) {
+      toast.success(result.message || "File uploaded successfully!", {
         id: toastId,
       });
+
+      const prev = previews[key];
+      if (prev && prev.url) URL.revokeObjectURL(prev.url);
+
+      setPreviews((p) => ({ ...p, [key]: { file: f, url, isImage } }));
+
+      if (inputsRef.current[key]) {
+        inputsRef.current[key]!.value = "";
+      }
       return;
     }
+
+    toast.error(result.message || "File upload failed", { id: toastId });
+    console.log(result);
   };
 
   const removeFile = (key: DocKey) => {
@@ -137,13 +133,15 @@ export default function UploadVendorDocuments({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
-            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${isSelected ? "border-[#DC3173]/30 bg-[#FFF7FB]" : "bg-white"
-              }`}
+            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${
+              isSelected ? "border-[#DC3173]/30 bg-[#FFF7FB]" : "bg-white"
+            }`}
           >
             <div className="flex items-center gap-4">
               <div
-                className={`w-14 h-14 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
-                  }`}
+                className={`w-14 h-14 rounded-lg flex items-center justify-center ${
+                  isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
+                }`}
               >
                 {d.prefersImagePreview ? (
                   <ImageIcon className="w-6 h-6 text-[#DC3173]" />
@@ -204,7 +202,7 @@ export default function UploadVendorDocuments({
                 onChange={(e) =>
                   handleFileChange(
                     d.key,
-                    e.target.files ? e.target.files[0] : null
+                    e.target.files ? e.target.files[0] : null,
                   )
                 }
               />

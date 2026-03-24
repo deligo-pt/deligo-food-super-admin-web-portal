@@ -42,7 +42,7 @@ export const catchAsync = async <T>(
       success: false,
       data: error?.response?.data || null,
       message: error?.response?.data?.message || customErrMsg,
-      error,
+      error: error?.response?.data?.error,
       meta: undefined,
     };
   }

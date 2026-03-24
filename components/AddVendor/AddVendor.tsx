@@ -24,11 +24,12 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
+import { approveOrRejectReq } from "@/services/auth/approveOrReject";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
-  registerVendorandSendOtpReq,
-  updateVendorDataReq,
-} from "@/services/dashboard/add-vendor/add-vendor";
+  registerUserAndSendOtpReq,
+  updateUserDataReq,
+} from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { TVendor } from "@/types/user.type";
@@ -137,29 +138,24 @@ export default function AddVendor({
         },
       );
 
-    try {
-      const result = await registerVendorandSendOtpReq({
+    const result = await registerUserAndSendOtpReq(
+      {
         email,
         password,
-      });
+      },
+      "create-vendor",
+    );
 
-      if (result.success) {
-        toast.success(result.message || "OTP sent successfully!", {
-          id: toastId,
-        });
-        setOtpSent(true);
-        return;
-      }
-
-      toast.error(result.message || "OTP send failed", { id: toastId });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "OTP send failed", {
+    if (result.success) {
+      toast.success(result.message || "OTP sent successfully!", {
         id: toastId,
       });
+      setOtpSent(true);
+      return;
     }
+
+    toast.error(result.message || "OTP send failed", { id: toastId });
+    console.log(result);
   };
 
   const resendOtp = async () => {
@@ -210,58 +206,65 @@ export default function AddVendor({
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Adding vendor...");
 
-    try {
-      const vendorData = {
-        name: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-        },
-        contactNumber: data.phoneNumber,
-        businessDetails: {
-          businessName: data.businessName,
-          businessType: data.businessType,
-          NIF: data.NIF?.toUpperCase(),
-          businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
-          totalBranches: Number(data.branches),
-          openingHours: data.openingHours,
-          closingHours: data.closingHours,
-          closingDays: data.closingDays,
-        },
-        businessLocation: {
-          street: data.street,
-          city: data.city,
-          postalCode: data.postalCode,
-          country: data.country,
-          latitude: locationCoordinates.latitude,
-          longitude: locationCoordinates.longitude,
-        },
-        bankDetails: {
-          bankName: data.bankName,
-          accountHolderName: data.accountHolderName,
-          iban: data.iban,
-          swiftCode: data.swiftCode,
-        },
-      } as Partial<TVendor>;
+    const vendorData = {
+      name: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+      },
+      contactNumber: data.phoneNumber,
+      businessDetails: {
+        businessName: data.businessName,
+        businessType: data.businessType,
+        NIF: data.NIF?.toUpperCase(),
+        businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
+        totalBranches: Number(data.branches),
+        openingHours: data.openingHours,
+        closingHours: data.closingHours,
+        closingDays: data.closingDays,
+      },
+      businessLocation: {
+        street: data.street,
+        city: data.city,
+        postalCode: data.postalCode,
+        country: data.country,
+        latitude: locationCoordinates.latitude,
+        longitude: locationCoordinates.longitude,
+      },
+      bankDetails: {
+        bankName: data.bankName,
+        accountHolderName: data.accountHolderName,
+        iban: data.iban,
+        swiftCode: data.swiftCode,
+      },
+    } as Partial<TVendor>;
 
-      const result = await updateVendorDataReq(vendorId, vendorData);
+    const updatedResult = await updateUserDataReq(
+      `/vendors/${vendorId}`,
+      vendorData,
+    );
 
-      if (result.success) {
+    if (updatedResult.success) {
+      const approveResult = await approveOrRejectReq(vendorId, {
+        status: "APPROVED",
+      });
+
+      if (approveResult.success) {
         form.reset();
-        toast.success(result.message || "Vendor added successfully!", {
+        toast.success(approveResult.message || "Vendor added successfully!", {
           id: toastId,
         });
         return;
       }
 
-      toast.error(result.message || "Vendor add failed", { id: toastId });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Failed to add vendor", {
+      toast.error(approveResult.message || "Vendor add failed", {
         id: toastId,
       });
+      console.log(approveResult);
+      return;
     }
+
+    toast.error(updatedResult.message || "Vendor add failed", { id: toastId });
+    console.log(updatedResult);
   };
 
   useEffect(() => {

@@ -16,11 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
+import { approveOrRejectReq } from "@/services/auth/approveOrReject";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
-  registerFleetManagerandSendOtpReq,
-  updateFleetManagerDataReq,
-} from "@/services/dashboard/add-fleet-manager/add-fleet-manager";
+  registerUserAndSendOtpReq,
+  updateUserDataReq,
+} from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
 import { TAgent } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
@@ -110,29 +111,24 @@ export default function AddFleetManager() {
         },
       );
 
-    try {
-      const result = await registerFleetManagerandSendOtpReq({
+    const result = await registerUserAndSendOtpReq(
+      {
         email,
         password,
-      });
+      },
+      "create-fleet-manager",
+    );
 
-      if (result.success) {
-        toast.success(result.message || "OTP sent successfully!", {
-          id: toastId,
-        });
-        setOtpSent(true);
-        return;
-      }
-
-      toast.error(result.message || "OTP send failed", { id: toastId });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "OTP send failed", {
+    if (result.success) {
+      toast.success(result.message || "OTP sent successfully!", {
         id: toastId,
       });
+      setOtpSent(true);
+      return;
     }
+
+    toast.error(result.message || "OTP send failed", { id: toastId });
+    console.log(result);
   };
 
   const resendOtp = async () => {
@@ -183,60 +179,64 @@ export default function AddFleetManager() {
   const onSubmit = async (data: TFleetManagerForm) => {
     const toastId = toast.loading("Adding fleet manager...");
 
-    try {
-      const fleetManagerData = {
-        name: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-        },
-        contactNumber: data.phoneNumber,
-        businessDetails: {
-          businessName: data.businessName,
-          businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
-        },
-        businessLocation: {
-          street: data.street,
-          city: data.city,
-          postalCode: data.postalCode,
-          country: data.country,
-          latitude: locationCoordinates.latitude,
-          longitude: locationCoordinates.longitude,
-        },
-        bankDetails: {
-          bankName: data.bankName,
-          accountHolderName: data.accountHolderName,
-          iban: data.iban,
-          swiftCode: data.swiftCode,
-        },
-      } as Partial<TAgent>;
+    const fleetManagerData = {
+      name: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+      },
+      contactNumber: data.phoneNumber,
+      businessDetails: {
+        businessName: data.businessName,
+        businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
+      },
+      businessLocation: {
+        street: data.street,
+        city: data.city,
+        postalCode: data.postalCode,
+        country: data.country,
+        latitude: locationCoordinates.latitude,
+        longitude: locationCoordinates.longitude,
+      },
+      bankDetails: {
+        bankName: data.bankName,
+        accountHolderName: data.accountHolderName,
+        iban: data.iban,
+        swiftCode: data.swiftCode,
+      },
+    } as Partial<TAgent>;
 
-      const result = await updateFleetManagerDataReq(
-        fleetManagerId,
-        fleetManagerData,
-      );
+    const updatedResult = await updateUserDataReq(
+      `/fleet-managers/${fleetManagerId}`,
+      fleetManagerData,
+    );
 
-      if (result.success) {
+    if (updatedResult.success) {
+      const approveResult = await approveOrRejectReq(fleetManagerId, {
+        status: "APPROVED",
+      });
+
+      if (approveResult.success) {
         form.reset();
-        toast.success(result.message || "Fleet manager added successfully!", {
-          id: toastId,
-        });
+        toast.success(
+          approveResult.message || "Fleet manager added successfully!",
+          {
+            id: toastId,
+          },
+        );
         return;
       }
 
-      toast.error(result.message || "Fleet manager add failed", {
+      toast.error(approveResult.message || "Fleet manager add failed", {
         id: toastId,
       });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Failed to add fleet manager",
-        {
-          id: toastId,
-        },
-      );
+      console.log(approveResult);
+      return;
     }
+
+    toast.error(updatedResult.message || "Fleet manager add failed", {
+      id: toastId,
+    });
+    console.log(updatedResult);
   };
 
   useEffect(() => {
