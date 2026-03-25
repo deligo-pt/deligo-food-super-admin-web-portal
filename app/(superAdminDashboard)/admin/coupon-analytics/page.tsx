@@ -52,6 +52,7 @@ export default function CouponAnalyticsPage() {
   const filtered = useMemo(() => {
     if (typeFilter === "all") return coupons;
     return coupons.filter((c) => c.type === typeFilter);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typeFilter]);
 
   const totalUsed = filtered.reduce((a, b) => a + b.used, 0);

@@ -18,7 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteTaxReq, updateTaxReq } from "@/services/dashboard/tax/tax";
+import {
+  deleteTaxReq,
+  updateTaxReq,
+} from "@/services/dashboard/tax/tax.service";
 import { TMeta } from "@/types";
 import { TTax } from "@/types/tax.type";
 import {

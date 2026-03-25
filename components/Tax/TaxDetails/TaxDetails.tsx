@@ -6,7 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { deleteTaxReq, updateTaxReq } from "@/services/dashboard/tax/tax";
+import {
+  deleteTaxReq,
+  updateTaxReq,
+} from "@/services/dashboard/tax/tax.service";
 import { TTax } from "@/types/tax.type";
 import { motion } from "framer-motion";
 import {

@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
-import { addProductCategoryReq } from "@/services/dashboard/category/product-category";
+import { addProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 import { TBusinessCategory } from "@/types/category.type";
 import { productCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -229,7 +229,9 @@ export default function AddProductCategory({
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300">
-                        <SelectValue placeholder={t("select_business_category")} />
+                        <SelectValue
+                          placeholder={t("select_business_category")}
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {businessCategories.map((businessCategory) => (

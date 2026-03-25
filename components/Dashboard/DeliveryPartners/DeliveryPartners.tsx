@@ -6,10 +6,9 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TMeta, TResponse } from "@/types";
+import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -91,25 +90,21 @@ export default function DeliveryPartners({
   const handleDeletePartner = async () => {
     const toastId = toast.loading("Deleting partner...");
 
-    try {
-      const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<null>;
+    const result = await userSoftDeleteReq(deleteId);
 
-      if (result?.success) {
-        router.refresh();
-        setDeleteId("");
-        toast.success(result.message || "Partner deleted successfully!", {
-          id: toastId,
-        });
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Partner delete failed", {
+    if (result?.success) {
+      router.refresh();
+      setDeleteId("");
+      toast.success(result.message || "Partner deleted successfully!", {
         id: toastId,
       });
+      return;
     }
+
+    toast.error(result?.message || "Partner delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (

@@ -16,7 +16,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteBusinessCategoryReq,
   updateBusinessCategoryReq,
-} from "@/services/dashboard/category/business-category";
+} from "@/services/dashboard/category/business-category.service";
 import { TBusinessCategory } from "@/types/category.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -257,13 +257,15 @@ export default function BusinessCategoryDetails({
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  {t("created")}: {format(category.createdAt as Date, "do MMM yyyy")}
+                  {t("created")}:{" "}
+                  {format(category.createdAt as Date, "do MMM yyyy")}
                 </span>
               </div>
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  {t("updated")}: {format(category.updatedAt as Date, "do MMM yyyy")}
+                  {t("updated")}:{" "}
+                  {format(category.updatedAt as Date, "do MMM yyyy")}
                 </span>
               </div>
             </div>

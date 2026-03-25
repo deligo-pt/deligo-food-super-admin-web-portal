@@ -19,10 +19,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
-import { TMeta, TResponse } from "@/types";
+import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
 import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
@@ -92,31 +91,24 @@ export default function DeliveryPartnerTable({
   const deleteDeliveryPartner = async () => {
     const toastId = toast.loading("Deleting Delivery Partner...");
 
-    try {
-      const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<null>;
+    const result = await userSoftDeleteReq(deleteId);
 
-      if (result?.success) {
-        router.refresh();
-        setDeleteId("");
-        toast.success(
-          result.message || "Delivery Partner deleted successfully!",
-          {
-            id: toastId,
-          }
-        );
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Delivery Partner delete failed",
+    if (result?.success) {
+      router.refresh();
+      setDeleteId("");
+      toast.success(
+        result.message || "Delivery Partner deleted successfully!",
         {
           id: toastId,
-        }
+        },
       );
+      return;
     }
+
+    toast.error(result?.message || "Delivery Partner delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (
@@ -188,7 +180,7 @@ export default function DeliveryPartnerTable({
                             onClick={() =>
                               router.push(
                                 "/admin/all-delivery-partners/" +
-                                deliveryPartner.userId
+                                  deliveryPartner.userId,
                               )
                             }
                           >
@@ -274,7 +266,7 @@ export default function DeliveryPartnerTable({
                   className="text-[#DC3173] text-lg text-center"
                   colSpan={5}
                 >
-                 {t("no_delivery_partners_found")}
+                  {t("no_delivery_partners_found")}
                 </TableCell>
               </TableRow>
             )}

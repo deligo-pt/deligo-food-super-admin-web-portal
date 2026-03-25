@@ -10,7 +10,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import {
   deleteOfferReq,
   updateOfferReq,
-} from "@/services/dashboard/offers/offers";
+} from "@/services/dashboard/offer/offer.service";
 import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
 import { motion } from "framer-motion";

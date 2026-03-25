@@ -6,7 +6,7 @@ import { catchAsync } from "@/utils/catchAsync";
 
 export const addProductCategoryReq = async (
   data: Partial<TProductCategory>,
-  image?: File | null
+  image?: File | null,
 ) => {
   return catchAsync<null>(async () => {
     const formData = new FormData();
@@ -23,7 +23,7 @@ export const addProductCategoryReq = async (
 export const updateProductCategoryReq = async (
   id: string,
   data: Partial<TProductCategory>,
-  image?: File | null
+  image?: File | null,
 ) => {
   return catchAsync<null>(async () => {
     const formData = new FormData();
@@ -40,7 +40,41 @@ export const updateProductCategoryReq = async (
 export const deleteProductCategoryReq = async (id: string) => {
   return catchAsync<null>(async () => {
     return await serverRequest.delete(
-      `/categories/productCategory/soft-delete/${id}`
+      `/categories/productCategory/soft-delete/${id}`,
     );
   });
+};
+
+export const getAllProductCategoriesReq = async (
+  queries: Record<string, string | undefined>,
+) => {
+  const limit = Number(queries?.limit || 10);
+  const page = Number(queries.page || 1);
+  const searchTerm = queries.searchTerm || "";
+  const sortBy = queries.sortBy || "-createdAt";
+  const status = queries.status || "";
+
+  const params = {
+    limit,
+    page,
+    sortBy,
+    ...(searchTerm ? { searchTerm: searchTerm } : {}),
+    ...(status ? { status: status } : {}),
+  };
+
+  const result = await catchAsync<TProductCategory[]>(async () => {
+    return await serverRequest.get("/categories/productCategory", {
+      params,
+    });
+  });
+
+  if (result?.success)
+    return {
+      data: result.data,
+      meta: result.meta,
+    };
+
+  return {
+    data: [],
+  };
 };

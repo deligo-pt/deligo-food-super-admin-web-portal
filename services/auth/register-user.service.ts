@@ -1,6 +1,8 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
+import { TAdmin } from "@/types/admin.type";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TAgent, TVendor } from "@/types/user.type";
 import { catchAsync } from "@/utils/catchAsync";
 
@@ -20,7 +22,7 @@ export const registerUserAndSendOtpReq = async (
 
 export const updateUserDataReq = async (
   endPoint: string,
-  data: Partial<TVendor | TAgent>,
+  data: Partial<TVendor | TAgent | TDeliveryPartner | TAdmin>,
 ) => {
   return catchAsync<null>(async () => {
     return await serverRequest.patch(endPoint, {

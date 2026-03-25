@@ -6,7 +6,7 @@ import DeleteModal from "@/components/Modals/DeleteModal";
 import {
   deleteOfferReq,
   updateOfferReq,
-} from "@/services/dashboard/offers/offers";
+} from "@/services/dashboard/offer/offer.service";
 import { TOffer } from "@/types/offer.type";
 import { motion } from "framer-motion";
 import {

@@ -4,7 +4,8 @@ import DeleteProductDialog from "@/components/AllProducts/DeleteProductDialog";
 import ProductCard from "@/components/AllProducts/ProductCard";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Button } from "@/components/ui/button";
-import { deleteProductReq } from "@/services/dashboard/product/product";
+import { useTranslation } from "@/hooks/use-translation";
+import { deleteProductReq } from "@/services/dashboard/product/product.service";
 import { TMeta } from "@/types";
 import { TProduct } from "@/types/product.type";
 import { AnimatePresence, motion } from "framer-motion";
@@ -13,8 +14,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import AllFilters from "../Filtering/AllFilters";
-import { useTranslation } from "@/hooks/use-translation";
-
 
 export default function Products({
   initialData,

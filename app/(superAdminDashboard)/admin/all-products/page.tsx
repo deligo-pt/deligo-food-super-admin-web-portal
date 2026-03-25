@@ -1,7 +1,5 @@
 import AllProducts from "@/components/AllProducts/AllProducts";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TProduct, TProductsQueryParams } from "@/types/product.type";
+import { getAllProductsReq } from "@/services/dashboard/product/product.service";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -9,34 +7,7 @@ type IProps = {
 
 export default async function ProductsPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-  const availability = queries.status || "";
+  const productsResult = await getAllProductsReq(queries);
 
-  const query: Partial<TProductsQueryParams> = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(availability ? { "stock.availabilityStatus": availability } : {}),
-  };
-
-  const initialData: { data: TProduct[]; meta?: TMeta } = { data: [] };
-
-  try {
-    const result = (await serverRequest.get("/products", {
-      params: query,
-    })) as TResponse<TProduct[]>;
-
-    if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetchProducts error:", err);
-  }
-
-  return <AllProducts initialData={initialData} />;
+  return <AllProducts initialData={productsResult} />;
 }

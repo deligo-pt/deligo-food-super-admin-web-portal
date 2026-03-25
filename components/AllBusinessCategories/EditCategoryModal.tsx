@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
-import { updateBusinessCategoryReq } from "@/services/dashboard/category/business-category";
+import { updateBusinessCategoryReq } from "@/services/dashboard/category/business-category.service";
 import { TBusinessCategory } from "@/types/category.type";
 import { updateBusinessCategoryValidation } from "@/validations/category/business-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -77,7 +77,7 @@ export default function EditBusinessCategoryModal({
     const result = await updateBusinessCategoryReq(
       category._id,
       categoryData,
-      data.image?.file
+      data.image?.file,
     );
 
     if (result?.success) {
@@ -140,7 +140,9 @@ export default function EditBusinessCategoryModal({
                             <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                               <div className="flex items-center">
                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">{t("category_name")}</span>
+                                <span className="ml-2">
+                                  {t("category_name")}
+                                </span>
                               </div>
                             </FormLabel>
                             <FormControl>
@@ -163,7 +165,9 @@ export default function EditBusinessCategoryModal({
                             <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                               <div className="flex items-center">
                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">{t("category_image")}</span>
+                                <span className="ml-2">
+                                  {t("category_image")}
+                                </span>
                               </div>
                             </FormLabel>
                             <FormControl>

@@ -8,8 +8,7 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
-import { deleteDeliveryPartner } from "@/services/dashboard/deliveryPartner/deliveryPartner";
-import { TResponse } from "@/types";
+import { userSoftDeleteReq } from "@/services/auth/deleteUser";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import {
@@ -78,24 +77,19 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   const handleDeletePartner = async () => {
     const toastId = toast.loading("Deleting Delivery Partner...");
 
-    try {
-      const result = (await deleteDeliveryPartner(
-        partner.userId,
-      )) as TResponse<null>;
+    const result = await userSoftDeleteReq(partner._id as string);
 
-      if (result.success) {
-        toast.success("Delivery Partner deleted successfully", { id: toastId });
-        setShowDeleteModal(false);
-        router.refresh();
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        error?.response?.data?.message || "Delivery Partner deletion failed",
-        { id: toastId },
-      );
+    if (result.success) {
+      toast.success("Delivery Partner deleted successfully", { id: toastId });
+      setShowDeleteModal(false);
+      router.refresh();
+      return;
     }
+
+    toast.error(result.message || "Delivery Partner delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (

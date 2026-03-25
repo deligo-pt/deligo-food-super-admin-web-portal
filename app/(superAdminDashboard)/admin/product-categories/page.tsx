@@ -1,8 +1,6 @@
 import CategoriesTitle from "@/components/ProductCategories/ProductCategoriesTitle";
 import CategoryTable from "@/components/ProductCategories/ProductCategoryTable";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TProductCategory } from "@/types/category.type";
+import { getAllProductCategoriesReq } from "@/services/dashboard/category/product-category.service";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -10,40 +8,7 @@ type IProps = {
 
 export default async function BusinessCategoryPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-  const status = queries.status || "";
-
-  const query = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(status ? { status: status } : {}),
-  };
-
-  const initialData: {
-    data: TProductCategory[];
-    meta?: TMeta;
-    isLoading: boolean;
-  } = { data: [], isLoading: true };
-
-  try {
-    const result = (await serverRequest.get("/categories/productCategory", {
-      params: query,
-    })) as TResponse<{ data: TProductCategory[]; meta?: TMeta }>;
-
-    if (result?.success) {
-      initialData.data = result.data.data;
-      initialData.meta = result.data.meta;
-      initialData.isLoading = false;
-    }
-  } catch (err) {
-    initialData.isLoading = false;
-    console.log("Server fetch error:", err);
-  }
+  const categoriesResult = await getAllProductCategoriesReq(queries);
 
   return (
     <div className="space-y-6 max-w-full p-6">
@@ -51,7 +16,7 @@ export default async function BusinessCategoryPage({ searchParams }: IProps) {
       <CategoriesTitle />
 
       {/* category Table */}
-      <CategoryTable categoriesResult={initialData} />
+      <CategoryTable categoriesResult={categoriesResult} />
     </div>
   );
 }

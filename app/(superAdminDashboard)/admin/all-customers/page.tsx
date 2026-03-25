@@ -1,7 +1,5 @@
 import Customers from "@/components/Dashboard/Customers/Customers";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TCustomer } from "@/types/user.type";
+import { getAllCustomersReq } from "@/services/dashboard/customer/customer.service";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -9,39 +7,11 @@ type IProps = {
 
 export default async function AllCustomersPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-  const status = queries.status || "";
-
-  const query = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(status ? { status: status } : {}),
-    isDeleted: false,
-  };
-
-  const initialData: { data: TCustomer[]; meta?: TMeta } = { data: [] };
-
-  try {
-    const result = (await serverRequest.get("/customers", {
-      params: query,
-    })) as TResponse<TCustomer[]>;
-
-    if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
+  const customersResult = await getAllCustomersReq(queries);
 
   return (
     <Customers
-      customersResult={initialData}
+      customersResult={customersResult}
       showFilters={true}
       title="All Customers"
       subtitle="Manage all registered customers"

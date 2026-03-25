@@ -27,11 +27,10 @@ import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approveOrReject";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
-  registerPartnerAndSendOtpReq,
-  updatePartnerDataReq,
-} from "@/services/dashboard/deliveryPartner/add-delivery-partner";
+  registerUserAndSendOtpReq,
+  updateUserDataReq,
+} from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
-import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { formatTime } from "@/utils/formatTime";
 import { deliveryPartnerValidation } from "@/validations/delivery-partner/delivery-partner.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -189,10 +188,13 @@ export default function AddDeliveryPartner() {
         },
       );
 
-    const result = await registerPartnerAndSendOtpReq({
-      email,
-      password,
-    });
+    const result = await registerUserAndSendOtpReq(
+      {
+        email,
+        password,
+      },
+      "onboard/delivery-partner",
+    );
 
     if (result.success) {
       toast.success(result.message || "OTP sent successfully!", {
@@ -317,22 +319,20 @@ export default function AddDeliveryPartner() {
       },
     };
 
-    const result = await updatePartnerDataReq(
-      partnerId,
-      partnerData as unknown as Partial<TDeliveryPartner>,
+    const updatedResult = await updateUserDataReq(
+      `/delivery-partners/${partnerId}`,
+      partnerData,
     );
 
-    if (result.success) {
+    if (updatedResult.success) {
       const approveResult = await approveOrRejectReq(partnerId, {
         status: "APPROVED",
-        remarks: "",
       });
+
       if (approveResult.success) {
         form.reset();
-        setPartnerId("");
-        setEmailVerified(false);
         toast.success(
-          result.message || "Delivery partner added successfully!",
+          approveResult.message || "Delivery partner added successfully!",
           {
             id: toastId,
           },
@@ -340,16 +340,17 @@ export default function AddDeliveryPartner() {
         return;
       }
 
-      toast.error(approveResult.message || "Delivery partner approved failed", {
+      toast.error(approveResult.message || "Delivery partner add failed", {
         id: toastId,
       });
       console.log(approveResult);
+      return;
     }
 
-    toast.error(result.message || "Delivery partner add failed", {
+    toast.error(updatedResult.message || "Delivery partner add failed", {
       id: toastId,
     });
-    console.log(result);
+    console.log(updatedResult);
   };
 
   useEffect(() => {

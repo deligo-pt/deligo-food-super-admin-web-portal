@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { createOfferReq } from "@/services/dashboard/offers/offers";
+import { createOfferReq } from "@/services/dashboard/offer/offer.service";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";

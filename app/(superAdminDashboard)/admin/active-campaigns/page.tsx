@@ -1,7 +1,5 @@
 import ActiveCampaigns from "@/components/Dashboard/Offers/ActiveCampaigns/ActiveCampaigns";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TOffer } from "@/types/offer.type";
+import { getAllOffersReq } from "@/services/dashboard/offer/offer.service";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -9,39 +7,15 @@ type IProps = {
 
 export default async function ActiveCampaignsPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-
-  const params = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm } : {}),
-    isExpired: false,
-    isActive: true,
-    isDeleted: false,
-  };
-
-  const initialData: { data: TOffer[]; meta?: TMeta } = { data: [] };
-
-  try {
-    const result = (await serverRequest.get("/offers", {
-      params,
-    })) as TResponse<TOffer[]>;
-
-    if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
+  const offersResult = await getAllOffersReq({
+    ...queries,
+    activeStatus: "ACTIVE",
+    validStatus: "VALID",
+  });
 
   return (
     <ActiveCampaigns
-      offersResult={initialData}
+      offersResult={offersResult}
       title="Active Campaigns"
       subtitle="List of all active offers"
     />

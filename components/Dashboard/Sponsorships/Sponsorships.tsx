@@ -6,7 +6,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { deleteSponsorshipReq } from "@/services/dashboard/sponsorships/sponsorships";
+import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TMeta } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { motion } from "framer-motion";

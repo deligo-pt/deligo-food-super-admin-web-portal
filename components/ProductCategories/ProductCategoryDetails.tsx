@@ -16,7 +16,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteProductCategoryReq,
   updateProductCategoryReq,
-} from "@/services/dashboard/category/product-category";
+} from "@/services/dashboard/category/product-category.service";
 import { TProductCategory } from "@/types/category.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -254,13 +254,15 @@ export default function ProductCategoryDetails({
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  {t("created")}: {format(category.createdAt as Date, "do MMM yyyy")}
+                  {t("created")}:{" "}
+                  {format(category.createdAt as Date, "do MMM yyyy")}
                 </span>
               </div>
               <div className="flex items-center text-gray-600">
                 <CalendarIcon size={16} className="mr-2" />
                 <span>
-                  {t("updated")}: {format(category.updatedAt as Date, "do MMM yyyy")}
+                  {t("updated")}:{" "}
+                  {format(category.updatedAt as Date, "do MMM yyyy")}
                 </span>
               </div>
             </div>
@@ -297,7 +299,7 @@ export default function ProductCategoryDetails({
                     : category.isActive
                       ? "deactivate"
                       : "activate"}{" "}
-                   {t("this_category")}
+                  {t("this_category")}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>

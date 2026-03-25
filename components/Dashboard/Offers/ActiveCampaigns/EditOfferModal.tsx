@@ -28,7 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { updateOfferReq } from "@/services/dashboard/offers/offers";
+import { updateOfferReq } from "@/services/dashboard/offer/offer.service";
 import { TOffer } from "@/types/offer.type";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";

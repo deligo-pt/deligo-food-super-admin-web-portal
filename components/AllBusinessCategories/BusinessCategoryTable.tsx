@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 import {
   deleteBusinessCategoryReq,
   updateBusinessCategoryReq,
-} from "@/services/dashboard/category/business-category";
+} from "@/services/dashboard/category/business-category.service";
 import { TMeta } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { getSortOptions } from "@/utils/sortOptions";
@@ -52,7 +52,6 @@ interface IProps {
   categoriesResult: {
     data: TBusinessCategory[];
     meta?: TMeta;
-    isLoading: boolean;
   };
 }
 
@@ -159,115 +158,105 @@ export default function CategoryTable({ categoriesResult }: IProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categoriesResult.isLoading && (
+            {categoriesResult?.data?.map((category) => (
+              <TableRow key={category._id}>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    {category.icon && (
+                      <div>
+                        <Image
+                          className="w-8 h-8 rounded-full object-cover"
+                          src={category.icon}
+                          alt={category.name}
+                          width={32}
+                          height={32}
+                        />
+                      </div>
+                    )}
+                    <p>{category.name}</p>
+                  </div>
+                </TableCell>
+                <TableCell>{category.description}</TableCell>
+                <TableCell
+                  className={cn(
+                    category.isDeleted
+                      ? "text-red-500"
+                      : category.isActive
+                        ? "text-green-500"
+                        : "text-yellow-500",
+                  )}
+                >
+                  {category.isDeleted
+                    ? t("deleted")
+                    : category.isActive
+                      ? t("active")
+                      : t("inactive")}
+                </TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <MoreVertical className="h-4 w-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        className=""
+                        onClick={() =>
+                          router.push(
+                            "/admin/business-categories/" + category._id,
+                          )
+                        }
+                      >
+                        {t("view")}
+                      </DropdownMenuItem>
+                      {category.isDeleted ? (
+                        <DropdownMenuItem className="text-red-500">
+                          {t("deleted")}
+                        </DropdownMenuItem>
+                      ) : (
+                        <>
+                          {!category.isDeleted && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setStatusInfo({
+                                  categoryId: category._id as string,
+                                  isDeleted: true,
+                                  field: "isDeleted",
+                                })
+                              }
+                            >
+                              {t("delete")}
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              setStatusInfo({
+                                categoryId: category._id as string,
+                                isActive: !category.isActive,
+                                field: "isActive",
+                              })
+                            }
+                          >
+                            {category.isActive
+                              ? t("deactivate")
+                              : t("activate")}
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+            {categoriesResult?.meta?.total === 0 && (
               <TableRow>
                 <TableCell
                   className="text-center text-lg text-[#DC3173]"
                   colSpan={5}
                 >
-                  {t("loading")}
+                  {t("no_categories_found")}
                 </TableCell>
               </TableRow>
             )}
-            {!categoriesResult.isLoading &&
-              categoriesResult?.data?.map((category) => (
-                <TableRow key={category._id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      {category.icon && (
-                        <div>
-                          <Image
-                            className="w-8 h-8 rounded-full object-cover"
-                            src={category.icon}
-                            alt={category.name}
-                            width={32}
-                            height={32}
-                          />
-                        </div>
-                      )}
-                      <p>{category.name}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{category.description}</TableCell>
-                  <TableCell
-                    className={cn(
-                      category.isDeleted
-                        ? "text-red-500"
-                        : category.isActive
-                          ? "text-green-500"
-                          : "text-yellow-500",
-                    )}
-                  >
-                    {category.isDeleted
-                      ? t("deleted")
-                      : category.isActive
-                        ? t("active")
-                        : t("inactive")}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreVertical className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            router.push(
-                              "/admin/business-categories/" + category._id,
-                            )
-                          }
-                        >
-                          {t("view")}
-                        </DropdownMenuItem>
-                        {category.isDeleted ? (
-                          <DropdownMenuItem className="text-red-500">
-                            {t("deleted")}
-                          </DropdownMenuItem>
-                        ) : (
-                          <>
-                            {!category.isDeleted && (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  setStatusInfo({
-                                    categoryId: category._id as string,
-                                    isDeleted: true,
-                                    field: "isDeleted",
-                                  })
-                                }
-                              >
-                                {t("delete")}
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              onClick={() =>
-                                setStatusInfo({
-                                  categoryId: category._id as string,
-                                  isActive: !category.isActive,
-                                  field: "isActive",
-                                })
-                              }
-                            >
-                              {category.isActive ? t("deactivate") : t("activate")}
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            {!categoriesResult.isLoading &&
-              categoriesResult?.meta?.total === 0 && (
-                <TableRow>
-                  <TableCell
-                    className="text-center text-lg text-[#DC3173]"
-                    colSpan={5}
-                  >
-                    {t("no_categories_found")}
-                  </TableCell>
-                </TableRow>
-              )}
           </TableBody>
         </Table>
       </motion.div>

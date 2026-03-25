@@ -14,11 +14,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { approveOrRejectReq } from "@/services/auth/approveOrReject";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
 import {
-  registerAdminAndSendOtpReq,
-  updateAdminDataReq,
-} from "@/services/dashboard/add-admin/add-admin";
+  registerUserAndSendOtpReq,
+  updateUserDataReq,
+} from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
 import { TAdmin } from "@/types/admin.type";
 import { formatTime } from "@/utils/formatTime";
@@ -93,29 +94,24 @@ export default function AddAdmin() {
         },
       );
 
-    try {
-      const result = await registerAdminAndSendOtpReq({
+    const result = await registerUserAndSendOtpReq(
+      {
         email,
         password,
-      });
+      },
+      "create-admin",
+    );
 
-      if (result.success) {
-        toast.success(result.message || "OTP sent successfully!", {
-          id: toastId,
-        });
-        setOtpSent(true);
-        return;
-      }
-
-      toast.error(result.message || "OTP send failed", { id: toastId });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "OTP send failed", {
+    if (result.success) {
+      toast.success(result.message || "OTP sent successfully!", {
         id: toastId,
       });
+      setOtpSent(true);
+      return;
     }
+
+    toast.error(result.message || "OTP send failed", { id: toastId });
+    console.log(result);
   };
 
   const resendOtp = async () => {
@@ -166,44 +162,49 @@ export default function AddAdmin() {
   const onSubmit = async (data: TAdminForm) => {
     const toastId = toast.loading("Adding admin...");
 
-    try {
-      const adminData = {
-        name: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-        },
-        contactNumber: data.phoneNumber,
-        address: {
-          street: data.street,
-          city: data.city,
-          postalCode: data.postalCode,
-          country: data.country,
-          latitude: locationCoordinates.latitude,
-          longitude: locationCoordinates.longitude,
-        },
-      } as Partial<TAdmin>;
+    const adminData = {
+      name: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+      },
+      contactNumber: data.phoneNumber,
+      address: {
+        street: data.street,
+        city: data.city,
+        postalCode: data.postalCode,
+        country: data.country,
+        latitude: locationCoordinates.latitude,
+        longitude: locationCoordinates.longitude,
+      },
+    } as Partial<TAdmin>;
 
-      const result = await updateAdminDataReq(adminId, adminData);
+    const updatedResult = await updateUserDataReq(
+      `/admins/${adminId}`,
+      adminData,
+    );
 
-      if (result.success) {
+    if (updatedResult.success) {
+      const approveResult = await approveOrRejectReq(adminId, {
+        status: "APPROVED",
+      });
+
+      if (approveResult.success) {
         form.reset();
-        toast.success(result.message || "Admin added successfully!", {
+        toast.success(approveResult.message || "Admin added successfully!", {
           id: toastId,
         });
         return;
       }
 
-      toast.error(result.message || "Admin add failed", {
+      toast.error(approveResult.message || "Admin add failed", {
         id: toastId,
       });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Failed to add admin", {
-        id: toastId,
-      });
+      console.log(approveResult);
+      return;
     }
+
+    toast.error(updatedResult.message || "Admin add failed", { id: toastId });
+    console.log(updatedResult);
   };
 
   useEffect(() => {

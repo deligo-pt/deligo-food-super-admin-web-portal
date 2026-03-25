@@ -1,7 +1,5 @@
 import Orders from "@/components/Dashboard/Orders/Orders";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TOrder } from "@/types/order.type";
+import { getAllOrdersReq } from "@/services/dashboard/order/order.service";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -9,38 +7,11 @@ type IProps = {
 
 export default async function AllOrdersPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-  // const orderStatus = queries.orderStatus || "";
-
-  const query = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    // ...(orderStatus ? { orderStatus: orderStatus } : {}),
-  };
-
-  const initialData: { data: TOrder[]; meta?: TMeta } = { data: [] };
-
-  try {
-    const result = (await serverRequest.get("/orders", {
-      params: query,
-    })) as TResponse<TOrder[]>;
-
-    if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
+  const ordersResult = await getAllOrdersReq(queries);
 
   return (
     <Orders
-      ordersResult={initialData}
+      ordersResult={ordersResult}
       title="All Orders"
       subtitle="Manage all orders here"
     />
