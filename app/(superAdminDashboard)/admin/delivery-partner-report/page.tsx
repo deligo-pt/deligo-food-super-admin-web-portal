@@ -1,8 +1,6 @@
 import DeliveryPartnerReport from "@/components/Dashboard/Reports/DeliveryPartnerReport/DeliveryPartnerReport";
-import { serverRequest } from "@/lib/serverFetch";
+import { getAllDeliveryPartnersReq } from "@/services/dashboard/delivery-partner/delivery-partner.service";
 import { getDeliverPartnerReportAnalytics } from "@/services/dashboard/reports/reports.service";
-import { TMeta, TResponse } from "@/types";
-import { TDeliveryPartner } from "@/types/delivery-partner.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -11,37 +9,16 @@ type IProps = {
 export default async function DeliveryPartnerReportPage({
   searchParams,
 }: IProps) {
-  const deliveryPartnerReportAnalytics = await getDeliverPartnerReportAnalytics();
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-  const status = queries.status || "";
 
-  const query = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(status ? { status: status } : {}),
-    isDeleted: false,
-  };
+  const deliveryPartnerReportAnalytics =
+    await getDeliverPartnerReportAnalytics();
+  const partnersData = await getAllDeliveryPartnersReq(queries);
 
-  const initialData: { data: TDeliveryPartner[]; meta?: TMeta } = { data: [] };
-
-  try {
-    const result = (await serverRequest.get("/delivery-partners", {
-      params: query,
-    })) as TResponse<TDeliveryPartner[]>;
-
-    if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <DeliveryPartnerReport partnersData={initialData} deliveryPartnerReportAnalytics={deliveryPartnerReportAnalytics} />;
+  return (
+    <DeliveryPartnerReport
+      partnersData={partnersData}
+      deliveryPartnerReportAnalytics={deliveryPartnerReportAnalytics}
+    />
+  );
 }

@@ -13,8 +13,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/use-translation";
-import { initializePayoutReq } from "@/services/dashboard/payout/payout";
-import { getAllWalletsReq } from "@/services/dashboard/wallet/wallet";
+import { initializePayoutReq } from "@/services/dashboard/payout/payout.service";
+import { getAllWalletsReq } from "@/services/dashboard/wallet/wallet.service";
 import { TMeta } from "@/types";
 import { TWallet } from "@/types/wallet.type";
 import { formatPrice } from "@/utils/formatPrice";
@@ -40,13 +40,11 @@ export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
 
   const getUsers = async ({ limit = 10 }) => {
     const result = await getAllWalletsReq({
-      limit,
+      limit: String(limit),
       userModel: type === "vendor" ? "Vendor" : "FleetManager",
     });
 
-    if (result.success) {
-      setUserData({ data: result.data, meta: result.meta });
-    }
+    setUserData(result);
   };
 
   const initializePayout = async (targetUserId: string) => {

@@ -10,12 +10,6 @@ export const createTaxReq = async (data: Partial<TTax>) => {
   });
 };
 
-export const getSingleTaxReq = async (id: string) => {
-  return catchAsync<null>(async () => {
-    return await serverRequest.patch(`/taxes/${id}`);
-  });
-};
-
 export const updateTaxReq = async (id: string, data: Partial<TTax>) => {
   return catchAsync<null>(async () => {
     return await serverRequest.patch(`/taxes/${id}`, { data });
@@ -26,6 +20,16 @@ export const deleteTaxReq = async (id: string) => {
   return catchAsync<null>(async () => {
     return await serverRequest.delete(`/taxes/soft-delete/${id}`);
   });
+};
+
+export const getSingleTaxReq = async (id: string) => {
+  const result = await catchAsync<TTax>(async () => {
+    return await serverRequest.get(`/taxes/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
 };
 
 export const getAllTaxesReq = async (

@@ -7,11 +7,9 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { USER_STATUS } from "@/consts/user.const";
-import { TResponse } from "@/types";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
 import { format, parse } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -57,22 +55,18 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
 
   const deleteVendor = async () => {
     const toastId = toast.loading("Deleting vendor...");
-    try {
-      const result = (await deleteData(`/auth/soft-delete/${vendor.userId}`, {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<null>;
-      if (result?.success) {
-        setShowDeleteModal(false);
-        toast.success("Vendor deleted successfully!", { id: toastId });
-        router.push("/admin/all-vendors");
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Vendor delete failed", {
-        id: toastId,
-      });
+
+    const result = await userSoftDeleteReq(vendor.userId as string);
+
+    if (result?.success) {
+      setShowDeleteModal(false);
+      toast.success("Vendor deleted successfully!", { id: toastId });
+      router.push("/admin/all-vendors");
+      return;
     }
+
+    toast.error(result?.message || "Vendor delete failed", { id: toastId });
+    console.log(result);
   };
 
   const getStatusColor = (status: keyof typeof USER_STATUS) => {

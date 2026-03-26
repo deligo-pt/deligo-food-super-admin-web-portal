@@ -5,7 +5,7 @@ import { SOSDetailModal } from "@/components/Dashboard/SOS/SOSDetailModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { USER_ROLE } from "@/consts/user.const";
 import { useSOSSocket } from "@/hooks/use-sos-socket";
-import { getAllSOSReq } from "@/services/dashboard/SOS/SOS";
+import { getAllSOSReq } from "@/services/dashboard/SOS/sos.service";
 import { TMeta } from "@/types";
 import { SOSType, TSOS, TSOSStats } from "@/types/sos.type";
 import { motion } from "framer-motion";

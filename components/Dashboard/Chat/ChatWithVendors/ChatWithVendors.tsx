@@ -4,8 +4,10 @@ import SelectVendorModal from "@/components/Dashboard/Chat/ChatWithVendors/Selec
 import { Button } from "@/components/ui/button";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
-import { getMessagesByRoom } from "@/services/chat/chat";
-import { openConversationReq } from "@/services/dashboard/chat/chat";
+import {
+  getMessagesByRoom,
+  openConversationReq,
+} from "@/services/dashboard/chat/chat.service";
 import { getAllVendorsReq } from "@/services/dashboard/vendor/vendor.service";
 import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
@@ -39,7 +41,7 @@ export default function ChatWithVendors({
   const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
-  const [attachments, setAttachments] = useState<string[]>([]);
+  const [attachments, setAttachments] = useState<File[]>([]);
   const [audioFile, setAudioFile] = useState<string | null>(null);
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [conversations, setConversations] = useState<TConversation[]>(
@@ -73,11 +75,9 @@ export default function ChatWithVendors({
 
   const getConversation = async (room: string) => {
     try {
-      const result = (await fetchData(`/support/conversations/${room}`, {
-        headers: { authorization: accessToken },
-      })) as TResponse<TConversation>;
-
-      console.log(result);
+      const result = (await fetchData(
+        `/support/conversations/${room}`,
+      )) as TResponse<TConversation>;
 
       if (result.success) {
         return {
@@ -151,6 +151,7 @@ export default function ChatWithVendors({
     token: accessToken as string,
     onMessage: (msg) => {
       if (msg.room === selectedId) {
+        console.log(msg);
         setMessages((prev) => [...prev, msg]);
       }
     },
@@ -190,7 +191,7 @@ export default function ChatWithVendors({
     const text = textRef.current?.value.trim() ?? "";
     if (!text && attachments.length === 0 && !audioFile) return;
 
-    sendMessage(text);
+    sendMessage(text, attachments);
 
     // reset
     if (textRef.current) textRef.current.value = "";
@@ -217,11 +218,10 @@ export default function ChatWithVendors({
   function onSelectImages(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files) return;
-    const urls: string[] = [];
-    Array.from(files)
-      .slice(0, 6)
-      .forEach((f) => urls.push(URL.createObjectURL(f)));
-    setAttachments((s) => [...s, ...urls]);
+
+    const finalFiles = Array.from(files).slice(0, 100);
+
+    setAttachments((prev) => [...prev, ...finalFiles]);
     e.currentTarget.value = "";
   }
 
@@ -275,11 +275,7 @@ export default function ChatWithVendors({
   useEffect(() => {
     if (selectedId) {
       getMessagesByRoom(selectedId).then((result) => {
-        if (result.success) {
-          setMessages(result.data);
-        } else {
-          setMessages([]);
-        }
+        setMessages(result.data);
       });
     }
   }, [selectedId]);
@@ -601,7 +597,7 @@ export default function ChatWithVendors({
                     </label>
                   </div>
 
-                  <div className="flex-1 flex flex-col">
+                  <div className="flex-1 flex flex-col overflow-hidden">
                     <textarea
                       ref={textRef}
                       placeholder={t("write_a_message")}
@@ -615,21 +611,23 @@ export default function ChatWithVendors({
 
                     {/* previews */}
                     {attachments.length > 0 && (
-                      <div className="mt-2 flex gap-2" aria-live="polite">
-                        {attachments.map((a, i) => (
-                          <div
-                            key={i}
-                            className="w-14 h-14 rounded-lg overflow-hidden border"
-                          >
-                            <Image
-                              width={500}
-                              height={500}
-                              src={a}
-                              alt={`attachment-preview-${i}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
+                      <div className="mt-2 overflow-x-auto">
+                        <div className="flex gap-2 w-fit" aria-live="polite">
+                          {attachments.map((a, i) => (
+                            <div
+                              key={i}
+                              className="w-14 h-14 rounded-lg overflow-hidden border"
+                            >
+                              <Image
+                                width={500}
+                                height={500}
+                                src={URL.createObjectURL(a) || ""}
+                                alt={`attachment-preview-${i}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 

@@ -1,6 +1,5 @@
 import OfferDetails from "@/components/Dashboard/Offers/ActiveCampaigns/OfferDetails";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { getSingleOfferReq } from "@/services/dashboard/offer/offer.service";
 import { TOffer } from "@/types/offer.type";
 
 export default async function OfferDetailsPage({
@@ -9,19 +8,7 @@ export default async function OfferDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let offerData: TOffer = {} as TOffer;
+  const offer: TOffer = await getSingleOfferReq(id);
 
-  try {
-    const result = (await serverRequest.get(
-      `/offers/${id}`,
-    )) as TResponse<TOffer>;
-
-    if (result?.success) {
-      offerData = result.data;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <OfferDetails offer={offerData} />;
+  return <OfferDetails offer={offer} />;
 }

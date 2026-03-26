@@ -1,6 +1,5 @@
 import PayoutDetails from "@/components/Dashboard/Payouts/PayoutDetails/PayoutDetails";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { getSinglePayoutReq } from "@/services/dashboard/payout/payout.service";
 import { TPayout } from "@/types/payout.type";
 
 export default async function DeliveryPartnerPayoutDetailsPage({
@@ -9,19 +8,7 @@ export default async function DeliveryPartnerPayoutDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let initialData: TPayout = {} as TPayout;
+  const payout: TPayout = await getSinglePayoutReq(id);
 
-  try {
-    const result = (await serverRequest.get(
-      `/payouts/${id}`,
-    )) as TResponse<TPayout>;
-
-    if (result?.success) {
-      initialData = result.data;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <PayoutDetails payout={initialData} />;
+  return <PayoutDetails payout={payout} />;
 }

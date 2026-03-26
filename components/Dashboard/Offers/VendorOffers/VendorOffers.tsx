@@ -36,11 +36,11 @@ const filterOptions = [
     items: [
       {
         label: "Active",
-        value: "active",
+        value: "ACTIVE",
       },
       {
         label: "Inactive",
-        value: "inactive",
+        value: "INACTIVE",
       },
     ],
   },

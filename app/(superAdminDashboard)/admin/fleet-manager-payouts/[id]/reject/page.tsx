@@ -1,6 +1,5 @@
 import RejectPayout from "@/components/Dashboard/Payouts/MakePayout/RejectPayout";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { getSinglePayoutReq } from "@/services/dashboard/payout/payout.service";
 import { TPayout } from "@/types/payout.type";
 
 export default async function FleetRejectPayoutPage({
@@ -9,19 +8,7 @@ export default async function FleetRejectPayoutPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let initialData: TPayout = {} as TPayout;
+  const payout: TPayout = await getSinglePayoutReq(id);
 
-  try {
-    const result = (await serverRequest.get(
-      `/payouts/${id}`,
-    )) as TResponse<TPayout>;
-
-    if (result?.success) {
-      initialData = result.data;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <RejectPayout payout={initialData} />;
+  return <RejectPayout payout={payout} />;
 }

@@ -11,7 +11,7 @@ import {
   allMarkReadReq,
   getAllNotificationsReq,
   singleMarkReadReq,
-} from "@/services/dashboard/notifications/notifications";
+} from "@/services/dashboard/notifications/notifications.service";
 import { TMeta } from "@/types";
 import { TNotification } from "@/types/notification.type";
 import { motion } from "framer-motion";

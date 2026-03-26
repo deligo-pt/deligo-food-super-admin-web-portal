@@ -38,3 +38,13 @@ export const getAllDeliveryPartnersReq = async (
     data: [],
   };
 };
+
+export const getSingleDeliveryPartnerReq = async (id: string) => {
+  const result = await catchAsync<TDeliveryPartner>(async () => {
+    return await serverRequest.get(`/delivery-partners/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
+};

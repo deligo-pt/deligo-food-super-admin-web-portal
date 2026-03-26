@@ -9,7 +9,6 @@ export async function getFcmToken(): Promise<string | null> {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return null;
 
-  // 🔥 THIS is the key line
   const registration = await navigator.serviceWorker.ready;
 
   return await getToken(messaging, {
@@ -27,7 +26,7 @@ export async function saveFcmToken(
   await postData("/auth/save-fcm-token", JSON.stringify(payload), {
     headers: {
       "Content-Type": "application/json",
-      authorization: accessToken,
+      authorization: `Bearer ${accessToken}`,
     },
   });
 }

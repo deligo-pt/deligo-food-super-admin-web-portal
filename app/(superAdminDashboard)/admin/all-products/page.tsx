@@ -5,7 +5,7 @@ type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
 };
 
-export default async function ProductsPage({ searchParams }: IProps) {
+export default async function AllProductsPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const productsResult = await getAllProductsReq(queries);
 

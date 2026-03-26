@@ -13,12 +13,14 @@ export const getAllOrdersReq = async (
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const customerId = queries.customerId || "";
 
   const params = {
     limit,
     page,
     sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
+    ...(searchTerm ? { searchTerm } : {}),
+    ...(customerId ? { customerId } : {}),
   };
 
   const result = await catchAsync<TOrder[]>(async () => {
@@ -36,6 +38,16 @@ export const getAllOrdersReq = async (
   return {
     data: [],
   };
+};
+
+export const getSingleOrderReq = async (id: string) => {
+  const result = await catchAsync<TOrder>(async () => {
+    return await serverRequest.get(`/orders/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
 };
 
 export const getAllOrders = async () => {

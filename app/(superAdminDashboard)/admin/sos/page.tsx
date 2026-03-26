@@ -1,20 +1,10 @@
 import { SOS } from "@/components/Dashboard/SOS/SOS";
-import { getSOSStatReq } from "@/services/dashboard/SOS/SOS";
-import { TSOSStats } from "@/types/sos.type";
+import { getSOSStatReq } from "@/services/dashboard/SOS/sos.service";
 import { cookies } from "next/headers";
 
 export default async function SOSPage() {
   const accessToken = (await cookies()).get("accessToken")?.value || "";
+  const SOSStats = await getSOSStatReq();
 
-  let initialData: TSOSStats = {} as TSOSStats;
-
-  const result = await getSOSStatReq();
-
-  if (result?.success) {
-    initialData = result.data;
-  } else {
-    console.log("Server fetch error:", result);
-  }
-
-  return <SOS accessToken={accessToken} SOSStats={initialData} />;
+  return <SOS accessToken={accessToken} SOSStats={SOSStats} />;
 }

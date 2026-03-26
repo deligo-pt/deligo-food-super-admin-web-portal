@@ -4,8 +4,10 @@ import SelectCustomerModal from "@/components/Dashboard/Chat/ChatWithCustomers/S
 import { Button } from "@/components/ui/button";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
-import { getMessagesByRoom } from "@/services/chat/chat";
-import { openConversationReq } from "@/services/dashboard/chat/chat";
+import {
+  getMessagesByRoom,
+  openConversationReq,
+} from "@/services/dashboard/chat/chat.service";
 import { getAllCustomersReq } from "@/services/dashboard/customer/customer.service";
 import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
@@ -73,11 +75,9 @@ export default function ChatWithCustomers({
 
   const getConversation = async (room: string) => {
     try {
-      const result = (await fetchData(`/support/conversations/${room}`, {
-        headers: { authorization: accessToken },
-      })) as TResponse<TConversation>;
-
-      console.log(result);
+      const result = (await fetchData(
+        `/support/conversations/${room}`,
+      )) as TResponse<TConversation>;
 
       if (result.success) {
         return {
@@ -261,11 +261,7 @@ export default function ChatWithCustomers({
   useEffect(() => {
     if (selectedId) {
       getMessagesByRoom(selectedId).then((result) => {
-        if (result.success) {
-          setMessages(result.data);
-        } else {
-          setMessages([]);
-        }
+        setMessages(result.data);
       });
     }
   }, [selectedId]);

@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { retryFailedPayoutReq } from "@/services/dashboard/payout/payout";
+import { retryFailedPayoutReq } from "@/services/dashboard/payout/payout.service";
 import { TFleetManagerPayout } from "@/types/payout.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";

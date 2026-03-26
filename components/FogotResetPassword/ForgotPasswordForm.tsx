@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/use-translation";
-import { forgotPasswordReq } from "@/services/forgotResetPassword/forgotResetPassword";
+import { forgotPasswordReq } from "@/services/forgotResetPassword/forgot-reset-password.service";
 import { TResponse } from "@/types";
 import { forgotPasswordValidation } from "@/validations/forgot-reset-password/forgot-reset-password.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,7 +56,7 @@ export default function ForgotPasswordForm() {
       console.log(error);
       toast.error(
         error?.response?.data?.message || "Recovery Email Sending Failed",
-        { id: toastId }
+        { id: toastId },
       );
     }
   };

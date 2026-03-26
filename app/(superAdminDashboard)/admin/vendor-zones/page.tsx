@@ -1,46 +1,12 @@
 import VendorZones from "@/components/Dashboard/Zones/VendorZones/VendorZones";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { getAllVendorsReq } from "@/services/dashboard/vendor/vendor.service";
+import { TMeta } from "@/types";
 import { TZone } from "@/types/zone.type";
 
-type IProps = {
-  searchParams?: Promise<Record<string, string | undefined>>;
-};
+export default async function VendorZonesPage() {
+  const vendorsResult = await getAllVendorsReq({ limit: "100" });
 
-export default async function VendorZonesPage({ searchParams }: IProps) {
-  const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 100);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
-  const status = queries.status || "";
-
-  const query = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(status ? { status: status } : {}),
-    isDeleted: false,
-  };
-
-  const initialData: { data: TVendor[]; meta?: TMeta } = { data: [] };
-
-  try {
-    const result = (await serverRequest.get("/vendors", {
-      params: query,
-    })) as TResponse<TVendor[]>;
-
-    if (result?.success) {
-      initialData.data = result.data;
-      initialData.meta = result.meta;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  const zonesData = initialData?.data?.reduce(
+  const zonesData = vendorsResult?.data?.reduce(
     (acc, vendor) => {
       const city = vendor.businessLocation?.city?.trim() as string;
       const vendorIndex = acc.data.findIndex((z) => z.zoneName === city);

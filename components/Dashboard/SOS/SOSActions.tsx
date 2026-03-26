@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { updateSOSStatusReq } from "@/services/dashboard/SOS/SOS";
+import { updateSOSStatusReq } from "@/services/dashboard/SOS/sos.service";
 import { TSosStatus } from "@/types/sos.type";
 import { CheckCircle, TriangleAlert, UserSearch } from "lucide-react";
 import { useState } from "react";

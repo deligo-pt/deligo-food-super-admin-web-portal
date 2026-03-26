@@ -78,3 +78,13 @@ export const getAllProductCategoriesReq = async (
     data: [],
   };
 };
+
+export const getSingleProductCategoryReq = async (id: string) => {
+  const result = await catchAsync<TProductCategory>(async () => {
+    return await serverRequest.get(`/categories/productCategory/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
+};

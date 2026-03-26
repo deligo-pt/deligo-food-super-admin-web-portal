@@ -1,12 +1,13 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
+import { TMeta } from "@/types";
 import { TAgent } from "@/types/user.type";
 import { catchAsync } from "@/utils/catchAsync";
 
 export const getAllFleetManagersReq = async (
   queries: Record<string, string | undefined>,
-) => {
+): Promise<{ data: TAgent[]; meta?: TMeta }> => {
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
@@ -37,4 +38,14 @@ export const getAllFleetManagersReq = async (
   return {
     data: [],
   };
+};
+
+export const getSingleFleetManagerReq = async (id: string) => {
+  const result = await catchAsync<TAgent>(async () => {
+    return await serverRequest.get(`/fleet-managers/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
 };

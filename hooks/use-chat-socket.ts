@@ -93,10 +93,11 @@ export function useChatSocket({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room]);
 
-  const sendMessage = (message: string) => {
+  const sendMessage = (message: string, attachments?: File[]) => {
     socketRef.current?.emit("send-message", {
       room,
       message,
+      ...(attachments && attachments?.length > 0 && { attachments }),
     });
   };
 

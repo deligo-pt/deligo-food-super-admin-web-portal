@@ -44,3 +44,13 @@ export const getAllSponsorshipsReq = async (
     data: [],
   };
 };
+
+export const getSingleSponsorshipReq = async (id: string) => {
+  const result = await catchAsync<TSponsorship>(async () => {
+    return await serverRequest.get(`/sponsorships/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
+};

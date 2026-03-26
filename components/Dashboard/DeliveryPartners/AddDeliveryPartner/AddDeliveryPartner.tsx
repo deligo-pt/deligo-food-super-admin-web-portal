@@ -24,8 +24,8 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { approveOrRejectReq } from "@/services/auth/approveOrReject";
-import { resendOtpReq, verifyOtpReq } from "@/services/auth/OTP";
+import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
+import { resendOtpReq, verifyOtpReq } from "@/services/auth/otp.service";
 import {
   registerUserAndSendOtpReq,
   updateUserDataReq,

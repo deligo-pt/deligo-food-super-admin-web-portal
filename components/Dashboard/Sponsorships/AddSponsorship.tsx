@@ -23,7 +23,6 @@ import { cn } from "@/lib/utils";
 import { TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { catchAsync } from "@/utils/catchAsync";
-import { getCookie } from "@/utils/cookies";
 import { postData } from "@/utils/requests";
 import { sponsorshipValidation } from "@/validations/sponsorship/sponsorship.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -76,7 +75,6 @@ export default function AddSponsorship() {
       return (await postData("/sponsorships/create-sponsorship", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${getCookie("accessToken")}`,
         },
       })) as unknown as Promise<TResponse<TSponsorship>>;
     });

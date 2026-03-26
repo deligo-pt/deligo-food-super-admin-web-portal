@@ -10,6 +10,16 @@ export const deleteProductReq = async (id: string) => {
   });
 };
 
+export const getSingleProductReq = async (id: string) => {
+  const result = await catchAsync<TProduct>(async () => {
+    return await serverRequest.get(`/products/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
+};
+
 export const getAllProductsReq = async (
   queries: Record<string, string | undefined>,
 ) => {

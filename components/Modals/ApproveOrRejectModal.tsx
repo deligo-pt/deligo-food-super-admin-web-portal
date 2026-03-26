@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
-import { approveOrRejectReq } from "@/services/auth/approveOrReject";
+import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ export default function ApproveOrRejectModal({
           ? "Rejecting..."
           : status === "BLOCKED"
             ? "Blocking..."
-            : "Unblocking..."
+            : "Unblocking...",
     );
 
     const updateStatus = {
@@ -67,7 +67,7 @@ export default function ApproveOrRejectModal({
             : status === "BLOCKED"
               ? "Blocked successfully!"
               : "Unblocked successfully!",
-        { id: toastId }
+        { id: toastId },
       );
       router.refresh();
       return;
@@ -75,14 +75,14 @@ export default function ApproveOrRejectModal({
 
     toast.error(
       result.message ||
-      (status === "APPROVED"
-        ? "Approving failed"
-        : status === "REJECTED"
-          ? "Rejecting failed"
-          : status === "BLOCKED"
-            ? "Blocking failed"
-            : "Unblocking failed"),
-      { id: toastId }
+        (status === "APPROVED"
+          ? "Approving failed"
+          : status === "REJECTED"
+            ? "Rejecting failed"
+            : status === "BLOCKED"
+              ? "Blocking failed"
+              : "Unblocking failed"),
+      { id: toastId },
     );
     console.log(result);
   };
@@ -99,7 +99,8 @@ export default function ApproveOrRejectModal({
               {status === "UNBLOCKED" && "Unblock"} {userName}
             </DialogTitle>
             <DialogDescription>
-              {t("let_them_know_why_you_are")} {status === "APPROVED" && "approving"}
+              {t("let_them_know_why_you_are")}{" "}
+              {status === "APPROVED" && "approving"}
               {status === "REJECTED" && "rejecting"}
               {status === "BLOCKED" && "blocking"}
               {status === "UNBLOCKED" && "unblocking"}

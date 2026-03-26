@@ -4,7 +4,6 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TResponse } from "@/types";
 import { TPayout } from "@/types/payout.type";
 import { catchAsync } from "@/utils/catchAsync";
-import { getCookie } from "@/utils/cookies";
 import { formatPrice } from "@/utils/formatPrice";
 import { postData } from "@/utils/requests";
 import { format } from "date-fns";
@@ -138,7 +137,6 @@ export default function PayoutSettlement({ payout }: IProps) {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            authorization: `Bearer ${getCookie("accessToken")}`,
           },
         },
       )) as unknown as TResponse<null>;

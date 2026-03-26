@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/use-translation";
-import { resetPasswordReq } from "@/services/forgotResetPassword/forgotResetPassword";
+import { resetPasswordReq } from "@/services/forgotResetPassword/forgot-reset-password.service";
 import { TResponse } from "@/types";
 import { resetPasswordValidation } from "@/validations/forgot-reset-password/forgot-reset-password.validation";
 import { zodResolver } from "@hookform/resolvers/zod";

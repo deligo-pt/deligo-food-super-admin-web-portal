@@ -1,21 +1,9 @@
 import CustomerInsights from "@/components/Dashboard/Analytics/CustomerInsights/CustomerInsights";
-import { serverRequest } from "@/lib/serverFetch";
+import { getCustomerInsightsReq } from "@/services/dashboard/analytics/analytics.service";
 import { TCustomerInsights } from "@/types/analytics.type";
 
 export default async function CustomerInsightsPage() {
-  let data: TCustomerInsights = {} as TCustomerInsights;
+  const insights: TCustomerInsights = await getCustomerInsightsReq();
 
-  try {
-    const result = await serverRequest.get(
-      "/analytics/admin/customer-insights",
-    );
-
-    if (result?.success) {
-      data = result?.data;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <CustomerInsights insights={data} />;
+  return <CustomerInsights insights={insights} />;
 }

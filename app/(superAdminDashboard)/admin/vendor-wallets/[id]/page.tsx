@@ -1,7 +1,5 @@
 import WalletDetails from "@/components/Dashboard/Wallets/WalletDetails/WalletDetails";
-import { serverRequest } from "@/lib/serverFetch";
-import { TWalletDetails } from "@/types/wallet.type";
-import { catchAsync } from "@/utils/catchAsync";
+import { getSingleWalletReq } from "@/services/dashboard/wallet/wallet.service";
 
 export default async function VendorWalletDetailsPage({
   params,
@@ -9,19 +7,7 @@ export default async function VendorWalletDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let initialData: TWalletDetails = {} as TWalletDetails;
+  const wallet = await getSingleWalletReq(id);
 
-  try {
-    const result = await catchAsync<TWalletDetails>(async () => {
-      return await serverRequest.get(`/wallets/${id}`);
-    });
-
-    if (result?.success) {
-      initialData = result.data || {};
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <WalletDetails wallet={initialData} />;
+  return <WalletDetails wallet={wallet} />;
 }

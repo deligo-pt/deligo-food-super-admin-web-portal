@@ -4,8 +4,10 @@ import SelectDriverModal from "@/components/Dashboard/Chat/ChatWithDrivers/Selec
 import { Button } from "@/components/ui/button";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
-import { getMessagesByRoom } from "@/services/chat/chat";
-import { openConversationReq } from "@/services/dashboard/chat/chat";
+import {
+  getMessagesByRoom,
+  openConversationReq,
+} from "@/services/dashboard/chat/chat.service";
 import { getAllDeliveryPartnersReq } from "@/services/dashboard/delivery-partner/delivery-partner.service";
 import { TMeta, TResponse } from "@/types";
 import { TConversation, TMessage } from "@/types/chat.type";
@@ -71,9 +73,9 @@ export default function ChatWithDrivers({
 
   const getConversation = async (room: string) => {
     try {
-      const result = (await fetchData(`/support/conversations/${room}`, {
-        headers: { authorization: accessToken },
-      })) as TResponse<TConversation>;
+      const result = (await fetchData(
+        `/support/conversations/${room}`,
+      )) as TResponse<TConversation>;
 
       if (result.success) {
         return {
@@ -256,11 +258,7 @@ export default function ChatWithDrivers({
   useEffect(() => {
     if (selectedId) {
       getMessagesByRoom(selectedId).then((result) => {
-        if (result.success) {
-          setMessages(result.data);
-        } else {
-          setMessages([]);
-        }
+        setMessages(result.data);
       });
     }
   }, [selectedId]);

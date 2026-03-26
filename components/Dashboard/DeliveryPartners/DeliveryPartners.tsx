@@ -6,7 +6,7 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";

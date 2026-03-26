@@ -3,7 +3,7 @@
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { USER_ROLE } from "@/consts/user.const";
-import { getAllUsersReq } from "@/services/dashboard/system-management/email-notification-settings";
+import { getAllUsersReq } from "@/services/dashboard/system-management/email-notification-settings.service";
 import { TMeta } from "@/types";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import {

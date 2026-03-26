@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
-import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
 import { getSortOptions } from "@/utils/sortOptions";
@@ -130,11 +130,17 @@ export default function AllCustomers({ customersResult }: IProps) {
             <tr>
               <th className="px-4 py-3 text-left w-[60px]">#</th>
               <th className="px-4 py-3 text-left w-[280px]">{t("customer")}</th>
-              <th className="px-4 py-3 text-center w-[120px]">{t("orders_lg")}</th>
-              <th className="px-4 py-3 text-center w-[150px]">{t("spend")} (€)</th>
+              <th className="px-4 py-3 text-center w-[120px]">
+                {t("orders_lg")}
+              </th>
+              <th className="px-4 py-3 text-center w-[150px]">
+                {t("spend")} (€)
+              </th>
               <th className="px-4 py-3 text-center w-[150px]">{t("status")}</th>
               <th className="px-4 py-3 text-center w-[150px]">{t("joined")}</th>
-              <th className="px-4 py-3 text-center w-[260px]">{t("actions")}</th>
+              <th className="px-4 py-3 text-center w-[260px]">
+                {t("actions")}
+              </th>
             </tr>
           </thead>
 

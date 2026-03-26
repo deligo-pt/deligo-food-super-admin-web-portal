@@ -1,6 +1,5 @@
 import ProductDetails from "@/components/AllProducts/ProductDetails.tsx/ProductDetails";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { getSingleProductReq } from "@/services/dashboard/product/product.service";
 import { TProduct } from "@/types/product.type";
 
 export default async function ProductDetailsPage({
@@ -9,20 +8,7 @@ export default async function ProductDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  let initialData: TProduct = {} as TProduct;
-
-  try {
-    const result = (await serverRequest.get(
-      `/products/${id}`,
-    )) as unknown as TResponse<TProduct>;
-
-    if (result?.success) {
-      initialData = result.data;
-    }
-  } catch (err) {
-    console.log("Server fetchProducts error:", err);
-  }
+  const initialData: TProduct = await getSingleProductReq(id);
 
   return <ProductDetails product={initialData} />;
 }

@@ -30,7 +30,6 @@ import { useTranslation } from "@/hooks/use-translation";
 import { updateProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 import { TResponse } from "@/types";
 import { TBusinessCategory, TProductCategory } from "@/types/category.type";
-import { getCookie } from "@/utils/cookies";
 import { fetchData } from "@/utils/requests";
 import { updateProductCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -111,9 +110,9 @@ export default function EditProductCategoryModal({
 
   const getBusinessCategories = async () => {
     try {
-      const result = (await fetchData("/categories/businessCategory", {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<{ data: TBusinessCategory[] }>;
+      const result = (await fetchData(
+        "/categories/businessCategory",
+      )) as unknown as TResponse<{ data: TBusinessCategory[] }>;
       if (result?.success) {
         setBusinessCategories(result?.data?.data);
       }

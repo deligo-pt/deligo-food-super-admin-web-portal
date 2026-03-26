@@ -1,10 +1,9 @@
-import SalesReport from '@/components/Dashboard/Reports/SalesReport/SalesReport';
-import { getSalesReportAnalytics } from '@/services/dashboard/reports/reports.service';
-import { queryStringFormatter } from '@/utils/formatter';
-
+import SalesReport from "@/components/Dashboard/Reports/SalesReport/SalesReport";
+import { getSalesReportAnalytics } from "@/services/dashboard/reports/reports.service";
+import { queryStringFormatter } from "@/utils/formatter";
 
 interface IProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 const SalesReportPage = async ({ searchParams }: IProps) => {

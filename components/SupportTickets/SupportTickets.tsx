@@ -7,7 +7,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
-import { getMessagesByRoom } from "@/services/chat/chat";
+import { getMessagesByRoom } from "@/services/dashboard/chat/chat.service";
 import { TMeta, TResponse } from "@/types";
 import {
   TAdminSupportMessage,
@@ -84,11 +84,9 @@ export default function SupportTickets({ conversationsData }: IProps) {
 
   const getConversation = async (room: string) => {
     try {
-      const result = (await fetchData(`/support/conversations/${room}`, {
-        headers: { authorization: accessToken },
-      })) as TResponse<TConversation>;
-
-      console.log(result);
+      const result = (await fetchData(
+        `/support/conversations/${room}`,
+      )) as TResponse<TConversation>;
 
       if (result.success) {
         return {
@@ -160,11 +158,7 @@ export default function SupportTickets({ conversationsData }: IProps) {
   useEffect(() => {
     if (!!conversation) {
       getMessagesByRoom(conversation?.room).then((result) => {
-        if (result.success) {
-          setMessages(result.data);
-        } else {
-          setMessages([]);
-        }
+        setMessages(result.data);
       });
     }
   }, [conversation]);

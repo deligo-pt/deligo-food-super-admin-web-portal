@@ -1,6 +1,5 @@
 import TaxDetails from "@/components/Tax/TaxDetails/TaxDetails";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { getSingleTaxReq } from "@/services/dashboard/tax/tax.service";
 import { TTax } from "@/types/tax.type";
 
 export default async function TaxDetailsPage({
@@ -9,17 +8,7 @@ export default async function TaxDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let initialData: TTax = {} as TTax;
+  const tax: TTax = await getSingleTaxReq(id);
 
-  try {
-    const result = (await serverRequest.get(`/taxes/${id}`)) as TResponse<TTax>;
-
-    if (result?.success) {
-      initialData = result.data;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <TaxDetails tax={initialData} />;
+  return <TaxDetails tax={tax} />;
 }

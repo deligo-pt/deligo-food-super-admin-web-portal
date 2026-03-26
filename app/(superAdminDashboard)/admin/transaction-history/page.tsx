@@ -1,8 +1,5 @@
 import Transactions from "@/components/Dashboard/Transactions/Transactions";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta } from "@/types";
-import { TTransaction } from "@/types/transaction.type";
-import { catchAsync } from "@/utils/catchAsync";
+import { getAllTransactionsReq } from "@/services/dashboard/transaction/transaction.service";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -10,32 +7,7 @@ type IProps = {
 
 export default async function TransactionsPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
-  const limit = Number(queries?.limit || 10);
-  const page = Number(queries.page || 1);
-  const searchTerm = queries.searchTerm || "";
-  const sortBy = queries.sortBy || "-createdAt";
+  const transactionsResult = await getAllTransactionsReq(queries);
 
-  const query = {
-    limit,
-    page,
-    sortBy,
-    ...(searchTerm ? { searchTerm } : {}),
-  };
-
-  const initialData: { data: TTransaction[]; meta?: TMeta } = { data: [] };
-
-  const result = await catchAsync<{ data: TTransaction[]; meta?: TMeta }>(
-    async () => {
-      return await serverRequest.get("/transactions", {
-        params: query,
-      });
-    },
-  );
-
-  if (result?.success) {
-    initialData.data = result.data?.data;
-    initialData.meta = result.data?.meta;
-  }
-
-  return <Transactions transactionsResult={initialData} />;
+  return <Transactions transactionsResult={transactionsResult} />;
 }

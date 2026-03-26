@@ -1,6 +1,5 @@
 import BusinessCategoryDetails from "@/components/AllBusinessCategories/BusinessCategoryDetails";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { getSingleBusinessCategoryReq } from "@/services/dashboard/category/business-category.service";
 import { TBusinessCategory } from "@/types/category.type";
 
 export default async function BusinessCategoryDetailsPage({
@@ -9,21 +8,7 @@ export default async function BusinessCategoryDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  let initialData: TBusinessCategory = {} as TBusinessCategory;
-
-  try {
-    const result = (await serverRequest.get(
-      `/categories/businessCategory/${id}`,
-      {}
-    )) as unknown as TResponse<TBusinessCategory>;
-
-    if (result?.success) {
-      initialData = result?.data || {};
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
+  const initialData: TBusinessCategory = await getSingleBusinessCategoryReq(id);
 
   return <BusinessCategoryDetails category={initialData} />;
 }

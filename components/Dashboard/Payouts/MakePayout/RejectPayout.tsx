@@ -1,7 +1,7 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { rejectPayoutReq } from "@/services/dashboard/payout/payout";
+import { rejectPayoutReq } from "@/services/dashboard/payout/payout.service";
 import { TPayout, TVendorPayout } from "@/types/payout.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";

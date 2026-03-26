@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import AddVendor from "@/components/AddVendor/AddVendor";
+import AddVendor from "@/components/Dashboard/Vendors/AddVendor/AddVendor";
 import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";

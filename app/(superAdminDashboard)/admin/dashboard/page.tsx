@@ -1,26 +1,11 @@
 export const dynamic = "force-dynamic";
 
 import Dashboard from "@/components/Dashboard/Dashboard/Dashboard";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
+import { getAdminDashboardReq } from "@/services/dashboard/analytics/analytics.service";
 import { TAnalytics } from "@/types/analytics.type";
 
 export default async function DashboardPage() {
-  let analyticsData: TAnalytics = {} as TAnalytics;
-
-  try {
-    const result = (await serverRequest.get(
-      "/analytics/admin/dashboard-analytics",
-    )) as unknown as TResponse<TAnalytics>;
-
-    if (result?.success) {
-      analyticsData = result?.data;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    console.log("Server fetch error:", err?.response?.data || err);
-  }
+  const analyticsData: TAnalytics = await getAdminDashboardReq();
 
   return <Dashboard analyticsData={analyticsData} />;
 }

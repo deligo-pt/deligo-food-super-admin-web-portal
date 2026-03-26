@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useTranslation } from "@/hooks/use-translation";
-import { TResponse } from "@/types";
-import { getCookie } from "@/utils/cookies";
-import { updateData } from "@/utils/requests";
+import { uploadUserDocumentsReq } from "@/utils/uploadUserDocument";
 import { motion } from "framer-motion";
 import { Eye, File, FileText, ImageIcon, UploadCloud } from "lucide-react";
 import Image from "next/image";
@@ -111,42 +108,31 @@ export default function UploadPartnerDocuments({
     const url = URL.createObjectURL(f);
 
     const toastId = toast.loading("Uploading...");
-    try {
-      const formData = new FormData();
-      formData.append("file", f);
-      formData.append("data", JSON.stringify({ docImageTitle: key }));
 
-      const result = (await updateData(
-        `/delivery-partners/${partnerId}/docImage`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            authorization: getCookie("accessToken"),
-          },
-        },
-      )) as unknown as TResponse<any>;
+    const result = await uploadUserDocumentsReq(
+      `/delivery-partners/${partnerId}/docImage`,
+      key,
+      f,
+    );
 
-      if (result.success) {
-        toast.success("File uploaded successfully!", { id: toastId });
-
-        const prev = previews[key];
-        if (prev && prev.url) URL.revokeObjectURL(prev.url);
-
-        setPreviews((p) => ({ ...p, [key]: { file: f, url, isImage } }));
-
-        if (inputsRef.current[key]) {
-          inputsRef.current[key]!.value = "";
-        }
-        return;
-      }
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "File upload failed", {
+    if (result.success) {
+      toast.success(result.message || "File uploaded successfully!", {
         id: toastId,
       });
+
+      const prev = previews[key];
+      if (prev && prev.url) URL.revokeObjectURL(prev.url);
+
+      setPreviews((p) => ({ ...p, [key]: { file: f, url, isImage } }));
+
+      if (inputsRef.current[key]) {
+        inputsRef.current[key]!.value = "";
+      }
       return;
     }
+
+    toast.error(result.message || "File upload failed", { id: toastId });
+    console.log(result);
   };
 
   const removeFile = (key: DocKey) => {

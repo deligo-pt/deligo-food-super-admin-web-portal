@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/hooks/use-translation";
-import { uploadProfilePhoto } from "@/services/dashboard/profile/uploadProfilePhoto";
+import { uploadProfilePhoto } from "@/services/dashboard/profile/profile.service";
 import { TResponse } from "@/types";
 import { TAdmin } from "@/types/admin.type";
 import { AnimatePresence, motion } from "framer-motion";
@@ -59,7 +59,7 @@ export default function ProfilePhotoUpload({ currentPhoto }: IProps) {
 
     try {
       const result = (await uploadProfilePhoto(
-        imageFile as File
+        imageFile as File,
       )) as TResponse<TAdmin>;
 
       if (result.success) {
@@ -183,7 +183,7 @@ export default function ProfilePhotoUpload({ currentPhoto }: IProps) {
           whileTap={{
             scale: 0.95,
           }}
-        // disabled={isUploading}
+          // disabled={isUploading}
         >
           <span>{t("upload")}</span>
           <UploadIcon className="w-4 h-4" />

@@ -78,3 +78,13 @@ export const getAllBusinessCategoriesReq = async (
     data: [],
   };
 };
+
+export const getSingleBusinessCategoryReq = async (id: string) => {
+  const result = await catchAsync<TBusinessCategory>(async () => {
+    return await serverRequest.get(`/categories/businessCategory/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
+};

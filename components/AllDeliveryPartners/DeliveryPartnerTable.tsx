@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
-import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { getSortOptions } from "@/utils/sortOptions";

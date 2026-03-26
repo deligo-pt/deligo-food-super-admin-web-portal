@@ -7,7 +7,7 @@ import DeleteModal from "@/components/Modals/DeleteModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
-import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TAdmin } from "@/types/admin.type";
 import { getSortOptions } from "@/utils/sortOptions";
@@ -179,7 +179,9 @@ export default function AllAdmins({ adminsResult }: IProps) {
         >
           <div className="px-4 py-3 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <h2>{t("total_admins")}: {adminsResult?.meta?.total}</h2>
+              <h2>
+                {t("total_admins")}: {adminsResult?.meta?.total}
+              </h2>
             </div>
 
             <div className="text-sm text-gray-500">
@@ -258,10 +260,11 @@ export default function AllAdmins({ adminsResult }: IProps) {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${a.status === "APPROVED"
-                          ? "bg-green-50 text-green-800"
-                          : "bg-red-50 text-red-800"
-                          }`}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          a.status === "APPROVED"
+                            ? "bg-green-50 text-green-800"
+                            : "bg-red-50 text-red-800"
+                        }`}
                       >
                         {a.status}
                       </span>

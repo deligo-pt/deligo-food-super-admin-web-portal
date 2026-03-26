@@ -1,5 +1,5 @@
 import ProductCategoryDetails from "@/components/ProductCategories/ProductCategoryDetails";
-import { cookies } from "next/headers";
+import { getSingleProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 
 export default async function ProductCategoryDetailsPage({
   params,
@@ -7,18 +7,11 @@ export default async function ProductCategoryDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const accessToken = (await cookies()).get("accessToken")?.value || "";
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/productCategory/${id}`,
-    { headers: { authorization: accessToken } }
-  );
-  const result = await response.json();
-  const data = result.data;
+  const category = await getSingleProductCategoryReq(id);
 
   return (
     <div>
-      <ProductCategoryDetails category={data} />
+      <ProductCategoryDetails category={category} />
     </div>
   );
 }

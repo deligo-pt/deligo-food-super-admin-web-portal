@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { loginReq } from "@/services/auth/login";
+import { loginReq } from "@/services/auth/login.service";
 import { setCookie } from "@/utils/cookies";
 import { getAndSaveFcmToken } from "@/utils/fcmToken";
 import { loginValidation } from "@/validations/auth/auth.validation";

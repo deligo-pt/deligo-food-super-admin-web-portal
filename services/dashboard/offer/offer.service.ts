@@ -1,8 +1,8 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
+import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
-import { TCustomer } from "@/types/user.type";
 import { catchAsync } from "@/utils/catchAsync";
 
 export const createOfferReq = async (data: Partial<TOffer>) => {
@@ -27,13 +27,24 @@ export const deleteOfferReq = async (id: string) => {
   });
 };
 
+export const getSingleOfferReq = async (id: string) => {
+  const result = await catchAsync<TOffer>(async () => {
+    return await serverRequest.get(`/offers/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
+};
+
 export const getAllOffersReq = async (
   queries: Record<string, string | undefined>,
-) => {
+): Promise<{ data: TOffer[]; meta?: TMeta }> => {
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const vendorId = queries.vendorId;
   const activeStatus = queries.activeStatus;
   const validStatus = queries.validStatus;
 
@@ -42,12 +53,13 @@ export const getAllOffersReq = async (
     page,
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
+    ...(vendorId ? { vendorId } : {}),
     ...(activeStatus ? { isActive: activeStatus !== "ACTIVE" } : {}),
     ...(validStatus ? { isExpired: validStatus !== "VALID" } : {}),
     isDeleted: false,
   };
 
-  const result = await catchAsync<TCustomer[]>(async () => {
+  const result = await catchAsync<TOffer[]>(async () => {
     return await serverRequest.get("/offers", {
       params,
     });

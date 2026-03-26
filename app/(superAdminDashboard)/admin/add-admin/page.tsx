@@ -1,4 +1,4 @@
-import AddAdmin from "@/components/AddAdmin/AddAdmin";
+import AddAdmin from "@/components/Dashboard/Admins/AddAdmin/AddAdmin";
 
 export default function AddAdminPage() {
   return <AddAdmin />;

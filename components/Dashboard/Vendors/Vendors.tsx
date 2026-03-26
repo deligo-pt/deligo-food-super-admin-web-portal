@@ -6,10 +6,9 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TMeta, TResponse } from "@/types";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
+import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
-import { getCookie } from "@/utils/cookies";
-import { deleteData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -91,25 +90,21 @@ export default function Vendors({
   const deleteVendor = async () => {
     const toastId = toast.loading("Deleting Vendor...");
 
-    try {
-      const result = (await deleteData(`/auth/soft-delete/${deleteId}`, {
-        headers: { authorization: getCookie("accessToken") },
-      })) as unknown as TResponse<null>;
+    const result = await userSoftDeleteReq(deleteId);
 
-      if (result?.success) {
-        router.refresh();
-        setDeleteId("");
-        toast.success(result.message || "Vendor deleted successfully!", {
-          id: toastId,
-        });
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Vendor delete failed", {
+    if (result?.success) {
+      router.refresh();
+      setDeleteId("");
+      toast.success(result.message || "Vendor deleted successfully!", {
         id: toastId,
       });
+      return;
     }
+
+    toast.error(result?.message || "Vendor delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (

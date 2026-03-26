@@ -38,3 +38,13 @@ export const getAllCustomersReq = async (
     data: [],
   };
 };
+
+export const getSingleCustomerReq = async (id: string) => {
+  const result = await catchAsync<TCustomer>(async () => {
+    return await serverRequest.get(`/customers/${id}`);
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
+};

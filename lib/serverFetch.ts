@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 
 const serverRequestHelper = async (
   url: string,
-  options?: AxiosRequestConfig
+  options?: AxiosRequestConfig,
 ) => {
   const accessToken = (await cookies()).get("accessToken")?.value || "";
 
@@ -19,7 +19,7 @@ const serverRequestHelper = async (
     ...options,
     headers: {
       ...(options?.headers || {}),
-      authorization: accessToken,
+      authorization: `Bearer ${accessToken}`,
     },
   }).then((res) => res.data);
 };

@@ -8,7 +8,7 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
-import { userSoftDeleteReq } from "@/services/auth/deleteUser";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import {
@@ -77,7 +77,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   const handleDeletePartner = async () => {
     const toastId = toast.loading("Deleting Delivery Partner...");
 
-    const result = await userSoftDeleteReq(partner._id as string);
+    const result = await userSoftDeleteReq(partner.userId as string);
 
     if (result.success) {
       toast.success("Delivery Partner deleted successfully", { id: toastId });

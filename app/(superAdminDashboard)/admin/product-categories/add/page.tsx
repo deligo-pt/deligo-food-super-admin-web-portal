@@ -1,29 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import AddProductCategory from "@/components/ProductCategories/AddProductCategory";
-import { serverRequest } from "@/lib/serverFetch";
-import { TResponse } from "@/types";
-import { TBusinessCategory } from "@/types/category.type";
+import { getAllBusinessCategoriesReq } from "@/services/dashboard/category/business-category.service";
 
 export default async function page() {
-  let initialData: TBusinessCategory[] = {} as TBusinessCategory[];
-
-  try {
-    const result = (await serverRequest.get(
-      "/categories/businessCategory",
-      {},
-    )) as unknown as TResponse<{ data: TBusinessCategory[] }>;
-
-    if (result?.success) {
-      initialData = result?.data?.data || [];
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
+  const businessCategoriesResult = await getAllBusinessCategoriesReq({});
 
   return (
     <div>
-      <AddProductCategory businessCategories={initialData} />
+      <AddProductCategory businessCategories={businessCategoriesResult?.data} />
     </div>
   );
 }
