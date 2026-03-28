@@ -1,6 +1,7 @@
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 
-export function exportCustomerReportCSV({
+export function generateCustomerReportCSV({
   statusDistribution,
   monthlySignups,
   stats,
@@ -8,20 +9,25 @@ export function exportCustomerReportCSV({
   statusDistribution: Record<string, number>;
   monthlySignups: { label: string; value: number }[];
   stats: {
-    total: number;
-    active: number;
+    totalCustomers: number;
+    activeCustomers: number;
     totalOrders: number;
-    totalSpent: number;
+    totalRevenue: string;
   };
 }) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Customers", String(stats.total)]);
-  rows.push(["Active Customers", String(stats.active)]);
+  rows.push(["Total Customers", String(stats.totalCustomers)]);
+  rows.push(["Active Customers", String(stats.activeCustomers)]);
   rows.push(["Total Orders", String(stats.totalOrders)]);
-  rows.push(["Total Revenue", String(stats.totalSpent)]);
+  rows.push([
+    "Total Revenue",
+    String(
+      `€${formatPrice(Number(stats.totalRevenue?.replace("€", "")) || 0)}`,
+    ),
+  ]);
   rows.push([]); // spacer row
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====

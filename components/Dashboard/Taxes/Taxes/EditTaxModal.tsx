@@ -87,7 +87,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <form>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Tax</DialogTitle>
             <DialogDescription>Make changes to your tax</DialogDescription>

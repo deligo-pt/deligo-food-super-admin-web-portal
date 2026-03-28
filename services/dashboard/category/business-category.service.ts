@@ -1,6 +1,7 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
+import { TMeta } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { catchAsync } from "@/utils/catchAsync";
 
@@ -62,16 +63,18 @@ export const getAllBusinessCategoriesReq = async (
     ...(status ? { status: status } : {}),
   };
 
-  const result = await catchAsync<TBusinessCategory[]>(async () => {
-    return await serverRequest.get("/categories/businessCategory", {
-      params,
-    });
-  });
+  const result = await catchAsync<{ data: TBusinessCategory[]; meta?: TMeta }>(
+    async () => {
+      return await serverRequest.get("/categories/businessCategory", {
+        params,
+      });
+    },
+  );
 
   if (result?.success)
     return {
-      data: result.data,
-      meta: result.meta,
+      data: result.data.data,
+      meta: result.data.meta,
     };
 
   return {

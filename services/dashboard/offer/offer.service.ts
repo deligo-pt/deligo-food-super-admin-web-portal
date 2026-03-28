@@ -54,8 +54,8 @@ export const getAllOffersReq = async (
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
     ...(vendorId ? { vendorId } : {}),
-    ...(activeStatus ? { isActive: activeStatus !== "ACTIVE" } : {}),
-    ...(validStatus ? { isExpired: validStatus !== "VALID" } : {}),
+    ...(activeStatus ? { isActive: activeStatus === "ACTIVE" } : {}),
+    ...(validStatus ? { isExpired: validStatus === "VALID" } : {}),
     isDeleted: false,
   };
 

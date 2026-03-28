@@ -85,7 +85,8 @@ export default function DeliveryPartnerPerformance({
                 }
               </p>
               <p className="text-[#DC3173] text-sm">
-                {partnerPerformanceData?.data?.topCards?.mostOrders?.ordersCount?.toLocaleString()}{" "}
+                {partnerPerformanceData?.data?.topCards?.mostOrders?.ordersCount?.toLocaleString() ||
+                  0}{" "}
                 orders this month
               </p>
             </div>

@@ -1,5 +1,6 @@
 import { VendorPerformance } from "@/components/Dashboard/Performance/VendorPerformance/VendorPerformance";
 import { getPerformanceAnalyticsReq } from "@/services/dashboard/analytics/analytics.service";
+import { TMeta } from "@/types";
 import { TVendorPerformanceData } from "@/types/performance.type";
 
 type IProps = {
@@ -10,9 +11,16 @@ export default async function VendorPerformancePage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const vendorPerformanceData =
     await getPerformanceAnalyticsReq<TVendorPerformanceData>(
-      "fvendor-performance-analytics",
+      "vendor-performance-analytics",
       queries,
     );
 
-  return <VendorPerformance vendorPerformanceData={vendorPerformanceData} />;
+  return (
+    <VendorPerformance
+      vendorPerformanceData={{
+        data: vendorPerformanceData.data,
+        meta: vendorPerformanceData.meta as TMeta,
+      }}
+    />
+  );
 }

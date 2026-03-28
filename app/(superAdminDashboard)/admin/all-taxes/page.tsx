@@ -1,4 +1,4 @@
-import AllTaxes from "@/components/Tax/AllTaxes/AllTaxes";
+import Taxes from "@/components/Dashboard/Taxes/Taxes/Taxes";
 import { getAllTaxesReq } from "@/services/dashboard/tax/tax.service";
 
 type IProps = {
@@ -9,5 +9,5 @@ export default async function AllTaxesPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
   const taxesResult = await getAllTaxesReq(queries);
 
-  return <AllTaxes taxesResult={taxesResult} />;
+  return <Taxes taxesResult={taxesResult} />;
 }

@@ -5,7 +5,7 @@ export type TTransaction = {
   type: string;
   description: string;
 
-  amount?: string;
+  amount?: number;
   positive: boolean;
 
   status?: string;

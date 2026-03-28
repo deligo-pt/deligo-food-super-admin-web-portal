@@ -1,17 +1,12 @@
+import { IOrderReportAnalytics } from "@/types/report.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const generateFleetManagerReportPDF = (reportData: {
-  statusDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalFleetManagers: number;
-    approvedFleetManagers: number;
-    submittedFleetManagers: number;
-    blockedOrRejectedFleetManagers: number;
-  };
-}) => {
+export const generateOrderReportPDF = (
+  orderReportData: IOrderReportAnalytics,
+) => {
   const doc = new jsPDF("p", "mm", "a4");
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -21,7 +16,6 @@ export const generateFleetManagerReportPDF = (reportData: {
   const headerTop = 15;
   const logoSize = 18;
 
-  // Logo
   doc.addImage(
     "/deligoLogo.png",
     "PNG",
@@ -31,13 +25,11 @@ export const generateFleetManagerReportPDF = (reportData: {
     logoSize,
   );
 
-  // Company info
   const textX = marginX + logoSize + 6;
   let currentY = headerTop + 5;
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
-  doc.setTextColor(0);
   doc.text("PIXELMIRACLE, LDA", textX, currentY);
 
   doc.setFont("helvetica", "normal");
@@ -60,10 +52,10 @@ export const generateFleetManagerReportPDF = (reportData: {
   doc.text("www.deligo.pt", textX, currentY);
   doc.setTextColor(0);
 
-  // Right meta
+  // Right header
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
-  doc.text("Fleet Manager Report", pageWidth - marginX, headerTop + 5, {
+  doc.text("Admin Order Report", pageWidth - marginX, headerTop + 5, {
     align: "right",
   });
 
@@ -76,9 +68,8 @@ export const generateFleetManagerReportPDF = (reportData: {
     { align: "right" },
   );
 
-  // divider
+  // Divider
   const dividerY = Math.max(headerTop + logoSize, currentY) + 8;
-
   doc.setDrawColor(220, 49, 115);
   doc.line(marginX, dividerY, pageWidth - marginX, dividerY);
 
@@ -87,48 +78,42 @@ export const generateFleetManagerReportPDF = (reportData: {
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Fleet Managers Summary", marginX, y);
+  doc.text("Order Summary", marginX, y);
 
   y += 6;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
 
   doc.text(
-    `Total Fleet Managers: ${reportData.stats.totalFleetManagers}`,
+    `Total Revenue: €${formatPrice(orderReportData.summary.totalRevenue || 0)}`,
     marginX,
     y,
   );
   y += 5;
   doc.text(
-    `Approved Fleet Managers: ${reportData.stats.approvedFleetManagers}`,
+    `Completed Orders: ${orderReportData.summary.totalOrders}`,
     marginX,
     y,
   );
   y += 5;
   doc.text(
-    `Submitted Fleet Managers: ${reportData.stats.submittedFleetManagers}`,
-    marginX,
-    y,
-  );
-  y += 5;
-  doc.text(
-    `Blocked/Rejected Fleet Managers: ${reportData.stats.blockedOrRejectedFleetManagers}`,
+    `Average Order Value: €${formatPrice(orderReportData.summary.avgOrderValue || 0)}`,
     marginX,
     y,
   );
 
-  // Monthly Fleet managers signups
+  // Orders trend
   y += 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Monthly Signups", marginX, y);
+  doc.text("Orders Trend", marginX, y);
 
   y += 4;
 
   autoTable(doc, {
     startY: y,
-    head: [["Month", ...reportData.monthlySignups.map((s) => s.label)]],
-    body: [["Managers", ...reportData.monthlySignups.map((s) => s.value)]],
+    head: [["Date", "Orders"]],
+    body: orderReportData.ordersTrend?.map((d) => [d.date, d.orders]),
     styles: {
       fontSize: 9,
       cellPadding: 3,
@@ -144,30 +129,22 @@ export const generateFleetManagerReportPDF = (reportData: {
     margin: { left: marginX, right: marginX },
   });
 
-  // Fleet Managers Status Distribution
-  y += 30;
+  // Revenue trends
+  y += 5 * (orderReportData.revenueTrend.length || 0);
+
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Status Distribution", marginX, y);
+  doc.text("Revenue Trend", marginX, y);
 
   y += 4;
 
-  const statusKeys = Object.keys(reportData.statusDistribution);
-
   autoTable(doc, {
     startY: y,
-    head: [
-      [
-        "Status",
-        ...statusKeys?.map((key) => key.replace(/_/g, " ").toUpperCase()),
-      ],
-    ],
-    body: [
-      [
-        "Managers",
-        ...statusKeys.map((key) => reportData.statusDistribution[key]),
-      ],
-    ],
+    head: [["Date", "Revenue (€)"]],
+    body: orderReportData.revenueTrend.map((d) => [
+      d.date,
+      formatPrice(d.revenue || 0),
+    ]),
     styles: {
       fontSize: 9,
       cellPadding: 3,
@@ -183,9 +160,8 @@ export const generateFleetManagerReportPDF = (reportData: {
     margin: { left: marginX, right: marginX },
   });
 
-  // footer
+  // footer section
   const pageCount = doc.getNumberOfPages();
-
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
@@ -195,7 +171,5 @@ export const generateFleetManagerReportPDF = (reportData: {
     });
   }
 
-  doc.save(
-    `fleet_manager_report_${format(new Date(), "yyyy-MM-dd_HH-mm-ss")}.pdf`,
-  );
+  doc.save(`order_report_${format(new Date(), "yyyy-MM-dd_HH-mm-ss")}.pdf`);
 };

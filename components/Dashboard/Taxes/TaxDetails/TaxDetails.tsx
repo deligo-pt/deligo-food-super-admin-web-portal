@@ -1,7 +1,7 @@
 "use client";
 
+import EditTaxModal from "@/components/Dashboard/Taxes/Taxes/EditTaxModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
-import EditTaxModal from "@/components/Tax/AllTaxes/EditTaxModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

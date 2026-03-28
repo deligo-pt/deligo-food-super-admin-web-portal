@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TTransaction } from "@/types/transaction.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -91,7 +92,7 @@ export default function TransactionTable({ transactions }: IProps) {
               <TableCell>{p.transactionId}</TableCell>
               <TableCell>{p.description}</TableCell>
               <TableCell className="capitalize">{p.type}</TableCell>
-              <TableCell>€{p.amount}</TableCell>
+              <TableCell>€{formatPrice(p.amount || 0)}</TableCell>
               <TableCell>{format(p.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 <Button

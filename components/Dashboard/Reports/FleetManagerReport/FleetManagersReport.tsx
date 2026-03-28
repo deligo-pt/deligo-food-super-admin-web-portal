@@ -3,114 +3,42 @@
 import StatusDistributionCard from "@/components/common/StatusDistributionCard";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
-import FleetManagerReportTable from "@/components/Dashboard/Reports/FleetManagerReport/FleetManagerReportTable";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
-import AllFilters from "@/components/Filtering/AllFilters";
-import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TMeta } from "@/types";
 import { IFleetManagerReportAnalytics } from "@/types/report.type";
-import { TAgent } from "@/types/user.type";
-import { exportFleetManagerReportCSV } from "@/utils/exportFleetManagerReportCSV";
+import { generateFleetManagerReportCSV } from "@/utils/csv/fleetManagerReportCSV";
 import { generateFleetManagerReportPDF } from "@/utils/pdf/fleetManagerReportPdf";
 import { motion } from "framer-motion";
 import { Bike, CheckCircle, PackageCheckIcon, Users } from "lucide-react";
 
 interface IProps {
-  fleetManagersData: { data: TAgent[]; meta?: TMeta };
   fleetReportAnalytics: IFleetManagerReportAnalytics;
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
-
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
-
-export default function FleetManagerReport({ fleetManagersData, fleetReportAnalytics }: IProps) {
-
-  const stats = {
-    total: fleetManagersData.meta?.total || 0,
-    approved: fleetManagersData.data?.filter((m) => m.status === "APPROVED")
-      .length,
-    submitted: fleetManagersData.data?.filter((m) => m.status === "SUBMITTED").length,
-    blocked_rejected: fleetManagersData.data?.filter((m) => m.status === "BLOCKED" || m.status === "REJECTED").length,
+export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
+  const data = {
+    stats: fleetReportAnalytics?.cards,
+    monthlySignups: fleetReportAnalytics?.monthlySignups || [],
+    statusDistribution: fleetReportAnalytics?.statusDistribution || {},
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div className="print:pt-4">
-        {/* Logo for print */}
-        <div className="hidden print:flex items-center gap-2 mb-4">
-          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#DC3173] overflow-hidden shadow-md">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/deligoLogo.png"
-              alt="DeliGo Logo"
-              width={36}
-              height={36}
-              className="object-cover"
-            />
-          </div>
-          <h1 className="font-bold text-xl text-[#DC3173]">DeliGo</h1>
-        </div>
-
+      <div>
         {/* Header */}
         <TitleHeader
           title="Fleet Manager Report"
           subtitle="Overview of all fleet managers and their operations"
           extraComponent={
             <ExportPopover
-              onPDFClick={() =>
-                generateFleetManagerReportPDF(fleetManagersData?.data || [])
-              }
-              onCSVClick={() =>
-                exportFleetManagerReportCSV({
-                  stats: stats,
-                  monthlySignups: fleetReportAnalytics?.monthlySignups || [],
-                  statusDistribution: fleetReportAnalytics?.statusDistribution || {},
-                  fleetManagers: fleetManagersData.data,
-                })
-              }
+              onPDFClick={() => generateFleetManagerReportPDF(data)}
+              onCSVClick={() => generateFleetManagerReportCSV(data)}
             />
           }
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 print:mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
           <StatsCard
             title="Total Managers"
             value={fleetReportAnalytics?.cards?.totalFleetManagers || 0}
@@ -131,7 +59,9 @@ export default function FleetManagerReport({ fleetManagersData, fleetReportAnaly
           />
           <StatsCard
             title="Blocked/Rejected Managers"
-            value={fleetReportAnalytics?.cards?.blockedOrRejectedFleetManagers || 0}
+            value={
+              fleetReportAnalytics?.cards?.blockedOrRejectedFleetManagers || 0
+            }
             icon={PackageCheckIcon}
             delay={0.3}
           />
@@ -208,51 +138,6 @@ export default function FleetManagerReport({ fleetManagersData, fleetReportAnaly
               color="#ef4444"
             />
           </div>
-        </motion.div>
-
-        {/* Table */}
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.4,
-          }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-[#DC3173]/10 rounded-lg text-[#DC3173]">
-              <Users size={20} />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                All Fleet Managers
-              </h2>
-              <p className="text-sm text-gray-500">
-                {fleetManagersData.meta?.total} managers
-              </p>
-            </div>
-          </div>
-
-          <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
-
-          <FleetManagerReportTable fleetManagers={fleetManagersData?.data} />
-
-          {!!fleetManagersData?.meta?.totalPage && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <PaginationComponent
-                totalPages={fleetManagersData?.meta?.totalPage as number}
-              />
-            </motion.div>
-          )}
         </motion.div>
       </div>
     </div>

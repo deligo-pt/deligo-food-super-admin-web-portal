@@ -129,7 +129,7 @@ export default function CampaignTable({
               <TableCell>{offer?.isActive ? "Active" : "Inactive"}</TableCell>
               <TableCell>
                 {new Date(offer.expiresAt).getTime() - new Date().getTime() > 0
-                  ? "Active"
+                  ? "Live"
                   : "Expired"}
               </TableCell>
               <TableCell className="text-right">

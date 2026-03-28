@@ -31,7 +31,6 @@ export const getAllWalletsReq = async (
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
     ...(userModel ? { userModel } : {}),
-    isDeleted: false,
   };
 
   const result = await catchAsync<TWallet[]>(async () => {

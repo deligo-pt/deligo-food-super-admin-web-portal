@@ -84,7 +84,8 @@ export default function FleetManagerPerformance({
                   "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.ordersCount?.toLocaleString()}{" "}
+                {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.ordersCount?.toLocaleString() ||
+                  0}{" "}
                 orders
               </p>
             </div>

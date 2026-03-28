@@ -1,34 +1,40 @@
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 
-export function exportCustomerReportCSV({
-  statusDistribution,
+export function generateDeliveryPartnerReportCSV({
+  vehicleDistribution,
   monthlySignups,
   stats,
 }: {
-  statusDistribution: Record<string, number>;
+  vehicleDistribution: Record<string, number>;
   monthlySignups: { label: string; value: number }[];
   stats: {
-    total: number;
-    active: number;
-    totalOrders: number;
-    totalSpent: number;
+    totalPartners: number;
+    activePartners: number;
+    totalDeliveries: number;
+    totalEarnings: string;
   };
 }) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Customers", String(stats.total)]);
-  rows.push(["Active Customers", String(stats.active)]);
-  rows.push(["Total Orders", String(stats.totalOrders)]);
-  rows.push(["Total Revenue", String(stats.totalSpent)]);
-  rows.push([]); // spacer row
+  rows.push(["Total Delivery Partners", String(stats.totalPartners)]);
+  rows.push(["Approved Delivery Partners", String(stats.activePartners)]);
+  rows.push(["Total Deliveries", String(stats.totalDeliveries)]);
+  rows.push([
+    "Total Earnings",
+    String(
+      `€${formatPrice(Number(stats.totalEarnings?.replace("€", "")) || 0)}`,
+    ),
+  ]);
+  rows.push([]);
 
-  // ===== SECTION 2: STATUS DISTRIBUTION =====
-  rows.push(["--- STATUS DISTRIBUTION ---"]);
+  // ===== SECTION 2: VEHICLE TYPE DISTRIBUTION =====
+  rows.push(["--- VEHICLE TYPE DISTRIBUTION ---"]);
   rows.push(["Status", "Count"]);
 
-  Object.entries(statusDistribution).forEach(([status, count]) => {
+  Object.entries(vehicleDistribution).forEach(([status, count]) => {
     rows.push([status.replace(/_/g, " ").toUpperCase(), count]);
   });
 
@@ -52,7 +58,7 @@ export function exportCustomerReportCSV({
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}.csv`;
+  a.download = `delivery_partner_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}.csv`;
   a.click();
 
   URL.revokeObjectURL(url);

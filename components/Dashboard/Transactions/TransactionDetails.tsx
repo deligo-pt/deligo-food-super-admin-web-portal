@@ -92,7 +92,7 @@ export default function TransactionDetails({
       {/* Back */}
       <motion.div variants={itemVariants}>
         <button
-          onClick={() => router.push("/vendor/transactions")}
+          onClick={() => router.push("/admin/transaction-history")}
           className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium"
         >
           <ArrowLeftIcon className="w-4 h-4" />

@@ -2,6 +2,9 @@
 
 import OrderItemsTable from "@/components/Dashboard/Orders/OrderDetails/OrderItemsTable";
 import OrderPricingSummary from "@/components/Dashboard/Orders/OrderDetails/OrderPricingSummary";
+import { Badge } from "@/components/ui/badge";
+import { ORDER_STATUS } from "@/consts/order.const";
+import { cn } from "@/lib/utils";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
@@ -50,6 +53,22 @@ export default function OrderDetails({ order }: IProps) {
     },
   };
 
+  const statusColors = {
+    [ORDER_STATUS.PENDING]: "text-amber-700",
+    [ORDER_STATUS.ACCEPTED]: "text-emerald-700",
+    [ORDER_STATUS.PREPARING]: "text-blue-700",
+    [ORDER_STATUS.READY_FOR_PICKUP]: "text-indigo-700",
+    [ORDER_STATUS.ASSIGNED]: "text-sky-700",
+    [ORDER_STATUS.AWAITING_PARTNER]: "text-violet-700",
+    [ORDER_STATUS.PICKED_UP]: "text-cyan-700",
+    [ORDER_STATUS.DISPATCHING]: "text-cyan-700",
+    [ORDER_STATUS.ON_THE_WAY]: "text-teal-700",
+    [ORDER_STATUS.DELIVERED]: "text-[#DC3173]",
+    [ORDER_STATUS.CANCELED]: "text-red-700",
+    [ORDER_STATUS.REJECTED]: "text-rose-700",
+    [ORDER_STATUS.REASSIGNMENT_NEEDED]: "text-orange-700",
+  };
+
   return (
     <div className="">
       <motion.div
@@ -59,7 +78,7 @@ export default function OrderDetails({ order }: IProps) {
         animate="visible"
       >
         {/* Header */}
-        <div className="bg-linear-to-r from-[#DC3173] to-[#e45a92] p-6 text-white">
+        <div className="bg-linear-to-r from-[#DC3173] to-[#e45a92] p-6 text-white flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
@@ -81,6 +100,16 @@ export default function OrderDetails({ order }: IProps) {
                 <span>{format(order.createdAt, "dd MMM yyyy, hh:mm a")}</span>
               </div>
             </div>
+          </div>
+          <div>
+            <Badge
+              className={cn(
+                "bg-white",
+                statusColors[order.orderStatus] ?? "text-slate-600",
+              )}
+            >
+              {order.orderStatus?.replace("_", " ")}
+            </Badge>
           </div>
         </div>
 

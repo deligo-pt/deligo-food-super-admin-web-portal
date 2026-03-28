@@ -1,30 +1,30 @@
-import { TVendor } from "@/types/user.type";
 import { format } from "date-fns";
 
-export function exportVendorReportCSV({
+export function generateVendorReportCSV({
   statusDistribution,
   monthlySignups,
   stats,
-  vendors,
 }: {
   statusDistribution: Record<string, number>;
   monthlySignups: { label: string; value: number }[];
   stats: {
-    total: number;
-    approved: number;
-    pending: number;
-    blocked: number;
+    totalVendors: number;
+    approvedVendors: number;
+    submittedVendors: number;
+    blockedOrRejectedVendors: number;
   };
-  vendors: TVendor[];
 }) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Vendors", String(stats.total)]);
-  rows.push(["Approved Vendors", String(stats.approved)]);
-  rows.push(["Submitted Vendors", String(stats.pending)]);
-  rows.push(["Blocked/Rejected Vendors", String(stats.blocked)]);
+  rows.push(["Total Vendors", String(stats.totalVendors)]);
+  rows.push(["Approved Vendors", String(stats.approvedVendors)]);
+  rows.push(["Submitted Vendors", String(stats.submittedVendors)]);
+  rows.push([
+    "Blocked/Rejected Vendors",
+    String(stats.blockedOrRejectedVendors),
+  ]);
   rows.push([]); // spacer row
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====
@@ -32,12 +32,9 @@ export function exportVendorReportCSV({
   rows.push(["Status", "Count"]);
 
   Object.entries(statusDistribution).forEach(([status, count]) => {
-    rows.push([
-      status.replace(/_/g, " ").toUpperCase(), // optional formatting
-      count,
-    ]);
+    rows.push([status.replace(/_/g, " ").toUpperCase(), count]);
   });
-  
+
   rows.push([]);
 
   // ===== SECTION 3: MONTHLY SIGNUPS =====
@@ -47,38 +44,6 @@ export function exportVendorReportCSV({
     rows.push([item.label, String(item.value)]);
   });
   rows.push([]);
-
-  // ===== SECTION 4: VENDORS TABLE =====
-  rows.push(["--- VENDORS ---"]);
-  rows.push([
-    "Vendor ID",
-    "Business Name",
-    "Business Type",
-    "Owner",
-    "Email",
-    "Vendor Photo",
-    "Orders",
-    "Rating",
-    "Joined Date",
-    "Status",
-  ]);
-
-  vendors.forEach((v) => {
-    rows.push([
-      v.userId,
-      v.businessDetails?.businessName || "N/A",
-      v.businessDetails?.businessType || "N/A",
-      v.name?.firstName && v.name?.lastName
-        ? `${v.name?.firstName} ${v.name?.lastName}`
-        : "N/A",
-      v.email || "N/A",
-      v.profilePhoto || "N/A",
-      v.totalOrders || 0,
-      v.rating?.average || 0,
-      format(v.createdAt as Date, "yyyy-MM-dd"),
-      v.status,
-    ]);
-  });
 
   // ===== BUILD CSV =====
   const csv = rows

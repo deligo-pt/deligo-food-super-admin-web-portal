@@ -1,4 +1,4 @@
-import TaxDetails from "@/components/Tax/TaxDetails/TaxDetails";
+import TaxDetails from "@/components/Dashboard/Taxes/TaxDetails/TaxDetails";
 import { getSingleTaxReq } from "@/services/dashboard/tax/tax.service";
 import { TTax } from "@/types/tax.type";
 

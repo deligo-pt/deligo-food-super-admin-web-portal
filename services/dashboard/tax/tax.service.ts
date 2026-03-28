@@ -1,6 +1,7 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
+import { TMeta } from "@/types";
 import { TTax } from "@/types/tax.type";
 import { catchAsync } from "@/utils/catchAsync";
 
@@ -47,7 +48,7 @@ export const getAllTaxesReq = async (
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
   };
 
-  const result = await catchAsync<TTax[]>(async () => {
+  const result = await catchAsync<{ data: TTax[]; meta: TMeta }>(async () => {
     return await serverRequest.get("/taxes", {
       params,
     });
@@ -55,8 +56,8 @@ export const getAllTaxesReq = async (
 
   if (result?.success)
     return {
-      data: result.data,
-      meta: result.meta,
+      data: result.data.data,
+      meta: result.data.meta,
     };
 
   return {

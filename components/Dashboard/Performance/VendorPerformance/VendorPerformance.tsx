@@ -70,7 +70,8 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
                 }
               </p>
               <p className="text-[#DC3173] text-sm">
-                {vendorPerformanceData.data?.vendorPerformanceStat?.mostOrders?.ordersCount?.toLocaleString()}{" "}
+                {vendorPerformanceData.data?.vendorPerformanceStat?.mostOrders?.ordersCount?.toLocaleString() ||
+                  0}{" "}
                 orders this month
               </p>
             </div>

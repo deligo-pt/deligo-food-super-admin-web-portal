@@ -13,6 +13,7 @@ export const getAllOrdersReq = async (
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const orderStatus = queries.orderStatus || "";
   const customerId = queries.customerId || "";
 
   const params = {
@@ -20,6 +21,7 @@ export const getAllOrdersReq = async (
     page,
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
+    ...(orderStatus ? { orderStatus } : {}),
     ...(customerId ? { customerId } : {}),
   };
 

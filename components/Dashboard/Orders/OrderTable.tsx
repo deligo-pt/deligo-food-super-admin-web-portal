@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
   CalendarIcon,
+  CheckCircleIcon,
   Cog,
   EuroIcon,
   EyeIcon,
@@ -67,6 +68,12 @@ export default function OrderTable({ orders }: IProps) {
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
+                <CheckCircleIcon className="w-4" />
+                Status
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
                 Date
               </div>
@@ -82,7 +89,7 @@ export default function OrderTable({ orders }: IProps) {
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={6}
+                colSpan={7}
               >
                 No orders found
               </TableCell>
@@ -121,6 +128,12 @@ export default function OrderTable({ orders }: IProps) {
               </TableCell>
               <TableCell>
                 €{formatPrice(order.payoutSummary?.grandTotal || 0)}
+              </TableCell>
+              <TableCell>
+                {order.orderStatus
+                  ?.split("_")
+                  ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
+                  ?.join(" ")}
               </TableCell>
               <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell>

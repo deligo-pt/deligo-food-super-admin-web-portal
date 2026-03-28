@@ -75,7 +75,6 @@ export const getPerformanceAnalyticsReq = async <T>(
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
     ...(status ? { status: status } : {}),
-    isDeleted: false,
   };
 
   const result = await catchAsync<T>(async () => {
@@ -84,7 +83,9 @@ export const getPerformanceAnalyticsReq = async <T>(
     });
   });
 
-  return { data: result.data, meta: result.meta };
+  if (result.success) return { data: result.data, meta: result.meta };
+
+  return { data: {}, meta: {} };
 };
 
 export const getSinglePerformanceReq = async <T>(endPoint: string) => {

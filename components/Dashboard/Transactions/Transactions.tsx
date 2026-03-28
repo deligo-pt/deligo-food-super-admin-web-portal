@@ -25,7 +25,7 @@ export default function Transactions({ transactionsResult }: IProps) {
       {/* Page Title */}
       <TitleHeader
         title={t("transaction_history")}
-        subtitle={t("full_breakdown_of_earnings_payouts_fees")}
+        subtitle="Full breakdown of earnings, payouts, and fees"
       />
 
       {/* Filters */}

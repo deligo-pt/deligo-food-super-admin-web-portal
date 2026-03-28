@@ -75,17 +75,16 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("fleet_managers"),
       icon: <Users size={18} />,
       items: [
+        { name: "Add Fleet Manager", path: "/admin/add-fleet-manager" },
         { name: t("all_fleet_managers"), path: "/admin/all-fleet-managers" },
-        { name: t("add_new_fleet_manager"), path: "/admin/add-fleet-manager" },
-        {
-          name: t("fleet_manager_wallet"),
-          path: "/admin/fleet-manager-wallets",
-        },
         {
           name: "Fleet Manager Payouts",
           path: "/admin/fleet-manager-payouts",
         },
-        { name: t("zones_and_coverage_areas"), path: "/admin/fleet-zones" },
+        {
+          name: t("fleet_manager_wallet"),
+          path: "/admin/fleet-manager-wallets",
+        },
         {
           name: t("fleet_performance_analytics"),
           path: "/admin/fleet-performance",
@@ -94,6 +93,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("suspended_blocked_fleet_managers"),
           path: "/admin/blocked-fleet-managers",
         },
+        { name: t("zones_and_coverage_areas"), path: "/admin/fleet-zones" },
       ],
     },
     {
@@ -114,40 +114,40 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <Bike size={18} />,
       items: [
         {
-          name: t("all_delivery_partners"),
-          path: "/admin/all-delivery-partners",
+          name: "Add Delivery Partner",
+          path: "/admin/add-delivery-partner",
         },
         {
-          name: t("delivery_partner_onboarding_requests"),
-          path: "/admin/delivery-partner-onboarding-requests",
+          name: t("all_delivery_partners"),
+          path: "/admin/all-delivery-partners",
         },
         {
           name: t("active_delivery_partners"),
           path: "/admin/active-delivery-partners",
         },
         {
+          name: "Pending Approvals",
+          path: "/admin/delivery-partner-onboarding-requests",
+        },
+        {
           name: t("suspended_delivery_partners"),
           path: "/admin/suspended-delivery-partners",
         },
         {
-          name: "Add New Delivery Partner",
-          path: "/admin/add-delivery-partner",
-        },
-        {
-          name: t("delivery_partner_performance"),
-          path: "/admin/delivery-partner-performance",
+          name: t("delivery_partner_analytics"),
+          path: "/admin/delivery-partner-analytics",
         },
         {
           name: t("delivery_partner_payouts"),
           path: "/admin/delivery-partner-payouts",
         },
         {
-          name: "Delivery Partner Wallets",
-          path: "/admin/delivery-partner-wallets",
+          name: t("delivery_partner_performance"),
+          path: "/admin/delivery-partner-performance",
         },
         {
-          name: t("delivery_partner_analytics"),
-          path: "/admin/delivery-partner-analytics",
+          name: "Delivery Partner Wallets",
+          path: "/admin/delivery-partner-wallets",
         },
       ],
     },
@@ -187,11 +187,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <ShoppingBag size={18} />,
       items: [
         { name: t("all_orders"), path: "/admin/all-orders" },
+        { name: t("cancelled_orders"), path: "/admin/cancelled-orders" },
+        { name: t("delivered_orders"), path: "/admin/delivered-orders" },
         { name: t("pending_orders"), path: "/admin/pending-orders" },
         { name: t("preparing_orders"), path: "/admin/preparing-orders" },
         { name: t("on_the_way_orders"), path: "/admin/on-the-way-orders" },
-        { name: t("delivered_orders"), path: "/admin/delivered-orders" },
-        { name: t("cancelled_orders"), path: "/admin/cancelled-orders" },
       ],
     },
     {
@@ -199,9 +199,9 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("payments_and_earnings"),
       icon: <BadgeEuro size={18} />,
       items: [
+        { name: t("payment_disputes"), path: "/admin/payment-disputes" },
         { name: t("platform_earnings"), path: "/admin/platform-earnings" },
         { name: t("transaction_history"), path: "/admin/transaction-history" },
-        { name: t("payment_disputes"), path: "/admin/payment-disputes" },
         {
           name: "All Taxes",
           path: "/admin/all-taxes",
@@ -244,11 +244,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("analytics_and_insights"),
       icon: <ChartNoAxesCombined size={18} />,
       items: [
-        { name: t("sales_analytics"), path: "/admin/sales-analytics" },
-        { name: t("delivery_insights"), path: "/admin/delivery-insights" },
         { name: t("customer_insights"), path: "/admin/customer-insights" },
-        { name: t("top_vendors"), path: "/admin/top-vendors" },
+        { name: t("delivery_insights"), path: "/admin/delivery-insights" },
+        { name: t("sales_analytics"), path: "/admin/sales-analytics" },
         { name: t("peak_hours_analytics"), path: "/admin/peak-hours-analysis" },
+        { name: t("top_vendors"), path: "/admin/top-vendors" },
       ],
     },
     {
@@ -273,9 +273,9 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <ShieldUser size={18} />,
       items: [
         { name: t("all_admins"), path: "/admin/all-admins" },
-        { name: t("roles_and_permissions"), path: "/admin/roles-permissions" },
         { name: t("activity_logs"), path: "/admin/activity-logs" },
         { name: t("login_history"), path: "/admin/login-history" },
+        { name: t("roles_and_permissions"), path: "/admin/roles-permissions" },
       ],
     },
     {

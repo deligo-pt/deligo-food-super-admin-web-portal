@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-export function exportCustomerReportCSV({
+export function generateFleetManagerReportCSV({
   statusDistribution,
   monthlySignups,
   stats,
@@ -8,20 +8,23 @@ export function exportCustomerReportCSV({
   statusDistribution: Record<string, number>;
   monthlySignups: { label: string; value: number }[];
   stats: {
-    total: number;
-    active: number;
-    totalOrders: number;
-    totalSpent: number;
+    totalFleetManagers: number;
+    approvedFleetManagers: number;
+    submittedFleetManagers: number;
+    blockedOrRejectedFleetManagers: number;
   };
 }) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Customers", String(stats.total)]);
-  rows.push(["Active Customers", String(stats.active)]);
-  rows.push(["Total Orders", String(stats.totalOrders)]);
-  rows.push(["Total Revenue", String(stats.totalSpent)]);
+  rows.push(["Total Managers", String(stats.totalFleetManagers)]);
+  rows.push(["Approved Managers", String(stats.approvedFleetManagers)]);
+  rows.push(["Submitted Managers", String(stats.submittedFleetManagers)]);
+  rows.push([
+    "Blocked/Rejected Managers",
+    String(stats.blockedOrRejectedFleetManagers),
+  ]);
   rows.push([]); // spacer row
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====
@@ -36,7 +39,7 @@ export function exportCustomerReportCSV({
 
   // ===== SECTION 3: MONTHLY SIGNUPS =====
   rows.push(["--- MONTHLY SIGNUPS ---"]);
-  rows.push(["Month", "Customers"]);
+  rows.push(["Month", "Managers"]);
   monthlySignups.forEach((item) => {
     rows.push([item.label, String(item.value)]);
   });
@@ -52,7 +55,7 @@ export function exportCustomerReportCSV({
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `customer_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}.csv`;
+  a.download = `fleet_manager_report_${format(new Date(), "yyyy-MM-dd_hh_mm_ss_a")}.csv`;
   a.click();
 
   URL.revokeObjectURL(url);

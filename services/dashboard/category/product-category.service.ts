@@ -1,6 +1,7 @@
 "use server";
 
 import { serverRequest } from "@/lib/serverFetch";
+import { TMeta } from "@/types";
 import { TProductCategory } from "@/types/category.type";
 import { catchAsync } from "@/utils/catchAsync";
 
@@ -62,16 +63,18 @@ export const getAllProductCategoriesReq = async (
     ...(status ? { status: status } : {}),
   };
 
-  const result = await catchAsync<TProductCategory[]>(async () => {
-    return await serverRequest.get("/categories/productCategory", {
-      params,
-    });
-  });
+  const result = await catchAsync<{ data: TProductCategory[]; meta: TMeta }>(
+    async () => {
+      return await serverRequest.get("/categories/productCategory", {
+        params,
+      });
+    },
+  );
 
   if (result?.success)
     return {
-      data: result.data,
-      meta: result.meta,
+      data: result.data.data,
+      meta: result.data.meta,
     };
 
   return {
