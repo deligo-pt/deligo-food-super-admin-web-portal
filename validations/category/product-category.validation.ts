@@ -11,12 +11,13 @@ export const productCategoryValidation = z.object({
 
   businessCategoryId: z.string().nonempty("Business category is required"),
 
-  image: z
-    .object({
+  image: z.object(
+    {
       file: z.file().nullable(),
-      url: z.string(),
-    })
-    .optional(),
+      url: z.url("Image is required").nonempty("Image is required"),
+    },
+    "Image is required",
+  ),
 });
 
 export const updateProductCategoryValidation = z.object({

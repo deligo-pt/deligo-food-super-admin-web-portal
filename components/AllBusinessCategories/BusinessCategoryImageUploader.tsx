@@ -9,9 +9,10 @@ import React, { useCallback, useRef, useState } from "react";
 interface IProps {
   image?: { file: File | null; url: string };
   onChange: (image: { file: File | null; url: string }) => void;
+  isInvalid: boolean;
 }
 
-export function ImageUploader({ image, onChange }: IProps) {
+export function ImageUploader({ image, onChange, isInvalid = false }: IProps) {
   const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +44,7 @@ export function ImageUploader({ image, onChange }: IProps) {
       };
       reader.readAsDataURL(file);
     },
-    [onChange]
+    [onChange],
   );
 
   const handleDrop = useCallback(
@@ -55,7 +56,7 @@ export function ImageUploader({ image, onChange }: IProps) {
         handleFile(e.dataTransfer.files?.[0]);
       }
     },
-    [handleFile]
+    [handleFile],
   );
 
   const handleChange = useCallback(
@@ -65,7 +66,7 @@ export function ImageUploader({ image, onChange }: IProps) {
         handleFile(e.target.files?.[0]);
       }
     },
-    [handleFile]
+    [handleFile],
   );
 
   const removeImage = () => {
@@ -78,10 +79,13 @@ export function ImageUploader({ image, onChange }: IProps) {
       <div className={!!image?.url ? "grid lg:grid-cols-2 gap-6" : ""}>
         <div
           onDragEnter={handleDrag}
-          className={`border-2 border-dashed rounded-lg p-8 text-center ${dragActive
-              ? "border-[#DC3173] bg-pink-50"
-              : "border-gray-300 hover:border-gray-400"
-            } transition-colors duration-200`}
+          className={`border-2 border-dashed rounded-lg p-8 text-center ${
+            isInvalid
+              ? "border-red-500 bg-red-50"
+              : dragActive
+                ? "border-[#DC3173] bg-pink-50"
+                : "border-gray-300 hover:border-gray-400"
+          } transition-colors duration-200`}
         >
           {dragActive && (
             <div

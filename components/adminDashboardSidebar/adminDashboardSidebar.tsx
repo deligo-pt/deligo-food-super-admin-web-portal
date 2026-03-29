@@ -56,18 +56,18 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("vendors"),
       icon: <Utensils size={18} />,
       items: [
+        { name: "Add Vendor", path: "/admin/add-vendor" },
         { name: t("all_vendors"), path: "/admin/all-vendors" },
-        { name: t("pending_approvals"), path: "/admin/pending-approvals" },
         { name: t("active_vendors"), path: "/admin/active-vendors" },
+        { name: t("pending_approvals"), path: "/admin/pending-approvals" },
         { name: t("suspended_vendors"), path: "/admin/suspended-vendors" },
-        { name: t("add_new_vendor"), path: "/admin/add-vendor" },
-        { name: "Vendor Zones", path: "/admin/vendor-zones" },
+        { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
         {
           name: "Vendor Performance Analytics",
           path: "/admin/vendor-performance",
         },
-        { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
         { name: "Vendor Wallets", path: "/admin/vendor-wallets" },
+        { name: "Vendor Zones", path: "/admin/vendor-zones" },
       ],
     },
     {
@@ -227,10 +227,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: "Promotions & Offers",
       icon: <Ticket size={18} />,
       items: [
+        { name: "Add Offer", path: "/admin/create-new-offer" },
         { name: "All Offers", path: "/admin/all-offers" },
         { name: t("active_campaigns"), path: "/admin/active-campaigns" },
         { name: "Expired Offers", path: "/admin/expired-offers" },
-        { name: t("create_new_offer"), path: "/admin/create-new-offer" },
         { name: t("coupon_analytics"), path: "/admin/coupon-analytics" },
         {
           name: "Sponsorships",
@@ -260,11 +260,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("email_and_notification_settings"),
           path: "/admin/email-notification-settings",
         },
-        { name: t("maintenance_mode"), path: "/admin/maintenance-mode" },
         {
           name: t("in_app_notifications"),
           path: "/admin/send-notification-fleet",
         },
+        { name: t("maintenance_mode"), path: "/admin/maintenance-mode" },
       ],
     },
     {
@@ -284,13 +284,13 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <MessageCircleMore size={18} />,
       items: [
         { name: t("support_tickets"), path: "/admin/support-tickets" },
-        { name: t("chat_with_vendors"), path: "/admin/chat-with-vendors" },
+        { name: t("chat_with_customers"), path: "/admin/chat-with-customers" },
+        { name: t("chat_with_drivers"), path: "/admin/chat-with-drivers" },
         {
           name: t("chat_with_fleet_managers"),
           path: "/admin/chat-with-fleet-managers",
         },
-        { name: t("chat_with_drivers"), path: "/admin/chat-with-drivers" },
-        { name: t("chat_with_customers"), path: "/admin/chat-with-customers" },
+        { name: t("chat_with_vendors"), path: "/admin/chat-with-vendors" },
       ],
     },
     {
@@ -298,15 +298,15 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("reports"),
       icon: <NotepadText size={18} />,
       items: [
-        { name: t("sales_report"), path: "/admin/sales-report" },
-        { name: t("order_report"), path: "/admin/order-report" },
         { name: "Customer Report", path: "/admin/customer-report" },
-        { name: t("vendor_report"), path: "/admin/vendor-report" },
-        { name: "Fleet Manager Report", path: "/admin/fleet-manager-report" },
         {
           name: "Delivery Partner Report",
           path: "/admin/delivery-partner-report",
         },
+        { name: "Fleet Manager Report", path: "/admin/fleet-manager-report" },
+        { name: t("order_report"), path: "/admin/order-report" },
+        { name: t("sales_report"), path: "/admin/sales-report" },
+        { name: t("vendor_report"), path: "/admin/vendor-report" },
       ],
     },
     {
@@ -314,11 +314,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("settings"),
       icon: <Settings size={18} />,
       items: [
+        { name: t("global_settings"), path: "/admin/global-settings" },
         {
           name: t("notification_preferences"),
           path: "/admin/notification-preferences",
         },
-        { name: t("global_settings"), path: "/admin/global-settings" },
       ],
     },
     {

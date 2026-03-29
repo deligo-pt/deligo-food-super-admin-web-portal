@@ -176,7 +176,7 @@ export default function AddProductCategory({
             <FormField
               control={form.control}
               name="image"
-              render={() => (
+              render={({ fieldState }) => (
                 <FormItem className="content-start">
                   <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                     <div className="flex items-center">
@@ -188,9 +188,15 @@ export default function AddProductCategory({
                     <ImageUploader
                       image={watchImage}
                       onChange={onChangeImage}
+                      isInvalid={fieldState.invalid}
                     />
                   </FormControl>
-                  <FormMessage />
+                  {fieldState.invalid && (
+                    <p className="text-destructive text-sm">
+                      Image is required
+                    </p>
+                  )}
+                  {/* <FormMessage /> */}
                 </FormItem>
               )}
             />
