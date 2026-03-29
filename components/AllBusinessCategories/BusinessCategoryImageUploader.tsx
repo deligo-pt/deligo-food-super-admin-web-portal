@@ -9,7 +9,7 @@ import React, { useCallback, useRef, useState } from "react";
 interface IProps {
   image?: { file: File | null; url: string };
   onChange: (image: { file: File | null; url: string }) => void;
-  isInvalid: boolean;
+  isInvalid?: boolean;
 }
 
 export function ImageUploader({ image, onChange, isInvalid = false }: IProps) {
