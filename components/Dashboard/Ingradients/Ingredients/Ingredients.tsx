@@ -1,5 +1,6 @@
 "use client";
 
+import EditIngredientModal from "@/components/Dashboard/Ingradients/Ingredients/EditIngredientModal";
 import IngredientTable from "@/components/Dashboard/Ingradients/Ingredients/IngredientTable";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
@@ -8,6 +9,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TIngredient } from "@/types/ingredient.type";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface IProps {
@@ -20,7 +22,10 @@ const sortOptions = [
 ];
 
 export default function Ingredients({ ingredientsData }: IProps) {
+  const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [selectedIngredient, setSelectedIngredient] =
+    useState<TIngredient | null>(null);
 
   const handleDeleteIngredient = async () => {
     console.log(deleteId);
@@ -32,6 +37,10 @@ export default function Ingredients({ ingredientsData }: IProps) {
       <TitleHeader
         title="All Ingredients"
         subtitle="Inventory management for packaging and supplies"
+        buttonInfo={{
+          text: "Add Ingredient",
+          onClick: () => router.push("/admin/add-ingredient"),
+        }}
       />
 
       {/* Filters */}
@@ -40,6 +49,7 @@ export default function Ingredients({ ingredientsData }: IProps) {
       {/* Ingredients Table */}
       <IngredientTable
         ingredients={ingredientsData.data || []}
+        onEdit={(ingredient: TIngredient) => setSelectedIngredient(ingredient)}
         onDelete={(id: string) => setDeleteId(id)}
       />
 
@@ -54,6 +64,15 @@ export default function Ingredients({ ingredientsData }: IProps) {
             totalPages={ingredientsData?.meta?.totalPage as number}
           />
         </motion.div>
+      )}
+
+      {/* Edit Modal */}
+      {selectedIngredient && (
+        <EditIngredientModal
+          open={!!selectedIngredient}
+          onOpenChange={() => setSelectedIngredient(null)}
+          prevValues={selectedIngredient}
+        />
       )}
 
       {/* Delete Modal */}

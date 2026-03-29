@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { TResponse } from "@/types";
+import { catchAsync } from "@/utils/catchAsync";
+import { postData } from "@/utils/requests";
 import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -46,10 +49,39 @@ export default function AddIngredients() {
     setIsSubmitting(true);
     const toastId = toast.loading("Adding ingredient...");
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(data);
+    const payload = {
+      name: data.name,
+      category: data.category,
+      price: data.price,
+      stock: data.stock,
+      minOrder: data.minOrder,
+      description: data.description,
+    };
+
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(payload));
+    if (data.image?.file) {
+      formData.append("file", data.image.file);
+    }
+
+    const result = await catchAsync<null>(async () => {
+      return (await postData("/ingredients/create-ingredient", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })) as unknown as TResponse<null>;
+    });
+
     setIsSubmitting(false);
-    toast.success("Ingredient added successfully!", { id: toastId });
+
+    if (result.success) {
+      toast.success("Ingredient added successfully!", { id: toastId });
+      form.reset();
+      return;
+    }
+
+    toast.error(result.message || "Ingredient add failed", { id: toastId });
+    console.log(result);
   };
 
   return (
@@ -210,7 +242,12 @@ export default function AddIngredients() {
                         isInvalid={fieldState.invalid}
                       />
                     </FormControl>
-                    <FormMessage />
+                    {fieldState.invalid && (
+                      <p className="text-sm text-destructive">
+                        {fieldState.error?.message || "Image is required"}
+                      </p>
+                    )}
+                    {/* <FormMessage /> */}
                   </FormItem>
                 )}
               />

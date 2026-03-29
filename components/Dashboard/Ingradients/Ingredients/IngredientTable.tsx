@@ -28,10 +28,15 @@ import { useRouter } from "next/navigation";
 
 interface IProps {
   ingredients: TIngredient[];
+  onEdit: (ingredient: TIngredient) => void;
   onDelete: (id: string) => void;
 }
 
-export default function IngredientTable({ ingredients, onDelete }: IProps) {
+export default function IngredientTable({
+  ingredients,
+  onEdit,
+  onDelete,
+}: IProps) {
   const router = useRouter();
 
   return (
@@ -108,14 +113,14 @@ export default function IngredientTable({ ingredients, onDelete }: IProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem
-                      className=""
                       onClick={() =>
-                        router.push(
-                          "/admin/all-ingredients/" + ingredient.ingredientId,
-                        )
+                        router.push("/admin/all-ingredients/" + ingredient._id)
                       }
                     >
                       View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onEdit(ingredient)}>
+                      Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"

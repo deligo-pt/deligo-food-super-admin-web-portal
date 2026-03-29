@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Image as ImageIcon, Upload, X } from "lucide-react";
 import Image from "next/image";
@@ -63,7 +64,12 @@ export default function ImageUpload({
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+      <label
+        className={cn(
+          "block text-sm font-semibold mb-1.5",
+          isInvalid ? "text-destructive" : "text-gray-700",
+        )}
+      >
         {label}
       </label>
 

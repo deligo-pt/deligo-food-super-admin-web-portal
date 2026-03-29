@@ -99,8 +99,9 @@ export default function ApproveOrRejectModal({
               {status === "UNBLOCKED" && "Unblock"} {userName}
             </DialogTitle>
             <DialogDescription>
-              {t("let_them_know_why_you_are")}{" "}
-              {status === "APPROVED" && "approving"}
+              {status === "APPROVED"
+                ? "Are you sure you want to approve?"
+                : t("let_them_know_why_you_are") + " "}
               {status === "REJECTED" && "rejecting"}
               {status === "BLOCKED" && "blocking"}
               {status === "UNBLOCKED" && "unblocking"}
@@ -111,12 +112,13 @@ export default function ApproveOrRejectModal({
             id="remarksForm"
             className="grid gap-4"
           >
-            <div className="grid gap-3">
+            <div className={status === "APPROVED" ? "hidden" : "grid gap-3"}>
               <Label htmlFor="remarks">{t("remarks")}</Label>
               <Input
                 id="remarks"
                 name="remarks"
                 onBlur={(e) => setRemarks(e.target.value)}
+                hidden={status === "APPROVED"}
               />
             </div>
           </form>

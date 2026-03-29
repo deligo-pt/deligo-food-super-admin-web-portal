@@ -13,11 +13,7 @@ export const ingredientSchema = z.object({
     .max(50, "Category must be at most 50 characters long")
     .nonempty("Category is required"),
 
-  description: z
-    .string()
-    .min(5, "Description must be at least 5 characters long")
-    .max(500, "Description must be at most 500 characters long")
-    .optional(),
+  description: z.string().optional(),
 
   price: z
     .number("Price must be a number")
