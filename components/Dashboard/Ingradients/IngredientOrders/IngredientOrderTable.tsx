@@ -15,7 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { updatedIngredientOrderStatusReq } from "@/services/dashboard/ingredient/ingredient.service";
 import { TIngredientOrder } from "@/types/ingredient.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -26,53 +28,77 @@ import {
   EuroIcon,
   HashIcon,
   MoreVertical,
+  PackageIcon,
   StoreIcon,
+  TruckIcon,
   Warehouse,
-  XCircleIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface IProps {
   orders: TIngredientOrder[];
-  onDeleteClick: (id: string) => void;
+  // onDeleteClick: (id: string) => void;
 }
 
-export default function IngredientOrderTable({
-  orders,
-  onDeleteClick,
-}: IProps) {
+export default function IngredientOrderTable({ orders }: IProps) {
   const router = useRouter();
 
-  const getStatusBadge = (status: TIngredientOrder["status"]) => {
+  const updateStatus = async (id: string, status: "SHIPPED" | "DELIVERED") => {
+    const toastId = toast.loading(
+      status === "SHIPPED"
+        ? "Updating order status to SHIPPED..."
+        : "Updating order status to DELIVERED...",
+    );
+
+    const result = await updatedIngredientOrderStatusReq(id, { status });
+
+    if (result?.success) {
+      toast.success(
+        result?.message ||
+          (status === "SHIPPED"
+            ? "Order status updated to SHIPPED"
+            : "Order status updated to DELIVERED"),
+        { id: toastId },
+      );
+      router.refresh();
+      return;
+    }
+
+    toast.error(
+      result?.message ||
+        (status === "SHIPPED"
+          ? "Failed to update order status to SHIPPED"
+          : "Failed to update order status to DELIVERED"),
+      { id: toastId },
+    );
+    console.log(result);
+  };
+
+  const getStatusBadge = (status: TIngredientOrder["orderStatus"]) => {
     switch (status) {
       case "DELIVERED":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#DC3173]/10 text-[#DC3173]">
             <CheckCircleIcon size={12} /> Delivered
           </span>
         );
-      case "APPROVED":
+      case "SHIPPED":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
-            <CheckCircleIcon size={12} /> Approved
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+            <TruckIcon size={12} /> Shipped
           </span>
         );
-      case "REJECTED":
+      case "CONFIRMED":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700">
-            <XCircleIcon size={12} /> Rejected
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
+            <PackageIcon size={12} /> Confirmed
           </span>
         );
       case "PENDING":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
             <ClockIcon size={12} /> Pending
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
-            <XCircleIcon size={12} /> Cancelled
           </span>
         );
     }
@@ -165,12 +191,11 @@ export default function IngredientOrderTable({
                 </div>
               </TableCell>
               <TableCell>
-                {order.ingredients
-                  .map((item) => `${item.name} (x${item.quantity})`)
-                  .join(" | ")}
+                {order.orderDetails?.ingredient?.name} (x
+                {order.orderDetails?.totalQuantity})
               </TableCell>
-              <TableCell>€{order.totalPrice}</TableCell>
-              <TableCell>{getStatusBadge(order.status)}</TableCell>
+              <TableCell>€{formatPrice(order.grandTotal)}</TableCell>
+              <TableCell>{getStatusBadge(order.orderStatus)}</TableCell>
               <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -186,12 +211,28 @@ export default function IngredientOrderTable({
                     >
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem
+                    {order.orderStatus === "CONFIRMED" && (
+                      <DropdownMenuItem
+                        className=""
+                        onClick={() => updateStatus(order._id, "SHIPPED")}
+                      >
+                        Update to SHIPPED
+                      </DropdownMenuItem>
+                    )}
+                    {order.orderStatus === "SHIPPED" && (
+                      <DropdownMenuItem
+                        className=""
+                        onClick={() => updateStatus(order._id, "DELIVERED")}
+                      >
+                        Update to DELIVERED
+                      </DropdownMenuItem>
+                    )}
+                    {/* <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => onDeleteClick(order._id)}
                     >
                       Delete
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

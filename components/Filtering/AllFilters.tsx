@@ -32,10 +32,13 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const oldFilters =
-    filterOptions?.reduce((acc, option) => {
-      acc[option.key] = searchParams.get(option.key) || "";
-      return acc;
-    }, {} as Record<string, string>) || {};
+    filterOptions?.reduce(
+      (acc, option) => {
+        acc[option.key] = searchParams.get(option.key) || "";
+        return acc;
+      },
+      {} as Record<string, string>,
+    ) || {};
   const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] =
@@ -86,7 +89,7 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
       className="mb-1"
     >
       <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
-        <SearchFilter paramName="searchTerm" placeholder="Searching..." />
+        <SearchFilter paramName="searchTerm" placeholder="Search..." />
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <div className="w-full lg:w-48">
             <SelectFilter
@@ -98,19 +101,20 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
           {filterOptions && (
             <Button
               variant="outline"
-              className={`flex items-center ${showFilters ||
+              className={`flex items-center ${
+                showFilters ||
                 Object.entries(paramFilters)?.filter(
-                  (filter) => filter[1] !== ""
+                  (filter) => filter[1] !== "",
                 )?.length > 0
-                ? "border-[#DC3173] text-[#DC3173]"
-                : ""
-                }`}
+                  ? "border-[#DC3173] text-[#DC3173]"
+                  : ""
+              }`}
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="mr-2 h-4 w-4" />
               {t("filters")}{" "}
               {Object.entries(paramFilters)?.filter(
-                (filter) => filter[1] !== ""
+                (filter) => filter[1] !== "",
               )?.length || ""}
             </Button>
           )}
@@ -135,19 +139,19 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
             </Badge>
           ) : (
             ""
-          )
+          ),
         )}
         {Object.entries(paramFilters)?.filter((filter) => filter[1] !== "")
           ?.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
-            >
-              <RefreshCcw className="h-3 w-3 mr-1" /> {t("clear_all")}
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearAllFilters}
+            className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
+          >
+            <RefreshCcw className="h-3 w-3 mr-1" /> {t("clear_all")}
+          </Button>
+        )}
       </div>
 
       <AnimatePresence>

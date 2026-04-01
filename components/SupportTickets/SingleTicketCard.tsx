@@ -5,6 +5,7 @@ import {
   TTicketStatus,
   TUserModel,
 } from "@/types/support.type";
+import { removeUnderscore } from "@/utils/formatter";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -27,7 +28,7 @@ const StatusBadge = ({ status }: { status: TTicketStatus }) => {
     <span
       className={`px-2.5 py-1 rounded-full text-xs font-bold ${styles[status]}`}
     >
-      {status}
+      {removeUnderscore(status)}
     </span>
   );
 };
@@ -103,9 +104,7 @@ export default function SingleTicketCard({
         </div>
         <div className="min-w-0">
           <p className="font-bold text-gray-900 truncate">
-            {ticket.userId?.name?.firstName}
-            {""}
-            {ticket.userId?.name?.lastName}
+            {ticket.userId?.name?.firstName} {ticket.userId?.name?.lastName}
             {!ticket.userId?.name?.firstName &&
               !ticket.userId?.name?.lastName &&
               ticket.userId?.email?.split("@")?.[0]}
@@ -123,7 +122,7 @@ export default function SingleTicketCard({
       </div>
 
       <h3 className="text-base font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#DC3173] transition-colors">
-        {ticket.category}
+        {removeUnderscore(ticket.category)}
       </h3>
       <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">
         {ticket.lastMessage || "-"}

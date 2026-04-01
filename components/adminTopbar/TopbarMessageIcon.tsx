@@ -1,7 +1,6 @@
 "use client";
 
 import { useAdminChatSocket } from "@/hooks/use-chat-socket";
-import { getUnreadCountReq } from "@/services/dashboard/chat/chat.service";
 import { getCookie } from "@/utils/cookies";
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
@@ -13,11 +12,10 @@ export default function TopbarMessageIcon() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const getUnreadMessageCount = async () => {
-    const result = await getUnreadCountReq();
-
-    if (result.success) {
-      setUnreadCount(result.data || 0);
-    }
+    // const result = await getUnreadCountReq();
+    // if (result.success) {
+    setUnreadCount(0);
+    // }
   };
 
   const newMessageHandler = () => {

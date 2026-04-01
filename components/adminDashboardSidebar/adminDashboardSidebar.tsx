@@ -544,7 +544,15 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                 </button>
               </div>
 
-              {MENU.map((menu) => (
+              <div className="mb-2">
+                <Input
+                  placeholder="Search Menu..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              {filteredMenu.map((menu) => (
                 <div key={menu.id} className="mb-2">
                   {menu.path ? (
                     <Link

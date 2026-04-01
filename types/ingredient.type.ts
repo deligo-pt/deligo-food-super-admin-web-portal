@@ -18,22 +18,43 @@ export type TIngredient = {
   updatedAt: string;
 };
 
+type TOrderStatus = "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED";
+type TPaymentStatus = "PROCESSING" | "PAID";
+type TPaymentMethod =
+  | "CARD"
+  | "MB_WAY"
+  | "APPLE_PAY"
+  | "PAYPAL"
+  | "GOOGLE_PAY"
+  | "OTHER";
+
 export type TIngredientOrder = {
   _id: string;
   orderId: string;
+  transactionId: string;
+
+  grandTotal: number;
+  isPaid: boolean;
+  orderDetails: {
+    ingredient: TIngredient;
+    totalAmount: number;
+    totalQuantity: number;
+  };
 
   vendor: Partial<TVendor>;
-  ingredients: (Partial<TIngredient> & { quantity: number })[];
-  totalPrice: number;
 
-  status: "PENDING" | "APPROVED" | "REJECTED" | "DELIVERED" | "CANCELLED";
+  orderStatus: TOrderStatus;
+  paymentMethod: TPaymentMethod;
+  paymentStatus: TPaymentStatus;
 
-  createdAt: string;
-  updatedAt: string;
+  delivery: { charge: number; distance: number; estimatedTime: number };
 
   timeline?: {
     status: string;
     date: string;
     completed: boolean;
   }[];
+
+  createdAt: string;
+  updatedAt: string;
 };

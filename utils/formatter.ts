@@ -19,9 +19,10 @@ export function queryStringFormatter(searchParamsObj: {
 }
 
 export function removeUnderscore(text: string): string {
-  const formattedText = text?.replace(/_/g, " ") || "";
   return (
-    formattedText?.charAt(0).toUpperCase() +
-    formattedText.slice(1)?.toLowerCase()
+    text
+      ?.split("_")
+      ?.map((w) => w.charAt(0).toUpperCase() + w.slice(1)?.toLowerCase())
+      ?.join(" ") ?? ""
   );
 }
