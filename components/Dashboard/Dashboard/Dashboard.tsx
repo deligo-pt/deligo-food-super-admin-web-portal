@@ -24,7 +24,7 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="p-6">
+    <div>
       {/* Header */}
       <TitleHeader
         title={`${t("hello")}, Administrator`}
