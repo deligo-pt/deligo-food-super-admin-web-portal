@@ -145,12 +145,12 @@ export default function ChatWithDrivers({
   });
 
   const { sendMessage, makeTyping } = useChatSocket({
-    room: selectedId,
+    ticketId: selectedId,
     token: accessToken as string,
-    onMessage: (msg) => {
-      if (msg.room === selectedId) {
-        setMessages((prev) => [...prev, msg]);
-      }
+    onMessage: () => {
+      // if (msg.room === selectedId) {
+      //   setMessages((prev) => [...prev, msg]);
+      // }
     },
     onTyping: (data) => {
       if (decoded.userId === data.userId) return;
@@ -168,6 +168,7 @@ export default function ChatWithDrivers({
         });
       }, 3000);
     },
+    onRead: () => {},
     onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
