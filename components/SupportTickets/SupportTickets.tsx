@@ -3,38 +3,32 @@
 
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import SingleTicketCard from "@/components/SupportTickets/SingleTicketCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { useAdminChatSocket, useChatSocket } from "@/hooks/use-chat-socket";
 import { useTranslation } from "@/hooks/use-translation";
 import { getMessagesByRoom } from "@/services/dashboard/chat/chat.service";
 import { TMeta, TResponse } from "@/types";
-import {
-  TAdminSupportMessage,
-  TConversation,
-  TConversationStatus,
-  TMessage,
-} from "@/types/chat.type";
+import { TAdminSupportMessage, TConversationStatus } from "@/types/chat.type";
+import { TSupportMessage, TSupportTicket } from "@/types/support.type";
 import { getCookie } from "@/utils/cookies";
 import { fetchData } from "@/utils/requests";
-import { formatDistanceToNow } from "date-fns";
-import { ArrowRight, MessageCircle, X } from "lucide-react";
+import { MessageSquareIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
-// Status Styling
 const STATUS: Record<TConversationStatus, string> = {
   OPEN: "bg-yellow-100 text-yellow-800",
   IN_PROGRESS: "bg-pink-100 text-pink-700",
-  // resolved: "bg-green-100 text-green-800",
   CLOSED: "bg-gray-200 text-gray-700",
 };
 
 interface IProps {
-  conversationsData: { data: TConversation[]; meta?: TMeta };
+  ticketData: { data: TSupportTicket[]; meta?: TMeta };
 }
 
-export default function SupportTickets({ conversationsData }: IProps) {
+export default function SupportTickets({ ticketData }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const sortOptions = [
@@ -42,12 +36,10 @@ export default function SupportTickets({ conversationsData }: IProps) {
     { label: t("oldest_first"), value: "createdAt" },
   ];
 
-  const [messages, setMessages] = useState<TMessage[]>([]);
-  const [query, setQuery] = useState("");
-
-  const [conversation, setConversation] = useState<TConversation | null>(null);
-  const [conversations, setConversations] = useState<TConversation[]>(
-    conversationsData?.data || [],
+  const [messages, setMessages] = useState<TSupportMessage[]>([]);
+  const [ticket, setTicket] = useState<TSupportTicket | null>(null);
+  const [tickets, setTickets] = useState<TSupportTicket[]>(
+    ticketData?.data || [],
   );
 
   const textRef = useRef<HTMLTextAreaElement | null>(null);
@@ -71,22 +63,22 @@ export default function SupportTickets({ conversationsData }: IProps) {
     textRef.current?.focus();
   };
 
-  const handleCloseConversation = async () => {
-    setConversations((prev) => {
-      const currentConversationIndex = prev.findIndex(
-        (c) => c.room === conversation?.room,
+  const handleCloseTicket = async () => {
+    setTickets((prev) => {
+      const currentTicketIndex = prev.findIndex(
+        (c) => c.ticketId === ticket?.ticketId,
       );
-      prev[currentConversationIndex].status = "CLOSED";
+      prev[currentTicketIndex].status = "CLOSED";
       return prev;
     });
-    setConversation(null);
+    setTicket(null);
   };
 
-  const getConversation = async (room: string) => {
+  const getTicket = async (room: string) => {
     try {
       const result = (await fetchData(
-        `/support/conversations/${room}`,
-      )) as TResponse<TConversation>;
+        `/support/tickets/${room}`,
+      )) as TResponse<TSupportTicket>;
 
       if (result.success) {
         return {
@@ -99,69 +91,72 @@ export default function SupportTickets({ conversationsData }: IProps) {
       return {
         success: false,
         data: null,
-        message: result.message || "Get conversation failed",
+        message: result.message || "Get ticket failed",
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       return {
         success: false,
         data: error?.response?.data || error,
-        message: error?.response?.data?.message || "Get conversation failed",
+        message: error?.response?.data?.message || "Get ticket failed",
       };
     }
   };
 
-  const getNewConversation = async (message: TAdminSupportMessage) => {
-    let newConversation = {} as TConversation;
+  const getNewTicket = async (message: TAdminSupportMessage) => {
+    let newTicket = {} as TSupportTicket;
 
-    const result = await getConversation(message?.room);
+    const result = await getTicket(message?.ticketId);
     if (result.success) {
-      newConversation = result.data;
+      newTicket = result.data;
     }
 
-    setConversations((prev) => {
-      const isConversationExist = prev?.find((c) => c.room === message?.room);
+    setTickets((prev) => {
+      const isTicketExist = prev?.find((c) => c.ticketId === message?.ticketId);
 
-      if (!isConversationExist) {
-        return [newConversation, ...prev];
+      if (!isTicketExist) {
+        return [newTicket, ...prev];
       }
-      const filteredConversations = prev.filter((c) => c.room !== message.room);
+      const filteredTickets = prev.filter(
+        (c) => c.ticketId !== message.ticketId,
+      );
 
-      isConversationExist!.lastMessage = message.messagePreview;
-      // isConversationExist!.lastMessageTime = message.message
+      isTicketExist!.lastMessage = message.messagePreview;
+      // isTicketExist!.lastMessageTime = message.message
       //   ?.createdAt as unknown as string;
-      return [newConversation, ...filteredConversations];
+      return [newTicket, ...filteredTickets];
     });
   };
 
   useAdminChatSocket({
     token: accessToken as string,
-    onMessage: (msg) => getNewConversation(msg as TAdminSupportMessage),
+    onMessage: (msg) => getNewTicket(msg as TAdminSupportMessage),
     onClosed: () => console.log("CLOSED"),
     onError: (msg) => console.log(msg),
   });
 
-  const { sendMessage, closeConversation } = useChatSocket({
-    room: conversation?.room as string,
+  const { sendMessage, closeConversation, leaveConversation } = useChatSocket({
+    ticketId: ticket?.ticketId,
     token: accessToken as string,
     onMessage: (msg) => {
-      if (msg.room === conversation?.room) {
+      if (msg.ticketId === ticket?.ticketId) {
         setMessages((prev) => [...prev, msg]);
         scrollToBottom();
       }
     },
     onTyping: (data) => {},
-    onClosed: () => handleCloseConversation(),
+    onClosed: () => handleCloseTicket(),
+    onRead: () => {},
     onError: (msg) => console.log(msg),
   });
 
   useEffect(() => {
-    if (!!conversation) {
-      getMessagesByRoom(conversation?.room).then((result) => {
+    if (!!ticket) {
+      getMessagesByRoom(ticket?.ticketId).then((result) => {
         setMessages(result.data);
       });
     }
-  }, [conversation]);
+  }, [ticket]);
 
   useEffect(() => {
     scrollToBottom();
@@ -176,73 +171,40 @@ export default function SupportTickets({ conversationsData }: IProps) {
 
       {/* Card Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {conversations?.map((c) => (
-          <div
-            key={c._id}
-            onClick={() => setConversation(c)}
-            className="cursor-pointer bg-white rounded-3xl p-5 shadow-sm border hover:shadow-lg transition group"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <span
-                className={`px-3 py-1 text-xs rounded-full ${STATUS[c.status]}`}
-              >
-                {c.status.replace("_", " ")}
-              </span>
-
-              <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
-            </div>
-
-            {/* Subject */}
-            <h2 className="text-lg font-semibold leading-tight group-hover:text-[#DC3173] transition">
-              {c.lastMessage || "-"}
-            </h2>
-
-            {/* User */}
-            <div className="flex items-center gap-3 mt-4">
-              <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center">
-                {c.participants?.[0]?.name?.[0]}
-              </div>
-              <div className="text-sm">
-                <p className="font-medium">
-                  {c.participants?.[0]?.name?.trim() || t("no_name_provided")}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {c.participants?.[0]?.role
-                    ?.split("_")
-                    .map((r) => r.charAt(0) + r.slice(1).toLowerCase())
-                    .join(" ")}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {formatDistanceToNow(c.createdAt as Date, {
-                    addSuffix: true,
-                  })}
-                </p>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between mt-5 pt-4 border-t">
-              <p className="text-xs text-gray-500">
-                {t("id")}: {c.ticketId}
-              </p>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#DC3173] transition" />
-            </div>
-          </div>
+        {tickets?.map((ticket, i) => (
+          <SingleTicketCard
+            key={ticket._id}
+            ticket={ticket}
+            index={i}
+            onClick={(ticket) => setTicket(ticket)}
+          />
         ))}
+        {ticketData?.meta?.total === 0 && (
+          <div className="col-span-full py-12 text-center">
+            <div className="inline-flex p-4 bg-white rounded-full text-gray-300 mb-3 shadow-sm">
+              <MessageSquareIcon size={32} />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900">
+              No tickets found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your search or filters
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Drawer */}
-      {!!conversation && (
+      {!!ticket && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-end z-50">
           <div className="w-full sm:w-[420px] h-full bg-white rounded-l-3xl p-6 flex flex-col shadow-xl animate-slide-in">
             {/* Top */}
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xl font-semibold w-10/12 leading-tight">
-                {conversation.ticketId}
+                {ticket.ticketId}
               </h2>
               <button
-                onClick={() => setConversation(null)}
+                onClick={() => setTicket(null)}
                 className="p-2 rounded-lg hover:bg-gray-100"
               >
                 <X className="w-5 h-5" />
@@ -251,24 +213,24 @@ export default function SupportTickets({ conversationsData }: IProps) {
 
             <div className="flex justify-between gap-3">
               {/* User */}
-              <div className="flex items-center gap-3 mb-4">
+              {/* <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full bg-[#DC3173]/10 text-[#DC3173] font-semibold flex items-center justify-center text-lg">
-                  {conversation?.participants?.[0]?.name?.[0]}
+                  {ticket?.participants?.[0]?.name?.[0]}
                 </div>
                 <div>
                   <p className="font-medium">
-                    {conversation?.participants?.[0]?.name}
+                    {ticket?.participants?.[0]?.name}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {conversation?.participants?.[0]?.role}
+                    {ticket?.participants?.[0]?.role}
                   </p>
                 </div>
-              </div>
+              </div> */}
 
-              {/* Close Conversation Button */}
+              {/* Close Ticket Button */}
               <div className="text-center">
                 <Button
-                  onClick={closeConversation}
+                  // onClick={closeTicket}
                   size="sm"
                   variant="ghost"
                   className="border border-gray-200 py-1"
@@ -289,15 +251,15 @@ export default function SupportTickets({ conversationsData }: IProps) {
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
-                  <p className="text-xs text-gray-500 mb-1">
+                  {/* <p className="text-xs text-gray-500 mb-1">
                     {m.senderRole === "ADMIN" || m.senderRole === "SUPER_ADMIN"
                       ? "You"
-                      : conversation?.participants?.[0]?.name}{" "}
+                      : ticket?.participants?.[0]?.name}{" "}
                     •{" "}
                     {formatDistanceToNow(m.createdAt as Date, {
                       addSuffix: true,
                     })}
-                  </p>
+                  </p> */}
                   {m.message}
                 </div>
               ))}
@@ -348,10 +310,10 @@ export default function SupportTickets({ conversationsData }: IProps) {
       )}
 
       {/* Pagination */}
-      {!!conversationsData?.meta?.totalPage && (
+      {!!ticketData?.meta?.totalPage && (
         <div className="my-4">
           <PaginationComponent
-            totalPages={conversationsData?.meta?.totalPage as number}
+            totalPages={ticketData?.meta?.totalPage as number}
           />
         </div>
       )}

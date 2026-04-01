@@ -29,6 +29,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import TopbarIcons from "@/components/adminTopbar/TopbarIcons";
+import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/use-translation";
 import { TAdmin } from "@/types/admin.type";
 import Image from "next/image";
@@ -44,6 +45,8 @@ const PRIMARY = "#DC3173";
 export default function Sidebar({ open, setOpen, admin }: IProps) {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const [searchTerm, setSearchTerm] = useState("");
+
   const MENU = [
     {
       id: "dashboard",
@@ -329,6 +332,17 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
     },
   ];
 
+  const filteredMenu =
+    searchTerm.length > 0
+      ? MENU.filter(
+          (menu) =>
+            menu.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            menu.items?.some((item) =>
+              item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+            ),
+        )
+      : MENU;
+
   const currentMenuId = MENU.find((menu) =>
     menu.items?.some((item) => pathname.includes(item.path)),
   )?.id;
@@ -415,7 +429,14 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
 
         {/* Navigation */}
         <nav className="flex-1 py-3 px-2 overflow-y-auto no-scrollbar">
-          {MENU.map((menu) => (
+          <div className="mb-2">
+            <Input
+              placeholder="Search Menu..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          {filteredMenu.map((menu) => (
             <div key={menu.id} className="mb-1">
               {menu.path ? (
                 <Link

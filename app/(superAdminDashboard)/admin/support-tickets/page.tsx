@@ -1,23 +1,13 @@
 import SupportTickets from "@/components/SupportTickets/SupportTickets";
-import { serverRequest } from "@/lib/serverFetch";
-import { TMeta, TResponse } from "@/types";
-import { TConversation } from "@/types/chat.type";
+import { getAllTicketsReq } from "@/services/dashboard/support/support.service";
 
-export default async function SupportTicketsPage() {
-  const initialData: { data: TConversation[]; meta?: TMeta } = { data: [] };
+interface IProps {
+  searchParams: Promise<Record<string, string | undefined>>;
+}
 
-  try {
-    const conversationsResult = (await serverRequest.get(
-      "/support/conversations",
-      { params: { type: "SUPPORT", limit: 12 } },
-    )) as TResponse<TConversation[]>;
+export default async function SupportTicketsPage({ searchParams }: IProps) {
+  const queries = await searchParams;
+  const ticketData = await getAllTicketsReq(queries);
 
-    initialData.data = conversationsResult.data;
-    initialData.meta = conversationsResult.meta;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.log(error?.response?.data, error.message);
-  }
-
-  return <SupportTickets conversationsData={initialData} />;
+  return <SupportTickets ticketData={ticketData} />;
 }

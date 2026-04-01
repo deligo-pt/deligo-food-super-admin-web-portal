@@ -1,25 +1,10 @@
 "use client";
 
 import { getAdminSocket, getSocket } from "@/lib/socket";
-import { TAdminSupportMessage, TMessage } from "@/types/chat.type";
+import { TAdminSupportMessage } from "@/types/chat.type";
+import { TSupportMessage } from "@/types/support.type";
 import { useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
-
-interface Props {
-  room?: string;
-  token: string;
-  onMessage: (msg: TMessage) => void;
-  onClosed: () => void;
-  onError: (msg: string) => void;
-  onTyping: (msg: {
-    userId: string;
-    name: {
-      firstName: string;
-      lastName: string;
-    };
-    isTyping: boolean;
-  }) => void;
-}
 
 interface AdminProps {
   token: string;
@@ -50,7 +35,6 @@ export function useAdminChatSocket({
   }, []);
 
   const turnOffEvents = () => {
-    socketRef.current?.off("new-message");
     socketRef.current?.off("conversation-closed");
     socketRef.current?.off("chat-error");
     socketRef.current?.off("incoming-notification");
@@ -59,13 +43,31 @@ export function useAdminChatSocket({
   return { turnOffEvents };
 }
 
+interface Props {
+  ticketId?: string;
+  token: string;
+  onMessage: (msg: TSupportMessage) => void;
+  onClosed: () => void;
+  onRead: () => void;
+  onError: (msg: string) => void;
+  onTyping: (msg: {
+    userId: string;
+    name: {
+      firstName: string;
+      lastName: string;
+    };
+    isTyping: boolean;
+  }) => void;
+}
+
 export function useChatSocket({
-  room,
+  ticketId,
   token,
   onMessage,
   onClosed,
   onError,
   onTyping,
+  onRead,
 }: Props) {
   const socketRef = useRef<Socket | null>(null);
 
@@ -73,45 +75,56 @@ export function useChatSocket({
     const socket = getSocket(token);
     socketRef.current = socket;
 
-    socket.emit("join-conversation", { room });
+    socket.emit("join-conversation", { ticketId });
     socket.on("join-conversation", (data) => {
       console.log("Ticket received:", data);
     });
 
     socket.on("new-message", onMessage);
     socket.on("user-typing", onTyping);
+    socket.on("read-update", onRead);
     socket.on("conversation-closed", onClosed);
     socket.on("chat-error", (e) => onError(e.message));
 
     return () => {
       socket.off("new-message");
       socket.off("user-typing");
+      socket.off("read-update");
       socket.off("conversation-closed");
       socket.off("chat-error");
-      socket.off("new-support-ticket");
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room]);
+  }, [ticketId]);
 
   const sendMessage = (message: string, attachments?: File[]) => {
     socketRef.current?.emit("send-message", {
-      room,
+      ticketId,
       message,
       ...(attachments && attachments?.length > 0 && { attachments }),
     });
   };
 
   const makeTyping = (isTyping: boolean) => {
-    socketRef.current?.emit("typing", { room, isTyping });
+    socketRef.current?.emit("typing", { ticketId, isTyping });
   };
 
   const markRead = () => {
-    socketRef.current?.emit("mark-read", { room });
+    socketRef.current?.emit("mark-read", { ticketId });
   };
 
   const closeConversation = () => {
-    socketRef.current?.emit("close-conversation", { room });
+    socketRef.current?.emit("close-conversation", { ticketId });
   };
 
-  return { sendMessage, markRead, makeTyping, closeConversation };
+  const leaveConversation = () => {
+    socketRef.current?.emit("leave-conversation", { ticketId });
+  };
+
+  return {
+    sendMessage,
+    markRead,
+    makeTyping,
+    closeConversation,
+    leaveConversation,
+  };
 }
