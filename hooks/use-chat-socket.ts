@@ -66,9 +66,6 @@ export function useChatSocket({
     socketRef.current = socket;
 
     socket.emit("join-conversation", { ticketId });
-    socket.on("join-conversation", (data) => {
-      console.log("Ticket received:", data);
-    });
 
     socket.on("new-message", onMessage);
     socket.on("user-typing", onTyping);

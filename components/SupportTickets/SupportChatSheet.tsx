@@ -283,6 +283,7 @@ export default function SupportChatSheet({
               </div>
             );
           })}
+
           <div ref={msgEndRef} />
 
           {otherUserTyping && (

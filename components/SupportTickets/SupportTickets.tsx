@@ -15,7 +15,6 @@ import { getCookie } from "@/utils/cookies";
 import { fetchData } from "@/utils/requests";
 import { AnimatePresence } from "framer-motion";
 import { MessageSquareIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const STATUS: Record<TConversationStatus, string> = {
@@ -30,7 +29,6 @@ interface IProps {
 
 export default function SupportTickets({ ticketData }: IProps) {
   const { t } = useTranslation();
-  const router = useRouter();
   const sortOptions = [
     { label: t("newest_first"), value: "-createdAt" },
     { label: t("oldest_first"), value: "createdAt" },
