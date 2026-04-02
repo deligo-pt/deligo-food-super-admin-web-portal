@@ -46,13 +46,13 @@ export const getMessagesReq = async (
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
   //   const searchTerm = queries.searchTerm || "";
-  //   const sortBy = queries.sortBy || "-createdAt";
+  const sortBy = queries.sortBy || "-createdAt";
   const status = queries.status || "";
 
   const params = {
     limit,
     page,
-    // sortBy,
+    sortBy,
     ...(status ? { status } : {}),
   };
 
@@ -64,7 +64,7 @@ export const getMessagesReq = async (
 
   if (result?.success)
     return {
-      data: result.data,
+      data: result.data.reverse(),
       meta: result.meta,
     };
 

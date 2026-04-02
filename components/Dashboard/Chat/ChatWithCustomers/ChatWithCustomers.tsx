@@ -142,7 +142,7 @@ export default function ChatWithCustomers({
           room: string;
         },
       ),
-    onClosed: () => {},
+    // onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
 
@@ -191,7 +191,13 @@ export default function ChatWithCustomers({
     const text = textRef.current?.value.trim() ?? "";
     if (!text && attachments.length === 0 && !audioFile) return;
 
-    sendMessage(text);
+    sendMessage({
+      message: text,
+      ticketId: selectedId,
+      targetUserId: selected?.userId || "",
+      targetUserModel: "Customer",
+      messageType: "TEXT",
+    });
 
     // reset
     if (textRef.current) textRef.current.value = "";

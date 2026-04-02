@@ -140,7 +140,7 @@ export default function ChatWithFleetManagers({
           room: string;
         },
       ),
-    onClosed: () => {},
+    // onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
 
@@ -189,7 +189,13 @@ export default function ChatWithFleetManagers({
     const text = textRef.current?.value.trim() ?? "";
     if (!text && attachments.length === 0 && !audioFile) return;
 
-    sendMessage(text);
+    sendMessage({
+      message: text,
+      ticketId: selectedId,
+      targetUserId: selected?.userId || "",
+      targetUserModel: "FleetManager",
+      messageType: "TEXT",
+    });
 
     // reset
     if (textRef.current) textRef.current.value = "";

@@ -2,23 +2,22 @@
 
 import { getAdminSocket, getSocket } from "@/lib/socket";
 import { TAdminSupportMessage } from "@/types/chat.type";
-import { TSupportMessage } from "@/types/support.type";
+import {
+  TSupportMessage,
+  TUserModel,
+  TUserTypingPayload,
+} from "@/types/support.type";
+import { File } from "node:buffer";
 import { useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
 
 interface AdminProps {
   token: string;
   onMessage: (msg: TAdminSupportMessage) => void;
-  onClosed?: () => void;
   onError?: (msg: string) => void;
 }
 
-export function useAdminChatSocket({
-  token,
-  onMessage,
-  onClosed,
-  onError,
-}: AdminProps) {
+export function useAdminChatSocket({ token, onMessage, onError }: AdminProps) {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -28,14 +27,12 @@ export function useAdminChatSocket({
     socket.emit("join-conversation", "admin-notifications-room");
 
     socket.on("incoming-notification", onMessage);
-    socket.on("conversation-closed", onClosed || (() => {}));
     socket.on("chat-error", (e) => onError && onError(e.message));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const turnOffEvents = () => {
-    socketRef.current?.off("conversation-closed");
     socketRef.current?.off("chat-error");
     socketRef.current?.off("incoming-notification");
   };
@@ -50,14 +47,7 @@ interface Props {
   onClosed: () => void;
   onRead: () => void;
   onError: (msg: string) => void;
-  onTyping: (msg: {
-    userId: string;
-    name: {
-      firstName: string;
-      lastName: string;
-    };
-    isTyping: boolean;
-  }) => void;
+  onTyping: (data: TUserTypingPayload) => void;
 }
 
 export function useChatSocket({
@@ -96,12 +86,16 @@ export function useChatSocket({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]);
 
-  const sendMessage = (message: string, attachments?: File[]) => {
-    socketRef.current?.emit("send-message", {
-      ticketId,
-      message,
-      ...(attachments && attachments?.length > 0 && { attachments }),
-    });
+  const sendMessage = (payload: {
+    ticketId: string;
+    message: string;
+    attachments?: File[];
+    targetUserObjectId?: string;
+    targetUserId: string;
+    targetUserModel: TUserModel;
+    messageType: TSupportMessage["messageType"];
+  }) => {
+    socketRef.current?.emit("send-message", payload);
   };
 
   const makeTyping = (isTyping: boolean) => {

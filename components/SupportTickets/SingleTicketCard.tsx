@@ -1,64 +1,12 @@
 "use client";
 
-import {
-  TSupportTicket,
-  TTicketStatus,
-  TUserModel,
-} from "@/types/support.type";
+import SupportRoleBadge from "@/components/SupportTickets/SupportRoleBadge";
+import SupportStatusBadge from "@/components/SupportTickets/SupportStatusBadge";
+import { TSupportTicket } from "@/types/support.type";
 import { removeUnderscore } from "@/utils/formatter";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
-import {
-  ArrowRightIcon,
-  BikeIcon,
-  BriefcaseIcon,
-  ClockIcon,
-  ShieldUserIcon,
-  StoreIcon,
-  UserIcon,
-} from "lucide-react";
-
-const StatusBadge = ({ status }: { status: TTicketStatus }) => {
-  const styles = {
-    OPEN: "bg-amber-100 text-amber-700",
-    IN_PROGRESS: "bg-blue-100 text-blue-700",
-    CLOSED: "bg-[#DC3173]/10 text-[#DC3173]",
-  };
-  return (
-    <span
-      className={`px-2.5 py-1 rounded-full text-xs font-bold ${styles[status]}`}
-    >
-      {removeUnderscore(status)}
-    </span>
-  );
-};
-
-const RoleBadge = ({ role }: { role: TUserModel }) => {
-  const styles = {
-    Vendor: "bg-purple-100 text-purple-700",
-    DeliveryPartner: "bg-blue-100 text-blue-700",
-    FleetManager: "bg-emerald-100 text-emerald-700",
-    Customer: "bg-amber-100 text-amber-700",
-    Admin: "bg-gray-100 text-gray-700",
-  };
-
-  const icons = {
-    Vendor: <StoreIcon size={12} />,
-    DeliveryPartner: <BikeIcon size={12} />,
-    FleetManager: <BriefcaseIcon size={12} />,
-    Customer: <UserIcon size={12} />,
-    Admin: <ShieldUserIcon size={12} />,
-  };
-
-  return (
-    <span
-      className={`px-2 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 w-fit ${styles[role] ?? "bg-gray-100 text-gray-600"}`}
-    >
-      {icons[role] ?? null}
-      {role}
-    </span>
-  );
-};
+import { ArrowRightIcon, ClockIcon } from "lucide-react";
 
 export default function SingleTicketCard({
   ticket,
@@ -93,8 +41,8 @@ export default function SingleTicketCard({
       <div className="absolute top-0 left-0 w-full h-1 bg-[#DC3173]" />
 
       <div className="flex items-start justify-between mb-3">
-        <RoleBadge role={ticket.userModel} />
-        <StatusBadge status={ticket.status} />
+        <SupportRoleBadge role={ticket.userModel} />
+        <SupportStatusBadge status={ticket.status} />
       </div>
 
       <div className="flex items-center gap-3 mb-4">

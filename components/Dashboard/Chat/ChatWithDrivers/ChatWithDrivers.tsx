@@ -140,7 +140,7 @@ export default function ChatWithDrivers({
           room: string;
         },
       ),
-    onClosed: () => {},
+    // onClosed: () => {},
     onError: (msg) => console.log(msg),
   });
 
@@ -189,7 +189,13 @@ export default function ChatWithDrivers({
     const text = textRef.current?.value.trim() ?? "";
     if (!text && attachments.length === 0 && !audioFile) return;
 
-    sendMessage(text);
+    sendMessage({
+      message: text,
+      ticketId: selectedId,
+      targetUserId: selected?.userId || "",
+      targetUserModel: "DeliveryPartner",
+      messageType: "TEXT",
+    });
 
     // reset
     if (textRef.current) textRef.current.value = "";
