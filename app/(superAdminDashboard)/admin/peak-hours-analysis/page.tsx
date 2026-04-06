@@ -1,9 +1,9 @@
 import PeakHourAnalysis from "@/components/Dashboard/Analytics/PeakHourAnalysis/PeakHourAnalysis";
 import { getPeakHourAnalysisReq } from "@/services/dashboard/analytics/analytics.service";
-import { TPeakHourData } from "@/types/analytics.type";
+import { TPeakHoursAnalysis } from "@/types/analytics/peak-hour-analysis.type";
 
 export default async function PeakHourAnalysisPage() {
-  const analyticsData: TPeakHourData = await getPeakHourAnalysisReq();
+  const analyticsData: TPeakHoursAnalysis = await getPeakHourAnalysisReq();
 
-  return <PeakHourAnalysis analyticsData={analyticsData} />;
+  return <PeakHourAnalysis peakHourAnalysis={analyticsData} />;
 }

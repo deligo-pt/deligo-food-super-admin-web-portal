@@ -1,147 +1,197 @@
 "use client";
 
+import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TTopVendorData } from "@/types/analytics.type";
+import { TTopVendors } from "@/types/analytics/top-vendors.type";
 import { formatPrice } from "@/utils/formatPrice";
-import { motion, Variants } from "framer-motion";
-import {
-  AwardIcon,
-  EuroIcon,
-  ShoppingBagIcon,
-  StarIcon,
-  StoreIcon,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { Star, Store, TrendingUp, XCircle } from "lucide-react";
 
 interface IProps {
-  topVendorData: TTopVendorData;
+  topVendors: TTopVendors;
 }
 
-export default function TopVendors({ topVendorData }: IProps) {
-  const getRankStyle = (rank: number) => {
-    if (rank === 1) return "bg-yellow-100 text-yellow-700 border-yellow-200";
-    if (rank === 2) return "bg-gray-200 text-gray-700 border-gray-300";
-    if (rank === 3) return "bg-orange-100 text-orange-800 border-orange-200";
-    return "bg-gray-50 text-gray-500 border-gray-100";
-  };
+export default function TopVendorsPage({ topVendors }: IProps) {
+  const totalVendors = topVendors.vendorPerformance.length;
 
-  const containerVariants = {
-    hidden: {
-      opacity: 0,
-    },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-      },
-    },
-  };
-  const itemVariants = {
-    hidden: {
-      y: 20,
-      opacity: 0,
-    },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
-    },
-  } as Variants;
+  const topVendor = topVendors.topSellingVendors[0];
+
+  const avgRating =
+    topVendors.vendorPerformance.reduce((acc, v) => acc + v.averageRating, 0) /
+    totalVendors;
+
+  const avgCancelRate =
+    topVendors.vendorPerformance.reduce((acc, v) => acc + v.cancelRate, 0) /
+    totalVendors;
 
   return (
-    <div className="min-h-screen p-6">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Header */}
-        <TitleHeader
-          title="Top Vendors"
-          subtitle="Vendors Performance leaderboard"
+    <div className="min-h-screen bg-gray-50/50 pb-20">
+      {/* Header */}
+      <TitleHeader
+        title="Top Vendors"
+        subtitle="Vendor ranking and performance insights"
+      />
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatsCard title="Total Vendors" value={totalVendors} icon={Store} />
+        <StatsCard
+          title="Top Vendor"
+          value={topVendor?.vendorName || "-"}
+          icon={TrendingUp}
+          delay={0.1}
         />
+        <StatsCard
+          title="Avg Rating"
+          value={avgRating.toFixed(1)}
+          icon={Star}
+          delay={0.2}
+        />
+        <StatsCard
+          title="Avg Cancel Rate"
+          value={`${avgCancelRate.toFixed(1)}%`}
+          icon={XCircle}
+          delay={0.3}
+        />
+      </div>
 
-        {/* Stat Cards */}
-        <motion.div
-          variants={itemVariants}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
-        >
-          <StatsCard
-            title="Active Vendors"
-            value={topVendorData?.stats?.activeVendors || 0}
-            icon={StoreIcon}
-            delay={0.1}
-          />
-          <StatsCard
-            title="Top Revenue (This Month)"
-            value={`€${formatPrice(topVendorData?.stats?.thisMonthTopRevenue || 0)}`}
-            icon={EuroIcon}
-            delay={0.2}
-          />
-        </motion.div>
+      {/* Top Selling Vendors */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-4">
+          Top Selling Vendors
+        </h3>
 
-        {/* Vendor Leaderboard */}
-        <motion.div
-          variants={itemVariants}
-          className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
-        >
-          <div className="flex items-center gap-2 mb-6">
-            <AwardIcon className="w-5 h-5 text-[#DC3173]" />
-            <h3 className="font-bold text-gray-900">Vendor Leaderboard</h3>
-          </div>
-          <div className="space-y-3">
-            {topVendorData?.topVendors?.map((vendor) => (
-              <div
-                key={vendor.rank}
-                className="flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold border ${getRankStyle(vendor.rank)}`}
-                  >
-                    {vendor.rank}
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-900">{vendor.name}</p>
-                    <p className="text-xs text-gray-500">{vendor.category}</p>
-                  </div>
+        <div className="space-y-4">
+          {topVendors.topSellingVendors.map((vendor, i) => (
+            <div
+              key={vendor.vendorId}
+              className="flex items-center justify-between p-4 rounded-xl border border-gray-100"
+            >
+              <div>
+                <p className="font-semibold text-gray-900">
+                  {i + 1}. {vendor.vendorName}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {vendor.totalOrders} orders
+                </p>
+              </div>
+
+              <p className="font-bold text-[#DC3173]">
+                €{formatPrice(vendor.totalRevenue)}
+              </p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Revenue by Vendor */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-2">
+          Revenue by Vendor
+        </h3>
+
+        <AnalyticsChart
+          data={topVendors.topSellingVendors}
+          type="bar"
+          dataKey="totalRevenue"
+          xKey="vendorName"
+          height={220}
+        />
+      </motion.div>
+
+      {/* Vendor Performance Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-4">
+          Vendor Performance
+        </h3>
+
+        <div className="space-y-4">
+          {topVendors.vendorPerformance.map((vendor) => (
+            <div
+              key={vendor.vendorId}
+              className="p-4 rounded-xl border border-gray-100"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <p className="font-semibold text-gray-900 text-lg">
+                  {vendor.vendorName}
+                </p>
+                <p className="text-[#DC3173] font-bold">
+                  €{formatPrice(vendor.totalRevenue)}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-gray-600 space-y-2">
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    Orders
+                  </h3>
+                  <p className="text-gray-500">{vendor.totalOrders}</p>
                 </div>
-                <div className="flex items-center gap-8">
-                  <div className="hidden md:block text-right">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
-                      Orders
-                    </p>
-                    <p className="font-medium text-gray-900 flex items-center gap-1 justify-end">
-                      <ShoppingBagIcon className="w-3.5 h-3.5 text-gray-400" />
-                      {vendor.orders || 0}
-                    </p>
-                  </div>
-                  <div className="hidden sm:block text-right">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
-                      Rating
-                    </p>
-                    <p className="font-medium text-gray-900 flex items-center gap-1 justify-end">
-                      <StarIcon className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                      {vendor.rating || 0}
-                    </p>
-                  </div>
-                  <div className="text-right min-w-20">
-                    <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">
-                      Revenue
-                    </p>
-                    <p className="font-bold text-[#DC3173]">
-                      €{formatPrice(vendor.revenue || 0)}
-                    </p>
-                  </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    Rating
+                  </h3>
+                  <p className="text-gray-500">
+                    €{formatPrice(vendor.averageRating)}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    Prep Time
+                  </h3>
+                  <p className="text-gray-500">{vendor.preparationTime} min</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    Cancel Rate
+                  </h3>
+                  <p className="text-gray-500">{vendor.cancelRate}%</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    Satisfaction
+                  </h3>
+                  <p className="text-gray-500">{vendor.satisfactionScore}%</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </motion.div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Rating Distribution */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-4">
+          Rating Distribution
+        </h3>
+
+        <AnalyticsChart
+          data={topVendors.ratingDistribution}
+          type="bar"
+          dataKey="rating"
+          xKey="vendorName"
+          height={200}
+        />
       </motion.div>
     </div>
   );

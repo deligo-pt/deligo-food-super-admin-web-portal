@@ -3,202 +3,177 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TPeakHourData } from "@/types/analytics.type";
-import { motion, Variants } from "framer-motion";
-import { ActivityIcon, CalendarIcon, ClockIcon } from "lucide-react";
-
-const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-const hours = [
-  "8AM - 10AM",
-  "10AM - 12PM",
-  "12PM - 2PM",
-  "2PM - 4PM",
-  "4PM - 6PM",
-  "6PM - 8PM",
-  "8PM - 10PM",
-  "10PM - 12AM",
-  "12AM - 2AM",
-  "2AM - 4AM",
-  "4AM - 6AM",
-  "6AM - 8AM",
-];
+import { TPeakHoursAnalysis } from "@/types/analytics/peak-hour-analysis.type";
+import { motion } from "framer-motion";
+import { AlertTriangle, CalendarDays, Clock, Flame } from "lucide-react";
 
 interface IProps {
-  analyticsData: TPeakHourData;
+  peakHourAnalysis: TPeakHoursAnalysis;
 }
 
-export default function PeakHourAnalysis({ analyticsData }: IProps) {
-  const containerVariants = {
-    hidden: {
-      opacity: 0,
-    },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-      },
-    },
-  };
+export default function PeakHoursPage({ peakHourAnalysis }: IProps) {
+  const peakHour = peakHourAnalysis.hourlyOrders.reduce((a, b) =>
+    a.orderCount > b.orderCount ? a : b,
+  );
 
-  const itemVariants = {
-    hidden: {
-      y: 20,
-      opacity: 0,
-    },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
-    },
-  } as Variants;
+  const peakDay = peakHourAnalysis.dayWiseOrders.reduce((a, b) =>
+    a.orderCount > b.orderCount ? a : b,
+  );
 
-  const heatmapOrders = (day: string, hour: string) =>
-    analyticsData?.weeklyHourlyOrders
-      ?.find((w) => w.day === day)
-      ?.hourlyData.find((h) => h.hour === hour)?.orders || 0;
+  const dinner = peakHourAnalysis.mealTimeComparison.find(
+    (m) => m.type === "DINNER",
+  );
+
+  const maxShortage = peakHourAnalysis.riderDemandGap.reduce((a, b) =>
+    a.shortage > b.shortage ? a : b,
+  );
 
   return (
-    <div className="min-h-screen p-6">
-      <motion.div
-        className="space-y-6"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Header */}
-        <TitleHeader
-          title="Peak Hour Analysis"
-          subtitle="Order volume patterns and demand forecasting"
+    <div className="min-h-screen bg-gray-50/50 pb-20">
+      {/* Header */}
+      <TitleHeader
+        title="Peak Hours Analysis"
+        subtitle="Understand demand patterns and optimize operations"
+      />
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatsCard
+          title="Peak Hour"
+          value={`${peakHour.hour}:00`}
+          icon={Clock}
         />
+        <StatsCard
+          title="Peak Day"
+          value={peakDay.day}
+          icon={CalendarDays}
+          delay={0.1}
+        />
+        <StatsCard
+          title="Dinner Dominance"
+          value={`${dinner?.percentage || 0}%`}
+          icon={Flame}
+          delay={0.2}
+        />
+        <StatsCard
+          title="Max Rider Shortage"
+          value={`${maxShortage.shortage}`}
+          icon={AlertTriangle}
+          delay={0.3}
+        />
+      </div>
 
-        {/* Stats */}
-        <motion.div
-          variants={itemVariants}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
-        >
-          <StatsCard
-            title="Peak Hour"
-            value={analyticsData.stats?.peakHour || 0}
-            icon={ClockIcon}
-            delay={0}
-          />
-          <StatsCard
-            title="Busiest Day"
-            value={analyticsData.stats?.busiestDay || 0}
-            icon={CalendarIcon}
-            delay={0.1}
-          />
-          <StatsCard
-            title="Avg Orders/Hour"
-            value={analyticsData.stats?.avgOrdersPerHour || 0}
-            icon={ActivityIcon}
-            delay={0.2}
-          />
-        </motion.div>
+      {/* Hourly Distribution */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-2">
+          Orders per Hour
+        </h3>
+        <p className="text-sm text-gray-500 mb-6">Identify peak demand times</p>
 
-        {/* Heatmap */}
+        <AnalyticsChart
+          data={peakHourAnalysis.hourlyOrders}
+          type="area"
+          dataKey="orderCount"
+          xKey="hour"
+          height={220}
+        />
+      </motion.div>
+
+      {/* Meal Comparison and Day-wise Orders */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
+        {/* Meal Comparison */}
         <motion.div
-          variants={itemVariants}
-          className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 overflow-x-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
-          <h3 className="font-bold text-gray-900 mb-6">
-            Weekly Demand Heatmap
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Lunch vs Dinner
           </h3>
-          <div className="min-w-[800px]">
-            <div className="grid grid-cols-[60px_repeat(12,1fr)] gap-1 mb-2">
-              <div className="text-xs font-medium text-gray-400"></div>
-              {hours.map((h) => (
-                <div
-                  key={h}
-                  className="text-xs font-medium text-gray-400 text-center"
-                >
-                  {h}
-                </div>
-              ))}
-            </div>
-            <div className="space-y-1">
-              {days.map((day) => (
-                <div
-                  key={day}
-                  className="grid grid-cols-[60px_repeat(12,1fr)] gap-1 items-center"
-                >
-                  <div className="text-sm font-medium text-gray-600">{day}</div>
-                  {hours.map((hour) => (
-                    <div
-                      key={hour}
-                      className="h-10 rounded-md transition-all hover:ring-2 hover:ring-gray-300 cursor-pointer border border-[#DC3173]/20"
-                      style={{
-                        backgroundColor: `rgba(220, 49, 115, ${heatmapOrders(day, hour) / (analyticsData?.weeklyHourlyMaxOrdersCount || 100)})`,
-                      }}
-                      title={`${heatmapOrders(day, hour)} orders`}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center justify-end gap-2 mt-4 text-xs text-gray-500">
-              <span>Less Busy</span>
-              <div className="flex gap-1">
-                {[0.1, 0.3, 0.5, 0.7, 0.9].map((op) => (
-                  <div
-                    key={op}
-                    className="w-4 h-4 rounded-sm"
-                    style={{
-                      backgroundColor: `rgba(220, 49, 115, ${op})`,
-                    }}
-                  />
-                ))}
-              </div>
-              <span>Very Busy</span>
-            </div>
-          </div>
-        </motion.div>
 
-        {/* Chart: Hourly Distribution */}
-        <motion.div
-          variants={itemVariants}
-          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-        >
-          <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Hourly Distribution
-          </h3>
-          <p className="text-sm text-gray-500 mb-6">
-            Previous Day Orders Distribution
-          </p>
           <AnalyticsChart
-            data={analyticsData.prevDayDistribution || []}
-            type="area"
-            dataKey="orders"
-            xKey="hour"
-            height={200}
-            xInterval={2}
-          />
-        </motion.div>
-
-        {/* Chart: Day of Week */}
-        <motion.div
-          variants={itemVariants}
-          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-        >
-          <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Orders by Day of Week
-          </h3>
-          <p className="text-sm text-gray-500 mb-6">
-            Last week orders distribution
-          </p>
-          <AnalyticsChart
-            data={analyticsData.weekDaysOrders || []}
+            data={peakHourAnalysis.mealTimeComparison}
             type="bar"
-            dataKey="orders"
+            dataKey="orderCount"
+            xKey="type"
+            height={200}
+          />
+        </motion.div>
+
+        {/* Day-wise */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Day-wise Orders
+          </h3>
+
+          <AnalyticsChart
+            data={peakHourAnalysis.dayWiseOrders}
+            type="bar"
+            dataKey="orderCount"
             xKey="day"
             height={200}
           />
         </motion.div>
+      </div>
+
+      {/* Rider Demand vs Availability */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-2">
+          Rider Demand vs Availability
+        </h3>
+        <p className="text-sm text-gray-500 mb-6">
+          Detect shortage during peak hours
+        </p>
+
+        <AnalyticsChart
+          data={peakHourAnalysis.riderDemandGap}
+          type="bar"
+          dataKey="orders"
+          xKey="hour"
+          height={220}
+        />
+      </motion.div>
+
+      {/* Heatmap */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-4">
+          Peak Heatmap (Top Slots)
+        </h3>
+
+        <div className="space-y-3">
+          {peakHourAnalysis.heatmap.map((item, i) => (
+            <div
+              key={i}
+              className="flex justify-between p-3 rounded-lg border border-gray-100"
+            >
+              <p className="text-gray-700">
+                {item.day} - {item.hour}:00
+              </p>
+              <p className="font-bold text-[#DC3173]">
+                {item.orderCount} orders
+              </p>
+            </div>
+          ))}
+        </div>
       </motion.div>
     </div>
   );

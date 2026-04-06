@@ -1,286 +1,191 @@
 "use client";
 
-import { AnimatedCounter } from "@/components/Dashboard/Analytics/AnimatedCounter/AnimatedCounter";
+import StatusDistributionCard from "@/components/common/StatusDistributionCard";
+import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { TSalesAnalytics } from "@/types/analytics.type";
+import { TSalesAnalytics } from "@/types/analytics/sales-analytics.type";
 import { formatPrice } from "@/utils/formatPrice";
-import { motion, Variants } from "framer-motion";
+import { removeUnderscore } from "@/utils/formatter";
+import { motion } from "framer-motion";
 import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  CalendarIcon,
-  ShoppingBagIcon,
-  TrendingUpIcon,
+  BarChart3,
+  EuroIcon,
+  MapPin,
+  ShoppingBag,
+  Store,
+  TrendingUp,
 } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { Formatter } from "recharts/types/component/DefaultTooltipContent";
 
 interface IProps {
   salesAnalytics: TSalesAnalytics;
 }
 
-export default function SalesAnalytics({ salesAnalytics }: IProps) {
-  const maxSold = Math.max(
-    ...(salesAnalytics?.topSellingItems?.map((i) => i.sold) || [0]),
-  );
-
-  const containerVariants = {
-    hidden: {
-      opacity: 0,
-    },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: {
-      y: 20,
-      opacity: 0,
-    },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
-    },
-  } as Variants;
-
+export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
   return (
-    <motion.div
-      className="min-h-screen p-6 space-y-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Header */}
       <TitleHeader
         title="Sales Analytics"
-        subtitle="Weekly performance and top products"
-        extraComponent={
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
-            <CalendarIcon className="w-4 h-4 text-[#DC3173]" />
-            <span className="text-sm font-medium text-gray-600">
-              Last 7 Days
-            </span>
-          </div>
-        }
+        subtitle="Overview of revenue, orders, and business performance"
       />
 
-      {/* Hero Stats */}
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatsCard
+          title="Total Orders"
+          value={salesAnalytics.summary.totalOrders}
+          icon={ShoppingBag}
+        />
+        <StatsCard
+          title="Total Revenue"
+          value={`€${formatPrice(salesAnalytics.summary.totalRevenue)}`}
+          icon={EuroIcon}
+          delay={0.1}
+        />
+        <StatsCard
+          title="Avg Order Value"
+          value={`€${formatPrice(salesAnalytics.summary.averageOrderValue)}`}
+          icon={TrendingUp}
+          delay={0.2}
+        />
+        <StatsCard
+          title="Growth Rate"
+          value={`${salesAnalytics.summary.growthRate}%`}
+          icon={BarChart3}
+          delay={0.3}
+        />
+      </div>
+
+      {/* Monthly Revenue */}
       <motion.div
-        variants={itemVariants}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
       >
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 relative overflow-hidden">
-          <div className="h-1.5 w-full bg-linear-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-[#DC3173]/10 rounded-lg text-[#DC3173]">
-              <TrendingUpIcon className="w-5 h-5" />
-            </div>
-          </div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">
-            Total Sales
-          </h3>
-          <div className="text-3xl font-bold text-[#DC3173]">
-            <AnimatedCounter
-              value={formatPrice(salesAnalytics.totalSales || 0)}
-              prefix="€"
+        <h3 className="text-lg font-bold text-gray-900 mb-2">
+          Monthly Revenue
+        </h3>
+        <p className="text-sm text-gray-500 mb-6">Revenue trend over months</p>
+
+        <AnalyticsChart
+          data={salesAnalytics.monthly}
+          type="area"
+          dataKey="revenue"
+          xKey="label"
+          height={220}
+        />
+      </motion.div>
+
+      {/* Daily Orders */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-2">Daily Orders</h3>
+        <p className="text-sm text-gray-500 mb-6">
+          Orders distribution over last 7 days
+        </p>
+
+        <AnalyticsChart
+          data={salesAnalytics.daily}
+          type="bar"
+          dataKey="orders"
+          xKey="label"
+          height={200}
+        />
+      </motion.div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
+        {/* Order Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Order Status</h3>
+
+          <div className="space-y-3">
+            <StatusDistributionCard
+              name="Completed"
+              value={salesAnalytics.statusDistribution.completed}
+              color="#22C55E"
+            />
+            <StatusDistributionCard
+              name="Cancelled"
+              value={salesAnalytics.statusDistribution.cancelled}
+              color="#EF4444"
             />
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 relative overflow-hidden">
-          <div className="h-1.5 w-full bg-linear-to-r from-green-400 to-green-600 absolute top-0 left-0" />
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-green-100 rounded-lg text-green-600">
-              <ArrowUpIcon className="w-5 h-5" />
-            </div>
-            <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded border border-green-100">
-              Best Day
-            </span>
-          </div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">
-            Best Performing
+        {/* Payment Split */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Payment Methods
           </h3>
-          <div className="text-3xl font-bold text-gray-900">
-            {salesAnalytics.bestPerformingDay || "N/A"}
-          </div>
-        </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 relative overflow-hidden">
-          <div className="h-1.5 w-full bg-linear-to-r from-amber-400 to-amber-600 absolute top-0 left-0" />
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
-              <ArrowDownIcon className="w-5 h-5" />
-            </div>
-            <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100">
-              Slowest Day
-            </span>
+          <div className="space-y-3">
+            {salesAnalytics.paymentSplit.map((item, i) => (
+              <StatusDistributionCard
+                key={i}
+                name={removeUnderscore(item.method)}
+                value={item.count}
+                color="#DC3173"
+              />
+            ))}
           </div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">
-            Slowest Day
+        </motion.div>
+      </div>
+
+      {/* Revenue */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
+        {/* Revenue by Location */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <MapPin size={18} /> Revenue by Location
           </h3>
-          <div className="text-3xl font-bold text-gray-900">
-            {salesAnalytics.slowestDay || "N/A"}
-          </div>
-        </div>
-      </motion.div>
 
-      {/* Weekly Trend Chart */}
-      <motion.div
-        variants={itemVariants}
-        className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 relative overflow-hidden"
-      >
-        <div className="h-1.5 w-full bg-linear-to-r from-[#DC3173] to-[#e45a92] absolute top-0 left-0" />
-        <div className="flex items-center gap-3 mb-6">
-          <TrendingUpIcon className="w-6 h-6 text-[#DC3173]" />
-          <h2 className="text-xl font-bold text-gray-900">
-            Weekly Sales Trend
-          </h2>
-        </div>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={salesAnalytics.weeklyTrend}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#E5E7EB"
-              />
-              <XAxis
-                dataKey="day"
-                axisLine={false}
-                tickLine={false}
-                tick={{
-                  fill: "#6B7280",
-                }}
-                dy={10}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{
-                  fill: "#6B7280",
-                }}
-                tickFormatter={(value) => `€${value}`}
-              />
-              <Tooltip
-                cursor={{
-                  fill: "#F9FAFB",
-                }}
-                contentStyle={{
-                  borderRadius: "12px",
-                  border: "1px solid #E5E7EB",
-                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.07)",
-                }}
-                formatter={
-                  ((value: number) => [
-                    `€${value.toFixed(2)}`,
-                    "Sales",
-                  ]) as Formatter<number, "Sales">
-                }
-              />
-              <Bar
-                dataKey="total"
-                radius={[8, 8, 0, 0]}
-                animationDuration={1500}
-              >
-                {salesAnalytics?.weeklyTrend?.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.total > 0 ? "#DC3173" : "#E5E7EB"}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </motion.div>
+          <AnalyticsChart
+            data={salesAnalytics.revenueByLocation}
+            type="bar"
+            dataKey="revenue"
+            xKey="location"
+            height={200}
+          />
+        </motion.div>
 
-      {/* Top Selling Items */}
-      <motion.div
-        variants={itemVariants}
-        className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8"
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <ShoppingBagIcon className="w-6 h-6 text-[#DC3173]" />
-          <h2 className="text-xl font-bold text-gray-900">Top Selling Items</h2>
-        </div>
-        <div className="space-y-4">
-          {!salesAnalytics?.topSellingItems && (
-            <p className="text-gray-500 text-center">
-              No top selling items found.
-            </p>
-          )}
-          {salesAnalytics?.topSellingItems &&
-            salesAnalytics?.topSellingItems?.length === 0 && (
-              <p className="text-gray-500 text-center">
-                No top selling items found.
-              </p>
-            )}
-          {salesAnalytics?.topSellingItems?.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{
-                opacity: 0,
-                x: -20,
-              }}
-              animate={{
-                opacity: 1,
-                x: 0,
-              }}
-              transition={{
-                delay: index * 0.1,
-              }}
-              className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100"
-            >
-              <div className="w-8 h-8 rounded-full bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] font-bold text-sm shrink-0">
-                {index + 1}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="font-medium text-gray-900 truncate">
-                    {item.name}
-                  </span>
-                  <span className="font-bold text-[#DC3173] ml-2 shrink-0">
-                    {item.sold} sold
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-linear-to-r from-[#DC3173] to-[#e45a92] rounded-full"
-                    initial={{
-                      width: 0,
-                    }}
-                    animate={{
-                      width: `${(item.sold / maxSold) * 100}%`,
-                    }}
-                    transition={{
-                      duration: 1,
-                      delay: index * 0.1,
-                    }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-    </motion.div>
+        {/* Revenue by Vendor */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+        >
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Store size={18} /> Revenue by Vendor
+          </h3>
+
+          <AnalyticsChart
+            data={salesAnalytics.revenueByVendor}
+            type="bar"
+            dataKey="revenue"
+            xKey="vendorName"
+            height={200}
+          />
+        </motion.div>
+      </div>
+    </div>
   );
 }
