@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { createOfferReq } from "@/services/dashboard/offer/offer.service";
+import { TOffer } from "@/types/offer.type";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -51,6 +52,8 @@ export default function CreateNewOffer() {
       minOrderAmount: 0,
       code: "",
       isAutoApply: false,
+      maxUsageCount: "",
+      userUsageLimit: "",
     },
   });
 
@@ -62,7 +65,17 @@ export default function CreateNewOffer() {
   const onSubmit = async (data: TOfferForm) => {
     const toastId = toast.loading("Creating offer...");
 
-    const result = await createOfferReq(data);
+    const payload = {
+      ...data,
+      ...(data.maxUsageCount?.length
+        ? { maxUsageCount: Number(data.maxUsageCount) }
+        : {}),
+      ...(data.userUsageLimit?.length
+        ? { userUsageLimit: Number(data.userUsageLimit) }
+        : {}),
+    } as Partial<TOffer>;
+
+    const result = await createOfferReq(payload);
 
     if (result.success) {
       toast.success(result.message || "Offer created successfully!", {
@@ -186,7 +199,6 @@ export default function CreateNewOffer() {
                               placeholder={t("discount_eg_20")}
                               type="number"
                               min={0}
-                              max={100}
                               className="h-12 text-base"
                               {...field}
                               value={String(field.value)}
@@ -310,7 +322,57 @@ export default function CreateNewOffer() {
                       </FormItem>
                     )}
                   />
-                  {/* <FormField
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="maxUsageCount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <FormLabel className="font-medium text-sm text-gray-700">
+                                Maximum Usage Count
+                              </FormLabel>
+                              <Input
+                                placeholder="Maximum usage count"
+                                type="number"
+                                min={0}
+                                className="h-12 text-base"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="userUsageLimit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <FormLabel className="font-medium text-sm text-gray-700">
+                                Users Usage Limit
+                              </FormLabel>
+                              <Input
+                                placeholder="Users usage limit"
+                                type="number"
+                                min={0}
+                                className="h-12 text-base"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
                     control={form.control}
                     name="isAutoApply"
                     render={({ field }) => (
@@ -337,7 +399,7 @@ export default function CreateNewOffer() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  /> */}
+                  />
                 </div>
 
                 {/* PROMO CODE */}

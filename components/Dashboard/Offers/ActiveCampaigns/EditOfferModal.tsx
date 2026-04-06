@@ -82,10 +82,15 @@ export default function EditOfferModal({
     setIsSubmitting(true);
     const toastId = toast.loading("Updating offer...");
 
-    const offerData: Partial<TOffer> = {
+    const offerData = {
       ...data,
-      isAutoApply: false,
-    };
+      ...(data.maxUsageCount?.length
+        ? { maxUsageCount: Number(data.maxUsageCount) }
+        : {}),
+      ...(data.userUsageLimit?.length
+        ? { userUsageLimit: Number(data.userUsageLimit) }
+        : {}),
+    } as Partial<TOffer>;
 
     const result = await updateOfferReq(prevValues._id, offerData);
 
@@ -330,6 +335,84 @@ export default function EditOfferModal({
                           }
                         />
                       </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="maxUsageCount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="space-y-2">
+                          <FormLabel className="font-medium text-sm text-gray-700">
+                            Maximum Usage Count
+                          </FormLabel>
+                          <Input
+                            placeholder="Maximum usage count"
+                            type="number"
+                            min={0}
+                            className="h-12 text-base"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="userUsageLimit"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="space-y-2">
+                          <FormLabel className="font-medium text-sm text-gray-700">
+                            Users Usage Limit
+                          </FormLabel>
+                          <Input
+                            placeholder="Users usage limit"
+                            type="number"
+                            min={0}
+                            className="h-12 text-base"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="isAutoApply"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <FormLabel className="flex space-y-2 gap-2 items-center">
+                        <Input
+                          type="checkbox"
+                          placeholder={t("offer_description")}
+                          className="w-4 h-4 mb-0"
+                          {...field}
+                          checked={field.value ? true : false}
+                          value={"true"}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                        />
+                        <span
+                          onClick={() => field.onChange(!field.value)}
+                          className="font-medium text-sm text-gray-700"
+                        >
+                          {t("will_auto_apply")}
+                        </span>
+                      </FormLabel>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

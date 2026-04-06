@@ -17,8 +17,7 @@ export const offerValidation = z
 
     discountValue: z
       .number()
-      .min(0, "Discount value must be at least 0")
-      .max(100, "Discount value must be at most 100")
+      .min(1, "Discount value must be at least 1")
       .optional(),
 
     maxDiscountAmount: z
@@ -36,8 +35,28 @@ export const offerValidation = z
       .optional(),
 
     code: z.string().optional(),
-    isAutoApply: z.boolean("Auto apply must be a boolean").optional(),
+    isAutoApply: z.boolean("Auto apply must be a boolean"),
+
+    maxUsageCount: z.string().optional(),
+
+    userUsageLimit: z.string().optional(),
   })
+  .refine(
+    (data) => {
+      if (
+        data.offerType === "PERCENT" &&
+        data.discountValue &&
+        data.discountValue > 100
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Discount value must be at most 100 for PERCENT offer type",
+      path: ["discountValue"],
+    },
+  )
   .refine(
     (data) => {
       if (data.validFrom >= data.expiresAt) {
@@ -55,4 +74,76 @@ export const offerValidation = z
       return true;
     },
     { message: "Code is required", path: ["code"] },
+  )
+  .refine(
+    (data) => {
+      if (data.isAutoApply && data.code && data.code?.length > 0) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Auto-apply offers should not have a promo code",
+      path: ["code"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.maxUsageCount) {
+        if (isNaN(Number(data.maxUsageCount))) {
+          return false;
+        }
+      }
+      return true;
+    },
+    {
+      message: "Max usage count must be a number",
+      path: ["maxUsageCount"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (
+        data.maxUsageCount &&
+        data.maxUsageCount.length > 0 &&
+        Number(data.maxUsageCount) < 1
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Max usage count must be at least 1",
+      path: ["maxUsageCount"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.userUsageLimit) {
+        if (isNaN(Number(data.userUsageLimit))) {
+          return false;
+        }
+      }
+      return true;
+    },
+    {
+      message: "User usage limit must be a number",
+      path: ["userUsageLimit"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (
+        data.userUsageLimit &&
+        data.userUsageLimit.length > 0 &&
+        Number(data.userUsageLimit) < 1
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "User usage limit must be at least 1",
+      path: ["userUsageLimit"],
+    },
   );

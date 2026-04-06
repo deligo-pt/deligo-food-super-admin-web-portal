@@ -88,7 +88,10 @@ export default function SupportChatSheet({
           if (prev.length >= 50) {
             prev.shift();
           }
-          return [...prev, msg];
+          if (prev.findIndex((m) => m._id === msg._id) === -1) {
+            return [...prev, msg];
+          }
+          return prev;
         });
         scrollToBottom();
       }
@@ -147,7 +150,8 @@ export default function SupportChatSheet({
     return () => {
       leaveConversation();
     };
-  }, [leaveConversation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
