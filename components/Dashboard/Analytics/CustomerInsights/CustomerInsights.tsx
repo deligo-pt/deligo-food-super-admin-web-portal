@@ -1,6 +1,8 @@
 "use client";
 
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import ActiveCustomersInsightsChart from "@/components/Dashboard/Analytics/CustomerInsights/ActiveCustomersInsightsChart";
+import CustomersOrderFrequencyChart from "@/components/Dashboard/Analytics/CustomerInsights/CustomersOrderFrequencyChart";
+import CustomersPeakOrderTimeChart from "@/components/Dashboard/Analytics/CustomerInsights/CustomersPeakOrderTimeChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TCustomerInsights } from "@/types/analytics/customer-insights.type";
@@ -9,7 +11,7 @@ import { motion } from "framer-motion";
 import {
   Activity,
   Clock,
-  DollarSign,
+  Euro,
   TrendingDown,
   UserPlus,
   Users,
@@ -20,6 +22,7 @@ interface IProps {
 }
 
 export default function CustomerInsightsPage({ customerInsights }: IProps) {
+  console.log(customerInsights);
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Header */}
@@ -50,7 +53,7 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
         <StatsCard
           title="Avg CLV"
           value={`€${formatPrice(customerInsights.summary.averageCLV)}`}
-          icon={DollarSign}
+          icon={Euro}
           delay={0.3}
         />
       </div>
@@ -61,21 +64,11 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
       >
-        <h3 className="text-lg font-bold text-gray-900 mb-2">Active Users</h3>
-        <p className="text-sm text-gray-500 mb-6">
-          Daily, Weekly, Monthly active users
-        </p>
-
-        <AnalyticsChart
-          data={[
-            { label: "DAU", value: customerInsights.activeUsers.dau },
-            { label: "WAU", value: customerInsights.activeUsers.wau },
-            { label: "MAU", value: customerInsights.activeUsers.mau },
-          ]}
-          type="bar"
-          dataKey="value"
-          xKey="label"
-          height={220}
+        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <Clock size={18} /> Peak Order Time
+        </h3>
+        <CustomersPeakOrderTimeChart
+          hourlyOrders={customerInsights.hourlyOrders}
         />
       </motion.div>
 
@@ -90,12 +83,8 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
             <Activity size={18} /> Order Frequency
           </h3>
 
-          <AnalyticsChart
-            data={customerInsights.orderFrequency}
-            type="bar"
-            dataKey="userCount"
-            xKey="range"
-            height={200}
+          <CustomersOrderFrequencyChart
+            orderFrequency={customerInsights.orderFrequency}
           />
         </motion.div>
 
@@ -107,15 +96,11 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Clock size={18} /> Peak Order Time
+            <Users size={18} /> Active Users
           </h3>
 
-          <AnalyticsChart
-            data={customerInsights.hourlyOrders}
-            type="area"
-            dataKey="orderCount"
-            xKey="hour"
-            height={200}
+          <ActiveCustomersInsightsChart
+            activeUsers={customerInsights.activeUsers}
           />
         </motion.div>
       </div>

@@ -22,6 +22,7 @@ interface IProps {
 }
 
 export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
+  console.log(salesAnalytics);
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Header */}
