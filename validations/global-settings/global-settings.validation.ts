@@ -25,11 +25,22 @@ export const globalSettingsSchema = z
       .positive("Maximum delivery distance must be greater than 0")
       .optional(),
 
+    // Customer nearest vendor search radius
+    customerNearestVendorRadiusKm: z
+      .number("Customer nearest vendor radius must be a number")
+      .positive("Customer nearest vendor radius must be greater than 0")
+      .optional(),
+
     // Platform commission
     platformCommissionPercent: z
       .number("Platform commission is required")
       .min(0, "Platform commission cannot be less than 0")
       .max(100, "Platform commission cannot exceed 100"),
+    fleetManagerCommissionPercent: z
+      .number("Fleet manager commission must be a number")
+      .min(0, "Fleet manager commission cannot be less than 0")
+      .max(100, "Fleet manager commission cannot exceed 100")
+      .optional(),
     deliveryPartnerCommissionPercent: z
       .number("Delivery partner commission must be a number")
       .min(0, "Delivery partner commission cannot be less than 0")
@@ -69,7 +80,6 @@ export const globalSettingsSchema = z
       .optional(),
 
     // Offers & coupons
-    isCouponEnabled: z.boolean("Coupon status is required"),
     isOfferEnabled: z.boolean("Offer status is required"),
     maxDiscountPercent: z
       .number("Maximum discount percent must be a number")

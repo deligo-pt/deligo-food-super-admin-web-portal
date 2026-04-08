@@ -1,11 +1,12 @@
 "use client";
 
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import RevenueByTopVendorChart from "@/components/Dashboard/Analytics/TopVendors/RevenueByTopVendorChart";
+import TopSellingVendors from "@/components/Dashboard/Analytics/TopVendors/TopSellingVendors";
+import TopVendorPerformance from "@/components/Dashboard/Analytics/TopVendors/TopVendorPerfomance";
+import TopVendorRatingDistribution from "@/components/Dashboard/Analytics/TopVendors/TopVendorRatingDistribution";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TTopVendors } from "@/types/analytics/top-vendors.type";
-import { formatPrice } from "@/utils/formatPrice";
-import { motion } from "framer-motion";
 import { Star, Store, TrendingUp, XCircle } from "lucide-react";
 
 interface IProps {
@@ -13,6 +14,7 @@ interface IProps {
 }
 
 export default function TopVendorsPage({ topVendors }: IProps) {
+  console.log("Top Vendors Data:", topVendors);
   const totalVendors = topVendors.vendorPerformance.length;
 
   const topVendor = topVendors.topSellingVendors[0];
@@ -57,125 +59,21 @@ export default function TopVendorsPage({ topVendors }: IProps) {
       </div>
 
       {/* Top Selling Vendors */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-      >
-        <h3 className="text-lg font-bold text-gray-900 mb-4">
-          Top Selling Vendors
-        </h3>
-
-        <div className="space-y-4">
-          {topVendors.topSellingVendors.map((vendor, i) => (
-            <div
-              key={vendor.vendorId}
-              className="flex items-center justify-between p-4 rounded-xl border border-gray-100"
-            >
-              <div>
-                <p className="font-semibold text-gray-900">
-                  {i + 1}. {vendor.vendorName}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {vendor.totalOrders} orders
-                </p>
-              </div>
-
-              <p className="font-bold text-[#DC3173]">
-                €{formatPrice(vendor.totalRevenue)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+      <TopSellingVendors topSellingVendors={topVendors.topSellingVendors} />
 
       {/* Revenue by Vendor */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-      >
-        <h3 className="text-lg font-bold text-gray-900 mb-2">
-          Revenue by Vendor
-        </h3>
-
-        <AnalyticsChart
-          data={topVendors.topSellingVendors}
-          type="bar"
-          dataKey="totalRevenue"
-          xKey="vendorName"
-          height={220}
-        />
-      </motion.div>
+      <RevenueByTopVendorChart
+        topSellingVendors={topVendors.topSellingVendors}
+      />
 
       {/* Vendor Performance Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-      >
-        <h3 className="text-lg font-bold text-gray-900 mb-4">
-          Vendor Performance
-        </h3>
-
-        <div className="space-y-4">
-          {topVendors.vendorPerformance.map((vendor) => (
-            <div
-              key={vendor.vendorId}
-              className="p-4 rounded-xl border border-gray-100"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <p className="font-semibold text-gray-900 text-lg">
-                  {vendor.vendorName}
-                </p>
-                <p className="text-[#DC3173] font-bold">
-                  €{formatPrice(vendor.totalRevenue)}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm text-gray-600 space-y-2">
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    Orders
-                  </h3>
-                  <p className="text-gray-500">{vendor.totalOrders}</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    Rating
-                  </h3>
-                  <p className="text-gray-500">
-                    €{formatPrice(vendor.averageRating)}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    Prep Time
-                  </h3>
-                  <p className="text-gray-500">{vendor.preparationTime} min</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    Cancel Rate
-                  </h3>
-                  <p className="text-gray-500">{vendor.cancelRate}%</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    Satisfaction
-                  </h3>
-                  <p className="text-gray-500">{vendor.satisfactionScore}%</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+      <TopVendorPerformance vendorPerformance={topVendors.vendorPerformance} />
 
       {/* Rating Distribution */}
-      <motion.div
+      <TopVendorRatingDistribution
+        ratingDistribution={topVendors.ratingDistribution}
+      />
+      {/* <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -192,7 +90,7 @@ export default function TopVendorsPage({ topVendors }: IProps) {
           xKey="vendorName"
           height={200}
         />
-      </motion.div>
+      </motion.div> */}
     </div>
   );
 }

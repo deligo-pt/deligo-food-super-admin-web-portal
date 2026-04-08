@@ -1,12 +1,15 @@
 "use client";
 
 import StatusDistributionCard from "@/components/common/StatusDistributionCard";
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import AreaPerformance from "@/components/Dashboard/Analytics/DeliveryInsights/AreaPerformance";
+import DistanceVsDeliveryTimeChart from "@/components/Dashboard/Analytics/DeliveryInsights/DistanceVsDeliveryTimeChart";
+import RiderIdleTime from "@/components/Dashboard/Analytics/DeliveryInsights/RiderIdleTime";
+import RiderPerformance from "@/components/Dashboard/Analytics/DeliveryInsights/RiderPerformance";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TDeliveryInsights } from "@/types/analytics/delivery-insights.type";
 import { motion } from "framer-motion";
-import { Activity, AlertTriangle, Clock, MapPin, XCircle } from "lucide-react";
+import { AlertTriangle, Clock, XCircle } from "lucide-react";
 
 interface IProps {
   deliveryInsights: TDeliveryInsights;
@@ -43,88 +46,19 @@ export default function DeliveryInsightsPage({ deliveryInsights }: IProps) {
       </div>
 
       {/* Rider Performance */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-      >
-        <h3 className="text-lg font-bold text-gray-900 mb-2">
-          Rider Performance
-        </h3>
-        <p className="text-sm text-gray-500 mb-6">
-          Deliveries handled by each rider
-        </p>
-
-        <AnalyticsChart
-          data={deliveryInsights.riderPerformance}
-          type="bar"
-          dataKey="totalDeliveries"
-          xKey="riderName"
-          height={220}
-        />
-      </motion.div>
+      <RiderPerformance riderPerformance={deliveryInsights.riderPerformance} />
 
       {/* Distance vs Delivery Time */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-      >
-        <h3 className="text-lg font-bold text-gray-900 mb-2">
-          Distance vs Delivery Time
-        </h3>
-        <p className="text-sm text-gray-500 mb-6">
-          Relationship between distance and time
-        </p>
-
-        <AnalyticsChart
-          data={deliveryInsights.distanceTimeAnalysis}
-          type="line"
-          dataKey="averageTime"
-          xKey="distanceKm"
-          height={220}
-        />
-      </motion.div>
+      <DistanceVsDeliveryTimeChart
+        distanceTimeAnalysis={deliveryInsights.distanceTimeAnalysis}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
         {/* Area Performance */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <MapPin size={18} /> Area Performance
-          </h3>
+        <AreaPerformance areaPerformance={deliveryInsights.areaPerformance} />
 
-          <AnalyticsChart
-            data={deliveryInsights.areaPerformance}
-            type="bar"
-            dataKey="averageTime"
-            xKey="area"
-            height={200}
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Activity size={18} /> Rider Idle Time
-          </h3>
-
-          <AnalyticsChart
-            data={deliveryInsights.riderIdleTime}
-            type="bar"
-            dataKey="idleTimeMinutes"
-            xKey="riderName"
-            height={200}
-          />
-        </motion.div>
+        {/* Rider Idle Time */}
+        <RiderIdleTime riderIdleTime={deliveryInsights.riderIdleTime} />
       </div>
 
       <motion.div

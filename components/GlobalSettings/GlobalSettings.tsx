@@ -61,7 +61,11 @@ export function GlobalSettings({
       platformCommissionPercent: settings.platformCommissionPercent || 0,
       deliveryPartnerCommissionPercent:
         settings.deliveryPartnerCommissionPercent || 0,
+      fleetManagerCommissionPercent:
+        settings.fleetManagerCommissionPercent || 0,
       vendorVatPercent: settings.vendorVatPercent || 0,
+      customerNearestVendorRadiusKm:
+        settings.customerNearestVendorRadiusKm || 0,
       minOrderAmount: settings.minOrderAmount || 0,
       maxOrderAmount: settings.maxOrderAmount || 0,
       maxItemsPerOrder: settings.maxItemsPerOrder || 0,
@@ -74,7 +78,6 @@ export function GlobalSettings({
         settings.autoMarkDeliveredAfterMinutes || 0,
       otpLength: settings.otpLength || 0,
       otpExpiryMinutes: settings.otpExpiryMinutes || 0,
-      isCouponEnabled: settings.isCouponEnabled || false,
       isOfferEnabled: settings.isOfferEnabled || false,
       isPlatformLive: settings.isPlatformLive || false,
       orderOtpEnabled: settings.orderOtpEnabled || false,
@@ -112,7 +115,7 @@ export function GlobalSettings({
   };
 
   return (
-    <div className="min-h-screen  p-6">
+    <div className="min-h-screen">
       <Form {...form}>
         <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="">
           {/* Header */}
@@ -138,11 +141,11 @@ export function GlobalSettings({
                 type="submit"
                 disabled={isSaving}
                 className={`
-              relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-white shadow-lg shadow-[#DC3173]/30 transition-all
+              relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-[#DC3173] transition-all
               ${
                 isSaving
-                  ? "bg-[#DC3173]/50 cursor-wait"
-                  : "bg-[#DC3173] hover:bg-[#DC3173]/90 hover:shadow-[#DC3173]/40"
+                  ? "bg-white/50 cursor-wait"
+                  : "bg-white hover:bg-white/90 cursor-pointer"
               }
             `}
               >
@@ -477,6 +480,30 @@ export function GlobalSettings({
                 />
                 <FormField
                   control={form.control}
+                  name="fleetManagerCommissionPercent"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label="Fleet Manager Commission"
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="%"
+                          description="Percentage paid to fleet manager"
+                          min={0}
+                          max={100}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="deliveryPartnerCommissionPercent"
                   render={({ field, fieldState }) => (
                     <FormItem>
@@ -514,6 +541,7 @@ export function GlobalSettings({
                             field.onChange(parseFloat(e.target.value))
                           }
                           suffix="%"
+                          description="VAT percentage added to vendor earnings"
                           min={0}
                           max={100}
                         />
@@ -681,17 +709,6 @@ export function GlobalSettings({
                             checked={field.value}
                             onChange={(val) => field.onChange(val)}
                           />
-                          {/* <SettingsInput
-                          fieldState={fieldState}
-                          label="Refund Processing Days"
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="days"
-                          min={0}
-                        /> */}
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -779,32 +796,12 @@ export function GlobalSettings({
                 <div className="p-4 bg-[#DC3173]/5 rounded-xl border border-[#DC3173]/10">
                   <FormField
                     control={form.control}
-                    name="isCouponEnabled"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <SettingsToggle
-                            label={t("enable_coupons")}
-                            description={t("allow_customers_use_promo")}
-                            checked={field.value}
-                            onChange={(val) => field.onChange(val)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="p-4 bg-[#DC3173]/5 rounded-xl border border-[#DC3173]/10">
-                  <FormField
-                    control={form.control}
                     name="isOfferEnabled"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
                           <SettingsToggle
-                            label={t("enable_global_offers")}
+                            label="Enable Offers"
                             description={t("activate_sitewide_promotional")}
                             checked={field.value}
                             onChange={(val) => field.onChange(val)}
@@ -898,6 +895,37 @@ export function GlobalSettings({
                   )}
                 />
               </div>
+            </SettingsCard>
+
+            {/* Delivery Pricing */}
+            <SettingsCard
+              title="Customer Nearest Vendor"
+              description="Set the radius to find nearest vendors for customers"
+              icon={EuroIcon}
+              delay={0.1}
+            >
+              <FormField
+                control={form.control}
+                name="customerNearestVendorRadiusKm"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormControl>
+                      <SettingsInput
+                        fieldState={fieldState}
+                        label="Customer Nearest Vendor Radius"
+                        type="number"
+                        value={field.value}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                        suffix="km"
+                        min={0}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </SettingsCard>
           </div>
         </form>

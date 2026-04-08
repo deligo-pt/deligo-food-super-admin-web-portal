@@ -1,6 +1,9 @@
 "use client";
 
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import CustomersPeakOrderTimeChart from "@/components/Dashboard/Analytics/CustomerInsights/CustomersPeakOrderTimeChart";
+import DayWiseOrdersChart from "@/components/Dashboard/Analytics/PeakHourAnalysis/DayWiseOrdersChart";
+import LunchVsDinnerChart from "@/components/Dashboard/Analytics/PeakHourAnalysis/LunchVsDinnerChart";
+import RiderDemandGapChart from "@/components/Dashboard/Analytics/PeakHourAnalysis/RiderDemandGap";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TPeakHoursAnalysis } from "@/types/analytics/peak-hour-analysis.type";
@@ -74,79 +77,24 @@ export default function PeakHoursPage({ peakHourAnalysis }: IProps) {
         </h3>
         <p className="text-sm text-gray-500 mb-6">Identify peak demand times</p>
 
-        <AnalyticsChart
-          data={peakHourAnalysis.hourlyOrders}
-          type="area"
-          dataKey="orderCount"
-          xKey="hour"
-          height={220}
+        <CustomersPeakOrderTimeChart
+          hourlyOrders={peakHourAnalysis.hourlyOrders}
         />
       </motion.div>
 
       {/* Meal Comparison and Day-wise Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
         {/* Meal Comparison */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <h3 className="text-lg font-bold text-gray-900 mb-4">
-            Lunch vs Dinner
-          </h3>
-
-          <AnalyticsChart
-            data={peakHourAnalysis.mealTimeComparison}
-            type="bar"
-            dataKey="orderCount"
-            xKey="type"
-            height={200}
-          />
-        </motion.div>
+        <LunchVsDinnerChart
+          mealTimeComparison={peakHourAnalysis.mealTimeComparison}
+        />
 
         {/* Day-wise */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <h3 className="text-lg font-bold text-gray-900 mb-4">
-            Day-wise Orders
-          </h3>
-
-          <AnalyticsChart
-            data={peakHourAnalysis.dayWiseOrders}
-            type="bar"
-            dataKey="orderCount"
-            xKey="day"
-            height={200}
-          />
-        </motion.div>
+        <DayWiseOrdersChart dayWiseOrders={peakHourAnalysis.dayWiseOrders} />
       </div>
 
       {/* Rider Demand vs Availability */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-      >
-        <h3 className="text-lg font-bold text-gray-900 mb-2">
-          Rider Demand vs Availability
-        </h3>
-        <p className="text-sm text-gray-500 mb-6">
-          Detect shortage during peak hours
-        </p>
-
-        <AnalyticsChart
-          data={peakHourAnalysis.riderDemandGap}
-          type="bar"
-          dataKey="orders"
-          xKey="hour"
-          height={220}
-        />
-      </motion.div>
+      <RiderDemandGapChart riderDemandGap={peakHourAnalysis.riderDemandGap} />
 
       {/* Heatmap */}
       <motion.div

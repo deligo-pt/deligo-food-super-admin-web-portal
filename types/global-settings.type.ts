@@ -11,6 +11,7 @@ export type TGlobalSettings = {
 
   // Platform commission
   platformCommissionPercent: number;
+  fleetManagerCommissionPercent?: number;
   deliveryPartnerCommissionPercent?: number;
   vendorVatPercent?: number;
 
@@ -19,12 +20,14 @@ export type TGlobalSettings = {
   maxOrderAmount?: number;
   maxItemsPerOrder?: number;
 
+  // Customer nearest vendor search radius
+  customerNearestVendorRadiusKm?: number;
+
   // Cancellation & refund
   cancelTimeLimitMinutes?: number;
   refundProcessingDays?: number;
 
-  // Offers & coupons
-  isCouponEnabled: boolean;
+  // Offers
   isOfferEnabled: boolean;
   maxDiscountPercent?: number;
 
