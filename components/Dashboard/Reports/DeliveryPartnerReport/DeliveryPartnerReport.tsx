@@ -16,35 +16,6 @@ interface IProps {
   deliveryPartnerReportAnalytics: IDeliveryPartnerReportAnalytics;
 }
 
-// const VehicleTypes = ({
-//   name,
-//   value,
-//   partnersData,
-// }: {
-//   name: string;
-//   value: number;
-//   partnersData: { data: TDeliveryPartner[]; meta?: TMeta };
-// }) => {
-//   return (
-//     <div key={name} className="flex items-center justify-between">
-//       <span className="text-sm text-gray-600">{name}</span>
-//       <div className="flex items-center gap-2">
-//         <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
-//           <div
-//             className="h-full bg-[#DC3173] rounded-full"
-//             style={{
-//               width: !!partnersData?.meta?.total
-//                 ? `${(value / (partnersData?.meta?.total || 1)) * 100}%`
-//                 : 0,
-//             }}
-//           />
-//         </div>
-//         <span className="font-bold text-gray-900 w-6 text-right">{value}</span>
-//       </div>
-//     </div>
-//   );
-// };
-
 export default function DeliveryPartnerReport({
   deliveryPartnerReportAnalytics,
 }: IProps) {

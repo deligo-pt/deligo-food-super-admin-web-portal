@@ -28,7 +28,7 @@ const DeleteModal = ({ open, onOpenChange, onConfirm }: IProps) => {
             <DialogDescription>
               {t("this_action_cannot_be_undone")}
             </DialogDescription>
-          </DialogHeader>{" "}
+          </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
