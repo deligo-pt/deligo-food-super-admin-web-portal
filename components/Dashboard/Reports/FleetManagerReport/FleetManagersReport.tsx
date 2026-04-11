@@ -4,18 +4,30 @@ import StatusDistributionCard from "@/components/common/StatusDistributionCard";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
+import {
+  SelectCustomDateFilter,
+  SelectDateRangeFilter,
+} from "@/components/Filtering/SelectDateRangeFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { IFleetManagerReportAnalytics } from "@/types/report.type";
 import { generateFleetManagerReportCSV } from "@/utils/csv/fleetManagerReportCSV";
 import { generateFleetManagerReportPDF } from "@/utils/pdf/fleetManagerReportPdf";
 import { motion } from "framer-motion";
 import { Bike, CheckCircle, PackageCheckIcon, Users } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 interface IProps {
   fleetReportAnalytics: IFleetManagerReportAnalytics;
 }
 
 export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
+  const searchParams = useSearchParams();
+  const currentTimeframe = searchParams.get("timeframe") || "";
+  const [isCustomDate, setIsCustomDate] = useState(
+    currentTimeframe === "custom",
+  );
+
   const data = {
     stats: fleetReportAnalytics?.cards,
     monthlySignups: fleetReportAnalytics?.monthlySignups || [],
@@ -30,12 +42,25 @@ export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
           title="Fleet Manager Report"
           subtitle="Overview of all fleet managers and their operations"
           extraComponent={
-            <ExportPopover
-              onPDFClick={() => generateFleetManagerReportPDF(data)}
-              onCSVClick={() => generateFleetManagerReportCSV(data)}
-            />
+            <div className="flex items-center gap-3">
+              {/* Date Filter */}
+              <SelectDateRangeFilter
+                placeholder="Select Date Range"
+                onCustomRangeSelect={() => setIsCustomDate(true)}
+              />
+
+              <ExportPopover
+                onPDFClick={() => generateFleetManagerReportPDF(data)}
+                onCSVClick={() => generateFleetManagerReportCSV(data)}
+              />
+            </div>
           }
         />
+
+        {/* Custom Date Filter */}
+        {isCustomDate && (
+          <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">

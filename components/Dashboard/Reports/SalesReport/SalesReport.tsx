@@ -1,6 +1,10 @@
 "use client";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
+import {
+  SelectCustomDateFilter,
+  SelectDateRangeFilter,
+} from "@/components/Filtering/SelectDateRangeFilter";
 import SelectFilter from "@/components/Filtering/SelectFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
@@ -10,6 +14,8 @@ import { formatPrice } from "@/utils/formatPrice";
 import { generateSalesReportPDF } from "@/utils/pdf/salesReportPdf";
 import { motion } from "framer-motion";
 import { BarChart2, CheckCircle, FileText, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   Bar,
   BarChart,
@@ -35,6 +41,11 @@ interface IProps {
 
 const SalesReport = ({ salesReportAnalytics }: IProps) => {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const currentTimeframe = searchParams.get("timeframe") || "";
+  const [isCustomDate, setIsCustomDate] = useState(
+    currentTimeframe === "custom",
+  );
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
@@ -44,14 +55,27 @@ const SalesReport = ({ salesReportAnalytics }: IProps) => {
           title={t("sales_report")}
           subtitle={t("overview_revenue_orders_metrics")}
           extraComponent={
-            <ExportPopover
-              onPDFClick={() =>
-                generateSalesReportPDF(salesReportAnalytics || {})
-              }
-              onCSVClick={() => generateSalesReportCSV(salesReportAnalytics)}
-            />
+            <div className="flex items-center gap-3">
+              {/* Date Filter */}
+              <SelectDateRangeFilter
+                placeholder="Select Date Range"
+                onCustomRangeSelect={() => setIsCustomDate(true)}
+              />
+
+              <ExportPopover
+                onPDFClick={() =>
+                  generateSalesReportPDF(salesReportAnalytics || {})
+                }
+                onCSVClick={() => generateSalesReportCSV(salesReportAnalytics)}
+              />
+            </div>
           }
         />
+
+        {/* Custom Date Filter */}
+        {isCustomDate && (
+          <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
+        )}
 
         {/* filtering */}
         <div className="flex flex-row justify-end items-end mb-6">

@@ -4,6 +4,10 @@ import StatusDistributionCard from "@/components/common/StatusDistributionCard";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
+import {
+  SelectCustomDateFilter,
+  SelectDateRangeFilter,
+} from "@/components/Filtering/SelectDateRangeFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { IDeliveryPartnerReportAnalytics } from "@/types/report.type";
 import { generateDeliveryPartnerReportCSV } from "@/utils/csv/deliveryPartnerReportCSV ";
@@ -11,6 +15,8 @@ import { formatPrice } from "@/utils/formatPrice";
 import { generateDeliveryPartnerReportPDF } from "@/utils/pdf/deliveryPartnerReportPdf";
 import { motion } from "framer-motion";
 import { Bike, CheckCircle, EuroIcon, Package } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 interface IProps {
   deliveryPartnerReportAnalytics: IDeliveryPartnerReportAnalytics;
@@ -19,6 +25,12 @@ interface IProps {
 export default function DeliveryPartnerReport({
   deliveryPartnerReportAnalytics,
 }: IProps) {
+  const searchParams = useSearchParams();
+  const currentTimeframe = searchParams.get("timeframe") || "";
+  const [isCustomDate, setIsCustomDate] = useState(
+    currentTimeframe === "custom",
+  );
+
   const data = {
     stats: deliveryPartnerReportAnalytics.cards,
     monthlySignups: deliveryPartnerReportAnalytics.partnerGrowth || [],
@@ -33,12 +45,25 @@ export default function DeliveryPartnerReport({
           title="Delivery Partner Report"
           subtitle="Overview of all delivery partners and their performance"
           extraComponent={
-            <ExportPopover
-              onPDFClick={() => generateDeliveryPartnerReportPDF(data)}
-              onCSVClick={() => generateDeliveryPartnerReportCSV(data)}
-            />
+            <div className="flex items-center gap-3">
+              {/* Date Filter */}
+              <SelectDateRangeFilter
+                placeholder="Select Date Range"
+                onCustomRangeSelect={() => setIsCustomDate(true)}
+              />
+
+              <ExportPopover
+                onPDFClick={() => generateDeliveryPartnerReportPDF(data)}
+                onCSVClick={() => generateDeliveryPartnerReportCSV(data)}
+              />
+            </div>
           }
         />
+
+        {/* Custom Date Filter */}
+        {isCustomDate && (
+          <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">

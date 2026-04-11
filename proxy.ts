@@ -1,50 +1,51 @@
-import { jwtVerify } from "jose";
+import { USER_ROLE } from "@/consts/user.const";
+import { getAdminInfo } from "@/utils/getAdminInfo";
+import { verifyTokens } from "@/utils/verifyTokens";
 import { NextRequest, NextResponse } from "next/server";
 
-const JWT_ACCESS_SECRET = new TextEncoder().encode(
-  process.env.JWT_ACCESS_SECRET || "Secret"
-);
-
-async function verifyJWT(token: string) {
-  try {
-    const { payload } = await jwtVerify(token, JWT_ACCESS_SECRET);
-    return payload as { role?: string; status?: string };
-  } catch {
-    return null;
-  }
-}
-
 export async function proxy(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const accessToken = req.cookies.get("accessToken")?.value;
+  const { pathname, searchParams } = req.nextUrl;
+
+  if (searchParams.has("tokenRefreshed")) {
+    const url = req.nextUrl.clone();
+    url.searchParams.delete("tokenRefreshed");
+    return NextResponse.redirect(url);
+  }
 
   const loginUrl = new URL("/", req.url);
   loginUrl.searchParams.set("redirect", pathname);
 
-  if (pathname === "/") {
-    if (accessToken) {
-      const decoded = await verifyJWT(accessToken);
-      if (
-        decoded &&
-        (decoded?.role === "SUPER_ADMIN" || decoded?.role === "ADMIN")
-      ) {
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
-      }
-    }
-    return NextResponse.next();
+  const tokenWasRefreshed = await verifyTokens();
+
+  console.log("Token was refreshed:", tokenWasRefreshed);
+
+  if (tokenWasRefreshed) {
+    const url = req.nextUrl.clone();
+    url.searchParams.set("tokenRefreshed", "true");
+    return NextResponse.redirect(url);
   }
 
-  if (pathname.startsWith("/admin")) {
-    if (!accessToken) {
-      return NextResponse.redirect(loginUrl);
-    }
+  const adminResult = await getAdminInfo();
 
-    const decoded = await verifyJWT(accessToken);
-    if (!decoded) {
-      return NextResponse.redirect(loginUrl);
-    }
+  if (adminResult) {
+    const adminInfo = adminResult?.admin;
 
-    if (decoded?.role !== "SUPER_ADMIN" && decoded?.role !== "ADMIN") {
+    if (
+      adminInfo.role === USER_ROLE.ADMIN ||
+      adminInfo.role === USER_ROLE.SUPER_ADMIN
+    ) {
+      if (pathname === "/") {
+        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+      }
+    } else {
+      req.cookies.delete("accessToken");
+      req.cookies.delete("refreshToken");
+      if (pathname !== "/") {
+        return NextResponse.redirect(loginUrl);
+      }
+    }
+  } else {
+    if (pathname.startsWith("/admin")) {
       return NextResponse.redirect(loginUrl);
     }
   }

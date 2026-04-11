@@ -52,7 +52,6 @@ export interface ICustomerReportAnalytics {
   statusDistribution: {
     approved: number;
     blocked: number;
-    pending: number;
   };
 }
 

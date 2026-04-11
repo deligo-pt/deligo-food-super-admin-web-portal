@@ -4,18 +4,30 @@ import StatusDistributionCard from "@/components/common/StatusDistributionCard";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
+import {
+  SelectCustomDateFilter,
+  SelectDateRangeFilter,
+} from "@/components/Filtering/SelectDateRangeFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { IVendorReportAnalytics } from "@/types/report.type";
 import { generateVendorReportCSV } from "@/utils/csv/vendorReportCSV";
 import { generateVendorReportPDF } from "@/utils/pdf/vendorReportPdf";
 import { motion } from "framer-motion";
 import { CheckCircle, Clock, Store, XCircle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 interface IProps {
   vendorReportAnalytics: IVendorReportAnalytics;
 }
 
 export default function VendorReport({ vendorReportAnalytics }: IProps) {
+  const searchParams = useSearchParams();
+  const currentTimeframe = searchParams.get("timeframe") || "";
+  const [isCustomDate, setIsCustomDate] = useState(
+    currentTimeframe === "custom",
+  );
+
   const data = {
     stats: vendorReportAnalytics.cards,
     monthlySignups: vendorReportAnalytics.monthlySignups || [],
@@ -30,12 +42,25 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
           title="Vendor Report"
           subtitle="Overview of all registered vendors and their status"
           extraComponent={
-            <ExportPopover
-              onPDFClick={() => generateVendorReportPDF(data)}
-              onCSVClick={() => generateVendorReportCSV(data)}
-            />
+            <div className="flex items-center gap-3">
+              {/* Date Filter */}
+              <SelectDateRangeFilter
+                placeholder="Select Date Range"
+                onCustomRangeSelect={() => setIsCustomDate(true)}
+              />
+
+              <ExportPopover
+                onPDFClick={() => generateVendorReportPDF(data)}
+                onCSVClick={() => generateVendorReportCSV(data)}
+              />
+            </div>
           }
         />
+
+        {/* Custom Date Filter */}
+        {isCustomDate && (
+          <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 print:mb-4">

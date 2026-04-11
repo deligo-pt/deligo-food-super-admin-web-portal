@@ -4,13 +4,18 @@ import { BarChart, PieChart, Search } from "lucide-react";
 
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
-import SelectFilter from "@/components/Filtering/SelectFilter";
+import {
+  SelectCustomDateFilter,
+  SelectDateRangeFilter,
+} from "@/components/Filtering/SelectDateRangeFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { IOrderReportAnalytics } from "@/types/report.type";
 import { generateOrderReportCSV } from "@/utils/csv/orderReportCSV";
 import { formatPrice } from "@/utils/formatPrice";
 import { generateOrderReportPDF } from "@/utils/pdf/orderReportPdf";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   Area,
   AreaChart,
@@ -25,18 +30,17 @@ import {
 
 const DELIGO = "#DC3173";
 
-const daysOption = [
-  { label: "Last 7 days", value: "last7days" },
-  { label: "Last 14 days", value: "last14days" },
-  { label: "Last 30 days", value: "last30days" },
-];
-
 interface IProps {
   orderReportAnalytics: IOrderReportAnalytics;
 }
 
 const OrderReport = ({ orderReportAnalytics }: IProps) => {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const currentTimeframe = searchParams.get("timeframe") || "";
+  const [isCustomDate, setIsCustomDate] = useState(
+    currentTimeframe === "custom",
+  );
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
@@ -46,15 +50,28 @@ const OrderReport = ({ orderReportAnalytics }: IProps) => {
           title={t("order_report")}
           subtitle={t("full_analytics_performance_insights")}
           extraComponent={
-            <ExportPopover
-              onPDFClick={() => generateOrderReportPDF(orderReportAnalytics)}
-              onCSVClick={() => generateOrderReportCSV(orderReportAnalytics)}
-            />
+            <div className="flex items-center gap-3">
+              {/* Date Filter */}
+              <SelectDateRangeFilter
+                placeholder="Select Date Range"
+                onCustomRangeSelect={() => setIsCustomDate(true)}
+              />
+
+              <ExportPopover
+                onPDFClick={() => generateOrderReportPDF(orderReportAnalytics)}
+                onCSVClick={() => generateOrderReportCSV(orderReportAnalytics)}
+              />
+            </div>
           }
         />
 
+        {/* Custom Date Filter */}
+        {isCustomDate && (
+          <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
+        )}
+
         {/* filtering */}
-        <div className="flex flex-row justify-end items-end mb-6">
+        {/* <div className="flex flex-row justify-end items-end mb-6">
           <div>
             <SelectFilter
               paramName="timeframe"
@@ -62,7 +79,7 @@ const OrderReport = ({ orderReportAnalytics }: IProps) => {
               placeholder="Timeframe"
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Metrics */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">

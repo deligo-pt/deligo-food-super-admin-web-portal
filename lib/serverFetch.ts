@@ -12,14 +12,22 @@ const serverRequestHelper = async (
   url: string,
   options?: AxiosRequestConfig,
 ) => {
-  const accessToken = (await cookies()).get("accessToken")?.value || "";
+  const cookieStore = await cookies();
+
+  const cookieStr = cookieStore.toString();
+  const accessToken = cookieStore.get("accessToken")?.value || "";
 
   return axiosInstance({
     url,
     ...options,
     headers: {
       ...(options?.headers || {}),
-      authorization: `Bearer ${accessToken}`,
+      ...(accessToken && {
+        authorization: `Bearer ${accessToken}`,
+      }),
+      ...(cookieStr && {
+        cookie: cookieStr,
+      }),
     },
   }).then((res) => res.data);
 };

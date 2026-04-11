@@ -1,5 +1,6 @@
 "use client";
 
+import ClearSessionModal from "@/components/login/ClearSessionModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,13 +16,14 @@ import { cn } from "@/lib/utils";
 import { loginReq } from "@/services/auth/login.service";
 import { setCookie } from "@/utils/cookies";
 import { getAndSaveFcmToken } from "@/utils/fcmToken";
+import { getDeviceInfo } from "@/utils/getDeviceInfo";
 import { loginValidation } from "@/validations/auth/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -35,6 +37,12 @@ export default function SuperAdminLoginPage({
 }: {
   redirect?: string;
 }) {
+  const router = useRouter();
+  const params = useSearchParams();
+
+  const [showModal, setShowModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginValidation),
     defaultValues: {
@@ -42,13 +50,17 @@ export default function SuperAdminLoginPage({
       password: "",
     },
   });
-  const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = async (data: LoginForm) => {
+  const login = async (payload: {
+    email: string;
+    password: string;
+    forceLogin?: boolean;
+  }) => {
     const toastId = toast.loading("Logging in...");
 
-    const result = await loginReq(data);
+    const deviceDetails = await getDeviceInfo();
+
+    const result = await loginReq({ ...payload, deviceDetails });
 
     if (result?.success) {
       const decoded = jwtDecode(result.data.accessToken) as { role: string };
@@ -78,7 +90,31 @@ export default function SuperAdminLoginPage({
 
     toast.error(result.message, { id: toastId });
     console.log(result);
+
+    if (result.message === "LIMIT_EXCEEDED") {
+      setShowModal(true);
+    }
   };
+
+  const onSubmit = async (data: LoginForm) => {
+    login(data);
+  };
+
+  const clearSession = async () => {
+    await login({
+      email: form.getValues("email"),
+      password: form.getValues("password"),
+      forceLogin: true,
+    });
+  };
+
+  useEffect(() => {
+    if (params.get("sessionExpired")) {
+      toast.error(
+        "Your session has expired as this device is no longer authorized.",
+      );
+    }
+  }, [params]);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-950 flex items-center justify-center p-6">
@@ -202,6 +238,12 @@ export default function SuperAdminLoginPage({
           </CardContent>
         </Card>
       </motion.div>
+
+      <ClearSessionModal
+        open={showModal}
+        onOpenChange={(open) => setShowModal(open)}
+        onRemove={clearSession}
+      />
     </div>
   );
 }
