@@ -19,7 +19,6 @@ export const getAdminInfo = async (): Promise<{
       decoded.success &&
       (decoded?.data?.role === "ADMIN" || decoded?.data?.role === "SUPER_ADMIN")
     ) {
-      console.log("Admin pending");
       const result = await catchAsync<TAdmin>(async () => {
         return await serverRequest.get(`/admins/${decoded?.data?.userId}`);
       });

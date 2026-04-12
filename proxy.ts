@@ -17,8 +17,6 @@ export async function proxy(req: NextRequest) {
 
   const tokenWasRefreshed = await verifyTokens();
 
-  console.log("Token was refreshed:", tokenWasRefreshed);
-
   if (tokenWasRefreshed) {
     const url = req.nextUrl.clone();
     url.searchParams.set("tokenRefreshed", "true");

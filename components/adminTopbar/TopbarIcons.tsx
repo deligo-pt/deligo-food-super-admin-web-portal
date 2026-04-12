@@ -3,9 +3,11 @@
 
 import TopbarMessageIcon from "@/components/adminTopbar/TopbarMessageIcon";
 import TopbarNotification from "@/components/adminTopbar/TopbarNotification";
+import { logoutReq } from "@/services/auth/login.service";
 import { useStore } from "@/store/store";
 import { TAdmin } from "@/types/admin.type";
 import { removeCookie } from "@/utils/cookies";
+import { getFcmToken } from "@/utils/fcmToken";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -17,6 +19,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -37,10 +40,29 @@ export default function TopbarIcons({ admin }: IProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const router = useRouter();
 
-  const logOut = () => {
-    removeCookie("accessToken");
-    removeCookie("refreshToken");
-    router.push("/");
+  const logOut = async () => {
+    const toastId = toast.loading("Logging out...");
+
+    const token = (await getFcmToken()) || "";
+
+    const result = await logoutReq({
+      email: admin?.email || "",
+      token,
+    });
+
+    if (result?.success) {
+      toast.success(result?.message || "Logout successful!", {
+        id: toastId,
+      });
+
+      removeCookie("accessToken");
+      removeCookie("refreshToken");
+      router.push("/");
+      return;
+    }
+
+    toast.error(result?.message || "Logout failed", { id: toastId });
+    console.log(result);
   };
 
   useEffect(() => {
