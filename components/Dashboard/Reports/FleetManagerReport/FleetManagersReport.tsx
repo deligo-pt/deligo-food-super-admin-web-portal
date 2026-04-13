@@ -1,7 +1,7 @@
 "use client";
 
+import CustomizedCharts from "@/components/common/CustomizedChart/CustomizedChart";
 import StatusDistributionCard from "@/components/common/StatusDistributionCard";
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import {
@@ -93,35 +93,15 @@ export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
         </div>
 
         {/* Charts */}
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.2,
-          }}
-          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
-        >
-          <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Monthly Registrations
-          </h3>
-          <p className="text-sm text-gray-500 mb-6">
-            New fleet manager signups over time
-          </p>
-
-          <AnalyticsChart
-            data={fleetReportAnalytics?.monthlySignups || []}
-            type="area"
-            dataKey="value"
-            xKey="label"
-            height={200}
-          />
-        </motion.div>
+        <CustomizedCharts
+          type="area"
+          title="Fleet Manager Growth"
+          description="New manager registrations over time"
+          data={fleetReportAnalytics.monthlySignups || []}
+          xLabel="Month"
+          yLabel="No of Managers"
+          delay={0.2}
+        />
 
         {/* status distribution */}
         <motion.div

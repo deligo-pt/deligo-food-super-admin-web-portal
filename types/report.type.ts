@@ -28,6 +28,10 @@ export interface IOrderReportAnalytics {
     totalOrders: number;
     totalRevenue: number;
   };
+  ordersByZone: {
+    label: string;
+    value: number;
+  }[];
   ordersTrend: {
     date: string;
     orders: number;

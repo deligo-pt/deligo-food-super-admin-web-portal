@@ -2,6 +2,7 @@
 
 import { BarChart, PieChart, Search } from "lucide-react";
 
+import CustomizedCharts from "@/components/common/CustomizedChart/CustomizedChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import {
@@ -16,19 +17,6 @@ import { formatPrice } from "@/utils/formatPrice";
 import { generateOrderReportPDF } from "@/utils/pdf/orderReportPdf";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  CartesianGrid,
-  BarChart as ReBarChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
-const DELIGO = "#DC3173";
 
 interface IProps {
   orderReportAnalytics: IOrderReportAnalytics;
@@ -106,55 +94,30 @@ const OrderReport = ({ orderReportAnalytics }: IProps) => {
         {/* Charts grid */}
         <section className="grid grid-cols-1 gap-6">
           {/* Bar - Orders Trend */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <BarChart className="w-4 h-4" /> Orders Trend
-            </h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <ReBarChart data={orderReportAnalytics.ordersTrend || []}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="orders" fill={DELIGO} />
-                </ReBarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <CustomizedCharts
+            title="Orders Trend"
+            description="Number of orders by zone"
+            data={orderReportAnalytics.ordersByZone || []}
+            xLabel="Zones"
+            yLabel="No of Orders"
+            delay={0.2}
+            xKey="zone"
+            yKey="orders"
+          />
 
           {/* Area - Revenue trend */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <BarChart className="w-4 h-4" /> {t("revenue_trend")}
-            </h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={orderReportAnalytics.revenueTrend || []}>
-                  <defs>
-                    <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={DELIGO} stopOpacity={0.6} />
-                      <stop
-                        offset="95%"
-                        stopColor={DELIGO}
-                        stopOpacity={0.05}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke={DELIGO}
-                    fill="url(#revGrad)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <CustomizedCharts
+            type="area"
+            title={t("revenue_trend")}
+            description="Revenue over time"
+            data={orderReportAnalytics.revenueTrend || []}
+            xLabel="Date"
+            yLabel="Revenue (€)"
+            delay={0.2}
+            xKey="date"
+            yKey="revenue"
+            yLabelCustomizedValue={(val) => formatPrice(val as number)}
+          />
         </section>
       </div>
     </div>

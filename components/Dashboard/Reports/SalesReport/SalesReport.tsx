@@ -1,4 +1,5 @@
 "use client";
+import CustomizedCharts from "@/components/common/CustomizedChart/CustomizedChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import {
@@ -16,18 +17,6 @@ import { motion } from "framer-motion";
 import { BarChart2, CheckCircle, FileText, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Label,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-
-const DELIGO = "#DC3173";
 
 const daysOption = [
   { label: "Last 7 days", value: "last7days" },
@@ -124,41 +113,20 @@ const SalesReport = ({ salesReportAnalytics }: IProps) => {
             transition={{ delay: 0.4 }}
             className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow"
           >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">{t("revenue")}</h2>
-            </div>
+            <CustomizedCharts
+              title={t("revenue")}
+              description="Sales over time"
+              data={salesReportAnalytics?.charts?.revenueTrend || []}
+              xLabel="Date"
+              delay={0.4}
+              xKey="date"
+              yKey="revenue"
+              isBGNeed={false}
+              yAxisCustomizedValue={(val) => `€${formatPrice(val as number)}`}
+              yLabelCustomizedValue={(val) => formatPrice(val as number)}
+            />
 
-            <div style={{ height: 300 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={salesReportAnalytics?.charts?.revenueTrend || []}
-                  margin={{ top: 10, right: 20, left: 10, bottom: 30 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f1" />
-                  <XAxis dataKey="date">
-                    <Label value="Date" offset={-15} position="insideBottom" />
-                  </XAxis>
-                  <YAxis tickFormatter={(val) => `€${formatPrice(val)}`}>
-                    <Label
-                      value="Revenue(€)"
-                      offset={-5}
-                      style={{ textAnchor: "middle" }}
-                      position="insideLeft"
-                      angle={-90}
-                    />
-                  </YAxis>
-                  <Tooltip
-                    formatter={(val: number, label: string) => [
-                      `€${formatPrice(val)}`,
-                      label?.charAt(0)?.toUpperCase() + label?.slice(1),
-                    ]}
-                  />
-                  <Bar dataKey="revenue" fill={DELIGO} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:text-center">
               <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40">
                 <p className="text-xs text-gray-500">{t("this_week")}</p>
                 <p className="font-semibold mt-1">

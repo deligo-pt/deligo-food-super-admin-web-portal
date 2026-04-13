@@ -1,6 +1,6 @@
 "use client";
 
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import CustomizedCharts from "@/components/common/CustomizedChart/CustomizedChart";
 import VendorPerformanceTable from "@/components/Dashboard/Performance/VendorPerformance/VendorPerformanceTable";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
@@ -196,44 +196,20 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
 
       {/* Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.2,
-          }}
-          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">
-                Orders & Revenue Trend
-              </h3>
-              <p className="text-sm text-gray-500">
-                Daily performance over the past months
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#DC3173]" />
-                <span className="text-gray-600">Orders</span>
-              </div>
-            </div>
-          </div>
-          <AnalyticsChart
-            data={vendorPerformanceData.data?.vendorMonthlyPerformance}
-            type="bar"
-            dataKey="totalOrders"
+        <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <CustomizedCharts
+            type="line"
+            title="Orders Performance"
+            description="Monthly performance over the last 12 months"
+            data={vendorPerformanceData.data?.vendorMonthlyPerformance || []}
+            xLabel="Month"
             xKey="month"
-            height={250}
+            yLabel="No of Orders"
+            yKey="totalOrders"
+            delay={0.2}
+            isBGNeed={false}
           />
-        </motion.div>
+        </div>
 
         {/* Top Performers */}
         <motion.div

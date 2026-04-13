@@ -1,6 +1,6 @@
 "use client";
 
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import CustomizedCharts from "@/components/common/CustomizedChart/CustomizedChart";
 import FleetManagerPerformanceTable from "@/components/Dashboard/Performance/FleetManagerPerformance/FleetManagerPerformanceTable";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
@@ -225,44 +225,36 @@ export default function FleetManagerPerformance({
 
       {/* Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.2,
-          }}
-          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">
-                Earnings Performance
-              </h3>
-              <p className="text-sm text-gray-500">
-                Daily performance over the last week
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#DC3173]" />
-                <span className="text-gray-600">Earnings</span>
-              </div>
-            </div>
-          </div>
-          <AnalyticsChart
-            data={fleetPerformanceData?.data?.fleetWeeklyPerformance}
-            type="bar"
-            dataKey="totalEarnings"
+        <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <CustomizedCharts
+            type="area"
+            title="Orders Performance"
+            description="Daily performance over the last 7 days"
+            data={fleetPerformanceData?.data?.fleetWeeklyPerformance || []}
+            xLabel="Days"
             xKey="day"
-            height={250}
+            yLabel="No of Orders"
+            yKey="totalOrders"
+            delay={0.2}
+            isBGNeed={false}
           />
-        </motion.div>
+        </div>
+
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <CustomizedCharts
+            title="Earnings Performance"
+            description="Daily performance over the last 7 days"
+            data={fleetPerformanceData?.data?.fleetWeeklyPerformance || []}
+            xLabel="Days"
+            xKey="day"
+            yLabel="Earnings (€)"
+            yKey="totalEarnings"
+            delay={0.3}
+            isBGNeed={false}
+            yAxisCustomizedValue={(val) => `€${formatPrice(val as number)}`}
+            yLabelCustomizedValue={(val) => `€${formatPrice(val as number)}`}
+          />
+        </div>
 
         {/* Top Performers */}
         <motion.div

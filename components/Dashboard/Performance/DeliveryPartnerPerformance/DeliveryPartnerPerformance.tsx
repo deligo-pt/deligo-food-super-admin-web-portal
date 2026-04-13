@@ -1,6 +1,6 @@
 "use client";
 
-import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
+import CustomizedCharts from "@/components/common/CustomizedChart/CustomizedChart";
 import DeliveryPartnerPerformanceTable from "@/components/Dashboard/Performance/DeliveryPartnerPerformance/DeliveryPartnerPerformanceTable";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
@@ -231,44 +231,19 @@ export default function DeliveryPartnerPerformance({
 
       {/* Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.2,
-          }}
-          className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">
-                Orders Performance
-              </h3>
-              <p className="text-sm text-gray-500">
-                Monthly performance over the last 6 months
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#DC3173]" />
-                <span className="text-gray-600">Orders</span>
-              </div>
-            </div>
-          </div>
-          <AnalyticsChart
-            data={partnerPerformanceData?.data?.earningsPerformance}
-            type="bar"
-            dataKey="totalOrders"
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <CustomizedCharts
+            title="Orders Performance"
+            description="Monthly performance over the last 6 months"
+            data={partnerPerformanceData?.data?.earningsPerformance || []}
+            xLabel="Month"
             xKey="month"
-            height={250}
+            yLabel="No of Orders"
+            yKey="totalOrders"
+            delay={0.2}
+            isBGNeed={false}
           />
-        </motion.div>
+        </div>
 
         {/* Top Performers */}
         <motion.div
