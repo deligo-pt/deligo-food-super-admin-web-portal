@@ -2,6 +2,7 @@
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TTransaction } from "@/types/transaction.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
 import {
@@ -9,6 +10,8 @@ import {
   ArrowLeftIcon,
   ArrowUpRightIcon,
   CheckCircle2Icon,
+  CircleXIcon,
+  InfoIcon,
   ShoppingBagIcon,
   TagIcon,
   UserIcon,
@@ -51,6 +54,8 @@ export default function TransactionDetails({
   transaction: TTransaction;
 }) {
   const router = useRouter();
+
+  console.log(transaction);
 
   const config = typeConfig[transaction.type] || typeConfig.earning;
 
@@ -142,14 +147,22 @@ export default function TransactionDetails({
             </div>
           </div>
           <div className="text-right">
-            <p
-              className={`text-lg md:text-2xl font-bold ${transaction.positive ? "text-green-500" : "text-red-500"}`}
-            >
-              {transaction.positive ? "+" : "-"}€{transaction.amount}
+            <p className={`text-lg md:text-2xl font-bold text-[#DC3173]`}>
+              €{formatPrice(transaction.amount || 0)}
             </p>
             <div className="flex items-center justify-end gap-1.5 mt-2">
-              <CheckCircle2Icon className="w-4 h-4 text-green-500" />
-              <span className="text-sm text-green-600 font-medium capitalize">
+              {transaction.status === "PENDING" && (
+                <InfoIcon className="w-4 h-4 text-amber-500" />
+              )}
+              {transaction.status === "SUCCESS" && (
+                <CheckCircle2Icon className="w-4 h-4 text-green-500" />
+              )}
+              {transaction.status === "FAILED" && (
+                <CircleXIcon className="w-4 h-4 text-destructive" />
+              )}
+              <span
+                className={`text-sm font-medium capitalize ${transaction.status === "PENDING" ? "text-amber-500" : transaction.status === "SUCCESS" ? "text-green-500" : "text-destructive"}`}
+              >
                 {transaction.status}
               </span>
             </div>
@@ -177,7 +190,7 @@ export default function TransactionDetails({
               },
               {
                 label: "Order Total",
-                value: `€${transaction.orderTotal}`,
+                value: `€${formatPrice(transaction.items?.reduce((acc, item) => acc + item.price * item.qty, 0) || 0)}`,
               },
               {
                 label: "Payment Method",
@@ -224,7 +237,7 @@ export default function TransactionDetails({
                 {transaction.customer?.name?.lastName}
               </p>
               <p className="text-sm text-gray-400">
-                {transaction.customerOrders} previous orders
+                {transaction.customer?.contactNumber || "-"}
               </p>
             </div>
           </div>
@@ -271,21 +284,21 @@ export default function TransactionDetails({
               className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
             >
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 bg-[#DC3173]/10 text-[#DC3173] rounded-lg flex items-center justify-center text-xs font-bold">
-                  {item.qty}
+                <span className="w-7 h-7 bg-[#DC3173]/10 text-[#DC3173] rounded-lg flex items-center justify-center text-xs font-bold">
+                  x{item.qty}
                 </span>
                 <span className="text-sm font-medium text-gray-900">
                   {item.name}
                 </span>
               </div>
               <span className="text-sm font-bold text-gray-900">
-                €{item.price}
+                €{formatPrice(item.price || 0)}
               </span>
             </div>
           ))}
         </div>
         {/* Earnings breakdown */}
-        <div className="border-t border-gray-100 pt-4 space-y-2">
+        {/* <div className="border-t border-gray-100 pt-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Order Total</span>
             <span className="font-medium text-gray-900">
@@ -304,7 +317,7 @@ export default function TransactionDetails({
               +€{transaction.netEarning}
             </span>
           </div>
-        </div>
+        </div> */}
       </motion.div>
     </motion.div>
   );

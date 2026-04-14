@@ -12,12 +12,16 @@ export const getAllTransactionsReq = async (
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const type = queries.type;
+  const status = queries.status;
 
   const params = {
     limit,
     page,
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
+    ...(type ? { type } : {}),
+    ...(status ? { status } : {}),
   };
 
   const result = await catchAsync<{ data: TTransaction[]; meta?: TMeta }>(

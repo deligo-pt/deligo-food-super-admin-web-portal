@@ -19,6 +19,7 @@ export type TTransaction = {
       firstName: string;
       lastName: string;
     };
+    contactNumber?: string;
   };
   customerOrders?: number;
 
@@ -28,7 +29,7 @@ export type TTransaction = {
   items?: {
     name: string;
     qty: number;
-    price: string;
+    price: number;
   }[];
 
   relatedTransactions?: {
