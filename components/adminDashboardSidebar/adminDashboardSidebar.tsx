@@ -107,7 +107,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_customers"), path: "/admin/all-customers" },
         { name: t("active_customers"), path: "/admin/active-customers" },
         { name: t("blocked_customers"), path: "/admin/blocked-customers" },
-        { name: "Customer Wallets", path: "/admin/customer-wallets" },
+        { name: "Customer Spends", path: "/admin/customer-spends" },
         { name: t("customer_feedback"), path: "/admin/customer-feedback" },
       ],
     },
