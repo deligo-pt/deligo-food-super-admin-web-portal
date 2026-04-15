@@ -19,6 +19,7 @@ export type TSupportTicket = {
   ticketId: string;
   userId: {
     _id: string;
+    userId: string;
     email: string;
     name?: { firstName?: string; lastName?: string };
   };

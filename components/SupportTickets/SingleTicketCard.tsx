@@ -3,9 +3,11 @@
 import SupportRoleBadge from "@/components/SupportTickets/SupportRoleBadge";
 import SupportStatusBadge from "@/components/SupportTickets/SupportStatusBadge";
 import { TSupportTicket } from "@/types/support.type";
+import { getCookie } from "@/utils/cookies";
 import { removeUnderscore } from "@/utils/formatter";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
 import { ArrowRightIcon, ClockIcon } from "lucide-react";
 
 export default function SingleTicketCard({
@@ -17,6 +19,12 @@ export default function SingleTicketCard({
   index: number;
   onClick: (ticket: TSupportTicket) => void;
 }) {
+  const accessToken = getCookie("accessToken");
+  const decoded = accessToken && (jwtDecode(accessToken) as { userId: string });
+  const unreadCount =
+    (decoded && ticket.unreadCount[decoded.userId]) ||
+    ticket.unreadCount["ADMIN_GENERAL"];
+
   return (
     <motion.div
       layout
@@ -69,8 +77,13 @@ export default function SingleTicketCard({
         </span>
       </div>
 
-      <h3 className="text-base font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#DC3173] transition-colors">
+      <h3 className="text-base font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#DC3173] transition-colors flex items-center gap-1 relative w-fit overflow-visible">
         {removeUnderscore(ticket.category)}
+        {unreadCount > 0 && (
+          <div className="w-4 h-4 bg-[#DC3173] text-white rounded-full text-[10px] font-mono flex items-center justify-center absolute top-0 -right-5">
+            {unreadCount > 99 ? "99" : unreadCount}
+          </div>
+        )}
       </h3>
       <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">
         {ticket.lastMessage || "-"}

@@ -45,7 +45,7 @@ interface Props {
   token: string;
   onMessage: (msg: TSupportMessage) => void;
   onClosed: () => void;
-  onRead: () => void;
+  onRead: (data: { ticketId: string; userId: string; time: string }) => void;
   onError: (msg: string) => void;
   onTyping: (data: TUserTypingPayload) => void;
 }
@@ -73,15 +73,15 @@ export function useChatSocket({
     socket.on("conversation-closed", onClosed);
     socket.on("chat-error", (e) => onError(e.message));
 
-    // return () => {
-    //   socket.off("new-message");
-    //   socket.off("user-typing");
-    //   socket.off("read-update");
-    //   socket.off("conversation-closed");
-    //   socket.off("chat-error");
-    // };
+    return () => {
+      socket.off("new-message");
+      socket.off("user-typing");
+      socket.off("read-update");
+      socket.off("conversation-closed");
+      socket.off("chat-error");
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticketId]);
+  }, [ticketId, token]);
 
   const sendMessage = (payload: {
     ticketId: string;

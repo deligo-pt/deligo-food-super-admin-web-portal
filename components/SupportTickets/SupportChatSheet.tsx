@@ -1,9 +1,10 @@
 "use client";
 
+import SupportChatInput from "@/components/SupportTickets/SupportChatInput";
+import SupportMessageItem from "@/components/SupportTickets/SupportMessageItem";
 import SupportRoleBadge from "@/components/SupportTickets/SupportRoleBadge";
 import SupportStatusBadge from "@/components/SupportTickets/SupportStatusBadge";
 import { useChatSocket } from "@/hooks/use-chat-socket";
-import { cn } from "@/lib/utils";
 import { getMessagesReq } from "@/services/dashboard/support/support.service";
 import {
   TSupportMessage,
@@ -13,10 +14,10 @@ import {
 } from "@/types/support.type";
 import { getCookie } from "@/utils/cookies";
 import { removeUnderscore } from "@/utils/formatter";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
-import { CheckCheckIcon, CheckIcon, Send, Tag, X } from "lucide-react";
+import { Loader2, Tag, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface IProps {
@@ -25,37 +26,87 @@ interface IProps {
   updateStatus: (ticketId: string, status: TTicketStatus) => void;
 }
 
+const MESSAGE_LIMIT = 6;
+
 export default function SupportChatSheet({
   ticket,
   closeChatSheet,
   updateStatus,
 }: IProps) {
-  const msgEndRef = useRef<HTMLDivElement | null>(null);
+  const isInitialLoad = useRef(true);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const msgEndRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+
   const [chatInput, setChatInput] = useState("");
   const [messages, setMessages] = useState<TSupportMessage[]>([]);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
   const [typing, setTyping] = useState(false);
-  const [timeoutState, setTimeoutState] = useState<
-    ReturnType<typeof setTimeout> | undefined
-  >(undefined);
+  const [lastReadAt, setLastReadAt] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPage: 1,
+    isLoadingMore: false,
+  });
+
+  const hasMore = pagination.page < pagination.totalPage;
 
   const accessToken = getCookie("accessToken");
   const decoded = (accessToken ? jwtDecode(accessToken) : {}) as {
     userId: string;
   };
 
-  const scrollToBottom = () => {
-    msgEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  const scrollToBottom = (isSmooth: boolean = true) => {
+    if (msgEndRef.current) {
+      msgEndRef.current.scrollIntoView({
+        behavior: isSmooth ? "smooth" : "auto",
+        block: "end",
+      });
+    }
+  };
+
+  const handleAutoScroll = () => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop <=
+      container.clientHeight + 100;
+
+    if (isInitialLoad.current) {
+      scrollToBottom(false);
+      isInitialLoad.current = false;
+    } else if (isNearBottom) {
+      scrollToBottom(true);
+    }
   };
 
   const handleSendMessage = async (text: string) => {
-    if (!text) return;
+    if (!text.trim()) {
+      setChatInput("");
+      return;
+    }
+
+    const optimisticMsg: TSupportMessage = {
+      _id: `temp-${Date.now()}`,
+      ticketId: ticket.ticketId,
+      senderId: decoded?.userId,
+      senderRole: "ADMIN",
+      message: text.trim(),
+      messageType: "TEXT",
+      attachments: [],
+      readBy: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, optimisticMsg]);
 
     sendMessage({
       ticketId: ticket.ticketId,
-      message: text,
+      message: text.trim(),
       targetUserObjectId: ticket.userId?._id || "",
-      targetUserId: decoded?.userId || "",
+      targetUserId: ticket.userId?.userId || "",
       targetUserModel: ticket.userModel,
       messageType: "TEXT",
     });
@@ -79,32 +130,48 @@ export default function SupportChatSheet({
   //   setTicket(null);
   // };
 
-  const { sendMessage, leaveConversation, makeTyping } = useChatSocket({
-    ticketId: ticket?.ticketId,
-    token: accessToken as string,
-    onMessage: (msg) => {
-      if (msg.ticketId === ticket?.ticketId) {
-        setMessages((prev) => {
-          if (prev.length >= 50) {
-            prev.shift();
-          }
-          if (prev.findIndex((m) => m._id === msg._id) === -1) {
-            return [...prev, msg];
-          }
-          return prev;
-        });
-        scrollToBottom();
-      }
-    },
-    onTyping: (data: TUserTypingPayload) => {
-      if (data.userId !== decoded?.userId) {
-        setOtherUserTyping(data.isTyping);
-      }
-    },
-    onClosed: () => {},
-    onRead: () => {},
-    onError: (msg) => console.log(msg),
-  });
+  const { sendMessage, leaveConversation, makeTyping, markRead } =
+    useChatSocket({
+      ticketId: ticket?.ticketId,
+      token: accessToken as string,
+      onMessage: (msg) => {
+        if (msg.ticketId === ticket?.ticketId) {
+          setMessages((prev) => {
+            if (prev.some((m) => m._id === msg._id)) return prev;
+            const optimisticIndex = prev.findIndex(
+              (m) =>
+                m._id.startsWith("temp-") &&
+                m.message === msg.message &&
+                m.senderId === msg.senderId,
+            );
+            if (optimisticIndex !== -1) {
+              const newMessages = [...prev];
+              newMessages[optimisticIndex] = msg;
+              return newMessages;
+            }
+            const updatedList = [...prev, msg];
+            return updatedList.length > MESSAGE_LIMIT * pagination.page
+              ? updatedList.slice(1)
+              : updatedList;
+          });
+        }
+      },
+      onTyping: (data: TUserTypingPayload) => {
+        if (data.userId !== decoded?.userId) {
+          setOtherUserTyping(data.isTyping);
+        }
+      },
+      onClosed: () => {},
+      onRead: (data) => {
+        if (
+          data.ticketId === ticket.ticketId &&
+          data.userId === ticket.userId.userId
+        ) {
+          setLastReadAt(data.time);
+        }
+      },
+      onError: (msg) => console.log(msg),
+    });
 
   const handleMessageTyping = async (
     e: React.KeyboardEvent<HTMLTextAreaElement>,
@@ -112,38 +179,91 @@ export default function SupportChatSheet({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage(chatInput);
-    }
 
-    if (e.key !== "Enter") {
-      if (!typing) {
-        setTyping(true);
-        makeTyping(true);
-      }
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
 
-      clearTimeout(timeoutState);
-      setTimeoutState(
-        setTimeout(() => {
-          setTyping(false);
-          makeTyping(false);
-        }, 2000),
-      );
-    } else {
-      clearTimeout(timeoutState);
       setTyping(false);
       makeTyping(false);
+
+      return;
+    }
+
+    if (!typing) {
+      setTyping(true);
+      makeTyping(true);
+    }
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    typingTimeoutRef.current = setTimeout(() => {
+      setTyping(false);
+      makeTyping(false);
+    }, 2000);
+  };
+
+  const loadMoreMessages = async () => {
+    if (pagination.isLoadingMore || !hasMore) return;
+
+    setPagination((prev) => ({ ...prev, isLoadingMore: true }));
+
+    const container = chatContainerRef.current;
+    const previousScrollHeight = container?.scrollHeight || 0;
+
+    const nextPage = pagination.page + 1;
+    const result = await getMessagesReq(ticket.ticketId, {
+      limit: MESSAGE_LIMIT.toString(),
+      page: nextPage.toString(),
+    });
+
+    if (result.data.length > 0) {
+      setMessages((prev) => [...result.data, ...prev]);
+      setPagination({
+        page: result.meta?.page || nextPage,
+        totalPage: result.meta?.totalPage || 1,
+        isLoadingMore: false,
+      });
+
+      requestAnimationFrame(() => {
+        if (container) {
+          container.scrollTop = container.scrollHeight - previousScrollHeight;
+        }
+      });
+      return;
+    }
+
+    setPagination((prev) => ({ ...prev, isLoadingMore: false }));
+  };
+
+  const handleScroll = () => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    if (container.scrollTop <= 20 && hasMore && !pagination.isLoadingMore) {
+      loadMoreMessages();
     }
   };
 
   useEffect(() => {
     if (!!ticket) {
-      getMessagesReq(ticket?.ticketId, { limit: "50" }).then((result) => {
+      getMessagesReq(ticket?.ticketId, {
+        limit: MESSAGE_LIMIT.toString(),
+      }).then((result) => {
         setMessages(result.data);
+        setPagination({
+          page: result.meta?.page || 1,
+          totalPage: result.meta?.totalPage || 1,
+          isLoadingMore: false,
+        });
       });
     }
   }, [ticket]);
 
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > 0) {
+      handleAutoScroll();
+      markRead();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
   useEffect(() => {
@@ -244,54 +364,28 @@ export default function SupportChatSheet({
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-6 bg-gray-50/50">
-          {messages.map((msg) => {
-            const isAdmin =
-              msg.senderRole === "ADMIN" || msg.senderRole === "SUPER_ADMIN";
+        <div
+          ref={chatContainerRef}
+          onScroll={handleScroll}
+          className="flex-1 overflow-y-auto p-5 space-y-6 bg-gray-50/50"
+        >
+          {pagination.isLoadingMore && (
+            <div className="flex justify-center py-2 animate-in fade-in duration-300">
+              <Loader2 className="h-6 w-6 animate-spin text-[#DC3173]" />
+            </div>
+          )}
 
-            return (
-              <div
-                key={msg._id}
-                className={`flex flex-col ${isAdmin ? "items-end" : "items-start"}`}
-              >
-                <p className="text-xs text-gray-400 mb-1 px-1">
-                  {!isAdmin &&
-                    !ticket.userId?.name?.firstName &&
-                    !ticket.userId?.name?.lastName &&
-                    ticket.userId?.email?.split("@")?.[0]}
-                  {isAdmin && "You"}
-                  {!isAdmin && ticket.userId?.name?.firstName}{" "}
-                  {!isAdmin && ticket.userId?.name?.lastName}
-                </p>
-                <div
-                  className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm ${isAdmin ? "bg-[#DC3173] text-white rounded-tr-sm" : "bg-white border border-gray-100 text-gray-800 rounded-tl-sm shadow-sm"}`}
-                >
-                  {msg.message}
-                  <div className="flex justify-between items-center mt-1 gap-2">
-                    <span
-                      className={cn(
-                        "text-xs block text-right",
-                        isAdmin ? "text-gray-300" : "text-gray-400",
-                      )}
-                    >
-                      {formatDistanceToNow(msg.createdAt, { addSuffix: true })}
-                    </span>
-                    {isAdmin &&
-                      (msg.readBy?.[ticket?.userId?._id] ? (
-                        <CheckCheckIcon size={16} className="text-indigo-400" />
-                      ) : (
-                        <CheckIcon size={16} className="text-gray-300" />
-                      ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          <div ref={msgEndRef} />
+          {messages.map((msg) => (
+            <SupportMessageItem
+              key={msg._id}
+              msg={msg}
+              userInfo={ticket.userId}
+              lastReadAt={lastReadAt}
+            />
+          ))}
 
           {otherUserTyping && (
-            <div className="flex items-center justify-center">
+            <div className="flex flex-col gap-1 items-center mb-0">
               <span className="text-xs text-gray-500">
                 {!ticket.userId?.name?.firstName &&
                   !ticket.userId?.name?.lastName &&
@@ -299,32 +393,28 @@ export default function SupportChatSheet({
                 {ticket.userId?.name?.firstName} {ticket.userId?.name?.lastName}{" "}
                 is typing...
               </span>
+              <div className="flex justify-center gap-1">
+                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                <span
+                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.12s" }}
+                />
+                <span
+                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.24s" }}
+                />
+              </div>
             </div>
           )}
+
+          <div ref={msgEndRef} />
         </div>
 
         {/* Message Input */}
-        <div className="p-4 bg-white border-t border-gray-100 shrink-0">
-          <div className="flex items-end gap-2">
-            <div className="flex-1 bg-gray-50 rounded-xl border border-gray-200 focus-within:border-[#DC3173] focus-within:ring-2 focus-within:ring-[#DC3173]/20 transition-all p-1">
-              <textarea
-                rows={1}
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target?.value?.trim())}
-                onKeyDown={handleMessageTyping}
-                placeholder="Type a reply..."
-                className="w-full bg-transparent px-3 py-2 outline-none text-sm resize-none max-h-32 min-h-[40px]"
-              />
-            </div>
-            <button
-              onClick={() => handleSendMessage(chatInput)}
-              disabled={!chatInput.trim()}
-              className="p-3 bg-[#DC3173] text-white rounded-xl hover:bg-[#DC3173]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-            >
-              <Send size={18} />
-            </button>
-          </div>
-        </div>
+        <SupportChatInput
+          onSend={handleSendMessage}
+          onTyping={handleMessageTyping}
+        />
       </motion.div>
     </>
   );

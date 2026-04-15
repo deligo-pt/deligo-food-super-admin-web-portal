@@ -96,17 +96,18 @@ export default function SupportTickets({ ticketData }: IProps) {
     }
 
     setTickets((prev) => {
-      const isTicketExist = prev?.find((c) => c.ticketId === message?.ticketId);
+      const existedTicketIndex = prev?.findIndex(
+        (c) => c.ticketId === message?.ticketId,
+      );
 
-      if (!isTicketExist) {
+      if (existedTicketIndex === -1) {
+        prev.shift();
         return [newTicket, ...prev];
       }
 
-      const filteredTickets = prev.filter(
-        (c) => c.ticketId !== message.ticketId,
-      );
+      prev[existedTicketIndex] = newTicket;
 
-      return [newTicket, ...filteredTickets];
+      return prev;
     });
   };
 
