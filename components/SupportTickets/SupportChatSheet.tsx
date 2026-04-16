@@ -4,6 +4,7 @@ import SupportChatInput from "@/components/SupportTickets/SupportChatInput";
 import SupportMessageItem from "@/components/SupportTickets/SupportMessageItem";
 import SupportRoleBadge from "@/components/SupportTickets/SupportRoleBadge";
 import SupportStatusBadge from "@/components/SupportTickets/SupportStatusBadge";
+import { USER_ROLE } from "@/consts/user.const";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 import { getMessagesReq } from "@/services/dashboard/support/support.service";
 import {
@@ -26,7 +27,7 @@ interface IProps {
   updateStatus: (ticketId: string, status: TTicketStatus) => void;
 }
 
-const MESSAGE_LIMIT = 6;
+const MESSAGE_LIMIT = 50;
 
 export default function SupportChatSheet({
   ticket,
@@ -65,22 +66,6 @@ export default function SupportChatSheet({
     }
   };
 
-  const handleAutoScroll = () => {
-    const container = chatContainerRef.current;
-    if (!container) return;
-
-    const isNearBottom =
-      container.scrollHeight - container.scrollTop <=
-      container.clientHeight + 100;
-
-    if (isInitialLoad.current) {
-      scrollToBottom(false);
-      isInitialLoad.current = false;
-    } else if (isNearBottom) {
-      scrollToBottom(true);
-    }
-  };
-
   const handleSendMessage = async (text: string) => {
     if (!text.trim()) {
       setChatInput("");
@@ -91,7 +76,7 @@ export default function SupportChatSheet({
       _id: `temp-${Date.now()}`,
       ticketId: ticket.ticketId,
       senderId: decoded?.userId,
-      senderRole: "ADMIN",
+      senderRole: USER_ROLE.ADMIN,
       message: text.trim(),
       messageType: "TEXT",
       attachments: [],
@@ -99,8 +84,14 @@ export default function SupportChatSheet({
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
+    setMessages((prev) => {
+      const updatedList = [...prev, optimisticMsg];
+      return updatedList.length > MESSAGE_LIMIT * pagination.page
+        ? updatedList.slice(1)
+        : updatedList;
+    });
 
-    setMessages((prev) => [...prev, optimisticMsg]);
+    setTimeout(() => scrollToBottom(true), 50);
 
     sendMessage({
       ticketId: ticket.ticketId,
@@ -115,7 +106,6 @@ export default function SupportChatSheet({
       updateStatus(ticket.ticketId, "IN_PROGRESS");
     }
 
-    // reset textarea
     setChatInput("");
   };
 
@@ -243,6 +233,16 @@ export default function SupportChatSheet({
     }
   };
 
+  const handleMarkRead = () => {
+    const lastMsg = messages[messages.length - 1];
+    if (!lastMsg) return;
+
+    const isLastMsgFromMe = lastMsg.senderId === decoded?.userId;
+    if (!isLastMsgFromMe) {
+      markRead();
+    }
+  };
+
   useEffect(() => {
     if (!!ticket) {
       getMessagesReq(ticket?.ticketId, {
@@ -260,11 +260,44 @@ export default function SupportChatSheet({
 
   useEffect(() => {
     if (messages.length > 0) {
-      handleAutoScroll();
-      markRead();
+      const container = chatContainerRef.current;
+      if (!container) return;
+
+      const scrollFromBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight;
+
+      const isNearBottom = scrollFromBottom <= 150;
+
+      if (isInitialLoad.current) {
+        scrollToBottom(false);
+        isInitialLoad.current = false;
+      } else if (isNearBottom) {
+        scrollToBottom(true);
+      }
+
+      if (isNearBottom) {
+        handleMarkRead();
+      }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
+
+  useEffect(() => {
+    if (otherUserTyping) {
+      const container = chatContainerRef.current;
+      if (container) {
+        const isNearBottom =
+          container.scrollHeight -
+            container.scrollTop -
+            container.clientHeight <=
+          150;
+        if (isNearBottom) {
+          scrollToBottom(true);
+        }
+      }
+    }
+  }, [otherUserTyping]);
 
   useEffect(() => {
     return () => {
