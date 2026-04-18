@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Sidebar from "@/components/adminDashboardSidebar/adminDashboardSidebar";
 import DesktopSidebar from "@/components/adminDashboardSidebar/DesktopSidebar";
 import Topbar from "@/components/adminTopbar/Topbar";
-import { serverRequest } from "@/lib/serverFetch";
+import { getProfileReq } from "@/services/dashboard/profile/profile.service";
 import { TAdmin } from "@/types/admin.type";
 import type { Metadata } from "next";
 
@@ -17,17 +17,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let adminData: TAdmin = {} as TAdmin;
-
-  try {
-    const result = await serverRequest.get("/profile");
-
-    if (result?.success) {
-      adminData = result?.data;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
+  const adminData: TAdmin = await getProfileReq();
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">

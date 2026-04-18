@@ -14,10 +14,11 @@ import {
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/use-translation";
 import { initializePayoutReq } from "@/services/dashboard/payout/payout.service";
-import { getAllWalletsReq } from "@/services/dashboard/wallet/wallet.service";
 import { TMeta } from "@/types";
 import { TWallet } from "@/types/wallet.type";
+import { catchAsync } from "@/utils/catchAsync";
 import { formatPrice } from "@/utils/formatPrice";
+import { fetchData } from "@/utils/requests";
 import { Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -38,13 +39,22 @@ export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
     meta?: TMeta;
   }>({ data: [] });
 
-  const getUsers = async ({ limit = 10 }) => {
-    const result = await getAllWalletsReq({
-      limit: String(limit),
-      userModel: type === "vendor" ? "Vendor" : "FleetManager",
+  const getUsers = async (limit = "10") => {
+    const result = await catchAsync<TWallet[]>(async () => {
+      return await fetchData("/wallets", {
+        params: {
+          limit,
+          userModel: type === "vendor" ? "Vendor" : "FleetManager",
+        },
+      });
     });
 
-    setUserData(result);
+    if (result?.success) {
+      setUserData({
+        data: result.data,
+        meta: result.meta,
+      });
+    }
   };
 
   const initializePayout = async (targetUserId: string) => {
@@ -72,7 +82,7 @@ export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
   };
 
   useEffect(() => {
-    (() => getUsers({ limit: 10 }))();
+    (() => getUsers())();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -141,9 +151,7 @@ export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
             {(userData?.meta?.limit || 10) < (userData?.meta?.total || 0) && (
               <Button
                 onClick={() =>
-                  getUsers({
-                    limit: (userData?.meta?.limit || 0) + 10,
-                  })
+                  getUsers(((userData?.meta?.limit || 0) + 10).toString())
                 }
                 className="bg-[#DC3173] hover:bg-[#DC3173]/90"
               >

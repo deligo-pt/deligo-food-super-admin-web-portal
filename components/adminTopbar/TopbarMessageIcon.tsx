@@ -4,35 +4,33 @@ import { useAdminChatSocket } from "@/hooks/use-chat-socket";
 import { getCookie } from "@/utils/cookies";
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 export default function TopbarMessageIcon() {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const accessToken = getCookie("accessToken") || "";
-  const [unreadCount, setUnreadCount] = useState(0);
+  const token = getCookie("accessToken") || "";
+  const [unreadCount] = useState(0);
 
-  const getUnreadMessageCount = async () => {
-    // const result = await getUnreadCountReq();
-    // if (result.success) {
-    setUnreadCount(0);
-    // }
-  };
+  // const getUnreadMessageCount = async () => {
+  //   // const result = await getUnreadCountReq();
+  //   // if (result.success) {
+  //   setUnreadCount(0);
+  //   // }
+  // };
 
   const newMessageHandler = () => {
-    getUnreadMessageCount();
-    audioRef.current?.play().catch((error) => {
-      console.log("Error playing audio:", error);
-    });
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((error) => {
+        console.warn("Autoplay blocked or audio error:", error);
+      });
+    }
   };
 
   useAdminChatSocket({
-    token: accessToken as string,
+    token,
     onMessage: () => newMessageHandler(),
   });
-
-  useEffect(() => {
-    (() => getUnreadMessageCount())();
-  }, []);
 
   return (
     <>
@@ -51,9 +49,13 @@ export default function TopbarMessageIcon() {
           </motion.span>
         )}
       </motion.button>
-      <div className="hidden">
-        <audio ref={audioRef} src="/audio/message-sound.mp3" preload="auto" />
-      </div>
+
+      <audio
+        ref={audioRef}
+        src="/audio/message-sound.mp3?v=1"
+        preload="none"
+        className="hidden"
+      />
     </>
   );
 }

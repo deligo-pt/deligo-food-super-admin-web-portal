@@ -9,11 +9,12 @@ import {
 import { cn } from "@/lib/utils";
 import {
   allMarkReadReq,
-  getAllNotificationsReq,
   singleMarkReadReq,
 } from "@/services/dashboard/notifications/notifications.service";
 import { TMeta } from "@/types";
 import { TNotification } from "@/types/notification.type";
+import { catchAsync } from "@/utils/catchAsync";
+import { fetchData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -25,20 +26,31 @@ export default function TopbarNotification() {
   }>({ data: [] });
 
   const getNotifications = async ({ limit = 10 }) => {
-    const result = await getAllNotificationsReq({ limit });
+    const result = await catchAsync<TNotification[]>(async () => {
+      return await fetchData("/notifications/my-notifications", {
+        params: { limit },
+      });
+    });
+
     if (result.success) {
       setNotificationsData({ data: result.data, meta: result.meta });
     }
   };
 
   const markSingleAsRead = async (notification: TNotification) => {
-    await singleMarkReadReq(notification._id);
-    getNotifications({ limit: notificationsData?.meta?.limit || 10 });
+    const result = await singleMarkReadReq(notification._id);
+
+    if (result.success) {
+      getNotifications({ limit: notificationsData?.meta?.limit || 10 });
+    }
   };
 
   const markAllAsRead = async () => {
-    await allMarkReadReq();
-    getNotifications({ limit: notificationsData?.meta?.limit || 10 });
+    const result = await allMarkReadReq();
+
+    if (result.success) {
+      getNotifications({ limit: notificationsData?.meta?.limit || 10 });
+    }
   };
 
   useEffect(() => {
@@ -80,7 +92,9 @@ export default function TopbarNotification() {
               )}
               {notificationsData?.data?.map((notification) => (
                 <div
-                  onClick={() => markSingleAsRead(notification)}
+                  onClick={() =>
+                    !notification?.isRead && markSingleAsRead(notification)
+                  }
                   key={notification._id}
                   className={cn(
                     "bg-slate-50 px-4 py-2 rounded-md shadow cursor-pointer",

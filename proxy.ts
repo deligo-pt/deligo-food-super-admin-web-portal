@@ -4,23 +4,14 @@ import { verifyTokens } from "@/utils/verifyTokens";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function proxy(req: NextRequest) {
-  const { pathname, searchParams } = req.nextUrl;
-
-  if (searchParams.has("tokenRefreshed")) {
-    const url = req.nextUrl.clone();
-    url.searchParams.delete("tokenRefreshed");
-    return NextResponse.redirect(url);
-  }
+  const { pathname } = req.nextUrl;
 
   const loginUrl = new URL("/", req.url);
-  loginUrl.searchParams.set("redirect", pathname);
 
   const tokenWasRefreshed = await verifyTokens();
 
   if (tokenWasRefreshed) {
-    const url = req.nextUrl.clone();
-    url.searchParams.set("tokenRefreshed", "true");
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL(pathname, req.url));
   }
 
   const adminResult = await getAdminInfo();
@@ -44,6 +35,8 @@ export async function proxy(req: NextRequest) {
     }
   } else {
     if (pathname.startsWith("/admin")) {
+      const loginUrl = new URL("/", req.url);
+      loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
   }
