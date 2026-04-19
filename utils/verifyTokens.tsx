@@ -16,7 +16,12 @@ export const verifyTokens = async (): Promise<boolean> => {
   if (accessToken) {
     const decoded = await verifyJWT(accessToken);
 
-    if (!decoded.success && decoded.reason === "jwt expired" && refreshToken) {
+    if (
+      !decoded.success &&
+      (decoded.reason === "jwt expired" ||
+        decoded.reason === '"exp" claim timestamp check failed') &&
+      refreshToken
+    ) {
       const newAccessTokenResult = await getNewAccessToken();
       if (newAccessTokenResult) {
         wasRefreshed = true;

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Super Admin Panel | DeliGo",
+  title: "Admin Panel | DeliGo",
   description:
     "DeliGo Super Admin Panel — Manage users, registrations, and system settings with advanced analytics and control.",
   keywords: [
