@@ -1,3 +1,4 @@
+import { DEVICE_KEY } from "@/consts/device.const";
 import { USER_ROLE } from "@/consts/user.const";
 import { getAdminInfo } from "@/utils/getAdminInfo";
 import { verifyTokens } from "@/utils/verifyTokens";
@@ -7,6 +8,7 @@ export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const loginUrl = new URL("/", req.url);
+  loginUrl.searchParams.set("redirect", pathname);
 
   const tokenWasRefreshed = await verifyTokens();
 
@@ -23,7 +25,21 @@ export async function proxy(req: NextRequest) {
       adminInfo.role === USER_ROLE.ADMIN ||
       adminInfo.role === USER_ROLE.SUPER_ADMIN
     ) {
-      if (pathname === "/") {
+      const currentDeviceId = req.cookies.get(DEVICE_KEY)?.value || "";
+      const isDeviceLoggedIn = adminInfo?.loginDevices?.some(
+        (device) => currentDeviceId === device.deviceId,
+      );
+
+      if (!isDeviceLoggedIn) {
+        req.cookies.delete("accessToken");
+        req.cookies.delete("refreshToken");
+        if (pathname !== "/") {
+          loginUrl.searchParams.set("sessionExpired", "true");
+          return NextResponse.redirect(loginUrl);
+        }
+      }
+
+      if (pathname === "/" && isDeviceLoggedIn) {
         return NextResponse.redirect(new URL("/admin/dashboard", req.url));
       }
     } else {
@@ -35,8 +51,6 @@ export async function proxy(req: NextRequest) {
     }
   } else {
     if (pathname.startsWith("/admin")) {
-      const loginUrl = new URL("/", req.url);
-      loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
   }

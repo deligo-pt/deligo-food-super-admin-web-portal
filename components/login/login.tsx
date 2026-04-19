@@ -22,10 +22,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+
+interface IProps {
+  redirect?: string;
+  sessionExpired?: boolean;
+}
 
 type LoginForm = {
   email: string;
@@ -34,11 +39,9 @@ type LoginForm = {
 
 export default function SuperAdminLoginPage({
   redirect,
-}: {
-  redirect?: string;
-}) {
+  sessionExpired,
+}: IProps) {
   const router = useRouter();
-  const params = useSearchParams();
 
   const [showModal, setShowModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -109,12 +112,21 @@ export default function SuperAdminLoginPage({
   };
 
   useEffect(() => {
-    if (params.get("sessionExpired")) {
-      toast.error(
-        "Your session has expired as this device is no longer authorized.",
-      );
+    if (sessionExpired) {
+      const timer = setTimeout(() => {
+        toast.error(
+          "Your session has expired as this device is no longer authorized.",
+          {
+            description: "Please log in again to continue.",
+            duration: 5000,
+          },
+        );
+      }, 100);
+
+      return () => clearTimeout(timer);
     }
-  }, [params]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-950 flex items-center justify-center p-6">

@@ -72,6 +72,18 @@ export type TAdmin = {
   approvedOrRejectedOrBlockedAt?: Date;
 
   remarks?: string;
+  // ------------------------------------------------------------------
+  // Login History
+  // ------------------------------------------------------------------
+  loginDevices: {
+    deviceId: string;
+    deviceType: string;
+    deviceName: string;
+    userAgent: string;
+    ip: string;
+    isVerified: boolean;
+    lastLogin: string;
+  }[];
 
   // ------------------------------------------------------------------
   // Timestamps
