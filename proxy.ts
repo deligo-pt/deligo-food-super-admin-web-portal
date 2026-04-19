@@ -26,11 +26,11 @@ export async function proxy(req: NextRequest) {
       adminInfo.role === USER_ROLE.SUPER_ADMIN
     ) {
       const currentDeviceId = req.cookies.get(DEVICE_KEY)?.value || "";
-      const isDeviceLoggedIn = adminInfo?.loginDevices?.some(
+      const isValidSession = adminInfo?.loginDevices?.some(
         (device) => currentDeviceId === device.deviceId,
       );
 
-      if (!isDeviceLoggedIn) {
+      if (!isValidSession) {
         req.cookies.delete("accessToken");
         req.cookies.delete("refreshToken");
         if (pathname !== "/") {
@@ -39,7 +39,7 @@ export async function proxy(req: NextRequest) {
         }
       }
 
-      if (pathname === "/" && isDeviceLoggedIn) {
+      if (pathname === "/" && isValidSession) {
         return NextResponse.redirect(new URL("/admin/dashboard", req.url));
       }
     } else {
