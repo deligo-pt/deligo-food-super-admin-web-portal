@@ -6,15 +6,32 @@ export async function getFcmToken(): Promise<string | null> {
   if (!messaging) return null;
   if (!("serviceWorker" in navigator)) return null;
 
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") return null;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return null;
 
-  const registration = await navigator.serviceWorker.ready;
+    const registration = await navigator.serviceWorker.ready;
 
-  return await getToken(messaging, {
-    vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
-    serviceWorkerRegistration: registration,
-  });
+    const token = await Promise.race([
+      getToken(messaging, {
+        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+        serviceWorkerRegistration: registration,
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("FCM Timeout")), 4000),
+      ),
+    ]);
+
+    // return await getToken(messaging, {
+    //   vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
+    //   serviceWorkerRegistration: registration,
+    // });
+
+    return token as string;
+  } catch (error) {
+    console.error("FCM Token Error:", error);
+    return null;
+  }
 }
 
 export async function saveFcmToken(

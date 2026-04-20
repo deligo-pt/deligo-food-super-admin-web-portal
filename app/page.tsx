@@ -6,6 +6,7 @@ export default async function Home({
   searchParams: Promise<{ redirect: string; sessionExpired: "true" | "false" }>;
 }) {
   const { redirect, sessionExpired } = await searchParams;
+
   return (
     <div className="min-h-screen">
       <SuperAdminLoginPage
