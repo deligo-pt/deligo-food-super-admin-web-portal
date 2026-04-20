@@ -263,10 +263,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("email_and_notification_settings"),
           path: "/admin/email-notification-settings",
         },
-        {
-          name: t("in_app_notifications"),
-          path: "/admin/send-notification-fleet",
-        },
         { name: t("maintenance_mode"), path: "/admin/maintenance-mode" },
       ],
     },
@@ -285,16 +281,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       id: "support-communication",
       title: t("support_communication"),
       icon: <MessageCircleMore size={18} />,
-      items: [
-        { name: t("support_tickets"), path: "/admin/support-tickets" },
-        { name: t("chat_with_customers"), path: "/admin/chat-with-customers" },
-        { name: t("chat_with_drivers"), path: "/admin/chat-with-drivers" },
-        {
-          name: t("chat_with_fleet_managers"),
-          path: "/admin/chat-with-fleet-managers",
-        },
-        { name: t("chat_with_vendors"), path: "/admin/chat-with-vendors" },
-      ],
+      items: [{ name: t("support_tickets"), path: "/admin/support-tickets" }],
     },
     {
       id: "reports",
