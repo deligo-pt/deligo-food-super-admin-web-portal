@@ -1,5 +1,6 @@
 "use client";
 
+import ReferralMilestoneSettings from "@/components/GlobalSettings/ReferralMilestoneSettings";
 import SettingsCard from "@/components/GlobalSettings/SettingsCard";
 import SettingsInput from "@/components/GlobalSettings/SettingsInput";
 import SettingsToggle from "@/components/GlobalSettings/SettingsToggle";
@@ -30,7 +31,6 @@ import {
   Percent,
   Save,
   Shield,
-  Zap,
 } from "lucide-react";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -52,36 +52,54 @@ export function GlobalSettings({
   const form = useForm<TGlobalSettingsForm>({
     resolver: zodResolver(globalSettingsSchema),
     values: {
-      deliveryChargePerKm: settings.deliveryChargePerKm || 0,
-      baseDeliveryCharge: settings.baseDeliveryCharge || 0,
-      minDeliveryCharge: settings.minDeliveryCharge || 0,
-      maxDeliveryCharge: settings.maxDeliveryCharge || 0,
-      freeDeliveryAbove: settings.freeDeliveryAbove || 0,
-      maxDeliveryDistanceKm: settings.maxDeliveryDistanceKm || 0,
-      platformCommissionPercent: settings.platformCommissionPercent || 0,
+      // delivery
+      deliveryChargePerKm: settings.delivery.ChargePerKm || 0,
+      baseDeliveryCharge: settings.delivery.baseCharge || 0,
+      minDeliveryCharge: settings.delivery.minCharge || 0,
+      maxDeliveryCharge: settings.delivery.maxCharge || 0,
+      freeDeliveryAbove: settings.delivery.freeAbove || 0,
+      maxDeliveryDistanceKm: settings.delivery.maxDistanceKm || 0,
+      deliveryVatRate: settings.delivery.vatRate || 0,
+
+      // commission
+      platformCommissionPercent: settings.commission.platformPercent || 0,
+      platformVatRate: settings.commission.platformVatRate || 0,
       deliveryPartnerCommissionPercent:
-        settings.deliveryPartnerCommissionPercent || 0,
+        settings.commission.deliveryPartnerPercent || 0,
       fleetManagerCommissionPercent:
-        settings.fleetManagerCommissionPercent || 0,
-      vendorVatPercent: settings.vendorVatPercent || 0,
-      customerNearestVendorRadiusKm:
-        settings.customerNearestVendorRadiusKm || 0,
-      minOrderAmount: settings.minOrderAmount || 0,
-      maxOrderAmount: settings.maxOrderAmount || 0,
-      maxItemsPerOrder: settings.maxItemsPerOrder || 0,
-      cancelTimeLimitMinutes: settings.cancelTimeLimitMinutes || 0,
-      refundProcessingDays: settings.refundProcessingDays || 0,
-      maxDiscountPercent: settings.maxDiscountPercent || 0,
+        settings.commission.fleetManagerPercent || 0,
+      vendorVatPercent: settings.commission.vendorVatPercent || 0,
+
+      // order
+      minOrderAmount: settings.order.minAmount || 0,
+      maxOrderAmount: settings.order.maxAmount || 0,
+      maxItemsPerOrder: settings.order.maxItemsPerOrder || 1,
+      customerNearestVendorRadiusKm: settings.order.nearestVendorRadiusKm || 0,
+      cancelTimeLimitMinutes: settings.order.cancelTimeLimitMinutes || 0,
       autoCancelUnacceptedOrderMinutes:
-        settings.autoCancelUnacceptedOrderMinutes || 0,
+        settings.order.autoCancelUnacceptedMinutes || 0,
       autoMarkDeliveredAfterMinutes:
-        settings.autoMarkDeliveredAfterMinutes || 0,
-      otpLength: settings.otpLength || 0,
-      otpExpiryMinutes: settings.otpExpiryMinutes || 0,
-      isOfferEnabled: settings.isOfferEnabled || false,
-      isPlatformLive: settings.isPlatformLive || false,
-      orderOtpEnabled: settings.orderOtpEnabled || false,
-      maintenanceMessage: settings.maintenanceMessage || "",
+        settings.order.autoMarkDeliveredMinutes || 0,
+
+      // system - otp
+      orderOtpEnabled: settings.system.otp.enabled || false,
+      otpLength: settings.system.otp?.length || 0,
+      otpExpiryMinutes: settings.system.otp?.expiryMinutes || 0,
+
+      // system - others
+      isOfferEnabled: settings.system.isOfferEnabled || false,
+      isPlatformLive: settings.system.isPlatformLive || false,
+      maintenanceMessage: settings.system.maintenanceMessage || "",
+      refundProcessingDays: settings.system.refundProcessingDays || 0,
+      maxDiscountPercent: settings.system.maxDiscountPercent || 0,
+
+      // rewards
+      customerPointsPerEuro: settings.rewards.customerPointsPerEuro || 0,
+      riderPointsPerDelivery: settings.rewards.riderPointsPerDelivery || 0,
+      riderReferralPoints: settings.rewards.riderReferralPoints || 0,
+      newRiderWelcomeBonus: settings.rewards.newRiderWelcomeBonus || 0,
+      customerReferralMilestones:
+        settings.rewards.customerReferralMilestones || [],
     },
   });
 
@@ -94,9 +112,56 @@ export function GlobalSettings({
     setIsSaving(true);
     const toastId = toast.loading("Saving global settings...");
 
+    const payload = {
+      delivery: {
+        ChargePerKm: data.deliveryChargePerKm,
+        baseCharge: data.baseDeliveryCharge,
+        minCharge: data.minDeliveryCharge,
+        maxCharge: data.maxDeliveryCharge,
+        freeAbove: data.freeDeliveryAbove,
+        maxDistanceKm: data.maxDeliveryDistanceKm,
+        vatRate: data.deliveryVatRate,
+      },
+      commission: {
+        platformPercent: data.platformCommissionPercent,
+        platformVatRate: data.platformVatRate,
+        deliveryPartnerPercent: data.deliveryPartnerCommissionPercent,
+        fleetManagerPercent: data.fleetManagerCommissionPercent,
+        vendorVatPercent: data.vendorVatPercent,
+      },
+      order: {
+        minAmount: data.minOrderAmount,
+        maxAmount: data.maxOrderAmount,
+        maxItemsPerOrder: data.maxItemsPerOrder,
+        nearestVendorRadiusKm: data.customerNearestVendorRadiusKm,
+        cancelTimeLimitMinutes: data.cancelTimeLimitMinutes,
+        autoCancelUnacceptedMinutes: data.autoCancelUnacceptedOrderMinutes,
+        autoMarkDeliveredMinutes: data.autoMarkDeliveredAfterMinutes,
+      },
+      rewards: {
+        customerPointsPerEuro: data.customerPointsPerEuro,
+        riderPointsPerDelivery: data.riderPointsPerDelivery,
+        riderReferralPoints: data.riderReferralPoints,
+        newRiderWelcomeBonus: data.newRiderWelcomeBonus,
+        customerReferralMilestones: data.customerReferralMilestones,
+      },
+      system: {
+        otp: {
+          enabled: data.orderOtpEnabled,
+          length: data.otpLength,
+          expiryMinutes: data.otpExpiryMinutes,
+        },
+        isOfferEnabled: data.isOfferEnabled,
+        isPlatformLive: data.isPlatformLive,
+        maintenanceMessage: data.maintenanceMessage,
+        refundProcessingDays: data.refundProcessingDays,
+        maxDiscountPercent: data.maxDiscountPercent,
+      },
+    } as Partial<TGlobalSettings>;
+
     const result = settings._id
-      ? await updateGlobalSettingsReq(data)
-      : await createGlobalSettingsReq(data);
+      ? await updateGlobalSettingsReq(payload)
+      : await createGlobalSettingsReq(payload);
 
     if (result.success) {
       toast.success(result.message || "Global settings saved successfully!", {
@@ -171,7 +236,7 @@ export function GlobalSettings({
 
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Platform Status - Full Width Hero */}
+            {/* Platform Status */}
             <div className="lg:col-span-2">
               <motion.div
                 initial={{
@@ -441,6 +506,29 @@ export function GlobalSettings({
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="deliveryVatRate"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="col-span-2">
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label="Delivery VAT Rate"
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="%"
+                          min={0}
+                          max={100}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </SettingsCard>
 
@@ -452,32 +540,57 @@ export function GlobalSettings({
               delay={0.2}
             >
               <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="platformCommissionPercent"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("platform_commission")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="%"
-                          description={t(
-                            "percentage_taken_from_each_order_total",
-                          )}
-                          min={0}
-                          max={100}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="platformCommissionPercent"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormControl>
+                          <SettingsInput
+                            fieldState={fieldState}
+                            label={t("platform_commission")}
+                            type="number"
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            suffix="%"
+                            // description={t(
+                            //   "percentage_taken_from_each_order_total",
+                            // )}
+                            min={0}
+                            max={100}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="platformVatRate"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormControl>
+                          <SettingsInput
+                            fieldState={fieldState}
+                            label="Platform VAT"
+                            type="number"
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            suffix="%"
+                            min={0}
+                            max={100}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
                   name="fleetManagerCommissionPercent"
@@ -617,9 +730,33 @@ export function GlobalSettings({
                           type="number"
                           value={field.value}
                           onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
+                            field.onChange(parseInt(e.target.value))
                           }
                           suffix="items"
+                          description="Maximum number of items allowed per order"
+                          min={0}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="customerNearestVendorRadiusKm"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="col-span-2">
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label="Customer Nearest Vendor Radius"
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="km"
+                          description="Maximum distance between customer and nearest vendor"
                           min={0}
                         />
                       </FormControl>
@@ -630,7 +767,7 @@ export function GlobalSettings({
               </div>
             </SettingsCard>
 
-            {/* Cancellation & Refunds */}
+            {/* Cancellation & Automation */}
             <SettingsCard
               title={t("cancellation_and_refunds")}
               description={t("manage_time_limits_processing")}
@@ -663,19 +800,43 @@ export function GlobalSettings({
                 />
                 <FormField
                   control={form.control}
-                  name="refundProcessingDays"
+                  name="autoCancelUnacceptedOrderMinutes"
                   render={({ field, fieldState }) => (
                     <FormItem>
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label={t("refund_processing_days")}
+                          label={t("auto_cancel_unaccepted_orders")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
-                          suffix="days"
+                          suffix="min"
+                          description={t("cancel_orders_if_no_driver_accepts")}
+                          min={0}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="autoMarkDeliveredAfterMinutes"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label={t("auto_mark_delivered")}
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="min"
+                          description={t("automatically_complete_orders")}
                           min={0}
                         />
                       </FormControl>
@@ -785,9 +946,9 @@ export function GlobalSettings({
               </div>
             </SettingsCard>
 
-            {/* Offers & Promotions */}
+            {/* Offers & Refunds */}
             <SettingsCard
-              title={t("offers_and_promotions")}
+              title="Offers & Refunds"
               description={t("control_global_discount_settings")}
               icon={Gift}
               delay={0.5}
@@ -837,56 +998,23 @@ export function GlobalSettings({
                     </FormItem>
                   )}
                 />
-              </div>
-            </SettingsCard>
 
-            {/* Automation */}
-            <SettingsCard
-              title={t("automation")}
-              description={t("configure_automated_system_actions")}
-              icon={Zap}
-              delay={0.6}
-            >
-              <div className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="autoCancelUnacceptedOrderMinutes"
+                  name="refundProcessingDays"
                   render={({ field, fieldState }) => (
                     <FormItem>
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label={t("auto_cancel_unaccepted_orders")}
+                          label={t("refund_processing_days")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
                             field.onChange(parseFloat(e.target.value))
                           }
-                          suffix="min"
-                          description={t("cancel_orders_if_no_driver_accepts")}
-                          min={0}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="autoMarkDeliveredAfterMinutes"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("auto_mark_delivered")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="min"
-                          description={t("automatically_complete_orders")}
+                          suffix="days"
+                          description="Number of days to process refunds"
                           min={0}
                         />
                       </FormControl>
@@ -897,35 +1025,129 @@ export function GlobalSettings({
               </div>
             </SettingsCard>
 
-            {/* Delivery Pricing */}
             <SettingsCard
-              title="Customer Nearest Vendor"
-              description="Set the radius to find nearest vendors for customers"
-              icon={EuroIcon}
-              delay={0.1}
+              title="Loyalty & Rewards"
+              description="Configure points, bonuses, and referral rewards"
+              icon={Gift}
+              delay={0.55}
             >
-              <FormField
-                control={form.control}
-                name="customerNearestVendorRadiusKm"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormControl>
-                      <SettingsInput
-                        fieldState={fieldState}
-                        label="Customer Nearest Vendor Radius"
-                        type="number"
-                        value={field.value}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
-                        }
-                        suffix="km"
-                        min={0}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
+                    Customer Rewards
+                  </h3>
+
+                  <FormField
+                    control={form.control}
+                    name="customerPointsPerEuro"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormControl>
+                          <SettingsInput
+                            fieldState={fieldState}
+                            label="Points per € spent"
+                            type="number"
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            suffix="pts"
+                            description="Points earned per euro spent"
+                            min={0}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
+                    Rider Rewards
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="riderPointsPerDelivery"
+                      render={({ field, fieldState }) => (
+                        <FormItem>
+                          <FormControl>
+                            <SettingsInput
+                              fieldState={fieldState}
+                              label="Points per delivery"
+                              type="number"
+                              value={field.value}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value))
+                              }
+                              suffix="pts"
+                              min={0}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="riderReferralPoints"
+                      render={({ field, fieldState }) => (
+                        <FormItem>
+                          <FormControl>
+                            <SettingsInput
+                              fieldState={fieldState}
+                              label="Referral bonus"
+                              type="number"
+                              value={field.value}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value))
+                              }
+                              suffix="pts"
+                              min={0}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="newRiderWelcomeBonus"
+                      render={({ field, fieldState }) => (
+                        <FormItem className="col-span-2">
+                          <FormControl>
+                            <SettingsInput
+                              fieldState={fieldState}
+                              label="New rider welcome bonus"
+                              type="number"
+                              value={field.value}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value))
+                              }
+                              suffix="pts"
+                              min={0}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Referral Milestones */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
+                    Customer Referral Milestones
+                  </h3>
+
+                  <ReferralMilestoneSettings form={form} />
+                </div>
+              </div>
             </SettingsCard>
           </div>
         </form>

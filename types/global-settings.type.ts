@@ -1,51 +1,70 @@
 export type TGlobalSettings = {
   _id?: string;
 
-  // Delivery pricing
-  deliveryChargePerKm: number;
-  baseDeliveryCharge: number;
-  minDeliveryCharge: number;
-  maxDeliveryCharge?: number;
-  freeDeliveryAbove?: number;
-  maxDeliveryDistanceKm?: number;
+  // Delivery Pricing
+  delivery: {
+    baseCharge: number;
+    ChargePerKm: number;
+    minCharge: number;
+    maxCharge: number;
+    freeAbove: number;
+    maxDistanceKm: number;
+    vatRate: number;
+  };
 
-  // Platform commission
-  platformCommissionPercent: number;
-  fleetManagerCommissionPercent?: number;
-  deliveryPartnerCommissionPercent?: number;
-  vendorVatPercent?: number;
+  // Commission & VAT
+  commission: {
+    platformPercent: number;
+    platformVatRate: number;
+    fleetManagerPercent: number;
+    deliveryPartnerPercent: number;
+    vendorVatPercent: number;
+  };
 
-  // Order rules
-  minOrderAmount?: number;
-  maxOrderAmount?: number;
-  maxItemsPerOrder?: number;
+  // Order Rules & Automation
+  order: {
+    minAmount: number;
+    maxAmount: number;
+    maxItemsPerOrder: number;
+    nearestVendorRadiusKm: number;
+    autoCancelUnacceptedMinutes: number;
+    autoMarkDeliveredMinutes: number;
+    cancelTimeLimitMinutes: number;
+  };
 
-  // Customer nearest vendor search radius
-  customerNearestVendorRadiusKm?: number;
+  // Loyalty & Rewards
+  rewards: {
+    customerPointsPerEuro: number;
+    riderPointsPerDelivery: number;
+    riderReferralPoints: number;
+    newRiderWelcomeBonus: number;
+    customerReferralMilestones: {
+      friendsRequired: number;
+      rewardType: "CASHBACK" | "FREE_MEAL" | "FREE_DELIVERY" | "CREDIT";
+      rewardValue: number;
+      minOrderAmountPerFriend: number;
+    }[];
+  };
 
-  // Cancellation & refund
-  cancelTimeLimitMinutes?: number;
-  refundProcessingDays?: number;
-
-  // Offers
-  isOfferEnabled: boolean;
-  maxDiscountPercent?: number;
-
-  // Order lifecycle automation
-  autoCancelUnacceptedOrderMinutes?: number;
-  autoMarkDeliveredAfterMinutes?: number;
-
-  // OTP & security
-  orderOtpEnabled: boolean;
-  otpLength?: number;
-  otpExpiryMinutes?: number;
-
-  // Platform state
-  isPlatformLive: boolean;
-  maintenanceMessage?: string;
+  // Security & System State
+  system: {
+    isPlatformLive: boolean;
+    maintenanceMessage: string;
+    isOfferEnabled: boolean;
+    maxDiscountPercent: number;
+    refundProcessingDays: number;
+    otp: {
+      enabled: boolean;
+      length?: number;
+      expiryMinutes: number;
+    };
+  };
 
   // Meta
-  updatedBy?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  meta: {
+    updatedBy: unknown;
+  };
+
+  createdAt: Date;
+  updatedAt: Date;
 };

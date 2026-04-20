@@ -1,103 +1,98 @@
 import z from "zod";
 
+const referralMilestoneSchema = z.object({
+  friendsRequired: z.number().positive("Friends required must be > 0"),
+  rewardType: z.enum(["CASHBACK", "FREE_MEAL", "FREE_DELIVERY", "CREDIT"]),
+  rewardValue: z.number().nonnegative("Reward value must be >= 0"),
+  minOrderAmountPerFriend: z
+    .number()
+    .nonnegative("Min order amount must be >= 0"),
+});
+
 export const globalSettingsSchema = z
   .object({
     // Delivery pricing
     deliveryChargePerKm: z
-      .number("Delivery charge per km is required")
-      .nonnegative("Delivery charge must be a positive number"),
+      .number("Delivery charge per km must be a number")
+      .nonnegative("Delivery charge must be at least 0"),
     baseDeliveryCharge: z
-      .number("Base delivery charge is required")
-      .nonnegative("Base delivery charge must be a positive number"),
+      .number("Base delivery charge must be a number")
+      .nonnegative("Base delivery charge must be at least 0"),
     minDeliveryCharge: z
-      .number("Minimum delivery charge is required")
-      .nonnegative("Minimum delivery charge must be a positive number"),
+      .number("Minimum delivery charge must be a number")
+      .nonnegative("Minimum delivery charge must be at least 0"),
     maxDeliveryCharge: z
       .number("Maximum delivery charge must be a number")
-      .nonnegative("Maximum delivery charge must be a positive number")
-      .optional(),
+      .nonnegative("Maximum delivery charge must be at least 0"),
     freeDeliveryAbove: z
       .number("Free delivery above must be a number")
-      .nonnegative("Free delivery above must be a positive number")
-      .optional(),
+      .nonnegative("Free delivery above must be at least 0"),
     maxDeliveryDistanceKm: z
       .number("Maximum delivery distance must be a number")
-      .positive("Maximum delivery distance must be greater than 0")
-      .optional(),
-
-    // Customer nearest vendor search radius
-    customerNearestVendorRadiusKm: z
-      .number("Customer nearest vendor radius must be a number")
-      .positive("Customer nearest vendor radius must be greater than 0")
-      .optional(),
+      .positive("Maximum delivery distance must be greater than 0"),
+    deliveryVatRate: z
+      .number("Delivery VAT rate must be a number")
+      .min(0, "Delivery VAT rate must be at least 0")
+      .max(100, "Delivery VAT rate cannot be more than 100"),
 
     // Platform commission
     platformCommissionPercent: z
-      .number("Platform commission is required")
-      .min(0, "Platform commission cannot be less than 0")
-      .max(100, "Platform commission cannot exceed 100"),
+      .number("Platform commission must be a number")
+      .min(0, "Platform commission must be at least 0")
+      .max(100, "Platform commission cannot be more than 100"),
+    platformVatRate: z
+      .number("Platform VAT rate must be a number")
+      .min(0, "Platform VAT rate must be at least 0")
+      .max(100, "Platform VAT rate cannot be more than 100"),
     fleetManagerCommissionPercent: z
       .number("Fleet manager commission must be a number")
-      .min(0, "Fleet manager commission cannot be less than 0")
-      .max(100, "Fleet manager commission cannot exceed 100")
-      .optional(),
+      .min(0, "Fleet manager commission must be at least 0")
+      .max(100, "Fleet manager commission cannot be more than 100"),
     deliveryPartnerCommissionPercent: z
       .number("Delivery partner commission must be a number")
-      .min(0, "Delivery partner commission cannot be less than 0")
-      .max(100, "Delivery partner commission cannot exceed 100")
-      .optional(),
+      .min(0, "Delivery partner commission must be at least 0")
+      .max(100, "Delivery partner commission cannot be more than 100"),
     vendorVatPercent: z
       .number("Vendor VAT percent must be a number")
-      .min(0, "VAT percent cannot be less than 0")
-      .max(100, "VAT percent cannot exceed 100")
-      .optional(),
+      .min(0, "VAT percent must be at least 0")
+      .max(100, "VAT percent cannot be more than 100"),
 
     // Order rules
     minOrderAmount: z
       .number("Minimum order amount must be a number")
-      .nonnegative("Minimum order amount must be a positive number")
-      .optional(),
+      .nonnegative("Minimum order amount must be at least 0"),
     maxOrderAmount: z
       .number("Maximum order amount must be a number")
-      .nonnegative("Maximum order amount must be a positive number")
-      .optional(),
+      .nonnegative("Maximum order amount must be at least 0"),
     maxItemsPerOrder: z
       .number("Maximum items per order must be a number")
       .int("Maximum items per order must be an integer")
-      .positive("Maximum items per order must be at least 1 item")
-      .optional(),
+      .positive("Maximum items per order must be at least 1 item"),
+    customerNearestVendorRadiusKm: z
+      .number("Customer nearest vendor radius must be a number")
+      .positive("Customer nearest vendor radius must be greater than 0"),
 
-    // Cancellation & refund
+    // Cancellation & automation
     cancelTimeLimitMinutes: z
       .number("Cancel time limit in minutes must be a number")
-      .int("Cancel time limit in minutes must be an integer")
-      .nonnegative("Cancel time limit in minutes cannot be negative")
-      .optional(),
-    refundProcessingDays: z
-      .number("Refund processing days must be a number")
-      .int("Refund processing days must be an integer")
-      .nonnegative("Refund processing days cannot be negative")
-      .optional(),
+      .nonnegative("Cancel time limit in minutes must be at least 0"),
+    autoCancelUnacceptedOrderMinutes: z
+      .number("Auto cancel minutes must be a number")
+      .nonnegative("Auto cancel minutes must be at least 0"),
+    autoMarkDeliveredAfterMinutes: z
+      .number("Auto mark delivered minutes must be a number")
+      .nonnegative("Auto mark delivered minutes must be at least 0"),
 
     // Offers & coupons
     isOfferEnabled: z.boolean("Offer status is required"),
     maxDiscountPercent: z
       .number("Maximum discount percent must be a number")
-      .min(0, "Maximum discount percent cannot be less than 0")
-      .max(100, "Maximum discount percent cannot exceed 100")
-      .optional(),
-
-    // Order lifecycle automation
-    autoCancelUnacceptedOrderMinutes: z
-      .number("Auto cancel minutes must be a number")
-      .int("Auto cancel minutes must be an integer")
-      .nonnegative("Auto cancel minutes cannot be negative")
-      .optional(),
-    autoMarkDeliveredAfterMinutes: z
-      .number("Auto mark delivered minutes must be a number")
-      .int("Auto mark delivered minutes must be an integer")
-      .nonnegative("Auto mark delivered minutes cannot be negative")
-      .optional(),
+      .min(0, "Maximum discount percent must be at least 0")
+      .max(100, "Maximum discount percent cannot be more than 100"),
+    refundProcessingDays: z
+      .number("Refund processing days must be a number")
+      .int("Refund processing days must be an integer")
+      .nonnegative("Refund processing days at least 0"),
 
     // OTP & security
     orderOtpEnabled: z.boolean("OTP status is required"),
@@ -105,17 +100,33 @@ export const globalSettingsSchema = z
       .number("OTP length must be a number")
       .int("OTP length must be an integer")
       .min(4, "OTP should be at least 4 digits")
-      .max(8, "OTP should be at most 8 digits")
-      .optional(),
+      .max(8, "OTP should be at most 8 digits"),
     otpExpiryMinutes: z
       .number("Expiry must be a number")
       .int("Expiry must be an integer")
-      .positive("Expiry must be at least 1 minute")
-      .optional(),
+      .positive("Expiry must be at least 1 minute"),
 
     // Platform state
     isPlatformLive: z.boolean("Platform live status is required"),
-    maintenanceMessage: z.string().optional(),
+    maintenanceMessage: z
+      .string("Maintenance message must be a string")
+      .max(300, "Maintenance message cannot be more than 300 characters")
+      .optional(),
+
+    // Loyalty & Rewards
+    customerPointsPerEuro: z
+      .number("Customer points per euro must be a number")
+      .nonnegative("Customer points per euro must be at least 0"),
+    riderPointsPerDelivery: z
+      .number("Rider points per delivery must be a number")
+      .nonnegative("Rider points per delivery must be at least 0"),
+    riderReferralPoints: z
+      .number("Rider referral points must be a number")
+      .nonnegative("Rider referral points must be at least 0"),
+    newRiderWelcomeBonus: z
+      .number("New rider welcome bonus must be a number")
+      .nonnegative("New rider welcome bonus must be at least 0"),
+    customerReferralMilestones: z.array(referralMilestoneSchema),
   })
   .refine(
     (data) => {
