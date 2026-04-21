@@ -120,12 +120,15 @@ export const globalSettingsSchema = z
     riderPointsPerDelivery: z
       .number("Rider points per delivery must be a number")
       .nonnegative("Rider points per delivery must be at least 0"),
-    riderReferralPoints: z
-      .number("Rider referral points must be a number")
-      .nonnegative("Rider referral points must be at least 0"),
+    referralPoints: z
+      .number("Referral points must be a number")
+      .nonnegative("Referral points must be at least 0"),
     newRiderWelcomeBonus: z
       .number("New rider welcome bonus must be a number")
       .nonnegative("New rider welcome bonus must be at least 0"),
+    pointsExpiryDays: z
+      .number("Points expiry days must be a number")
+      .nonnegative("Points expiry days must be at least 0"),
     customerReferralMilestones: z.array(referralMilestoneSchema),
   })
   .refine(

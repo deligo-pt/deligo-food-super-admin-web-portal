@@ -4,7 +4,7 @@ export type TGlobalSettings = {
   // Delivery Pricing
   delivery: {
     baseCharge: number;
-    ChargePerKm: number;
+    chargePerKm: number;
     minCharge: number;
     maxCharge: number;
     freeAbove: number;
@@ -36,8 +36,9 @@ export type TGlobalSettings = {
   rewards: {
     customerPointsPerEuro: number;
     riderPointsPerDelivery: number;
-    riderReferralPoints: number;
+    referralPoints: number;
     newRiderWelcomeBonus: number;
+    pointsExpiryDays: number;
     customerReferralMilestones: {
       friendsRequired: number;
       rewardType: "CASHBACK" | "FREE_MEAL" | "FREE_DELIVERY" | "CREDIT";

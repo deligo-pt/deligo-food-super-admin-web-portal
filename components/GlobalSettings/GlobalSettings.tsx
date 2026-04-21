@@ -53,7 +53,7 @@ export function GlobalSettings({
     resolver: zodResolver(globalSettingsSchema),
     values: {
       // delivery
-      deliveryChargePerKm: settings.delivery.ChargePerKm || 0,
+      deliveryChargePerKm: settings.delivery.chargePerKm || 0,
       baseDeliveryCharge: settings.delivery.baseCharge || 0,
       minDeliveryCharge: settings.delivery.minCharge || 0,
       maxDeliveryCharge: settings.delivery.maxCharge || 0,
@@ -96,8 +96,9 @@ export function GlobalSettings({
       // rewards
       customerPointsPerEuro: settings.rewards.customerPointsPerEuro || 0,
       riderPointsPerDelivery: settings.rewards.riderPointsPerDelivery || 0,
-      riderReferralPoints: settings.rewards.riderReferralPoints || 0,
+      referralPoints: settings.rewards.referralPoints || 0,
       newRiderWelcomeBonus: settings.rewards.newRiderWelcomeBonus || 0,
+      pointsExpiryDays: settings.rewards.pointsExpiryDays || 0,
       customerReferralMilestones:
         settings.rewards.customerReferralMilestones || [],
     },
@@ -114,7 +115,7 @@ export function GlobalSettings({
 
     const payload = {
       delivery: {
-        ChargePerKm: data.deliveryChargePerKm,
+        chargePerKm: data.deliveryChargePerKm,
         baseCharge: data.baseDeliveryCharge,
         minCharge: data.minDeliveryCharge,
         maxCharge: data.maxDeliveryCharge,
@@ -141,8 +142,9 @@ export function GlobalSettings({
       rewards: {
         customerPointsPerEuro: data.customerPointsPerEuro,
         riderPointsPerDelivery: data.riderPointsPerDelivery,
-        riderReferralPoints: data.riderReferralPoints,
+        referralPoints: data.referralPoints,
         newRiderWelcomeBonus: data.newRiderWelcomeBonus,
+        pointsExpiryDays: data.pointsExpiryDays,
         customerReferralMilestones: data.customerReferralMilestones,
       },
       system: {
@@ -1093,13 +1095,13 @@ export function GlobalSettings({
 
                     <FormField
                       control={form.control}
-                      name="riderReferralPoints"
+                      name="referralPoints"
                       render={({ field, fieldState }) => (
                         <FormItem>
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="Referral bonus"
+                              label="Referral points"
                               type="number"
                               value={field.value}
                               onChange={(e) =>
@@ -1129,6 +1131,29 @@ export function GlobalSettings({
                                 field.onChange(parseFloat(e.target.value))
                               }
                               suffix="pts"
+                              min={0}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="pointsExpiryDays"
+                      render={({ field, fieldState }) => (
+                        <FormItem className="col-span-2">
+                          <FormControl>
+                            <SettingsInput
+                              fieldState={fieldState}
+                              label="Points Expiry"
+                              type="number"
+                              value={field.value}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value))
+                              }
+                              suffix="days"
                               min={0}
                             />
                           </FormControl>
