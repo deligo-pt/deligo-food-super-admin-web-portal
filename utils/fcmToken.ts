@@ -2,36 +2,34 @@ import { messaging } from "@/config/firebase";
 import { postData } from "@/utils/requests";
 import { getToken } from "firebase/messaging";
 
+const FCM_TOKEN_KEY = "deligo-admin-fcm-token";
+
 export async function getFcmToken(): Promise<string | null> {
+  const localToken = localStorage.getItem(FCM_TOKEN_KEY);
+  console.log("local token", localToken);
+  console.log("vapid", process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY);
+  if (localToken) return localToken;
+
   if (!messaging) return null;
   if (!("serviceWorker" in navigator)) return null;
 
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return null;
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return null;
 
-    const registration = await navigator.serviceWorker.ready;
+  const registration = await navigator.serviceWorker.ready;
 
-    const token = await Promise.race([
-      getToken(messaging, {
-        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-        serviceWorkerRegistration: registration,
-      }),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("FCM Timeout")), 4000),
-      ),
-    ]);
+  const token = await getToken(messaging, {
+    vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
+    serviceWorkerRegistration: registration,
+  });
 
-    // return await getToken(messaging, {
-    //   vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
-    //   serviceWorkerRegistration: registration,
-    // });
+  console.log("token", token);
 
-    return token as string;
-  } catch (error) {
-    console.error("FCM Token Error:", error);
-    return null;
+  if (token) {
+    localStorage.setItem(FCM_TOKEN_KEY, token);
   }
+
+  return token;
 }
 
 export async function saveFcmToken(

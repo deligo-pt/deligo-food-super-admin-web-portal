@@ -45,14 +45,12 @@ export default function TopbarIcons({ admin }: IProps) {
 
     const token = (await getFcmToken()) || "";
 
-    console.log("token",token)
-
     const result = await logoutReq({
       email: admin?.email || "",
       token,
     });
 
-    console.log("server result",result)
+    console.log("server result", result);
 
     if (result?.success) {
       toast.success(result?.message || "Logout successful!", {

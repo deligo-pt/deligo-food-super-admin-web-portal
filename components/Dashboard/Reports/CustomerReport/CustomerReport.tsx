@@ -29,6 +29,8 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
     currentTimeframe === "custom",
   );
 
+  console.log(customerReportAnalytics);
+
   const data = {
     stats: customerReportAnalytics.cards,
     monthlySignups: customerReportAnalytics.customerGrowth,
