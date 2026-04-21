@@ -1,8 +1,11 @@
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", () => self.clients.claim());
+
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"
+  "https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js",
 );
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js"
+  "https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js",
 );
 
 firebase.initializeApp({
@@ -19,7 +22,7 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log(
     "[firebase-messaging-sw.js] Received background message:",
-    payload
+    payload,
   );
 
   const notificationTitle = payload.notification?.title || "New Message";

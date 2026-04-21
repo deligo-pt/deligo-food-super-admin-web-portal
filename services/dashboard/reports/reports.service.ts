@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverFetch } from "@/lib/fetchHelper";
+import { queryStringFormatter } from "@/utils/formatter";
 
 export const getSalesReportAnalytics = async (queryString?: string) => {
   try {
@@ -57,10 +58,12 @@ export const getOrderReportAnalytics = async (queryString?: string) => {
   }
 };
 
-export const getCustomerReportAnalytics = async () => {
+export const getCustomerReportAnalytics = async (
+  queries?: Record<string, string | undefined>,
+) => {
   try {
     const res = await serverFetch.get(
-      `/analytics/admin/customer-report-analytics`,
+      `/analytics/admin/customer-report-analytics?${queries ? queryStringFormatter(queries) : ""}`,
       {
         next: {
           revalidate: 30,

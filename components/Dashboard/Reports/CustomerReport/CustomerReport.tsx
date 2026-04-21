@@ -29,14 +29,6 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
     currentTimeframe === "custom",
   );
 
-  console.log(customerReportAnalytics);
-
-  const data = {
-    stats: customerReportAnalytics.cards,
-    monthlySignups: customerReportAnalytics.customerGrowth,
-    statusDistribution: customerReportAnalytics.statusDistribution,
-  };
-
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div>
@@ -53,8 +45,12 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
               />
 
               <ExportPopover
-                onPDFClick={() => generateCustomerReportPDF(data)}
-                onCSVClick={() => generateCustomerReportCSV(data)}
+                onPDFClick={() =>
+                  generateCustomerReportPDF(customerReportAnalytics)
+                }
+                onCSVClick={() =>
+                  generateCustomerReportCSV(customerReportAnalytics)
+                }
               />
             </div>
           }
@@ -69,25 +65,25 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatsCard
             title="Total Customers"
-            value={customerReportAnalytics.cards.totalCustomers || 0}
+            value={customerReportAnalytics.stats?.totalCustomers || 0}
             icon={User}
             delay={0}
           />
           <StatsCard
             title="Active Customers"
-            value={customerReportAnalytics.cards.activeCustomers || 0}
+            value={customerReportAnalytics.stats?.activeCustomers || 0}
             icon={Heart}
             delay={0.1}
           />
           <StatsCard
             title="Total Orders"
-            value={customerReportAnalytics.cards.totalOrders || 0}
+            value={customerReportAnalytics.stats?.totalOrders || 0}
             icon={ShoppingBag}
             delay={0.2}
           />
           <StatsCard
-            title="Total Revenue"
-            value={`€${formatPrice(Number(customerReportAnalytics.cards.totalRevenue?.replace("€", "")) || 0)}`}
+            title="Total Spent"
+            value={`€${formatPrice(customerReportAnalytics.stats?.totalSpent || 0)}`}
             icon={EuroIcon}
             delay={0.3}
           />
@@ -99,7 +95,7 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
           title="Customer Growth"
           description="New customer registrations over time"
           data={customerReportAnalytics.customerGrowth || []}
-          xLabel="Month"
+          xLabel="Time"
           yLabel="No of Customers"
           delay={0.2}
         />
@@ -125,7 +121,7 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
           <div className="space-y-3">
             <StatusDistributionCard
               name="Active"
-              value={customerReportAnalytics.statusDistribution.approved || 0}
+              value={customerReportAnalytics.statusDistribution.active || 0}
               color="#DC3173"
             />
             <StatusDistributionCard

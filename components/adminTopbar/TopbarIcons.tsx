@@ -43,7 +43,7 @@ export default function TopbarIcons({ admin }: IProps) {
   const logOut = async () => {
     const toastId = toast.loading("Logging out...");
 
-    const token = (await getFcmToken()) || "";
+    const token = (await getFcmToken().catch(() => "")) || "";
 
     const result = await logoutReq({
       email: admin?.email || "",

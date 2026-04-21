@@ -1,51 +1,39 @@
+import { ICustomerReportAnalytics } from "@/types/report.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 
-export function generateCustomerReportCSV({
-  statusDistribution,
-  monthlySignups,
-  stats,
-}: {
-  statusDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalCustomers: number;
-    activeCustomers: number;
-    totalOrders: number;
-    totalRevenue: string;
-  };
-}) {
+export function generateCustomerReportCSV(
+  reportData: ICustomerReportAnalytics,
+) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Customers", String(stats.totalCustomers)]);
-  rows.push(["Active Customers", String(stats.activeCustomers)]);
-  rows.push(["Total Orders", String(stats.totalOrders)]);
+  rows.push(["Total Customers", String(reportData.stats?.totalCustomers)]);
+  rows.push(["Active Customers", String(reportData.stats?.activeCustomers)]);
+  rows.push(["Total Orders", String(reportData.stats?.totalOrders)]);
   rows.push([
     "Total Revenue",
-    String(
-      `€${formatPrice(Number(stats.totalRevenue?.replace("€", "")) || 0)}`,
-    ),
+    String(`€${formatPrice(reportData.stats?.totalSpent || 0)}`),
   ]);
-  rows.push([]); // spacer row
+
+  rows.push([]);
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====
   rows.push(["--- STATUS DISTRIBUTION ---"]);
   rows.push(["Status", "Count"]);
-
-  Object.entries(statusDistribution).forEach(([status, count]) => {
-    rows.push([status.replace(/_/g, " ").toUpperCase(), count]);
-  });
+  rows.push(["ACTIVE", reportData.statusDistribution?.active]);
+  rows.push(["BLOCKED", reportData.statusDistribution?.blocked]);
 
   rows.push([]);
 
-  // ===== SECTION 3: MONTHLY SIGNUPS =====
-  rows.push(["--- MONTHLY SIGNUPS ---"]);
-  rows.push(["Month", "Customers"]);
-  monthlySignups.forEach((item) => {
+  // ===== SECTION 3: CUSTOMER GROWTH =====
+  rows.push(["--- CUSTOMER GROWTH ---"]);
+  rows.push(["Time", "Customers"]);
+  reportData.customerGrowth.forEach((item) => {
     rows.push([item.label, String(item.value)]);
   });
+
   rows.push([]);
 
   // ===== BUILD CSV =====

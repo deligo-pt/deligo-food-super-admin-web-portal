@@ -43,18 +43,18 @@ export interface IOrderReportAnalytics {
 }
 
 export interface ICustomerReportAnalytics {
-  cards: {
+  stats: {
     totalCustomers: number;
     activeCustomers: number;
     totalOrders: number;
-    totalRevenue: string;
+    totalSpent: number;
   };
   customerGrowth: {
     label: string;
     value: number;
   }[];
   statusDistribution: {
-    approved: number;
+    active: number;
     blocked: number;
   };
 }

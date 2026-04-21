@@ -1,18 +1,12 @@
+import { ICustomerReportAnalytics } from "@/types/report.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const generateCustomerReportPDF = (reportData: {
-  statusDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalCustomers: number;
-    activeCustomers: number;
-    totalOrders: number;
-    totalRevenue: string;
-  };
-}) => {
+export const generateCustomerReportPDF = (
+  reportData: ICustomerReportAnalytics,
+) => {
   const doc = new jsPDF("p", "mm", "a4");
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -94,14 +88,22 @@ export const generateCustomerReportPDF = (reportData: {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
 
-  doc.text(`Total Customers: ${reportData.stats.totalCustomers}`, marginX, y);
-  y += 5;
-  doc.text(`Active Customers: ${reportData.stats.activeCustomers}`, marginX, y);
-  y += 5;
-  doc.text(`Total Orders: ${reportData.stats.totalOrders}`, marginX, y);
+  doc.text(
+    `Total Customers: ${reportData.stats?.totalCustomers || 0}`,
+    marginX,
+    y,
+  );
   y += 5;
   doc.text(
-    `Total Revenue: €${formatPrice(Number(reportData.stats.totalRevenue?.replace("€", "")))}`,
+    `Active Customers: ${reportData.stats?.activeCustomers || 0}`,
+    marginX,
+    y,
+  );
+  y += 5;
+  doc.text(`Total Orders: ${reportData.stats?.totalOrders || 0}`, marginX, y);
+  y += 5;
+  doc.text(
+    `Total Spent: €${formatPrice(reportData.stats?.totalSpent || 0)}`,
     marginX,
     y,
   );
@@ -116,8 +118,8 @@ export const generateCustomerReportPDF = (reportData: {
 
   autoTable(doc, {
     startY: y,
-    head: [["Month", ...reportData.monthlySignups.map((s) => s.label)]],
-    body: [["Customers", ...reportData.monthlySignups.map((s) => s.value)]],
+    head: [["Time", ...reportData.customerGrowth.map((g) => g.label)]],
+    body: [["Customers", ...reportData.customerGrowth.map((g) => g.value)]],
     styles: {
       fontSize: 9,
       cellPadding: 3,
@@ -141,20 +143,14 @@ export const generateCustomerReportPDF = (reportData: {
 
   y += 4;
 
-  const statusKeys = Object.keys(reportData.statusDistribution);
-
   autoTable(doc, {
     startY: y,
-    head: [
-      [
-        "Status",
-        ...statusKeys?.map((key) => key.replace(/_/g, " ").toUpperCase()),
-      ],
-    ],
+    head: [["Status", "Active", "Blocked"]],
     body: [
       [
         "Customers",
-        ...statusKeys.map((key) => reportData.statusDistribution[key]),
+        reportData.statusDistribution.active,
+        reportData.statusDistribution.blocked,
       ],
     ],
     styles: {
