@@ -108,11 +108,11 @@ export const generateCustomerReportPDF = (
     y,
   );
 
-  // Monthly Customers signups
+  // Customer Growth over time
   y += 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Monthly Signups", marginX, y);
+  doc.text("Customer Growth", marginX, y);
 
   y += 4;
 

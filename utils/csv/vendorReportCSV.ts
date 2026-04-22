@@ -1,48 +1,48 @@
+import { IVendorReportAnalytics } from "@/types/report.type";
 import { format } from "date-fns";
 
-export function generateVendorReportCSV({
-  statusDistribution,
-  monthlySignups,
-  stats,
-}: {
-  statusDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalVendors: number;
-    approvedVendors: number;
-    submittedVendors: number;
-    blockedOrRejectedVendors: number;
-  };
-}) {
+export function generateVendorReportCSV(
+  vendorReportData: IVendorReportAnalytics,
+) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Vendors", String(stats.totalVendors)]);
-  rows.push(["Approved Vendors", String(stats.approvedVendors)]);
-  rows.push(["Submitted Vendors", String(stats.submittedVendors)]);
+  rows.push(["Total Vendors", String(vendorReportData.stats?.totalVendors)]);
+  rows.push([
+    "Approved Vendors",
+    String(vendorReportData.stats?.approvedVendors),
+  ]);
+  rows.push([
+    "Pending Vendors",
+    String(vendorReportData.stats?.pendingVendors),
+  ]);
   rows.push([
     "Blocked/Rejected Vendors",
-    String(stats.blockedOrRejectedVendors),
+    String(vendorReportData.stats?.blockedVendors),
   ]);
-  rows.push([]); // spacer row
+
+  rows.push([]);
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====
   rows.push(["--- STATUS DISTRIBUTION ---"]);
   rows.push(["Status", "Count"]);
 
-  Object.entries(statusDistribution).forEach(([status, count]) => {
-    rows.push([status.replace(/_/g, " ").toUpperCase(), count]);
-  });
+  Object.entries(vendorReportData.statusDistribution).forEach(
+    ([status, count]) => {
+      rows.push([status.replace(/_/g, " ").toUpperCase(), count]);
+    },
+  );
 
   rows.push([]);
 
-  // ===== SECTION 3: MONTHLY SIGNUPS =====
-  rows.push(["--- MONTHLY SIGNUPS ---"]);
-  rows.push(["Month", "Customers"]);
-  monthlySignups.forEach((item) => {
-    rows.push([item.label, String(item.value)]);
+  // ===== SECTION 3: VENDOR GROWTH =====
+  rows.push(["--- VENDOR GROWTH ---"]);
+  rows.push(["Time", "Vendors"]);
+  vendorReportData.vendorGrowths?.forEach((item) => {
+    rows.push([item.time, String(item.vendors)]);
   });
+
   rows.push([]);
 
   // ===== BUILD CSV =====

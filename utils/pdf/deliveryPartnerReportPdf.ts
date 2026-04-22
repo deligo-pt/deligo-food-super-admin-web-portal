@@ -1,18 +1,12 @@
+import { IDeliveryPartnerReportAnalytics } from "@/types/report.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const generateDeliveryPartnerReportPDF = (reportData: {
-  vehicleDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalPartners: number;
-    activePartners: number;
-    totalDeliveries: number;
-    totalEarnings: string;
-  };
-}) => {
+export const generateDeliveryPartnerReportPDF = (
+  reportData: IDeliveryPartnerReportAnalytics,
+) => {
   const doc = new jsPDF("p", "mm", "a4");
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -95,37 +89,41 @@ export const generateDeliveryPartnerReportPDF = (reportData: {
   doc.setFontSize(10);
 
   doc.text(
-    `Total Delivery Partners: ${reportData.stats.totalPartners}`,
+    `Total Delivery Partners: ${reportData.stats?.totalPartners}`,
     marginX,
     y,
   );
   y += 5;
   doc.text(
-    `Active Delivery Partners: ${reportData.stats.activePartners}`,
+    `Active Delivery Partners: ${reportData.stats?.approvedPartners}`,
     marginX,
     y,
   );
   y += 5;
-  doc.text(`Total Deliveries: ${reportData.stats.totalDeliveries}`, marginX, y);
+  doc.text(
+    `Total Deliveries: ${reportData.stats?.totalDeliveries}`,
+    marginX,
+    y,
+  );
   y += 5;
   doc.text(
-    `Total Earnings: €${formatPrice(Number(reportData.stats.totalEarnings?.replace("€", "")) || 0)}`,
+    `Total Earnings: €${formatPrice(reportData.stats?.totalEarnings || 0)}`,
     marginX,
     y,
   );
 
-  // Monthly Delivery Partners signups
+  // Delivery Partner Growth
   y += 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Monthly Signups", marginX, y);
+  doc.text("Delivery Partner Growth", marginX, y);
 
   y += 4;
 
   autoTable(doc, {
     startY: y,
-    head: [["Month", ...reportData.monthlySignups.map((s) => s.label)]],
-    body: [["Managers", ...reportData.monthlySignups.map((s) => s.value)]],
+    head: [["Time", ...reportData.partnerGrowths?.map((s) => s.time)]],
+    body: [["Managers", ...reportData.partnerGrowths?.map((s) => s.managers)]],
     styles: {
       fontSize: 9,
       cellPadding: 3,
@@ -162,7 +160,12 @@ export const generateDeliveryPartnerReportPDF = (reportData: {
     body: [
       [
         "Partners",
-        ...vehicleTypes.map((type) => reportData.vehicleDistribution[type]),
+        ...vehicleTypes.map(
+          (type) =>
+            reportData.vehicleDistribution[
+              type as keyof IDeliveryPartnerReportAnalytics["vehicleDistribution"]
+            ],
+        ),
       ],
     ],
     styles: {

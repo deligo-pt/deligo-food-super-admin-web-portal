@@ -28,12 +28,6 @@ export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
     currentTimeframe === "custom",
   );
 
-  const data = {
-    stats: fleetReportAnalytics?.cards,
-    monthlySignups: fleetReportAnalytics?.monthlySignups || [],
-    statusDistribution: fleetReportAnalytics?.statusDistribution || {},
-  };
-
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div>
@@ -50,8 +44,12 @@ export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
               />
 
               <ExportPopover
-                onPDFClick={() => generateFleetManagerReportPDF(data)}
-                onCSVClick={() => generateFleetManagerReportCSV(data)}
+                onPDFClick={() =>
+                  generateFleetManagerReportPDF(fleetReportAnalytics)
+                }
+                onCSVClick={() =>
+                  generateFleetManagerReportCSV(fleetReportAnalytics)
+                }
               />
             </div>
           }
@@ -66,27 +64,24 @@ export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
           <StatsCard
             title="Total Managers"
-            value={fleetReportAnalytics?.cards?.totalFleetManagers || 0}
+            value={fleetReportAnalytics?.stats?.totalManagers || 0}
             icon={Users}
-            delay={0}
           />
           <StatsCard
             title="Approved Managers"
-            value={fleetReportAnalytics?.cards?.approvedFleetManagers || 0}
+            value={fleetReportAnalytics?.stats?.approvedManagers || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
-            title="Submitted Managers"
-            value={fleetReportAnalytics?.cards?.submittedFleetManagers || 0}
+            title="Total Drivers"
+            value={fleetReportAnalytics?.stats?.totalDrivers || 0}
             icon={Bike}
             delay={0.2}
           />
           <StatsCard
-            title="Blocked/Rejected Managers"
-            value={
-              fleetReportAnalytics?.cards?.blockedOrRejectedFleetManagers || 0
-            }
+            title="Total Deliveries"
+            value={fleetReportAnalytics?.stats?.totalDeliveries || 0}
             icon={PackageCheckIcon}
             delay={0.3}
           />
@@ -97,9 +92,11 @@ export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
           type="area"
           title="Fleet Manager Growth"
           description="New manager registrations over time"
-          data={fleetReportAnalytics.monthlySignups || []}
-          xLabel="Month"
+          data={fleetReportAnalytics.fleetGrowths || []}
+          xLabel="Time"
           yLabel="No of Managers"
+          xKey="time"
+          yKey="managers"
           delay={0.2}
         />
 
@@ -131,6 +128,11 @@ export default function FleetManagerReport({ fleetReportAnalytics }: IProps) {
               name="Pending"
               value={fleetReportAnalytics.statusDistribution.pending || 0}
               color="#f59e0b"
+            />
+            <StatusDistributionCard
+              name="Submitted"
+              value={fleetReportAnalytics.statusDistribution.submitted || 0}
+              color="#3b82f6"
             />
             <StatusDistributionCard
               name="Rejected"

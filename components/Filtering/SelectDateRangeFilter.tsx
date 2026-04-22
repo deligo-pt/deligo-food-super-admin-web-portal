@@ -122,6 +122,8 @@ export function SelectCustomDateFilter({
       return;
     }
 
+    setError("");
+
     const params = new URLSearchParams(searchParams.toString());
 
     params.set(paramName, "custom");

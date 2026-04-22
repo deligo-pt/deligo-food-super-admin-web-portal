@@ -22,7 +22,7 @@ export const getAllLoyaltyPointsReq = async (
 
   const result = await catchAsync<{ data: TLoyaltyPoint[]; meta: TMeta }>(
     async () => {
-      return await serverRequest.get("/loyalties/all-points", {
+      return await serverRequest.get("/points/all-points", {
         params,
       });
     },

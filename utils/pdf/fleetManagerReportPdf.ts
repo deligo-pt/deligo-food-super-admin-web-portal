@@ -1,17 +1,11 @@
+import { IFleetManagerReportAnalytics } from "@/types/report.type";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const generateFleetManagerReportPDF = (reportData: {
-  statusDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalFleetManagers: number;
-    approvedFleetManagers: number;
-    submittedFleetManagers: number;
-    blockedOrRejectedFleetManagers: number;
-  };
-}) => {
+export const generateFleetManagerReportPDF = (
+  reportData: IFleetManagerReportAnalytics,
+) => {
   const doc = new jsPDF("p", "mm", "a4");
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -94,41 +88,37 @@ export const generateFleetManagerReportPDF = (reportData: {
   doc.setFontSize(10);
 
   doc.text(
-    `Total Fleet Managers: ${reportData.stats.totalFleetManagers}`,
+    `Total Fleet Managers: ${reportData.stats?.totalManagers}`,
     marginX,
     y,
   );
   y += 5;
   doc.text(
-    `Approved Fleet Managers: ${reportData.stats.approvedFleetManagers}`,
+    `Approved Fleet Managers: ${reportData.stats?.approvedManagers}`,
     marginX,
     y,
   );
   y += 5;
-  doc.text(
-    `Submitted Fleet Managers: ${reportData.stats.submittedFleetManagers}`,
-    marginX,
-    y,
-  );
+  doc.text(`Total Drivers: ${reportData.stats?.totalDrivers}`, marginX, y);
   y += 5;
   doc.text(
-    `Blocked/Rejected Fleet Managers: ${reportData.stats.blockedOrRejectedFleetManagers}`,
+    `Total Deliveries: ${reportData.stats?.totalDeliveries}`,
     marginX,
     y,
   );
 
-  // Monthly Fleet managers signups
+  // Fleet Manager Growth
   y += 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Monthly Signups", marginX, y);
+  doc.text("Fleet Manager Growth", marginX, y);
 
   y += 4;
 
   autoTable(doc, {
     startY: y,
-    head: [["Month", ...reportData.monthlySignups.map((s) => s.label)]],
-    body: [["Managers", ...reportData.monthlySignups.map((s) => s.value)]],
+    head: [["Time", ...reportData.fleetGrowths?.map((g) => g.time)]],
+    body: [["Managers", ...reportData.fleetGrowths?.map((g) => g.managers)]],
     styles: {
       fontSize: 9,
       cellPadding: 3,
@@ -165,7 +155,12 @@ export const generateFleetManagerReportPDF = (reportData: {
     body: [
       [
         "Managers",
-        ...statusKeys.map((key) => reportData.statusDistribution[key]),
+        ...statusKeys.map(
+          (key) =>
+            reportData.statusDistribution[
+              key as keyof IFleetManagerReportAnalytics["statusDistribution"]
+            ],
+        ),
       ],
     ],
     styles: {

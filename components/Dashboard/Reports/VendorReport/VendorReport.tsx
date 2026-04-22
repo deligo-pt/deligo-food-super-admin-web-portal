@@ -28,12 +28,6 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
     currentTimeframe === "custom",
   );
 
-  const data = {
-    stats: vendorReportAnalytics.cards,
-    monthlySignups: vendorReportAnalytics.monthlySignups || [],
-    statusDistribution: vendorReportAnalytics.statusDistribution || {},
-  };
-
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div>
@@ -50,8 +44,12 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
               />
 
               <ExportPopover
-                onPDFClick={() => generateVendorReportPDF(data)}
-                onCSVClick={() => generateVendorReportCSV(data)}
+                onPDFClick={() =>
+                  generateVendorReportPDF(vendorReportAnalytics)
+                }
+                onCSVClick={() =>
+                  generateVendorReportCSV(vendorReportAnalytics)
+                }
               />
             </div>
           }
@@ -66,25 +64,25 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Vendors"
-            value={vendorReportAnalytics.cards.totalVendors || 0}
+            value={vendorReportAnalytics.stats?.totalVendors || 0}
             icon={Store}
             delay={0}
           />
           <StatsCard
             title="Approved Vendors"
-            value={vendorReportAnalytics.cards.approvedVendors || 0}
+            value={vendorReportAnalytics.stats?.approvedVendors || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
-            title="Submitted Vendors"
-            value={vendorReportAnalytics.cards.submittedVendors || 0}
+            title="Pending Vendors"
+            value={vendorReportAnalytics.stats?.pendingVendors || 0}
             icon={Clock}
             delay={0.2}
           />
           <StatsCard
             title="Blocked/Rejected Vendors"
-            value={vendorReportAnalytics.cards.blockedOrRejectedVendors || 0}
+            value={vendorReportAnalytics.stats?.blockedVendors || 0}
             icon={XCircle}
             delay={0.3}
           />
@@ -95,9 +93,11 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
           type="area"
           title="Vendor Growth"
           description="New vendor registrations over time"
-          data={vendorReportAnalytics.monthlySignups || []}
-          xLabel="Month"
+          data={vendorReportAnalytics.vendorGrowths || []}
+          xLabel="Time"
           yLabel="No of Vendors"
+          xKey="time"
+          yKey="vendors"
           delay={0.2}
         />
 

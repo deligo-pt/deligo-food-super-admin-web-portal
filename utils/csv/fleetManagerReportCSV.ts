@@ -1,48 +1,37 @@
+import { IFleetManagerReportAnalytics } from "@/types/report.type";
 import { format } from "date-fns";
 
-export function generateFleetManagerReportCSV({
-  statusDistribution,
-  monthlySignups,
-  stats,
-}: {
-  statusDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalFleetManagers: number;
-    approvedFleetManagers: number;
-    submittedFleetManagers: number;
-    blockedOrRejectedFleetManagers: number;
-  };
-}) {
+export function generateFleetManagerReportCSV(
+  reportData: IFleetManagerReportAnalytics,
+) {
   const rows: (string | number | undefined | null)[][] = [];
 
   // ===== SECTION 1: SUMMARY STATS =====
   rows.push(["--- SUMMARY STATS ---"]);
-  rows.push(["Total Managers", String(stats.totalFleetManagers)]);
-  rows.push(["Approved Managers", String(stats.approvedFleetManagers)]);
-  rows.push(["Submitted Managers", String(stats.submittedFleetManagers)]);
-  rows.push([
-    "Blocked/Rejected Managers",
-    String(stats.blockedOrRejectedFleetManagers),
-  ]);
-  rows.push([]); // spacer row
+  rows.push(["Total Managers", String(reportData.stats?.totalManagers)]);
+  rows.push(["Approved Managers", String(reportData.stats?.approvedManagers)]);
+  rows.push(["Total Drivers", String(reportData.stats?.totalDrivers)]);
+  rows.push(["Total Deliveries", String(reportData.stats?.totalDeliveries)]);
+
+  rows.push([]);
 
   // ===== SECTION 2: STATUS DISTRIBUTION =====
   rows.push(["--- STATUS DISTRIBUTION ---"]);
   rows.push(["Status", "Count"]);
 
-  Object.entries(statusDistribution).forEach(([status, count]) => {
+  Object.entries(reportData.statusDistribution).forEach(([status, count]) => {
     rows.push([status.replace(/_/g, " ").toUpperCase(), count]);
   });
 
   rows.push([]);
 
-  // ===== SECTION 3: MONTHLY SIGNUPS =====
-  rows.push(["--- MONTHLY SIGNUPS ---"]);
-  rows.push(["Month", "Managers"]);
-  monthlySignups.forEach((item) => {
-    rows.push([item.label, String(item.value)]);
+  // ===== SECTION 3: FLEET MANAGER GROWTH =====
+  rows.push(["--- FLEET MANAGER GROWTH ---"]);
+  rows.push(["Time", "Managers"]);
+  reportData.fleetGrowths?.forEach((item) => {
+    rows.push([item.time, String(item.managers)]);
   });
+
   rows.push([]);
 
   // ===== BUILD CSV =====

@@ -90,10 +90,12 @@ export const getCustomerReportAnalytics = async (
   }
 };
 
-export const getVendorReportAnalytics = async () => {
+export const getVendorReportAnalytics = async (
+  queries?: Record<string, string | undefined>,
+) => {
   try {
     const res = await serverFetch.get(
-      `/analytics/admin/vendor-report-analytics`,
+      `/analytics/admin/vendor-report-analytics?${queries ? queryStringFormatter(queries) : ""}`,
       {
         next: {
           revalidate: 30,
@@ -118,10 +120,12 @@ export const getVendorReportAnalytics = async () => {
   }
 };
 
-export const getFleetManagerReportAnalytics = async () => {
+export const getFleetManagerReportAnalytics = async (
+  queries?: Record<string, string | undefined>,
+) => {
   try {
     const res = await serverFetch.get(
-      `/analytics/admin/fleet-manager-report-analytics`,
+      `/analytics/admin/fleet-manager-report-analytics?${queries ? queryStringFormatter(queries) : ""}`,
       {
         next: {
           revalidate: 30,
@@ -148,10 +152,12 @@ export const getFleetManagerReportAnalytics = async () => {
   }
 };
 
-export const getDeliverPartnerReportAnalytics = async () => {
+export const getDeliverPartnerReportAnalytics = async (
+  queries?: Record<string, string | undefined>,
+) => {
   try {
     const res = await serverFetch.get(
-      `/analytics/admin/delivery-partner-report-analytics`,
+      `/analytics/admin/delivery-partner-report-analytics?${queries ? queryStringFormatter(queries) : ""}`,
       {
         next: {
           revalidate: 30,

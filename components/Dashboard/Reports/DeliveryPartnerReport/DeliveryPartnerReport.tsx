@@ -31,12 +31,6 @@ export default function DeliveryPartnerReport({
     currentTimeframe === "custom",
   );
 
-  const data = {
-    stats: deliveryPartnerReportAnalytics.cards,
-    monthlySignups: deliveryPartnerReportAnalytics.partnerGrowth || [],
-    vehicleDistribution: deliveryPartnerReportAnalytics.vehicleTypes || {},
-  };
-
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       <div className="print:pt-4">
@@ -53,8 +47,16 @@ export default function DeliveryPartnerReport({
               />
 
               <ExportPopover
-                onPDFClick={() => generateDeliveryPartnerReportPDF(data)}
-                onCSVClick={() => generateDeliveryPartnerReportCSV(data)}
+                onPDFClick={() =>
+                  generateDeliveryPartnerReportPDF(
+                    deliveryPartnerReportAnalytics,
+                  )
+                }
+                onCSVClick={() =>
+                  generateDeliveryPartnerReportCSV(
+                    deliveryPartnerReportAnalytics,
+                  )
+                }
               />
             </div>
           }
@@ -69,25 +71,24 @@ export default function DeliveryPartnerReport({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
             title="Total Partners"
-            value={deliveryPartnerReportAnalytics.cards.totalPartners || 0}
+            value={deliveryPartnerReportAnalytics.stats?.totalPartners || 0}
             icon={Bike}
-            delay={0}
           />
           <StatsCard
             title="Active Partners"
-            value={deliveryPartnerReportAnalytics.cards.activePartners || 0}
+            value={deliveryPartnerReportAnalytics.stats?.approvedPartners || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
             title="Total Deliveries"
-            value={deliveryPartnerReportAnalytics.cards.totalDeliveries || 0}
+            value={deliveryPartnerReportAnalytics.stats?.totalDeliveries || 0}
             icon={Package}
             delay={0.2}
           />
           <StatsCard
             title="Total Earnings"
-            value={`€${formatPrice(Number(deliveryPartnerReportAnalytics.cards.totalEarnings?.replace("€", "")) || 0)}`}
+            value={`€${formatPrice(deliveryPartnerReportAnalytics.stats?.totalEarnings || 0)}`}
             icon={EuroIcon}
             delay={0.3}
           />
@@ -98,9 +99,11 @@ export default function DeliveryPartnerReport({
           type="area"
           title="Partner Growth"
           description="New partner registrations over time"
-          data={deliveryPartnerReportAnalytics?.partnerGrowth || []}
-          xLabel="Month"
+          data={deliveryPartnerReportAnalytics?.partnerGrowths || []}
+          xLabel="Time"
           yLabel="No of Partners"
+          xKey="time"
+          yKey="managers"
           delay={0.2}
         />
 
@@ -126,28 +129,41 @@ export default function DeliveryPartnerReport({
             <StatusDistributionCard
               name="Motorbike"
               value={
-                deliveryPartnerReportAnalytics?.vehicleTypes?.motorbike || 0
+                deliveryPartnerReportAnalytics?.vehicleDistribution
+                  ?.MOTORBIKE || 0
               }
               color="#DC3173"
             />
             <StatusDistributionCard
               name="E-Bike"
-              value={deliveryPartnerReportAnalytics?.vehicleTypes?.eBike || 0}
+              value={
+                deliveryPartnerReportAnalytics?.vehicleDistribution?.[
+                  "E-BIKE"
+                ] || 0
+              }
               color="#f59e0b"
             />
             <StatusDistributionCard
               name="Car"
-              value={deliveryPartnerReportAnalytics?.vehicleTypes?.car || 0}
+              value={
+                deliveryPartnerReportAnalytics?.vehicleDistribution?.CAR || 0
+              }
               color="#3b82f6"
             />
             <StatusDistributionCard
               name="Scooter"
-              value={deliveryPartnerReportAnalytics?.vehicleTypes?.scooter || 0}
+              value={
+                deliveryPartnerReportAnalytics?.vehicleDistribution?.SCOOTER ||
+                0
+              }
               color="#6b7280"
             />
             <StatusDistributionCard
               name="Bicycle"
-              value={deliveryPartnerReportAnalytics?.vehicleTypes?.bicycle || 0}
+              value={
+                deliveryPartnerReportAnalytics?.vehicleDistribution?.BICYCLE ||
+                0
+              }
               color="#ef4444"
             />
           </div>

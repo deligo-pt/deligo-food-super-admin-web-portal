@@ -60,15 +60,15 @@ export interface ICustomerReportAnalytics {
 }
 
 export interface IVendorReportAnalytics {
-  cards: {
+  stats: {
     totalVendors: number;
     approvedVendors: number;
-    submittedVendors: number;
-    blockedOrRejectedVendors: number;
+    pendingVendors: number;
+    blockedVendors: number;
   };
-  monthlySignups: {
-    label: string;
-    value: number;
+  vendorGrowths: {
+    time: string;
+    vendors: number;
   }[];
   statusDistribution: {
     approved: number;
@@ -80,40 +80,41 @@ export interface IVendorReportAnalytics {
 }
 
 export interface IFleetManagerReportAnalytics {
-  cards: {
-    totalFleetManagers: number;
-    approvedFleetManagers: number;
-    submittedFleetManagers: number;
-    blockedOrRejectedFleetManagers: number;
+  stats: {
+    totalManagers: number;
+    approvedManagers: number;
+    totalDrivers: number;
+    totalDeliveries: number;
   };
-  monthlySignups: {
-    label: string;
-    value: number;
+  fleetGrowths: {
+    time: string;
+    managers: number;
   }[];
   statusDistribution: {
     approved: number;
     blocked: number;
     pending: number;
     rejected: number;
+    submitted: number;
   };
 }
 
 export interface IDeliveryPartnerReportAnalytics {
-  cards: {
-    activePartners: number;
+  stats: {
+    approvedPartners: number;
     totalDeliveries: number;
     totalPartners: number;
-    totalEarnings: string;
+    totalEarnings: number;
   };
-  partnerGrowth: {
-    label: string;
-    value: number;
+  partnerGrowths: {
+    time: string;
+    managers: number;
   }[];
-  vehicleTypes: {
-    bicycle: number;
-    motorbike: number;
-    car: number;
-    eBike: number;
-    scooter: number;
+  vehicleDistribution: {
+    BICYCLE: number;
+    MOTORBIKE: number;
+    CAR: number;
+    SCOOTER: number;
+    "E-BIKE": number;
   };
 }

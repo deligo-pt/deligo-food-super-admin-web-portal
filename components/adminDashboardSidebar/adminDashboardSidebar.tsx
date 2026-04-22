@@ -210,6 +210,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/all-taxes",
         },
         { name: "Create tax", path: "/admin/create-tax" },
+        { name: "Loyalty Points", path: "/admin/loyalty-points" },
       ],
     },
     {

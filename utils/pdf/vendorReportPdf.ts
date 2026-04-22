@@ -1,17 +1,11 @@
+import { IVendorReportAnalytics } from "@/types/report.type";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const generateVendorReportPDF = (vendorReportData: {
-  statusDistribution: Record<string, number>;
-  monthlySignups: { label: string; value: number }[];
-  stats: {
-    totalVendors: number;
-    approvedVendors: number;
-    submittedVendors: number;
-    blockedOrRejectedVendors: number;
-  };
-}) => {
+export const generateVendorReportPDF = (
+  vendorReportData: IVendorReportAnalytics,
+) => {
   const doc = new jsPDF("p", "mm", "a4");
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -102,29 +96,31 @@ export const generateVendorReportPDF = (vendorReportData: {
   );
   y += 5;
   doc.text(
-    `Submitted Vendors: ${vendorReportData.stats.submittedVendors}`,
+    `Pending Vendors: ${vendorReportData.stats.pendingVendors}`,
     marginX,
     y,
   );
   y += 5;
   doc.text(
-    `Blocked/Rejected Vendors: ${vendorReportData.stats.blockedOrRejectedVendors}`,
+    `Blocked/Rejected Vendors: ${vendorReportData.stats.blockedVendors}`,
     marginX,
     y,
   );
 
-  // Monthly vendor signups
+  // Vendor Growth over time
   y += 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Monthly Signups", marginX, y);
+  doc.text("Vendor Growth", marginX, y);
 
   y += 4;
 
   autoTable(doc, {
     startY: y,
-    head: [["Month", ...vendorReportData.monthlySignups.map((s) => s.label)]],
-    body: [["Vendors", ...vendorReportData.monthlySignups.map((s) => s.value)]],
+    head: [["Time", ...vendorReportData.vendorGrowths.map((g) => g.time)]],
+    body: [
+      ["Vendors", ...vendorReportData.vendorGrowths.map((g) => g.vendors)],
+    ],
     styles: {
       fontSize: 9,
       cellPadding: 3,
@@ -161,7 +157,12 @@ export const generateVendorReportPDF = (vendorReportData: {
     body: [
       [
         "Vendors",
-        ...statusKeys.map((key) => vendorReportData.statusDistribution[key]),
+        ...statusKeys.map(
+          (key: string) =>
+            vendorReportData.statusDistribution[
+              key as keyof typeof vendorReportData.statusDistribution
+            ],
+        ),
       ],
     ],
     styles: {
