@@ -43,6 +43,7 @@ export type TProduct = {
     quantity: number;
     unit: string;
     availabilityStatus: "In Stock" | "Out of Stock" | "Limited";
+    hasVariations: boolean;
   };
 
   images: string[];
