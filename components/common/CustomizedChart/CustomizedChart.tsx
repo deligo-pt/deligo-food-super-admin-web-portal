@@ -7,9 +7,13 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Label,
+  Legend,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -17,11 +21,12 @@ import {
 } from "recharts";
 
 interface IProps<T> {
-  type?: "bar" | "area" | "line";
+  type?: "bar" | "area" | "line" | "pie";
   title: string;
   description?: string;
   caption?: string;
   data: T[];
+  colors?: string[];
   xKey?: string;
   yKey?: string;
   xLabel?: string;
@@ -31,11 +36,23 @@ interface IProps<T> {
   delay?: number;
   xTooltipKey?: string;
   yTooltipKey?: string;
+  isBGNeed?: boolean;
+  isLegendNeed?: boolean;
   xLabelCustomizedValue?: (val: number | string) => string;
   yLabelCustomizedValue?: (val: number | string) => string;
-  isBGNeed?: boolean;
   yAxisCustomizedValue?: (val: number | string) => string;
 }
+
+const COLORS = [
+  "#DC3173",
+  "#16a34a",
+  "#f59e0b",
+  "#2563eb",
+  "#8b5cf6",
+  "#06b6d4",
+  "#dc2626",
+  "#a3e635",
+];
 
 export default function CustomizedCharts<T>({
   type = "bar",
@@ -43,6 +60,7 @@ export default function CustomizedCharts<T>({
   description,
   caption,
   data,
+  colors = COLORS,
   xKey = "label",
   yKey = "value",
   xLabel,
@@ -52,9 +70,10 @@ export default function CustomizedCharts<T>({
   delay = 0,
   xTooltipKey,
   yTooltipKey,
+  isBGNeed = true,
+  isLegendNeed = true,
   xLabelCustomizedValue,
   yLabelCustomizedValue,
-  isBGNeed = true,
   yAxisCustomizedValue,
 }: IProps<T>) {
   const chartMargin = { top: 10, right: 20, left: 10, bottom: 30 };
@@ -198,6 +217,50 @@ export default function CustomizedCharts<T>({
                 }}
               />
             </LineChart>
+          )}
+
+          {type === "pie" && (
+            <PieChart>
+              <Pie
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                data={data as any[]}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                paddingAngle={2}
+                dataKey={yKey}
+              >
+                {data.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={colors[index % colors.length]}
+                  />
+                ))}
+              </Pie>
+
+              <Tooltip
+                formatter={(val: number | string, label) => [
+                  yLabelCustomizedValue ? yLabelCustomizedValue(val) : val,
+                  xLabelCustomizedValue ? xLabelCustomizedValue(label) : label,
+                ]}
+              />
+
+              {isLegendNeed && (
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  iconType="circle"
+                  formatter={(value) => (
+                    <span className="text-sm text-slate-600 font-medium">
+                      {xLabelCustomizedValue
+                        ? xLabelCustomizedValue(value)
+                        : value}
+                    </span>
+                  )}
+                />
+              )}
+            </PieChart>
           )}
         </ResponsiveContainer>
       </motion.div>

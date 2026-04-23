@@ -1,9 +1,11 @@
+type TOfferType = "PERCENT" | "FLAT" | "FREE_DELIVERY" | "BOGO";
+
 export type TOffer = {
   _id: string;
   title: string;
   description?: string;
   // Offer type
-  offerType: "PERCENT" | "FLAT" | "FREE_DELIVERY" | "BOGO";
+  offerType: TOfferType;
   // Discount values
   discountValue?: number;
   maxDiscountAmount?: number;
@@ -39,4 +41,33 @@ export type TOffer = {
 
   createdAt?: Date;
   updatedAt?: Date;
+};
+
+type TOfferAnalyticsStats = {
+  totalOffers: number;
+  activeOffers: number;
+  totalRedemptions: number;
+  revenueImpact: number;
+};
+
+type TUsageOverTime = {
+  time: string;
+  redemptions: number;
+}[];
+
+type TOfferTypeUsage = {
+  name: TOfferType;
+  usage: number;
+}[];
+
+type TTopOffers = {
+  name: string;
+  usage: number;
+}[];
+
+export type TOfferAnalytics = {
+  stats: TOfferAnalyticsStats;
+  usageOverTime: TUsageOverTime;
+  offerTypeUsage: TOfferTypeUsage;
+  topOffers: TTopOffers;
 };
