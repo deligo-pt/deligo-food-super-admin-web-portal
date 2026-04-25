@@ -53,54 +53,54 @@ export function GlobalSettings({
     resolver: zodResolver(globalSettingsSchema),
     values: {
       // delivery
-      deliveryChargePerKm: settings.delivery.chargePerKm || 0,
-      baseDeliveryCharge: settings.delivery.baseCharge || 0,
-      minDeliveryCharge: settings.delivery.minCharge || 0,
-      maxDeliveryCharge: settings.delivery.maxCharge || 0,
-      freeDeliveryAbove: settings.delivery.freeAbove || 0,
-      maxDeliveryDistanceKm: settings.delivery.maxDistanceKm || 0,
-      deliveryVatRate: settings.delivery.vatRate || 0,
+      deliveryChargePerKm: settings?.delivery?.chargePerKm || 0,
+      baseDeliveryCharge: settings?.delivery?.baseCharge || 0,
+      minDeliveryCharge: settings?.delivery?.minCharge || 0,
+      maxDeliveryCharge: settings?.delivery?.maxCharge || 0,
+      freeDeliveryAbove: settings?.delivery?.freeAbove || 0,
+      maxDeliveryDistanceKm: settings?.delivery?.maxDistanceKm || 0,
+      deliveryVatRate: settings?.delivery?.vatRate || 0,
 
       // commission
-      platformCommissionPercent: settings.commission.platformPercent || 0,
-      platformVatRate: settings.commission.platformVatRate || 0,
+      platformCommissionPercent: settings?.commission?.platformPercent || 0,
+      platformVatRate: settings?.commission?.platformVatRate || 0,
       deliveryPartnerCommissionPercent:
-        settings.commission.deliveryPartnerPercent || 0,
+        settings?.commission?.deliveryPartnerPercent || 0,
       fleetManagerCommissionPercent:
-        settings.commission.fleetManagerPercent || 0,
-      vendorVatPercent: settings.commission.vendorVatPercent || 0,
+        settings?.commission?.fleetManagerPercent || 0,
+      vendorVatPercent: settings?.commission?.vendorVatPercent || 0,
 
       // order
-      minOrderAmount: settings.order.minAmount || 0,
-      maxOrderAmount: settings.order.maxAmount || 0,
-      maxItemsPerOrder: settings.order.maxItemsPerOrder || 1,
-      customerNearestVendorRadiusKm: settings.order.nearestVendorRadiusKm || 0,
-      cancelTimeLimitMinutes: settings.order.cancelTimeLimitMinutes || 0,
+      minOrderAmount: settings?.order?.minAmount || 0,
+      maxOrderAmount: settings?.order?.maxAmount || 0,
+      maxItemsPerOrder: settings?.order?.maxItemsPerOrder || 1,
+      customerNearestVendorRadiusKm: settings?.order?.nearestVendorRadiusKm || 0,
+      cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
       autoCancelUnacceptedOrderMinutes:
-        settings.order.autoCancelUnacceptedMinutes || 0,
+        settings?.order?.autoCancelUnacceptedMinutes || 0,
       autoMarkDeliveredAfterMinutes:
-        settings.order.autoMarkDeliveredMinutes || 0,
+        settings?.order?.autoMarkDeliveredMinutes || 0,
 
       // system - otp
-      orderOtpEnabled: settings.system.otp.enabled || false,
-      otpLength: settings.system.otp?.length || 0,
-      otpExpiryMinutes: settings.system.otp?.expiryMinutes || 0,
+      orderOtpEnabled: settings?.system?.otp?.enabled || false,
+      otpLength: settings?.system?.otp?.length || 0,
+      otpExpiryMinutes: settings?.system?.otp?.expiryMinutes || 0,
 
       // system - others
-      isOfferEnabled: settings.system.isOfferEnabled || false,
-      isPlatformLive: settings.system.isPlatformLive || false,
-      maintenanceMessage: settings.system.maintenanceMessage || "",
-      refundProcessingDays: settings.system.refundProcessingDays || 0,
-      maxDiscountPercent: settings.system.maxDiscountPercent || 0,
+      isOfferEnabled: settings?.system?.isOfferEnabled || false,
+      isPlatformLive: settings?.system?.isPlatformLive || false,
+      maintenanceMessage: settings?.system?.maintenanceMessage || "",
+      refundProcessingDays: settings?.system?.refundProcessingDays || 0,
+      maxDiscountPercent: settings?.system?.maxDiscountPercent || 0,
 
       // rewards
-      customerPointsPerEuro: settings.rewards.customerPointsPerEuro || 0,
-      riderPointsPerDelivery: settings.rewards.riderPointsPerDelivery || 0,
-      referralPoints: settings.rewards.referralPoints || 0,
-      newRiderWelcomeBonus: settings.rewards.newRiderWelcomeBonus || 0,
-      pointsExpiryDays: settings.rewards.pointsExpiryDays || 0,
+      customerPointsPerEuro: settings?.rewards?.customerPointsPerEuro || 0,
+      riderPointsPerDelivery: settings?.rewards?.riderPointsPerDelivery || 0,
+      referralPoints: settings?.rewards?.referralPoints || 0,
+      newRiderWelcomeBonus: settings?.rewards?.newRiderWelcomeBonus || 0,
+      pointsExpiryDays: settings?.rewards?.pointsExpiryDays || 0,
       customerReferralMilestones:
-        settings.rewards.customerReferralMilestones || [],
+        settings?.rewards?.customerReferralMilestones || [],
     },
   });
 

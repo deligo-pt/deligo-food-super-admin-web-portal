@@ -39,6 +39,7 @@ export const createGlobalSettingsReq = async (
   }
 };
 
+
 export const updateGlobalSettingsReq = async (
   payload: Partial<TGlobalSettings>,
 ) => {
