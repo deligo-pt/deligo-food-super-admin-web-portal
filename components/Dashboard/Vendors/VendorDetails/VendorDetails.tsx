@@ -18,6 +18,7 @@ import {
   BriefcaseIcon,
   BuildingIcon,
   CheckIcon,
+  EditIcon,
   FileTextIcon,
   MapPinIcon,
   TicketIcon,
@@ -162,6 +163,14 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
         <div className="p-6">
           <div className="mb-6 border-gray-200">
             <div className="flex flex-wrap justify-end gap-4">
+              <ActionButton
+                onClick={() =>
+                  router.push("/admin/vendor/edit/" + vendor.userId)
+                }
+                label="Edit"
+                icon={<EditIcon size={18} />}
+                variant="primary"
+              />
               {vendor.status === "SUBMITTED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("APPROVED")}
@@ -448,9 +457,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             icon={<FileTextIcon size={20} />}
             defaultOpen={true}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-6">
-              <VendorDetailsDoc documents={vendor?.documents} />
-            </div>
+            <VendorDetailsDoc documents={vendor?.documents} />
           </AgentOrVendorSection>
           <AgentOrVendorSection
             title="Created Offers"
@@ -482,15 +489,21 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   </p>
                 </div>
               ))}
+
+              {offerData?.length === 0 && (
+                <p className="text-gray-500 italic">No offers created</p>
+              )}
             </div>
-            <div className="text-center mt-2">
-              <Link
-                className="text-[#DC3173] text-sm font-medium hover:underline"
-                href={`/admin/vendor/offers/${vendor.userId}`}
-              >
-                View all
-              </Link>
-            </div>
+            {offerData?.length > 0 && (
+              <div className="text-center mt-2">
+                <Link
+                  className="text-[#DC3173] text-sm font-medium hover:underline"
+                  href={`/admin/vendor/offers/${vendor.userId}`}
+                >
+                  View all
+                </Link>
+              </div>
+            )}
           </AgentOrVendorSection>
         </div>
       </motion.div>

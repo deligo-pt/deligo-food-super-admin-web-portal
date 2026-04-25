@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useTranslation } from "@/hooks/use-translation";
 import { Search } from "lucide-react";
 import {
   Dispatch,
@@ -74,7 +73,6 @@ const BusinessLocationMap = ({
   businessLocation,
   setLocationCoordinates,
 }: IProps) => {
-  const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<any>(null);
   const geocoderRef = useRef<any>(null);
@@ -84,7 +82,7 @@ const BusinessLocationMap = ({
     (components: any[]) => {
       const address: any = {};
       components.forEach((c) => {
-        if (c.types.includes("route")) address.streetAddress = c.long_name;
+        if (c.types.includes("route")) address.street = c.long_name;
         if (c.types.includes("street_number"))
           address.streetNumber = c.long_name;
         if (c.types.includes("locality")) address.city = c.long_name;
@@ -93,10 +91,10 @@ const BusinessLocationMap = ({
       });
 
       Object.entries(address).forEach(([key, value]) =>
-        form.setValue(key as keyof LocationFormType, (value || "") as string)
+        form.setValue(key as keyof LocationFormType, (value || "") as string),
       );
     },
-    [form]
+    [form],
   );
 
   /** --- Update Marker Position --- */
@@ -154,7 +152,7 @@ const BusinessLocationMap = ({
             updateMarker(map, loc);
             fillAddressFields(results[0].address_components);
           }
-        }
+        },
       );
     });
 
@@ -170,7 +168,7 @@ const BusinessLocationMap = ({
       if (loc.latitude && loc.longitude) {
         const savedLoc = new window.google.maps.LatLng(
           loc.latitude,
-          loc.longitude
+          loc.longitude,
         );
         setLocationCoordinates({
           latitude: loc.latitude,
@@ -211,7 +209,7 @@ const BusinessLocationMap = ({
         <Search className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
         <input
           id="autocomplete"
-          placeholder={t("search_business_address")}
+          placeholder="Search address here..."
           className="pl-10 py-3 rounded-xl border w-full"
         />
       </div>

@@ -12,7 +12,8 @@ import { toast } from "sonner";
 type DocKey =
   | "businessLicenseDoc"
   | "taxDoc"
-  | "idProof"
+  | "idProofFront"
+  | "idProofBack"
   | "storePhoto"
   | "menuUpload";
 
@@ -22,19 +23,47 @@ type FilePreview = {
   isImage: boolean;
 };
 
+const linkToFilePreviews = (prevDocuments: Record<DocKey, string>) => {
+  const savedPreviews: Record<DocKey, FilePreview | null> = {} as Record<
+    DocKey,
+    FilePreview | null
+  >;
+
+  const docs = prevDocuments || {};
+  (Object.keys(docs) as DocKey[]).forEach((key) => {
+    const url = docs[key];
+    if (url) {
+      savedPreviews[key] = {
+        file: null,
+        url: url || "",
+        isImage: /\.(jpg|jpeg|png|gif|webp)$/i.test(url),
+      };
+    }
+  });
+
+  return savedPreviews;
+};
+
 export default function UploadVendorDocuments({
   vendorId,
+  prevDocuments,
 }: {
   vendorId: string;
+  prevDocuments?: Record<DocKey, string>;
 }) {
   const { t } = useTranslation();
-  const [previews, setPreviews] = useState<Record<DocKey, FilePreview | null>>({
-    businessLicenseDoc: null,
-    taxDoc: null,
-    idProof: null,
-    storePhoto: null,
-    menuUpload: null,
-  });
+  const [previews, setPreviews] = useState<Record<DocKey, FilePreview | null>>(
+    prevDocuments
+      ? linkToFilePreviews(prevDocuments)
+      : {
+          businessLicenseDoc: null,
+          taxDoc: null,
+          idProofFront: null,
+          idProofBack: null,
+          storePhoto: null,
+          menuUpload: null,
+        },
+  );
 
   const DOCUMENTS: {
     key: DocKey;
@@ -47,7 +76,16 @@ export default function UploadVendorDocuments({
       prefersImagePreview: false,
     },
     { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
-    { key: "idProof", label: t("id_proof"), prefersImagePreview: true },
+    {
+      key: "idProofFront",
+      label: t("id_proof") + " Front",
+      prefersImagePreview: true,
+    },
+    {
+      key: "idProofBack",
+      label: t("id_proof") + " Back",
+      prefersImagePreview: true,
+    },
     { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
     { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
   ];
@@ -166,7 +204,7 @@ export default function UploadVendorDocuments({
                           }
                           width={56}
                           height={40}
-                          className="object-cover rounded-md border"
+                          className="object-cover rounded-md border w-14 h-10"
                           unoptimized
                         />
                         <div className="truncate">
