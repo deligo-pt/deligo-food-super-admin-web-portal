@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
@@ -139,22 +140,33 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     );
 
     if (updatedResult.success) {
-      const approveResult = await approveOrRejectReq(vendor.userId, {
-        status: "APPROVED",
-      });
+      if (vendor.status !== USER_STATUS.APPROVED) {
+        const approveResult = await approveOrRejectReq(vendor.userId, {
+          status: USER_STATUS.APPROVED,
+        });
 
-      if (approveResult.success) {
-        form.reset();
-        toast.success(approveResult.message || "Vendor updated successfully!", {
+        if (approveResult.success) {
+          form.reset();
+          toast.success(
+            approveResult.message || "Vendor updated successfully!",
+            {
+              id: toastId,
+            },
+          );
+          return;
+        }
+
+        toast.error(approveResult.message || "Vendor updated failed", {
           id: toastId,
         });
+        console.log(approveResult);
         return;
       }
 
-      toast.error(approveResult.message || "Vendor updated failed", {
+      form.reset();
+      toast.success(updatedResult.message || "Vendor updated successfully!", {
         id: toastId,
       });
-      console.log(approveResult);
       return;
     }
 
