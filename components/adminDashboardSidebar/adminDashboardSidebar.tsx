@@ -306,6 +306,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <Settings size={18} />,
       items: [
         { name: t("global_settings"), path: "/admin/global-settings" },
+        { name: "Rewards Settings", path: "/admin/rewards-settings" },
         {
           name: t("notification_preferences"),
           path: "/admin/notification-preferences",

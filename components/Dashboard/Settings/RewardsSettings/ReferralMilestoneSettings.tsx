@@ -1,6 +1,6 @@
 "use client";
 
-import SettingsInput from "@/components/GlobalSettings/SettingsInput";
+import SettingsInput from "@/components/Dashboard/Settings/GlobalSettings/SettingsInput";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form";
 import { useFieldArray } from "react-hook-form";

@@ -1,8 +1,8 @@
 "use client";
 
+import SettingsInput from "@/components/Dashboard/Settings/GlobalSettings/SettingsInput";
+import SettingsToggle from "@/components/Dashboard/Settings/GlobalSettings/SettingsToggle";
 import ImageUpload from "@/components/Dashboard/Sponsorships/ImageUpload";
-import SettingsInput from "@/components/GlobalSettings/SettingsInput";
-import SettingsToggle from "@/components/GlobalSettings/SettingsToggle";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

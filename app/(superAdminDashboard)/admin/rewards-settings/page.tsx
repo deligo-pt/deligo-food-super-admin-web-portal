@@ -1,9 +1,9 @@
-import GlobalSettings from "@/components/Dashboard/Settings/GlobalSettings/GlobalSettings";
+import RewardsSettings from "@/components/Dashboard/Settings/RewardsSettings/RewardsSettings";
 import { getGlobalSettingsReq } from "@/services/dashboard/global-settings/global-settings.service";
 import { TGlobalSettings } from "@/types/global-settings.type";
 
-export default async function GlobalSettingsPage() {
+export default async function RewardsSettingsPage() {
   const settingsResult: TGlobalSettings = await getGlobalSettingsReq();
 
-  return <GlobalSettings settingsResult={settingsResult} />;
+  return <RewardsSettings settingsResult={settingsResult} />;
 }

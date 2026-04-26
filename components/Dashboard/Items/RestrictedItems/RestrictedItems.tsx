@@ -7,9 +7,11 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { deleteRestrictedItemReq } from "@/services/dashboard/product/restricted-item.service";
 import { TMeta } from "@/types";
 import { TRestrictedItem } from "@/types/product.type";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -25,7 +27,7 @@ const sortOptions = [
 ];
 
 export default function RestrictedItems({ restrictedItemsData }: IProps) {
-  // const router = useRouter();
+  const router = useRouter();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<TRestrictedItem | null>(null);
   const [deleteId, setDeleteId] = useState("");
@@ -33,12 +35,21 @@ export default function RestrictedItems({ restrictedItemsData }: IProps) {
   const deleteItem = async () => {
     const toastId = toast.loading("Deleting Item...");
 
-    setTimeout(() => {
-      toast.success("Restricted item deleted successfully!", {
+    const result = await deleteRestrictedItemReq(deleteId);
+
+    if (result?.success) {
+      toast.success(result.message || "Restricted item deleted successfully!", {
         id: toastId,
       });
       setDeleteId("");
-    }, 1500);
+      router.refresh();
+      return;
+    }
+
+    toast.error(result?.message || "Restricted item delete failed", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (

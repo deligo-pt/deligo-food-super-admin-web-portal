@@ -1,9 +1,9 @@
 "use client";
 
+import SettingsCard from "@/components/Dashboard/Settings/GlobalSettings/SettingsCard";
+import SettingsInput from "@/components/Dashboard/Settings/GlobalSettings/SettingsInput";
+import SettingsToggle from "@/components/Dashboard/Settings/GlobalSettings/SettingsToggle";
 import ImageUpload from "@/components/Dashboard/Sponsorships/ImageUpload";
-import SettingsCard from "@/components/GlobalSettings/SettingsCard";
-import SettingsInput from "@/components/GlobalSettings/SettingsInput";
-import SettingsToggle from "@/components/GlobalSettings/SettingsToggle";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import {
   Form,

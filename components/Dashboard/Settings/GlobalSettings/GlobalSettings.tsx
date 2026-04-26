@@ -1,9 +1,8 @@
 "use client";
 
-import ReferralMilestoneSettings from "@/components/GlobalSettings/ReferralMilestoneSettings";
-import SettingsCard from "@/components/GlobalSettings/SettingsCard";
-import SettingsInput from "@/components/GlobalSettings/SettingsInput";
-import SettingsToggle from "@/components/GlobalSettings/SettingsToggle";
+import SettingsCard from "@/components/Dashboard/Settings/GlobalSettings/SettingsCard";
+import SettingsInput from "@/components/Dashboard/Settings/GlobalSettings/SettingsInput";
+import SettingsToggle from "@/components/Dashboard/Settings/GlobalSettings/SettingsToggle";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import {
   Form,
@@ -18,7 +17,7 @@ import {
   updateGlobalSettingsReq,
 } from "@/services/dashboard/global-settings/global-settings.service";
 import { TGlobalSettings } from "@/types/global-settings.type";
-import { globalSettingsSchema } from "@/validations/global-settings/global-settings.validation";
+import { globalSettingsSchema } from "@/validations/settings/global-settings/global-settings.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -39,7 +38,7 @@ import z from "zod";
 
 type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
-export function GlobalSettings({
+export default function GlobalSettings({
   settingsResult: settings,
 }: {
   settingsResult: TGlobalSettings;
@@ -74,7 +73,8 @@ export function GlobalSettings({
       minOrderAmount: settings?.order?.minAmount || 0,
       maxOrderAmount: settings?.order?.maxAmount || 0,
       maxItemsPerOrder: settings?.order?.maxItemsPerOrder || 1,
-      customerNearestVendorRadiusKm: settings?.order?.nearestVendorRadiusKm || 0,
+      customerNearestVendorRadiusKm:
+        settings?.order?.nearestVendorRadiusKm || 0,
       cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
       autoCancelUnacceptedOrderMinutes:
         settings?.order?.autoCancelUnacceptedMinutes || 0,
@@ -92,15 +92,6 @@ export function GlobalSettings({
       maintenanceMessage: settings?.system?.maintenanceMessage || "",
       refundProcessingDays: settings?.system?.refundProcessingDays || 0,
       maxDiscountPercent: settings?.system?.maxDiscountPercent || 0,
-
-      // rewards
-      customerPointsPerEuro: settings?.rewards?.customerPointsPerEuro || 0,
-      riderPointsPerDelivery: settings?.rewards?.riderPointsPerDelivery || 0,
-      referralPoints: settings?.rewards?.referralPoints || 0,
-      newRiderWelcomeBonus: settings?.rewards?.newRiderWelcomeBonus || 0,
-      pointsExpiryDays: settings?.rewards?.pointsExpiryDays || 0,
-      customerReferralMilestones:
-        settings?.rewards?.customerReferralMilestones || [],
     },
   });
 
@@ -138,14 +129,6 @@ export function GlobalSettings({
         cancelTimeLimitMinutes: data.cancelTimeLimitMinutes,
         autoCancelUnacceptedMinutes: data.autoCancelUnacceptedOrderMinutes,
         autoMarkDeliveredMinutes: data.autoMarkDeliveredAfterMinutes,
-      },
-      rewards: {
-        customerPointsPerEuro: data.customerPointsPerEuro,
-        riderPointsPerDelivery: data.riderPointsPerDelivery,
-        referralPoints: data.referralPoints,
-        newRiderWelcomeBonus: data.newRiderWelcomeBonus,
-        pointsExpiryDays: data.pointsExpiryDays,
-        customerReferralMilestones: data.customerReferralMilestones,
       },
       system: {
         otp: {
@@ -1024,154 +1007,6 @@ export function GlobalSettings({
                     </FormItem>
                   )}
                 />
-              </div>
-            </SettingsCard>
-
-            <SettingsCard
-              title="Loyalty & Rewards"
-              description="Configure points, bonuses, and referral rewards"
-              icon={Gift}
-              delay={0.55}
-            >
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                    Customer Rewards
-                  </h3>
-
-                  <FormField
-                    control={form.control}
-                    name="customerPointsPerEuro"
-                    render={({ field, fieldState }) => (
-                      <FormItem>
-                        <FormControl>
-                          <SettingsInput
-                            fieldState={fieldState}
-                            label="Points per € spent"
-                            type="number"
-                            value={field.value}
-                            onChange={(e) =>
-                              field.onChange(parseFloat(e.target.value))
-                            }
-                            suffix="pts"
-                            description="Points earned per euro spent"
-                            min={0}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                    Rider Rewards
-                  </h3>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="riderPointsPerDelivery"
-                      render={({ field, fieldState }) => (
-                        <FormItem>
-                          <FormControl>
-                            <SettingsInput
-                              fieldState={fieldState}
-                              label="Points per delivery"
-                              type="number"
-                              value={field.value}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
-                              suffix="pts"
-                              min={0}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="referralPoints"
-                      render={({ field, fieldState }) => (
-                        <FormItem>
-                          <FormControl>
-                            <SettingsInput
-                              fieldState={fieldState}
-                              label="Referral points"
-                              type="number"
-                              value={field.value}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
-                              suffix="pts"
-                              min={0}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="newRiderWelcomeBonus"
-                      render={({ field, fieldState }) => (
-                        <FormItem className="col-span-2">
-                          <FormControl>
-                            <SettingsInput
-                              fieldState={fieldState}
-                              label="New rider welcome bonus"
-                              type="number"
-                              value={field.value}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
-                              suffix="pts"
-                              min={0}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="pointsExpiryDays"
-                      render={({ field, fieldState }) => (
-                        <FormItem className="col-span-2">
-                          <FormControl>
-                            <SettingsInput
-                              fieldState={fieldState}
-                              label="Points Expiry"
-                              type="number"
-                              value={field.value}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
-                              suffix="days"
-                              min={0}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-
-                {/* Referral Milestones */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                    Customer Referral Milestones
-                  </h3>
-
-                  <ReferralMilestoneSettings form={form} />
-                </div>
               </div>
             </SettingsCard>
           </div>

@@ -28,8 +28,10 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { RESTRICTED_CATEGORIES } from "@/consts/item.const";
 import { useTranslation } from "@/hooks/use-translation";
+import { createRestrictedItemReq } from "@/services/dashboard/product/restricted-item.service";
 import { restrictedItemValidation } from "@/validations/item/restricted-item.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -46,6 +48,7 @@ export default function CreateRestrictedItemModal({
   onOpenChange,
 }: IProps) {
   const { t } = useTranslation();
+  const router = useRouter();
 
   const form = useForm<TFormValues>({
     resolver: zodResolver(restrictedItemValidation),
@@ -56,18 +59,25 @@ export default function CreateRestrictedItemModal({
     },
   });
 
-  const onSubmit = (data: TFormValues) => {
+  const onSubmit = async (data: TFormValues) => {
     const toastId = toast.loading("Adding restricted item...");
 
-    console.log("Form Data:", data);
+    const result = await createRestrictedItemReq(data);
 
-    setTimeout(() => {
-      toast.success("Restricted item added successfully!", {
+    if (result.success) {
+      toast.success(result.message || "Restricted item added successfully!", {
         id: toastId,
       });
       onOpenChange(false);
       form.reset();
-    }, 1500);
+      router.refresh();
+      return;
+    }
+
+    toast.error(result.message || "Failed to add restricted item", {
+      id: toastId,
+    });
+    console.log(result);
   };
 
   return (
