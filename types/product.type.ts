@@ -87,6 +87,9 @@ export type TProduct = {
     createdAt: Date;
     updatedAt: Date;
   };
+
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type TProductsQueryParams = {

@@ -39,8 +39,8 @@ interface IProps {
     city: string;
     postalCode: string;
     country: string;
-    latitude: number;
-    longitude: number;
+    latitude?: number;
+    longitude?: number;
   };
   setLocationCoordinates: Dispatch<
     SetStateAction<{ latitude: number; longitude: number }>
@@ -66,7 +66,9 @@ const formFields = [
   },
 ];
 
-const GOOGLE_API_URL = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBHT9ARgpTJIEdvsiaD72Gf7SUUXz-Xqfg&libraries=places`;
+const defaultLocation = { lat: 38.7223, lng: -9.1393 }; // LISBON
+
+const GOOGLE_API_URL = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBHT9ARgpTJIEdvsiaD72Gf7SUUXz-Xqfg&libraries=places&loading=async&callback=initMapCallback`;
 
 const BusinessLocationMap = ({
   form,
@@ -75,9 +77,8 @@ const BusinessLocationMap = ({
 }: IProps) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const markerRef = useRef<any>(null);
-  const geocoderRef = useRef<any>(null);
+  const isInitialized = useRef(false);
 
-  /** --- Extract and Set Address Fields --- */
   const fillAddressFields = useCallback(
     (components: any[]) => {
       const address: any = {};
@@ -97,116 +98,103 @@ const BusinessLocationMap = ({
     [form],
   );
 
-  /** --- Update Marker Position --- */
-  const updateMarker = useCallback((map: any, location: any) => {
-    markerRef.current.setPosition(location);
-    map.setCenter(location);
-    map.setZoom(15);
-  }, []);
-
-  /** --- Initialize Google Map & Autocomplete --- */
   const initializeMap = useCallback(async () => {
-    if (!window.google?.maps) return;
+    if (isInitialized.current || !window.google?.maps) return;
+    isInitialized.current = true;
 
-    const defaultLocation = { lat: 40.4168, lng: -3.7038 }; // Madrid
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: defaultLocation,
-      zoom: 12,
+    const { Map } = await window.google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } =
+      await window.google.maps.importLibrary("marker");
+    const { Autocomplete } = await window.google.maps.importLibrary("places");
+    const { Geocoder } = await window.google.maps.importLibrary("geocoding");
+
+    const initialPos = businessLocation?.latitude
+      ? { lat: businessLocation.latitude, lng: businessLocation.longitude }
+      : defaultLocation;
+
+    const map = new Map(mapRef.current as HTMLElement, {
+      center: initialPos,
+      zoom: 14,
+      mapId: "DEMO_MAP_ID", // REQUIRED for AdvancedMarkerElement
     });
 
-    geocoderRef.current = new window.google.maps.Geocoder();
-
-    markerRef.current = new window.google.maps.Marker({
+    const marker = new AdvancedMarkerElement({
       map,
-      position: defaultLocation,
-      animation: window.google.maps.Animation.DROP,
+      position: initialPos,
+      gmpDraggable: true,
     });
+    markerRef.current = marker;
+
+    const geocoder = new Geocoder();
 
     /** Autocomplete */
     const input = document.getElementById("autocomplete") as HTMLInputElement;
-    const autocomplete = new window.google.maps.places.Autocomplete(input, {
-      fields: ["address_components", "geometry"],
+    const autocomplete = new Autocomplete(input, {
+      fields: ["address_components", "geometry", "name"],
       types: ["address"],
     });
 
+    autocomplete.bindTo("bounds", map);
+
     autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace();
-      if (!place.geometry) return;
+      if (!place.geometry?.location) return;
 
       const loc = place.geometry.location;
+      map.setCenter(loc);
+      map.setZoom(17);
+      marker.position = loc;
 
       setLocationCoordinates({ latitude: loc.lat(), longitude: loc.lng() });
-      updateMarker(map, loc);
-      fillAddressFields(place.address_components);
+      fillAddressFields(place.address_components || []);
     });
 
-    /** On Map Click */
-    map.addListener("click", (e: any) => {
+    /** Map Click */
+    map.addListener("click", async (e: any) => {
       const loc = e.latLng;
+      marker.position = loc;
       setLocationCoordinates({ latitude: loc.lat(), longitude: loc.lng() });
 
-      geocoderRef.current.geocode(
-        { location: loc },
-        (results: any, status: string) => {
-          if (status === "OK" && results[0]) {
-            updateMarker(map, loc);
-            fillAddressFields(results[0].address_components);
-          }
-        },
-      );
+      const { results } = await geocoder.geocode({ location: loc });
+      if (results && results[0]) {
+        fillAddressFields(results[0].address_components);
+      }
     });
 
     if (businessLocation) {
-      const loc = businessLocation;
       form.reset({
-        streetAddress: loc.street || "",
-        city: loc.city || "",
-        postalCode: loc.postalCode || "",
-        country: loc.country || "",
+        street: businessLocation.street || "",
+        city: businessLocation.city || "",
+        postalCode: businessLocation.postalCode || "",
+        country: businessLocation.country || "",
       });
-
-      if (loc.latitude && loc.longitude) {
-        const savedLoc = new window.google.maps.LatLng(
-          loc.latitude,
-          loc.longitude,
-        );
-        setLocationCoordinates({
-          latitude: loc.latitude,
-          longitude: loc.longitude,
-        });
-        updateMarker(map, savedLoc);
-      }
     }
-  }, [
-    businessLocation,
-    fillAddressFields,
-    form,
-    setLocationCoordinates,
-    updateMarker,
-  ]);
+  }, [businessLocation, fillAddressFields, setLocationCoordinates, form]);
 
-  /** --- Load Google Maps Script Once --- */
   useEffect(() => {
-    if (document.querySelector(`script[src="${GOOGLE_API_URL}"]`)) {
-      Promise.resolve().then(() => initializeMap());
-
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = GOOGLE_API_URL;
-    script.async = true;
-    script.onload = () => {
-      // Defer this as well
-      Promise.resolve().then(() => initializeMap());
+    (window as any).initMapCallback = () => {
+      initializeMap();
     };
-    document.body.appendChild(script);
+
+    const existingScript = document.querySelector(
+      `script[src="${GOOGLE_API_URL}"]`,
+    );
+
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = GOOGLE_API_URL;
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    } else if (window.google?.maps) {
+      initializeMap();
+    }
   }, [initializeMap]);
 
   return (
     <div className="space-y-6">
       <div className="relative">
-        <Search className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
+        <Search className="absolute left-3 top-3.5 text-gray-500 w-5 h-5" />
         <input
           id="autocomplete"
           placeholder="Search address here..."

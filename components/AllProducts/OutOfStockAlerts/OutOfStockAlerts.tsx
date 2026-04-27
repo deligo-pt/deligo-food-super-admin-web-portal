@@ -32,21 +32,21 @@ export default function OutOfStockAlerts({ productsData }: IProps) {
       {/* Alerts List */}
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
-          {productsData.data.map((product) => (
+          {productsData.data?.map((product) => (
             <ProductAlertCard key={product._id} product={product} />
           ))}
         </AnimatePresence>
 
         {productsData.meta?.total === 0 && (
           <div className="py-16 text-center bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div className="inline-flex p-4 bg-green-50 rounded-full text-green-500 mb-3">
+            <div className="inline-flex p-4 bg-green-50 rounded-full text-red-500 mb-3">
               <PackageX size={32} />
             </div>
             <h3 className="text-lg font-medium text-gray-900">
               All caught up!
             </h3>
             <p className="text-gray-500">
-              No products match your current alert filters.
+              No out of stock items match your current filters.
             </p>
           </div>
         )}

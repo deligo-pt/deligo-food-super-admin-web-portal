@@ -5,14 +5,7 @@ export type TPayout = {
   _id: string;
   payoutId: string;
 
-  amount: string;
-
-  bankDetails: {
-    iban: string;
-    accountHolderName: string;
-    bankName: string;
-    swiftCode: string;
-  };
+  amount: number;
 
   status: "PENDING" | "PROCESSING" | "PAID" | "FAILED";
   paymentMethod: "BANK_TRANSFER" | "MOBILE_BANKING" | "CASH";
@@ -24,7 +17,22 @@ export type TPayout = {
 
   payoutProof: string;
 
-  userId: unknown;
+  userId: {
+    userId: string;
+    name: {
+      firstName: string;
+      lastName: string;
+    };
+    email: string;
+    profilePhoto: string;
+    bankDetails: {
+      iban: string;
+      accountHolderName: string;
+      bankName: string;
+      swiftCode: string;
+    };
+  };
+
   userModel: "Vendor" | "DeliveryPartner" | "FleetManager";
 
   createdAt: string;

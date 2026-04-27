@@ -225,7 +225,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
       <div className="border-t border-gray-100 p-4 bg-gray-50/30 flex items-center justify-between">
         <span className="text-xs text-gray-400 flex items-center gap-1">
           <RefreshCw size={12} /> Last updated:{" "}
-          {format(product.meta.updatedAt, "do MMM yyyy")}
+          {format(product.updatedAt, "do MMM yyyy")}
         </span>
         <div>
           <Button className="bg-[#DC3173] text-white hover:bg-[#DC3173]/90 transition-colors shadow-sm shadow-[#DC3173]/20 flex items-center gap-2">

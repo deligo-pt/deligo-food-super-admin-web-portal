@@ -9,7 +9,6 @@ import {
   Hash,
   Loader2,
   Mail,
-  MapPin,
   Phone,
   Store,
   Truck,
@@ -118,9 +117,9 @@ export const InfoRow = ({
 export const RecipientCard = ({ payout }: { payout: TPayout }) => {
   if (payout.userModel === "Vendor") {
     const v = payout.userId as TVendor;
-    const fullAddress = v.businessLocation
-      ? `${v.businessLocation.street}, ${v.businessLocation.city}, ${v.businessLocation.country} ${v.businessLocation.postalCode}`
-      : null;
+    // const fullAddress = v.businessLocation
+    //   ? `${v.businessLocation.street}, ${v.businessLocation.city}, ${v.businessLocation.country} ${v.businessLocation.postalCode}`
+    //   : null;
 
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -132,11 +131,14 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
         </div>
         <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
           <div className="w-12 h-12 rounded-full bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] font-extrabold text-lg">
-            {v.businessDetails?.businessName?.charAt(0) ?? "V"}
+            {!v.name?.firstName && !v.name?.lastName && "V"}
+            {v.name?.firstName?.charAt(0)}
+            {v.name?.lastName?.charAt(0)}
           </div>
           <div>
             <h3 className="font-bold text-gray-900">
-              {v.businessDetails?.businessName ?? "Unknown Business"}
+              {!v.name?.firstName && !v.name?.lastName && "Unknown"}
+              {v.name?.firstName} {v.name?.lastName}
             </h3>
             <p className="text-xs text-gray-500 font-mono">ID: {v.userId}</p>
           </div>
@@ -157,13 +159,13 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
               value={v.businessDetails.businessLicenseNumber}
             />
           )}
-          {fullAddress && (
+          {/* {fullAddress && (
             <InfoRow
               icon={<MapPin size={16} />}
               label="Address"
               value={fullAddress}
             />
-          )}
+          )} */}
         </div>
       </div>
     );
@@ -174,16 +176,16 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
     const fullName =
       [d.name?.firstName, d.name?.lastName].filter(Boolean).join(" ") ||
       "Unknown";
-    const fullAddress = d.address
-      ? [
-          d.address.street,
-          d.address.city,
-          d.address.country,
-          d.address.postalCode,
-        ]
-          .filter(Boolean)
-          .join(", ")
-      : null;
+    // const fullAddress = d.address
+    //   ? [
+    //       d.address.street,
+    //       d.address.city,
+    //       d.address.country,
+    //       d.address.postalCode,
+    //     ]
+    //       .filter(Boolean)
+    //       .join(", ")
+    //   : null;
 
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -218,13 +220,13 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
               value={d.vehicleInfo.vehicleType}
             />
           )}
-          {fullAddress && (
+          {/* {fullAddress && (
             <InfoRow
               icon={<MapPin size={16} />}
               label="Address"
               value={fullAddress}
             />
-          )}
+          )} */}
         </div>
       </div>
     );
@@ -235,16 +237,16 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
     const fullName =
       [f.name?.firstName, f.name?.lastName].filter(Boolean).join(" ") ||
       "Unknown";
-    const fullAddress = f.address
-      ? [
-          f.address.street,
-          f.address.city,
-          f.address.country,
-          f.address.postalCode,
-        ]
-          .filter(Boolean)
-          .join(", ")
-      : null;
+    // const fullAddress = f.address
+    //   ? [
+    //       f.address.street,
+    //       f.address.city,
+    //       f.address.country,
+    //       f.address.postalCode,
+    //     ]
+    //       .filter(Boolean)
+    //       .join(", ")
+    //   : null;
 
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -272,13 +274,13 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
               value={f.contactNumber}
             />
           )}
-          {fullAddress && (
+          {/* {fullAddress && (
             <InfoRow
               icon={<MapPin size={16} />}
               label="Address"
               value={fullAddress}
             />
-          )}
+          )} */}
         </div>
       </div>
     );

@@ -2,7 +2,7 @@
 
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
-import { TOffer } from "@/types/offer.type";
+import { TOffer, TOfferAnalytics } from "@/types/offer.type";
 import { catchAsync } from "@/utils/catchAsync";
 
 export const createOfferReq = async (data: Partial<TOffer>) => {
@@ -74,4 +74,14 @@ export const getAllOffersReq = async (
   return {
     data: [],
   };
+};
+
+export const getOfferAnalyticsReq = async () => {
+  const result = await catchAsync<TOfferAnalytics>(async () => {
+    return await serverRequest.get("/analytics/offer-analytics");
+  });
+
+  if (result?.success) return result.data;
+
+  return {};
 };

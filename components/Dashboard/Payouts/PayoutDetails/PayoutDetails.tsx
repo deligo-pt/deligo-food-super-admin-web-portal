@@ -8,6 +8,7 @@ import {
 } from "@/components/Dashboard/Payouts/PayoutDetails/PayoutDetailsComponents";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TPayout } from "@/types/payout.type";
+import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -81,7 +82,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   Payout Amount
                 </p>
                 <p className="text-5xl font-extrabold text-gray-900">
-                  €{payout.amount}
+                  €{formatPrice(payout.amount)}
                 </p>
                 <div className="flex items-center gap-2 mt-3">
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#DC3173]/10 text-[#DC3173]">
@@ -134,7 +135,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   Account Holder
                 </p>
                 <p className="font-semibold text-gray-900">
-                  {payout.bankDetails.accountHolderName}
+                  {payout.userId?.bankDetails?.accountHolderName}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
@@ -142,7 +143,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   Bank Name
                 </p>
                 <p className="font-semibold text-gray-900">
-                  {payout.bankDetails.bankName}
+                  {payout.userId?.bankDetails?.bankName}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl sm:col-span-2">
@@ -150,7 +151,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   IBAN
                 </p>
                 <p className="font-mono font-semibold text-gray-900 tracking-wider">
-                  {payout.bankDetails.iban}
+                  {payout.userId?.bankDetails?.iban}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
@@ -158,7 +159,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   SWIFT / BIC
                 </p>
                 <p className="font-mono font-semibold text-gray-900">
-                  {payout.bankDetails.swiftCode}
+                  {payout.userId?.bankDetails?.swiftCode}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">

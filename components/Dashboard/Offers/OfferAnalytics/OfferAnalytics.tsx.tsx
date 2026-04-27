@@ -55,7 +55,7 @@ export default function OfferAnalytics({ analyticsData }: IProps) {
         description="The number of usages over time"
         data={analyticsData.usageOverTime || []}
         xLabel="Time"
-        yLabel="User Redemtions"
+        yLabel="User Redemptions"
         xKey="time"
         yKey="redemptions"
         delay={0.4}

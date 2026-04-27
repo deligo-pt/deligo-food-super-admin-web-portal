@@ -132,6 +132,10 @@
   /* Chrome, Safari, Opera */
 }
 
+.pac-container {
+  z-index: 9999 !important;
+}
+
 @media print {
   @page {
     size: landscape;

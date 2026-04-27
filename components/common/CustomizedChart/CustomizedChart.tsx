@@ -159,6 +159,8 @@ export default function CustomizedCharts<T>({
         }}
         style={{
           height,
+          minHeight: height,
+          width: "100%",
         }}
       >
         <ResponsiveContainer width="100%" height="100%">

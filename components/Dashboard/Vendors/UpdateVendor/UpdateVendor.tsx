@@ -650,6 +650,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
 
                     <BusinessLocationMap
                       form={form}
+                      businessLocation={vendor.businessLocation}
                       setLocationCoordinates={setLocationCoordinates}
                     />
                   </Card>
