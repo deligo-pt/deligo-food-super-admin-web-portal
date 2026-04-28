@@ -1,29 +1,19 @@
 export interface ISalesReportAnalytics {
-  summary: {
+  stats: {
     totalRevenue: number;
     completedOrders: number;
     cancelledOrders: number;
     avgOrderValue: number;
   };
-  revenueCards: {
-    thisWeek: number;
-    thisMonth: number;
-    topEarningDay: string;
-  };
-  charts: {
-    revenueTrend: {
-      date: string;
-      revenue: number;
-    }[];
-    // earningsByDay: {
-    //   date: string;
-    //   revenue: number;
-    // }[];
-  };
+
+  revenueTrend: {
+    time: string;
+    revenue: number;
+  }[];
 }
 
 export interface IOrderReportAnalytics {
-  summary: {
+  stats: {
     avgOrderValue: number;
     totalOrders: number;
     totalRevenue: number;
@@ -33,12 +23,13 @@ export interface IOrderReportAnalytics {
     value: number;
   }[];
   ordersTrend: {
-    date: string;
+    time: string;
     orders: number;
   }[];
-  revenueTrend: {
-    date: string;
-    revenue: number;
+  zoneHeatmap: {
+    zone: string;
+    hour: number;
+    orderCount: number;
   }[];
 }
 

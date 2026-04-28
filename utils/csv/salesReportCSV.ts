@@ -7,25 +7,18 @@ export function generateSalesReportCSV(data: ISalesReportAnalytics) {
 
   /* ===== SECTION 1: SUMMARY ===== */
   rows.push(["--- SALES SUMMARY ---"]);
-  rows.push(["Total Revenue", formatPrice(data.summary.totalRevenue)]);
-  rows.push(["Completed Orders", data.summary.completedOrders]);
-  rows.push(["Cancelled Orders", data.summary.cancelledOrders]);
-  rows.push(["Average Order Value", formatPrice(data.summary.avgOrderValue)]);
+  rows.push(["Total Revenue", formatPrice(data.stats?.totalRevenue)]);
+  rows.push(["Completed Orders", data.stats?.completedOrders]);
+  rows.push(["Cancelled Orders", data.stats?.cancelledOrders]);
+  rows.push(["Average Order Value", formatPrice(data.stats?.avgOrderValue)]);
   rows.push([]);
 
-  /* ===== SECTION 2: REVENUE CARDS ===== */
-  rows.push(["--- REVENUE HIGHLIGHTS ---"]);
-  rows.push(["This Week Revenue", formatPrice(data.revenueCards.thisWeek)]);
-  rows.push(["This Month Revenue", formatPrice(data.revenueCards.thisMonth)]);
-  rows.push(["Top Earning Day", data.revenueCards.topEarningDay]);
-  rows.push([]);
-
-  /* ===== SECTION 4: REVENUE TREND ===== */
+  /* ===== SECTION 2: REVENUE TREND ===== */
   rows.push(["--- REVENUE TREND ---"]);
-  rows.push(["Date", "Revenue"]);
+  rows.push(["Time", "Revenue"]);
 
-  data.charts.revenueTrend.forEach((item) => {
-    rows.push([item.date, formatPrice(item.revenue)]);
+  data.revenueTrend?.forEach((item) => {
+    rows.push([item.time, formatPrice(item.revenue)]);
   });
 
   /* ===== BUILD CSV ===== */

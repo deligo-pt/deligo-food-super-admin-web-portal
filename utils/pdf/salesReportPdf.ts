@@ -83,44 +83,20 @@ export const generateSalesReportPDF = (sales: ISalesReportAnalytics) => {
   doc.setFontSize(10);
 
   doc.text(
-    `Total Revenue: €${formatPrice(sales.summary.totalRevenue || 0)}`,
+    `Total Revenue: €${formatPrice(sales.stats?.totalRevenue || 0)}`,
     marginX,
     y,
   );
   y += 5;
-  doc.text(`Completed Orders: ${sales.summary.completedOrders}`, marginX, y);
+  doc.text(`Completed Orders: ${sales.stats?.completedOrders}`, marginX, y);
   y += 5;
-  doc.text(`Cancelled Orders: ${sales.summary.cancelledOrders}`, marginX, y);
+  doc.text(`Cancelled Orders: ${sales.stats?.cancelledOrders}`, marginX, y);
   y += 5;
   doc.text(
-    `Average Order Value: €${formatPrice(sales.summary.avgOrderValue || 0)}`,
+    `Average Order Value: €${formatPrice(sales.stats?.avgOrderValue || 0)}`,
     marginX,
     y,
   );
-
-  // revenue cards
-  y += 10;
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.text("Revenue Highlights", marginX, y);
-
-  y += 6;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-
-  doc.text(
-    `This Week: €${formatPrice(sales.revenueCards.thisWeek || 0)}`,
-    marginX,
-    y,
-  );
-  y += 5;
-  doc.text(
-    `This Month: €${formatPrice(sales.revenueCards.thisMonth || 0)}`,
-    marginX,
-    y,
-  );
-  y += 5;
-  doc.text(`Top Earning Day: ${sales.revenueCards.topEarningDay}`, marginX, y);
 
   // Revenue trends
   y += 10;
@@ -132,11 +108,8 @@ export const generateSalesReportPDF = (sales: ISalesReportAnalytics) => {
 
   autoTable(doc, {
     startY: y,
-    head: [["Date", "Revenue (€)"]],
-    body: sales.charts.revenueTrend.map((d) => [
-      d.date,
-      formatPrice(d.revenue || 0),
-    ]),
+    head: [["Time", "Revenue (€)"]],
+    body: sales.revenueTrend?.map((d) => [d.time, formatPrice(d.revenue || 0)]),
     styles: {
       fontSize: 9,
       cellPadding: 3,

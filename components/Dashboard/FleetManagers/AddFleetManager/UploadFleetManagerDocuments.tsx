@@ -1,5 +1,6 @@
 "use client";
 
+import { TFleetDocKey } from "@/types/document.type";
 import { uploadUserDocumentsReq } from "@/utils/uploadUserDocument";
 import { motion } from "framer-motion";
 import { Eye, File, FileText, ImageIcon, UploadCloud } from "lucide-react";
@@ -7,10 +8,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
-type DocKey = "businessLicense" | "idProof";
-
 const DOCUMENTS: {
-  key: DocKey;
+  key: TFleetDocKey;
   label: string;
   prefersImagePreview: boolean;
 }[] = [
@@ -19,8 +18,31 @@ const DOCUMENTS: {
     label: "Business License",
     prefersImagePreview: false,
   },
-  { key: "idProof", label: "ID Proof", prefersImagePreview: true },
+  { key: "idProofFront", label: "ID Proof", prefersImagePreview: true },
+  { key: "idProofBack", label: "ID Proof", prefersImagePreview: true },
+  { key: "myPhoto", label: "Fleet Manager Photo", prefersImagePreview: true },
 ];
+
+const linkToFilePreviews = (prevDocuments: Record<TFleetDocKey, string>) => {
+  const savedPreviews: Record<TFleetDocKey, FilePreview | null> = {} as Record<
+    TFleetDocKey,
+    FilePreview | null
+  >;
+
+  const docs = prevDocuments || {};
+  (Object.keys(docs) as TFleetDocKey[]).forEach((key) => {
+    const url = docs[key];
+    if (url) {
+      savedPreviews[key] = {
+        file: null,
+        url: url || "",
+        isImage: /\.(jpg|jpeg|png|gif|webp)$/i.test(url),
+      };
+    }
+  });
+
+  return savedPreviews;
+};
 
 type FilePreview = {
   file: File | null;
@@ -30,21 +52,31 @@ type FilePreview = {
 
 export default function UploadFleetManagerDocuments({
   fleetManagerId,
+  prevDocuments,
 }: {
   fleetManagerId: string;
+  prevDocuments?: Record<TFleetDocKey, string>;
 }) {
-  const [previews, setPreviews] = useState<Record<DocKey, FilePreview | null>>({
-    businessLicense: null,
-    idProof: null,
-  });
+  const [previews, setPreviews] = useState<
+    Record<TFleetDocKey, FilePreview | null>
+  >(
+    prevDocuments
+      ? linkToFilePreviews(prevDocuments)
+      : {
+          businessLicense: null,
+          idProofFront: null,
+          idProofBack: null,
+          myPhoto: null,
+        },
+  );
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const openPicker = (key: DocKey) => {
+  const openPicker = (key: TFleetDocKey) => {
     const el = inputsRef.current[key];
     el?.click();
   };
 
-  const handleFileChange = async (key: DocKey, f?: File | null) => {
+  const handleFileChange = async (key: TFleetDocKey, f?: File | null) => {
     if (!f) return;
     const isImage = f.type.startsWith("image/");
     const url = URL.createObjectURL(f);
@@ -75,7 +107,7 @@ export default function UploadFleetManagerDocuments({
     console.log(result);
   };
 
-  const removeFile = (key: DocKey) => {
+  const removeFile = (key: TFleetDocKey) => {
     const prev = previews[key];
     if (prev && prev.url) URL.revokeObjectURL(prev.url);
     setPreviews((p) => ({ ...p, [key]: null }));

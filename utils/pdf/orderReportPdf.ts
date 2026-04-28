@@ -85,19 +85,19 @@ export const generateOrderReportPDF = (
   doc.setFontSize(10);
 
   doc.text(
-    `Total Revenue: €${formatPrice(orderReportData.summary.totalRevenue || 0)}`,
+    `Total Revenue: €${formatPrice(orderReportData.stats?.totalRevenue || 0)}`,
     marginX,
     y,
   );
   y += 5;
   doc.text(
-    `Completed Orders: ${orderReportData.summary.totalOrders}`,
+    `Completed Orders: ${orderReportData.stats?.totalOrders}`,
     marginX,
     y,
   );
   y += 5;
   doc.text(
-    `Average Order Value: €${formatPrice(orderReportData.summary.avgOrderValue || 0)}`,
+    `Average Order Value: €${formatPrice(orderReportData.stats?.avgOrderValue || 0)}`,
     marginX,
     y,
   );
@@ -112,8 +112,8 @@ export const generateOrderReportPDF = (
 
   autoTable(doc, {
     startY: y,
-    head: [["Date", "Orders"]],
-    body: orderReportData.ordersTrend?.map((d) => [d.date, d.orders]),
+    head: [["Time", "Orders"]],
+    body: orderReportData.ordersTrend?.map((d) => [d.time, d.orders]),
     styles: {
       fontSize: 9,
       cellPadding: 3,
@@ -129,21 +129,48 @@ export const generateOrderReportPDF = (
     margin: { left: marginX, right: marginX },
   });
 
-  // Revenue trends
-  y += 5 * (orderReportData.revenueTrend.length || 0);
-
+  // Orders By Zone
+  y += 20 + orderReportData.ordersTrend?.length * 10;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text("Revenue Trend", marginX, y);
+  doc.text("Orders By Zone", marginX, y);
 
   y += 4;
 
   autoTable(doc, {
     startY: y,
-    head: [["Date", "Revenue (€)"]],
-    body: orderReportData.revenueTrend.map((d) => [
-      d.date,
-      formatPrice(d.revenue || 0),
+    head: [["Zone", "Orders"]],
+    body: orderReportData.ordersByZone?.map((d) => [d.label, d.value]),
+    styles: {
+      fontSize: 9,
+      cellPadding: 3,
+    },
+    headStyles: {
+      fillColor: [220, 49, 115],
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+    },
+    alternateRowStyles: {
+      fillColor: [245, 245, 245],
+    },
+    margin: { left: marginX, right: marginX },
+  });
+
+  // Zone Heatmap
+  y += 20 + orderReportData.ordersByZone?.length * 10;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Zone Heatmap", marginX, y);
+
+  y += 4;
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Zone", "Hour", "Orders"]],
+    body: orderReportData.zoneHeatmap?.map((d) => [
+      d.zone,
+      d.hour,
+      d.orderCount,
     ]),
     styles: {
       fontSize: 9,

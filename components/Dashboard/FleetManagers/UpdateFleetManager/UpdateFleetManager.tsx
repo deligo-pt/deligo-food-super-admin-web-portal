@@ -1,7 +1,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadVendorDocuments from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
+import UploadFleetManagerDocuments from "@/components/Dashboard/FleetManagers/AddFleetManager/UploadFleetManagerDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,22 +15,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
-import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
-import { TBusinessCategory } from "@/types/category.type";
-import { TVendorDocKey } from "@/types/document.type";
-import { TVendor } from "@/types/user.type";
-import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
+import { TFleetDocKey } from "@/types/document.type";
+import { TAgent } from "@/types/user.type";
+import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import parsePhoneNumberFromString from "libphonenumber-js";
@@ -44,64 +35,50 @@ import { toast } from "sonner";
 import z from "zod";
 
 const DELIGO = "#DC3173";
+
 interface IProps {
-  businessCategories: TBusinessCategory[];
-  vendor: TVendor;
+  fleetManager: TAgent;
 }
 
-type TVendorForm = z.infer<typeof addVendorValidation>;
+type TFleetManagerForm = z.infer<typeof addFleetManagerValidation>;
 
-export default function UpdateVendor({ businessCategories, vendor }: IProps) {
+export default function UpdateFleetManager({ fleetManager }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const [locationCoordinates, setLocationCoordinates] = useState({
-    latitude: vendor.businessLocation?.latitude || 0,
-    longitude: vendor.businessLocation?.longitude || 0,
+    latitude: 0,
+    longitude: 0,
   });
-  const daysOfWeek = [
-    t("sunday"),
-    t("monday"),
-    t("tuesday"),
-    t("wednesday"),
-    t("thursday"),
-    t("friday"),
-    t("saturday"),
-  ];
-  const phone = parsePhoneNumberFromString(vendor.contactNumber || "");
 
-  const form = useForm<TVendorForm>({
-    resolver: zodResolver(addVendorValidation),
+  const phone = parsePhoneNumberFromString(fleetManager.contactNumber || "");
+
+  const form = useForm<TFleetManagerForm>({
+    resolver: zodResolver(addFleetManagerValidation),
     defaultValues: {
-      firstName: vendor.name?.firstName || "",
-      lastName: vendor.name?.lastName || "",
+      firstName: fleetManager.name?.firstName || "",
+      lastName: fleetManager.name?.lastName || "",
       prefixPhoneNumber: phone?.countryCallingCode
         ? `+${phone?.countryCallingCode}`
         : "+351",
       phoneNumber: phone?.nationalNumber || "",
-      businessName: vendor.businessDetails?.businessName || "",
-      businessType: vendor.businessDetails?.businessType || "",
+      businessName: fleetManager.businessDetails?.businessName || "",
       businessLicenseNumber:
-        vendor.businessDetails?.businessLicenseNumber || "",
-      NIF: vendor.businessDetails?.NIF || "",
-      branches: vendor.businessDetails?.totalBranches?.toString() || "1",
-      openingHours: vendor.businessDetails?.openingHours || "",
-      closingHours: vendor.businessDetails?.closingHours || "",
-      closingDays: vendor.businessDetails?.closingDays || [],
-      street: vendor.businessLocation?.street || "",
-      city: vendor.businessLocation?.city || "",
-      postalCode: vendor.businessLocation?.postalCode || "",
-      country: vendor.businessLocation?.country || "",
-      bankName: vendor.bankDetails?.bankName || "",
-      accountHolderName: vendor.bankDetails?.accountHolderName || "",
-      iban: vendor.bankDetails?.iban || "",
-      swiftCode: vendor.bankDetails?.swiftCode || "",
+        fleetManager.businessDetails?.businessLicenseNumber || "",
+      street: fleetManager.businessLocation?.street || "",
+      city: fleetManager.businessLocation?.city || "",
+      postalCode: fleetManager.businessLocation?.postalCode || "",
+      country: fleetManager.businessLocation?.country || "",
+      bankName: fleetManager.bankDetails?.bankName || "",
+      accountHolderName: fleetManager.bankDetails?.accountHolderName || "",
+      iban: fleetManager.bankDetails?.iban || "",
+      swiftCode: fleetManager.bankDetails?.swiftCode || "",
     },
   });
 
-  const onSubmit = async (data: TVendorForm) => {
-    const toastId = toast.loading("Updating vendor data...");
+  const onSubmit = async (data: TFleetManagerForm) => {
+    const toastId = toast.loading("Adding fleet manager...");
 
-    const vendorData = {
+    const fleetManagerData = {
       name: {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -109,13 +86,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       contactNumber: data.phoneNumber,
       businessDetails: {
         businessName: data.businessName,
-        businessType: data.businessType,
-        NIF: data.NIF?.toUpperCase(),
         businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
-        totalBranches: Number(data.branches),
-        openingHours: data.openingHours,
-        closingHours: data.closingHours,
-        closingDays: data.closingDays,
       },
       businessLocation: {
         street: data.street,
@@ -131,24 +102,24 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
         iban: data.iban,
         swiftCode: data.swiftCode,
       },
-    } as Partial<TVendor>;
+    } as Partial<TAgent>;
 
     const updatedResult = await updateUserDataReq(
-      `/vendors/${vendor.userId}`,
-      vendorData,
+      `/fleet-managers/${fleetManager.userId}`,
+      fleetManagerData,
     );
 
     if (updatedResult.success) {
-      if (vendor.status !== USER_STATUS.APPROVED) {
-        const approveResult = await approveOrRejectReq(vendor.userId, {
-          status: USER_STATUS.APPROVED,
+      if (fleetManager.status !== USER_STATUS.APPROVED) {
+        const approveResult = await approveOrRejectReq(fleetManager.userId, {
+          status: "APPROVED",
         });
 
         if (approveResult.success) {
           form.reset();
           router.refresh();
           toast.success(
-            approveResult.message || "Vendor updated successfully!",
+            approveResult.message || "Fleet manager added successfully!",
             {
               id: toastId,
             },
@@ -156,7 +127,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
           return;
         }
 
-        toast.error(approveResult.message || "Vendor updated failed", {
+        toast.error(approveResult.message || "Fleet manager add failed", {
           id: toastId,
         });
         console.log(approveResult);
@@ -170,7 +141,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       return;
     }
 
-    toast.error(updatedResult.message || "Vendor updated failed", {
+    toast.error(updatedResult.message || "Fleet manager add failed", {
       id: toastId,
     });
     console.log(updatedResult);
@@ -183,8 +154,8 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
         className="min-h-screen bg-slate-50"
       >
         <TitleHeader
-          title="Edit Vendor Details"
-          subtitle="Update vendor details and information"
+          title="Edit Fleet Manager Details"
+          subtitle="Update fleet manager details and information"
           onBackClick={() => router.back()}
         />
 
@@ -192,6 +163,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
           {/* Left Section - Registration Data */}
           <div className="space-y-8">
             {/* Account Information */}
+
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -241,8 +213,8 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
-                        placeholder={t("vendor_email")}
-                        value={vendor.email}
+                        placeholder={t("fleet_manager_email")}
+                        value={fleetManager.email}
                         disabled
                       />
                     </div>
@@ -316,7 +288,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
               </Card>
             </motion.div>
             <AnimatePresence>
-              {vendor.userId && (
+              {fleetManager.userId && (
                 <>
                   {/* Business Details */}
                   <motion.div
@@ -354,46 +326,6 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
 
                         <FormField
                           control={form.control}
-                          name="businessType"
-                          render={({ field, fieldState }) => (
-                            <FormItem>
-                              <FormLabel>{t("business_type")}</FormLabel>
-                              <FormControl>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                >
-                                  <SelectTrigger
-                                    className={cn(
-                                      "w-full",
-                                      fieldState.invalid
-                                        ? "border-red-500"
-                                        : "",
-                                    )}
-                                  >
-                                    <SelectValue
-                                      placeholder={t("select_business_type")}
-                                    />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {businessCategories?.map((category) => (
-                                      <SelectItem
-                                        key={category._id}
-                                        value={category.name}
-                                      >
-                                        {category.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
                           name="businessLicenseNumber"
                           render={({ field }) => (
                             <FormItem>
@@ -406,126 +338,6 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                                   {...field}
                                 />
                               </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="NIF"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("nif")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("tax_identification_number")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="branches"
-                          render={({ field }) => (
-                            <FormItem className="col-span-2">
-                              <FormLabel>{t("total_branches")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder={t("total_branches")}
-                                  {...field}
-                                  min={0}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="openingHours"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="relative">
-                                <FormLabel className="mb-2">
-                                  {t("opening_hours")}
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="time"
-                                    placeholder="e.g. 09:00 AM"
-                                    {...field}
-                                  />
-                                </FormControl>
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="closingHours"
-                          render={({ field }) => (
-                            <FormItem>
-                              <div className="relative">
-                                <FormLabel className="mb-2">
-                                  {t("closing_hours")}
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="time"
-                                    placeholder="e.g. 09:00 AM"
-                                    {...field}
-                                  />
-                                </FormControl>
-                              </div>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="closingDays"
-                          render={({ field }) => (
-                            <FormItem className="col-span-2">
-                              <div>
-                                <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                  {t("closing_days")}
-                                </FormLabel>
-                                <div className="flex flex-wrap gap-2">
-                                  {daysOfWeek.map((day) => (
-                                    <motion.button
-                                      key={day}
-                                      type="button"
-                                      onClick={() => {
-                                        field.onChange(
-                                          field.value?.includes(day)
-                                            ? field.value?.filter(
-                                                (d) => d !== day,
-                                              )
-                                            : [...field.value, day],
-                                        );
-                                      }}
-                                      whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
-                                        field.value.includes(day)
-                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                      }`}
-                                    >
-                                      {day}
-                                    </motion.button>
-                                  ))}
-                                </div>
-                              </div>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -627,7 +439,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
 
           {/* Right Section - Business Location + Documents */}
           <AnimatePresence>
-            {vendor.userId && (
+            {fleetManager.userId && (
               <div className="space-y-8">
                 {/* Business Location */}
                 <motion.div
@@ -643,13 +455,14 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      {/* <Banknote className="w-5 h-5" /> 4. Bank & Payment
+                      Information */}
                       <Banknote className="w-5 h-5" /> 4.{" "}
                       {t("business_location_information")}
                     </h2>
 
                     <BusinessLocationMap
                       form={form}
-                      businessLocation={vendor.businessLocation}
                       setLocationCoordinates={setLocationCoordinates}
                     />
                   </Card>
@@ -673,10 +486,10 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                       {t("documents_nd_verification")}
                     </h2>
 
-                    <UploadVendorDocuments
-                      vendorId={vendor.userId}
+                    <UploadFleetManagerDocuments
+                      fleetManagerId={fleetManager.userId}
                       prevDocuments={
-                        vendor.documents as Record<TVendorDocKey, string>
+                        fleetManager.documents as Record<TFleetDocKey, string>
                       }
                     />
                   </Card>
@@ -687,13 +500,13 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
         </div>
 
         {/* SUBMIT BUTTON */}
-        {vendor.userId && (
+        {fleetManager.userId && (
           <div className="mt-10 flex justify-end">
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
             >
-              {t("submit_vendor")}
+              {t("submit_fleetManager")}
             </Button>
           </div>
         )}

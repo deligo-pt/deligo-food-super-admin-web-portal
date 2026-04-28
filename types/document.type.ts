@@ -1,4 +1,4 @@
-export type DocKey =
+export type TVendorDocKey =
   | "businessLicenseDoc"
   | "taxDoc"
   | "idProofFront"
@@ -6,7 +6,13 @@ export type DocKey =
   | "storePhoto"
   | "menuUpload";
 
-export type FilePreview = {
+export type TFleetDocKey =
+  | "myPhoto"
+  | "businessLicense"
+  | "idProofFront"
+  | "idProofBack";
+
+export type TFilePreview = {
   file: File | null;
   url: string | null;
   isImage: boolean;

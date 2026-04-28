@@ -1,9 +1,9 @@
 "use client";
 
-import { BarChart, PieChart, Search } from "lucide-react";
-
 import CustomizedCharts from "@/components/common/CustomizedChart/CustomizedChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
+import OrderReportZoneCard from "@/components/Dashboard/Reports/OrderReport/OrderReportZoneCard";
+import ZoneHeatmap from "@/components/Dashboard/Reports/OrderReport/ZoneHeatmap";
 import ExportPopover from "@/components/ExportPopover/ExportPopover";
 import {
   SelectCustomDateFilter,
@@ -15,6 +15,8 @@ import { IOrderReportAnalytics } from "@/types/report.type";
 import { generateOrderReportCSV } from "@/utils/csv/orderReportCSV";
 import { formatPrice } from "@/utils/formatPrice";
 import { generateOrderReportPDF } from "@/utils/pdf/orderReportPdf";
+import { motion } from "framer-motion";
+import { BarChart, PieChart, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -31,95 +33,97 @@ const OrderReport = ({ orderReportAnalytics }: IProps) => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-20">
-      <div>
-        {/* Header */}
-        <TitleHeader
-          title={t("order_report")}
-          subtitle={t("full_analytics_performance_insights")}
-          extraComponent={
-            <div className="flex items-center gap-3">
-              {/* Date Filter */}
-              <SelectDateRangeFilter
-                placeholder="Select Date Range"
-                onCustomRangeSelect={() => setIsCustomDate(true)}
-              />
+    <div className="min-h-screen">
+      {/* Header */}
+      <TitleHeader
+        title={t("order_report")}
+        subtitle={t("full_analytics_performance_insights")}
+        extraComponent={
+          <div className="flex items-center gap-3">
+            {/* Date Filter */}
+            <SelectDateRangeFilter
+              placeholder="Select Date Range"
+              onCustomRangeSelect={() => setIsCustomDate(true)}
+            />
 
-              <ExportPopover
-                onPDFClick={() => generateOrderReportPDF(orderReportAnalytics)}
-                onCSVClick={() => generateOrderReportCSV(orderReportAnalytics)}
-              />
-            </div>
-          }
-        />
-
-        {/* Custom Date Filter */}
-        {isCustomDate && (
-          <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
-        )}
-
-        {/* filtering */}
-        {/* <div className="flex flex-row justify-end items-end mb-6">
-          <div>
-            <SelectFilter
-              paramName="timeframe"
-              options={daysOption}
-              placeholder="Timeframe"
+            <ExportPopover
+              onPDFClick={() => generateOrderReportPDF(orderReportAnalytics)}
+              onCSVClick={() => generateOrderReportCSV(orderReportAnalytics)}
             />
           </div>
-        </div> */}
+        }
+      />
 
-        {/* Metrics */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <StatsCard
-            title={t("total_revenue")}
-            value={`€${formatPrice(orderReportAnalytics.summary.totalRevenue || 0)}`}
-            icon={BarChart}
-            delay={0}
-          />
-          <StatsCard
-            title={t("total_orders")}
-            value={`${orderReportAnalytics.summary.totalOrders || 0}`}
-            icon={PieChart}
-            delay={0.1}
-          />
-          <StatsCard
-            title={t("avg_order")}
-            value={`€${formatPrice(orderReportAnalytics.summary.avgOrderValue || 0)}`}
-            icon={Search}
-            delay={0.2}
-          />
-        </section>
+      {/* Custom Date Filter */}
+      {isCustomDate && (
+        <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
+      )}
 
-        {/* Charts grid */}
-        <section className="grid grid-cols-1 gap-6">
-          {/* Bar - Orders Trend */}
-          <CustomizedCharts
-            title="Orders Trend"
-            description="Number of orders by zone"
-            data={orderReportAnalytics.ordersByZone || []}
-            xLabel="Zones"
-            yLabel="No of Orders"
-            delay={0.2}
-            xKey="zone"
-            yKey="orders"
-          />
+      {/* Metrics */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <StatsCard
+          title={t("total_revenue")}
+          value={`€${formatPrice(orderReportAnalytics.stats?.totalRevenue || 0)}`}
+          icon={BarChart}
+          delay={0}
+        />
+        <StatsCard
+          title={t("total_orders")}
+          value={`${orderReportAnalytics.stats?.totalOrders || 0}`}
+          icon={PieChart}
+          delay={0.1}
+        />
+        <StatsCard
+          title={t("avg_order")}
+          value={`€${formatPrice(orderReportAnalytics.stats?.avgOrderValue || 0)}`}
+          icon={Search}
+          delay={0.2}
+        />
+      </section>
 
-          {/* Area - Revenue trend */}
-          <CustomizedCharts
-            type="area"
-            title={t("revenue_trend")}
-            description="Revenue over time"
-            data={orderReportAnalytics.revenueTrend || []}
-            xLabel="Date"
-            yLabel="Revenue (€)"
-            delay={0.2}
-            xKey="date"
-            yKey="revenue"
-            yLabelCustomizedValue={(val) => formatPrice(val as number)}
-          />
-        </section>
-      </div>
+      {/* Bar Chart - Orders Trend */}
+      <CustomizedCharts
+        title="Orders Trend"
+        description=""
+        data={orderReportAnalytics.ordersTrend || []}
+        xLabel="Time"
+        yLabel="No of Orders"
+        delay={0.3}
+        xKey="time"
+        yKey="orders"
+      />
+
+      {/* Orders By Zone */}
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          delay: 0.4,
+        }}
+        className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
+      >
+        <h3 className="text-lg font-bold text-gray-900 mb-6">Orders By Zone</h3>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {orderReportAnalytics.ordersByZone.map((zone, i) => (
+            <OrderReportZoneCard
+              key={zone.label}
+              zone={zone.label}
+              orders={zone.value}
+              delay={0.6 + i * 0.1}
+            />
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Zone Heatmap */}
+      <ZoneHeatmap zoneHeatmap={orderReportAnalytics.zoneHeatmap} />
     </div>
   );
 };

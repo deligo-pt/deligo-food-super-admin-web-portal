@@ -6,7 +6,6 @@ import {
   SelectCustomDateFilter,
   SelectDateRangeFilter,
 } from "@/components/Filtering/SelectDateRangeFilter";
-import SelectFilter from "@/components/Filtering/SelectFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { ISalesReportAnalytics } from "@/types/report.type";
@@ -17,12 +16,6 @@ import { motion } from "framer-motion";
 import { BarChart2, CheckCircle, FileText, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-
-const daysOption = [
-  { label: "Last 7 days", value: "last7days" },
-  { label: "Last 14 days", value: "last14days" },
-  { label: "Last 30 days", value: "last30days" },
-];
 
 interface IProps {
   salesReportAnalytics: ISalesReportAnalytics;
@@ -66,40 +59,29 @@ const SalesReport = ({ salesReportAnalytics }: IProps) => {
           <SelectCustomDateFilter onClear={() => setIsCustomDate(false)} />
         )}
 
-        {/* filtering */}
-        <div className="flex flex-row justify-end items-end mb-6">
-          <div>
-            <SelectFilter
-              paramName="timeframe"
-              options={daysOption}
-              placeholder="Timeframe"
-            />
-          </div>
-        </div>
-
         {/* Metrics cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatsCard
             title={t("total_revenue")}
-            value={`€${formatPrice(salesReportAnalytics.summary.totalRevenue || 0)}`}
+            value={`€${formatPrice(salesReportAnalytics.stats?.totalRevenue || 0)}`}
             icon={BarChart2}
             delay={0}
           />
           <StatsCard
             title={t("completed_orders")}
-            value={salesReportAnalytics.summary.completedOrders || 0}
+            value={salesReportAnalytics.stats?.completedOrders || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
             title={t("cancelled")}
-            value={salesReportAnalytics.summary.cancelledOrders || 0}
+            value={salesReportAnalytics.stats?.cancelledOrders || 0}
             icon={X}
             delay={0.2}
           />
           <StatsCard
             title={t("avg_order")}
-            value={`€${formatPrice(salesReportAnalytics.summary.avgOrderValue || 0)}`}
+            value={`€${formatPrice(salesReportAnalytics.stats?.avgOrderValue || 0)}`}
             icon={FileText}
             delay={0.3}
           />
@@ -116,17 +98,18 @@ const SalesReport = ({ salesReportAnalytics }: IProps) => {
             <CustomizedCharts
               title={t("revenue")}
               description="Sales over time"
-              data={salesReportAnalytics?.charts?.revenueTrend || []}
-              xLabel="Date"
+              data={salesReportAnalytics?.revenueTrend || []}
+              xLabel="Time"
+              yLabel="Revenue(€)"
               delay={0.4}
-              xKey="date"
+              xKey="time"
               yKey="revenue"
               isBGNeed={false}
               yAxisCustomizedValue={(val) => `€${formatPrice(val as number)}`}
               yLabelCustomizedValue={(val) => formatPrice(val as number)}
             />
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:text-center">
+            {/* <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:text-center">
               <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-900/40">
                 <p className="text-xs text-gray-500">{t("this_week")}</p>
                 <p className="font-semibold mt-1">
@@ -151,7 +134,7 @@ const SalesReport = ({ salesReportAnalytics }: IProps) => {
                   {salesReportAnalytics?.revenueCards?.topEarningDay || "N/A"}
                 </p>
               </div>
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </div>

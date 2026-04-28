@@ -17,6 +17,7 @@ import {
   BriefcaseIcon,
   BuildingIcon,
   CheckIcon,
+  EditIcon,
   FileTextIcon,
   MapPinIcon,
   TrashIcon,
@@ -158,6 +159,12 @@ export default function FleetManagerDetails({ agent }: IProps) {
         <div className="p-6">
           <div className="mb-6 border-gray-200">
             <div className="flex flex-wrap justify-end gap-4">
+              <ActionButton
+                onClick={() => router.push("/admin/agent/edit/" + agent.userId)}
+                label="Edit"
+                icon={<EditIcon size={18} />}
+                variant="primary"
+              />
               {agent?.status === "SUBMITTED" && (
                 <>
                   <ActionButton

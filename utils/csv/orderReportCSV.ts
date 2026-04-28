@@ -7,27 +7,37 @@ export function generateOrderReportCSV(data: IOrderReportAnalytics) {
 
   /* ===== SECTION 1: SUMMARY ===== */
   rows.push(["--- ORDER SUMMARY ---"]);
-  rows.push(["Total Orders", data.summary.totalOrders]);
-  rows.push(["Total Revenue", formatPrice(data.summary.totalRevenue)]);
-  rows.push(["Average Order Value", formatPrice(data.summary.avgOrderValue)]);
+  rows.push(["Total Orders", data.stats?.totalOrders]);
+  rows.push(["Total Revenue", formatPrice(data.stats?.totalRevenue)]);
+  rows.push(["Average Order Value", formatPrice(data.stats?.avgOrderValue)]);
   rows.push([]);
 
   /* ===== SECTION 2: ORDERS TREND ===== */
   rows.push(["--- ORDERS TREND ---"]);
-  rows.push(["Date", "Orders"]);
+  rows.push(["Time", "Orders"]);
 
-  data.ordersTrend.forEach((item) => {
-    rows.push([item.date, item.orders]);
+  data.ordersTrend?.forEach((item) => {
+    rows.push([item.time, item.orders]);
   });
 
   rows.push([]);
 
-  /* ===== SECTION 3: REVENUE TREND ===== */
-  rows.push(["--- REVENUE TREND ---"]);
-  rows.push(["Date", "Revenue"]);
+  /* ===== SECTION 3: ORDERS BY ZONE ===== */
+  rows.push(["--- ORDERS BY ZONE ---"]);
+  rows.push(["Zone", "Orders"]);
 
-  data.revenueTrend.forEach((item) => {
-    rows.push([item.date, item.revenue]);
+  data.ordersByZone?.forEach((item) => {
+    rows.push([item.label, item.value]);
+  });
+
+  rows.push([]);
+
+  /* ===== SECTION 4: Zone Heat Map ===== */
+  rows.push(["--- Zone Heat Map ---"]);
+  rows.push(["Zone", "Hour", "Orders"]);
+
+  data.zoneHeatmap?.forEach((item) => {
+    rows.push([item.zone, item.hour, item.orderCount]);
   });
 
   rows.push([]);

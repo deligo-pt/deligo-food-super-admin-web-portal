@@ -161,9 +161,15 @@ export default function CustomizedCharts<T>({
           height,
           minHeight: height,
           width: "100%",
+          minWidth: 0,
         }}
       >
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minHeight={height}
+          debounce={100}
+        >
           {type === "bar" && (
             <BarChart data={data} margin={chartMargin}>
               {axisesComponents()}

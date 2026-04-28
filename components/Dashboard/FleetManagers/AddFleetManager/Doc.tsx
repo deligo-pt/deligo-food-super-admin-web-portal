@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
+import { TFilePreview, TFleetDocKey } from "@/types/document.type";
 import { motion } from "framer-motion";
 import {
   Eye,
@@ -11,55 +13,48 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-
-import { useTranslation } from "@/hooks/use-translation";
-import { TFilePreview, TVendorDocKey } from "@/types/document.type";
 import { toast } from "sonner";
 
-export default function UploadVendorDocuments(
+export default function UploadFleetManagerDocuments(
   {
-    // vendorId,
+    // fleetManagerId,
   }: {
-    vendorId: string;
+    fleetManagerId: string;
   },
 ) {
   const { t } = useTranslation();
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
 
   const [previews, setPreviews] = useState<
-    Record<TVendorDocKey, TFilePreview[] | null>
+    Record<TFleetDocKey, TFilePreview[] | null>
   >({
-    businessLicenseDoc: null,
-    taxDoc: null,
+    myPhoto: null,
+    businessLicense: null,
     idProofFront: null,
     idProofBack: null,
-    storePhoto: null,
-    menuUpload: null,
   });
 
   const DOCUMENTS: {
-    key: TVendorDocKey;
+    key: TFleetDocKey;
     label: string;
     prefersImagePreview: boolean;
   }[] = [
+    { key: "myPhoto", label: "Fleet Manager Photo", prefersImagePreview: true },
     {
-      key: "businessLicenseDoc",
+      key: "businessLicense",
       label: t("business_license"),
       prefersImagePreview: false,
     },
-    { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
     { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
     { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
-    { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
-    { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
   ];
 
-  const openPicker = (key: TVendorDocKey) => {
+  const openPicker = (key: TFleetDocKey) => {
     const el = inputsRef.current[key];
     el?.click();
   };
 
-  const handleFileChange = async (key: TVendorDocKey, f?: File | null) => {
+  const handleFileChange = async (key: TFleetDocKey, f?: File | null) => {
     if (!f) return;
     const isImage = f.type.startsWith("image/");
     const url = URL.createObjectURL(f);
@@ -67,7 +62,7 @@ export default function UploadVendorDocuments(
     const toastId = toast.loading("Uploading...");
 
     // const result = await uploadUserDocumentsReq(
-    //   `/vendors/${vendorId}/docImage`,
+    //   `/fleet-managers/${fleetManagerId}/docImage`,
     //   key,
     //   f,
     // );
@@ -75,9 +70,7 @@ export default function UploadVendorDocuments(
     const result = { success: true, message: "File uploaded successfully!" };
 
     if (result.success) {
-      toast.success(result.message || "File uploaded successfully!", {
-        id: toastId,
-      });
+      toast.success("File uploaded successfully!", { id: toastId });
 
       setPreviews((p) => ({
         ...p,
@@ -94,7 +87,7 @@ export default function UploadVendorDocuments(
     console.log(result);
   };
 
-  const removeFile = (key: TVendorDocKey, index: number) => {
+  const removeFile = (key: TFleetDocKey, index: number) => {
     const prev = previews[key];
     if (prev && prev[index].url) URL.revokeObjectURL(prev[index].url);
     setPreviews((p) => ({
@@ -125,8 +118,7 @@ export default function UploadVendorDocuments(
       const decoded = decodeURIComponent(url);
       const lastSegment = decoded.split("/").pop() || "";
       const match = lastSegment.match(/file-(.+)$/);
-      const fileName = match ? match[1] : lastSegment;
-      return fileName.length > 10 ? fileName.slice(0, 10) + "..." : fileName;
+      return match ? match[1] : lastSegment;
     } catch {
       return "";
     }
