@@ -98,98 +98,95 @@ const BusinessLocationMap = ({
     [form],
   );
 
-  const initializeMap = useCallback(async () => {
-    if (isInitialized.current || !window.google?.maps) return;
-    isInitialized.current = true;
+  const setupMap = useCallback(async () => {
+    if (isInitialized.current || !mapRef.current) return;
 
-    const { Map } = await window.google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } =
-      await window.google.maps.importLibrary("marker");
-    const { Autocomplete } = await window.google.maps.importLibrary("places");
-    const { Geocoder } = await window.google.maps.importLibrary("geocoding");
+    try {
+      // 1. Load Libraries
+      const { Map } = await window.google.maps.importLibrary("maps");
+      const { AdvancedMarkerElement } =
+        await window.google.maps.importLibrary("marker");
+      const { Autocomplete } = await window.google.maps.importLibrary("places");
+      const { Geocoder } = await window.google.maps.importLibrary("geocoding");
 
-    const initialPos = businessLocation?.latitude
-      ? { lat: businessLocation.latitude, lng: businessLocation.longitude }
-      : defaultLocation;
+      isInitialized.current = true;
 
-    const map = new Map(mapRef.current as HTMLElement, {
-      center: initialPos,
-      zoom: 14,
-      mapId: "DEMO_MAP_ID", // REQUIRED for AdvancedMarkerElement
-    });
+      const initialPos = businessLocation?.latitude
+        ? { lat: businessLocation.latitude, lng: businessLocation.longitude }
+        : defaultLocation;
 
-    const marker = new AdvancedMarkerElement({
-      map,
-      position: initialPos,
-      gmpDraggable: true,
-    });
-    markerRef.current = marker;
-
-    const geocoder = new Geocoder();
-
-    /** Autocomplete */
-    const input = document.getElementById("autocomplete") as HTMLInputElement;
-    const autocomplete = new Autocomplete(input, {
-      fields: ["address_components", "geometry", "name"],
-      types: ["address"],
-    });
-
-    autocomplete.bindTo("bounds", map);
-
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-      if (!place.geometry?.location) return;
-
-      const loc = place.geometry.location;
-      map.setCenter(loc);
-      map.setZoom(17);
-      marker.position = loc;
-
-      setLocationCoordinates({ latitude: loc.lat(), longitude: loc.lng() });
-      fillAddressFields(place.address_components || []);
-    });
-
-    /** Map Click */
-    map.addListener("click", async (e: any) => {
-      const loc = e.latLng;
-      marker.position = loc;
-      setLocationCoordinates({ latitude: loc.lat(), longitude: loc.lng() });
-
-      const { results } = await geocoder.geocode({ location: loc });
-      if (results && results[0]) {
-        fillAddressFields(results[0].address_components);
-      }
-    });
-
-    if (businessLocation) {
-      form.reset({
-        street: businessLocation.street || "",
-        city: businessLocation.city || "",
-        postalCode: businessLocation.postalCode || "",
-        country: businessLocation.country || "",
+      // 2. Initialize Map
+      const map = new Map(mapRef.current, {
+        center: initialPos,
+        zoom: 14,
+        mapId: "DEMO_MAP_ID",
       });
+
+      const marker = new AdvancedMarkerElement({
+        map,
+        position: initialPos,
+        gmpDraggable: true,
+      });
+
+      const geocoder = new Geocoder();
+
+      // 3. Setup Autocomplete
+      const input = document.getElementById("autocomplete") as HTMLInputElement;
+      if (input) {
+        const autocomplete = new Autocomplete(input, {
+          fields: ["address_components", "geometry"],
+          types: ["address"],
+        });
+
+        // Stop form submission on Enter
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") e.preventDefault();
+        });
+
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (!place.geometry?.location) return;
+
+          const loc = place.geometry.location;
+          map.setCenter(loc);
+          map.setZoom(17);
+          marker.position = loc;
+
+          setLocationCoordinates({ latitude: loc.lat(), longitude: loc.lng() });
+          fillAddressFields(place.address_components || []);
+        });
+      }
+
+      // 4. Map Click Geocoding
+      map.addListener("click", async (e: any) => {
+        const loc = e.latLng;
+        marker.position = loc;
+        setLocationCoordinates({ latitude: loc.lat(), longitude: loc.lng() });
+
+        const { results } = await geocoder.geocode({ location: loc });
+        if (results?.[0]) {
+          fillAddressFields(results[0].address_components);
+        }
+      });
+    } catch (error) {
+      console.error("Error loading Google Maps:", error);
     }
-  }, [businessLocation, fillAddressFields, setLocationCoordinates, form]);
+  }, [businessLocation, fillAddressFields, setLocationCoordinates]);
 
   useEffect(() => {
-    (window as any).initMapCallback = () => {
-      initializeMap();
-    };
-
-    const existingScript = document.querySelector(
-      `script[src="${GOOGLE_API_URL}"]`,
-    );
-
-    if (!existingScript) {
-      const script = document.createElement("script");
-      script.src = GOOGLE_API_URL;
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    } else if (window.google?.maps) {
-      initializeMap();
+    // Check if script is already there
+    if (window.google?.maps) {
+      setupMap();
+      return;
     }
-  }, [initializeMap]);
+
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBHT9ARgpTJIEdvsiaD72Gf7SUUXz-Xqfg&v=weekly`;
+    script.async = true;
+    script.defer = true;
+    script.onload = setupMap;
+    document.head.appendChild(script);
+  }, [setupMap]);
 
   return (
     <div className="space-y-6">
@@ -197,8 +194,9 @@ const BusinessLocationMap = ({
         <Search className="absolute left-3 top-3.5 text-gray-500 w-5 h-5" />
         <input
           id="autocomplete"
+          type="text"
           placeholder="Search address here..."
-          className="pl-10 py-3 rounded-xl border w-full"
+          className="pl-10 py-3 rounded-xl border w-full focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 

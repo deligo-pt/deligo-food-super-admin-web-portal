@@ -117,6 +117,7 @@ export default function AddVendor({
       country: "",
       bankName: "",
       accountHolderName: "",
+      accountNumber: "",
       iban: "",
       swiftCode: "",
     },
@@ -233,6 +234,7 @@ export default function AddVendor({
       bankDetails: {
         bankName: data.bankName,
         accountHolderName: data.accountHolderName,
+        accountNumber: data.accountNumber,
         iban: data.iban,
         swiftCode: data.swiftCode,
       },
@@ -289,7 +291,6 @@ export default function AddVendor({
           {/* Left Section - Registration Data */}
           <div className="space-y-8">
             {/* Account Information */}
-
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -751,6 +752,23 @@ export default function AddVendor({
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="accountNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Account Number</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Account Number"
                                   {...field}
                                 />
                               </FormControl>

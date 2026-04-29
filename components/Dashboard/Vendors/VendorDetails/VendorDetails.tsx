@@ -375,21 +375,27 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">Bank Name</p>
-                  <p className="font-medium">{vendor?.bankDetails.bankName}</p>
+                  <p className="font-medium">{vendor.bankDetails?.bankName}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Account Holder</p>
                   <p className="font-medium">
-                    {vendor?.bankDetails.accountHolderName}
+                    {vendor.bankDetails?.accountHolderName}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Account Number</p>
+                  <p className="font-medium">
+                    {vendor.bankDetails?.accountNumber}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">IBAN</p>
-                  <p className="font-medium">{vendor?.bankDetails.iban}</p>
+                  <p className="font-medium">{vendor.bankDetails?.iban}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">SWIFT Code</p>
-                  <p className="font-medium">{vendor?.bankDetails.swiftCode}</p>
+                  <p className="font-medium">{vendor.bankDetails?.swiftCode}</p>
                 </div>
               </div>
             ) : (

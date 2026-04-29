@@ -93,6 +93,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       country: vendor.businessLocation?.country || "",
       bankName: vendor.bankDetails?.bankName || "",
       accountHolderName: vendor.bankDetails?.accountHolderName || "",
+      accountNumber: vendor.bankDetails?.accountNumber || "",
       iban: vendor.bankDetails?.iban || "",
       swiftCode: vendor.bankDetails?.swiftCode || "",
     },
@@ -128,6 +129,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       bankDetails: {
         bankName: data.bankName,
         accountHolderName: data.accountHolderName,
+        accountNumber: data.accountNumber,
         iban: data.iban,
         swiftCode: data.swiftCode,
       },
@@ -579,6 +581,23 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="accountNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Account Number</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Account Number"
                                   {...field}
                                 />
                               </FormControl>

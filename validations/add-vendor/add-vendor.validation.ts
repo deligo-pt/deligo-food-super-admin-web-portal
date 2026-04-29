@@ -53,7 +53,7 @@ export const addVendorValidation = z
       .nonempty("Number of branches is required")
       .refine(
         (val) => !isNaN(parseInt(val)),
-        "Number of branches must be a number"
+        "Number of branches must be a number",
       ),
 
     openingHours: z.string().nonempty("Opening hours is required"),
@@ -102,6 +102,12 @@ export const addVendorValidation = z
       .max(100, "Account holder name must be at most 100 characters")
       .nonempty("Account holder name is required"),
 
+    accountNumber: z
+      .string()
+      .min(2, "Account number must be at least 2 characters")
+      .max(100, "Account number must be at most 100 characters")
+      .nonempty("Account number is required"),
+
     iban: z
       .string()
       .min(15, "IBAN must be at least 15 characters")
@@ -122,7 +128,7 @@ export const addVendorValidation = z
     {
       message: "Invalid phone number for the selected country",
       path: ["phoneNumber"],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -140,7 +146,7 @@ export const addVendorValidation = z
     {
       message: "Business must be open at least 6 hours",
       path: ["closingHours"],
-    }
+    },
   )
   .transform((data) => {
     const full = data.prefixPhoneNumber + data.phoneNumber;
