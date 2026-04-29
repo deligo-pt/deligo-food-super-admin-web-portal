@@ -27,7 +27,7 @@ import { toast } from "sonner";
 interface IProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  type: "vendor" | "fleetManager";
+  type: "vendor" | "fleetManager" | "deliveryPartner";
 }
 
 export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
@@ -44,7 +44,12 @@ export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
       return await fetchData("/wallets", {
         params: {
           limit,
-          userModel: type === "vendor" ? "Vendor" : "FleetManager",
+          userModel:
+            type === "vendor"
+              ? "Vendor"
+              : type === "fleetManager"
+                ? "FleetManager"
+                : "DeliveryPartner",
         },
       });
     });
@@ -70,7 +75,9 @@ export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
       router.push(
         result.data?.userModel === "Vendor"
           ? `/admin/vendor-payouts/${result.data?.payoutId}/settle`
-          : `/admin/fleet-manager-payouts/${result.data?.payoutId}/settle`,
+          : result.data?.userModel === "FleetManager"
+            ? `/admin/fleet-manager-payouts/${result.data?.payoutId}/settle`
+            : `/admin/delivery-partner-payouts/${result.data?.payoutId}/settle`,
       );
       return;
     }
@@ -99,8 +106,13 @@ export default function AddNewPayout({ open, onOpenChange, type }: IProps) {
           <DialogHeader>
             <DialogTitle>Add New Payout</DialogTitle>
             <DialogDescription>
-              Select the {type === "vendor" ? "vendor" : "fleet manager"} you
-              want to make a payout
+              Select the{" "}
+              {type === "vendor"
+                ? "vendor"
+                : type === "fleetManager"
+                  ? "fleet manager"
+                  : "delivery partner"}{" "}
+              you want to make a payout
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

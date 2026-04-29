@@ -1,12 +1,14 @@
 "use client";
 
 import DeliveryPartnerPayoutTable from "@/components/Dashboard/Payouts/DeliveryPartnerPayouts/DeliveryPartnerPayoutTable";
+import AddNewPayout from "@/components/Dashboard/Payouts/MakePayout/AddNewPayout";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { TMeta } from "@/types";
 import { TDeliveryPartnerPayout } from "@/types/payout.type";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 interface IProps {
   deliveryPartnerPayoutsResult: {
@@ -27,10 +29,22 @@ export default function DeliveryPartnerPayouts({
   title,
   subtitle,
 }: IProps) {
+  const [openPartnerPayout, setOpenPartnerPayout] = useState(false);
+
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader title={title} subtitle={subtitle} />
+      <TitleHeader
+        title={title}
+        subtitle={subtitle}
+        extraComponent={
+          <AddNewPayout
+            open={openPartnerPayout}
+            onOpenChange={(open: boolean) => setOpenPartnerPayout(open)}
+            type="deliveryPartner"
+          />
+        }
+      />
 
       {/* Filters */}
       <AllFilters sortOptions={sortOptions} />
