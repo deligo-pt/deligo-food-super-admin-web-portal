@@ -26,9 +26,20 @@ interface IProps {
     type: string;
     items: { label: string; value: string }[];
   }[];
+  extraSelectFilter?: {
+    key: string;
+    placeholder: string;
+    options: { label: string; value: string }[];
+    defaultValue?: string;
+    isAllNeeded?: boolean;
+  };
 }
 
-export default function AllFilters({ sortOptions, filterOptions }: IProps) {
+export default function AllFilters({
+  sortOptions,
+  filterOptions,
+  extraSelectFilter,
+}: IProps) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const oldFilters =
@@ -98,6 +109,17 @@ export default function AllFilters({ sortOptions, filterOptions }: IProps) {
               placeholder="Sort By"
             />
           </div>
+          {extraSelectFilter && (
+            <div className="w-full lg:w-48">
+              <SelectFilter
+                paramName={extraSelectFilter.key}
+                options={extraSelectFilter.options}
+                placeholder={extraSelectFilter.placeholder}
+                defaultValue={extraSelectFilter.defaultValue}
+                isAllNeeded={extraSelectFilter.isAllNeeded}
+              />
+            </div>
+          )}
           {filterOptions && (
             <Button
               variant="outline"

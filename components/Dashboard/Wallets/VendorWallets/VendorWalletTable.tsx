@@ -60,7 +60,7 @@ export default function VendorWalletTable({ wallets }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Balance
+                Current Balance
               </div>
             </TableHead>
             <TableHead>

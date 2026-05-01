@@ -13,12 +13,13 @@ import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
-  Calendar,
+  CalendarCheck,
+  CalendarMinus,
+  CalendarPlus,
   CreditCard,
   ExternalLink,
   ImageIcon,
   Landmark,
-  RefreshCw,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -53,7 +54,6 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               {payout.payoutId}
             </h1>
             <StatusBadge status={payout.status} />
-            <PaymentMethodBadge method={payout.paymentMethod} />
           </div>
           <p className="text-gray-500">
             Created {format(payout.createdAt, "do MMM yyyy")} · Last updated{" "}
@@ -84,10 +84,8 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                 <p className="text-5xl font-extrabold text-gray-900">
                   €{formatPrice(payout.amount)}
                 </p>
-                <div className="flex items-center gap-2 mt-3">
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#DC3173]/10 text-[#DC3173]">
-                    {payout.payoutCategory}
-                  </span>
+                <div className="mt-3">
+                  <PaymentMethodBadge method={payout.paymentMethod} />
                 </div>
               </div>
               <div className="p-6 bg-[#DC3173]/10 rounded-2xl text-[#DC3173]">
@@ -132,26 +130,34 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Account Holder
-                </p>
-                <p className="font-semibold text-gray-900">
-                  {payout.userId?.bankDetails?.accountHolderName}
-                </p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
                   Bank Name
                 </p>
                 <p className="font-semibold text-gray-900">
                   {payout.userId?.bankDetails?.bankName}
                 </p>
               </div>
-              <div className="p-4 bg-gray-50 rounded-xl sm:col-span-2">
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                  Account Holder
+                </p>
+                <p className="font-semibold text-gray-900">
+                  {payout.userId?.bankDetails?.accountHolderName || "-"}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                  Account Number
+                </p>
+                <p className="font-semibold text-gray-900">
+                  {payout.userId?.bankDetails?.accountNumber || "-"}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
                   IBAN
                 </p>
                 <p className="font-mono font-semibold text-gray-900 tracking-wider">
-                  {payout.userId?.bankDetails?.iban}
+                  {payout.userId?.bankDetails?.iban || "-"}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
@@ -159,7 +165,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   SWIFT / BIC
                 </p>
                 <p className="font-mono font-semibold text-gray-900">
-                  {payout.userId?.bankDetails?.swiftCode}
+                  {payout.userId?.bankDetails?.swiftCode || "-"}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
@@ -167,7 +173,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   Bank Reference ID
                 </p>
                 <p className="font-mono font-semibold text-gray-900">
-                  {payout.bankReferenceId || "—"}
+                  {payout.bankReferenceId || "-"}
                 </p>
               </div>
             </div>
@@ -275,27 +281,46 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-gray-50 rounded-lg text-gray-500 shrink-0">
-                  <Calendar size={16} />
+                  <CalendarPlus size={16} />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Created At
+                    Start Date
                   </p>
                   <p className="text-sm font-medium text-gray-900 mt-0.5">
-                    {format(payout.createdAt, "do MMM yyyy")}
+                    {payout.startDate
+                      ? format(payout.startDate, "do MMM yyyy")
+                      : "-"}
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-gray-50 rounded-lg text-gray-500 shrink-0">
-                  <RefreshCw size={16} />
+                  <CalendarMinus size={16} />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Last Updated
+                    End Date
                   </p>
                   <p className="text-sm font-medium text-gray-900 mt-0.5">
-                    {format(payout.updatedAt, "do MMM yyyy")}
+                    {payout.endDate
+                      ? format(payout.endDate, "do MMM yyyy")
+                      : "-"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-50 rounded-lg text-gray-500 shrink-0">
+                  <CalendarCheck size={16} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    Payment Date
+                  </p>
+                  <p className="text-sm font-medium text-gray-900 mt-0.5">
+                    {payout.paymentDate
+                      ? format(payout.paymentDate, "do MMM yyyy")
+                      : "-"}
                   </p>
                 </div>
               </div>

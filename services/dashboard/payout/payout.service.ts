@@ -4,29 +4,6 @@ import { serverRequest } from "@/lib/serverFetch";
 import { TPayout } from "@/types/payout.type";
 import { catchAsync } from "@/utils/catchAsync";
 
-export const initializePayoutReq = async (data: { targetUserId: string }) => {
-  return catchAsync<TPayout>(async () => {
-    return await serverRequest.post("/payouts/initiate-settlement", { data });
-  });
-};
-
-export const rejectPayoutReq = async (
-  payoutId: string,
-  data: { reason: string },
-) => {
-  return catchAsync<null>(async () => {
-    return await serverRequest.post(`/payouts/reject-payout/${payoutId}`, {
-      data,
-    });
-  });
-};
-
-export const retryFailedPayoutReq = async (payoutId: string) => {
-  return catchAsync<null>(async () => {
-    return await serverRequest.post(`/payouts/retry-failed-payout/${payoutId}`);
-  });
-};
-
 export const getSinglePayoutReq = async (id: string) => {
   const result = await catchAsync<TPayout>(async () => {
     return await serverRequest.get(`/payouts/${id}`);
@@ -44,6 +21,7 @@ export const getAllPayoutsReq = async <T>(
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const status = queries.status || "PAID";
   const userModel = (queries.userModel || "Vendor") as
     | "Vendor"
     | "FleetManager"
@@ -53,6 +31,7 @@ export const getAllPayoutsReq = async <T>(
     limit,
     page,
     sortBy,
+    ...(status ? { status } : {}),
     ...(searchTerm ? { searchTerm } : {}),
     ...(userModel ? { userModel } : {}),
   };

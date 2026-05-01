@@ -1,6 +1,6 @@
 "use client";
 
-import VendorPayoutTable from "@/components/Dashboard/Payouts/VendorPayouts/VendorPayoutTable";
+import PayoutTable from "@/components/Dashboard/Payouts/Payouts/PayoutTable";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
@@ -9,9 +9,10 @@ import { TPayout } from "@/types/payout.type";
 import { motion } from "framer-motion";
 
 interface IProps {
-  vendorPayoutsResult: { data: TPayout[]; meta?: TMeta };
+  payoutsResult: { data: TPayout[]; meta?: TMeta };
   title: string;
   subtitle?: string;
+  userRole: "VENDOR" | "FLEET_MANAGER" | "DELIVERY_PARTNER";
 }
 
 const sortOptions = [
@@ -37,10 +38,11 @@ const extraSelectFilter = {
   ],
 };
 
-export default function VendorPayouts({
-  vendorPayoutsResult,
+export default function Payouts({
+  payoutsResult,
   title,
   subtitle,
+  userRole,
 }: IProps) {
   return (
     <div className="space-y-6 max-w-full">
@@ -53,18 +55,18 @@ export default function VendorPayouts({
         extraSelectFilter={extraSelectFilter}
       />
 
-      {/* VendorPayouts Table */}
-      <VendorPayoutTable vendorPayouts={vendorPayoutsResult?.data || []} />
+      {/* Payouts Table */}
+      <PayoutTable payouts={payoutsResult?.data || []} userRole={userRole} />
 
       {/* Pagination */}
-      {!!vendorPayoutsResult?.meta?.totalPage && (
+      {!!payoutsResult?.meta?.totalPage && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="px-4 md:px-6"
         >
           <PaginationComponent
-            totalPages={vendorPayoutsResult?.meta?.totalPage as number}
+            totalPages={payoutsResult?.meta?.totalPage as number}
           />
         </motion.div>
       )}

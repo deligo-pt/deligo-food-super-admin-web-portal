@@ -14,10 +14,14 @@ export default function SelectFilter({
   placeholder,
   paramName,
   options,
+  isAllNeeded = true,
+  defaultValue,
 }: {
   placeholder: string;
   paramName: string;
   options: { label: string; value: string }[];
+  isAllNeeded?: boolean;
+  defaultValue?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -45,12 +49,13 @@ export default function SelectFilter({
       value={currentValue}
       onValueChange={handleChange}
       disabled={isPending}
+      defaultValue={defaultValue}
     >
       <SelectTrigger className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="All">All</SelectItem>
+        {isAllNeeded && <SelectItem value="All">All</SelectItem>}
         {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}

@@ -15,31 +15,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { USER_ROLE } from "@/consts/user.const";
 import { TPayout } from "@/types/payout.type";
 import { downloadFileFromAnyLink } from "@/utils/downloadFromLink";
 import { formatPrice } from "@/utils/formatPrice";
-import { removeUnderscore } from "@/utils/formatter";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
   CalendarCheck,
   CalendarMinus,
   CalendarPlus,
-  CircleCheckBig,
   Cog,
   Euro,
   FileText,
   MoreVertical,
   Store,
+  Truck,
+  UserCog,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface IProps {
-  vendorPayouts: TPayout[];
+  payouts: TPayout[];
+  userRole: "VENDOR" | "FLEET_MANAGER" | "DELIVERY_PARTNER";
 }
 
-export default function VendorPayoutTable({ vendorPayouts }: IProps) {
+export default function PayoutTable({ payouts, userRole }: IProps) {
   const router = useRouter();
+
+  const payoutLinks = {
+    VENDOR: "/admin/vendor-payouts",
+    FLEET_MANAGER: "/admin/fleet-manager-payouts",
+    DELIVERY_PARTNER: "/admin/delivery-partner-payouts",
+  };
 
   return (
     <motion.div
@@ -52,8 +60,24 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
           <TableRow>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
-                <Store className="w-4" />
-                Vendor
+                {userRole === USER_ROLE.VENDOR && (
+                  <>
+                    <Store className="w-4" />
+                    Vendor
+                  </>
+                )}
+                {userRole === USER_ROLE.FLEET_MANAGER && (
+                  <>
+                    <UserCog className="w-4" />
+                    Fleet Manager
+                  </>
+                )}
+                {userRole === USER_ROLE.DELIVERY_PARTNER && (
+                  <>
+                    <Truck className="w-4" />
+                    Delivery Partner
+                  </>
+                )}
               </div>
             </TableHead>
             <TableHead>
@@ -86,12 +110,6 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
                 Document
               </div>
             </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CircleCheckBig className="w-4" />
-                Status
-              </div>
-            </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
               Actions
@@ -99,17 +117,17 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {vendorPayouts?.length === 0 && (
+          {payouts?.length === 0 && (
             <TableRow>
               <TableCell
                 className="text-[#DC3173] text-lg text-center"
-                colSpan={8}
+                colSpan={7}
               >
-                No vendor payouts found
+                No payouts found
               </TableCell>
             </TableRow>
           )}
-          {vendorPayouts?.map((payout) => (
+          {payouts?.map((payout) => (
             <TableRow key={payout._id}>
               <TableCell>
                 <div className="flex items-center gap-3">
@@ -162,7 +180,6 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
                   "-"
                 )}
               </TableCell>
-              <TableCell>{removeUnderscore(payout.status)}</TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger>
@@ -171,7 +188,9 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        router.push(`/admin/vendor-payouts/${payout.payoutId}`)
+                        router.push(
+                          `${payoutLinks[userRole]}/${payout.payoutId}`,
+                        )
                       }
                     >
                       View
@@ -180,7 +199,7 @@ export default function VendorPayoutTable({ vendorPayouts }: IProps) {
                       <DropdownMenuItem
                         onClick={() =>
                           router.push(
-                            `/admin/vendor-payouts/${payout.payoutId}/settle`,
+                            `${payoutLinks[userRole]}/${payout.payoutId}/settle`,
                           )
                         }
                       >

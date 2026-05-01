@@ -5,6 +5,7 @@ import { TResponse } from "@/types";
 import { TPayout } from "@/types/payout.type";
 import { catchAsync } from "@/utils/catchAsync";
 import { formatPrice } from "@/utils/formatPrice";
+import { removeUnderscore } from "@/utils/formatter";
 import { postData } from "@/utils/requests";
 import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
@@ -175,7 +176,9 @@ export default function PayoutSettlement({ payout }: IProps) {
               router.push(
                 payout.userModel === "Vendor"
                   ? "/admin/vendor-payouts"
-                  : "/admin/fleet-manager-payouts",
+                  : payout.userModel === "FleetManager"
+                    ? "/admin/fleet-manager-payouts"
+                    : "/admin/delivery-partner-payouts",
               )
             }
             className="flex items-center gap-2 text-[#DC3173] transition-colors text-sm font-medium hover:underline"
@@ -211,7 +214,9 @@ export default function PayoutSettlement({ payout }: IProps) {
               </div>
             </div>
             <div className="text-right text-sm">
-              <p className="text-black/70">{payout.paymentMethod}</p>
+              <p className="text-black/70">
+                {removeUnderscore(payout.paymentMethod)}
+              </p>
               <p className="font-medium">
                 {format(payout.createdAt, "do MMM yyyy")}
               </p>

@@ -1,7 +1,6 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { Button } from "@/components/ui/button";
 import { TWalletDetails } from "@/types/wallet.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -43,28 +42,22 @@ export default function WalletDetails({ wallet }: IProps) {
         subtitle="View the details of a wallet"
       />
 
-      <div className="md:flex justify-between gap-6 mb-6">
-        <div className="mb-6">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{wallet.walletId}</h1>
-            <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full border border-blue-100 flex items-center">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
-              Active Wallet
-            </span>
-            <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">
-              {wallet.userModel}
-            </span>
-          </div>
-          <p className="text-gray-500 mt-2 text-sm">
-            Created: {format(wallet.createdAt, "do MMM yyyy, hh:mm a")}
-          </p>
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold">{wallet.walletId}</h1>
+          <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full border border-blue-100 flex items-center">
+            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+            Active Wallet
+          </span>
+          <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">
+            {wallet.userModel === "Vendor" && "Vendor"}
+            {wallet.userModel === "FleetManager" && "Fleet Manager"}
+            {wallet.userModel === "DeliveryPartner" && "Delivery Partner"}
+          </span>
         </div>
-
-        <div>
-          <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90">
-            Make Payout
-          </Button>
-        </div>
+        <p className="text-gray-500 mt-2 text-sm">
+          Created: {format(wallet.createdAt, "do MMM yyyy, hh:mm a")}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -147,7 +140,7 @@ export default function WalletDetails({ wallet }: IProps) {
                 {wallet.userModel === "Vendor" && "Vendor"}{" "}
                 {wallet.userModel === "FleetManager" && "Fleet Manager"}{" "}
                 {wallet.userModel === "DeliveryPartner" && "Delivery Partner"}{" "}
-                {wallet.userModel === "Customer" && "Customer"} Information
+                Information
               </h3>
             </div>
             <div className="p-6 space-y-4">

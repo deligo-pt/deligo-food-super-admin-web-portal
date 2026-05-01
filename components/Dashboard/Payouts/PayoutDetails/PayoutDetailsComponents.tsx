@@ -172,7 +172,7 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
   }
 
   if (payout.userModel === "DeliveryPartner") {
-    const d = payout.userId as TDeliveryPartner;
+    const d = payout.userId as unknown as TDeliveryPartner;
     const fullName =
       [d.name?.firstName, d.name?.lastName].filter(Boolean).join(" ") ||
       "Unknown";
@@ -233,7 +233,7 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
   }
 
   if (payout.userModel === "FleetManager") {
-    const f = payout.userId as TAgent;
+    const f = payout.userId as unknown as TAgent;
     const fullName =
       [f.name?.firstName, f.name?.lastName].filter(Boolean).join(" ") ||
       "Unknown";
@@ -296,11 +296,6 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
       desc: "Payout request created",
     },
     {
-      key: "PROCESSING",
-      label: "Processing",
-      desc: "Bank transfer initiated",
-    },
-    {
       key: "PAID",
       label: "Paid",
       desc: "Funds delivered",
@@ -309,31 +304,25 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
 
   const statusOrder = {
     PENDING: 0,
-    PROCESSING: 1,
-    PAID: 2,
-    FAILED: 2,
+    PAID: 1,
   };
 
   const currentIndex = statusOrder[status];
-  const isFailed = status === "FAILED";
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <h2 className="text-lg font-bold text-gray-900 mb-6">Payout Status</h2>
       <div className="space-y-0">
         {steps.map((step, index) => {
-          const isDone = !isFailed && index < currentIndex;
-          const isCurrent = !isFailed && index === currentIndex;
-          const isFinalFailed = isFailed && index === 2;
+          const isDone = status === "PAID" || index < currentIndex;
+          const isCurrent = index === currentIndex;
           return (
             <div key={step.key} className="flex gap-4">
               <div className="flex flex-col items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 transition-all ${isFinalFailed ? "bg-red-100 border-red-400 text-red-600" : isDone ? "bg-[#DC3173] border-[#DC3173] text-white" : isCurrent ? "bg-[#DC3173]/10 border-[#DC3173] text-[#DC3173]" : "bg-white border-gray-200 text-gray-300"}`}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 transition-all ${isDone ? "bg-[#DC3173] border-[#DC3173] text-white" : isCurrent ? "bg-[#DC3173]/10 border-[#DC3173] text-[#DC3173]" : "bg-white border-gray-200 text-gray-300"}`}
                 >
-                  {isFinalFailed ? (
-                    <XCircle size={16} />
-                  ) : isDone ? (
+                  {isDone ? (
                     <CheckCircle size={16} />
                   ) : isCurrent ? (
                     <Loader2 size={16} className="animate-spin" />
@@ -351,12 +340,12 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
                 <p
                   className={`font-bold text-sm ${isDone || isCurrent ? "text-gray-900" : "text-gray-400"}`}
                 >
-                  {isFinalFailed ? "Failed" : step.label}
+                  {step.label}
                 </p>
                 <p
                   className={`text-xs mt-0.5 ${isDone || isCurrent ? "text-gray-500" : "text-gray-300"}`}
                 >
-                  {isFinalFailed ? "Payout could not be processed" : step.desc}
+                  {step.desc}
                 </p>
               </div>
             </div>
