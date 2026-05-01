@@ -1,4 +1,5 @@
-import FleetManagerPayouts from "@/components/Dashboard/Payouts/FleetManagerPayouts/FleetManagerPayouts";
+import Payouts from "@/components/Dashboard/Payouts/Payouts/Payouts";
+import { USER_ROLE } from "@/consts/user.const";
 import { getAllPayoutsReq } from "@/services/dashboard/payout/payout.service";
 import { TFleetManagerPayout } from "@/types/payout.type";
 
@@ -18,10 +19,11 @@ export default async function FleetManagerPayoutsPage({
   });
 
   return (
-    <FleetManagerPayouts
-      fleetManagerPayoutsResult={fleetManagerPayoutsResult}
+    <Payouts
+      payoutsResult={fleetManagerPayoutsResult}
       title="Fleet Manager Payouts"
       subtitle=" Manage all fleet manager payouts here"
+      userRole={USER_ROLE.FLEET_MANAGER}
     />
   );
 }

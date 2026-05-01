@@ -26,7 +26,7 @@ export default function SelectFilter({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const currentValue = searchParams.get(paramName) || "";
+  const currentValue = searchParams.get(paramName) || defaultValue || "";
 
   const handleChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -49,7 +49,6 @@ export default function SelectFilter({
       value={currentValue}
       onValueChange={handleChange}
       disabled={isPending}
-      defaultValue={defaultValue}
     >
       <SelectTrigger className="w-full">
         <SelectValue placeholder={placeholder} />

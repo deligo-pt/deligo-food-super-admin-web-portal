@@ -1,4 +1,5 @@
-import DeliveryPartnerPayouts from "@/components/Dashboard/Payouts/DeliveryPartnerPayouts/DeliveryPartnerPayouts";
+import Payouts from "@/components/Dashboard/Payouts/Payouts/Payouts";
+import { USER_ROLE } from "@/consts/user.const";
 import { getAllPayoutsReq } from "@/services/dashboard/payout/payout.service";
 import { TDeliveryPartnerPayout } from "@/types/payout.type";
 
@@ -18,10 +19,11 @@ export default async function DeliveryPartnerPayoutsPage({
   });
 
   return (
-    <DeliveryPartnerPayouts
-      deliveryPartnerPayoutsResult={deliveryPartnerPayoutsResult}
+    <Payouts
+      payoutsResult={deliveryPartnerPayoutsResult}
       title="Delivery Partner Payouts"
       subtitle=" Manage all delivery partner payouts here"
+      userRole={USER_ROLE.DELIVERY_PARTNER}
     />
   );
 }
