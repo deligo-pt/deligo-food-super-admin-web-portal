@@ -1,6 +1,10 @@
 "use client";
 
+import WalletPayoutTable from "@/components/Dashboard/Wallets/WalletDetails/WalletPayoutTable";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { TMeta } from "@/types";
+import { TPayout } from "@/types/payout.type";
 import { TWalletDetails } from "@/types/wallet.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -17,9 +21,10 @@ import { useRouter } from "next/navigation";
 
 interface IProps {
   wallet: TWalletDetails;
+  payoutsData: { data: TPayout[]; meta?: TMeta };
 }
 
-export default function WalletDetails({ wallet }: IProps) {
+export default function WalletDetails({ wallet, payoutsData }: IProps) {
   const brandColor = "#DC3173";
   const router = useRouter();
 
@@ -111,6 +116,33 @@ export default function WalletDetails({ wallet }: IProps) {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Transaction History Card */}
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                  Payout History
+                </p>
+                <h2 className="text-3xl font-black tracking-tight text-gray-800">
+                  {payoutsData.meta?.total}
+                </h2>
+              </div>
+              <div className="p-4 rounded-xl bg-pink-50">
+                <Wallet className="w-8 h-8" style={{ color: brandColor }} />
+              </div>
+            </div>
+
+            <WalletPayoutTable payouts={payoutsData.data} />
+
+            {!!payoutsData?.meta?.totalPage && (
+              <div>
+                <PaginationComponent
+                  totalPages={payoutsData?.meta?.totalPage as number}
+                />
+              </div>
+            )}
           </div>
         </div>
 

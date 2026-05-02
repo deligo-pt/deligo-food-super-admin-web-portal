@@ -22,6 +22,7 @@ export const getAllPayoutsReq = async <T>(
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
   const status = queries.status || "PAID";
+  const userId = queries.userId;
   const userModel = (queries.userModel || "Vendor") as
     | "Vendor"
     | "FleetManager"
@@ -34,6 +35,7 @@ export const getAllPayoutsReq = async <T>(
     ...(status ? { status } : {}),
     ...(searchTerm ? { searchTerm } : {}),
     ...(userModel ? { userModel } : {}),
+    ...(userId ? { userId } : {}),
   };
 
   const result = await catchAsync<T>(async () => {

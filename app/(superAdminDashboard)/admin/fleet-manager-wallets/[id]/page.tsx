@@ -1,27 +1,22 @@
 import WalletDetails from "@/components/Dashboard/Wallets/WalletDetails/WalletDetails";
-import { serverRequest } from "@/lib/serverFetch";
-import { TWalletDetails } from "@/types/wallet.type";
-import { catchAsync } from "@/utils/catchAsync";
+import { getAllPayoutsReq } from "@/services/dashboard/payout/payout.service";
+import { getSingleWalletReq } from "@/services/dashboard/wallet/wallet.service";
 
 export default async function VendorWalletDetailsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<Record<string, string | undefined>>;
 }) {
   const { id } = await params;
-  let initialData: TWalletDetails = {} as TWalletDetails;
+  const queries = (await searchParams) || {};
 
-  try {
-    const result = await catchAsync<TWalletDetails>(async () => {
-      return await serverRequest.get(`/wallets/${id}`);
-    });
+  const wallet = await getSingleWalletReq(id);
+  const payoutsData = await getAllPayoutsReq({
+    ...queries,
+    userId: wallet.userId?._id,
+  });
 
-    if (result?.success) {
-      initialData = result.data || {};
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <WalletDetails wallet={initialData} />;
+  return <WalletDetails wallet={wallet} payoutsData={payoutsData} />;
 }
