@@ -58,8 +58,22 @@ export default function CustomersPeakOrderTimeChart({
             />
           </YAxis>
           <Tooltip
-            labelFormatter={(hour) => `Hour: ${hour}`}
-            formatter={(val: number) => [val, "Orders:"]}
+            labelFormatter={(label) => {
+              const hour =
+                typeof label === "string" || typeof label === "number"
+                  ? label
+                  : "";
+
+              return `Hour: ${hour}`;
+            }}
+            formatter={(value) => {
+              const val =
+                typeof value === "number" || typeof value === "string"
+                  ? value
+                  : "";
+
+              return [val, "Orders"];
+            }}
           />
           <defs>
             <linearGradient

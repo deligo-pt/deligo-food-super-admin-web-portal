@@ -110,13 +110,20 @@ export default function CustomizedCharts<T>({
           )}
         </YAxis>
         <Tooltip
-          labelFormatter={(val: number | string) =>
-            `${xTooltipKey || xLabel || "Label"}: ${xLabelCustomizedValue ? xLabelCustomizedValue(val) : val}`
-          }
-          formatter={(val: number | string) => [
-            yLabelCustomizedValue ? yLabelCustomizedValue(val) : val,
-            yTooltipKey || yLabel || "Value",
-          ]}
+          labelFormatter={(label) => {
+            const val = label as string | number;
+
+            return `${xTooltipKey || xLabel || "Label"}: ${xLabelCustomizedValue ? xLabelCustomizedValue(val) : val
+              }`;
+          }}
+          formatter={(value) => {
+            const val = value as string | number;
+
+            return [
+              yLabelCustomizedValue ? yLabelCustomizedValue(val) : val,
+              yTooltipKey || yLabel || "Value",
+            ];
+          }}
         />
       </>
     );
@@ -248,10 +255,22 @@ export default function CustomizedCharts<T>({
               </Pie>
 
               <Tooltip
-                formatter={(val: number | string, label) => [
-                  yLabelCustomizedValue ? yLabelCustomizedValue(val) : val,
-                  xLabelCustomizedValue ? xLabelCustomizedValue(label) : label,
-                ]}
+                formatter={(value, name) => {
+                  const val =
+                    typeof value === "number" || typeof value === "string"
+                      ? value
+                      : "";
+
+                  const label =
+                    typeof name === "number" || typeof name === "string"
+                      ? name
+                      : "";
+
+                  return [
+                    yLabelCustomizedValue ? yLabelCustomizedValue(val) : val,
+                    xLabelCustomizedValue ? xLabelCustomizedValue(label) : label,
+                  ];
+                }}
               />
 
               {isLegendNeed && (

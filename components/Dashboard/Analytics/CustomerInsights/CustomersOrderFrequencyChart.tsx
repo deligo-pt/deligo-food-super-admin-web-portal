@@ -56,7 +56,19 @@ export default function CustomersOrderFrequencyChart({
               className="text-gray-900 font-semibold"
             />
           </YAxis>
-          <Tooltip formatter={(val: number) => [val, "Customers"]} />
+          <Tooltip
+            formatter={(value) => {
+              if (typeof value === "number") {
+                return [value, "Customers"];
+              }
+
+              if (typeof value === "string") {
+                return [value, "Customers"];
+              }
+
+              return ["", "Customers"];
+            }}
+          />
           <Bar dataKey="userCount" fill="#DC3173" />
         </BarChart>
       </ResponsiveContainer>

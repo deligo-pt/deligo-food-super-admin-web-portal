@@ -19,40 +19,48 @@ export default function VendorDetailsDoc({ documents }: IProps) {
 
   return (
     <>
-      {docsArr.map((doc) => (
-        <div key={doc}>
-          <p className="text-sm text-gray-500 mb-2">
-            {doc === "idProofFront" && "ID Proof Front"}
-            {doc === "idProofBack" && "ID Proof Back"}
-            {doc === "businessLicenseDoc" && "Business License"}
-            {doc === "taxDoc" && "Tax Document"}
-            {doc === "storePhoto" && "Store Photo"}
-            {doc === "menuUpload" && "Menu / Brochure"}
-          </p>
-          {documents?.[doc as keyof IDocs]?.toLowerCase()?.endsWith(".pdf") ? (
-            <iframe
-              src={documents?.[doc as keyof IDocs] || ""}
-              className="w-full h-40 rounded-lg  border border-gray-200"
-            />
-          ) : (
-            <Image
-              src={documents?.[doc as keyof IDocs] || ""}
-              alt={doc || "Document"}
-              className="w-full h-40 object-cover rounded-lg border border-gray-200"
-              width={500}
-              height={500}
-            />
-          )}
-          <a
-            href={documents?.[doc as keyof IDocs] || ""}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 text-sm text-[#DC3173] hover:underline inline-block"
-          >
-            View Full Image
-          </a>
-        </div>
-      ))}
+      {docsArr.map((doc) => {
+        const file = documents?.[doc as keyof IDocs]?.[0];
+
+        if (!file) return null;
+
+        return (
+          <div key={doc}>
+            <p className="text-sm text-gray-500 mb-2">
+              {doc === "idProofFront" && "ID Proof Front"}
+              {doc === "idProofBack" && "ID Proof Back"}
+              {doc === "businessLicenseDoc" && "Business License"}
+              {doc === "taxDoc" && "Tax Document"}
+              {doc === "storePhoto" && "Store Photo"}
+              {doc === "menuUpload" && "Menu / Brochure"}
+            </p>
+
+            {file.toLowerCase().endsWith(".pdf") ? (
+              <iframe
+                src={file}
+                className="w-full h-40 rounded-lg border border-gray-200"
+              />
+            ) : (
+              <Image
+                src={file}
+                alt={doc}
+                width={500}
+                height={500}
+                className="w-full h-40 object-cover rounded-lg border border-gray-200"
+              />
+            )}
+
+            <a
+              href={file}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 text-sm text-[#DC3173] hover:underline inline-block"
+            >
+              View Full Image
+            </a>
+          </div>
+        );
+      })}
       {docsArr.length === 0 && (
         <p className="text-gray-500 italic col-span-2">No documents uploaded</p>
       )}
