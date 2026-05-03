@@ -66,7 +66,15 @@ export default function RevenueByTopVendorChart({
                 className="text-gray-900 font-semibold"
               />
             </YAxis>
-            <Tooltip formatter={(val: number) => [`€${val}`, "Revenue"]} />
+            <Tooltip
+              formatter={(val) => {
+                if (typeof val === "number" || typeof val === "string") {
+                  return [`€${val}`, "Revenue"];
+                }
+
+                return ["€0", "Revenue"];
+              }}
+            />
             <Bar dataKey="totalRevenue" fill="#DC3173" />
           </BarChart>
         </ResponsiveContainer>

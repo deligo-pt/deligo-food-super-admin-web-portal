@@ -80,8 +80,22 @@ export default function DistanceVsDeliveryTimeChart({
               />
             </YAxis>
             <Tooltip
-              labelFormatter={(distance) => `Distance: ${distance} km`}
-              formatter={(val: number) => [val, "Average Time:"]}
+              labelFormatter={(label) => {
+                const distance =
+                  typeof label === "string" || typeof label === "number"
+                    ? label
+                    : "";
+
+                return `Distance: ${distance} km`;
+              }}
+              formatter={(value) => {
+                const val =
+                  typeof value === "number" || typeof value === "string"
+                    ? value
+                    : "";
+
+                return [val, "Average Time:"];
+              }}
             />
             <defs>
               <linearGradient

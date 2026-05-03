@@ -64,7 +64,12 @@ export default function DayWiseOrdersChart({
                 className="text-gray-900 font-semibold"
               />
             </YAxis>
-            <Tooltip formatter={(val: number) => [val, "Orders"]} />
+            <Tooltip
+              formatter={(val) => [
+                typeof val === "number" || typeof val === "string" ? val : 0,
+                "Orders",
+              ]}
+            />
             <Bar dataKey="orderCount" fill="#DC3173" />
           </BarChart>
         </ResponsiveContainer>
