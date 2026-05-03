@@ -2,7 +2,7 @@
 
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
 import Section from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
-import FleetManagerDetailsDoc from "@/components/Dashboard/FleetManagers/FleetManagerDetails/FleetManagerDetailsDoc";
+import FleetManagerDetailsDoc, { IFleetDocs } from "@/components/Dashboard/FleetManagers/FleetManagerDetails/FleetManagerDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
@@ -384,7 +384,7 @@ export default function FleetManagerDetails({ agent }: IProps) {
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-6">
-              <FleetManagerDetailsDoc documents={agent?.documents} />
+              <FleetManagerDetailsDoc documents={agent?.documents as IFleetDocs} />
             </div>
           </Section>
           <div className="mt-8 border-t pt-6 border-gray-200">

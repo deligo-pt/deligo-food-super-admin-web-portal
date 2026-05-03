@@ -2,7 +2,7 @@
 
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
 import AgentOrVendorSection from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
-import VendorDetailsDoc from "@/components/Dashboard/Vendors/VendorDetails/VendorDetailsDoc";
+import VendorDetailsDoc, { IVendorDocs } from "@/components/Dashboard/Vendors/VendorDetails/VendorDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
@@ -282,17 +282,17 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   <p className="font-medium">
                     {vendor?.businessDetails?.openingHours
                       ? /\b(AM|PM)\b/i.test(
-                          vendor?.businessDetails?.openingHours,
-                        )
+                        vendor?.businessDetails?.openingHours,
+                      )
                         ? vendor?.businessDetails?.openingHours
                         : format(
-                            parse(
-                              vendor?.businessDetails?.openingHours,
-                              "HH:mm",
-                              new Date(),
-                            ),
-                            "hh:mm a",
-                          )
+                          parse(
+                            vendor?.businessDetails?.openingHours,
+                            "HH:mm",
+                            new Date(),
+                          ),
+                          "hh:mm a",
+                        )
                       : "N/A"}
                   </p>
                 </div>
@@ -304,13 +304,13 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                     ? /\b(AM|PM)\b/i.test(vendor?.businessDetails?.closingHours)
                       ? vendor?.businessDetails?.closingHours
                       : format(
-                          parse(
-                            vendor?.businessDetails?.closingHours,
-                            "HH:mm",
-                            new Date(),
-                          ),
-                          "hh:mm a",
-                        )
+                        parse(
+                          vendor?.businessDetails?.closingHours,
+                          "HH:mm",
+                          new Date(),
+                        ),
+                        "hh:mm a",
+                      )
                     : "N/A"}
                 </p>
               </div>
@@ -439,9 +439,9 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                     <p className="font-medium">
                       {vendor?.approvedOrRejectedOrBlockedAt
                         ? format(
-                            vendor?.approvedOrRejectedOrBlockedAt,
-                            "do MMM yyyy",
-                          )
+                          vendor?.approvedOrRejectedOrBlockedAt,
+                          "do MMM yyyy",
+                        )
                         : "N/A"}
                     </p>
                   </div>
@@ -463,7 +463,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             icon={<FileTextIcon size={20} />}
             defaultOpen={true}
           >
-            <VendorDetailsDoc documents={vendor?.documents} />
+            <VendorDetailsDoc documents={vendor?.documents as IVendorDocs} />
           </AgentOrVendorSection>
           <AgentOrVendorSection
             title="Created Offers"
