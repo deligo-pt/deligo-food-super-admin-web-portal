@@ -50,8 +50,6 @@ export default function TopbarIcons({ admin }: IProps) {
       token,
     });
 
-    console.log("server result", result);
-
     if (result?.success) {
       toast.success(result?.message || "Logout successful!", {
         id: toastId,
