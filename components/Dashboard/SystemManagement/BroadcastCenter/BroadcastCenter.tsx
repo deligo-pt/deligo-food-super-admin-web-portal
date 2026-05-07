@@ -12,6 +12,7 @@ import NotificationDropdown from "./NotificationDropdown";
 import { TNotificationType } from "@/types/notification.type";
 import PreviewCard from "./PreviewCard";
 import RoleSelector from "./RoleSelector";
+import { broadcastNotificationReq } from "@/services/dashboard/notifications/notifications.service";
 
 export type TUser = {
   _id: string;
@@ -43,10 +44,20 @@ export default function BroadcastCenter() {
     FLEET_MANAGER: new Set(),
     ADMIN: new Set(),
   });
+  const [expandedPanels, setExpandedPanels] = useState<
+    Record<RoleType, boolean>
+  >({
+    VENDOR: true,
+    CUSTOMER: true,
+    DELIVERY_PARTNER: true,
+    FLEET_MANAGER: true,
+    ADMIN: true,
+  });
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const containerVariants = {
     hidden: {
@@ -76,7 +87,7 @@ export default function BroadcastCenter() {
     },
   } as Variants;
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (selectedRoles.length === 0)
       return toast.error("Please select at least one role.");
     if (commType !== "EMAIL" && !title.trim())
@@ -99,7 +110,6 @@ export default function BroadcastCenter() {
       }
     });
 
-
     const payload = {
       communicationType: commType,
       targetAudience: finalTargetAudience,
@@ -107,9 +117,26 @@ export default function BroadcastCenter() {
       title,
       body: body,
       type: notificationCategory,
+      data: {
+        click_action: "",
+        screen: "",
+        promoId: "",
+        discount: "",
+        sound: "default",
+        channelId: "default"
+      }
     };
 
-    console.log("Final Payload:", payload);
+    try {
+      setLoading(true);
+      const res = await broadcastNotificationReq(payload);
+      console.log(res);
+
+    } catch (error) {
+
+    } finally {
+      setLoading(false);
+    }
 
     setTimeout(() => {
       setTitle("");
@@ -123,13 +150,19 @@ export default function BroadcastCenter() {
         FLEET_MANAGER: new Set(),
         ADMIN: new Set(),
       });
+      setExpandedPanels({
+        VENDOR: false,
+        CUSTOMER: false,
+        DELIVERY_PARTNER: false,
+        FLEET_MANAGER: false,
+        ADMIN: false,
+      });
       setNotificationCategory(undefined as unknown as TNotificationType);
     }, 2000);
   };
 
-
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       <motion.div
         className="space-y-6"
         variants={containerVariants}
@@ -159,6 +192,8 @@ export default function BroadcastCenter() {
               setSelectedRoles={setSelectedRoles}
               selectedUsers={selectedUsers}
               setSelectedUsers={setSelectedUsers}
+              expandedPanels={expandedPanels}
+              setExpandedPanels={setExpandedPanels}
               itemVariants={itemVariants}
             />
 

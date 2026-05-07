@@ -53,21 +53,13 @@ export default function PreviewCard({ commType, title, message, showPreview }: I
                                             <MailIcon className="w-5 h-5 text-[#DC3173]" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-500">Subject</p>
+                                            <p className="text-xs text-gray-500">Title</p>
                                             <p className="font-bold text-gray-900">
-                                                {/* {subject || "No subject"} */}
-                                                {"No subject"}
+                                                {title || "No Title"}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-                                        {message || "No message content..."}
-                                    </div>
                                 </div>
-                            )}
-
-                            {commType === "BOTH" && (
-                                <div className="h-px bg-gray-200 w-full my-6" />
                             )}
 
                             {(commType === "PUSH" || commType === "BOTH") && (

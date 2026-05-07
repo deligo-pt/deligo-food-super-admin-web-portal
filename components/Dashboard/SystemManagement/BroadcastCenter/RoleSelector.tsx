@@ -18,6 +18,8 @@ interface IProps {
     setSelectedRoles: (value: RoleType[] | ((prev: RoleType[]) => RoleType[])) => void;
     selectedUsers: Record<RoleType, Set<string>>;
     setSelectedUsers: (value: Record<RoleType, Set<string>> | ((prev: Record<RoleType, Set<string>>) => Record<RoleType, Set<string>>)) => void;
+    expandedPanels: Record<RoleType, boolean>;
+    setExpandedPanels: (value: Record<RoleType, boolean> | ((prev: Record<RoleType, boolean>) => Record<RoleType, boolean>)) => void;
     itemVariants: Variants;
 }
 
@@ -71,7 +73,7 @@ const Avatar = ({ name, colorClass }: { name: string; colorClass: string }) => {
     );
 };
 
-export default function RoleSelector({ selectedRoles, setSelectedRoles, selectedUsers, setSelectedUsers, itemVariants }: IProps) {
+export default function RoleSelector({ selectedRoles, setSelectedRoles, selectedUsers, setSelectedUsers, expandedPanels, setExpandedPanels, itemVariants }: IProps) {
 
     const [targetModes, setTargetModes] = useState<
         Record<RoleType, "all" | "specific">
@@ -98,15 +100,6 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
         DELIVERY_PARTNER: "",
         FLEET_MANAGER: "",
         ADMIN: "",
-    });
-    const [expandedPanels, setExpandedPanels] = useState<
-        Record<RoleType, boolean>
-    >({
-        VENDOR: true,
-        CUSTOMER: true,
-        DELIVERY_PARTNER: true,
-        FLEET_MANAGER: true,
-        ADMIN: true,
     });
     const [userDataLoading, setUserDataLoading] = useState<
         Record<RoleType, boolean>
