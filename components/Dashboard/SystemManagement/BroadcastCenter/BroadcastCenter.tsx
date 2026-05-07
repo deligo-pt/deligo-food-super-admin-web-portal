@@ -24,8 +24,14 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import CommunicationType from "./CommunicationType";
+import MessageForm from "./MessageForm";
+import NotificationDropdown from "./NotificationDropdown";
+import { TNotificationType } from "@/types/notification.type";
+import PreviewCard from "./PreviewCard";
+import RoleSelector from "./RoleSelector";
 
-type TUser = {
+export type TUser = {
   _id: string;
   name: {
     firstName: string;
@@ -95,26 +101,10 @@ const Avatar = ({ name, colorClass }: { name: string; colorClass: string }) => {
 };
 
 export default function BroadcastCenter() {
+  const [notificationCategory, setNotificationCategory] = useState<TNotificationType>();
   const [commType, setCommType] = useState<"email" | "push" | "both">("email");
+
   const [selectedRoles, setSelectedRoles] = useState<RoleType[]>([]);
-  const [targetModes, setTargetModes] = useState<
-    Record<RoleType, "all" | "specific">
-  >({
-    VENDOR: "all",
-    CUSTOMER: "all",
-    DELIVERY_PARTNER: "all",
-    FLEET_MANAGER: "all",
-    ADMIN: "all",
-  });
-  const [usersData, setUsersData] = useState<
-    Record<RoleType, { data: TUser[]; meta?: TMeta }>
-  >({
-    VENDOR: { data: [] },
-    CUSTOMER: { data: [] },
-    DELIVERY_PARTNER: { data: [] },
-    FLEET_MANAGER: { data: [] },
-    ADMIN: { data: [] },
-  });
   const [selectedUsers, setSelectedUsers] = useState<
     Record<RoleType, Set<string>>
   >({
@@ -124,44 +114,10 @@ export default function BroadcastCenter() {
     FLEET_MANAGER: new Set(),
     ADMIN: new Set(),
   });
-  const [searchQueries, setSearchQueries] = useState<Record<RoleType, string>>({
-    VENDOR: "",
-    CUSTOMER: "",
-    DELIVERY_PARTNER: "",
-    FLEET_MANAGER: "",
-    ADMIN: "",
-  });
-  const [expandedPanels, setExpandedPanels] = useState<
-    Record<RoleType, boolean>
-  >({
-    VENDOR: true,
-    CUSTOMER: true,
-    DELIVERY_PARTNER: true,
-    FLEET_MANAGER: true,
-    ADMIN: true,
-  });
 
-  const [subject, setSubject] = useState("");
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-  const [userDataLoading, setUserDataLoading] = useState<
-    Record<RoleType, boolean>
-  >({
-    VENDOR: false,
-    CUSTOMER: false,
-    DELIVERY_PARTNER: false,
-    FLEET_MANAGER: false,
-    ADMIN: false,
-  });
-
-  const toggleRole = (roleId: RoleType) => {
-    setSelectedRoles((prev) =>
-      prev.includes(roleId)
-        ? prev.filter((r) => r !== roleId)
-        : [...prev, roleId],
-    );
-  };
 
   const containerVariants = {
     hidden: {
@@ -191,76 +147,14 @@ export default function BroadcastCenter() {
     },
   } as Variants;
 
-  const getUsers = async (roleId: RoleType, limit: number = 10) => {
-    const resultData = await getAllUsersReq({
-      limit,
-      role: roleId,
-      searchTerm: searchQueries[roleId],
-    });
-
-    setUsersData((prev) => ({
-      ...prev,
-      [roleId]: resultData,
-    }));
-
-    setUserDataLoading((prev) => ({ ...prev, [roleId]: false }));
-  };
-
-  const handleTargetMode = (roleId: RoleType, mode: "all" | "specific") => {
-    setTargetModes((prev) => ({
-      ...prev,
-      [roleId]: mode,
-    }));
-    if (mode === "specific") {
-      setExpandedPanels((prev) => ({
-        ...prev,
-        [roleId]: true,
-      }));
-
-      setUserDataLoading((prev) => ({ ...prev, [roleId]: true }));
-      getUsers(roleId);
-    }
-  };
-
-  const toggleUser = (roleId: RoleType, userId: string) => {
-    setSelectedUsers((prev) => {
-      const newSet = new Set(prev[roleId]);
-      if (newSet.has(userId)) newSet.delete(userId);
-      else newSet.add(userId);
-      return {
-        ...prev,
-        [roleId]: newSet,
-      };
-    });
-  };
-
-  const toggleAllUsers = (roleId: RoleType, filteredUserIds: string[]) => {
-    setSelectedUsers((prev) => {
-      const newSet = new Set(prev[roleId]);
-      const allSelected = filteredUserIds.every((id) => newSet.has(id));
-      if (allSelected) {
-        filteredUserIds.forEach((id) => newSet.delete(id));
-      } else {
-        filteredUserIds.forEach((id) => newSet.add(id));
-      }
-      return {
-        ...prev,
-        [roleId]: newSet,
-      };
-    });
-  };
-
   const handleSend = () => {
     if (selectedRoles.length === 0)
       return toast.error("Please select at least one role.");
-    if (commType !== "push" && !subject.trim())
-      return toast.error("Please enter a subject.");
     if (commType !== "email" && !title.trim())
       return toast.error("Please enter a title.");
     if (!message.trim()) return toast.error("Please enter a message.");
 
     setTimeout(() => {
-      setSubject("");
       setTitle("");
       setMessage("");
       setSelectedRoles([]);
@@ -268,55 +162,6 @@ export default function BroadcastCenter() {
     }, 3000);
   };
 
-  const getColorClasses = (color: string) => {
-    const map: Record<
-      string,
-      {
-        border: string;
-        bg: string;
-        text: string;
-        lightBg: string;
-        ring: string;
-      }
-    > = {
-      blue: {
-        border: "border-blue-500",
-        bg: "bg-blue-500",
-        text: "text-blue-600",
-        lightBg: "bg-blue-50",
-        ring: "ring-blue-500",
-      },
-      purple: {
-        border: "border-purple-500",
-        bg: "bg-purple-500",
-        text: "text-purple-600",
-        lightBg: "bg-purple-50",
-        ring: "ring-purple-500",
-      },
-      emerald: {
-        border: "border-emerald-500",
-        bg: "bg-emerald-500",
-        text: "text-emerald-600",
-        lightBg: "bg-emerald-50",
-        ring: "ring-emerald-500",
-      },
-      amber: {
-        border: "border-amber-500",
-        bg: "bg-amber-500",
-        text: "text-amber-600",
-        lightBg: "bg-amber-50",
-        ring: "ring-amber-500",
-      },
-      red: {
-        border: "border-red-500",
-        bg: "bg-red-500",
-        text: "text-red-600",
-        lightBg: "bg-red-50",
-        ring: "ring-red-500",
-      },
-    };
-    return map[color] || map.blue;
-  };
 
   return (
     <div className="min-h-screen p-6">
@@ -335,455 +180,41 @@ export default function BroadcastCenter() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Configuration */}
           <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+
             {/* Communication Type */}
-            <motion.div
-              variants={itemVariants}
-              className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
-            >
-              <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-                Communication Type
-              </h2>
-              <div className="flex p-1 bg-gray-100 rounded-xl">
-                {[
-                  {
-                    id: "email",
-                    label: "Email",
-                    icon: MailIcon,
-                  },
-                  {
-                    id: "push",
-                    label: "Push Notification",
-                    icon: BellIcon,
-                  },
-                  {
-                    id: "both",
-                    label: "Both",
-                    icon: SendIcon,
-                  },
-                ].map((type) => (
-                  <button
-                    key={type.id}
-                    onClick={() =>
-                      setCommType(type.id as "push" | "both" | "email")
-                    }
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all relative ${commType === type.id ? "text-[#DC3173] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-                  >
-                    {commType === type.id && (
-                      <motion.div
-                        layoutId="commTypeBg"
-                        className="absolute inset-0 bg-white rounded-lg"
-                        transition={{
-                          type: "spring",
-                          bounce: 0.2,
-                          duration: 0.6,
-                        }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center gap-2">
-                      <type.icon className="w-4 h-4" />
-                      {type.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
+            <CommunicationType
+              commType={commType}
+              setCommType={setCommType}
+              itemVariants={itemVariants}
+            />
 
             {/* Role Selection */}
-            <motion.div
-              variants={itemVariants}
-              className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                  Target Audience
-                </h2>
-                <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
-                  {selectedRoles.length} selected
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-                {ROLES.map((role) => {
-                  const isSelected = selectedRoles.includes(role.id);
-                  const colors = getColorClasses(role.color);
-                  return (
-                    <motion.button
-                      whileHover={{
-                        scale: 1.02,
-                      }}
-                      whileTap={{
-                        scale: 0.98,
-                      }}
-                      key={role.id}
-                      onClick={() => toggleRole(role.id)}
-                      className={`relative overflow-hidden flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${isSelected ? `${colors.border} ${colors.lightBg} shadow-sm ring-1 ${colors.ring}` : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}`}
-                    >
-                      {isSelected && (
-                        <div
-                          className={`absolute left-0 top-0 bottom-0 w-1 ${colors.bg}`}
-                        />
-                      )}
-                      <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isSelected ? colors.bg : "bg-gray-100"}`}
-                      >
-                        <role.icon
-                          className={`w-5 h-5 ${isSelected ? "text-white" : "text-gray-500"}`}
-                        />
-                      </div>
-                      <div>
-                        <p
-                          className={`font-bold text-sm ${isSelected ? "text-gray-900" : "text-gray-700"}`}
-                        >
-                          {role.label}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {role.count.toLocaleString()} users
-                        </p>
-                      </div>
-                      {isSelected && (
-                        <div
-                          className={`absolute top-2 right-2 w-4 h-4 rounded-full ${colors.bg} flex items-center justify-center`}
-                        >
-                          <CheckIcon className="w-2.5 h-2.5 text-white" />
-                        </div>
-                      )}
-                    </motion.button>
-                  );
-                })}
-              </div>
-
-              {/* Specific User Selection Panels */}
-              <AnimatePresence>
-                {selectedRoles.length > 0 && (
-                  <motion.div
-                    initial={{
-                      opacity: 0,
-                      height: 0,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      height: "auto",
-                    }}
-                    exit={{
-                      opacity: 0,
-                      height: 0,
-                    }}
-                    className="mt-6 space-y-4"
-                  >
-                    <div className="h-px bg-gray-100 w-full mb-6" />
-
-                    {selectedRoles.map((roleId) => {
-                      const roleDef = ROLES.find((r) => r.id === roleId)!;
-                      const colors = getColorClasses(roleDef.color);
-                      const mode = targetModes[roleId];
-                      const users = usersData?.[roleId] || [];
-                      const filteredUsers = users;
-                      const isExpanded = expandedPanels[roleId];
-                      const selectedCount = selectedUsers[roleId].size;
-                      return (
-                        <motion.div
-                          key={roleId}
-                          initial={{
-                            opacity: 0,
-                            y: 10,
-                          }}
-                          animate={{
-                            opacity: 1,
-                            y: 0,
-                          }}
-                          exit={{
-                            opacity: 0,
-                            scale: 0.95,
-                          }}
-                          className={`border rounded-xl overflow-hidden ${mode === "specific" ? colors.border : "border-gray-200"}`}
-                        >
-                          {/* Panel Header */}
-                          <div
-                            className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${mode === "specific" ? colors.lightBg : "bg-gray-50"}`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <roleDef.icon
-                                className={`w-4 h-4 ${colors.text}`}
-                              />
-                              <span className="font-bold text-gray-900 text-sm">
-                                {roleDef.label}
-                              </span>
-                              {mode === "specific" && (
-                                <span
-                                  className={`text-xs px-2 py-0.5 rounded-full ${colors.bg} text-white font-medium ml-2`}
-                                >
-                                  {selectedCount} selected
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="flex bg-white rounded-lg p-0.5 border border-gray-200 shadow-sm">
-                              <button
-                                onClick={() => handleTargetMode(roleId, "all")}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "all" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                              >
-                                All Users
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleTargetMode(roleId, "specific")
-                                }
-                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "specific" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                              >
-                                Select Specific
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Panel Body (Specific Selection) */}
-                          <AnimatePresence>
-                            {mode === "specific" && (
-                              <motion.div
-                                initial={{
-                                  height: 0,
-                                }}
-                                animate={{
-                                  height: "auto",
-                                }}
-                                exit={{
-                                  height: 0,
-                                }}
-                                className="overflow-hidden bg-white"
-                              >
-                                <div className="p-4 border-t border-gray-100">
-                                  <div className="flex items-center gap-3 mb-4">
-                                    <div className="relative flex-1">
-                                      <SearchIcon className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                                      <input
-                                        type="text"
-                                        placeholder={`Search ${roleDef.label.toLowerCase()}...`}
-                                        value={searchQueries[roleId]}
-                                        onChange={(e) =>
-                                          setSearchQueries((prev) => ({
-                                            ...prev,
-                                            [roleId]: e.target.value,
-                                          }))
-                                        }
-                                        className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400"
-                                      />
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        toggleAllUsers(
-                                          roleId,
-                                          filteredUsers?.data?.map(
-                                            (u) => u._id,
-                                          ),
-                                        )
-                                      }
-                                      className="text-xs font-medium text-gray-600 hover:text-gray-900 px-3 py-2 bg-gray-100 rounded-lg"
-                                    >
-                                      {filteredUsers?.data?.every((u) =>
-                                        selectedUsers[roleId].has(u._id),
-                                      ) && filteredUsers?.data?.length > 0
-                                        ? "Deselect All"
-                                        : "Select All"}
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        setExpandedPanels((prev) => ({
-                                          ...prev,
-                                          [roleId]: !isExpanded,
-                                        }))
-                                      }
-                                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
-                                    >
-                                      {isExpanded ? (
-                                        <ChevronUpIcon className="w-4 h-4" />
-                                      ) : (
-                                        <ChevronDownIcon className="w-4 h-4" />
-                                      )}
-                                    </button>
-                                  </div>
-
-                                  <AnimatePresence>
-                                    {isExpanded &&
-                                      (userDataLoading[roleId] ? (
-                                        <motion.div
-                                          initial={{
-                                            opacity: 0,
-                                          }}
-                                          animate={{
-                                            opacity: 1,
-                                          }}
-                                          exit={{
-                                            opacity: 0,
-                                          }}
-                                          className="max-h-[240px] flex justify-center items-center"
-                                        >
-                                          <LoaderCircleIcon className="w-6 h-6 text-gray-400 animate-spin" />
-                                        </motion.div>
-                                      ) : (
-                                        <motion.div
-                                          initial={{
-                                            opacity: 0,
-                                          }}
-                                          animate={{
-                                            opacity: 1,
-                                          }}
-                                          exit={{
-                                            opacity: 0,
-                                          }}
-                                          className="max-h-[240px] overflow-y-auto pr-2 space-y-1 custom-scrollbar"
-                                        >
-                                          {filteredUsers?.meta?.total === 0 ? (
-                                            <p className="text-sm text-gray-500 text-center py-4">
-                                              No users found.
-                                            </p>
-                                          ) : (
-                                            filteredUsers?.data?.map((user) => {
-                                              const isUserSelected =
-                                                selectedUsers[roleId].has(
-                                                  user._id,
-                                                );
-                                              return (
-                                                <div
-                                                  key={user._id}
-                                                  onClick={() =>
-                                                    toggleUser(roleId, user._id)
-                                                  }
-                                                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${isUserSelected ? colors.lightBg : "hover:bg-gray-50"}`}
-                                                >
-                                                  <div
-                                                    className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${isUserSelected ? `${colors.bg} border-transparent` : "border-gray-300 bg-white"}`}
-                                                  >
-                                                    {isUserSelected && (
-                                                      <CheckIcon className="w-3 h-3 text-white" />
-                                                    )}
-                                                  </div>
-                                                  <Avatar
-                                                    name={`${user.name?.firstName} ${user.name?.lastName}`}
-                                                    colorClass={`${colors.lightBg} ${colors.text}`}
-                                                  />
-                                                  <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                                      {!user.name?.firstName &&
-                                                        !user.name?.lastName &&
-                                                        "N/A"}
-                                                      {user.name?.firstName}{" "}
-                                                      {user.name?.lastName}
-                                                    </p>
-                                                    {roleId === "CUSTOMER" ? (
-                                                      <p className="text-xs text-gray-500 truncate">
-                                                        {user.contactNumber ||
-                                                          user.email ||
-                                                          "-"}
-                                                      </p>
-                                                    ) : (
-                                                      <p className="text-xs text-gray-500 truncate">
-                                                        {user.email ||
-                                                          user.contactNumber ||
-                                                          "-"}
-                                                      </p>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              );
-                                            })
-                                          )}
-                                          {(usersData?.[roleId]?.meta?.limit ||
-                                            10) <
-                                            (usersData?.[roleId]?.meta?.total ||
-                                              0) && (
-                                            <div className="text-center mt-2">
-                                              <Button
-                                                onClick={() =>
-                                                  getUsers(
-                                                    roleId,
-                                                    (usersData?.[roleId]?.meta
-                                                      ?.limit || 10) + 10,
-                                                  )
-                                                }
-                                                size="sm"
-                                                className={`text-xs cursor-pointer hover:opacity-90 ${colors.bg} hover:${colors.bg} transition-colors`}
-                                              >
-                                                Show More
-                                              </Button>
-                                            </div>
-                                          )}
-                                        </motion.div>
-                                      ))}
-                                  </AnimatePresence>
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </motion.div>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+            <RoleSelector
+              selectedRoles={selectedRoles}
+              setSelectedRoles={setSelectedRoles}
+              selectedUsers={selectedUsers}
+              setSelectedUsers={setSelectedUsers}
+              itemVariants={itemVariants}
+            />
 
             {/* Message Composition */}
-            <motion.div
-              variants={itemVariants}
-              className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
-            >
-              <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-                Message Content
-              </h2>
-
-              <div className="space-y-4">
-                {(commType === "email" || commType === "both") && (
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                      Email Subject
-                    </label>
-                    <input
-                      type="text"
-                      value={subject}
-                      onChange={(e) => setSubject(e.target.value)}
-                      placeholder="Enter an attractive subject line..."
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#DC3173] focus:ring-1 focus:ring-[#DC3173] outline-none transition-all"
-                    />
-                  </div>
-                )}
-
-                {(commType === "push" || commType === "both") && (
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                      Notification Title
-                    </label>
-                    <input
-                      type="text"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Short, catchy title for the push notification..."
-                      className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#DC3173] focus:ring-1 focus:ring-[#DC3173] outline-none transition-all"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <div className="flex justify-between items-end mb-1.5">
-                    <label className="block text-xs font-semibold text-gray-600">
-                      Message Body
-                    </label>
-                    <span className="text-xs text-gray-400">
-                      {message.length} chars
-                    </span>
-                  </div>
-                  <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Write your message here..."
-                    rows={6}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#DC3173] focus:ring-1 focus:ring-[#DC3173] outline-none transition-all resize-none"
-                  />
-                </div>
-              </div>
-            </motion.div>
+            <MessageForm
+              title={title}
+              setTitle={setTitle}
+              message={message}
+              setMessage={setMessage}
+              itemVariants={itemVariants}
+            />
           </div>
 
           {/* Right Column: Preview & Actions */}
           <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+
+            <NotificationDropdown
+              onValueChange={setNotificationCategory}
+              defaultValue={notificationCategory}
+              itemVariants={itemVariants}
+            />
             {/* Actions Card */}
             <motion.div
               variants={itemVariants}
@@ -827,89 +258,12 @@ export default function BroadcastCenter() {
             </motion.div>
 
             {/* Inline Preview Card */}
-            <AnimatePresence>
-              {showPreview && (
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    y: 20,
-                    height: 0,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    height: "auto",
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: 20,
-                    height: 0,
-                  }}
-                  className="overflow-hidden"
-                >
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
-                    <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
-                      <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-400" />
-                        <div className="w-3 h-3 rounded-full bg-amber-400" />
-                        <div className="w-3 h-3 rounded-full bg-green-400" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-500 ml-2">
-                        Preview
-                      </span>
-                    </div>
-
-                    <div className="p-6">
-                      {(commType === "email" || commType === "both") && (
-                        <div className="mb-6">
-                          <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
-                            <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 flex items-center justify-center">
-                              <MailIcon className="w-5 h-5 text-[#DC3173]" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-500">Subject</p>
-                              <p className="font-bold text-gray-900">
-                                {subject || "No subject"}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
-                            {message || "No message content..."}
-                          </div>
-                        </div>
-                      )}
-
-                      {commType === "both" && (
-                        <div className="h-px bg-gray-200 w-full my-6" />
-                      )}
-
-                      {(commType === "push" || commType === "both") && (
-                        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 shadow-sm max-w-xs mx-auto relative">
-                          <div className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
-                            <span className="text-[10px] font-bold text-white">
-                              1
-                            </span>
-                          </div>
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-[#DC3173] flex items-center justify-center flex-shrink-0">
-                              <BellIcon className="w-4 h-4 text-white" />
-                            </div>
-                            <div>
-                              <p className="font-bold text-sm text-gray-900 leading-tight">
-                                {title || "Notification Title"}
-                              </p>
-                              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                                {message || "Notification message preview..."}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <PreviewCard
+              title={title}
+              commType={commType}
+              message={message}
+              showPreview={showPreview}
+            />
           </div>
         </div>
       </motion.div>
