@@ -1,12 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { AnimatePresence } from "framer-motion";
 import { BellIcon, MailIcon } from "lucide-react";
 import { motion } from 'framer-motion';
 
+interface IProps {
+    commType: "PUSH" | "BOTH" | "EMAIL";
+    title: string;
+    message: string;
+    showPreview: boolean;
+}
 
-
-export default function PreviewCard({ commType, title, message, showPreview }) {
+export default function PreviewCard({ commType, title, message, showPreview }: IProps) {
 
     return (
         <AnimatePresence>
@@ -42,7 +46,7 @@ export default function PreviewCard({ commType, title, message, showPreview }) {
                         </div>
 
                         <div className="p-6">
-                            {(commType === "email" || commType === "both") && (
+                            {(commType === "EMAIL" || commType === "BOTH") && (
                                 <div className="mb-6">
                                     <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
                                         <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 flex items-center justify-center">
@@ -62,11 +66,11 @@ export default function PreviewCard({ commType, title, message, showPreview }) {
                                 </div>
                             )}
 
-                            {commType === "both" && (
+                            {commType === "BOTH" && (
                                 <div className="h-px bg-gray-200 w-full my-6" />
                             )}
 
-                            {(commType === "push" || commType === "both") && (
+                            {(commType === "PUSH" || commType === "BOTH") && (
                                 <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 shadow-sm max-w-xs mx-auto relative">
                                     <div className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
                                         <span className="text-[10px] font-bold text-white">

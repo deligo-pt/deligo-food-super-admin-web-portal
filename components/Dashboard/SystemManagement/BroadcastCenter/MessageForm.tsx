@@ -1,14 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
+interface IProps {
+    title: string;
+    setTitle: (value: string) => void;
+    body: string;
+    setBody: (value: string) => void;
+    itemVariants: Variants;
+}
 
 export default function MessageForm({
     title,
     setTitle,
-    message,
-    setMessage,
+    body,
+    setBody,
     itemVariants
-}) {
+}: IProps) {
     return (
         <motion.div
             variants={itemVariants}
@@ -38,12 +44,12 @@ export default function MessageForm({
                             Message Body
                         </label>
                         <span className="text-xs text-gray-400">
-                            {message.length} chars
+                            {body.length} chars
                         </span>
                     </div>
                     <textarea
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        value={body}
+                        onChange={(e) => setBody(e.target.value)}
                         placeholder="Write your message here..."
                         rows={6}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#DC3173] focus:ring-1 focus:ring-[#DC3173] outline-none transition-all resize-none"

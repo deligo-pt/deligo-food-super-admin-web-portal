@@ -1,27 +1,9 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import { Button } from "@/components/ui/button";
 import { USER_ROLE } from "@/consts/user.const";
-import { getAllUsersReq } from "@/services/dashboard/system-management/email-notification-settings.service";
-import { TMeta } from "@/types";
-import { AnimatePresence, motion, Variants } from "framer-motion";
-import {
-  BellIcon,
-  BikeIcon,
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  EyeIcon,
-  LoaderCircleIcon,
-  MailIcon,
-  SearchIcon,
-  SendIcon,
-  ShieldIcon,
-  StoreIcon,
-  UserIcon,
-  UsersIcon,
-} from "lucide-react";
+import { motion, Variants } from "framer-motion";
+import { EyeIcon, SendIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import CommunicationType from "./CommunicationType";
@@ -33,6 +15,7 @@ import RoleSelector from "./RoleSelector";
 
 export type TUser = {
   _id: string;
+  userId: string;
   name: {
     firstName: string;
     lastName: string;
@@ -46,63 +29,9 @@ type RoleType = keyof Pick<
   "ADMIN" | "CUSTOMER" | "FLEET_MANAGER" | "VENDOR" | "DELIVERY_PARTNER"
 >;
 
-const ROLES = [
-  {
-    id: "VENDOR",
-    label: "Vendors",
-    icon: StoreIcon,
-    count: 47,
-    color: "blue",
-  },
-  {
-    id: "FLEET_MANAGER",
-    label: "Fleet Managers",
-    icon: UsersIcon,
-    count: 8,
-    color: "purple",
-  },
-  {
-    id: "CUSTOMER",
-    label: "Customers",
-    icon: UserIcon,
-    count: 1240,
-    color: "emerald",
-  },
-  {
-    id: "DELIVERY_PARTNER",
-    label: "Delivery Partners",
-    icon: BikeIcon,
-    count: 32,
-    color: "amber",
-  },
-  {
-    id: "ADMIN",
-    label: "Admins",
-    icon: ShieldIcon,
-    count: 5,
-    color: "red",
-  },
-] as const;
-
-const Avatar = ({ name, colorClass }: { name: string; colorClass: string }) => {
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .substring(0, 2)
-    .toUpperCase();
-  return (
-    <div
-      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${colorClass}`}
-    >
-      {initials}
-    </div>
-  );
-};
-
 export default function BroadcastCenter() {
   const [notificationCategory, setNotificationCategory] = useState<TNotificationType>();
-  const [commType, setCommType] = useState<"email" | "push" | "both">("email");
+  const [commType, setCommType] = useState<"PUSH" | "BOTH" | "EMAIL">("EMAIL");
 
   const [selectedRoles, setSelectedRoles] = useState<RoleType[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<
@@ -116,7 +45,7 @@ export default function BroadcastCenter() {
   });
 
   const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
+  const [body, setBody] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
   const containerVariants = {
@@ -150,16 +79,52 @@ export default function BroadcastCenter() {
   const handleSend = () => {
     if (selectedRoles.length === 0)
       return toast.error("Please select at least one role.");
-    if (commType !== "email" && !title.trim())
+    if (commType !== "EMAIL" && !title.trim())
       return toast.error("Please enter a title.");
-    if (!message.trim()) return toast.error("Please enter a message.");
+    if (!body.trim()) return toast.error("Please enter a message.");
+    if (!notificationCategory)
+      return toast.error("Please select a category of notification");
+
+
+    const finalCustomUserIds: string[] = [];
+    const finalTargetAudience: RoleType[] = [];
+
+    selectedRoles.forEach((role) => {
+      const userSet = selectedUsers[role];
+
+      if (userSet && userSet.size > 0) {
+        finalCustomUserIds.push(...Array.from(userSet));
+      } else {
+        finalTargetAudience.push(role);
+      }
+    });
+
+
+    const payload = {
+      communicationType: commType,
+      targetAudience: finalTargetAudience,
+      customUserIds: finalCustomUserIds,
+      title,
+      body: body,
+      type: notificationCategory,
+    };
+
+    console.log("Final Payload:", payload);
 
     setTimeout(() => {
       setTitle("");
-      setMessage("");
+      setBody("");
       setSelectedRoles([]);
       setShowPreview(false);
-    }, 3000);
+      setSelectedUsers({
+        VENDOR: new Set(),
+        CUSTOMER: new Set(),
+        DELIVERY_PARTNER: new Set(),
+        FLEET_MANAGER: new Set(),
+        ADMIN: new Set(),
+      });
+      setNotificationCategory(undefined as unknown as TNotificationType);
+    }, 2000);
   };
 
 
@@ -201,8 +166,8 @@ export default function BroadcastCenter() {
             <MessageForm
               title={title}
               setTitle={setTitle}
-              message={message}
-              setMessage={setMessage}
+              body={body}
+              setBody={setBody}
               itemVariants={itemVariants}
             />
           </div>
@@ -261,7 +226,7 @@ export default function BroadcastCenter() {
             <PreviewCard
               title={title}
               commType={commType}
-              message={message}
+              message={body}
               showPreview={showPreview}
             />
           </div>

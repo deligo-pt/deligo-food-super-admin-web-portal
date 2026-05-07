@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/ui/button';
 import { USER_ROLE } from '@/consts/user.const';
 import { TMeta } from '@/types';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { BikeIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon, LoaderCircleIcon, SearchIcon, ShieldIcon, StoreIcon, UserIcon, UsersIcon } from 'lucide-react';
 import { useState } from 'react';
 import { getAllUsersReq } from '@/services/dashboard/system-management/email-notification-settings.service';
@@ -19,7 +18,7 @@ interface IProps {
     setSelectedRoles: (value: RoleType[] | ((prev: RoleType[]) => RoleType[])) => void;
     selectedUsers: Record<RoleType, Set<string>>;
     setSelectedUsers: (value: Record<RoleType, Set<string>> | ((prev: Record<RoleType, Set<string>>) => Record<RoleType, Set<string>>)) => void;
-    itemVariants: any;
+    itemVariants: Variants;
 }
 
 const ROLES = [
@@ -426,14 +425,14 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                                 toggleAllUsers(
                                                                     roleId,
                                                                     filteredUsers?.data?.map(
-                                                                        (u) => u._id,
+                                                                        (u) => u.userId,
                                                                     ),
                                                                 )
                                                             }
                                                             className="text-xs font-medium text-gray-600 hover:text-gray-900 px-3 py-2 bg-gray-100 rounded-lg"
                                                         >
                                                             {filteredUsers?.data?.every((u) =>
-                                                                selectedUsers[roleId].has(u._id),
+                                                                selectedUsers[roleId].has(u.userId),
                                                             ) && filteredUsers?.data?.length > 0
                                                                 ? "Deselect All"
                                                                 : "Select All"}
@@ -493,13 +492,13 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                                         filteredUsers?.data?.map((user) => {
                                                                             const isUserSelected =
                                                                                 selectedUsers[roleId].has(
-                                                                                    user._id,
+                                                                                    user.userId,
                                                                                 );
                                                                             return (
                                                                                 <div
                                                                                     key={user._id}
                                                                                     onClick={() =>
-                                                                                        toggleUser(roleId, user._id)
+                                                                                        toggleUser(roleId, user?.userId)
                                                                                     }
                                                                                     className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${isUserSelected ? colors.lightBg : "hover:bg-gray-50"}`}
                                                                                 >

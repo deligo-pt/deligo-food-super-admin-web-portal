@@ -1,13 +1,19 @@
 import { Mail, Bell, Send } from "lucide-react";
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
+
+interface IProps {
+    itemVariants: Variants;
+    commType: "PUSH" | "BOTH" | "EMAIL";
+    setCommType: (value: "PUSH" | "BOTH" | "EMAIL") => void;
+}
 
 const OPTIONS = [
-    { id: "email", label: "Email", icon: Mail },
-    { id: "push", label: "Push", icon: Bell },
-    { id: "both", label: "Both", icon: Send },
+    { id: "EMAIL", label: "Email", icon: Mail },
+    { id: "PUSH", label: "Push", icon: Bell },
+    { id: "BOTH", label: "Both", icon: Send },
 ];
 
-export default function CommunicationType({ itemVariants, commType, setCommType }) {
+export default function CommunicationType({ itemVariants, commType, setCommType }: IProps) {
 
     return (
         <motion.div
@@ -22,7 +28,7 @@ export default function CommunicationType({ itemVariants, commType, setCommType 
                     <button
                         key={type.id}
                         onClick={() =>
-                            setCommType(type.id as "push" | "both" | "email")
+                            setCommType(type.id as "PUSH" | "BOTH" | "EMAIL")
                         }
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium rounded-lg transition-all relative ${commType === type.id ? "text-[#DC3173] shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
                     >
