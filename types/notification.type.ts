@@ -13,3 +13,23 @@ export type TNotification = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+// types/notification.ts
+export type TNotificationType =
+  | "ORDER"
+  | "OFFER"
+  | "SYSTEM"
+  | "PAYOUT"
+  | "PAYOUT_ALERT"
+  | "TRANSACTION"
+  | "PROMOTIONAL";
+
+export const NOTIFICATION_TYPES: TNotificationType[] = [
+  "ORDER",
+  "OFFER",
+  "SYSTEM",
+  "PAYOUT",
+  "PAYOUT_ALERT",
+  "TRANSACTION",
+  "PROMOTIONAL",
+];
