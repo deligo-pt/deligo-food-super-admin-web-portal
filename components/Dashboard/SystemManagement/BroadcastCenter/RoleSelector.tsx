@@ -282,9 +282,9 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                 >
                                     {role.label}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-0.5">
+                                {/* <p className="text-xs text-gray-500 mt-0.5">
                                     {20} users
-                                </p>
+                                </p> */}
                             </div>
                             {isSelected && (
                                 <div
