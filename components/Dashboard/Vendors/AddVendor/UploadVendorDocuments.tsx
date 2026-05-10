@@ -1,72 +1,42 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Eye, File, FileText, ImageIcon, UploadCloud } from "lucide-react";
+import {
+  Eye,
+  File,
+  FileText,
+  ImageIcon,
+  Plus,
+  UploadCloud,
+} from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { useTranslation } from "@/hooks/use-translation";
-import { uploadUserDocumentsReq } from "@/utils/uploadUserDocument";
+import {
+  deleteDocumentReq,
+  updateDocumentsReq,
+} from "@/services/auth/register-user.service";
+import { uploadImagesReq } from "@/services/upload/upload.service";
+import { TFilePreview, TVendorDocKey } from "@/types/document.type";
 import { toast } from "sonner";
-
-type DocKey =
-  | "businessLicenseDoc"
-  | "taxDoc"
-  | "idProofFront"
-  | "idProofBack"
-  | "storePhoto"
-  | "menuUpload";
-
-type FilePreview = {
-  file: File | null;
-  url: string | null;
-  isImage: boolean;
-};
-
-const linkToFilePreviews = (prevDocuments: Record<DocKey, string>) => {
-  const savedPreviews: Record<DocKey, FilePreview | null> = {} as Record<
-    DocKey,
-    FilePreview | null
-  >;
-
-  const docs = prevDocuments || {};
-  (Object.keys(docs) as DocKey[]).forEach((key) => {
-    const url = docs[key];
-    if (url) {
-      savedPreviews[key] = {
-        file: null,
-        url: url || "",
-        isImage: /\.(jpg|jpeg|png|gif|webp)$/i.test(url),
-      };
-    }
-  });
-
-  return savedPreviews;
-};
 
 export default function UploadVendorDocuments({
   vendorId,
-  prevDocuments,
+  previews,
+  setPreviews,
 }: {
   vendorId: string;
-  prevDocuments?: Record<DocKey, string>;
+  previews: Record<TVendorDocKey, TFilePreview[] | null>;
+  setPreviews: React.Dispatch<
+    React.SetStateAction<Record<TVendorDocKey, TFilePreview[] | null>>
+  >;
 }) {
   const { t } = useTranslation();
-  const [previews, setPreviews] = useState<Record<DocKey, FilePreview | null>>(
-    prevDocuments
-      ? linkToFilePreviews(prevDocuments)
-      : {
-          businessLicenseDoc: null,
-          taxDoc: null,
-          idProofFront: null,
-          idProofBack: null,
-          storePhoto: null,
-          menuUpload: null,
-        },
-  );
+  const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
 
   const DOCUMENTS: {
-    key: DocKey;
+    key: TVendorDocKey;
     label: string;
     prefersImagePreview: boolean;
   }[] = [
@@ -76,74 +46,115 @@ export default function UploadVendorDocuments({
       prefersImagePreview: false,
     },
     { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
-    {
-      key: "idProofFront",
-      label: t("id_proof") + " Front",
-      prefersImagePreview: true,
-    },
-    {
-      key: "idProofBack",
-      label: t("id_proof") + " Back",
-      prefersImagePreview: true,
-    },
+    { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
+    { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
     { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
     { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
   ];
 
-  const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
-
-  const openPicker = (key: DocKey) => {
+  const openPicker = (key: TVendorDocKey) => {
     const el = inputsRef.current[key];
     el?.click();
   };
 
-  const handleFileChange = async (key: DocKey, f?: File | null) => {
+  const handleFileChange = async (key: TVendorDocKey, f?: File | null) => {
     if (!f) return;
-    const isImage = f.type.startsWith("image/");
-    const url = URL.createObjectURL(f);
-
-    const toastId = toast.loading("Uploading...");
-
-    const result = await uploadUserDocumentsReq(
-      `/vendors/${vendorId}/docImage`,
-      key,
-      f,
-    );
-
-    if (result.success) {
-      toast.success(result.message || "File uploaded successfully!", {
-        id: toastId,
-      });
-
-      const prev = previews[key];
-      if (prev && prev.url) URL.revokeObjectURL(prev.url);
-
-      setPreviews((p) => ({ ...p, [key]: { file: f, url, isImage } }));
-
-      if (inputsRef.current[key]) {
-        inputsRef.current[key]!.value = "";
-      }
-      return;
-    }
-
-    toast.error(result.message || "File upload failed", { id: toastId });
-    console.log(result);
-  };
-
-  const removeFile = (key: DocKey) => {
-    const prev = previews[key];
-    if (prev && prev.url) URL.revokeObjectURL(prev.url);
-    setPreviews((p) => ({ ...p, [key]: null }));
 
     if (inputsRef.current[key]) {
       inputsRef.current[key]!.value = "";
+    }
+
+    const toastId = toast.loading("Uploading...");
+
+    if (previews[key]?.length === 3) {
+      toast.error("You can only upload a maximum of 3 documents", {
+        id: toastId,
+      });
+      return;
+    }
+
+    const isImage = f.type.startsWith("image/");
+
+    const uploadResult = await uploadImagesReq([f]);
+
+    if (uploadResult.success) {
+      const prevUrls =
+        previews[key]?.filter((p) => p.url)?.map((p) => p.url) || [];
+
+      const updateResult = await updateDocumentsReq(vendorId, {
+        docImageTitle: key,
+        docImageUrls: [...prevUrls, uploadResult.data?.[0]],
+      });
+
+      if (updateResult.success) {
+        toast.success("File uploaded successfully!", { id: toastId });
+
+        setPreviews((p) => ({
+          ...p,
+          [key]: [
+            ...(p[key] || []),
+            { file: f, url: uploadResult.data?.[0], isImage },
+          ],
+        }));
+
+        return;
+      }
+
+      deleteDocumentReq(vendorId, {
+        docImageTitle: key,
+        imageUrl: uploadResult.data?.[0],
+      });
+
+      toast.error(updateResult.message || "File upload failed", {
+        id: toastId,
+      });
+      console.log(updateResult);
+      return;
+    }
+
+    toast.error(uploadResult.message || "File upload failed", { id: toastId });
+    console.log(uploadResult);
+  };
+
+  const removeFile = async (key: TVendorDocKey, index: number) => {
+    const prev = previews[key];
+
+    if (prev && prev[index]?.url) {
+      const toastId = toast.loading("Deleting...");
+
+      const result = await deleteDocumentReq(vendorId, {
+        docImageTitle: key,
+        imageUrl: prev[index].url,
+      });
+
+      if (result.success) {
+        toast.success("File deleted successfully!", { id: toastId });
+
+        setPreviews((p) => ({
+          ...p,
+          [key]: p[key]?.filter((_, i) => i !== index),
+        }));
+
+        if (inputsRef.current[key]) {
+          inputsRef.current[key]!.value = "";
+        }
+
+        return;
+      }
+
+      toast.error(result.message || "File deletion failed", { id: toastId });
+      console.log(result);
     }
   };
 
   useEffect(() => {
     return () => {
       Object.values(previews).forEach((p) => {
-        if (p && p.url) URL.revokeObjectURL(p.url);
+        if (p) {
+          p.forEach((f) => {
+            if (f.url) URL.revokeObjectURL(f.url);
+          });
+        }
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,7 +165,8 @@ export default function UploadVendorDocuments({
       const decoded = decodeURIComponent(url);
       const lastSegment = decoded.split("/").pop() || "";
       const match = lastSegment.match(/file-(.+)$/);
-      return match ? match[1] : lastSegment;
+      const fileName = match ? match[1] : lastSegment;
+      return fileName.length > 10 ? fileName.slice(0, 10) + "..." : fileName;
     } catch {
       return "";
     }
@@ -163,8 +175,8 @@ export default function UploadVendorDocuments({
   return (
     <div className="grid grid-cols-1 gap-4">
       {DOCUMENTS.map((d, idx) => {
-        const preview = previews[d.key];
-        const isSelected = !!preview;
+        const previewFiles = previews[d.key];
+        const isSelected = !(!previewFiles || previewFiles?.length === 0);
         return (
           <motion.div
             key={d.key}
@@ -172,10 +184,12 @@ export default function UploadVendorDocuments({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
             className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${
-              isSelected ? "border-[#DC3173]/30 bg-[#FFF7FB]" : "bg-white"
+              isSelected
+                ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
+                : "bg-white"
             }`}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 w-full">
               <div
                 className={`w-14 h-14 rounded-lg flex items-center justify-center ${
                   isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
@@ -188,85 +202,97 @@ export default function UploadVendorDocuments({
                 )}
               </div>
 
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-gray-800">
+              <div className="min-w-0 w-full">
+                <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
                   {d.label}
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {preview ? (
-                    preview.isImage && preview.url ? (
-                      <div className="flex items-center gap-2">
-                        <Image
-                          src={preview.url}
-                          alt={
-                            preview.file?.name ||
-                            getActualFileName(preview.url || "")
-                          }
-                          width={56}
-                          height={40}
-                          className="object-cover rounded-md border w-14 h-10"
-                          unoptimized
-                        />
-                        <div className="truncate">
-                          {preview.file?.name ||
-                            getActualFileName(preview.url || "")}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <File className="w-4 h-4 text-gray-500" />
-                        <div className="truncate">
-                          {preview.file?.name ||
-                            getActualFileName(preview.url || "")}
-                        </div>
-                      </div>
-                    )
-                  ) : (
-                    <span>{t("no_file_selected")}</span>
+                  {isSelected && (
+                    <button
+                      type="button"
+                      onClick={() => openPicker(d.key)}
+                      className="inline-flex items-center gap-2 p-0 text-sm font-medium text-[#DC3173]  hover:underline"
+                    >
+                      <Plus className="w-3 h-3 text-[#DC3173]" /> Add More
+                    </button>
                   )}
+
+                  <input
+                    ref={(el) => {
+                      inputsRef.current[d.key] = el;
+                    }}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                    onChange={(e) =>
+                      handleFileChange(
+                        d.key,
+                        e.target.files ? e.target.files[0] : null,
+                      )
+                    }
+                  />
+                </div>
+                <div className="text-xs text-gray-500 mt-1 space-y-1">
+                  {previewFiles?.map((f, i) => (
+                    <div className="flex items-center gap-2 w-full" key={i}>
+                      {f.isImage && f.url ? (
+                        <div className="flex items-center gap-2 border p-1 rounded-md">
+                          <Image
+                            src={f.url}
+                            alt={f.file?.name || getActualFileName(f.url || "")}
+                            width={56}
+                            height={40}
+                            className="object-cover rounded-md border"
+                            unoptimized
+                          />
+                          <div className="truncate">
+                            {f.file?.name
+                              ? f.file.name.length > 20
+                                ? f.file.name.slice(0, 20) + "..."
+                                : f.file.name
+                              : getActualFileName(f.url || "")}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <File className="w-4 h-4 text-gray-500" />
+                          <div className="truncate">
+                            {f.file?.name
+                              ? f.file.name.length > 10
+                                ? f.file.name.slice(0, 10) + "..."
+                                : f.file.name
+                              : getActualFileName(f.url || "")}
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 w-full">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            f.url
+                              ? window.open(f.url, "_blank")
+                              : alert(f.file?.name)
+                          }
+                          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
+                        >
+                          <Eye className="w-4 h-4 text-[#DC3173]" /> {t("view")}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => removeFile(d.key, i)}
+                          className="px-2 py-1 rounded-md text-xs cursor-pointer"
+                        >
+                          {t("remove")}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {!isSelected && <span>{t("no_file_selected")}</span>}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* hidden native input */}
-              <input
-                ref={(el) => {
-                  inputsRef.current[d.key] = el;
-                }}
-                type="file"
-                accept="image/*,application/pdf"
-                className="hidden"
-                onChange={(e) =>
-                  handleFileChange(
-                    d.key,
-                    e.target.files ? e.target.files[0] : null,
-                  )
-                }
-              />
-
-              {preview ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      preview.url
-                        ? window.open(preview.url, "_blank")
-                        : alert(preview.file?.name)
-                    }
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm border border-gray-200 hover:shadow"
-                  >
-                    <Eye className="w-4 h-4 text-[#DC3173]" /> {t("view")}
-                  </button>
-
-                  <button
-                    onClick={() => removeFile(d.key)}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm text-gray-600 border border-gray-100 hover:bg-gray-50"
-                  >
-                    {t("remove")}
-                  </button>
-                </>
-              ) : (
+            {!isSelected && (
+              <div className="flex items-center justify-end gap-3 w-[170px]!">
                 <button
                   type="button"
                   onClick={() => openPicker(d.key)}
@@ -275,8 +301,8 @@ export default function UploadVendorDocuments({
                   <UploadCloud className="w-4 h-4" />
                   {t("select_file")}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         );
       })}

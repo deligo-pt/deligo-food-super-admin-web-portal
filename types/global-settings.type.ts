@@ -61,6 +61,21 @@ export type TGlobalSettings = {
     };
   };
 
+  payout: {
+    autoGenerate: boolean;
+    payoutDays: (
+      | "Sunday"
+      | "Monday"
+      | "Tuesday"
+      | "Wednesday"
+      | "Thursday"
+      | "Friday"
+      | "Saturday"
+    )[];
+    minPayoutAmount: number;
+    payoutWindowDays: number;
+  };
+
   // Meta
   meta: {
     updatedBy: unknown;

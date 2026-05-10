@@ -31,6 +31,7 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
+import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
 import { formatTime } from "@/utils/formatTime";
 import { deliveryPartnerValidation } from "@/validations/delivery-partner/delivery-partner.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,6 +92,18 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
+const defaultDocuments: Record<TPartnerDocKey, TFilePreview[] | null> = {
+  idProofFront: null,
+  idProofBack: null,
+  drivingLicenseFront: null,
+  drivingLicenseBack: null,
+  vehicleRegistration: null,
+  criminalRecordCertificate: null,
+  activity: null,
+  insurancePolicy: null,
+  myPhoto: null,
+};
+
 export default function AddDeliveryPartner() {
   const { t } = useTranslation();
   const [emailVerified, setEmailVerified] = useState(false);
@@ -106,6 +119,8 @@ export default function AddDeliveryPartner() {
     latitude: 0,
     longitude: 0,
   });
+  const [previews, setPreviews] =
+    useState<Record<TPartnerDocKey, TFilePreview[] | null>>(defaultDocuments);
 
   const form = useForm<TDeliveryPartnerForm>({
     resolver: zodResolver(deliveryPartnerValidation),
@@ -331,6 +346,7 @@ export default function AddDeliveryPartner() {
 
       if (approveResult.success) {
         form.reset();
+        setPreviews(defaultDocuments);
         toast.success(
           approveResult.message || "Delivery partner added successfully!",
           {
@@ -1384,7 +1400,11 @@ export default function AddDeliveryPartner() {
                       9. {t("documents_nd_verification")}
                     </h2>
 
-                    <UploadPartnerDocuments partnerId={partnerId} />
+                    <UploadPartnerDocuments
+                      partnerId={partnerId}
+                      previews={previews}
+                      setPreviews={setPreviews}
+                    />
                   </Card>
                 </motion.div>
               </div>

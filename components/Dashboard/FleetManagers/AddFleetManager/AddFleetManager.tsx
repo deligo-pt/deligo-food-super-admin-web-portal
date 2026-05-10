@@ -23,6 +23,7 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
+import { TFilePreview, TFleetDocKey } from "@/types/document.type";
 import { TAgent } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
@@ -60,6 +61,13 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
+const defaultDocuments: Record<TFleetDocKey, TFilePreview[] | null> = {
+  businessLicense: null,
+  myPhoto: null,
+  idProofFront: null,
+  idProofBack: null,
+};
+
 export default function AddFleetManager() {
   const { t } = useTranslation();
   const [emailVerified, setEmailVerified] = useState(false);
@@ -74,6 +82,8 @@ export default function AddFleetManager() {
     latitude: 0,
     longitude: 0,
   });
+  const [previews, setPreviews] =
+    useState<Record<TFleetDocKey, TFilePreview[] | null>>(defaultDocuments);
 
   const form = useForm<TFleetManagerForm>({
     resolver: zodResolver(addFleetManagerValidation),
@@ -217,6 +227,7 @@ export default function AddFleetManager() {
 
       if (approveResult.success) {
         form.reset();
+        setPreviews(defaultDocuments);
         toast.success(
           approveResult.message || "Fleet manager added successfully!",
           {
@@ -660,6 +671,8 @@ export default function AddFleetManager() {
 
                     <UploadFleetManagerDocuments
                       fleetManagerId={fleetManagerId}
+                      previews={previews}
+                      setPreviews={setPreviews}
                     />
                   </Card>
                 </motion.div>

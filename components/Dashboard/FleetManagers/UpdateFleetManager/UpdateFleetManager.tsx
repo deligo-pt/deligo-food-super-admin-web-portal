@@ -19,7 +19,7 @@ import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
-import { TFleetDocKey } from "@/types/document.type";
+import { TFilePreview, TFleetDocKey } from "@/types/document.type";
 import { TAgent } from "@/types/user.type";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,6 +48,22 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
     longitude: 0,
+  });
+  const [previews, setPreviews] = useState<
+    Record<TFleetDocKey, TFilePreview[] | null>
+  >({
+    businessLicense: Array.isArray(fleetManager?.documents?.businessLicense)
+      ? fleetManager?.documents?.businessLicense
+      : null,
+    myPhoto: Array.isArray(fleetManager?.documents?.myPhoto)
+      ? fleetManager?.documents?.myPhoto
+      : null,
+    idProofFront: Array.isArray(fleetManager?.documents?.idProofFront)
+      ? fleetManager?.documents?.idProofFront
+      : null,
+    idProofBack: Array.isArray(fleetManager?.documents?.idProofBack)
+      ? fleetManager?.documents?.idProofBack
+      : null,
   });
 
   const phone = parsePhoneNumberFromString(fleetManager.contactNumber || "");
@@ -488,9 +504,8 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
 
                     <UploadFleetManagerDocuments
                       fleetManagerId={fleetManager.userId}
-                      prevDocuments={
-                        fleetManager.documents as Record<TFleetDocKey, string>
-                      }
+                      previews={previews}
+                      setPreviews={setPreviews}
                     />
                   </Card>
                 </motion.div>

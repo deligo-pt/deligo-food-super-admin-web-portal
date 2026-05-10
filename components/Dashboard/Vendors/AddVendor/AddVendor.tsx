@@ -32,6 +32,7 @@ import {
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
+import { TFilePreview, TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
@@ -69,6 +70,15 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
+const defaultDocuments: Record<TVendorDocKey, TFilePreview[] | null> = {
+  businessLicenseDoc: null,
+  taxDoc: null,
+  idProofFront: null,
+  idProofBack: null,
+  storePhoto: null,
+  menuUpload: null,
+};
+
 export default function AddVendor({
   businessCategories,
 }: {
@@ -87,15 +97,9 @@ export default function AddVendor({
     latitude: 0,
     longitude: 0,
   });
-  const daysOfWeek = [
-    t("sunday"),
-    t("monday"),
-    t("tuesday"),
-    t("wednesday"),
-    t("thursday"),
-    t("friday"),
-    t("saturday"),
-  ];
+  const [previews, setPreviews] =
+    useState<Record<TVendorDocKey, TFilePreview[] | null>>(defaultDocuments);
+
   const form = useForm<TVendorForm>({
     resolver: zodResolver(addVendorValidation),
     defaultValues: {
@@ -122,6 +126,16 @@ export default function AddVendor({
       swiftCode: "",
     },
   });
+
+  const daysOfWeek = [
+    t("sunday"),
+    t("monday"),
+    t("tuesday"),
+    t("wednesday"),
+    t("thursday"),
+    t("friday"),
+    t("saturday"),
+  ];
 
   const sendOtp = async () => {
     if (!email || !password) return;
@@ -252,6 +266,7 @@ export default function AddVendor({
 
       if (approveResult.success) {
         form.reset();
+        setPreviews(defaultDocuments);
         toast.success(approveResult.message || "Vendor added successfully!", {
           id: toastId,
         });
@@ -862,7 +877,11 @@ export default function AddVendor({
                       {t("documents_nd_verification")}
                     </h2>
 
-                    <UploadVendorDocuments vendorId={vendorId} />
+                    <UploadVendorDocuments
+                      vendorId={vendorId}
+                      previews={previews}
+                      setPreviews={setPreviews}
+                    />
                   </Card>
                 </motion.div>
               </div>

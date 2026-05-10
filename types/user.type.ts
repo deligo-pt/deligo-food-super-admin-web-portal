@@ -82,8 +82,10 @@ export type TAgent = {
   // Documents & Verification
   // ---------------------------------------------
   documents?: {
-    idProof?: string;
+    idProofFront?: string;
+    idProofBack?: string;
     businessLicense?: string;
+    myPhoto?: string;
   };
 
   // ---------------------------------------------
@@ -219,7 +221,8 @@ export type TVendor = {
   documents?: {
     businessLicenseDoc?: string;
     taxDoc?: string;
-    idProof?: string;
+    idProofFront?: string;
+    idProofBack?: string;
     storePhoto?: string;
     menuUpload?: string;
   };

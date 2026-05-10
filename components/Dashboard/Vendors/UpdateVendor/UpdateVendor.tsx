@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
 import { TBusinessCategory } from "@/types/category.type";
-import { TVendorDocKey } from "@/types/document.type";
+import { TFilePreview, TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,6 +57,28 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: vendor.businessLocation?.latitude || 0,
     longitude: vendor.businessLocation?.longitude || 0,
+  });
+  const [previews, setPreviews] = useState<
+    Record<TVendorDocKey, TFilePreview[] | null>
+  >({
+    businessLicenseDoc: Array.isArray(vendor?.documents?.businessLicenseDoc)
+      ? vendor?.documents?.businessLicenseDoc
+      : null,
+    taxDoc: Array.isArray(vendor?.documents?.taxDoc)
+      ? vendor?.documents?.taxDoc
+      : null,
+    idProofFront: Array.isArray(vendor?.documents?.idProofFront)
+      ? vendor?.documents?.idProofFront
+      : null,
+    idProofBack: Array.isArray(vendor?.documents?.idProofBack)
+      ? vendor?.documents?.idProofBack
+      : null,
+    storePhoto: Array.isArray(vendor?.documents?.storePhoto)
+      ? vendor?.documents?.storePhoto
+      : null,
+    menuUpload: Array.isArray(vendor?.documents?.menuUpload)
+      ? vendor?.documents?.menuUpload
+      : null,
   });
   const daysOfWeek = [
     t("sunday"),
@@ -694,9 +716,8 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
 
                     <UploadVendorDocuments
                       vendorId={vendor.userId}
-                      prevDocuments={
-                        vendor.documents as Record<TVendorDocKey, string>
-                      }
+                      previews={previews}
+                      setPreviews={setPreviews}
                     />
                   </Card>
                 </motion.div>
