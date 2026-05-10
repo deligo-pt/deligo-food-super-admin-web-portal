@@ -69,9 +69,8 @@ export default function ProductCard({ product, onDelete }: IProps) {
           </div>
         )}
         <div
-          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${
-            statusColors[product.isDeleted ? "DELETED" : product.meta.status]
-          }`}
+          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[product.isDeleted ? "DELETED" : product.meta.status]
+            }`}
         >
           {product.isDeleted ? "DELETED" : product.meta.status}
         </div>
@@ -120,13 +119,12 @@ export default function ProductCard({ product, onDelete }: IProps) {
               ""
             )}
           </div>
-          <div
-            className={`text-xs px-2 py-1 rounded-full ${
-              availabilityColors[product.stock.availabilityStatus]
-            }`}
+          {product?.vendorId?.businessDetails?.businessType !== "RESTAURANT" && <div
+            className={`text-xs px-2 py-1 rounded-full ${availabilityColors[product.stock.availabilityStatus]
+              }`}
           >
             {product.stock.availabilityStatus}
-          </div>
+          </div>}
         </div>
         {product.deliveryInfo && (
           <div className="flex items-center text-xs text-gray-500 mb-3">

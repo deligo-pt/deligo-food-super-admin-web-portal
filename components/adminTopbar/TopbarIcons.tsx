@@ -7,7 +7,6 @@ import { logoutReq } from "@/services/auth/login.service";
 import { useStore } from "@/store/store";
 import { TAdmin } from "@/types/admin.type";
 import { removeCookie } from "@/utils/cookies";
-import { getFcmToken } from "@/utils/fcmToken";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -43,12 +42,7 @@ export default function TopbarIcons({ admin }: IProps) {
   const logOut = async () => {
     const toastId = toast.loading("Logging out...");
 
-    const token = (await getFcmToken().catch(() => "")) || "";
-
-    const result = await logoutReq({
-      email: admin?.email || "",
-      token,
-    });
+    const result = await logoutReq();
 
     if (result?.success) {
       toast.success(result?.message || "Logout successful!", {
@@ -93,7 +87,7 @@ export default function TopbarIcons({ admin }: IProps) {
             setLang(value);
           }}
         >
-          <SelectTrigger className="w-[70px] hover:border hover:border-[#DC3173]">
+          <SelectTrigger className="w-17.5 hover:border hover:border-[#DC3173]">
             <SelectValue placeholder="Language" />
           </SelectTrigger>
           <SelectContent>
@@ -139,7 +133,7 @@ export default function TopbarIcons({ admin }: IProps) {
           className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-pink-50 transition"
         >
           {admin?.profilePhoto &&
-          admin?.profilePhoto !== "<admin_profile_photo_url>" ? (
+            admin?.profilePhoto !== "<admin_profile_photo_url>" ? (
             <Image
               src={admin?.profilePhoto}
               alt="avatar"
@@ -154,9 +148,8 @@ export default function TopbarIcons({ admin }: IProps) {
           )}
           <ChevronDown
             size={16}
-            className={`text-gray-700 hidden sm:inline transition-transform ${
-              profileOpen ? "rotate-180" : ""
-            }`}
+            className={`text-gray-700 hidden sm:inline transition-transform ${profileOpen ? "rotate-180" : ""
+              }`}
           />
         </button>
 

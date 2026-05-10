@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
@@ -57,7 +58,6 @@ export default function BroadcastCenter() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const containerVariants = {
     hidden: {
@@ -110,6 +110,8 @@ export default function BroadcastCenter() {
       }
     });
 
+    const toastId = toast.loading("Sending...");
+
     const payload = {
       communicationType: commType,
       targetAudience: finalTargetAudience,
@@ -128,14 +130,10 @@ export default function BroadcastCenter() {
     };
 
     try {
-      setLoading(true);
       const res = await broadcastNotificationReq(payload);
-      console.log(res);
-
-    } catch (error) {
-
-    } finally {
-      setLoading(false);
+      toast.success(res?.message, { id: toastId })
+    } catch (error: any) {
+      toast.error(error?.message || "Notification sent failed", { id: toastId })
     }
 
     setTimeout(() => {
