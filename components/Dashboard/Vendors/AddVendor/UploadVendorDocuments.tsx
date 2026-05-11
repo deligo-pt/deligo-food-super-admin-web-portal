@@ -40,17 +40,17 @@ export default function UploadVendorDocuments({
     label: string;
     prefersImagePreview: boolean;
   }[] = [
-    {
-      key: "businessLicenseDoc",
-      label: t("business_license"),
-      prefersImagePreview: false,
-    },
-    { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
-    { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
-    { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
-    { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
-    { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
-  ];
+      {
+        key: "businessLicenseDoc",
+        label: t("business_license"),
+        prefersImagePreview: false,
+      },
+      { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
+      { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
+      { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
+      { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
+      { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
+    ];
 
   const openPicker = (key: TVendorDocKey) => {
     const el = inputsRef.current[key];
@@ -183,17 +183,15 @@ export default function UploadVendorDocuments({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
-            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${
-              isSelected
-                ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
-                : "bg-white"
-            }`}
+            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${isSelected
+              ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
+              : "bg-white"
+              }`}
           >
             <div className="flex items-center gap-4 w-full">
               <div
-                className={`w-14 h-14 rounded-lg flex items-center justify-center ${
-                  isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
-                }`}
+                className={`w-14 h-14 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
+                  }`}
               >
                 {d.prefersImagePreview ? (
                   <ImageIcon className="w-6 h-6 text-[#DC3173]" />
@@ -292,7 +290,7 @@ export default function UploadVendorDocuments({
             </div>
 
             {!isSelected && (
-              <div className="flex items-center justify-end gap-3 w-[170px]!">
+              <div className="flex items-center justify-end gap-3 w-42.5!">
                 <button
                   type="button"
                   onClick={() => openPicker(d.key)}

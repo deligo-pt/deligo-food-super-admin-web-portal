@@ -37,8 +37,12 @@ export const updateDocumentsReq = async (
   data: { docImageTitle: string; docImageUrls: string[] },
 ) => {
   return catchAsync<null>(async () => {
+    const formData = new FormData();
+
+    formData.append("data", JSON.stringify(data));
+
     return await serverRequest.patch(`/vendors/${id}/docImage`, {
-      data,
+      data: formData,
     });
   });
 };
