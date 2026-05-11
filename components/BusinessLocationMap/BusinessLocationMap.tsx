@@ -15,7 +15,6 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
-  useRef,
 } from "react";
 import { Map, Marker, useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { UseFormReturn } from "react-hook-form";
@@ -76,7 +75,6 @@ const BusinessLocationMap = ({
 }: IProps) => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const markerRef = useRef<any>(null);
 
   const fillAddressFields = useCallback(
     (components: any[]) => {
@@ -101,8 +99,8 @@ const BusinessLocationMap = ({
 
     const initialPos = businessLocation?.latitude
       ? {
-        lat: businessLocation.latitude,
-        lng: businessLocation.longitude,
+        lat: businessLocation.latitude as number,
+        lng: businessLocation.longitude as number,
       }
       : defaultLocation;
 
