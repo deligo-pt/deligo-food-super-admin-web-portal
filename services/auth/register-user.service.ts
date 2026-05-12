@@ -33,22 +33,22 @@ export const updateUserDataReq = async (
 
 
 export const updateDocumentsReq = async (
-  id: string,
+  endpoint: string,
   data: { docImageTitle: string; docImageUrls: string[] },
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.patch(`/vendors/${id}/docImage`, {
+    return await serverRequest.patch(endpoint, {
       data,
     });
   });
 };
 
 export const deleteDocumentReq = async (
-  id: string,
+  endpoint: string,
   data: { docImageTitle: string; imageUrl: string },
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.delete(`/vendors/${id}/docImage`, {
+    return await serverRequest.delete(endpoint, {
       data,
     });
   });

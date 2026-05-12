@@ -19,7 +19,7 @@ import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
-import { TFilePreview, TFleetDocKey } from "@/types/document.type";
+import { TFleetDocKey } from "@/types/document.type";
 import { TAgent } from "@/types/user.type";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,7 +50,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
     longitude: 0,
   });
   const [previews, setPreviews] = useState<
-    Record<TFleetDocKey, TFilePreview[] | null>
+    Record<TFleetDocKey, string[] | null>
   >({
     businessLicense: Array.isArray(fleetManager?.documents?.businessLicense)
       ? fleetManager?.documents?.businessLicense
@@ -154,6 +154,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       toast.success(updatedResult.message || "Vendor updated successfully!", {
         id: toastId,
       });
+      router.refresh();
       return;
     }
 
