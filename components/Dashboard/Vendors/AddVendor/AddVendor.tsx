@@ -32,7 +32,7 @@ import {
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
-import { TFilePreview, TVendorDocKey } from "@/types/document.type";
+import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
@@ -70,14 +70,14 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
-const defaultDocuments: Record<TVendorDocKey, TFilePreview[] | null> = {
+const defaultDocuments: Record<TVendorDocKey, string[] | null> = ({
   businessLicenseDoc: null,
   taxDoc: null,
   idProofFront: null,
   idProofBack: null,
   storePhoto: null,
   menuUpload: null,
-};
+});
 
 export default function AddVendor({
   businessCategories,
@@ -98,7 +98,7 @@ export default function AddVendor({
     longitude: 0,
   });
   const [previews, setPreviews] =
-    useState<Record<TVendorDocKey, TFilePreview[] | null>>(defaultDocuments);
+    useState<Record<TVendorDocKey, string[] | null>>(defaultDocuments);
 
   const form = useForm<TVendorForm>({
     resolver: zodResolver(addVendorValidation),
@@ -697,17 +697,16 @@ export default function AddVendor({
                                         field.onChange(
                                           field.value?.includes(day)
                                             ? field.value?.filter(
-                                                (d) => d !== day,
-                                              )
+                                              (d) => d !== day,
+                                            )
                                             : [...field.value, day],
                                         );
                                       }}
                                       whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
-                                        field.value.includes(day)
-                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                      }`}
+                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
+                                        ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                        : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                        }`}
                                     >
                                       {day}
                                     </motion.button>
