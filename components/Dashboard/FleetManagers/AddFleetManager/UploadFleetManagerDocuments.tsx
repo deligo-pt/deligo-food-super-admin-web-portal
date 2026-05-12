@@ -63,56 +63,60 @@ export default function UploadFleetManagerDocuments({
 
     const toastId = toast.loading("Uploading...");
 
-    if (previews[key]?.length === 3) {
+    const currentFiles = previews[key] || [];
+
+    if (currentFiles.length === 3) {
       toast.error("You can only upload a maximum of 3 documents", {
         id: toastId,
       });
       return;
     }
 
-    const isImage = f.type.startsWith("image/");
-
     const uploadResult = await uploadImagesReq([f]);
 
-    if (uploadResult.success) {
-      const prevUrls =
-        previews[key]?.filter((p) => p)?.map((p) => p) || [];
-
-      const endpoint = `/fleet-managers/${fleetManagerId}/docImage`;
-
-      const updateResult = await updateDocumentsReq(endpoint, {
-        docImageTitle: key,
-        docImageUrls: [...prevUrls, uploadResult.data?.[0]],
+    if (!uploadResult.success) {
+      toast.error(uploadResult.message || "File upload failed", {
+        id: toastId,
       });
+      return;
+    }
 
-      if (updateResult.success) {
-        toast.success("File uploaded successfully!", { id: toastId });
+    const newUrl = uploadResult.data?.[0];
 
-        setPreviews((p) => ({
-          ...p,
-          [key]: [
-            ...(p[key] || []),
-            { file: f, url: uploadResult.data?.[0], isImage },
-          ],
-        }));
+    if (!newUrl) {
+      toast.error("Upload failed: no file URL returned", {
+        id: toastId,
+      });
+      return;
+    }
 
-        return;
-      }
+    const prevUrls = currentFiles;
 
-      deleteDocumentReq(endpoint, {
+    const endpoint = `/fleet-managers/${fleetManagerId}/docImage`;
+    const updateResult = await updateDocumentsReq(endpoint, {
+      docImageTitle: key,
+      docImageUrls: [...prevUrls, newUrl],
+    });
+
+    if (!updateResult.success) {
+      await deleteDocumentReq(endpoint, {
         docImageTitle: key,
-        imageUrl: uploadResult.data?.[0],
+        imageUrl: newUrl,
       });
 
       toast.error(updateResult.message || "File upload failed", {
         id: toastId,
       });
-      console.log(updateResult);
       return;
     }
 
-    toast.error(uploadResult.message || "File upload failed", { id: toastId });
-    console.log(uploadResult);
+    toast.success("File uploaded successfully!", { id: toastId });
+
+    setPreviews((p) => ({
+      ...p,
+      [key]: [...(p[key] || []), newUrl],
+    }));
+
   };
 
   const removeFile = async (key: TFleetDocKey, index: number) => {
@@ -232,7 +236,7 @@ export default function UploadFleetManagerDocuments({
                 <div className="text-xs text-gray-500 mt-1 space-y-1">
                   {(previewFiles || [])?.map((url, i) => (
                     <div className="flex items-center gap-2 w-full" key={i}>
-                      {/\.(jpg|jpeg|png|webp|gif)$/i.test(url) ? (
+                      {/\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url) ? (
                         <div className="flex items-center gap-2 border p-1 rounded-md">
                           <Image
                             src={url}
@@ -243,14 +247,14 @@ export default function UploadFleetManagerDocuments({
                             unoptimized
                           />
                           <div className="truncate">
-                            {getActualFileName(url)}
+                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
                           <File className="w-4 h-4 text-gray-500" />
                           <div className="truncate">
-                            {getActualFileName(url)}
+                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
                           </div>
                         </div>
                       )}

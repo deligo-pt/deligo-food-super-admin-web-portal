@@ -165,211 +165,307 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="min-h-screen bg-slate-50"
-      >
-        <TitleHeader
-          title="Edit Fleet Manager Details"
-          subtitle="Update fleet manager details and information"
-          onBackClick={() => router.back()}
-        />
+    <>
+      <TitleHeader
+        title="Edit Fleet Manager Details"
+        subtitle="Update fleet manager details and information"
+        onBackClick={() => router.back()}
+      />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="min-h-screen bg-slate-50"
+        >
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {/* Left Section - Registration Data */}
-          <div className="space-y-8">
-            {/* Account Information */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            {/* Left Section - Registration Data */}
+            <div className="space-y-8">
+              {/* Account Information */}
 
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.2,
-              }}
-            >
-              <Card
-                className="p-6 shadow-md border-t-4"
-                style={{ borderColor: DELIGO }}
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.2,
+                }}
               >
-                <h2 className="text-xl font-semibold mb-4">
-                  1. {t("account_information")}
-                </h2>
+                <Card
+                  className="p-6 shadow-md border-t-4"
+                  style={{ borderColor: DELIGO }}
+                >
+                  <h2 className="text-xl font-semibold mb-4">
+                    1. {t("account_information")}
+                  </h2>
 
-                <div className="space-y-4 items-start">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("first_name")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="space-y-4 items-start">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("first_name")}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t("first_name")} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("last_name")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("last_name")}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t("last_name")} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <div>
-                    <Label>{t("email")}</Label>
-                    <div className="flex items-center gap-3 mt-2">
-                      <Input
-                        type="email"
-                        placeholder={t("fleet_manager_email")}
-                        value={fleetManager.email}
-                        disabled
+                    <div>
+                      <Label>{t("email")}</Label>
+                      <div className="flex items-center gap-3 mt-2">
+                        <Input
+                          type="email"
+                          placeholder={t("fleet_manager_email")}
+                          value={fleetManager.email}
+                          disabled
+                        />
+                      </div>
+                    </div>
+
+                    <Label className="mb-2">{t("phone_number")}</Label>
+                    <div className="relative">
+                      <FormField
+                        control={form.control}
+                        name="prefixPhoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <div className="absolute left-2 z-10">
+                                <PhoneInput
+                                  {...field}
+                                  defaultCountry="pt"
+                                  countrySelectorStyleProps={{
+                                    buttonStyle: {
+                                      border: "none",
+                                      height: "36px",
+                                      backgroundColor: "transparent",
+                                    },
+                                  }}
+                                  inputStyle={{
+                                    marginTop: "1px",
+                                    border: "none",
+                                    height: "34px",
+                                    width: "48px",
+                                    borderRadius: "0px",
+                                    backgroundColor: "#ccc",
+                                    zIndex: "-99",
+                                    position: "relative",
+                                  }}
+                                  inputProps={{
+                                    placeholder: t("phone_number"),
+                                    disabled: true,
+                                  }}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                type="tel"
+                                className="pl-26 py-3"
+                                {...field}
+                                onChange={(e) => {
+                                  const onlyDigits = e.target.value.replace(
+                                    /\D/g,
+                                    "",
+                                  );
+                                  field.onChange(onlyDigits);
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
                   </div>
+                </Card>
+              </motion.div>
+              <AnimatePresence>
+                {fleetManager.userId && (
+                  <>
+                    {/* Business Details */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.3,
+                      }}
+                    >
+                      <Card
+                        className="p-6 shadow-md border-t-4"
+                        style={{ borderColor: DELIGO }}
+                      >
+                        <h2 className="text-xl font-semibold mb-4">
+                          2. {t("business_details")}
+                        </h2>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
-                  <div className="relative">
-                    <FormField
-                      control={form.control}
-                      name="prefixPhoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="absolute left-2 z-10">
-                              <PhoneInput
-                                {...field}
-                                defaultCountry="pt"
-                                countrySelectorStyleProps={{
-                                  buttonStyle: {
-                                    border: "none",
-                                    height: "36px",
-                                    backgroundColor: "transparent",
-                                  },
-                                }}
-                                inputStyle={{
-                                  marginTop: "1px",
-                                  border: "none",
-                                  height: "34px",
-                                  width: "48px",
-                                  borderRadius: "0px",
-                                  backgroundColor: "#ccc",
-                                  zIndex: "-99",
-                                  position: "relative",
-                                }}
-                                inputProps={{
-                                  placeholder: t("phone_number"),
-                                  disabled: true,
-                                }}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              type="tel"
-                              className="pl-26 py-3"
-                              {...field}
-                              onChange={(e) => {
-                                const onlyDigits = e.target.value.replace(
-                                  /\D/g,
-                                  "",
-                                );
-                                field.onChange(onlyDigits);
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                          <FormField
+                            control={form.control}
+                            name="businessName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("business_name")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("business_name")}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="businessLicenseNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  {t("business_license_number")}
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("license_number")}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </Card>
+                    </motion.div>
+
+                    {/* Bank Details */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        delay: 0.3,
+                      }}
+                    >
+                      <Card
+                        className="p-6 shadow-md border-t-4"
+                        style={{ borderColor: DELIGO }}
+                      >
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                          <Banknote className="w-5 h-5" /> 3.{" "}
+                          {t("bank_nd_payment_information")}
+                        </h2>
+
+                        <div className="space-y-4">
+                          <FormField
+                            control={form.control}
+                            name="bankName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("bank_name")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("bank_name")}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="accountHolderName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("account_holder_name")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("account_holder_name")}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="iban"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("iban")}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder={t("iban")} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="swiftCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("swift_code")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("swift_code")}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </Card>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Right Section - Business Location + Documents */}
             <AnimatePresence>
               {fleetManager.userId && (
-                <>
-                  {/* Business Details */}
+                <div className="space-y-8">
+                  {/* Business Location */}
                   <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
                       duration: 0.3,
-                    }}
-                  >
-                    <Card
-                      className="p-6 shadow-md border-t-4"
-                      style={{ borderColor: DELIGO }}
-                    >
-                      <h2 className="text-xl font-semibold mb-4">
-                        2. {t("business_details")}
-                      </h2>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                        <FormField
-                          control={form.control}
-                          name="businessName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("business_name")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("business_name")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="businessLicenseNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>
-                                {t("business_license_number")}
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("license_number")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </Card>
-                  </motion.div>
-
-                  {/* Bank Details */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: 0.3,
+                      delay: 0.6,
                     }}
                   >
                     <Card
@@ -377,156 +473,62 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <Banknote className="w-5 h-5" /> 3.{" "}
-                        {t("bank_nd_payment_information")}
+                        {/* <Banknote className="w-5 h-5" /> 4. Bank & Payment
+                      Information */}
+                        <Banknote className="w-5 h-5" /> 4.{" "}
+                        {t("business_location_information")}
                       </h2>
 
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="bankName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("bank_name")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("bank_name")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="accountHolderName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("account_holder_name")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("account_holder_name")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="iban"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("iban")}</FormLabel>
-                              <FormControl>
-                                <Input placeholder={t("iban")} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="swiftCode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("swift_code")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("swift_code")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                      <BusinessLocationMap
+                        form={form}
+                        setLocationCoordinates={setLocationCoordinates}
+                      />
                     </Card>
                   </motion.div>
-                </>
+
+                  {/* Documents */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 0.9,
+                    }}
+                  >
+                    <Card
+                      className="p-6 shadow-md border-t-4"
+                      style={{ borderColor: DELIGO }}
+                    >
+                      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <FileText className="w-5 h-5" /> 5.{" "}
+                        {t("documents_nd_verification")}
+                      </h2>
+
+                      <UploadFleetManagerDocuments
+                        fleetManagerId={fleetManager.userId}
+                        previews={previews}
+                        setPreviews={setPreviews}
+                      />
+                    </Card>
+                  </motion.div>
+                </div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Right Section - Business Location + Documents */}
-          <AnimatePresence>
-            {fleetManager.userId && (
-              <div className="space-y-8">
-                {/* Business Location */}
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: 0.6,
-                  }}
-                >
-                  <Card
-                    className="p-6 shadow-md border-t-4"
-                    style={{ borderColor: DELIGO }}
-                  >
-                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      {/* <Banknote className="w-5 h-5" /> 4. Bank & Payment
-                      Information */}
-                      <Banknote className="w-5 h-5" /> 4.{" "}
-                      {t("business_location_information")}
-                    </h2>
-
-                    <BusinessLocationMap
-                      form={form}
-                      setLocationCoordinates={setLocationCoordinates}
-                    />
-                  </Card>
-                </motion.div>
-
-                {/* Documents */}
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: 0.9,
-                  }}
-                >
-                  <Card
-                    className="p-6 shadow-md border-t-4"
-                    style={{ borderColor: DELIGO }}
-                  >
-                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <FileText className="w-5 h-5" /> 5.{" "}
-                      {t("documents_nd_verification")}
-                    </h2>
-
-                    <UploadFleetManagerDocuments
-                      fleetManagerId={fleetManager.userId}
-                      previews={previews}
-                      setPreviews={setPreviews}
-                    />
-                  </Card>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* SUBMIT BUTTON */}
-        {fleetManager.userId && (
-          <div className="mt-10 flex justify-end">
-            <Button
-              className="px-8 py-2 text-white"
-              style={{ background: DELIGO }}
-            >
-              {t("submit_fleetManager")}
-            </Button>
-          </div>
-        )}
-      </form>
-    </Form>
+          {/* SUBMIT BUTTON */}
+          {fleetManager.userId && (
+            <div className="mt-10 flex justify-end">
+              <Button
+                className="px-8 py-2 text-white"
+                style={{ background: DELIGO }}
+              >
+                {t("submit_fleetManager")}
+              </Button>
+            </div>
+          )}
+        </form>
+      </Form>
+    </>
   );
 }

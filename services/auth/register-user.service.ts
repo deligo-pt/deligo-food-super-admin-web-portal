@@ -36,6 +36,8 @@ export const updateDocumentsReq = async (
   endpoint: string,
   data: { docImageTitle: string; docImageUrls: string[] },
 ) => {
+  console.log("endpoint:", endpoint);
+  console.log("data:", data);
   return catchAsync<null>(async () => {
     return await serverRequest.patch(endpoint, {
       data,

@@ -242,7 +242,7 @@ export default function UploadVendorDocuments({
                 <div className="text-xs text-gray-500 mt-1 space-y-1">
                   {(previewFiles || [])?.map((url, i) => (
                     <div className="flex items-center gap-2 w-full" key={i}>
-                      {/\.(jpg|jpeg|png|webp|gif)$/i.test(url) ? (
+                      {/\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url) ? (
                         <div className="flex items-center gap-2 border p-1 rounded-md">
                           <Image
                             src={url}
@@ -253,14 +253,14 @@ export default function UploadVendorDocuments({
                             unoptimized
                           />
                           <div className="truncate">
-                            {getActualFileName(url)}
+                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
                           <File className="w-4 h-4 text-gray-500" />
                           <div className="truncate">
-                            {getActualFileName(url)}
+                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
                           </div>
                         </div>
                       )}
