@@ -191,6 +191,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       toast.success(updatedResult.message || "Vendor updated successfully!", {
         id: toastId,
       });
+      router.refresh();
       return;
     }
 
