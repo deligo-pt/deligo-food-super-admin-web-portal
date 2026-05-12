@@ -23,7 +23,7 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
-import { TFilePreview, TFleetDocKey } from "@/types/document.type";
+import { TFleetDocKey } from "@/types/document.type";
 import { TAgent } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
@@ -61,7 +61,7 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
-const defaultDocuments: Record<TFleetDocKey, TFilePreview[] | null> = {
+const defaultDocuments: Record<TFleetDocKey, string[] | null> = {
   businessLicense: null,
   myPhoto: null,
   idProofFront: null,
@@ -83,7 +83,7 @@ export default function AddFleetManager() {
     longitude: 0,
   });
   const [previews, setPreviews] =
-    useState<Record<TFleetDocKey, TFilePreview[] | null>>(defaultDocuments);
+    useState<Record<TFleetDocKey, string[] | null>>(defaultDocuments);
 
   const form = useForm<TFleetManagerForm>({
     resolver: zodResolver(addFleetManagerValidation),
