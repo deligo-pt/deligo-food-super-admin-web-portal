@@ -28,11 +28,11 @@ export type TDeliveryPartner = {
   // OTP & Password Reset
   // ------------------------------------------------------
   otp?: string;
-  isOtpExpired?: Date;
+  isOtpExpired?: string;
   requiresOtpVerification?: boolean;
 
   passwordResetToken?: string;
-  passwordResetTokenExpiresAt?: Date;
+  passwordResetTokenExpiresAt?: string;
   passwordChangedAt?: Date;
 
   // -------------------------------------------------
@@ -55,14 +55,14 @@ export type TDeliveryPartner = {
     geoAccuracy?: number;
   };
   personalInfo?: {
-    dateOfBirth?: Date;
+    dateOfBirth?: string;
     gender?: "MALE" | "FEMALE" | "OTHER";
     nationality?: string;
 
-    nifNumber?: string;
+    NIF?: string;
     citizenCardNumber?: string;
     passportNumber?: string;
-    idExpiryDate?: Date;
+    idExpiryDate?: string;
   };
 
   // -------------------------------------------------
@@ -71,7 +71,7 @@ export type TDeliveryPartner = {
   legalStatus?: {
     residencePermitType?: string;
     residencePermitNumber?: string;
-    residencePermitExpiry?: Date;
+    residencePermitExpiry?: string;
   };
 
   // -------------------------------------------------
@@ -94,10 +94,10 @@ export type TDeliveryPartner = {
     licensePlate?: string;
 
     drivingLicenseNumber?: string;
-    drivingLicenseExpiry?: Date;
+    drivingLicenseExpiry?: string;
 
     insurancePolicyNumber?: string;
-    insuranceExpiry?: Date;
+    insuranceExpiry?: string;
   };
 
   // -------------------------------------------------
@@ -105,7 +105,8 @@ export type TDeliveryPartner = {
   // -------------------------------------------------
   criminalRecord?: {
     certificate?: boolean;
-    issueDate?: Date;
+    issueDate?: string;
+    expiryDate?: string;
   };
 
   // -------------------------------------------------
@@ -172,8 +173,8 @@ export type TDeliveryPartner = {
   // -------------------------------------------------
   // Timestamps
   // -------------------------------------------------
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type TDeliveryPartnersQueryParams = {

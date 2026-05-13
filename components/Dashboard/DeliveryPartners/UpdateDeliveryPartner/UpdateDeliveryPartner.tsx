@@ -22,31 +22,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
-import { resendOtpReq, verifyOtpReq } from "@/services/auth/otp.service";
-import {
-  registerUserAndSendOtpReq,
-  updateUserDataReq,
-} from "@/services/auth/register-user.service";
-import { TResponse } from "@/types";
+import { updateUserDataReq } from "@/services/auth/register-user.service";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
-import { formatTime } from "@/utils/formatTime";
 import { deliveryPartnerValidation } from "@/validations/delivery-partner/delivery-partner.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { jwtDecode } from "jwt-decode";
-import {
-  BadgeCheck,
-  CheckCircle,
-  Eye,
-  EyeOff,
-  Mail,
-  PlusIcon,
-  XIcon,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+import parsePhoneNumberFromString from "libphonenumber-js";
+import { PlusIcon, XIcon } from "lucide-react";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -81,88 +70,110 @@ const equipment = [
   },
 ];
 
-function isValidEmail(email: string) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function isValidPassword(password: string) {
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return passwordRegex.test(password);
-}
-
-const defaultDocuments: Record<TPartnerDocKey, TFilePreview[] | null> = {
-  idProofFront: null,
-  idProofBack: null,
-  drivingLicenseFront: null,
-  drivingLicenseBack: null,
-  vehicleRegistration: null,
-  criminalRecordCertificate: null,
-  activity: null,
-  insurancePolicy: null,
-  myPhoto: null,
-};
-
-export default function AddDeliveryPartner() {
+export default function UpdateDeliveryPartner({
+  partner,
+}: {
+  partner: TDeliveryPartner;
+}) {
   const { t } = useTranslation();
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [partnerId, setPartnerId] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [zone, setZone] = useState("");
-  const [timer, setTimer] = useState(300);
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
     longitude: 0,
   });
-  const [previews, setPreviews] =
-    useState<Record<TPartnerDocKey, TFilePreview[] | null>>(defaultDocuments);
+
+  const [previews, setPreviews] = useState<
+    Record<TPartnerDocKey, TFilePreview[] | null>
+  >({
+    myPhoto: Array.isArray(partner?.documents?.myPhoto)
+      ? partner?.documents?.myPhoto
+      : null,
+    idProofFront: Array.isArray(partner?.documents?.idProofFront)
+      ? partner?.documents?.idProofFront
+      : null,
+    idProofBack: Array.isArray(partner?.documents?.idProofBack)
+      ? partner?.documents?.idProofBack
+      : null,
+    drivingLicenseFront: Array.isArray(partner?.documents?.drivingLicenseFront)
+      ? partner?.documents?.drivingLicenseFront
+      : null,
+    drivingLicenseBack: Array.isArray(partner?.documents?.drivingLicenseBack)
+      ? partner?.documents?.drivingLicenseBack
+      : null,
+    vehicleRegistration: Array.isArray(partner?.documents?.vehicleRegistration)
+      ? partner?.documents?.vehicleRegistration
+      : null,
+    criminalRecordCertificate: Array.isArray(
+      partner?.documents?.criminalRecordCertificate,
+    )
+      ? partner?.documents?.criminalRecordCertificate
+      : null,
+    activity: Array.isArray(partner?.documents?.activity)
+      ? partner?.documents?.activity
+      : null,
+    insurancePolicy: Array.isArray(partner?.documents?.insurancePolicy)
+      ? partner?.documents?.insurancePolicy
+      : null,
+  });
+
+  const phone = parsePhoneNumberFromString(partner.contactNumber || "");
 
   const form = useForm<TDeliveryPartnerForm>({
     resolver: zodResolver(deliveryPartnerValidation),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      prefixPhoneNumber: "",
-      phoneNumber: "",
-      dateOfBirth: "",
-      gender: "MALE",
-      nationality: "",
-      nifNumber: "",
-      passportNumber: "",
-      street: "",
-      city: "",
-      postalCode: "",
-      country: "",
-      vehicleType: "SCOOTER",
-      brand: "",
-      model: "",
-      licensePlate: "",
-      drivingLicenseNumber: "",
-      drivingLicenseExpiry: "",
-      insurancePolicyNumber: "",
-      insuranceExpiry: "",
-      bankName: "",
-      accountHolderName: "",
-      iban: "",
-      swiftCode: "",
-      preferredZones: [],
-      preferredHours: [],
-      isothermalBag: false,
-      helmet: false,
-      powerBank: false,
-      workedWithOtherPlatform: false,
-      otherPlatformName: "",
-      residencePermitType: "",
-      residencePermitNumber: "",
-      residencePermitExpiry: "",
-      haveCriminalRecordCertificate: true,
-      issueDate: "",
-      expiryDate: "",
+      firstName: partner.name?.firstName || "",
+      lastName: partner.name?.lastName || "",
+      prefixPhoneNumber: phone?.countryCallingCode
+        ? `+${phone?.countryCallingCode}`
+        : "+351",
+      phoneNumber: phone?.nationalNumber || "",
+      dateOfBirth: partner.personalInfo?.dateOfBirth
+        ? format(new Date(partner.personalInfo?.dateOfBirth), "yyyy-MM-dd")
+        : "",
+      gender: partner.personalInfo?.gender || "MALE",
+      nationality: partner.personalInfo?.nationality || "",
+      nifNumber: partner.personalInfo?.NIF || "",
+      passportNumber: partner.personalInfo?.passportNumber || "",
+      street: partner.address?.street || "",
+      city: partner.address?.city || "",
+      postalCode: partner.address?.postalCode || "",
+      country: partner.address?.country || "",
+      vehicleType: partner.vehicleInfo?.vehicleType || "SCOOTER",
+      brand: partner.vehicleInfo?.brand || "",
+      model: partner.vehicleInfo?.model || "",
+      licensePlate: partner.vehicleInfo?.licensePlate || "",
+      drivingLicenseNumber: partner.vehicleInfo?.drivingLicenseNumber || "",
+      drivingLicenseExpiry: partner.vehicleInfo?.drivingLicenseExpiry || "",
+      insurancePolicyNumber: partner.vehicleInfo?.insurancePolicyNumber || "",
+      insuranceExpiry: partner.vehicleInfo?.insuranceExpiry
+        ? format(partner.vehicleInfo?.insuranceExpiry, "yyyy-MM-dd")
+        : "",
+      bankName: partner.bankDetails?.bankName || "",
+      accountHolderName: partner.bankDetails?.accountHolderName || "",
+      iban: partner.bankDetails?.iban || "",
+      swiftCode: partner.bankDetails?.swiftCode || "",
+      preferredZones: partner.workPreferences?.preferredZones || [],
+      preferredHours: partner.workPreferences?.preferredHours || [],
+      isothermalBag:
+        partner.workPreferences?.hasEquipment?.isothermalBag || false,
+      helmet: partner.workPreferences?.hasEquipment?.helmet || false,
+      powerBank: partner.workPreferences?.hasEquipment?.powerBank || false,
+      workedWithOtherPlatform:
+        partner.workPreferences?.workedWithOtherPlatform || false,
+      otherPlatformName: partner.workPreferences?.otherPlatformName || "",
+      residencePermitType: partner.legalStatus?.residencePermitType || "",
+      residencePermitNumber: partner.legalStatus?.residencePermitNumber || "",
+      residencePermitExpiry: partner.legalStatus?.residencePermitExpiry
+        ? format(partner.legalStatus?.residencePermitExpiry, "yyyy-MM-dd")
+        : "",
+      haveCriminalRecordCertificate:
+        partner.criminalRecord?.certificate || true,
+      issueDate: partner.criminalRecord?.issueDate
+        ? format(partner.criminalRecord?.issueDate, "yyyy-MM-dd")
+        : "",
+      expiryDate: partner.criminalRecord?.expiryDate
+        ? format(partner.criminalRecord?.expiryDate, "yyyy-MM-dd")
+        : "",
     },
   });
 
@@ -186,91 +197,8 @@ export default function AddDeliveryPartner() {
     form.setValue("preferredZones", newZones);
   };
 
-  const sendOtp = async () => {
-    if (!email || !password) return;
-
-    const toastId = toast.loading("Sending OTP...");
-
-    if (!isValidEmail(email))
-      return toast.error("Invalid email address", { id: toastId });
-
-    if (!isValidPassword(password))
-      return toast.error(
-        "Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
-        {
-          id: toastId,
-        },
-      );
-
-    const result = await registerUserAndSendOtpReq(
-      {
-        email,
-        password,
-      },
-      "onboard/delivery-partner",
-    );
-
-    if (result.success) {
-      toast.success(result.message || "OTP sent successfully!", {
-        id: toastId,
-      });
-      setOtpSent(true);
-      return;
-    }
-
-    toast.error(result.message || "OTP send failed", { id: toastId });
-    console.log(result);
-  };
-
-  const resendOtp = async () => {
-    const toastId = toast.loading("Resending OTP...");
-    try {
-      const result = (await resendOtpReq({
-        email,
-      })) as unknown as TResponse<null>;
-
-      if (result.success) {
-        setTimer(300);
-        console.log("OTP resent!");
-        toast.success("OTP resent successfully!", { id: toastId });
-        return;
-      }
-      toast.error(result.message, { id: toastId });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "OTP resend failed", {
-        id: toastId,
-      });
-      console.log(error);
-    }
-  };
-
-  const verifyOtp = async () => {
-    const toastId = toast.loading("Verifying OTP...");
-
-    const result = await verifyOtpReq({
-      email,
-      otp,
-    });
-
-    if (result.success) {
-      toast.success(result.message || "OTP verified successfully!", {
-        id: toastId,
-      });
-      const decoded = jwtDecode(result.data.accessToken) as { userId: string };
-      setPartnerId(decoded.userId);
-      setEmailVerified(true);
-      setOtpSent(false);
-      setOtp("");
-      return;
-    }
-
-    toast.error(result.message || "OTP verification failed", { id: toastId });
-    console.log(result);
-  };
-
   const onSubmit = async (data: TDeliveryPartnerForm) => {
-    const toastId = toast.loading("Adding partner...");
+    const toastId = toast.loading("Updating partner...");
 
     const partnerData = {
       name: {
@@ -333,31 +261,41 @@ export default function AddDeliveryPartner() {
     };
 
     const updatedResult = await updateUserDataReq(
-      `/delivery-partners/${partnerId}`,
+      `/delivery-partners/${partner.userId}`,
       partnerData,
     );
 
     if (updatedResult.success) {
-      const approveResult = await approveOrRejectReq(partnerId, {
-        status: "APPROVED",
-      });
+      if (partner.status !== USER_STATUS.APPROVED) {
+        const approveResult = await approveOrRejectReq(partner.userId, {
+          status: "APPROVED",
+        });
 
-      if (approveResult.success) {
-        form.reset();
-        setPreviews(defaultDocuments);
-        toast.success(
-          approveResult.message || "Delivery partner added successfully!",
-          {
-            id: toastId,
-          },
-        );
+        if (approveResult.success) {
+          form.reset();
+          toast.success(
+            approveResult.message || "Delivery partner added successfully!",
+            {
+              id: toastId,
+            },
+          );
+          return;
+        }
+
+        toast.error(approveResult.message || "Delivery partner add failed", {
+          id: toastId,
+        });
+        console.log(approveResult);
         return;
       }
 
-      toast.error(approveResult.message || "Delivery partner add failed", {
-        id: toastId,
-      });
-      console.log(approveResult);
+      form.reset();
+      toast.success(
+        updatedResult.message || "Delivery partner updated successfully!",
+        {
+          id: toastId,
+        },
+      );
       return;
     }
 
@@ -367,13 +305,6 @@ export default function AddDeliveryPartner() {
     console.log(updatedResult);
   };
 
-  useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
-      return () => clearInterval(interval);
-    }
-  }, [timer]);
-
   return (
     <Form {...form}>
       <form
@@ -381,8 +312,8 @@ export default function AddDeliveryPartner() {
         className="min-h-screen bg-slate-50"
       >
         <TitleHeader
-          title="Add New Delivery Partner"
-          subtitle="Create a new delivery partner with the form below"
+          title="Update Delivery Partner"
+          subtitle="Update the delivery partner information with the form below"
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -439,83 +370,9 @@ export default function AddDeliveryPartner() {
                       <Input
                         type="email"
                         placeholder={t("partner_email")}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={partner.email}
+                        onChange={() => {}}
                       />
-                      {!otpSent && !emailVerified && (
-                        <Button
-                          disabled={!email || !password}
-                          type="button"
-                          style={{ background: DELIGO }}
-                          onClick={sendOtp}
-                          className="w-32"
-                        >
-                          <Mail className="w-4 h-4 mr-2" /> {t("send_otp")}
-                        </Button>
-                      )}
-                      {otpSent && !emailVerified && (
-                        <Button
-                          disabled={timer > 0}
-                          type="button"
-                          style={{ background: DELIGO }}
-                          onClick={resendOtp}
-                          className="w-32"
-                        >
-                          {t("resend")} {timer > 0 && `(${formatTime(timer)})`}
-                        </Button>
-                      )}
-                      {emailVerified && (
-                        <span className="text-green-600 flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4" /> {t("verified")}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {otpSent && !emailVerified && (
-                    <div>
-                      <Label className="mb-2">{t("otp")}</Label>
-                      <div className="flex items-center gap-3">
-                        <Input
-                          placeholder={t("enter_otp")}
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
-                        />
-                        <Button
-                          type="button"
-                          style={{ background: DELIGO }}
-                          onClick={verifyOtp}
-                          className="w-32"
-                        >
-                          <BadgeCheck className="w-4 h-4 mr-2" />{" "}
-                          {t("verify_otp")}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <Label className="mb-2">{t("password")}</Label>
-                    <div className="relative">
-                      <Input
-                        type={showPass ? "text" : "password"}
-                        placeholder={t("password")}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      {showPass ? (
-                        <EyeOff
-                          size={18}
-                          className="absolute right-3 top-2.5 cursor-pointer"
-                          onClick={() => setShowPass(false)}
-                        />
-                      ) : (
-                        <Eye
-                          size={18}
-                          className="absolute right-3 top-2.5 cursor-pointer"
-                          onClick={() => setShowPass(true)}
-                        />
-                      )}
                     </div>
                   </div>
 
@@ -588,7 +445,7 @@ export default function AddDeliveryPartner() {
             </motion.div>
 
             <AnimatePresence>
-              {partnerId && (
+              {partner.userId && (
                 <>
                   {/* Personal Information */}
                   <motion.div
@@ -823,7 +680,7 @@ export default function AddDeliveryPartner() {
 
           {/* Right Section */}
           <AnimatePresence>
-            {partnerId && (
+            {partner.userId && (
               <div className="space-y-8">
                 {/* Legal Status */}
                 <motion.div
@@ -1381,7 +1238,7 @@ export default function AddDeliveryPartner() {
                     </h2>
 
                     <UploadPartnerDocuments
-                      partnerId={partnerId}
+                      partnerId={partner.userId}
                       previews={previews}
                       setPreviews={setPreviews}
                     />
@@ -1393,13 +1250,13 @@ export default function AddDeliveryPartner() {
         </div>
 
         {/* SUBMIT BUTTON */}
-        {partnerId && (
+        {partner.userId && (
           <div className="mt-10 flex justify-end">
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
             >
-              Add Delivery Partner
+              Update Delivery Partner
             </Button>
           </div>
         )}

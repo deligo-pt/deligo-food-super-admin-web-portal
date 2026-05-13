@@ -151,9 +151,12 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       }
 
       form.reset();
-      toast.success(updatedResult.message || "Vendor updated successfully!", {
-        id: toastId,
-      });
+      toast.success(
+        updatedResult.message || "Fleet manager updated successfully!",
+        {
+          id: toastId,
+        },
+      );
       return;
     }
 

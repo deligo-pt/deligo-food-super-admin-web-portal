@@ -247,7 +247,7 @@ export default function DeliveryPartnerLogs() {
                   <span className="text-xs font-medium">Earnings</span>
                 </div>
                 <p className="text-xl font-bold text-gray-900">
-                  ${selectedPartner.todayEarnings}
+                  €{selectedPartner.todayEarnings}
                 </p>
                 <p className="text-xs text-gray-500">today</p>
               </div>

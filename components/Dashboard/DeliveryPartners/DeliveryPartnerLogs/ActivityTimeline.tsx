@@ -35,8 +35,8 @@ const activityConfig: Record<
   },
   online: {
     icon: Wifi,
-    color: "text-brand-600",
-    bg: "bg-brand-100",
+    color: "text-[#DC3173]",
+    bg: "bg-[#DC3173]/10",
   },
   offline: {
     icon: WifiOff,
