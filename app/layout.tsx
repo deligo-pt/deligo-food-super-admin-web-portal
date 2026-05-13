@@ -2,6 +2,7 @@ import NumberInputStopScroll from "@/components/NumberInputStopScroll/NumberInpu
 import SonnerToaster from "@/components/SonnerToaster/SonnerToaster";
 import type { Metadata } from "next";
 import "./globals.css";
+import { GoogleMapsProvider } from "@/store/googleProvider";
 
 export const metadata: Metadata = {
   title: "Admin Panel | DeliGo",
@@ -36,9 +37,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`antialiased`} suppressHydrationWarning>
-        {children}
-        <SonnerToaster />
-        <NumberInputStopScroll />
+        <GoogleMapsProvider>
+          {children}
+          <SonnerToaster />
+          <NumberInputStopScroll />
+        </GoogleMapsProvider>
       </body>
     </html>
   );

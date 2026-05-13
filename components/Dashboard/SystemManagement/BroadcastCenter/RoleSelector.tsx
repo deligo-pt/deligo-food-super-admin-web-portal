@@ -3,7 +3,7 @@ import { USER_ROLE } from '@/consts/user.const';
 import { TMeta } from '@/types';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { BikeIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon, LoaderCircleIcon, SearchIcon, ShieldIcon, StoreIcon, UserIcon, UsersIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getAllUsersReq } from '@/services/dashboard/system-management/email-notification-settings.service';
 import { TUser } from './BroadcastCenter';
 
@@ -234,6 +234,12 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
         return map[color] || map.blue;
     };
 
+    useEffect(() => {
+        Object.keys(USER_ROLE).forEach((role) => {
+            getUsers(role as RoleType);
+        });
+    }, []);
+
     return (
         <motion.div
             variants={itemVariants}
@@ -283,7 +289,7 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                     {role.label}
                                 </p>
                                 <p className="text-xs text-gray-500 mt-0.5">
-                                    {20} users
+                                    {usersData[role?.id]?.meta?.total || 0} users
                                 </p>
                             </div>
                             {isSelected && (

@@ -36,7 +36,7 @@ export const updateDocumentsReq = async (
   data: { docImageTitle: string; docImageUrls: string[] },
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.patch(`/${endPoint}/docImage`, {
+    return await serverRequest.patch(endPoint, {
       data,
     });
   });
@@ -47,7 +47,7 @@ export const deleteDocumentReq = async (
   data: { docImageTitle: string; imageUrl: string },
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.delete(`/${endPoint}/docImage`, {
+    return await serverRequest.delete(endPoint, {
       data,
     });
   });
