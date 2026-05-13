@@ -92,7 +92,7 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
-const defaultDocuments: Record<TPartnerDocKey, TFilePreview[] | null> = {
+const defaultDocuments: Record<TPartnerDocKey, TFilePreview | null> = {
   idProofFront: null,
   idProofBack: null,
   drivingLicenseFront: null,
@@ -120,7 +120,7 @@ export default function AddDeliveryPartner() {
     longitude: 0,
   });
   const [previews, setPreviews] =
-    useState<Record<TPartnerDocKey, TFilePreview[] | null>>(defaultDocuments);
+    useState<Record<TPartnerDocKey, TFilePreview | null>>(defaultDocuments);
 
   const form = useForm<TDeliveryPartnerForm>({
     resolver: zodResolver(deliveryPartnerValidation),

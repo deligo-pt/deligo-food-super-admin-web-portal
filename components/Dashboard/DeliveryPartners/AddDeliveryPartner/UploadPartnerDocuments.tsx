@@ -1,23 +1,22 @@
 "use client";
 
 import { useTranslation } from "@/hooks/use-translation";
-import {
-  deleteDocumentReq,
-  updateDocumentsReq,
-} from "@/services/auth/register-user.service";
-import { uploadImagesReq } from "@/services/upload/upload.service";
+import { TResponse } from "@/types";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
+import { catchAsync } from "@/utils/catchAsync";
+import { updateData } from "@/utils/requests";
 import { motion } from "framer-motion";
 import {
   Eye,
   File,
   FileText,
   ImageIcon,
-  Plus,
+  RefreshCcw,
   UploadCloud,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 
 type DocKey =
@@ -37,9 +36,9 @@ export default function UploadPartnerDocuments({
   setPreviews,
 }: {
   partnerId: string;
-  previews: Record<TPartnerDocKey, TFilePreview[] | null>;
+  previews: Record<TPartnerDocKey, TFilePreview | null>;
   setPreviews: React.Dispatch<
-    React.SetStateAction<Record<TPartnerDocKey, TFilePreview[] | null>>
+    React.SetStateAction<Record<TPartnerDocKey, TFilePreview | null>>
   >;
 }) {
   const { t } = useTranslation();
@@ -105,55 +104,49 @@ export default function UploadPartnerDocuments({
   const handleFileChange = async (key: TPartnerDocKey, f?: File | null) => {
     if (!f) return;
 
+    const toastId = toast.loading("Uploading...");
+
+    if (f.size > 5 * 1024 * 1024) {
+      toast.error("File size should be less than 5MB", { id: toastId });
+      return;
+    }
+
     if (inputsRef.current[key]) {
       inputsRef.current[key]!.value = "";
     }
 
-    const toastId = toast.loading("Uploading...");
-
-    if (previews[key]?.length === 3) {
-      toast.error("You can only upload a maximum of 3 documents", {
-        id: toastId,
-      });
-      return;
-    }
-
     const isImage = f.type.startsWith("image/");
 
-    const uploadResult = await uploadImagesReq([f]);
+    const formData = new FormData();
+    formData.append("file", f);
+    formData.append("data", JSON.stringify({ docImageTitle: key }));
+
+    const uploadResult = await catchAsync<TDeliveryPartner>(async () => {
+      return (await updateData(
+        `/delivery-partners/${partnerId}/docImage`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      )) as unknown as TResponse<TDeliveryPartner>;
+    });
 
     if (uploadResult.success) {
-      const prevUrls =
-        previews[key]?.filter((p) => p.url)?.map((p) => p.url) || [];
-
-      const updateResult = await updateDocumentsReq(partnerId, {
-        docImageTitle: key,
-        docImageUrls: [...prevUrls, uploadResult.data?.[0]],
-      });
-
-      if (updateResult.success) {
-        toast.success("File uploaded successfully!", { id: toastId });
-
-        setPreviews((p) => ({
-          ...p,
-          [key]: [
-            ...(p[key] || []),
-            { file: f, url: uploadResult.data?.[0], isImage },
-          ],
-        }));
-
-        return;
-      }
-
-      deleteDocumentReq(partnerId, {
-        docImageTitle: key,
-        imageUrl: uploadResult.data?.[0],
-      });
-
-      toast.error(updateResult.message || "File upload failed", {
+      toast.success(uploadResult.message || "File uploaded successfully!", {
         id: toastId,
       });
-      console.log(updateResult);
+
+      setPreviews((p) => ({
+        ...p,
+        [key]: {
+          file: f,
+          url: uploadResult.data?.documents?.[key],
+          isImage,
+        },
+      }));
+
       return;
     }
 
@@ -161,57 +154,13 @@ export default function UploadPartnerDocuments({
     console.log(uploadResult);
   };
 
-  const removeFile = async (key: TPartnerDocKey, index: number) => {
-    const prev = previews[key];
-
-    if (prev && prev[index]?.url) {
-      const toastId = toast.loading("Deleting...");
-
-      const result = await deleteDocumentReq(partnerId, {
-        docImageTitle: key,
-        imageUrl: prev[index].url,
-      });
-
-      if (result.success) {
-        toast.success("File deleted successfully!", { id: toastId });
-
-        setPreviews((p) => ({
-          ...p,
-          [key]: p[key]?.filter((_, i) => i !== index),
-        }));
-
-        if (inputsRef.current[key]) {
-          inputsRef.current[key]!.value = "";
-        }
-
-        return;
-      }
-
-      toast.error(result.message || "File deletion failed", { id: toastId });
-      console.log(result);
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      Object.values(previews).forEach((p) => {
-        if (p) {
-          p.forEach((f) => {
-            if (f.url) URL.revokeObjectURL(f.url);
-          });
-        }
-      });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   function getActualFileName(url: string): string {
     try {
       const decoded = decodeURIComponent(url);
       const lastSegment = decoded.split("/").pop() || "";
       const match = lastSegment.match(/file-(.+)$/);
-      const fileName = match ? match[1] : lastSegment;
-      return fileName.length > 10 ? fileName.slice(0, 10) + "..." : fileName;
+
+      return match ? match[1] : lastSegment;
     } catch {
       return "";
     }
@@ -220,8 +169,8 @@ export default function UploadPartnerDocuments({
   return (
     <div className="grid grid-cols-1 gap-4">
       {DOCUMENTS.map((d, idx) => {
-        const previewFiles = previews[d.key];
-        const isSelected = !(!previewFiles || previewFiles?.length === 0);
+        const previewFile = previews[d.key];
+        const isSelected = !!previewFile?.url;
         return (
           <motion.div
             key={d.key}
@@ -235,29 +184,44 @@ export default function UploadPartnerDocuments({
             }`}
           >
             <div className="flex items-center gap-4 w-full">
-              <div
-                className={`w-14 h-14 rounded-lg flex items-center justify-center ${
-                  isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
-                }`}
-              >
-                {d.prefersImagePreview ? (
-                  <ImageIcon className="w-6 h-6 text-[#DC3173]" />
-                ) : (
-                  <FileText className="w-6 h-6 text-[#DC3173]" />
-                )}
-              </div>
+              {!isSelected && (
+                <div
+                  className={`w-14 h-14 rounded-lg flex items-center justify-center ${
+                    isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
+                  }`}
+                >
+                  {d.prefersImagePreview ? (
+                    <ImageIcon className="w-6 h-6 text-[#DC3173]" />
+                  ) : (
+                    <FileText className="w-6 h-6 text-[#DC3173]" />
+                  )}
+                </div>
+              )}
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
                   {d.label}
                   {isSelected && (
-                    <button
-                      type="button"
-                      onClick={() => openPicker(d.key)}
-                      className="inline-flex items-center gap-2 p-0 text-sm font-medium text-[#DC3173]  hover:underline"
-                    >
-                      <Plus className="w-3 h-3 text-[#DC3173]" /> Add More
-                    </button>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          previewFile?.url
+                            ? window.open(previewFile.url, "_blank")
+                            : toast.error("Cannot view the file")
+                        }
+                        className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
+                      >
+                        <Eye className="w-3 h-3 text-[#DC3173]" /> {t("view")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openPicker(d.key)}
+                        className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
+                      >
+                        <RefreshCcw className="w-3 h-3 text-[#DC3173]" /> Change
+                      </button>
+                    </div>
                   )}
 
                   <input
@@ -276,62 +240,32 @@ export default function UploadPartnerDocuments({
                   />
                 </div>
                 <div className="text-xs text-gray-500 mt-1 space-y-1">
-                  {previewFiles?.map((f, i) => (
-                    <div className="flex items-center gap-2 w-full" key={i}>
-                      {f.isImage && f.url ? (
-                        <div className="flex items-center gap-2 border p-1 rounded-md">
-                          <Image
-                            src={f.url}
-                            alt={f.file?.name || getActualFileName(f.url || "")}
-                            width={56}
-                            height={40}
-                            className="object-cover rounded-md border"
-                            unoptimized
-                          />
-                          <div className="truncate">
-                            {f.file?.name
-                              ? f.file.name.length > 20
-                                ? f.file.name.slice(0, 20) + "..."
-                                : f.file.name
-                              : getActualFileName(f.url || "")}
-                          </div>
+                  {isSelected ? (
+                    previewFile?.isImage && previewFile?.url ? (
+                      <div className="grid grid-cols-[56px_1fr] items-center gap-2 rounded-md">
+                        <Image
+                          src={previewFile?.url}
+                          alt={getActualFileName(previewFile?.url || "")}
+                          width={56}
+                          height={40}
+                          className="object-cover rounded-md border w-14 h-8"
+                          unoptimized
+                        />
+                        <div className="truncate">
+                          {getActualFileName(previewFile?.url || "")}
                         </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <File className="w-4 h-4 text-gray-500" />
-                          <div className="truncate">
-                            {f.file?.name
-                              ? f.file.name.length > 10
-                                ? f.file.name.slice(0, 10) + "..."
-                                : f.file.name
-                              : getActualFileName(f.url || "")}
-                          </div>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 w-full">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            f.url
-                              ? window.open(f.url, "_blank")
-                              : alert(f.file?.name)
-                          }
-                          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
-                        >
-                          <Eye className="w-4 h-4 text-[#DC3173]" /> {t("view")}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => removeFile(d.key, i)}
-                          className="px-2 py-1 rounded-md text-xs cursor-pointer"
-                        >
-                          {t("remove")}
-                        </button>
                       </div>
-                    </div>
-                  ))}
-                  {!isSelected && <span>{t("no_file_selected")}</span>}
+                    ) : (
+                      <div className="grid grid-cols-[56px_1fr] items-center gap-2">
+                        <File className="w-4 h-4 text-gray-500" />
+                        <div className="truncate">
+                          {getActualFileName(previewFile?.url || "")}
+                        </div>
+                      </div>
+                    )
+                  ) : (
+                    <span>{t("no_file_selected")}</span>
+                  )}
                 </div>
               </div>
             </div>

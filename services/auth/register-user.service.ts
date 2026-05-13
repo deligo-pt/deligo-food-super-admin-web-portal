@@ -31,29 +31,27 @@ export const updateUserDataReq = async (
   });
 };
 
-
 export const updateDocumentsReq = async (
-  id: string,
+  endPoint: string,
   data: { docImageTitle: string; docImageUrls: string[] },
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.patch(`/vendors/${id}/docImage`, {
+    return await serverRequest.patch(`/${endPoint}/docImage`, {
       data,
     });
   });
 };
 
 export const deleteDocumentReq = async (
-  id: string,
+  endPoint: string,
   data: { docImageTitle: string; imageUrl: string },
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.delete(`/vendors/${id}/docImage`, {
+    return await serverRequest.delete(`/${endPoint}/docImage`, {
       data,
     });
   });
 };
-
 
 // export const uploadUserDocumentsReq = async (
 //   id: string,

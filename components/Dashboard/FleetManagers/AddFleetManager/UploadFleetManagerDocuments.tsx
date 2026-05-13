@@ -78,7 +78,7 @@ export default function UploadFleetManagerDocuments({
       const prevUrls =
         previews[key]?.filter((p) => p.url)?.map((p) => p.url) || [];
 
-      const updateResult = await updateDocumentsReq(fleetManagerId, {
+      const updateResult = await updateDocumentsReq(`fleet-managers/${fleetManagerId}`, {
         docImageTitle: key,
         docImageUrls: [...prevUrls, uploadResult.data?.[0]],
       });

@@ -70,6 +70,16 @@ const equipment = [
   },
 ];
 
+const generateFilePreview = (url: string | undefined): TFilePreview | null => {
+  if (!url) return null;
+
+  return {
+    file: null,
+    url,
+    isImage: url.includes("image"),
+  };
+};
+
 export default function UpdateDeliveryPartner({
   partner,
 }: {
@@ -83,37 +93,26 @@ export default function UpdateDeliveryPartner({
   });
 
   const [previews, setPreviews] = useState<
-    Record<TPartnerDocKey, TFilePreview[] | null>
+    Record<TPartnerDocKey, TFilePreview | null>
   >({
-    myPhoto: Array.isArray(partner?.documents?.myPhoto)
-      ? partner?.documents?.myPhoto
-      : null,
-    idProofFront: Array.isArray(partner?.documents?.idProofFront)
-      ? partner?.documents?.idProofFront
-      : null,
-    idProofBack: Array.isArray(partner?.documents?.idProofBack)
-      ? partner?.documents?.idProofBack
-      : null,
-    drivingLicenseFront: Array.isArray(partner?.documents?.drivingLicenseFront)
-      ? partner?.documents?.drivingLicenseFront
-      : null,
-    drivingLicenseBack: Array.isArray(partner?.documents?.drivingLicenseBack)
-      ? partner?.documents?.drivingLicenseBack
-      : null,
-    vehicleRegistration: Array.isArray(partner?.documents?.vehicleRegistration)
-      ? partner?.documents?.vehicleRegistration
-      : null,
-    criminalRecordCertificate: Array.isArray(
+    myPhoto: generateFilePreview(partner?.documents?.myPhoto),
+    idProofFront: generateFilePreview(partner?.documents?.idProofFront),
+    idProofBack: generateFilePreview(partner?.documents?.idProofBack),
+    drivingLicenseFront: generateFilePreview(
+      partner?.documents?.drivingLicenseFront,
+    ),
+
+    drivingLicenseBack: generateFilePreview(
+      partner?.documents?.drivingLicenseBack,
+    ),
+    vehicleRegistration: generateFilePreview(
+      partner?.documents?.vehicleRegistration,
+    ),
+    criminalRecordCertificate: generateFilePreview(
       partner?.documents?.criminalRecordCertificate,
-    )
-      ? partner?.documents?.criminalRecordCertificate
-      : null,
-    activity: Array.isArray(partner?.documents?.activity)
-      ? partner?.documents?.activity
-      : null,
-    insurancePolicy: Array.isArray(partner?.documents?.insurancePolicy)
-      ? partner?.documents?.insurancePolicy
-      : null,
+    ),
+    activity: generateFilePreview(partner?.documents?.activity),
+    insurancePolicy: generateFilePreview(partner?.documents?.insurancePolicy),
   });
 
   const phone = parsePhoneNumberFromString(partner.contactNumber || "");
@@ -143,7 +142,9 @@ export default function UpdateDeliveryPartner({
       model: partner.vehicleInfo?.model || "",
       licensePlate: partner.vehicleInfo?.licensePlate || "",
       drivingLicenseNumber: partner.vehicleInfo?.drivingLicenseNumber || "",
-      drivingLicenseExpiry: partner.vehicleInfo?.drivingLicenseExpiry || "",
+      drivingLicenseExpiry: partner.vehicleInfo?.drivingLicenseExpiry
+        ? format(partner.vehicleInfo?.drivingLicenseExpiry, "yyyy-MM-dd")
+        : "",
       insurancePolicyNumber: partner.vehicleInfo?.insurancePolicyNumber || "",
       insuranceExpiry: partner.vehicleInfo?.insuranceExpiry
         ? format(partner.vehicleInfo?.insuranceExpiry, "yyyy-MM-dd")
