@@ -70,14 +70,14 @@ function isValidPassword(password: string) {
   return passwordRegex.test(password);
 }
 
-const defaultDocuments: Record<TVendorDocKey, string[] | null> = ({
+const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
   businessLicenseDoc: null,
   taxDoc: null,
   idProofFront: null,
   idProofBack: null,
   storePhoto: null,
   menuUpload: null,
-});
+};
 
 export default function AddVendor({
   businessCategories,
@@ -121,7 +121,6 @@ export default function AddVendor({
       country: "",
       bankName: "",
       accountHolderName: "",
-      accountNumber: "",
       iban: "",
       swiftCode: "",
     },
@@ -248,7 +247,6 @@ export default function AddVendor({
       bankDetails: {
         bankName: data.bankName,
         accountHolderName: data.accountHolderName,
-        accountNumber: data.accountNumber,
         iban: data.iban,
         swiftCode: data.swiftCode,
       },
@@ -697,16 +695,17 @@ export default function AddVendor({
                                         field.onChange(
                                           field.value?.includes(day)
                                             ? field.value?.filter(
-                                              (d) => d !== day,
-                                            )
+                                                (d) => d !== day,
+                                              )
                                             : [...field.value, day],
                                         );
                                       }}
                                       whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
-                                        ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                        : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                        }`}
+                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
+                                        field.value.includes(day)
+                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                      }`}
                                     >
                                       {day}
                                     </motion.button>
@@ -766,23 +765,6 @@ export default function AddVendor({
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="accountNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Account Number</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Account Number"
                                   {...field}
                                 />
                               </FormControl>
