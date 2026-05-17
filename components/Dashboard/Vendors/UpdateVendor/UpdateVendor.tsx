@@ -33,10 +33,10 @@ import { TVendor } from "@/types/user.type";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import parsePhoneNumberFromString from "libphonenumber-js";
+// import parsePhoneNumberFromString from "libphonenumber-js";
 import { Banknote, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -89,17 +89,16 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     t("friday"),
     t("saturday"),
   ];
-  const phone = parsePhoneNumberFromString(vendor.contactNumber || "");
 
   const form = useForm<TVendorForm>({
     resolver: zodResolver(addVendorValidation),
     defaultValues: {
       firstName: vendor.name?.firstName || "",
       lastName: vendor.name?.lastName || "",
-      prefixPhoneNumber: phone?.countryCallingCode
-        ? `+${phone?.countryCallingCode}`
-        : "+351",
-      phoneNumber: phone?.nationalNumber || "",
+      // prefixPhoneNumber: phone?.countryCallingCode
+      //   ? `+${phone?.countryCallingCode}`
+      //   : "+351",
+      phoneNumber: vendor?.contactNumber || "",
       businessName: vendor.businessDetails?.businessName || "",
       businessType: vendor.businessDetails?.businessType || "",
       businessLicenseNumber:
@@ -151,7 +150,6 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       bankDetails: {
         bankName: data.bankName,
         accountHolderName: data.accountHolderName,
-        accountNumber: data.accountNumber,
         iban: data.iban,
         swiftCode: data.swiftCode,
       },
@@ -200,6 +198,13 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     });
     console.log(updatedResult);
   };
+
+  useEffect(() => {
+    const currentPhone = form.getValues("phoneNumber");
+    if (!currentPhone) {
+      form.setValue("phoneNumber", "+351", { shouldValidate: true });
+    }
+  }, [form]);
 
   return (
     <>
@@ -276,69 +281,54 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                     </div>
 
                     <Label className="mb-2">{t("phone_number")}</Label>
-                    <div className="relative">
-                      <FormField
-                        control={form.control}
-                        name="prefixPhoneNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <div className="absolute left-2 z-10">
-                                <PhoneInput
-                                  {...field}
-                                  defaultCountry="pt"
-                                  countrySelectorStyleProps={{
-                                    buttonStyle: {
-                                      border: "none",
-                                      height: "36px",
-                                      backgroundColor: "transparent",
-                                    },
-                                  }}
-                                  inputStyle={{
-                                    marginTop: "1px",
-                                    border: "none",
-                                    height: "34px",
-                                    width: "48px",
-                                    borderRadius: "0px",
-                                    backgroundColor: "#ccc",
-                                    zIndex: "-99",
-                                    position: "relative",
-                                  }}
-                                  inputProps={{
-                                    placeholder: t("phone_number"),
-                                    disabled: true,
-                                  }}
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="phoneNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                type="tel"
-                                className="pl-26 py-3"
-                                {...field}
-                                onChange={(e) => {
-                                  const onlyDigits = e.target.value.replace(
-                                    /\D/g,
-                                    "",
-                                  );
-                                  field.onChange(onlyDigits);
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <PhoneInput
+                              defaultCountry="pt"
+                              value={field.value || ""}
+                              onChange={(phone) => {
+                                field.onChange(phone);
+                              }}
+                              forceDialCode={true}
+                              disableDialCodePrefill={false}
+
+                              className="w-full flex"
+
+                              inputStyle={{
+                                width: "100%",
+                                height: "46px",
+                                fontSize: "14px",
+                                color: "#374151",
+                                borderRadius: "0.5rem",
+                                border: "1px solid #D1D5DB",
+                                outline: "none",
+                                paddingLeft: "52px",
+                              }}
+                              countrySelectorStyleProps={{
+                                buttonStyle: {
+                                  position: "absolute",
+                                  left: "1px",
+                                  top: "1px",
+                                  bottom: "1px",
+                                  border: "none",
+                                  backgroundColor: "transparent",
+                                  height: "44px",
+                                  padding: "0 12px",
+                                  borderTopLeftRadius: "0.5rem",
+                                  borderBottomLeftRadius: "0.5rem",
+                                },
+                              }}
+                              inputClassName="focus-visible:ring-2 focus-visible:ring-[#D1D5DB] focus-visible:border-[#D1D5DB]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </Card>
               </motion.div>

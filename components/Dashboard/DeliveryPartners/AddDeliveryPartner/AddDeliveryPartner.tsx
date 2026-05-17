@@ -127,7 +127,6 @@ export default function AddDeliveryPartner() {
     defaultValues: {
       firstName: "",
       lastName: "",
-      prefixPhoneNumber: "",
       phoneNumber: "",
       dateOfBirth: "",
       gender: "MALE",
@@ -376,6 +375,13 @@ export default function AddDeliveryPartner() {
     }
   }, [timer]);
 
+  useEffect(() => {
+    const currentPhone = form.getValues("phoneNumber");
+    if (!currentPhone) {
+      form.setValue("phoneNumber", "+351", { shouldValidate: true });
+    }
+  }, [form]);
+
   return (
     <Form {...form}>
       <form
@@ -522,69 +528,54 @@ export default function AddDeliveryPartner() {
                   </div>
 
                   <Label className="mb-2">{t("phone_number")}</Label>
-                  <div className="relative">
-                    <FormField
-                      control={form.control}
-                      name="prefixPhoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="absolute left-2 z-10">
-                              <PhoneInput
-                                {...field}
-                                defaultCountry="pt"
-                                countrySelectorStyleProps={{
-                                  buttonStyle: {
-                                    border: "none",
-                                    height: "36px",
-                                    backgroundColor: "transparent",
-                                  },
-                                }}
-                                inputStyle={{
-                                  marginTop: "1px",
-                                  border: "none",
-                                  height: "34px",
-                                  width: "48px",
-                                  borderRadius: "0px",
-                                  backgroundColor: "#ccc",
-                                  zIndex: "-99",
-                                  position: "relative",
-                                }}
-                                inputProps={{
-                                  placeholder: t("phone_number"),
-                                  disabled: true,
-                                }}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              type="tel"
-                              className="pl-26 py-3"
-                              {...field}
-                              onChange={(e) => {
-                                const onlyDigits = e.target.value.replace(
-                                  /\D/g,
-                                  "",
-                                );
-                                field.onChange(onlyDigits);
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <PhoneInput
+                            defaultCountry="pt"
+                            value={field.value || ""}
+                            onChange={(phone) => {
+                              field.onChange(phone);
+                            }}
+                            forceDialCode={true}
+                            disableDialCodePrefill={false}
+
+                            className="w-full flex"
+
+                            inputStyle={{
+                              width: "100%",
+                              height: "40px",
+                              fontSize: "14px",
+                              color: "#374151",
+                              borderRadius: "0.5rem",
+                              border: "1px solid #D1D5DB",
+                              outline: "none",
+                              paddingLeft: "52px",
+                            }}
+                            countrySelectorStyleProps={{
+                              buttonStyle: {
+                                position: "absolute",
+                                left: "1px",
+                                top: "-1px",
+                                bottom: "1px",
+                                border: "none",
+                                backgroundColor: "transparent",
+                                height: "44px",
+                                padding: "0 12px",
+                                borderTopLeftRadius: "0.5rem",
+                                borderBottomLeftRadius: "0.5rem",
+                              },
+                            }}
+                            inputClassName="focus-visible:ring-2 focus-visible:ring-[#D1D5DB] focus-visible:border-[#D1D5DB]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </Card>
             </motion.div>
@@ -1306,9 +1297,9 @@ export default function AddDeliveryPartner() {
                               control={form.control}
                               name={
                                 item.id as
-                                  | "isothermalBag"
-                                  | "helmet"
-                                  | "powerBank"
+                                | "isothermalBag"
+                                | "helmet"
+                                | "powerBank"
                               }
                               render={({ field }) => (
                                 <FormItem className="content-start">
