@@ -116,7 +116,7 @@ export const InfoRow = ({
 
 export const RecipientCard = ({ payout }: { payout: TPayout }) => {
   if (payout.userModel === "Vendor") {
-    const v = payout.userId as TVendor;
+    const v = payout.userId as unknown as TVendor;
     // const fullAddress = v.businessLocation
     //   ? `${v.businessLocation.street}, ${v.businessLocation.city}, ${v.businessLocation.country} ${v.businessLocation.postalCode}`
     //   : null;

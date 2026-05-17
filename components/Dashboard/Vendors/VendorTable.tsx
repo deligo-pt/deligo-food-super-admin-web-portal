@@ -96,7 +96,7 @@ export default function VendorTable({
           {vendors?.map((vendor) => (
             <TableRow key={vendor._id}>
               <TableCell>
-                {vendor.name?.firstName} {vendor.name?.lastName}
+                {vendor.businessDetails?.businessName || "N/A"}
               </TableCell>
               <TableCell>{vendor.email}</TableCell>
               <TableCell>{vendor.contactNumber}</TableCell>

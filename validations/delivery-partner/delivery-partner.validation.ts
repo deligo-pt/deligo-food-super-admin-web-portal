@@ -48,22 +48,10 @@ export const deliveryPartnerValidation = z
       .min(9, "NIF number must be at least 9 characters")
       .nonempty("NIF number is required"),
 
-    citizenCardNumber: z
-      .string()
-      .min(5, "Citizen card number must be at least 5 characters")
-      .nonempty("Citizen card number is required"),
-
     passportNumber: z
       .string()
       .min(5, "Passport number must be at least 5 characters")
       .optional(),
-
-    idExpiryDate: z
-      .string()
-      .refine((value) => {
-        return Date.parse(value);
-      }, "Invalid date format")
-      .nonempty("ID expiry date is required"),
 
     street: z
       .string()
@@ -200,6 +188,8 @@ export const deliveryPartnerValidation = z
     ),
 
     issueDate: z.string().optional(),
+
+    expiryDate: z.string().optional(),
   })
   .refine((data) => {
     if (
@@ -252,5 +242,30 @@ export const deliveryPartnerValidation = z
     {
       message: "Invalid issue date format",
       path: ["issueDate"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.haveCriminalRecordCertificate) {
+        return !!data.expiryDate;
+      }
+      return true;
+    },
+    {
+      message: "Expiry date is required",
+      path: ["expiryDate"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.expiryDate) {
+        return Date.parse(data.expiryDate);
+      }
+
+      return true;
+    },
+    {
+      message: "Invalid expiry date format",
+      path: ["expiryDate"],
     },
   );

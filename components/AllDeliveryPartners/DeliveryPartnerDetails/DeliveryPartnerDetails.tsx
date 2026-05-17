@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
   ArrowLeftCircle,
@@ -20,6 +21,7 @@ import {
   Car,
   Check,
   CreditCard,
+  Edit,
   FileText,
   Gavel,
   Mail,
@@ -40,11 +42,6 @@ import { toast } from "sonner";
 interface IProps {
   partner: TDeliveryPartner;
 }
-
-const formatDate = (date: Date | undefined) => {
-  if (!date) return "N/A";
-  return new Date(date).toLocaleDateString();
-};
 
 export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   const { t } = useTranslation();
@@ -214,7 +211,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("date_of_birth")}
                 value={
                   partner.personalInfo?.dateOfBirth
-                    ? formatDate(partner.personalInfo?.dateOfBirth)
+                    ? format(partner.personalInfo?.dateOfBirth, "do MMM yyyy")
                     : "N/A"
                 }
               />
@@ -240,7 +237,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("id_expiry_date")}
                 value={
                   partner.personalInfo?.idExpiryDate
-                    ? formatDate(partner.personalInfo?.idExpiryDate)
+                    ? format(partner.personalInfo?.idExpiryDate, "do MMM yyyy")
                     : "N/A"
                 }
               />
@@ -304,7 +301,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("license_expiry")}
                 value={
                   partner.vehicleInfo?.drivingLicenseExpiry
-                    ? formatDate(partner.vehicleInfo?.drivingLicenseExpiry)
+                    ? format(
+                        partner.vehicleInfo?.drivingLicenseExpiry,
+                        "do MMM yyyy",
+                      )
                     : "N/A"
                 }
               />
@@ -316,7 +316,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("insurance_expiry")}
                 value={
                   partner.vehicleInfo?.insuranceExpiry
-                    ? formatDate(partner.vehicleInfo?.insuranceExpiry)
+                    ? format(
+                        partner.vehicleInfo?.insuranceExpiry,
+                        "do MMM yyyy",
+                      )
                     : "N/A"
                 }
               />
@@ -364,7 +367,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("permit_expiry_date")}
                 value={
                   partner.legalStatus?.residencePermitExpiry
-                    ? formatDate(partner.legalStatus?.residencePermitExpiry)
+                    ? format(
+                        partner.legalStatus?.residencePermitExpiry,
+                        "do MMM yyyy",
+                      )
                     : "N/A"
                 }
               />
@@ -647,17 +653,17 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             <div>
               <InfoRow
                 label={t("account_created")}
-                value={formatDate(partner.createdAt)}
+                value={format(partner.createdAt, "do MMM yyyy")}
               />
               <InfoRow
                 label={t("last_updated")}
-                value={formatDate(partner.updatedAt)}
+                value={format(partner.updatedAt, "do MMM yyyy")}
               />
               <InfoRow
                 label={t("submitted_for_approval")}
                 value={
                   partner.submittedForApprovalAt
-                    ? formatDate(partner.submittedForApprovalAt)
+                    ? format(partner.submittedForApprovalAt, "do MMM yyyy")
                     : "N/A"
                 }
               />
@@ -667,7 +673,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("approved_rejected_blocked_at")}
                 value={
                   partner.approvedOrRejectedOrBlockedAt
-                    ? formatDate(partner.approvedOrRejectedOrBlockedAt)
+                    ? format(
+                        partner.approvedOrRejectedOrBlockedAt,
+                        "do MMM yyyy",
+                      )
                     : "N/A"
                 }
               />
@@ -678,6 +687,21 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <div className="mt-8 flex flex-wrap justify-end gap-3">
+          <motion.button
+            onClick={() =>
+              router.push(`/admin/all-delivery-partners/edit/${partner.userId}`)
+            }
+            whileHover={{
+              scale: 1.05,
+            }}
+            whileTap={{
+              scale: 0.95,
+            }}
+            className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Edit</span>
+          </motion.button>
           {partner.status === "SUBMITTED" && (
             <>
               <motion.button

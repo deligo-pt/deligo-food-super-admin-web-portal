@@ -39,15 +39,15 @@ export default function UploadFleetManagerDocuments({
     label: string;
     prefersImagePreview: boolean;
   }[] = [
-      { key: "myPhoto", label: "Fleet Manager Photo", prefersImagePreview: true },
-      {
-        key: "businessLicense",
-        label: t("business_license"),
-        prefersImagePreview: false,
-      },
-      { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
-      { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
-    ];
+    { key: "myPhoto", label: "Fleet Manager Photo", prefersImagePreview: true },
+    {
+      key: "businessLicense",
+      label: t("business_license"),
+      prefersImagePreview: false,
+    },
+    { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
+    { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
+  ];
 
   const openPicker = (key: TFleetDocKey) => {
     const el = inputsRef.current[key];
@@ -116,7 +116,6 @@ export default function UploadFleetManagerDocuments({
       ...p,
       [key]: [...(p[key] || []), newUrl],
     }));
-
   };
 
   const removeFile = async (key: TFleetDocKey, index: number) => {
@@ -188,15 +187,17 @@ export default function UploadFleetManagerDocuments({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
-            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${isSelected
-              ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
-              : "bg-white"
-              }`}
+            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${
+              isSelected
+                ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
+                : "bg-white"
+            }`}
           >
             <div className="flex items-center gap-4 w-full">
               <div
-                className={`w-14 h-14 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
-                  }`}
+                className={`w-14 h-14 rounded-lg flex items-center justify-center ${
+                  isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
+                }`}
               >
                 {d.prefersImagePreview ? (
                   <ImageIcon className="w-6 h-6 text-[#DC3173]" />
@@ -247,14 +248,18 @@ export default function UploadFleetManagerDocuments({
                             unoptimized
                           />
                           <div className="truncate">
-                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
+                            {url.length > 30
+                              ? getActualFileName(url)?.slice(0, 30)
+                              : getActualFileName(url)}
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
                           <File className="w-4 h-4 text-gray-500" />
                           <div className="truncate">
-                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
+                            {url.length > 30
+                              ? getActualFileName(url)?.slice(0, 30)
+                              : getActualFileName(url)}
                           </div>
                         </div>
                       )}

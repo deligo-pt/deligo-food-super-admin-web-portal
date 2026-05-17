@@ -106,12 +106,6 @@ export const addVendorValidation = z
       .max(100, "Account holder name must be at most 100 characters")
       .nonempty("Account holder name is required"),
 
-    accountNumber: z
-      .string()
-      .min(2, "Account number must be at least 2 characters")
-      .max(100, "Account number must be at most 100 characters")
-      .nonempty("Account number is required"),
-
     iban: z
       .string()
       .min(15, "IBAN must be at least 15 characters")

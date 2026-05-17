@@ -146,10 +146,12 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       }
 
       form.reset();
-      toast.success(updatedResult.message || "Vendor updated successfully!", {
-        id: toastId,
-      });
-      router.refresh();
+      toast.success(
+        updatedResult.message || "Fleet manager updated successfully!",
+        {
+          id: toastId,
+        },
+      );
       return;
     }
 
@@ -178,7 +180,6 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="min-h-screen bg-slate-50"
         >
-
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {/* Left Section - Registration Data */}
             <div className="space-y-8">
@@ -392,7 +393,9 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                             name="accountHolderName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t("account_holder_name")}</FormLabel>
+                                <FormLabel>
+                                  {t("account_holder_name")}
+                                </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder={t("account_holder_name")}

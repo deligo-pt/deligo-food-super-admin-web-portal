@@ -114,7 +114,6 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       country: vendor.businessLocation?.country || "",
       bankName: vendor.bankDetails?.bankName || "",
       accountHolderName: vendor.bankDetails?.accountHolderName || "",
-      accountNumber: vendor.bankDetails?.accountNumber || "",
       iban: vendor.bankDetails?.iban || "",
       swiftCode: vendor.bankDetails?.swiftCode || "",
     },
@@ -219,7 +218,6 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="min-h-screen bg-slate-50"
         >
-
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {/* Left Section - Registration Data */}
             <div className="space-y-8">
@@ -526,16 +524,17 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                                           field.onChange(
                                             field.value?.includes(day)
                                               ? field.value?.filter(
-                                                (d) => d !== day,
-                                              )
+                                                  (d) => d !== day,
+                                                )
                                               : [...field.value, day],
                                           );
                                         }}
                                         whileTap={{ scale: 0.95 }}
-                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
-                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                          }`}
+                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
+                                          field.value.includes(day)
+                                            ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                            : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                        }`}
                                       >
                                         {day}
                                       </motion.button>
@@ -591,27 +590,12 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                             name="accountHolderName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t("account_holder_name")}</FormLabel>
+                                <FormLabel>
+                                  {t("account_holder_name")}
+                                </FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder={t("account_holder_name")}
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name="accountNumber"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Account Number</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="Account Number"
                                     {...field}
                                   />
                                 </FormControl>

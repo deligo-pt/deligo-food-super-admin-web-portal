@@ -31,31 +31,27 @@ export const updateUserDataReq = async (
   });
 };
 
-
 export const updateDocumentsReq = async (
-  endpoint: string,
+  endPoint: string,
   data: { docImageTitle: string; docImageUrls: string[] },
 ) => {
-  console.log("endpoint:", endpoint);
-  console.log("data:", data);
   return catchAsync<null>(async () => {
-    return await serverRequest.patch(endpoint, {
+    return await serverRequest.patch(endPoint, {
       data,
     });
   });
 };
 
 export const deleteDocumentReq = async (
-  endpoint: string,
+  endPoint: string,
   data: { docImageTitle: string; imageUrl: string },
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.delete(endpoint, {
+    return await serverRequest.delete(endPoint, {
       data,
     });
   });
 };
-
 
 // export const uploadUserDocumentsReq = async (
 //   id: string,
