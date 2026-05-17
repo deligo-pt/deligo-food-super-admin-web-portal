@@ -33,9 +33,8 @@ import { deliveryPartnerValidation } from "@/validations/delivery-partner/delive
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import parsePhoneNumberFromString from "libphonenumber-js";
 import { PlusIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -115,17 +114,12 @@ export default function UpdateDeliveryPartner({
     insurancePolicy: generateFilePreview(partner?.documents?.insurancePolicy),
   });
 
-  const phone = parsePhoneNumberFromString(partner.contactNumber || "");
-
   const form = useForm<TDeliveryPartnerForm>({
     resolver: zodResolver(deliveryPartnerValidation),
     defaultValues: {
       firstName: partner.name?.firstName || "",
       lastName: partner.name?.lastName || "",
-      prefixPhoneNumber: phone?.countryCallingCode
-        ? `+${phone?.countryCallingCode}`
-        : "+351",
-      phoneNumber: phone?.nationalNumber || "",
+      phoneNumber: partner?.contactNumber || "",
       dateOfBirth: partner.personalInfo?.dateOfBirth
         ? format(new Date(partner.personalInfo?.dateOfBirth), "yyyy-MM-dd")
         : "",
@@ -306,6 +300,13 @@ export default function UpdateDeliveryPartner({
     console.log(updatedResult);
   };
 
+  useEffect(() => {
+    const currentPhone = form.getValues("phoneNumber");
+    if (!currentPhone) {
+      form.setValue("phoneNumber", "+351", { shouldValidate: true });
+    }
+  }, [form]);
+
   return (
     <Form {...form}>
       <form
@@ -372,75 +373,60 @@ export default function UpdateDeliveryPartner({
                         type="email"
                         placeholder={t("partner_email")}
                         value={partner.email}
-                        onChange={() => {}}
+                        onChange={() => { }}
                       />
                     </div>
                   </div>
 
                   <Label className="mb-2">{t("phone_number")}</Label>
-                  <div className="relative">
-                    <FormField
-                      control={form.control}
-                      name="prefixPhoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="absolute left-2 z-10">
-                              <PhoneInput
-                                {...field}
-                                defaultCountry="pt"
-                                countrySelectorStyleProps={{
-                                  buttonStyle: {
-                                    border: "none",
-                                    height: "36px",
-                                    backgroundColor: "transparent",
-                                  },
-                                }}
-                                inputStyle={{
-                                  marginTop: "1px",
-                                  border: "none",
-                                  height: "34px",
-                                  width: "48px",
-                                  borderRadius: "0px",
-                                  backgroundColor: "#ccc",
-                                  zIndex: "-99",
-                                  position: "relative",
-                                }}
-                                inputProps={{
-                                  placeholder: t("phone_number"),
-                                  disabled: true,
-                                }}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              type="tel"
-                              className="pl-26 py-3"
-                              {...field}
-                              onChange={(e) => {
-                                const onlyDigits = e.target.value.replace(
-                                  /\D/g,
-                                  "",
-                                );
-                                field.onChange(onlyDigits);
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <PhoneInput
+                            defaultCountry="pt"
+                            value={field.value || ""}
+                            onChange={(phone) => {
+                              field.onChange(phone);
+                            }}
+                            forceDialCode={true}
+                            disableDialCodePrefill={false}
+
+                            className="w-full flex"
+
+                            inputStyle={{
+                              width: "100%",
+                              height: "40px",
+                              fontSize: "14px",
+                              color: "#374151",
+                              borderRadius: "0.5rem",
+                              border: "1px solid #D1D5DB",
+                              outline: "none",
+                              paddingLeft: "52px",
+                            }}
+                            countrySelectorStyleProps={{
+                              buttonStyle: {
+                                position: "absolute",
+                                left: "1px",
+                                top: "-1px",
+                                bottom: "1px",
+                                border: "none",
+                                backgroundColor: "transparent",
+                                height: "44px",
+                                padding: "0 12px",
+                                borderTopLeftRadius: "0.5rem",
+                                borderBottomLeftRadius: "0.5rem",
+                              },
+                            }}
+                            inputClassName="focus-visible:ring-2 focus-visible:ring-[#D1D5DB] focus-visible:border-[#D1D5DB]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </Card>
             </motion.div>
@@ -1144,9 +1130,9 @@ export default function UpdateDeliveryPartner({
                               control={form.control}
                               name={
                                 item.id as
-                                  | "isothermalBag"
-                                  | "helmet"
-                                  | "powerBank"
+                                | "isothermalBag"
+                                | "helmet"
+                                | "powerBank"
                               }
                               render={({ field }) => (
                                 <FormItem className="content-start">
