@@ -1,6 +1,4 @@
-import parsePhoneNumberFromString, {
-  isValidPhoneNumber,
-} from "libphonenumber-js";
+import parsePhoneNumberFromString from "libphonenumber-js";
 import { z } from "zod";
 
 export const addFleetManagerValidation = z
@@ -17,12 +15,18 @@ export const addFleetManagerValidation = z
       .max(30, "Last name must be at most 30 characters long")
       .nonempty("Last name is required"),
 
-    prefixPhoneNumber: z.string(),
+    // prefixPhoneNumber: z.string(),
 
-    phoneNumber: z
-      .string()
-      .nonempty("Phone number is required")
-      .nonempty("Phone number is required"),
+    phoneNumber: z.string()
+      .min(10, "Phone number is required")
+      .refine((val) => {
+        try {
+          const phone = parsePhoneNumberFromString(val);
+          return phone?.isValid() ?? false;
+        } catch {
+          return false;
+        }
+      }, "Invalid phone number for the selected country"),
 
     businessName: z
       .string()
@@ -82,23 +86,3 @@ export const addFleetManagerValidation = z
       .min(8, "SWIFT code must be at least 8 characters")
       .max(11, "SWIFT code must be at most 11 characters"),
   })
-  .refine(
-    (data) => {
-      const full = data.prefixPhoneNumber + data.phoneNumber;
-      const result = isValidPhoneNumber(full);
-
-      return result;
-    },
-    {
-      message: "Invalid phone number for the selected country",
-      path: ["phoneNumber"],
-    }
-  )
-  .transform((data) => {
-    const full = data.prefixPhoneNumber + data.phoneNumber;
-    const phone = parsePhoneNumberFromString(full);
-    return {
-      ...data,
-      phoneNumber: `+${phone?.countryCallingCode}${phone?.nationalNumber}`,
-    };
-  });

@@ -1,6 +1,4 @@
-import parsePhoneNumberFromString, {
-  isValidPhoneNumber,
-} from "libphonenumber-js";
+import parsePhoneNumberFromString from "libphonenumber-js";
 import { z } from "zod";
 
 export const deliveryPartnerValidation = z
@@ -17,12 +15,18 @@ export const deliveryPartnerValidation = z
       .max(30, "Last name must be at most 30 characters long")
       .nonempty("Last name is required"),
 
-    prefixPhoneNumber: z.string(),
+    // prefixPhoneNumber: z.string(),
 
-    phoneNumber: z
-      .string()
-      .nonempty("Phone number is required")
-      .nonempty("Phone number is required"),
+    phoneNumber: z.string()
+      .min(10, "Phone number is required")
+      .refine((val) => {
+        try {
+          const phone = parsePhoneNumberFromString(val);
+          return phone?.isValid() ?? false;
+        } catch {
+          return false;
+        }
+      }, "Invalid phone number for the selected country"),
 
     dateOfBirth: z
       .string()
@@ -187,18 +191,6 @@ export const deliveryPartnerValidation = z
 
     expiryDate: z.string().optional(),
   })
-  .refine(
-    (data) => {
-      const full = data.prefixPhoneNumber + data.phoneNumber;
-      const result = isValidPhoneNumber(full);
-
-      return result;
-    },
-    {
-      message: "Invalid phone number for the selected country",
-      path: ["phoneNumber"],
-    },
-  )
   .refine((data) => {
     if (
       data.vehicleType === "CAR" ||
@@ -215,14 +207,6 @@ export const deliveryPartnerValidation = z
     }
     return true;
   }, "License plate, driving license number, driving license expiry, insurance policy number and insurance expiry is required if vehicle type is car, scooter or bike")
-  .transform((data) => {
-    const full = data.prefixPhoneNumber + data.phoneNumber;
-    const phone = parsePhoneNumberFromString(full);
-    return {
-      ...data,
-      phoneNumber: `+${phone?.countryCallingCode}${phone?.nationalNumber}`,
-    };
-  })
   .refine(
     (data) => {
       if (data.workedWithOtherPlatform && !data.otherPlatformName) {

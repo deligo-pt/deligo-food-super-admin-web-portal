@@ -11,7 +11,6 @@ interface IProps {
 }
 
 export default function FleetManagerDetailsDoc({ documents }: IProps) {
-  console.log("documents", documents);
   const docsArr = Object.keys(documents || {}) as (keyof IFleetDocs)[];
 
   return (
