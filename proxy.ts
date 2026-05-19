@@ -10,52 +10,140 @@ export async function proxy(req: NextRequest) {
   const loginUrl = new URL("/", req.url);
   loginUrl.searchParams.set("redirect", pathname);
 
-  const tokenWasRefreshed = await verifyTokens();
+  try {
+    /**
+     * ==================================================
+     * TOKEN VERIFY / REFRESH
+     * ==================================================
+     */
 
-  if (tokenWasRefreshed) {
-    return NextResponse.redirect(new URL(pathname, req.url));
-  }
+    const tokenWasRefreshed = await verifyTokens();
 
-  const adminResult = await getAdminInfo();
+    /**
+     * IMPORTANT:
+     * NEVER redirect to same pathname here.
+     * This causes redirect loops + router corruption.
+     */
 
-  if (adminResult) {
-    const adminInfo = adminResult?.admin;
+    if (tokenWasRefreshed) {
+      console.log("Token refreshed successfully");
 
-    if (
-      adminInfo.role === USER_ROLE.ADMIN ||
-      adminInfo.role === USER_ROLE.SUPER_ADMIN
-    ) {
-      const currentDeviceId = req.cookies.get(DEVICE_KEY)?.value || "";
-      const isValidSession = adminInfo?.loginDevices?.some(
-        (device) => currentDeviceId === device.deviceId,
-      );
-
-      if (!isValidSession) {
-        req.cookies.delete("accessToken");
-        req.cookies.delete("refreshToken");
-        if (pathname !== "/") {
-          loginUrl.searchParams.set("sessionExpired", "true");
-          return NextResponse.redirect(loginUrl);
-        }
-      }
-
-      if (pathname === "/" && isValidSession) {
-        return NextResponse.redirect(new URL("/admin/dashboard", req.url));
-      }
-    } else {
-      req.cookies.delete("accessToken");
-      req.cookies.delete("refreshToken");
-      if (pathname !== "/") {
-        return NextResponse.redirect(loginUrl);
-      }
+      return NextResponse.next();
     }
-  } else {
+
+    /**
+     * ==================================================
+     * GET ADMIN INFO
+     * ==================================================
+     */
+
+    const adminResult = await getAdminInfo();
+
+    /**
+     * ==================================================
+     * IF ADMIN EXISTS
+     * ==================================================
+     */
+
+    if (adminResult) {
+      const adminInfo = adminResult?.admin;
+
+      /**
+       * ==================================================
+       * ROLE CHECK
+       * ==================================================
+       */
+
+      if (
+        adminInfo.role === USER_ROLE.ADMIN ||
+        adminInfo.role === USER_ROLE.SUPER_ADMIN
+      ) {
+        /**
+         * ==================================================
+         * DEVICE SESSION CHECK
+         * ==================================================
+         */
+
+        const currentDeviceId = req.cookies.get(DEVICE_KEY)?.value || "";
+
+
+        const isValidSession = adminInfo?.loginDevices?.some(
+          (device) => currentDeviceId === device.deviceId,
+        );
+
+
+        /**
+         * ==================================================
+         * INVALID SESSION
+         * ==================================================
+         */
+
+        if (!isValidSession) {
+          const response = NextResponse.redirect(loginUrl);
+
+          response.cookies.delete("accessToken");
+          response.cookies.delete("refreshToken");
+
+          if (pathname !== "/") {
+            loginUrl.searchParams.set("sessionExpired", "true");
+
+            return NextResponse.redirect(loginUrl);
+          }
+
+          return response;
+        }
+
+        /**
+         * ==================================================
+         * REDIRECT LOGGED IN USER FROM "/"
+         * ==================================================
+         */
+
+        if (pathname === "/" && isValidSession) {
+
+          return NextResponse.redirect(
+            new URL("/admin/dashboard", req.url),
+          );
+        }
+
+        return NextResponse.next();
+      }
+
+      /**
+       * ==================================================
+       * INVALID ROLE
+       * ==================================================
+       */
+
+      const response = NextResponse.redirect(loginUrl);
+
+      response.cookies.delete("accessToken");
+      response.cookies.delete("refreshToken");
+
+
+      if (pathname !== "/") {
+        return response;
+      }
+
+      return response;
+    }
+
+    /**
+     * ==================================================
+     * NO ADMIN FOUND
+     * ==================================================
+     */
+
     if (pathname.startsWith("/admin")) {
       return NextResponse.redirect(loginUrl);
     }
-  }
 
-  return NextResponse.next();
+    return NextResponse.next();
+  } catch (error) {
+    console.log("MIDDLEWARE ERROR =>", error);
+
+    return NextResponse.next();
+  }
 }
 
 export const config = {

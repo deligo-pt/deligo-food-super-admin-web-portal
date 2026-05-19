@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import NumberInputStopScroll from "@/components/NumberInputStopScroll/NumberInputStopScroll";
 import SonnerToaster from "@/components/SonnerToaster/SonnerToaster";
 import type { Metadata } from "next";
