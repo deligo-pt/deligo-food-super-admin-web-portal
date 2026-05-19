@@ -42,6 +42,7 @@ interface IProps {
 type TFleetManagerForm = z.infer<typeof addFleetManagerValidation>;
 
 export default function UpdateFleetManager({ fleetManager }: IProps) {
+  const [fleetManagerState, setFleetManagerState] = useState(fleetManager);
   const { t } = useTranslation();
   const router = useRouter();
   const [locationCoordinates, setLocationCoordinates] = useState({
@@ -65,7 +66,6 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       : null,
   });
 
-
   const form = useForm<TFleetManagerForm>({
     resolver: zodResolver(addFleetManagerValidation),
     defaultValues: {
@@ -85,6 +85,28 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       swiftCode: fleetManager.bankDetails?.swiftCode || "",
     },
   });
+
+  useEffect(() => {
+    form.reset({
+      firstName: fleetManagerState.name?.firstName || "",
+      lastName: fleetManagerState.name?.lastName || "",
+      phoneNumber: fleetManagerState?.contactNumber || "",
+      businessName:
+        fleetManagerState.businessDetails?.businessName || "",
+      businessLicenseNumber:
+        fleetManagerState.businessDetails?.businessLicenseNumber || "",
+      street: fleetManagerState.businessLocation?.street || "",
+      city: fleetManagerState.businessLocation?.city || "",
+      postalCode:
+        fleetManagerState.businessLocation?.postalCode || "",
+      country: fleetManagerState.businessLocation?.country || "",
+      bankName: fleetManagerState.bankDetails?.bankName || "",
+      accountHolderName:
+        fleetManagerState.bankDetails?.accountHolderName || "",
+      iban: fleetManagerState.bankDetails?.iban || "",
+      swiftCode: fleetManagerState.bankDetails?.swiftCode || "",
+    });
+  }, [fleetManagerState, form]);
 
   const onSubmit = async (data: TFleetManagerForm) => {
     const toastId = toast.loading("Adding fleet manager...");
@@ -121,6 +143,12 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
     );
 
     if (updatedResult.success) {
+
+      setFleetManagerState((prev) => ({
+        ...prev,
+        ...fleetManagerData,
+      }));
+
       if (fleetManager.status !== USER_STATUS.APPROVED) {
         const approveResult = await approveOrRejectReq(fleetManager.userId, {
           status: "APPROVED",

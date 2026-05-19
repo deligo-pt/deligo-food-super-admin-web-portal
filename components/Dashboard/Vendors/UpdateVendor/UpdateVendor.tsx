@@ -52,32 +52,33 @@ interface IProps {
 type TVendorForm = z.infer<typeof addVendorValidation>;
 
 export default function UpdateVendor({ businessCategories, vendor }: IProps) {
+  const [vendorState, setVendorState] = useState(vendor);
   const { t } = useTranslation();
   const router = useRouter();
   const [locationCoordinates, setLocationCoordinates] = useState({
-    latitude: vendor.businessLocation?.latitude || 0,
-    longitude: vendor.businessLocation?.longitude || 0,
+    latitude: vendorState.businessLocation?.latitude || 0,
+    longitude: vendorState.businessLocation?.longitude || 0,
   });
   const [previews, setPreviews] = useState<
     Record<TVendorDocKey, string[] | null>
   >({
-    businessLicenseDoc: Array.isArray(vendor?.documents?.businessLicenseDoc)
-      ? vendor?.documents?.businessLicenseDoc
+    businessLicenseDoc: Array.isArray(vendorState?.documents?.businessLicenseDoc)
+      ? vendorState?.documents?.businessLicenseDoc
       : null,
-    taxDoc: Array.isArray(vendor?.documents?.taxDoc)
-      ? vendor?.documents?.taxDoc
+    taxDoc: Array.isArray(vendorState?.documents?.taxDoc)
+      ? vendorState?.documents?.taxDoc
       : null,
-    idProofFront: Array.isArray(vendor?.documents?.idProofFront)
-      ? vendor?.documents?.idProofFront
+    idProofFront: Array.isArray(vendorState?.documents?.idProofFront)
+      ? vendorState?.documents?.idProofFront
       : null,
-    idProofBack: Array.isArray(vendor?.documents?.idProofBack)
-      ? vendor?.documents?.idProofBack
+    idProofBack: Array.isArray(vendorState?.documents?.idProofBack)
+      ? vendorState?.documents?.idProofBack
       : null,
-    storePhoto: Array.isArray(vendor?.documents?.storePhoto)
-      ? vendor?.documents?.storePhoto
+    storePhoto: Array.isArray(vendorState?.documents?.storePhoto)
+      ? vendorState?.documents?.storePhoto
       : null,
-    menuUpload: Array.isArray(vendor?.documents?.menuUpload)
-      ? vendor?.documents?.menuUpload
+    menuUpload: Array.isArray(vendorState?.documents?.menuUpload)
+      ? vendorState?.documents?.menuUpload
       : null,
   });
   const daysOfWeek = [
@@ -93,31 +94,54 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
   const form = useForm<TVendorForm>({
     resolver: zodResolver(addVendorValidation),
     defaultValues: {
-      firstName: vendor.name?.firstName || "",
-      lastName: vendor.name?.lastName || "",
-      // prefixPhoneNumber: phone?.countryCallingCode
-      //   ? `+${phone?.countryCallingCode}`
-      //   : "+351",
-      phoneNumber: vendor?.contactNumber || "",
-      businessName: vendor.businessDetails?.businessName || "",
-      businessType: vendor.businessDetails?.businessType || "",
-      businessLicenseNumber:
-        vendor.businessDetails?.businessLicenseNumber || "",
-      NIF: vendor.businessDetails?.NIF || "",
-      branches: vendor.businessDetails?.totalBranches?.toString() || "1",
-      openingHours: vendor.businessDetails?.openingHours || "",
-      closingHours: vendor.businessDetails?.closingHours || "",
-      closingDays: vendor.businessDetails?.closingDays || [],
-      street: vendor.businessLocation?.street || "",
-      city: vendor.businessLocation?.city || "",
-      postalCode: vendor.businessLocation?.postalCode || "",
-      country: vendor.businessLocation?.country || "",
-      bankName: vendor.bankDetails?.bankName || "",
-      accountHolderName: vendor.bankDetails?.accountHolderName || "",
-      iban: vendor.bankDetails?.iban || "",
-      swiftCode: vendor.bankDetails?.swiftCode || "",
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      businessName: "",
+      businessType: "",
+      businessLicenseNumber: "",
+      NIF: "",
+      branches: "1",
+      openingHours: "",
+      closingHours: "",
+      closingDays: [],
+      street: "",
+      city: "",
+      postalCode: "",
+      country: "",
+      bankName: "",
+      accountHolderName: "",
+      iban: "",
+      swiftCode: "",
     },
   });
+
+  useEffect(() => {
+    form.reset({
+      firstName: vendorState.name?.firstName || "",
+      lastName: vendorState.name?.lastName || "",
+      phoneNumber: vendorState?.contactNumber || "",
+      businessName: vendorState.businessDetails?.businessName || "",
+      businessType: vendorState.businessDetails?.businessType || "",
+      businessLicenseNumber:
+        vendorState.businessDetails?.businessLicenseNumber || "",
+      NIF: vendorState.businessDetails?.NIF || "",
+      branches:
+        vendorState.businessDetails?.totalBranches?.toString() || "1",
+      openingHours: vendorState.businessDetails?.openingHours || "",
+      closingHours: vendorState.businessDetails?.closingHours || "",
+      closingDays: vendorState.businessDetails?.closingDays || [],
+      street: vendorState.businessLocation?.street || "",
+      city: vendorState.businessLocation?.city || "",
+      postalCode: vendorState.businessLocation?.postalCode || "",
+      country: vendorState.businessLocation?.country || "",
+      bankName: vendorState.bankDetails?.bankName || "",
+      accountHolderName:
+        vendorState.bankDetails?.accountHolderName || "",
+      iban: vendorState.bankDetails?.iban || "",
+      swiftCode: vendorState.bankDetails?.swiftCode || "",
+    });
+  }, [vendorState, form]);
 
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Updating vendor data...");
@@ -160,6 +184,12 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     );
 
     if (updatedResult.success) {
+
+      setVendorState((prev) => ({
+        ...prev,
+        ...vendorData,
+      }));
+
       if (vendor.status !== USER_STATUS.APPROVED) {
         const approveResult = await approveOrRejectReq(vendor.userId, {
           status: USER_STATUS.APPROVED,
@@ -272,7 +302,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                         <Input
                           type="email"
                           placeholder={t("vendor_email")}
-                          value={vendor.email}
+                          value={vendorState.email}
                           disabled
                         />
                       </div>
@@ -524,17 +554,16 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                                           field.onChange(
                                             field.value?.includes(day)
                                               ? field.value?.filter(
-                                                  (d) => d !== day,
-                                                )
+                                                (d) => d !== day,
+                                              )
                                               : [...field.value, day],
                                           );
                                         }}
                                         whileTap={{ scale: 0.95 }}
-                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
-                                          field.value.includes(day)
-                                            ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                            : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                        }`}
+                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
+                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                          }`}
                                       >
                                         {day}
                                       </motion.button>
@@ -666,7 +695,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
 
                       <BusinessLocationMap
                         form={form}
-                        businessLocation={vendor.businessLocation}
+                        businessLocation={vendorState.businessLocation}
                         setLocationCoordinates={setLocationCoordinates}
                       />
                     </Card>
