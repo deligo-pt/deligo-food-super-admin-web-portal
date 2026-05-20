@@ -69,6 +69,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: "Vendor Performance Analytics",
           path: "/admin/vendor-performance",
         },
+        { name: "Vendor Agreements", path: "/admin/vendor-agreements" },
         { name: "Vendor Wallets", path: "/admin/vendor-wallets" },
         { name: "Vendor Zones", path: "/admin/vendor-zones" },
       ],
@@ -325,12 +326,12 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
   const filteredMenu =
     searchTerm.length > 0
       ? MENU.filter(
-          (menu) =>
-            menu.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            menu.items?.some((item) =>
-              item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-            ),
-        )
+        (menu) =>
+          menu.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          menu.items?.some((item) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+          ),
+      )
       : MENU;
 
   const currentMenuId = MENU.find((menu) =>
@@ -431,11 +432,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
               {menu.path ? (
                 <Link
                   href={menu.path}
-                  className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${
-                    pathname === menu.path
-                      ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                      : "hover:bg-pink-100"
-                  } ${!open ? "justify-center" : ""}`}
+                  className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${pathname === menu.path
+                    ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                    : "hover:bg-pink-100"
+                    } ${!open ? "justify-center" : ""}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="text-pink-600">{menu.icon}</div>
@@ -481,11 +481,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                           <Link
                             key={sub.name}
                             href={sub.path}
-                            className={`text-sm px-2 py-1 rounded-md transition-all duration-300 ${
-                              pathname === sub.path
-                                ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                                : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
-                            }`}
+                            className={`text-sm px-2 py-1 rounded-md transition-all duration-300 ${pathname === sub.path
+                              ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                              : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
+                              }`}
                           >
                             {sub.name}
                           </Link>
@@ -548,11 +547,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                     <Link
                       href={menu.path}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-2 py-2 ${
-                        pathname === menu.path
-                          ? "text-pink-700 font-semibold"
-                          : "text-gray-800 hover:text-pink-600"
-                      }`}
+                      className={`flex items-center gap-2 py-2 ${pathname === menu.path
+                        ? "text-pink-700 font-semibold"
+                        : "text-gray-800 hover:text-pink-600"
+                        }`}
                     >
                       <div className="text-pink-600">{menu.icon}</div>
                       <span>{menu.title}</span>
@@ -569,9 +567,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                         </div>
                         <ChevronDown
                           size={16}
-                          className={`transition-transform ${
-                            expanded[menu.id] ? "rotate-180" : ""
-                          }`}
+                          className={`transition-transform ${expanded[menu.id] ? "rotate-180" : ""
+                            }`}
                         />
                       </button>
 
@@ -588,11 +585,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                                 key={sub.name}
                                 href={sub.path}
                                 onClick={() => setMobileOpen(false)}
-                                className={`text-sm py-1 transition-all ${
-                                  pathname === sub.path
-                                    ? "text-pink-700 font-semibold"
-                                    : "text-gray-600 hover:text-pink-600"
-                                }`}
+                                className={`text-sm py-1 transition-all ${pathname === sub.path
+                                  ? "text-pink-700 font-semibold"
+                                  : "text-gray-600 hover:text-pink-600"
+                                  }`}
                               >
                                 {sub.name}
                               </Link>
