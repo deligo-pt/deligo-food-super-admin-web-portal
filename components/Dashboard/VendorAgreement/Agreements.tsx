@@ -38,7 +38,7 @@ const filterOptions = [
 export default function Agreements({
     agreementsResult,
 }: IProps) {
-    console.log("Agreements", agreementsResult);
+
     return (
         <div className="space-y-6 max-w-full">
             {/* Page Title */}

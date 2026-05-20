@@ -116,7 +116,7 @@ export default function AgreementsTable({ agreements }: IProps) {
                                         <DropdownMenuItem
                                             className="cursor-pointer font-medium text-slate-700 focus:text-[#DC3173]"
                                             onClick={() =>
-                                                router.push(`/admin/agreements/${agreement._id}`)
+                                                router.push(`/admin/vendor-agreements/${agreement._id}`)
                                             }
                                         >
                                             View

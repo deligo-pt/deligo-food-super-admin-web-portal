@@ -34,3 +34,25 @@ export const getAllVendorAgreements = async (queryString?: string) => {
         };
     }
 };
+
+export const getSingleAgreement = async (agreementId: string) => {
+    try {
+        const response = await serverFetch.get(`/agreements/${agreementId}`, {
+            next: {
+                tags: ["agreement", `agreement-${agreementId}`],
+                revalidate: 10
+            }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result?.message || "Failed to fetch agreement details");
+        }
+
+        return result?.data;
+    } catch (error) {
+        console.error("Get Single Agreement Error:", error);
+        throw error;
+    }
+};
