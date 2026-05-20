@@ -49,7 +49,7 @@ export default function AgreementsTable({ agreements }: IProps) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
+            className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-5 overflow-x-auto"
         >
             <Table className="max-w-full">
                 <TableHeader>
