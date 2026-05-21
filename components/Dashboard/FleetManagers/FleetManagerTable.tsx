@@ -96,7 +96,7 @@ export default function FleetManagerTable({
           {agents?.map((agent) => (
             <TableRow key={agent._id}>
               <TableCell>
-                {agent.name?.firstName} {agent.name?.lastName}
+                {agent?.businessDetails?.businessName || "N/A"}
               </TableCell>
               <TableCell>{agent.email}</TableCell>
               <TableCell>{agent.contactNumber}</TableCell>
