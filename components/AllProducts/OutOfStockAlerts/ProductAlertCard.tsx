@@ -24,21 +24,22 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
   const getProductAlertLevel = (
     product: TProduct,
   ): "Critical" | "Low" | "Normal" => {
-    if (product.stock.hasVariations) {
+    if (product?.stock && product.stock.hasVariations) {
       const allOptions = product.variations.flatMap((v) => v.options);
       if (allOptions.some((o) => o.stockQuantity === 0 || o.isOutOfStock))
         return "Critical";
       if (allOptions.some((o) => o.stockQuantity <= 10)) return "Low";
       return "Normal";
     } else {
-      if (
-        product.stock.quantity === 0 ||
-        product.stock.availabilityStatus === "Out of Stock"
+      if (product?.stock &&
+        (product.stock.quantity === 0 ||
+          product.stock.availabilityStatus === "Out of Stock")
       )
         return "Critical";
       if (
-        product.stock.quantity <= 10 ||
-        product.stock.availabilityStatus === "Limited"
+        product?.stock &&
+        (product.stock.quantity <= 10 ||
+          product.stock.availabilityStatus === "Limited")
       )
         return "Low";
       return "Normal";
@@ -118,7 +119,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
           </div>
 
           {/* Stock Display (No Variations) */}
-          {!product.stock.hasVariations && (
+          {(product?.stock && !product.stock.hasVariations) && (
             <div className="mt-4">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-500 font-medium">Current Stock</span>
@@ -140,7 +141,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
           )}
 
           {/* Variations Toggle */}
-          {product.stock.hasVariations && (
+          {(product?.stock && product.stock.hasVariations) && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="mt-2 flex items-center gap-1.5 text-sm font-medium text-[#DC3173] hover:text-[#DC3173]/80 transition-colors"

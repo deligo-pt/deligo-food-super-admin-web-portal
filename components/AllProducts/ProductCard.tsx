@@ -119,7 +119,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
               ""
             )}
           </div>
-          {product?.vendorId?.businessDetails?.businessType !== "RESTAURANT" && <div
+          {product?.stock && <div
             className={`text-xs px-2 py-1 rounded-full ${availabilityColors[product.stock.availabilityStatus]
               }`}
           >
