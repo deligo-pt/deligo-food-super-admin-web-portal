@@ -4,57 +4,77 @@ import { getDeviceInfo } from "@/utils/getDeviceInfo";
 import { getToken } from "firebase/messaging";
 
 export async function getFcmToken(): Promise<string | null> {
-  if (!messaging) return null;
-  if (!("serviceWorker" in navigator)) return null;
+  try {
+    if (!messaging) return null;
 
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") return null;
+    if (!("serviceWorker" in navigator)) return null;
 
-  // const registration = await navigator.serviceWorker.ready;
+    const permission = await Notification.requestPermission();
 
-  return await getToken(messaging, {
-    vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
-    // serviceWorkerRegistration: registration,
-  });
+    if (permission !== "granted") return null;
+
+    const registration = await navigator.serviceWorker.ready;
+
+    const token = await getToken(messaging, {
+      vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
+      serviceWorkerRegistration: registration,
+    });
+
+    return token;
+  } catch (error) {
+    console.error("Error getting FCM token:", error);
+    return null;
+  }
 }
 
-export async function updateFcmToken(token: string): Promise<void> {
+export async function updateFcmToken(token: string, accessToken: string): Promise<void> {
   try {
     const deviceInfo = await getDeviceInfo();
 
-    const result = await updateFcmTockenReq({
-      token,
-      deviceId: deviceInfo.deviceId,
-    });
+    const result = await updateFcmTockenReq(
+      {
+        token,
+        deviceId: deviceInfo.deviceId,
+      },
+      accessToken
+    );
 
-    if (result.success) {
-      console.log("FCM token updated successfully!");
-      return;
+
+    if (result?.success) {
+      console.log("FCM token updated successfully");
+    } else {
+      console.error("FCM update failed:", result);
     }
-
-    console.error("Failed to update FCM token:", result);
   } catch (err) {
-    console.error("updateFcmToken failed:", err);
-    throw err;
+    console.error("updateFcmToken crashed:", err);
   }
 }
 
 export async function getAndSaveFcmToken(accessToken: string): Promise<void> {
   try {
     if (!accessToken) {
-      console.warn("No access token provided, skipping FCM token update");
+      console.warn("No access token provided");
       return;
     }
 
     const token = await getFcmToken();
-    if (!token) return;
 
-    const savedToken = localStorage.getItem("deligo-admin-fcm-token");
+    if (!token) {
+      console.warn("No FCM token generated");
+      return;
+    }
 
-    // Only hit the update API if the token is actually new
+    const savedToken = localStorage.getItem(
+      "deligo-admin-fcm-token"
+    );
+
     if (token !== savedToken) {
-      await updateFcmToken(token);
-      localStorage.setItem("deligo-admin-fcm-token", token);
+      await updateFcmToken(token, accessToken);
+
+      localStorage.setItem(
+        "deligo-admin-fcm-token",
+        token
+      );
     }
   } catch (fcmError) {
     console.error("Failed to update FCM token:", fcmError);
