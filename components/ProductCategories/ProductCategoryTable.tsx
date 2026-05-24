@@ -279,7 +279,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
           }
         >
           <form>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-106.25">
               <DialogHeader>
                 <DialogTitle>
                   {statusInfo.field === "isDeleted"
