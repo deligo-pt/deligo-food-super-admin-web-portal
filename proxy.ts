@@ -17,7 +17,7 @@ export async function proxy(req: NextRequest) {
      * ==================================================
      */
 
-    const tokenWasRefreshed = await verifyTokens();
+    // const tokenWasRefreshed = await verifyTokens();
 
     /**
      * IMPORTANT:
@@ -25,11 +25,11 @@ export async function proxy(req: NextRequest) {
      * This causes redirect loops + router corruption.
      */
 
-    if (tokenWasRefreshed) {
-      console.log("Token refreshed successfully");
+    // if (tokenWasRefreshed) {
+    //   console.log("Token refreshed successfully");
 
-      return NextResponse.next();
-    }
+    //   return NextResponse.next();
+    // }
 
     /**
      * ==================================================
