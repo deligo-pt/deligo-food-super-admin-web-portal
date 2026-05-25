@@ -3,7 +3,6 @@
 import NumberInputStopScroll from "@/components/NumberInputStopScroll/NumberInputStopScroll";
 import SonnerToaster from "@/components/SonnerToaster/SonnerToaster";
 import type { Metadata } from "next";
-// @ts-expect-error CSS import is allowed in Next.js app directory
 import "./globals.css";
 import { GoogleMapsProvider } from "@/store/googleProvider";
 

@@ -1,4 +1,4 @@
-
+export const dynamic = "force-dynamic";
 
 import Sidebar from "@/components/adminDashboardSidebar/adminDashboardSidebar";
 import DesktopSidebar from "@/components/adminDashboardSidebar/DesktopSidebar";
