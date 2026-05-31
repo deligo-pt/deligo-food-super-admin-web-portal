@@ -2,7 +2,6 @@
 
 import { DEVICE_KEY } from "@/consts/device.const";
 import { serverFetch } from "@/lib/fetchHelper";
-import { serverRequest } from "@/lib/serverFetch";
 import { TDeviceDetails } from "@/types";
 import { catchAsync } from "@/utils/catchAsync";
 import { cookies } from "next/headers";
