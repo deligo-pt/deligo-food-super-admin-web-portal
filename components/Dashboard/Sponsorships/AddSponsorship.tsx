@@ -46,6 +46,7 @@ export default function AddSponsorship() {
       endDate: new Date(),
       isActive: true,
       sponsorBanner: { file: null, url: "" },
+      url: ""
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,6 +64,7 @@ export default function AddSponsorship() {
       startDate: format(data.startDate, "yyyy-MM-dd"),
       endDate: format(data.endDate, "yyyy-MM-dd"),
       isActive: data.isActive,
+      ...(data.url && { url: data.url }),
     };
 
     const formData = new FormData();
@@ -197,6 +199,25 @@ export default function AddSponsorship() {
                       label="End Date"
                       value={format(field.value, "yyyy-MM-dd")}
                       onChange={(e) => field.onChange(new Date(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <SettingsInput
+                      fieldState={fieldState}
+                      label="Sponsor Url (optional)"
+                      placeholder="e.g. https://example.com"
+                      value={field.value}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />

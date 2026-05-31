@@ -41,6 +41,8 @@ export const sponsorshipValidation = z
       .default(true)
       .optional(),
 
+    url: z.string().url("Invalid URL format").max(255).or(z.literal("")),
+
     sponsorBanner: z.object(
       {
         file: z.file().nullable(),
