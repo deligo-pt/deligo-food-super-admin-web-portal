@@ -31,6 +31,8 @@ const formFields = [
   { label: "City", name: "city" },
   { label: "Postal Code", name: "postalCode" },
   { label: "Country", name: "country" },
+  { label: "Latitude", name: "latitude" },
+  { label: "Longitude", name: "longitude" },
 ];
 
 type LocationFormType = {
@@ -38,6 +40,8 @@ type LocationFormType = {
   city: string;
   postalCode: string;
   country: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 interface IProps {
@@ -124,12 +128,15 @@ const BusinessLocationMap = ({
       setPosition(newPos);
       setLocationCoordinates({ latitude: lat, longitude: lng });
 
+      form.setValue("latitude", lat);
+      form.setValue("longitude", lng);
+
       map?.panTo(newPos);
       map?.setZoom(16);
 
       fillAddressFields(place.address_components || []);
     });
-  }, [places, map, fillAddressFields, setLocationCoordinates]);
+  }, [places, map, fillAddressFields, setLocationCoordinates, form]);
 
   // MAP DRAG SUPPORT (IMPORTANT FIX)
   const handleIdle = () => {
@@ -147,6 +154,9 @@ const BusinessLocationMap = ({
       latitude: lat,
       longitude: lng,
     });
+
+    form.setValue("latitude", lat);
+    form.setValue("longitude", lng);
 
     reverseGeocode(lat, lng);
   };
@@ -172,7 +182,7 @@ const BusinessLocationMap = ({
           defaultZoom={14}
           gestureHandling="greedy"
           disableDefaultUI
-          onIdle={handleIdle}   // ✅ allows drag select
+          onIdle={handleIdle}
         >
           <Marker position={position} />
         </Map>
@@ -191,7 +201,8 @@ const BusinessLocationMap = ({
                 <FormControl>
                   <Input
                     {...formField}
-                    readOnly 
+                    value={formField.value || ""}
+                    readOnly
                   />
                 </FormControl>
                 <FormMessage />
