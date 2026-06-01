@@ -201,7 +201,6 @@ const BusinessLocationMap = ({
                 <FormControl>
                   <Input
                     {...formField}
-                    value={formField.value || ""}
                     readOnly
                   />
                 </FormControl>
