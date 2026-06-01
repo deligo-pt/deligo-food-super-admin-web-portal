@@ -15,34 +15,23 @@ import {
   SetStateAction,
   useCallback,
   useEffect,
+  useRef,
+  useState,
 } from "react";
-import { Map, Marker, useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
+import {
+  Map,
+  Marker,
+  useMap,
+  useMapsLibrary,
+} from "@vis.gl/react-google-maps";
 import { UseFormReturn } from "react-hook-form";
 
 const formFields = [
-  {
-    label: "Street Address",
-    name: "street",
-  },
-  {
-    label: "City",
-    name: "city",
-  },
-  {
-    label: "Postal Code",
-    name: "postalCode",
-  },
-  {
-    label: "Country",
-    name: "country",
-  },
+  { label: "Street Address", name: "street" },
+  { label: "City", name: "city" },
+  { label: "Postal Code", name: "postalCode" },
+  { label: "Country", name: "country" },
 ];
-
-declare global {
-  interface Window {
-    google: any;
-  }
-}
 
 type LocationFormType = {
   street: string;
@@ -66,7 +55,7 @@ interface IProps {
   >;
 }
 
-const defaultLocation = { lat: 38.7223, lng: -9.1393 }; // LISBON
+const defaultLocation = { lat: 38.7223, lng: -9.1393 };
 
 const BusinessLocationMap = ({
   form,
@@ -75,6 +64,13 @@ const BusinessLocationMap = ({
 }: IProps) => {
   const map = useMap();
   const places = useMapsLibrary("places");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [position, setPosition] = useState({
+    lat: businessLocation?.latitude ?? defaultLocation.lat,
+    lng: businessLocation?.longitude ?? defaultLocation.lng,
+  });
 
   const fillAddressFields = useCallback(
     (components: any[]) => {
@@ -94,74 +90,96 @@ const BusinessLocationMap = ({
     [form],
   );
 
-  useEffect(() => {
-    if (!map || !places) return;
+  // Reverse geocode (for map drag/select)
+  const reverseGeocode = useCallback((lat: number, lng: number) => {
+    if (!window.google) return;
 
-    const initialPos = businessLocation?.latitude
-      ? {
-        lat: businessLocation.latitude as number,
-        lng: businessLocation.longitude as number,
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status === "OK" && results?.[0]) {
+        fillAddressFields(results[0].address_components);
       }
-      : defaultLocation;
+    });
+  }, [fillAddressFields]);
 
-    map.setCenter(initialPos);
-    map.setZoom(14);
+  // SEARCH + INIT AUTOCOMPLETE
+  useEffect(() => {
+    if (!places || !inputRef.current) return;
 
-    // Autocomplete
-    const input = document.getElementById(
-      "autocomplete",
-    ) as HTMLInputElement;
+    const autocomplete = new places.Autocomplete(inputRef.current, {
+      fields: ["geometry", "address_components"],
+      types: ["address"],
+    });
 
-    if (input) {
-      const autocomplete = new places.Autocomplete(input, {
-        fields: ["address_components", "geometry"],
-        types: ["address"],
-      });
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry?.location) return;
 
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (!place.geometry?.location) return;
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
 
-        const loc = place.geometry.location;
+      const newPos = { lat, lng };
 
-        map.setCenter(loc);
-        map.setZoom(17);
+      setPosition(newPos);
+      setLocationCoordinates({ latitude: lat, longitude: lng });
 
-        setLocationCoordinates({
-          latitude: loc.lat(),
-          longitude: loc.lng(),
-        });
+      map?.panTo(newPos);
+      map?.setZoom(16);
 
-        fillAddressFields(place.address_components || []);
-      });
-    }
-  }, [map, places, businessLocation, fillAddressFields, setLocationCoordinates]);
+      fillAddressFields(place.address_components || []);
+    });
+  }, [places, map, fillAddressFields, setLocationCoordinates]);
+
+  // MAP DRAG SUPPORT (IMPORTANT FIX)
+  const handleIdle = () => {
+    if (!map) return;
+
+    const center = map.getCenter();
+    if (!center) return;
+
+    const lat = center.lat();
+    const lng = center.lng();
+
+    setPosition({ lat, lng });
+
+    setLocationCoordinates({
+      latitude: lat,
+      longitude: lng,
+    });
+
+    reverseGeocode(lat, lng);
+  };
 
   return (
     <div className="space-y-6">
+
+      {/* SEARCH */}
       <div className="relative">
         <Search className="absolute left-3 top-3.5 text-gray-500 w-5 h-5" />
         <input
-          id="autocomplete"
+          ref={inputRef}
           type="text"
           placeholder="Search address here..."
           className="pl-10 py-3 rounded-xl border w-full focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
 
-      {/* Google Map */}
+      {/* MAP */}
       <div className="w-full h-80 rounded-xl shadow-md border overflow-hidden">
         <Map
-          defaultCenter={defaultLocation}
+          defaultCenter={position}
           defaultZoom={14}
           gestureHandling="greedy"
           disableDefaultUI
+          onIdle={handleIdle}   // ✅ allows drag select
         >
-          <Marker position={defaultLocation} />
+          <Marker position={position} />
         </Map>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start">
+      {/* FORM (READ ONLY) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {formFields.map((field) => (
           <FormField
             key={field.name}
@@ -171,7 +189,10 @@ const BusinessLocationMap = ({
               <FormItem>
                 <FormLabel>{field.label}</FormLabel>
                 <FormControl>
-                  <Input {...formField} placeholder={field.label} />
+                  <Input
+                    {...formField}
+                    readOnly 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
