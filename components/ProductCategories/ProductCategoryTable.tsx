@@ -174,7 +174,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                     <p>{category.name}</p>
                   </div>
                 </TableCell>
-                <TableCell>{category.description}</TableCell>
+                <TableCell>{(category?.description && category?.description?.length > 70) ? category?.description.slice(0, 70) + "...." : category?.description}</TableCell>
                 <TableCell
                   className={cn(
                     category.isDeleted
@@ -279,7 +279,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
           }
         >
           <form>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-106.25">
               <DialogHeader>
                 <DialogTitle>
                   {statusInfo.field === "isDeleted"

@@ -1,36 +1,89 @@
-import { verifyTokens } from "@/utils/verifyTokens";
 import { cookies } from "next/headers";
+import { getNewAccessToken } from "@/utils/getNewAccessToken";
 
 const backendUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "http://localhost:5000/api/v1";
 
-async function serverFetchHelper(
-  endPoint: string,
-  options: RequestInit,
-): Promise<Response> {
-  const { headers, ...rest } = options;
+// CREATE HEADERS
+async function createHeaders(
+  headers?: HeadersInit
+) {
 
   const cookieStore = await cookies();
 
   const cookieStr = cookieStore.toString();
-  const accessToken = cookieStore.get("accessToken")?.value || "";
 
-  if (endPoint !== "/auth/refresh-token") {
-    await verifyTokens();
+  const accessToken =
+    cookieStore.get("accessToken")?.value || "";
+
+  return {
+    ...headers,
+
+    Authorization: accessToken
+      ? `Bearer ${accessToken}`
+      : "",
+
+    ...(cookieStr && {
+      cookie: cookieStr,
+    }),
+  };
+}
+
+// MAIN FETCH HELPER
+async function serverFetchHelper(
+  endPoint: string,
+  options: RequestInit = {},
+): Promise<Response> {
+
+  const { headers, ...rest } = options;
+
+
+  // FIRST REQUEST
+  let response = await fetch(
+    `${backendUrl}${endPoint}`,
+    {
+      credentials: "include",
+
+      headers: await createHeaders(headers),
+
+      ...rest,
+
+      cache: "no-store",
+    }
+  );
+
+
+  // ACCESS TOKEN EXPIRED
+  if (response.status === 401) {
+
+    const refreshed =
+      await getNewAccessToken();
+
+    // refresh failed
+    if (!refreshed) {
+      return response;
+    }
+
+
+    // RETRY REQUEST
+    response = await fetch(
+      `${backendUrl}${endPoint}`,
+      {
+        credentials: "include",
+
+        headers: await createHeaders(headers),
+
+        ...rest,
+
+        cache: "no-store",
+      }
+    );
   }
 
-  return fetch(`${backendUrl}${endPoint}`, {
-    credentials: "include",
-    headers: {
-      ...headers,
-      Authorization: accessToken ? `Bearer ${accessToken}` : "",
-      ...(cookieStr && {
-        cookie: cookieStr,
-      }),
-    },
-    ...rest,
-  });
+  return response;
 }
+
 
 export const serverFetch = {
   get: (endPoint: string, options: RequestInit = {}) =>

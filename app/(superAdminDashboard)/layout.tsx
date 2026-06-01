@@ -6,6 +6,7 @@ import Topbar from "@/components/adminTopbar/Topbar";
 import { getProfileReq } from "@/services/dashboard/profile/profile.service";
 import { TAdmin } from "@/types/admin.type";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
@@ -18,6 +19,11 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const adminData: TAdmin = await getProfileReq();
+
+  // no admin
+  if (!adminData) {
+    redirect("/");
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">

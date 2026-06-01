@@ -12,9 +12,11 @@ export const getProfileReq = async () => {
     return await serverRequest.get("/profile");
   });
 
-  if (result?.success) return result.data;
+  if (result?.success) {
+    return result.data;
+  }
 
-  return {};
+  return null;
 };
 
 export const uploadProfilePhoto = async (file: File) => {
