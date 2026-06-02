@@ -40,6 +40,8 @@ export const addVendorValidation = z
       .max(50, "Business type must be at most 50 characters long")
       .nonempty("Business type is required"),
 
+    restaurantCuisineType: z.string().optional(),
+
     businessLicenseNumber: z
       .string()
       .min(2, "Business license number must be at least 2 characters long")
@@ -149,6 +151,18 @@ export const addVendorValidation = z
       path: ["closingHours"],
     },
   )
+  .superRefine((data, ctx) => {
+    if (
+      data.businessType === "RESTAURANT" &&
+      !data.restaurantCuisineType
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["restaurantCuisineType"],
+        message: "Restaurant cuisine type is required",
+      });
+    }
+  });
 // .transform((data) => {
 //   const full = data.prefixPhoneNumber + data.phoneNumber;
 //   const phone = parsePhoneNumberFromString(full);
