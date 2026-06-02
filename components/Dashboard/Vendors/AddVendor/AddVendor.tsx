@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { restaurantCuisineOptions } from "@/consts/vendor.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
@@ -49,7 +50,7 @@ import {
   Mail,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { toast } from "sonner";
@@ -109,6 +110,7 @@ export default function AddVendor({
       phoneNumber: "",
       businessName: "",
       businessType: "",
+      restaurantCuisineType: "",
       businessLicenseNumber: "",
       NIF: "",
       branches: "",
@@ -135,6 +137,11 @@ export default function AddVendor({
     t("friday"),
     t("saturday"),
   ];
+
+  const businessType = useWatch({
+    control: form.control,
+    name: "businessType",
+  });
 
   const sendOtp = async () => {
     if (!email || !password) return;
@@ -229,6 +236,7 @@ export default function AddVendor({
       businessDetails: {
         businessName: data.businessName,
         businessType: data.businessType,
+        restaurantCuisineType: data.restaurantCuisineType,
         NIF: data.NIF?.toUpperCase(),
         businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
         totalBranches: Number(data.branches),
@@ -571,6 +579,52 @@ export default function AddVendor({
                           )}
                         />
 
+                        {/* if business type is restaurant */}
+                        {businessType === "RESTAURANT" && (
+                          <FormField
+                            control={form.control}
+                            name="restaurantCuisineType"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormLabel>Restaurant Cuisine Type</FormLabel>
+                                <FormControl>
+                                  <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                  >
+                                    <SelectTrigger
+                                      className={cn(
+                                        "px-3 h-8 w-full bg-white/90 text-gray-700 shadow-sm focus-visible:ring-2 focus-visible:ring-[#DC3173]/70 hover:shadow-md transition-all cursor-pointer  ",
+                                        fieldState.invalid
+                                          ? "border-destructive focus-visible:ring-destructive/20"
+                                          : "border-gray-300",
+                                      )}
+                                      style={{
+                                        height: "2.4rem",
+                                      }}
+                                    >
+                                      <SelectValue placeholder="Select Restaurant Cuisine" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                      {restaurantCuisineOptions.map((type, idx) => (
+                                        <SelectItem
+                                          key={idx}
+                                          value={type.label}
+                                          className="capitalize"
+                                        >
+                                          {type.label}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+
                         <FormField
                           control={form.control}
                           name="businessLicenseNumber"
@@ -688,17 +742,16 @@ export default function AddVendor({
                                         field.onChange(
                                           field.value?.includes(day)
                                             ? field.value?.filter(
-                                                (d) => d !== day,
-                                              )
+                                              (d) => d !== day,
+                                            )
                                             : [...field.value, day],
                                         );
                                       }}
                                       whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
-                                        field.value.includes(day)
-                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                      }`}
+                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
+                                        ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                        : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                        }`}
                                     >
                                       {day}
                                     </motion.button>

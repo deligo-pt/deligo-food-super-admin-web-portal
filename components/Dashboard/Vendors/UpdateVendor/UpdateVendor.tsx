@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { USER_STATUS } from "@/consts/user.const";
+import { restaurantCuisineOptions } from "@/consts/vendor.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
@@ -37,7 +38,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Banknote, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { toast } from "sonner";
@@ -99,6 +100,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       phoneNumber: "",
       businessName: "",
       businessType: "",
+      restaurantCuisineType: "",
       businessLicenseNumber: "",
       NIF: "",
       branches: "1",
@@ -118,6 +120,11 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     },
   });
 
+  const businessType = useWatch({
+    control: form.control,
+    name: "businessType",
+  });
+
   useEffect(() => {
     form.reset({
       firstName: vendorState.name?.firstName || "",
@@ -125,6 +132,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       phoneNumber: vendorState?.contactNumber || "",
       businessName: vendorState.businessDetails?.businessName || "",
       businessType: vendorState?.businessDetails?.businessType || "",
+      restaurantCuisineType: vendorState?.businessDetails?.restaurantCuisineType || "",
       businessLicenseNumber:
         vendorState?.businessDetails?.businessLicenseNumber || "",
       NIF: vendorState?.businessDetails?.NIF || "",
@@ -159,6 +167,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       businessDetails: {
         businessName: data.businessName,
         businessType: data.businessType,
+        restaurantCuisineType: data.restaurantCuisineType,
         NIF: data.NIF?.toUpperCase(),
         businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
         totalBranches: Number(data.branches),
@@ -188,7 +197,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     );
 
     if (updatedResult.success) {
-
+      router.back()
       setVendorState((prev) => ({
         ...prev,
         ...vendorData,
@@ -229,7 +238,6 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     toast.error(updatedResult.message || "Vendor updated failed", {
       id: toastId,
     });
-    console.log(updatedResult);
   };
 
   useEffect(() => {
@@ -440,6 +448,53 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                               </FormItem>
                             )}
                           />
+
+                          {/* if business type is restaurant */}
+                          {businessType === "RESTAURANT" && (
+                            <FormField
+                              control={form.control}
+                              name="restaurantCuisineType"
+                              render={({ field, fieldState }) => (
+                                <FormItem>
+                                  <FormLabel>Restaurant Cuisine Type</FormLabel>
+                                  <FormControl>
+                                    <Select
+                                      value={field.value}
+                                      onValueChange={field.onChange}
+                                    >
+                                      <SelectTrigger
+                                        className={cn(
+                                          "px-3 h-8 w-full bg-white/90 text-gray-700 shadow-sm focus-visible:ring-2 focus-visible:ring-[#DC3173]/70 hover:shadow-md transition-all cursor-pointer  ",
+                                          fieldState.invalid
+                                            ? "border-destructive focus-visible:ring-destructive/20"
+                                            : "border-gray-300",
+                                        )}
+                                        style={{
+                                          height: "2.4rem",
+                                        }}
+                                      >
+                                        <SelectValue placeholder="Select Restaurant Cuisine" />
+                                      </SelectTrigger>
+
+                                      <SelectContent>
+                                        {restaurantCuisineOptions.map((type, idx) => (
+                                          <SelectItem
+                                            key={idx}
+                                            value={type.label}
+                                            className="capitalize"
+                                          >
+                                            {type.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
+
 
                           <FormField
                             control={form.control}
