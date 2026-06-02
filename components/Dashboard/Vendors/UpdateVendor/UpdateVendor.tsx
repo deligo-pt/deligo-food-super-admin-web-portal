@@ -109,6 +109,8 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
       bankName: "",
       accountHolderName: "",
       iban: "",
@@ -122,24 +124,26 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       lastName: vendorState.name?.lastName || "",
       phoneNumber: vendorState?.contactNumber || "",
       businessName: vendorState.businessDetails?.businessName || "",
-      businessType: vendorState.businessDetails?.businessType || "",
+      businessType: vendorState?.businessDetails?.businessType || "",
       businessLicenseNumber:
-        vendorState.businessDetails?.businessLicenseNumber || "",
-      NIF: vendorState.businessDetails?.NIF || "",
+        vendorState?.businessDetails?.businessLicenseNumber || "",
+      NIF: vendorState?.businessDetails?.NIF || "",
       branches:
-        vendorState.businessDetails?.totalBranches?.toString() || "1",
-      openingHours: vendorState.businessDetails?.openingHours || "",
-      closingHours: vendorState.businessDetails?.closingHours || "",
-      closingDays: vendorState.businessDetails?.closingDays || [],
-      street: vendorState.businessLocation?.street || "",
-      city: vendorState.businessLocation?.city || "",
-      postalCode: vendorState.businessLocation?.postalCode || "",
-      country: vendorState.businessLocation?.country || "",
-      bankName: vendorState.bankDetails?.bankName || "",
+        vendorState?.businessDetails?.totalBranches?.toString() || "1",
+      openingHours: vendorState?.businessDetails?.openingHours || "",
+      closingHours: vendorState?.businessDetails?.closingHours || "",
+      closingDays: vendorState?.businessDetails?.closingDays || [],
+      street: vendorState?.businessLocation?.street || "",
+      city: vendorState?.businessLocation?.city || "",
+      postalCode: vendorState?.businessLocation?.postalCode || "",
+      country: vendorState?.businessLocation?.country || "",
+      latitude: vendorState?.businessLocation?.latitude ?? 0,
+      longitude: vendorState?.businessLocation?.longitude ?? 0,
+      bankName: vendorState?.bankDetails?.bankName || "",
       accountHolderName:
-        vendorState.bankDetails?.accountHolderName || "",
-      iban: vendorState.bankDetails?.iban || "",
-      swiftCode: vendorState.bankDetails?.swiftCode || "",
+        vendorState?.bankDetails?.accountHolderName || "",
+      iban: vendorState?.bankDetails?.iban || "",
+      swiftCode: vendorState?.bankDetails?.swiftCode || "",
     });
   }, [vendorState, form]);
 
@@ -406,7 +410,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                                 <FormControl>
                                   <Select
                                     onValueChange={field.onChange}
-                                    value={field.value}
+                                    value={field.value || vendorState.businessDetails?.businessType || undefined}
                                   >
                                     <SelectTrigger
                                       className={cn(

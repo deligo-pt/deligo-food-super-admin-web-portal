@@ -135,31 +135,13 @@ const BusinessLocationMap = ({
       map?.setZoom(16);
 
       fillAddressFields(place.address_components || []);
+
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
     });
   }, [places, map, fillAddressFields, setLocationCoordinates, form]);
 
-  // MAP DRAG SUPPORT (IMPORTANT FIX)
-  const handleIdle = () => {
-    if (!map) return;
-
-    const center = map.getCenter();
-    if (!center) return;
-
-    const lat = center.lat();
-    const lng = center.lng();
-
-    setPosition({ lat, lng });
-
-    setLocationCoordinates({
-      latitude: lat,
-      longitude: lng,
-    });
-
-    form.setValue("latitude", lat);
-    form.setValue("longitude", lng);
-
-    reverseGeocode(lat, lng);
-  };
 
   return (
     <div className="space-y-6">
@@ -171,6 +153,11 @@ const BusinessLocationMap = ({
           ref={inputRef}
           type="text"
           placeholder="Search address here..."
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          }}
           className="pl-10 py-3 rounded-xl border w-full focus:ring-2 focus:ring-blue-500 outline-none"
         />
       </div>
@@ -182,7 +169,24 @@ const BusinessLocationMap = ({
           defaultZoom={14}
           gestureHandling="greedy"
           disableDefaultUI
-          onIdle={handleIdle}
+          onClick={(event) => {
+            if (!event.detail?.latLng) return;
+
+            const lat = event.detail.latLng.lat;
+            const lng = event.detail.latLng.lng;
+
+            setPosition({ lat, lng });
+
+            setLocationCoordinates({
+              latitude: lat,
+              longitude: lng,
+            });
+
+            form.setValue("latitude", lat);
+            form.setValue("longitude", lng);
+
+            reverseGeocode(lat, lng);
+          }}
         >
           <Marker position={position} />
         </Map>
@@ -201,7 +205,10 @@ const BusinessLocationMap = ({
                 <FormControl>
                   <Input
                     {...formField}
-                    readOnly
+                    readOnly={
+                      field.name === "latitude" ||
+                      field.name === "longitude"
+                    }
                   />
                 </FormControl>
                 <FormMessage />
