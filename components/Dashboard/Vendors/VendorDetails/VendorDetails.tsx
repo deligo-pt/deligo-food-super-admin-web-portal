@@ -272,6 +272,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessType || "N/A"}
                 </p>
               </div>
+              {vendor?.businessDetails?.businessType === "RESTAURANT" && <div>
+                <p className="text-sm text-gray-500">Restaurant Cuisine Type</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.restaurantCuisineType || "N/A"}
+                </p>
+              </div>}
               <div>
                 <p className="text-sm text-gray-500">Total Branches</p>
                 <p className="font-medium">
@@ -284,17 +290,17 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   <p className="font-medium">
                     {vendor?.businessDetails?.openingHours
                       ? /\b(AM|PM)\b/i.test(
-                          vendor?.businessDetails?.openingHours,
-                        )
+                        vendor?.businessDetails?.openingHours,
+                      )
                         ? vendor?.businessDetails?.openingHours
                         : format(
-                            parse(
-                              vendor?.businessDetails?.openingHours,
-                              "HH:mm",
-                              new Date(),
-                            ),
-                            "hh:mm a",
-                          )
+                          parse(
+                            vendor?.businessDetails?.openingHours,
+                            "HH:mm",
+                            new Date(),
+                          ),
+                          "hh:mm a",
+                        )
                       : "N/A"}
                   </p>
                 </div>
@@ -306,13 +312,13 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                     ? /\b(AM|PM)\b/i.test(vendor?.businessDetails?.closingHours)
                       ? vendor?.businessDetails?.closingHours
                       : format(
-                          parse(
-                            vendor?.businessDetails?.closingHours,
-                            "HH:mm",
-                            new Date(),
-                          ),
-                          "hh:mm a",
-                        )
+                        parse(
+                          vendor?.businessDetails?.closingHours,
+                          "HH:mm",
+                          new Date(),
+                        ),
+                        "hh:mm a",
+                      )
                     : "N/A"}
                 </p>
               </div>
@@ -435,9 +441,9 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                     <p className="font-medium">
                       {vendor?.approvedOrRejectedOrBlockedAt
                         ? format(
-                            vendor?.approvedOrRejectedOrBlockedAt,
-                            "do MMM yyyy",
-                          )
+                          vendor?.approvedOrRejectedOrBlockedAt,
+                          "do MMM yyyy",
+                        )
                         : "N/A"}
                     </p>
                   </div>
