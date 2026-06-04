@@ -78,6 +78,7 @@ const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
   idProofBack: null,
   storePhoto: null,
   menuUpload: null,
+  agoserisHaccpCertificate: null,
 };
 
 export default function AddVendor({
@@ -236,7 +237,9 @@ export default function AddVendor({
       businessDetails: {
         businessName: data.businessName,
         businessType: data.businessType,
-        restaurantCuisineType: data.restaurantCuisineType,
+        ...(data?.businessType === "RESTAURANT" && {
+          restaurantCuisineType: data.restaurantCuisineType
+        }),
         NIF: data.NIF?.toUpperCase(),
         businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
         totalBranches: Number(data.branches),

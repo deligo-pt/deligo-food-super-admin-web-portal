@@ -46,10 +46,15 @@ export default function UploadVendorDocuments({
         prefersImagePreview: false,
       },
       { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
-      { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
-      { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
+      { key: "idProofFront", label: t("id_proof_front"), prefersImagePreview: true },
+      { key: "idProofBack", label: t("id_proof_back"), prefersImagePreview: true },
       { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
       { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
+      {
+        key: "agoserisHaccpCertificate",
+        label: t("agoserisHaccpCertificate"),
+        prefersImagePreview: true,
+      },
     ];
 
   const openPicker = (key: TVendorDocKey) => {
@@ -71,15 +76,22 @@ export default function UploadVendorDocuments({
 
     const currentFiles = previews[key] || [];
 
-    if (currentFiles.length === 3) {
-      toast.error("You can only upload a maximum of 3 documents", {
+    if (key === "agoserisHaccpCertificate" && currentFiles?.length === 1) {
+      toast.error("You can only upload one AGOSERIS HACCP Certificate", {
         id: toastId,
       });
       return;
+    } else {
+      if (currentFiles?.length === 3) {
+        toast.error("You can only upload a maximum of 3 documents", {
+          id: toastId,
+        });
+        return;
+      }
     }
 
     const uploadResult = await uploadImagesReq([f]);
-
+    console.log("upload", uploadResult);
     if (!uploadResult.success) {
       toast.error(uploadResult.message || "File upload failed", {
         id: toastId,
