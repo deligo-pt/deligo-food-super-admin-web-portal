@@ -20,13 +20,14 @@ import {
 import { uploadImagesReq } from "@/services/upload/upload.service";
 import { TVendorDocKey } from "@/types/document.type";
 import { toast } from "sonner";
+import { TVendor } from "@/types/user.type";
 
 export default function UploadVendorDocuments({
-  vendorId,
+  vendor,
   previews,
   setPreviews,
 }: {
-  vendorId: string;
+  vendor: TVendor | null;
   previews: Record<TVendorDocKey, string[] | null>;
   setPreviews: React.Dispatch<
     React.SetStateAction<Record<TVendorDocKey, string[] | null>>
@@ -56,6 +57,10 @@ export default function UploadVendorDocuments({
         prefersImagePreview: true,
       },
     ];
+
+  const visibleDocuments = DOCUMENTS.filter(
+    (doc) => !(vendor?.businessDetails?.businessType === "STORE" && doc.key === "agoserisHaccpCertificate")
+  );
 
   const openPicker = (key: TVendorDocKey) => {
     const el = inputsRef.current[key];
@@ -91,7 +96,7 @@ export default function UploadVendorDocuments({
     }
 
     const uploadResult = await uploadImagesReq([f]);
-    console.log("upload", uploadResult);
+
     if (!uploadResult.success) {
       toast.error(uploadResult.message || "File upload failed", {
         id: toastId,
@@ -110,7 +115,7 @@ export default function UploadVendorDocuments({
 
     const prevUrls = currentFiles;
 
-    const endpoint = `/vendors/${vendorId}/docImage`;
+    const endpoint = `/vendors/${vendor?.userId}/docImage`;
     const updateResult = await updateDocumentsReq(endpoint, {
       docImageTitle: key,
       docImageUrls: [...prevUrls, newUrl],
@@ -145,7 +150,7 @@ export default function UploadVendorDocuments({
 
     const toastId = toast.loading("Deleting...");
 
-    const endpoint = `/vendors/${vendorId}/docImage`;
+    const endpoint = `/vendors/${vendor?.userId}/docImage`;
     const result = await deleteDocumentReq(endpoint, {
       docImageTitle: key,
       imageUrl: url,
@@ -197,7 +202,7 @@ export default function UploadVendorDocuments({
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      {DOCUMENTS.map((d, idx) => {
+      {visibleDocuments.map((d, idx) => {
         const previewFiles = previews[d.key];
         const isSelected = !(!previewFiles || previewFiles?.length === 0);
         return (
