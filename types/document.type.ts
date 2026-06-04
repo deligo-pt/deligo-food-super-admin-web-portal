@@ -4,7 +4,8 @@ export type TVendorDocKey =
   | "idProofFront"
   | "idProofBack"
   | "storePhoto"
-  | "menuUpload";
+  | "menuUpload"
+  | "agoserisHaccpCertificate";
 
 export type TFleetDocKey =
   | "myPhoto"

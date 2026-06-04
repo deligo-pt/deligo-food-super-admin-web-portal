@@ -81,6 +81,9 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     menuUpload: Array.isArray(vendorState?.documents?.menuUpload)
       ? vendorState?.documents?.menuUpload
       : null,
+    agoserisHaccpCertificate: Array.isArray(vendorState?.documents?.agoserisHaccpCertificate)
+      ? vendorState?.documents?.agoserisHaccpCertificate
+      : null,
   });
   const daysOfWeek = [
     t("sunday"),
@@ -167,7 +170,9 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
       businessDetails: {
         businessName: data.businessName,
         businessType: data.businessType,
-        restaurantCuisineType: data.restaurantCuisineType,
+        ...(data?.businessType === "RESTAURANT" && {
+          restaurantCuisineType: data.restaurantCuisineType
+        }),
         NIF: data.NIF?.toUpperCase(),
         businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
         totalBranches: Number(data.branches),
