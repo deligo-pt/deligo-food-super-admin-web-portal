@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
@@ -31,6 +32,7 @@ import {
   registerUserAndSendOtpReq,
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
+import { getSingleVendorReq } from "@/services/dashboard/vendor/vendor.service";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { TVendorDocKey } from "@/types/document.type";
@@ -92,7 +94,7 @@ export default function AddVendor({
   const [otp, setOtp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [vendorId, setVendorId] = useState("");
+  const [vendorDetails, setVendorDetails] = useState<TVendor | null>(null);
   const [showPass, setShowPass] = useState(false);
   const [timer, setTimer] = useState(300);
   const [locationCoordinates, setLocationCoordinates] = useState({
@@ -194,7 +196,6 @@ export default function AddVendor({
         return;
       }
       toast.error(result.message, { id: toastId });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "OTP resend failed", {
         id: toastId,
@@ -206,23 +207,49 @@ export default function AddVendor({
   const verifyOtp = async () => {
     const toastId = toast.loading("Verifying OTP...");
 
-    const result = await verifyOtpReq({
-      email,
-      otp,
-    });
+    try {
+      const result = await verifyOtpReq({
+        email,
+        otp,
+      });
 
-    if (result.success) {
-      toast.success(result.message || "OTP verified successfully!", {
+      if (result && result.success) {
+        // 1. Decode the JWT to get the userId
+        const decoded = jwtDecode(result.data.accessToken) as { userId: string };
+        const currentUserId = decoded.userId;
+
+        setEmailVerified(true);
+
+        // 2. Fetch the single vendor details using the userId
+        try {
+          const vendorResult = await getSingleVendorReq(currentUserId);
+          if (vendorResult && vendorResult.success) {
+            setVendorDetails(vendorResult.data); // Store vendor details in state
+          } else {
+            console.error("Failed to fetch vendor details:", vendorResult?.message);
+          }
+        } catch (vendorError) {
+          // Log background error but don't break the successful OTP verification flow
+          console.error("Error fetching vendor details:", vendorError);
+        }
+
+        toast.success(result.message || "OTP verified successfully!", {
+          id: toastId,
+        });
+        return;
+      }
+
+      // Handle unsuccessful response from backend
+      toast.error(result?.message || "OTP verification failed", { id: toastId });
+      console.log(result);
+
+    } catch (error: any) {
+      // Catch unexpected network/server/runtime crashes
+      console.error("OTP Verification Runtime Error:", error);
+      toast.error(error?.message || "Something went wrong during verification", {
         id: toastId,
       });
-      const decoded = jwtDecode(result.data.accessToken) as { userId: string };
-      setVendorId(decoded.userId);
-      setEmailVerified(true);
-      return;
     }
-
-    toast.error(result.message || "OTP verification failed", { id: toastId });
-    console.log(result);
   };
 
   const onSubmit = async (data: TVendorForm) => {
@@ -264,12 +291,12 @@ export default function AddVendor({
     } as Partial<TVendor>;
 
     const updatedResult = await updateUserDataReq(
-      `/vendors/${vendorId}`,
+      `/vendors/${vendorDetails?.userId}`,
       vendorData,
     );
 
     if (updatedResult.success) {
-      const approveResult = await approveOrRejectReq(vendorId, {
+      const approveResult = await approveOrRejectReq(vendorDetails?.userId as string, {
         status: "APPROVED",
       });
 
@@ -506,7 +533,7 @@ export default function AddVendor({
               </Card>
             </motion.div>
             <AnimatePresence>
-              {vendorId && (
+              {vendorDetails?.userId && (
                 <>
                   {/* Business Details */}
                   <motion.div
@@ -862,7 +889,7 @@ export default function AddVendor({
 
           {/* Right Section - Business Location + Documents */}
           <AnimatePresence>
-            {vendorId && (
+            {vendorDetails?.userId && (
               <div className="space-y-8">
                 {/* Business Location */}
                 <motion.div
@@ -908,7 +935,7 @@ export default function AddVendor({
                     </h2>
 
                     <UploadVendorDocuments
-                      vendorId={vendorId}
+                      vendor={vendorDetails}
                       previews={previews}
                       setPreviews={setPreviews}
                     />
@@ -920,7 +947,7 @@ export default function AddVendor({
         </div>
 
         {/* SUBMIT BUTTON */}
-        {vendorId && (
+        {vendorDetails?.userId && (
           <div className="mt-10 flex justify-end">
             <Button
               className="px-8 py-2 text-white"
