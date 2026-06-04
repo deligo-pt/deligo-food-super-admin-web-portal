@@ -46,8 +46,8 @@ export default function UploadVendorDocuments({
         prefersImagePreview: false,
       },
       { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
-      { key: "idProofFront", label: "Id Proof Front", prefersImagePreview: true },
-      { key: "idProofBack", label: "Id Proof Back", prefersImagePreview: true },
+      { key: "idProofFront", label: t("id_proof_front"), prefersImagePreview: true },
+      { key: "idProofBack", label: t("id_proof_back"), prefersImagePreview: true },
       { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
       { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
       {

@@ -301,6 +301,7 @@ export const pt = {
   id_proof: "Documento de identificação",
   store_photo: "Foto da loja",
   menu_brochure: "Menu / Brochura",
+  agoserisHaccpCertificate: "Certificado HACCP Agoseris",
   no_file_selected: "Nenhum ficheiro selecionado",
   remove: "Remover",
   select_file: "Selecionar ficheiro",
