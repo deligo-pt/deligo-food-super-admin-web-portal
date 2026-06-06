@@ -281,6 +281,8 @@ export const en = {
   search_business_address: "Search your business address...",
   documents_nd_verification: "Documents & Verification",
   business_license: "Business License",
+  proof_of_address: "Proof of Address",
+  activity_document: "Activity Document",
   tax_document: "Tax Document",
   store_photo: "Store Photo",
   menu_brochure: "Menu / Brochure",

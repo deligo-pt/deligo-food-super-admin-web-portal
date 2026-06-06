@@ -297,6 +297,8 @@ export const pt = {
   search_business_address: "Pesquisar o endereço do seu negócio...",
   documents_nd_verification: "Documentos e verificação",
   business_license: "Licença comercial",
+  proof_of_address: "Comprovante de Morada",
+  activity_document: "Documento de Atividade",
   tax_document: "Documento fiscal",
   id_proof: "Documento de identificação",
   store_photo: "Foto da loja",

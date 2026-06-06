@@ -15,6 +15,8 @@ export const addFleetManagerValidation = z
       .max(30, "Last name must be at most 30 characters long")
       .nonempty("Last name is required"),
 
+    gender: z.enum(["MALE", "FEMALE", "OTHER"]),
+    
     // prefixPhoneNumber: z.string(),
 
     phoneNumber: z.string()
