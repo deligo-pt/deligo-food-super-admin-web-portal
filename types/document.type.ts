@@ -11,7 +11,9 @@ export type TFleetDocKey =
   | "myPhoto"
   | "businessLicense"
   | "idProofFront"
-  | "idProofBack";
+  | "idProofBack"
+  | "proofOfAddress"
+  | "activityDocument";
 
 export type TPartnerDocKey =
   | "idProofFront"

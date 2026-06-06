@@ -784,7 +784,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
                       </h2>
 
                       <UploadVendorDocuments
-                        vendorId={vendor.userId}
+                        vendor={vendor}
                         previews={previews}
                         setPreviews={setPreviews}
                       />
