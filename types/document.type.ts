@@ -1,4 +1,5 @@
 export type TVendorDocKey =
+  | "myPhoto"
   | "businessLicenseDoc"
   | "taxDoc"
   | "idProofFront"

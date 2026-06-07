@@ -39,7 +39,7 @@ export default function UploadFleetManagerDocuments({
     label: string;
     prefersImagePreview: boolean;
   }[] = [
-      { key: "myPhoto", label: "Fleet Manager Photo", prefersImagePreview: true },
+      { key: "myPhoto", label: t("fleet_manager_photo"), prefersImagePreview: true },
       {
         key: "businessLicense",
         label: t("business_license"),
@@ -59,6 +59,18 @@ export default function UploadFleetManagerDocuments({
       },
     ];
 
+  const uploadLimits: Partial<Record<TFleetDocKey, number>> = {
+    myPhoto: 1,
+    proofOfAddress: 1,
+    activityDocument: 1,
+
+    // these can have up to 3 files
+    businessLicense: 3,
+    idProofFront: 3,
+    idProofBack: 3,
+  };
+  const DEFAULT_LIMIT = 3;
+
   const openPicker = (key: TFleetDocKey) => {
     const el = inputsRef.current[key];
     el?.click();
@@ -75,10 +87,16 @@ export default function UploadFleetManagerDocuments({
 
     const currentFiles = previews[key] || [];
 
-    if (currentFiles.length === 3) {
-      toast.error("You can only upload a maximum of 3 documents", {
-        id: toastId,
-      });
+    const limit = uploadLimits[key] ?? DEFAULT_LIMIT;
+
+    if (currentFiles.length >= limit) {
+      toast.error(
+        limit === 1
+          ? `You can only upload one ${key} document`
+          : `You can only upload a maximum of ${limit} documents`,
+        { id: toastId }
+      );
+
       return;
     }
 

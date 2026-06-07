@@ -41,22 +41,29 @@ export default function UploadVendorDocuments({
     label: string;
     prefersImagePreview: boolean;
   }[] = [
-      {
-        key: "businessLicenseDoc",
-        label: t("business_license"),
-        prefersImagePreview: false,
-      },
+      { key: "myPhoto", label: t("vendor_photo"), prefersImagePreview: true },
+      { key: "businessLicenseDoc", label: t("business_license"), prefersImagePreview: false },
       { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
       { key: "idProofFront", label: t("id_proof_front"), prefersImagePreview: true },
       { key: "idProofBack", label: t("id_proof_back"), prefersImagePreview: true },
       { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
       { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
-      {
-        key: "agoserisHaccpCertificate",
-        label: t("agoserisHaccpCertificate"),
-        prefersImagePreview: true,
-      },
+      { key: "agoserisHaccpCertificate", label: t("agoserisHaccpCertificate"), prefersImagePreview: true },
     ];
+
+  const uploadLimits: Partial<Record<TVendorDocKey, number>> = {
+    myPhoto: 1,
+    agoserisHaccpCertificate: 1,
+
+    // these can have up to 3 files
+    businessLicenseDoc: 3,
+    taxDoc: 3,
+    idProofFront: 3,
+    idProofBack: 3,
+    storePhoto: 3,
+    menuUpload: 3,
+  };
+  const DEFAULT_LIMIT = 3;
 
   const visibleDocuments = DOCUMENTS.filter(
     (doc) => !(vendor?.businessDetails?.businessType === "STORE" && doc.key === "agoserisHaccpCertificate")
@@ -81,18 +88,17 @@ export default function UploadVendorDocuments({
 
     const currentFiles = previews[key] || [];
 
-    if (key === "agoserisHaccpCertificate" && currentFiles?.length === 1) {
-      toast.error("You can only upload one AGOSERIS HACCP Certificate", {
-        id: toastId,
-      });
+    const limit = uploadLimits[key] ?? DEFAULT_LIMIT;
+
+    if (currentFiles.length >= limit) {
+      toast.error(
+        limit === 1
+          ? `You can only upload one ${key} document`
+          : `You can only upload a maximum of ${limit} documents`,
+        { id: toastId }
+      );
+
       return;
-    } else {
-      if (currentFiles?.length === 3) {
-        toast.error("You can only upload a maximum of 3 documents", {
-          id: toastId,
-        });
-        return;
-      }
     }
 
     const uploadResult = await uploadImagesReq([f]);
