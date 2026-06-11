@@ -4,7 +4,7 @@ import { serverRequest } from "@/lib/serverFetch";
 import { TResponse } from "@/types";
 import { catchAsync } from "@/utils/catchAsync";
 
-export const resendOtpReq = async (data: { email: string }) => {
+export const resendOtpReq = async (data: { email: string; role: string; }) => {
   try {
     const result = (await serverRequest.post("/auth/resend-otp", {
       data,
@@ -27,7 +27,7 @@ export const resendOtpReq = async (data: { email: string }) => {
   }
 };
 
-export const verifyOtpReq = async (data: { email: string; otp: string }) => {
+export const verifyOtpReq = async (data: { email: string; otp: string; role: string; }) => {
   return catchAsync<{ accessToken: string; refreshToken: string }>(async () => {
     return await serverRequest.post("/auth/verify-otp", {
       data,

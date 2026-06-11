@@ -54,6 +54,7 @@ import "react-international-phone/style.css";
 import { toast } from "sonner";
 import z from "zod";
 import { cn } from "@/lib/utils";
+import { USER_ROLE } from "@/consts/user.const";
 
 const DELIGO = "#DC3173";
 
@@ -136,8 +137,8 @@ export default function AddFleetManager() {
       {
         email,
         password,
+        role: USER_ROLE.FLEET_MANAGER,
       },
-      "create-fleet-manager",
     );
 
     if (result.success) {
@@ -157,6 +158,7 @@ export default function AddFleetManager() {
     try {
       const result = (await resendOtpReq({
         email,
+        role: USER_ROLE.FLEET_MANAGER,
       })) as unknown as TResponse<null>;
 
       if (result.success) {
@@ -181,6 +183,7 @@ export default function AddFleetManager() {
     const result = await verifyOtpReq({
       email,
       otp,
+      role: USER_ROLE.FLEET_MANAGER,
     });
 
     if (result.success) {

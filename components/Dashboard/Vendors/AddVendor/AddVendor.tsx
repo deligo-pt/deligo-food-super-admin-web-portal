@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { USER_ROLE } from "@/consts/user.const";
 import { restaurantCuisineOptions } from "@/consts/vendor.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -74,6 +75,7 @@ function isValidPassword(password: string) {
 }
 
 const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
+  myPhoto: null,
   businessLicenseDoc: null,
   taxDoc: null,
   idProofFront: null,
@@ -166,8 +168,8 @@ export default function AddVendor({
       {
         email,
         password,
+        role: USER_ROLE.VENDOR,
       },
-      "create-vendor",
     );
 
     if (result.success) {
@@ -187,6 +189,7 @@ export default function AddVendor({
     try {
       const result = (await resendOtpReq({
         email,
+        role: USER_ROLE.VENDOR,
       })) as unknown as TResponse<null>;
 
       if (result.success) {
@@ -211,6 +214,7 @@ export default function AddVendor({
       const result = await verifyOtpReq({
         email,
         otp,
+        role: USER_ROLE.VENDOR,
       });
 
       if (result && result.success) {

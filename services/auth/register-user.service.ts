@@ -10,11 +10,11 @@ export const registerUserAndSendOtpReq = async (
   data: {
     email: string;
     password: string;
+    role: string;
   },
-  endPoint: string,
 ) => {
   return catchAsync<null>(async () => {
-    return await serverRequest.post(`/auth/register/${endPoint}`, {
+    return await serverRequest.post(`/auth/register`, {
       data,
     });
   });
