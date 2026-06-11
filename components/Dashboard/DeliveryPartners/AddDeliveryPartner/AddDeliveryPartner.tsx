@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
@@ -205,8 +206,8 @@ export default function AddDeliveryPartner() {
       {
         email,
         password,
+        role: USER_ROLE.DELIVERY_PARTNER,
       },
-      "onboard/delivery-partner",
     );
 
     if (result.success) {
@@ -226,6 +227,7 @@ export default function AddDeliveryPartner() {
     try {
       const result = (await resendOtpReq({
         email,
+        role: USER_ROLE.DELIVERY_PARTNER,
       })) as unknown as TResponse<null>;
 
       if (result.success) {
@@ -250,6 +252,7 @@ export default function AddDeliveryPartner() {
     const result = await verifyOtpReq({
       email,
       otp,
+      role: USER_ROLE.DELIVERY_PARTNER,
     });
 
     if (result.success) {

@@ -46,6 +46,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
     const resetData = {
       email: data.email,
       newPassword: data.password,
+      role: "SUPER_ADMIN",
       token,
     };
     try {

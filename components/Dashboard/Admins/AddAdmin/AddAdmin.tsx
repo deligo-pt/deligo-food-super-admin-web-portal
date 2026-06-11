@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { USER_ROLE } from "@/consts/user.const";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/otp.service";
 import {
@@ -98,8 +99,8 @@ export default function AddAdmin() {
       {
         email,
         password,
+        role: USER_ROLE.ADMIN,
       },
-      "create-admin",
     );
 
     if (result.success) {
@@ -119,6 +120,7 @@ export default function AddAdmin() {
     try {
       const result = (await resendOtpReq({
         email,
+        role: USER_ROLE.ADMIN,
       })) as unknown as TResponse<null>;
 
       if (result.success) {
@@ -143,6 +145,7 @@ export default function AddAdmin() {
     const result = await verifyOtpReq({
       email,
       otp,
+      role: USER_ROLE.ADMIN,
     });
 
     if (result.success) {

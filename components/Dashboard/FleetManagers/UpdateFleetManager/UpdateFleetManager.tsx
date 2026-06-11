@@ -64,6 +64,12 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
     idProofBack: Array.isArray(fleetManager?.documents?.idProofBack)
       ? fleetManager?.documents?.idProofBack
       : null,
+    proofOfAddress: Array.isArray(fleetManager?.documents?.proofOfAddress)
+      ? fleetManager?.documents?.proofOfAddress
+      : null,
+    activityDocument: Array.isArray(fleetManager?.documents?.activityDocument)
+      ? fleetManager?.documents?.activityDocument
+      : null,
   });
 
   const form = useForm<TFleetManagerForm>({
