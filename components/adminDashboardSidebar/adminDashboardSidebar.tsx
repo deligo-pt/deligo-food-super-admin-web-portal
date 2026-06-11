@@ -500,7 +500,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
 
         {open && (
           <div className="border-t border-pink-200 py-3 px-3 text-center text-xs text-gray-500">
-            © 2025 <span style={{ color: PRIMARY }}>Admin</span> Dashboard
+            © 2026 <span style={{ color: PRIMARY }}>Admin</span> Dashboard
           </div>
         )}
       </motion.aside>
