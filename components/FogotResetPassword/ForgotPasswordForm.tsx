@@ -46,7 +46,7 @@ export default function ForgotPasswordForm() {
     const toastId = toast.loading("Sending Recovery Email...");
 
     try {
-      const result = (await forgotPasswordReq(data)) as TResponse<null>;
+      const result = (await forgotPasswordReq({ ...data, role: "SUPER_ADMIN" })) as TResponse<null>;
       if (result.success) {
         toast.success("Recovery Email Sent Successfully!", { id: toastId });
         setIsSubmitted(true);
