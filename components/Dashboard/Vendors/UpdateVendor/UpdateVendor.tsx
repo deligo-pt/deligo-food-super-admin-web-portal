@@ -63,6 +63,9 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
   const [previews, setPreviews] = useState<
     Record<TVendorDocKey, string[] | null>
   >({
+    myPhoto: Array.isArray(vendorState?.documents?.myPhoto)
+      ? vendorState?.documents?.myPhoto
+      : null,
     businessLicenseDoc: Array.isArray(vendorState?.documents?.businessLicenseDoc)
       ? vendorState?.documents?.businessLicenseDoc
       : null,
