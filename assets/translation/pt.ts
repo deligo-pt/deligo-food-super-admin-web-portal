@@ -296,6 +296,8 @@ export const pt = {
   business_location_information: "Informações de localização do negócio",
   search_business_address: "Pesquisar o endereço do seu negócio...",
   documents_nd_verification: "Documentos e verificação",
+  vendor_photo: "Foto do vendedor",
+  fleet_manager_photo: "Foto do gestor de frota",
   business_license: "Licença comercial",
   proof_of_address: "Comprovante de Morada",
   activity_document: "Documento de Atividade",

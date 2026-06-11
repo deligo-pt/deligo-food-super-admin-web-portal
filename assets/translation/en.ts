@@ -280,6 +280,8 @@ export const en = {
   business_location_information: "Business Location Information",
   search_business_address: "Search your business address...",
   documents_nd_verification: "Documents & Verification",
+  vendor_photo: "Vendor Photo",
+  fleet_manager_photo: "Fleet Manager Photo",
   business_license: "Business License",
   proof_of_address: "Proof of Address",
   activity_document: "Activity Document",

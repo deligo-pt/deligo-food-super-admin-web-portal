@@ -41,11 +41,13 @@ export const logoutReq = async () => {
       body: JSON.stringify({ deviceId }),
     });
 
+    const result = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      const errorData = result.catch(() => ({}));
       throw new Error(errorData?.message || "Failed to log out");
     }
 
-    return await response.json();
+    return result;
   });
 };
