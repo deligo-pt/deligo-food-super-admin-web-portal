@@ -54,6 +54,8 @@ export default function SuperAdminLoginPage({
     },
   });
 
+  const { formState: { isSubmitting } } = form;
+
   const login = async (payload: {
     email: string;
     password: string;
@@ -231,6 +233,7 @@ export default function SuperAdminLoginPage({
                 >
                   <Button
                     type="submit"
+                    disabled={isSubmitting}
                     className="w-full bg-linear-to-r from-[#DC3173] to-[#5C2BFF] hover:opacity-90 text-white font-semibold py-2 rounded-xl shadow-lg"
                   >
                     Login

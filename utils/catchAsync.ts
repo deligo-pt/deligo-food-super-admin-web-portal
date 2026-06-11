@@ -40,8 +40,8 @@ export const catchAsync = async <T>(
     return {
       statusCode: error?.response?.status,
       success: false,
-      data: error?.response?.data || null,
-      message: error?.response?.data?.message || customErrMsg,
+      data: error?.response?.data || error?.data || null,
+      message: error?.response?.data?.message || error?.message || customErrMsg,
       error: error?.response?.data?.error,
       meta: undefined,
     };
