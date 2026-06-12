@@ -1,8 +1,10 @@
+const FIREBASE_VERSION = "12.7.0";   // ← Temporary fallback
+
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js",
+  `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-app-compat.js`
 );
 importScripts(
-  "https://www.gstatic.com/firebasejs/10.11.0/firebase-messaging-compat.js",
+  `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/firebase-messaging-compat.js`
 );
 
 firebase.initializeApp({
