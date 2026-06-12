@@ -4,6 +4,7 @@ import axios, {
 } from "axios";
 import { cookies } from "next/headers";
 import { getNewAccessToken } from "@/utils/getNewAccessToken";
+import { redirect } from "next/navigation";
 
 const backendUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -59,22 +60,23 @@ const serverRequestHelper = async (
     // ACCESS TOKEN EXPIRED
     if (err.response?.status === 401) {
 
-      const refreshed =
-        await getNewAccessToken();
+      redirect('/login');
 
-      // refresh failed
-      if (!refreshed) {
-        throw error;
-      }
+      // const refreshed = await getNewAccessToken();
 
-      // RETRY REQUEST
-      const retryResponse = await axiosInstance({
-        url,
-        ...options,
-        headers: await createHeaders(options),
-      });
+      // // refresh failed
+      // if (!refreshed) {
+      //   throw error;
+      // }
 
-      return retryResponse.data;
+      // // RETRY REQUEST
+      // const retryResponse = await axiosInstance({
+      //   url,
+      //   ...options,
+      //   headers: await createHeaders(options),
+      // });
+
+      // return retryResponse.data;
     }
 
     throw error;

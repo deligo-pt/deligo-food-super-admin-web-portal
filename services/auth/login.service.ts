@@ -13,20 +13,21 @@ export const loginReq = async (data: {
   deviceDetails: TDeviceDetails;
 }) => {
   return catchAsync<{ accessToken: string; refreshToken: string }>(async () => {
-
+    console.log("deviceDetails", data.deviceDetails);
     const response = await serverFetch.post("/auth/login", {
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
+    const result = await response.json();
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData?.message || "Failed to log in");
     }
 
-    return await response.json();
+    return result;
   });
 };
 
