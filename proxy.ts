@@ -3,13 +3,20 @@ import { verifyJWT } from "@/utils/verifyJWT";
 import { USER_ROLE } from "@/consts/user.const";
 
 export async function proxy(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
 
   const accessToken = req.cookies.get("accessToken")?.value;
 
   const loginUrl = new URL("/", req.url);
 
   let isAdmin = false;
+
+  if (pathname === "/" && searchParams.get("clearSession") === "true") {
+    const response = NextResponse.redirect(new URL("/", req.url));
+    response.cookies.delete("accessToken");
+    response.cookies.delete("refreshToken");
+    return response;
+  }
 
   // VERIFY TOKEN
   if (accessToken) {
@@ -35,8 +42,13 @@ export async function proxy(req: NextRequest) {
   // PROTECT ADMIN ROUTES
   if (pathname.startsWith("/admin")) {
     if (!accessToken || !isAdmin) {
-      req.cookies.clear();
-      return NextResponse.redirect(loginUrl);
+      const response = NextResponse.redirect(loginUrl);
+
+      // remove tokens
+      response.cookies.delete("accessToken");
+      response.cookies.delete("refreshToken");
+
+      return response;
     }
   }
 

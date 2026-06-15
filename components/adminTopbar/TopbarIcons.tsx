@@ -39,6 +39,7 @@ export default function TopbarIcons({ admin }: IProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const router = useRouter();
 
+
   const logOut = async () => {
     const toastId = toast.loading("Logging out...");
 
@@ -54,9 +55,30 @@ export default function TopbarIcons({ admin }: IProps) {
       router.push("/");
       return;
     }
+    if (result?.message === "NEXT_REDIRECT") {
+      toast.success("Logout successful!", {
+        id: toastId,
+      });
+
+      removeCookie("accessToken");
+      removeCookie("refreshToken");
+      router.push("/");
+      return;
+    }
+
+    if (result?.success === false) {
+      toast.success("Logout successful!", {
+        id: toastId,
+      });
+
+      removeCookie("accessToken");
+      removeCookie("refreshToken");
+      router.push("/");
+      return;
+    }
 
     toast.error(result?.message || "Logout failed", { id: toastId });
-    console.log(result);
+
   };
 
   useEffect(() => {

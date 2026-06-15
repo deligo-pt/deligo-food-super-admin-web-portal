@@ -102,7 +102,7 @@ export default function SuperAdminLoginPage({
   };
 
   const onSubmit = async (data: LoginForm) => {
-    login(data);
+    await login(data);
   };
 
   const clearSession = async () => {
