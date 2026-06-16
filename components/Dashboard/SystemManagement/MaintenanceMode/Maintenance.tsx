@@ -152,14 +152,14 @@ export default function MaintenanceMode() {
                       </span>
                     </div>
 
-                    <div className="bg-gray-50 p-6 rounded-2xl p-4 border border-gray-100 shadow-sm max-w-xs mx-auto relative my-4">
+                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 shadow-sm max-w-xs mx-auto relative my-4">
                       <div className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
                         <span className="text-[10px] font-bold text-white">
                           1
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#DC3173] flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-[#DC3173] flex items-center justify-center shrink-0">
                           <BellIcon className="w-4 h-4 text-white" />
                         </div>
                         <div>
