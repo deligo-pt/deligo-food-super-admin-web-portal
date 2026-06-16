@@ -95,7 +95,6 @@ export default function SuperAdminLoginPage({
     }
 
     toast.error(result.message, { id: toastId });
-    console.log(result);
 
     if (result.message === "LIMIT_EXCEEDED") {
       setShowModal(true);
