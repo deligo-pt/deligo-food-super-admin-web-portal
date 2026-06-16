@@ -15,12 +15,14 @@ interface IProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRemove: () => void;
+  isSubmitting: boolean;
 }
 
 export default function ClearSessionModal({
   open,
   onOpenChange,
   onRemove,
+  isSubmitting
 }: IProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -39,7 +41,7 @@ export default function ClearSessionModal({
                 Cancel
               </Button>
             </DialogClose>
-            <Button onClick={onRemove} variant="destructive" type="submit">
+            <Button onClick={onRemove} disabled={isSubmitting} variant="destructive" type="submit">
               Remove
             </Button>
           </DialogFooter>

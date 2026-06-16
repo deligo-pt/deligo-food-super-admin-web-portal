@@ -72,6 +72,7 @@ export default function Admins({
     status: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleStatusInfo = (
     adminId: string,
@@ -89,6 +90,7 @@ export default function Admins({
 
   const deleteAdmin = async () => {
     const toastId = toast.loading("Deleting Admin...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -105,6 +107,7 @@ export default function Admins({
       id: toastId,
     });
     console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -150,6 +153,7 @@ export default function Admins({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteAdmin}
+        isDeleting={isDeleting}
       />
 
       {/* Approve or Reject or Block Modal */}

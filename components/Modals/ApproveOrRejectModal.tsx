@@ -35,6 +35,7 @@ export default function ApproveOrRejectModal({
 }: IProps) {
   const { t } = useTranslation();
   const [remarks, setRemarks] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const approveOrReject = async (e: React.FormEvent) => {
@@ -48,6 +49,7 @@ export default function ApproveOrRejectModal({
             ? "Blocking..."
             : "Unblocking...",
     );
+    setIsSubmitting(true);
 
     const updateStatus = {
       status: status === "UNBLOCKED" ? "APPROVED" : status,
@@ -75,22 +77,23 @@ export default function ApproveOrRejectModal({
 
     toast.error(
       result.message ||
-        (status === "APPROVED"
-          ? "Approving failed"
-          : status === "REJECTED"
-            ? "Rejecting failed"
-            : status === "BLOCKED"
-              ? "Blocking failed"
-              : "Unblocking failed"),
+      (status === "APPROVED"
+        ? "Approving failed"
+        : status === "REJECTED"
+          ? "Rejecting failed"
+          : status === "BLOCKED"
+            ? "Blocking failed"
+            : "Unblocking failed"),
       { id: toastId },
     );
     console.log(result);
+    setIsSubmitting(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <form>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>
               {status === "APPROVED" && "Approve"}
@@ -130,13 +133,14 @@ export default function ApproveOrRejectModal({
               <Button
                 form="remarksForm"
                 type="submit"
+                disabled={isSubmitting}
                 className="bg-green-600 hover:bg-green-500"
               >
                 {t("approve")}
               </Button>
             )}
             {status === "REJECTED" && (
-              <Button form="remarksForm" type="submit" variant="destructive">
+              <Button form="remarksForm" type="submit" disabled={isSubmitting} variant="destructive">
                 {t("reject")}
               </Button>
             )}
@@ -144,6 +148,7 @@ export default function ApproveOrRejectModal({
               <Button
                 form="remarksForm"
                 type="submit"
+                disabled={isSubmitting}
                 className="bg-yellow-500 hover:bg-yellow-600"
               >
                 {t("block")}
@@ -153,6 +158,7 @@ export default function ApproveOrRejectModal({
               <Button
                 form="remarksForm"
                 type="submit"
+                disabled={isSubmitting}
                 className="bg-[#DC3173] hover:bg-[#DC3173]/90"
               >
                 {t("unblock")}

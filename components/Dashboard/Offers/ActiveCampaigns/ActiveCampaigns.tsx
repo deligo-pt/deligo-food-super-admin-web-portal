@@ -79,6 +79,8 @@ export default function ActiveCampaigns({
     offerName: "",
     status: false,
   });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const handleStatusInfo = (
     offerId: string,
@@ -100,6 +102,7 @@ export default function ActiveCampaigns({
 
   const handleUpdateStatus = async () => {
     const toastId = toast.loading("Updating offer...");
+    setButtonDisabled(true);
 
     const result = await updateOfferReq(statusInfo.offerId, {
       isActive: statusInfo.status,
@@ -116,6 +119,7 @@ export default function ActiveCampaigns({
 
     toast.error(result.message || "Offer update failed", { id: toastId });
     console.log(result);
+    setButtonDisabled(false);
   };
 
   const closeDeleteModal = (open: boolean) => {
@@ -128,6 +132,7 @@ export default function ActiveCampaigns({
 
   const handleDeleteCampaign = async () => {
     const toastId = toast.loading("Deleting Offer...");
+    setIsDeleting(true);
 
     const result = await deleteOfferReq(deleteId);
 
@@ -142,6 +147,7 @@ export default function ActiveCampaigns({
 
     toast.error(result.message || "Offer delete failed", { id: toastId });
     console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -192,6 +198,7 @@ export default function ActiveCampaigns({
           onOpenChange={closeStatusUpdateModal}
           onConfirm={handleUpdateStatus}
           statusInfo={statusInfo}
+          buttonDisabled={buttonDisabled}
         />
       )}
 
@@ -200,6 +207,7 @@ export default function ActiveCampaigns({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={handleDeleteCampaign}
+        isDeleting={isDeleting}
       />
     </div>
   );

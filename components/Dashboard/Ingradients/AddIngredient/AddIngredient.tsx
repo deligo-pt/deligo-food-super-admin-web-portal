@@ -11,8 +11,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TResponse } from "@/types";
+import { TTax } from "@/types/tax.type";
 import { catchAsync } from "@/utils/catchAsync";
 import { postData } from "@/utils/requests";
 import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
@@ -26,7 +28,7 @@ import z from "zod";
 
 type TIngredientForm = z.infer<typeof ingredientSchema>;
 
-export default function AddIngredients() {
+export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<TIngredientForm>({
@@ -38,6 +40,7 @@ export default function AddIngredients() {
       stock: 0,
       minOrder: 1,
       description: "",
+      // taxId: "",
       image: {
         url: "",
         file: null,
@@ -56,6 +59,7 @@ export default function AddIngredients() {
       stock: data.stock,
       minOrder: data.minOrder,
       description: data.description,
+      // taxId: data?.taxId
     };
 
     const formData = new FormData();
@@ -81,7 +85,6 @@ export default function AddIngredients() {
     }
 
     toast.error(result.message || "Ingredient add failed", { id: toastId });
-    console.log(result);
   };
 
   return (
@@ -208,6 +211,36 @@ export default function AddIngredients() {
                     </FormItem>
                   )}
                 />
+
+                {/* tax rate */}
+                {/* <FormField
+                  name="taxId"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tax rate</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger className="w-full h-10!">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {taxes?.map((tax) => (
+                              <SelectItem key={tax._id} value={tax._id}>
+                                {tax.taxName} ({tax.taxRate}%)
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+
               </div>
 
               {/* Description */}

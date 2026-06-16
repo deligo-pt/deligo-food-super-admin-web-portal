@@ -58,6 +58,7 @@ export default function BroadcastCenter() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const containerVariants = {
     hidden: {
@@ -111,6 +112,7 @@ export default function BroadcastCenter() {
     });
 
     const toastId = toast.loading("Sending...");
+    setIsSubmitting(true);
 
     const payload = {
       communicationType: commType,
@@ -134,6 +136,8 @@ export default function BroadcastCenter() {
       toast.success(res?.message, { id: toastId })
     } catch (error: any) {
       toast.error(error?.message || "Notification sent failed", { id: toastId })
+    } finally {
+      setIsSubmitting(false);
     }
 
     setTimeout(() => {
@@ -233,6 +237,7 @@ export default function BroadcastCenter() {
 
                 <button
                   onClick={handleSend}
+                  disabled={isSubmitting}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm bg-[#DC3173] text-white hover:bg-[#c42a65] transition-colors shadow-sm shadow-[#DC3173]/20"
                 >
                   <SendIcon className="w-4 h-4" />

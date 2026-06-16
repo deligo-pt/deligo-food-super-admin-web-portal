@@ -17,9 +17,11 @@ export default function SOSActions({
   onStatusUpdateSuccess,
 }: IProps) {
   const [note, setNote] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateStatus = async (status: TSosStatus) => {
     const toastId = toast.loading("Updating status...");
+    setIsSubmitting(true);
 
     const result = await updateSOSStatusReq(sosId, { status, note });
 
@@ -35,6 +37,7 @@ export default function SOSActions({
       id: toastId,
     });
     console.log(result);
+    setIsSubmitting(false);
   };
 
   return (
@@ -53,6 +56,7 @@ export default function SOSActions({
         {status !== "INVESTIGATING" && status !== "RESOLVED" && (
           <button
             onClick={() => updateStatus("INVESTIGATING")}
+            disabled={isSubmitting}
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500/90"
           >
             <UserSearch size={16} />
@@ -62,6 +66,7 @@ export default function SOSActions({
         {status !== "RESOLVED" && (
           <button
             onClick={() => updateStatus("RESOLVED")}
+            disabled={isSubmitting}
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#DC3173] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#DC3173]/90"
           >
             <CheckCircle size={16} />
@@ -71,6 +76,7 @@ export default function SOSActions({
         {status !== "FALSE_ALARM" && status !== "RESOLVED" && (
           <button
             onClick={() => updateStatus("FALSE_ALARM")}
+            disabled={isSubmitting}
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-yellow-500/90"
           >
             <TriangleAlert size={16} />

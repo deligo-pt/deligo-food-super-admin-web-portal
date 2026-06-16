@@ -64,6 +64,7 @@ export default function AddAdmin() {
     latitude: 0,
     longitude: 0,
   });
+  const [buttonDisabled, setButtonDisabled] = useState(0);
 
   const form = useForm<TAdminForm>({
     resolver: zodResolver(addAdminValidation),
@@ -83,6 +84,7 @@ export default function AddAdmin() {
     if (!email || !password) return;
 
     const toastId = toast.loading("Sending OTP...");
+    setButtonDisabled(1);
 
     if (!isValidEmail(email))
       return toast.error("Invalid email address", { id: toastId });
@@ -113,10 +115,13 @@ export default function AddAdmin() {
 
     toast.error(result.message || "OTP send failed", { id: toastId });
     console.log(result);
+    setButtonDisabled(0);
   };
 
   const resendOtp = async () => {
     const toastId = toast.loading("Resending OTP...");
+    setButtonDisabled(2);
+
     try {
       const result = (await resendOtpReq({
         email,
@@ -136,11 +141,14 @@ export default function AddAdmin() {
         id: toastId,
       });
       console.log(error);
+    } finally {
+      setButtonDisabled(0);
     }
   };
 
   const verifyOtp = async () => {
     const toastId = toast.loading("Verifying OTP...");
+    setButtonDisabled(3);
 
     const result = await verifyOtpReq({
       email,
@@ -160,10 +168,12 @@ export default function AddAdmin() {
 
     toast.error(result.message || "OTP verification failed", { id: toastId });
     console.log(result);
+    setButtonDisabled(0);
   };
 
   const onSubmit = async (data: TAdminForm) => {
     const toastId = toast.loading("Adding admin...");
+    setButtonDisabled(4);
 
     const adminData = {
       name: {
@@ -208,6 +218,7 @@ export default function AddAdmin() {
 
     toast.error(updatedResult.message || "Admin add failed", { id: toastId });
     console.log(updatedResult);
+    setButtonDisabled(0);
   };
 
   useEffect(() => {
@@ -287,7 +298,7 @@ export default function AddAdmin() {
                       />
                       {!otpSent && !emailVerified && (
                         <Button
-                          disabled={!email || !password}
+                          disabled={!email || !password || buttonDisabled === 1}
                           type="button"
                           style={{ background: DELIGO }}
                           onClick={sendOtp}
@@ -298,7 +309,7 @@ export default function AddAdmin() {
                       )}
                       {otpSent && !emailVerified && (
                         <Button
-                          disabled={timer > 0}
+                          disabled={timer > 0 || buttonDisabled === 2}
                           type="button"
                           style={{ background: DELIGO }}
                           onClick={resendOtp}
@@ -326,6 +337,7 @@ export default function AddAdmin() {
                         />
                         <Button
                           type="button"
+                          disabled={buttonDisabled === 3}
                           style={{ background: DELIGO }}
                           onClick={verifyOtp}
                           className="w-32"
@@ -468,6 +480,7 @@ export default function AddAdmin() {
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
+              disabled={buttonDisabled === 4}
             >
               Add Admin
             </Button>

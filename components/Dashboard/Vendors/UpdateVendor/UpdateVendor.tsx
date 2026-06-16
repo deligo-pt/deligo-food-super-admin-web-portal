@@ -126,6 +126,8 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
     },
   });
 
+  const { formState: { isSubmitting } } = form;
+
   const businessType = useWatch({
     control: form.control,
     name: "businessType",
@@ -804,6 +806,7 @@ export default function UpdateVendor({ businessCategories, vendor }: IProps) {
               <Button
                 className="px-8 py-2 text-white"
                 style={{ background: DELIGO }}
+                disabled={isSubmitting}
               >
                 {t("submit_vendor")}
               </Button>

@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { getNewAccessToken } from "@/utils/getNewAccessToken";
+import { redirect } from "next/navigation";
 
 const backendUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -35,50 +36,23 @@ async function serverFetchHelper(
   endPoint: string,
   options: RequestInit = {},
 ): Promise<Response> {
-
   const { headers, ...rest } = options;
 
-
   // FIRST REQUEST
-  let response = await fetch(
+  const response = await fetch(
     `${backendUrl}${endPoint}`,
     {
       credentials: "include",
-
       headers: await createHeaders(headers),
-
       ...rest,
-
       cache: "no-store",
     }
   );
 
 
-  // ACCESS TOKEN EXPIRED
   if (response.status === 401) {
-
-    const refreshed =
-      await getNewAccessToken();
-
-    // refresh failed
-    if (!refreshed) {
-      return response;
-    }
-
-
-    // RETRY REQUEST
-    response = await fetch(
-      `${backendUrl}${endPoint}`,
-      {
-        credentials: "include",
-
-        headers: await createHeaders(headers),
-
-        ...rest,
-
-        cache: "no-store",
-      }
-    );
+    console.log("Unauthorized! Redirecting to login...");
+    redirect("/?clearSession=true");
   }
 
   return response;

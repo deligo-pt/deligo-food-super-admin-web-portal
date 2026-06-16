@@ -72,6 +72,7 @@ export default function FleetManagers({
     status: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleStatusInfo = (
     agentId: string,
@@ -89,6 +90,7 @@ export default function FleetManagers({
 
   const handleDeleteFleetManager = async () => {
     const toastId = toast.loading("Deleting fleet manager...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -105,6 +107,7 @@ export default function FleetManagers({
       id: toastId,
     });
     console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -150,6 +153,7 @@ export default function FleetManagers({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={handleDeleteFleetManager}
+        isDeleting={isDeleting}
       />
 
       {/* Approve or Reject or Block Modal */}

@@ -26,6 +26,7 @@ export default function Ingredients({ ingredientsData }: IProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedIngredient, setSelectedIngredient] =
     useState<TIngredient | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDeleteIngredient = async () => {
     console.log(deleteId);
@@ -80,6 +81,7 @@ export default function Ingredients({ ingredientsData }: IProps) {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDeleteIngredient}
+        isDeleting={isDeleting}
       />
     </div>
   );

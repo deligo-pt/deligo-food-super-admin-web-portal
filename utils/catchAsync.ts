@@ -1,4 +1,5 @@
 import { TResponse } from "@/types";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export const catchAsync = async <T>(
   fn: () => Promise<TResponse<T>>,
@@ -36,6 +37,10 @@ export const catchAsync = async <T>(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.log(error);
+
+    if (isRedirectError(error)) {
+      throw error;
+    }
 
     return {
       statusCode: error?.response?.status,

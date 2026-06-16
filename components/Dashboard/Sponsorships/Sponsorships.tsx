@@ -55,6 +55,7 @@ export default function Sponsorships({
   const [deleteId, setDeleteId] = useState("");
   const [selectedSponsorship, setSelectedSponsorship] =
     useState<TSponsorship | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleOpenEditModal = (sponsorship: TSponsorship) =>
     setSelectedSponsorship(sponsorship);
@@ -69,6 +70,7 @@ export default function Sponsorships({
 
   const deleteSponsorship = async () => {
     const toastId = toast.loading("Deleting Sponsorship...");
+    setIsDeleting(true);
 
     const result = await deleteSponsorshipReq(deleteId);
 
@@ -83,6 +85,7 @@ export default function Sponsorships({
 
     toast.error(result.message || "Sponsorship delete failed", { id: toastId });
     console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -134,6 +137,7 @@ export default function Sponsorships({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteSponsorship}
+        isDeleting={isDeleting}
       />
     </div>
   );

@@ -60,6 +60,7 @@ export default function Customers({
     status: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleStatusInfo = (
     customerId: string,
@@ -77,6 +78,7 @@ export default function Customers({
 
   const deleteCustomer = async () => {
     const toastId = toast.loading("Deleting Customer...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -93,6 +95,7 @@ export default function Customers({
       id: toastId,
     });
     console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -131,6 +134,7 @@ export default function Customers({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteCustomer}
+        isDeleting={isDeleting}
       />
 
       {/* Approve or Reject or Block Modal */}

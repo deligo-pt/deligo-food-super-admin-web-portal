@@ -60,6 +60,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
     },
   });
   const router = useRouter();
+  const { formState: { isSubmitting } } = form;
 
   const handleEditTax = async (data: TaxForm) => {
     const toastId = toast.loading("Updating Tax...");
@@ -257,6 +258,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
               type="submit"
               form="edit-tax-form"
               className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+              disabled={isSubmitting}
             >
               Update
             </Button>

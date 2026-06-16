@@ -5,6 +5,7 @@ import axios, {
 import { cookies } from "next/headers";
 import { getNewAccessToken } from "@/utils/getNewAccessToken";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 const backendUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -44,7 +45,6 @@ const serverRequestHelper = async (
 ) => {
 
   try {
-    // FIRST REQUEST
     const response = await axiosInstance({
       url,
       ...options,
@@ -55,33 +55,23 @@ const serverRequestHelper = async (
 
   } catch (error) {
 
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     const err = error as AxiosError;
 
-    // ACCESS TOKEN EXPIRED
     if (err.response?.status === 401) {
+      console.log("Unauthorized! Redirecting to login...");
 
-      redirect('/login');
-
-      // const refreshed = await getNewAccessToken();
-
-      // // refresh failed
-      // if (!refreshed) {
-      //   throw error;
-      // }
-
-      // // RETRY REQUEST
-      // const retryResponse = await axiosInstance({
-      //   url,
-      //   ...options,
-      //   headers: await createHeaders(options),
-      // });
-
-      // return retryResponse.data;
+      redirect('/?clearSession=true');
     }
+
 
     throw error;
   }
-};
+
+}
 
 export const serverRequest = {
   get: (url: string, options: AxiosRequestConfig = {}) =>

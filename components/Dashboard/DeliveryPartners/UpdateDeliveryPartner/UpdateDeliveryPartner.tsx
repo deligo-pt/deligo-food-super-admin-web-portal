@@ -172,6 +172,8 @@ export default function UpdateDeliveryPartner({
     },
   });
 
+  const { formState: { isSubmitting } } = form;
+
   const [watchZones] = useWatch({
     control: form.control,
     name: ["preferredZones"],
@@ -1242,6 +1244,7 @@ export default function UpdateDeliveryPartner({
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
+              disabled={isSubmitting}
             >
               Update Delivery Partner
             </Button>

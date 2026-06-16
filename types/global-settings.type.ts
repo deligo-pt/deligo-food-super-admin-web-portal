@@ -61,6 +61,13 @@ export type TGlobalSettings = {
     };
   };
 
+  // ingredients order and delivery charges
+  ingredientsOrder: {
+    deliveryChargeInsideLisbon: number;
+    deliveryChargeOutsideLisbon: number;
+    vatRate: number;
+  };
+
   payout: {
     autoGenerate: boolean;
     payoutDays: (

@@ -45,6 +45,7 @@ export default function SuperAdminLoginPage({
 
   const [showModal, setShowModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [removeSubmitting, setRemoveSubmitting] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginValidation),
@@ -94,7 +95,6 @@ export default function SuperAdminLoginPage({
     }
 
     toast.error(result.message, { id: toastId });
-    console.log(result);
 
     if (result.message === "LIMIT_EXCEEDED") {
       setShowModal(true);
@@ -102,15 +102,17 @@ export default function SuperAdminLoginPage({
   };
 
   const onSubmit = async (data: LoginForm) => {
-    login(data);
+    await login(data);
   };
 
   const clearSession = async () => {
+    setRemoveSubmitting(true);
     await login({
       email: form.getValues("email"),
       password: form.getValues("password"),
       forceLogin: true,
     });
+    setRemoveSubmitting(false);
   };
 
   useEffect(() => {
@@ -258,6 +260,7 @@ export default function SuperAdminLoginPage({
         open={showModal}
         onOpenChange={(open) => setShowModal(open)}
         onRemove={clearSession}
+        isSubmitting={removeSubmitting}
       />
     </div>
   );
