@@ -92,6 +92,8 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
     },
   });
 
+  const { formState: { isSubmitting } } = form;
+
   useEffect(() => {
     form.reset({
       firstName: fleetManagerState.name?.firstName || "",
@@ -546,6 +548,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
               <Button
                 className="px-8 py-2 text-white"
                 style={{ background: DELIGO }}
+                disabled={isSubmitting}
               >
                 {t("submit_fleetManager")}
               </Button>

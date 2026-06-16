@@ -105,6 +105,7 @@ export default function AddVendor({
   });
   const [previews, setPreviews] =
     useState<Record<TVendorDocKey, string[] | null>>(defaultDocuments);
+
   const [buttonDisabled, setButtonDisabled] = useState(0);
 
   const form = useForm<TVendorForm>({
