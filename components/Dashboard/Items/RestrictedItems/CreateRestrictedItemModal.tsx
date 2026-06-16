@@ -58,6 +58,7 @@ export default function CreateRestrictedItemModal({
       reason: "",
     },
   });
+  const { formState: { isSubmitting } } = form;
 
   const onSubmit = async (data: TFormValues) => {
     const toastId = toast.loading("Adding restricted item...");
@@ -166,6 +167,7 @@ export default function CreateRestrictedItemModal({
             <Button
               form="addRestrictedItemForm"
               type="submit"
+              disabled={isSubmitting}
               className="bg-[#DC3173] hover:bg-[#DC3173]/90"
             >
               Add

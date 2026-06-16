@@ -31,9 +31,11 @@ export default function RestrictedItems({ restrictedItemsData }: IProps) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<TRestrictedItem | null>(null);
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const deleteItem = async () => {
     const toastId = toast.loading("Deleting Item...");
+    setIsDeleting(true);
 
     const result = await deleteRestrictedItemReq(deleteId);
 
@@ -50,6 +52,7 @@ export default function RestrictedItems({ restrictedItemsData }: IProps) {
       id: toastId,
     });
     console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -109,6 +112,7 @@ export default function RestrictedItems({ restrictedItemsData }: IProps) {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId("")}
         onConfirm={deleteItem}
+        isDeleting={isDeleting}
       />
     </div>
   );

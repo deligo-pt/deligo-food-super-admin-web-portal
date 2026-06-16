@@ -61,6 +61,7 @@ export default function EditRestrictedItemModal({
       reason: prevValues?.reason || "",
     },
   });
+  const { formState: { isSubmitting } } = form;
 
   const onSubmit = async (data: TFormValues) => {
     const toastId = toast.loading("Updating restricted item...");
@@ -169,6 +170,7 @@ export default function EditRestrictedItemModal({
             <Button
               form="editRestrictedItemForm"
               type="submit"
+              disabled={isSubmitting}
               className="bg-[#DC3173] hover:bg-[#DC3173]/90"
             >
               Update

@@ -28,6 +28,7 @@ export default function Products({
     action: "edit" | "delete" | null;
     product?: TProduct | null;
   }>({ id: null, action: null });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const sortOptions = [
     { label: t("newest_first"), value: "-createdAt" },
@@ -75,6 +76,7 @@ export default function Products({
 
   const handleDeleteProduct = async () => {
     const toastId = toast.loading("Deleting product...");
+    setIsDeleting(true);
 
     if (selectedProduct.id && selectedProduct.action === "delete") {
       const result = await deleteProductReq(selectedProduct.id);
@@ -91,6 +93,8 @@ export default function Products({
       });
       console.log(result);
     }
+
+    setIsDeleting(false);
   };
 
   return (
@@ -178,6 +182,7 @@ export default function Products({
           setSelectedProduct({ id: null, action: null, product: null })
         }
         onConfirm={handleDeleteProduct}
+        isDeleting={isDeleting}
       />
     </div>
   );
