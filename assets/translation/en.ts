@@ -1441,6 +1441,12 @@ export const en = {
   auto_mark_delivered: "Auto-mark Delivered",
   automatically_complete_orders:
     "Automatically complete orders after driver arrival",
+  offers_refunds: "Offers & Refunds",
+  ingredients_delivery_charges: "Ingredients Delivery Charges",
+  control_ingredients_delivery_charges_settings: "Control ingredients delivery charges settings",
+  deliveryChargeInsideLisbon: "Delivery Charge Inside Lisbon",
+  deliveryChargeOutsideLisbon: "Delivery Charge Outside Lisbon",
+  vatRate: "Vat Rate",
 
   // profile
   personal_information: "Personal Information",

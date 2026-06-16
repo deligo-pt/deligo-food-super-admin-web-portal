@@ -937,7 +937,7 @@ export default function GlobalSettings({
 
             {/* Offers & Refunds */}
             <SettingsCard
-              title="Offers & Refunds"
+              title={t("offers_refunds")}
               description={t("control_global_discount_settings")}
               icon={Gift}
               delay={0.5}
@@ -1016,8 +1016,8 @@ export default function GlobalSettings({
 
             {/* Ingredients order and delivery changes */}
             <SettingsCard
-              title="Ingredients Delivery Charges"
-              description={t("control_global_discount_settings")}
+              title={t("ingredients_delivery_charges")}
+              description={t("control_ingredients_delivery_charges_settings")}
               icon={Gift}
               delay={0.5}
             >
@@ -1030,7 +1030,7 @@ export default function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label={t("base_charge")}
+                          label={t("deliveryChargeInsideLisbon")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>

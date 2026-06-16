@@ -1487,6 +1487,12 @@ export const pt = {
   auto_mark_delivered: "Marcar como Entregue Automaticamente",
   automatically_complete_orders:
     "Completar encomendas automaticamente após a chegada do estafeta",
+  offers_refunds: "Ofertas e Reembolsos",
+  ingredients_delivery_charges: "Taxas de Entrega de Ingredientes",
+  control_ingredients_delivery_charges_settings: "Controlar configurações das taxas de entrega de ingredientes",
+  deliveryChargeInsideLisbon: "Taxa de Entrega Dentro de Lisboa",
+  deliveryChargeOutsideLisbon: "Taxa de Entrega Fora de Lisboa",
+  vatRate: "Taxa de IVA",
 
   // profile
   personal_information: "Informação Pessoal",
