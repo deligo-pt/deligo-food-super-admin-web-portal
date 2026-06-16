@@ -31,12 +31,14 @@ const sortOptions = [
 export default function Taxes({ taxesResult }: IProps) {
   const [editTax, setEditTax] = useState<TTax | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [buttonDisabled, setButtonDisabled] = useState(0);
   const router = useRouter();
 
   const handleUpdateStatus = async (id: string, isActive: boolean) => {
     const toastId = toast.loading(
       isActive ? "Activating Tax..." : "Deactivating Tax...",
     );
+    setButtonDisabled(2);
 
     const result = await updateTaxReq(id, { isActive });
 
@@ -58,10 +60,12 @@ export default function Taxes({ taxesResult }: IProps) {
       },
     );
     console.log(result);
+    setButtonDisabled(0);
   };
 
   const handleDeleteTax = async () => {
     const toastId = toast.loading("Deleting Tax...");
+    setButtonDisabled(1);
 
     const result = await deleteTaxReq(deleteId as string);
 
@@ -78,6 +82,7 @@ export default function Taxes({ taxesResult }: IProps) {
       id: toastId,
     });
     console.log(result);
+    setButtonDisabled(0);
   };
 
   return (
@@ -120,6 +125,7 @@ export default function Taxes({ taxesResult }: IProps) {
         open={!!deleteId}
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDeleteTax}
+        isDeleting={buttonDisabled === 1 ? true : false}
       />
     </div>
   );

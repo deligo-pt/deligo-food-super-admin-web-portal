@@ -46,6 +46,8 @@ export default function CreateTax() {
     },
   });
 
+  const { formState: { isSubmitting } } = form;
+
   const handleCreateTax = async (data: TaxForm) => {
     const toastId = toast.loading("Creating Tax...");
 
@@ -228,6 +230,7 @@ export default function CreateTax() {
                 </div>
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="bg-[#DC3173] text-white py-2 px-4 rounded-lg w-full"
                 >
                   Create Tax
