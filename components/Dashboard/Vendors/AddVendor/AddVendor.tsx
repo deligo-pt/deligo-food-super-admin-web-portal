@@ -105,6 +105,7 @@ export default function AddVendor({
   });
   const [previews, setPreviews] =
     useState<Record<TVendorDocKey, string[] | null>>(defaultDocuments);
+  const [buttonDisabled, setButtonDisabled] = useState(0);
 
   const form = useForm<TVendorForm>({
     resolver: zodResolver(addVendorValidation),
@@ -152,6 +153,7 @@ export default function AddVendor({
 
   const sendOtp = async () => {
     if (!email || !password) return;
+    setButtonDisabled(1);
 
     const toastId = toast.loading("Sending OTP...");
 
@@ -184,10 +186,12 @@ export default function AddVendor({
 
     toast.error(result.message || "OTP send failed", { id: toastId });
     console.log(result);
+    setButtonDisabled(0);
   };
 
   const resendOtp = async () => {
     const toastId = toast.loading("Resending OTP...");
+    setButtonDisabled(2);
     try {
       const result = (await resendOtpReq({
         email,
@@ -206,11 +210,14 @@ export default function AddVendor({
         id: toastId,
       });
       console.log(error);
+    } finally {
+      setButtonDisabled(0);
     }
   };
 
   const verifyOtp = async () => {
     const toastId = toast.loading("Verifying OTP...");
+    setButtonDisabled(3);
 
     try {
       const result = await verifyOtpReq({
@@ -255,6 +262,8 @@ export default function AddVendor({
       toast.error(error?.message || "Something went wrong during verification", {
         id: toastId,
       });
+    } finally {
+      setButtonDisabled(0);
     }
   };
 
@@ -410,7 +419,7 @@ export default function AddVendor({
                       />
                       {!otpSent && !emailVerified && (
                         <Button
-                          disabled={!email || !password}
+                          disabled={!email || !password || buttonDisabled === 1}
                           type="button"
                           style={{ background: DELIGO }}
                           onClick={sendOtp}
@@ -421,7 +430,7 @@ export default function AddVendor({
                       )}
                       {otpSent && !emailVerified && (
                         <Button
-                          disabled={timer > 0}
+                          disabled={timer > 0 || buttonDisabled === 2}
                           type="button"
                           style={{ background: DELIGO }}
                           onClick={resendOtp}
@@ -449,6 +458,7 @@ export default function AddVendor({
                         />
                         <Button
                           type="button"
+                          disabled={buttonDisabled === 3}
                           style={{ background: DELIGO }}
                           onClick={verifyOtp}
                           className="w-32"
