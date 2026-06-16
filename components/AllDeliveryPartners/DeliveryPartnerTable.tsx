@@ -51,6 +51,7 @@ export default function DeliveryPartnerTable({
     status: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const sortOptions = getSortOptions(t);
   const filterOptions = [
     {
@@ -90,6 +91,7 @@ export default function DeliveryPartnerTable({
 
   const deleteDeliveryPartner = async () => {
     const toastId = toast.loading("Deleting Delivery Partner...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -108,7 +110,7 @@ export default function DeliveryPartnerTable({
     toast.error(result?.message || "Delivery Partner delete failed", {
       id: toastId,
     });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -180,7 +182,7 @@ export default function DeliveryPartnerTable({
                             onClick={() =>
                               router.push(
                                 "/admin/all-delivery-partners/" +
-                                  deliveryPartner.userId,
+                                deliveryPartner.userId,
                               )
                             }
                           >
@@ -289,6 +291,7 @@ export default function DeliveryPartnerTable({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteDeliveryPartner}
+        isDeleting={isDeleting}
       />
 
       <ApproveOrRejectModal

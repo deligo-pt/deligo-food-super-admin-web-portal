@@ -43,6 +43,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -58,6 +59,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
 
   const deleteVendor = async () => {
     const toastId = toast.loading("Deleting vendor...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(vendor.userId as string);
 
@@ -69,7 +71,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
     }
 
     toast.error(result?.message || "Vendor delete failed", { id: toastId });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   const getStatusColor = (status: keyof typeof USER_STATUS) => {
@@ -528,6 +530,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
         open={showDeleteModal}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteVendor}
+        isDeleting={isDeleting}
       />
     </div>
   );

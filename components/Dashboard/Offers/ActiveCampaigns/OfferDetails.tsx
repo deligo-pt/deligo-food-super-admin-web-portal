@@ -67,6 +67,8 @@ export default function OfferDetails({ offer }: IProps) {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openStatusUpdateModal, setOpenStatusUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const config = offerTypeConfig[offer.offerType];
   const IconComponent = config.icon;
@@ -116,6 +118,7 @@ export default function OfferDetails({ offer }: IProps) {
 
   const handleUpdateStatus = async () => {
     const toastId = toast.loading("Updating offer...");
+    setButtonDisabled(true);
 
     const result = await updateOfferReq(offer._id, {
       isActive: !offer.isActive,
@@ -131,7 +134,7 @@ export default function OfferDetails({ offer }: IProps) {
     }
 
     toast.error(result.message || "Offer update failed", { id: toastId });
-    console.log(result);
+    setButtonDisabled(false);
   };
 
   const closeDeleteModal = (open: boolean) => {
@@ -140,6 +143,7 @@ export default function OfferDetails({ offer }: IProps) {
 
   const handleDeleteCampaign = async () => {
     const toastId = toast.loading("Deleting Offer...");
+    setIsDeleting(true);
 
     const result = await deleteOfferReq(offer._id);
 
@@ -153,7 +157,7 @@ export default function OfferDetails({ offer }: IProps) {
     }
 
     toast.error(result.message || "Offer delete failed", { id: toastId });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -623,6 +627,7 @@ export default function OfferDetails({ offer }: IProps) {
           offerName: offer.title,
           status: !offer.isActive,
         }}
+        buttonDisabled={buttonDisabled}
       />
 
       {/* Delete Modal */}
@@ -630,6 +635,7 @@ export default function OfferDetails({ offer }: IProps) {
         open={openDeleteModal}
         onOpenChange={closeDeleteModal}
         onConfirm={handleDeleteCampaign}
+        isDeleting={isDeleting}
       />
     </div>
   );

@@ -67,6 +67,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
     remarks: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const showingInfo = useMemo(() => {
     const page = adminsResult?.meta?.page || 1;
@@ -89,6 +90,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
 
   const deleteAdmin = async () => {
     const toastId = toast.loading("Deleting Admin...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -104,7 +106,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
     toast.error(result.message || "Admin deletion failed", {
       id: toastId,
     });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   // Small UI helpers
@@ -260,11 +262,10 @@ export default function AllAdmins({ adminsResult }: IProps) {
 
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                          a.status === "APPROVED"
-                            ? "bg-green-50 text-green-800"
-                            : "bg-red-50 text-red-800"
-                        }`}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${a.status === "APPROVED"
+                          ? "bg-green-50 text-green-800"
+                          : "bg-red-50 text-red-800"
+                          }`}
                       >
                         {a.status}
                       </span>
@@ -355,6 +356,7 @@ export default function AllAdmins({ adminsResult }: IProps) {
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteAdmin}
+        isDeleting={isDeleting}
       />
 
       <ApproveOrRejectModal
