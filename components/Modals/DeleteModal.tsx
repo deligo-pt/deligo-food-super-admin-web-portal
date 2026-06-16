@@ -14,9 +14,10 @@ interface IProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  isDeleting: boolean;
 }
 
-const DeleteModal = ({ open, onOpenChange, onConfirm }: IProps) => {
+const DeleteModal = ({ open, onOpenChange, onConfirm, isDeleting }: IProps) => {
   const { t } = useTranslation();
 
   return (
@@ -35,7 +36,7 @@ const DeleteModal = ({ open, onOpenChange, onConfirm }: IProps) => {
                 {t("cancel")}
               </Button>
             </DialogClose>
-            <Button variant="destructive" onClick={onConfirm} type="submit">
+            <Button variant="destructive" disabled={isDeleting} onClick={onConfirm} type="submit">
               {t("delete")}
             </Button>
           </DialogFooter>

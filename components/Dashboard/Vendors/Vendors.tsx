@@ -72,6 +72,7 @@ export default function Vendors({
     status: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleStatusInfo = (
     vendorId: string,
@@ -89,6 +90,7 @@ export default function Vendors({
 
   const deleteVendor = async () => {
     const toastId = toast.loading("Deleting Vendor...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -105,6 +107,7 @@ export default function Vendors({
       id: toastId,
     });
     console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -150,6 +153,7 @@ export default function Vendors({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteVendor}
+        isDeleting={isDeleting}
       />
 
       {/* Approve or Reject or Block Modal */}
