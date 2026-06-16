@@ -40,7 +40,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
       stock: 0,
       minOrder: 1,
       description: "",
-      taxId: "",
+      // taxId: "",
       image: {
         url: "",
         file: null,
@@ -59,7 +59,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
       stock: data.stock,
       minOrder: data.minOrder,
       description: data.description,
-      taxId: data?.taxId
+      // taxId: data?.taxId
     };
 
     const formData = new FormData();
@@ -213,7 +213,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                 />
 
                 {/* tax rate */}
-                <FormField
+                {/* <FormField
                   name="taxId"
                   control={form.control}
                   render={({ field }) => (
@@ -239,7 +239,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
 
               </div>
 

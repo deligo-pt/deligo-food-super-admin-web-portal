@@ -27,7 +27,7 @@ export const ingredientSchema = z.object({
     .number("Minimum order quantity must be a number")
     .min(1, "Minimum order quantity must be at least 1")
     .optional(),
-  taxId: z.string().nonempty("Tax is required"),
+  // taxId: z.string().nonempty("Tax is required"),
 
   image: z.object({
     url: z.url("Image URL must be a valid URL"),
