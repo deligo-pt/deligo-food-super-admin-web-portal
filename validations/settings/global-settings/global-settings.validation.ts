@@ -97,6 +97,18 @@ export const globalSettingsSchema = z
       .int("Expiry must be an integer")
       .positive("Expiry must be at least 1 minute"),
 
+    // ingredients order and delivery charges
+    deliveryChargeInsideLisbon: z
+      .number("Delivery charge inside lisbon must be a number")
+      .nonnegative("Delivery charge inside lisbon must be at least 0"),
+    deliveryChargeOutsideLisbon: z
+      .number("Delivery charge outside lisbon must be a number")
+      .nonnegative("Delivery charge outside lisbon must be at least 0"),
+    vatRate: z
+      .number("Vat rate must be a number")
+      .min(0, "Vat rate must be at least 0")
+      .max(100, "Vat rate cannot be more than 100"),
+
     // Platform state
     isPlatformLive: z.boolean("Platform live status is required"),
     maintenanceMessage: z

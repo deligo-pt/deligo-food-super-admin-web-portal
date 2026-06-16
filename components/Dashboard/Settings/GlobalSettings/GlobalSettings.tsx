@@ -92,6 +92,11 @@ export default function GlobalSettings({
       maintenanceMessage: settings?.system?.maintenanceMessage || "",
       refundProcessingDays: settings?.system?.refundProcessingDays || 0,
       maxDiscountPercent: settings?.system?.maxDiscountPercent || 0,
+
+      // ingredients and delivery charges
+      deliveryChargeInsideLisbon: settings?.ingredientsOrder?.deliveryChargeInsideLisbon || 20,
+      deliveryChargeOutsideLisbon: settings?.ingredientsOrder?.deliveryChargeOutsideLisbon || 30,
+      vatRate: settings?.ingredientsOrder?.vatRate || 23,
     },
   });
 
@@ -142,6 +147,11 @@ export default function GlobalSettings({
         refundProcessingDays: data.refundProcessingDays,
         maxDiscountPercent: data.maxDiscountPercent,
       },
+      ingredientsOrder: {
+        deliveryChargeInsideLisbon: data.deliveryChargeInsideLisbon,
+        deliveryChargeOutsideLisbon: data.deliveryChargeOutsideLisbon,
+        vatRate: data.vatRate
+      }
     } as Partial<TGlobalSettings>;
 
     const result = settings._id
@@ -192,11 +202,10 @@ export default function GlobalSettings({
                 disabled={isSaving}
                 className={`
               relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-[#DC3173] transition-all
-              ${
-                isSaving
-                  ? "bg-white/50 cursor-wait"
-                  : "bg-white hover:bg-white/90 cursor-pointer"
-              }
+              ${isSaving
+                    ? "bg-white/50 cursor-wait"
+                    : "bg-white hover:bg-white/90 cursor-pointer"
+                  }
             `}
               >
                 {isSaving ? (
@@ -237,11 +246,10 @@ export default function GlobalSettings({
                 }}
                 className={`
                 relative overflow-hidden rounded-2xl border transition-all duration-300
-                ${
-                  watchIsPlatformLive
+                ${watchIsPlatformLive
                     ? "bg-white border-gray-200 shadow-sm"
                     : "bg-gray-900 border-gray-800 shadow-xl"
-                }
+                  }
               `}
               >
                 <div className="absolute top-0 right-0 p-32 bg-[#DC3173]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
@@ -251,29 +259,26 @@ export default function GlobalSettings({
                     <div
                       className={`
                     p-4 rounded-2xl transition-colors duration-300
-                    ${
-                      watchIsPlatformLive
-                        ? "bg-green-100 text-green-600"
-                        : "bg-gray-800 text-gray-400"
-                    }
+                    ${watchIsPlatformLive
+                          ? "bg-green-100 text-green-600"
+                          : "bg-gray-800 text-gray-400"
+                        }
                   `}
                     >
                       <Activity size={32} strokeWidth={2.5} />
                     </div>
                     <div>
                       <h2
-                        className={`text-2xl font-bold ${
-                          watchIsPlatformLive ? "text-gray-900" : "text-white"
-                        }`}
+                        className={`text-2xl font-bold ${watchIsPlatformLive ? "text-gray-900" : "text-white"
+                          }`}
                       >
                         {t("platform_status")}
                       </h2>
                       <p
-                        className={`mt-1 font-medium ${
-                          watchIsPlatformLive
-                            ? "text-gray-500"
-                            : "text-gray-400"
-                        }`}
+                        className={`mt-1 font-medium ${watchIsPlatformLive
+                          ? "text-gray-500"
+                          : "text-gray-400"
+                          }`}
                       >
                         {watchIsPlatformLive
                           ? t("your_platform_currently_live")
@@ -284,9 +289,8 @@ export default function GlobalSettings({
 
                   <div className="flex items-center gap-4">
                     <span
-                      className={`text-sm font-bold uppercase tracking-wider ${
-                        watchIsPlatformLive ? "text-green-600" : "text-gray-400"
-                      }`}
+                      className={`text-sm font-bold uppercase tracking-wider ${watchIsPlatformLive ? "text-green-600" : "text-gray-400"
+                        }`}
                     >
                       {watchIsPlatformLive ? t("live") : t("maintenance")}
                     </span>
@@ -1007,6 +1011,87 @@ export default function GlobalSettings({
                     </FormItem>
                   )}
                 />
+              </div>
+            </SettingsCard>
+
+            {/* Ingredients order and delivery changes */}
+            <SettingsCard
+              title="Ingredients Delivery Charges"
+              description={t("control_global_discount_settings")}
+              icon={Gift}
+              delay={0.5}
+            >
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="deliveryChargeInsideLisbon"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label={t("base_charge")}
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="€"
+                          min={0}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="deliveryChargeOutsideLisbon"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label={t("deliveryChargeOutsideLisbon")}
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="€"
+                          min={0}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="vatRate"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormControl>
+                        <SettingsInput
+                          fieldState={fieldState}
+                          label={t("vatRate")}
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                          suffix="%"
+                          min={0}
+                          max={100}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
               </div>
             </SettingsCard>
           </div>
