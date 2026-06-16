@@ -8,6 +8,7 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
+import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TOrder } from "@/types/order.type";
 import { TCustomer } from "@/types/user.type";
 import { motion } from "framer-motion";
@@ -28,6 +29,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   customer: TCustomer;
@@ -44,10 +46,11 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const fullName =
-    `${customer.name?.firstName || ""} ${
-      customer.name?.lastName || ""
-    }`.trim() || t("no_name_provided");
+    `${customer.name?.firstName || ""} ${customer.name?.lastName || ""
+      }`.trim() || t("no_name_provided");
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -55,7 +58,25 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
     }
   };
 
-  const handleDeleteCustomer = async () => {};
+  const handleDeleteCustomer = async () => {
+    const toastId = toast.loading("Deleting Customer...");
+    setIsDeleting(true);
+
+    const result = await userSoftDeleteReq(customer?.userId);
+
+    if (result?.success) {
+      router.push('/admin/all-customers')
+      toast.success(result.message || "Customer deleted successfully!", {
+        id: toastId,
+      });
+      return;
+    }
+
+    toast.error(result.message || "Customer deletion failed", {
+      id: toastId,
+    });
+    setIsDeleting(false);
+  };
 
   return (
     <div>
@@ -325,6 +346,7 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
         onConfirm={handleDeleteCustomer}
+        isDeleting={isDeleting}
       />
 
       <ApproveOrRejectModal

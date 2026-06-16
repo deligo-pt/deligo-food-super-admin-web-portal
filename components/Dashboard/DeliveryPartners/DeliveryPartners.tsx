@@ -72,6 +72,7 @@ export default function DeliveryPartners({
     status: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleStatusInfo = (
     partnerId: string,
@@ -89,6 +90,7 @@ export default function DeliveryPartners({
 
   const handleDeletePartner = async () => {
     const toastId = toast.loading("Deleting partner...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -104,7 +106,7 @@ export default function DeliveryPartners({
     toast.error(result?.message || "Partner delete failed", {
       id: toastId,
     });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -143,6 +145,7 @@ export default function DeliveryPartners({
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={handleDeletePartner}
+        isDeleting={isDeleting}
       />
 
       {/* Approve or Reject or Block Modal */}

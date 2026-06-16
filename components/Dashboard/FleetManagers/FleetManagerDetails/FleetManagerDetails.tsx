@@ -37,6 +37,7 @@ export default function FleetManagerDetails({ agent }: IProps) {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -52,6 +53,7 @@ export default function FleetManagerDetails({ agent }: IProps) {
 
   const deleteAgent = async () => {
     const toastId = toast.loading("Deleting Fleet Manager...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(agent.userId as string);
 
@@ -63,7 +65,7 @@ export default function FleetManagerDetails({ agent }: IProps) {
     }
 
     toast.error("Fleet Manager delete failed", { id: toastId });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   const getStatusColor = (status: keyof typeof USER_STATUS) => {
@@ -408,6 +410,7 @@ export default function FleetManagerDetails({ agent }: IProps) {
         open={showDeleteModal}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteAgent}
+        isDeleting={isDeleting}
       />
     </div>
   );

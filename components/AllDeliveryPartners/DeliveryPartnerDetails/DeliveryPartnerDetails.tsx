@@ -47,6 +47,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   const { t } = useTranslation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const fullName =
     `${partner.name?.firstName || ""} ${partner.name?.lastName || ""}`.trim() ||
@@ -73,6 +74,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
 
   const handleDeletePartner = async () => {
     const toastId = toast.loading("Deleting Delivery Partner...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(partner.userId as string);
 
@@ -86,7 +88,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
     toast.error(result.message || "Delivery Partner delete failed", {
       id: toastId,
     });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -223,11 +225,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("email_verified")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${
-                      partner.isEmailVerified
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
+                    className={`px-2 py-0.5 rounded text-xs ${partner.isEmailVerified
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                      }`}
                   >
                     {partner.isEmailVerified ? t("yes") : t("no")}
                   </span>
@@ -302,9 +303,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 value={
                   partner.vehicleInfo?.drivingLicenseExpiry
                     ? format(
-                        partner.vehicleInfo?.drivingLicenseExpiry,
-                        "do MMM yyyy",
-                      )
+                      partner.vehicleInfo?.drivingLicenseExpiry,
+                      "do MMM yyyy",
+                    )
                     : "N/A"
                 }
               />
@@ -317,9 +318,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 value={
                   partner.vehicleInfo?.insuranceExpiry
                     ? format(
-                        partner.vehicleInfo?.insuranceExpiry,
-                        "do MMM yyyy",
-                      )
+                      partner.vehicleInfo?.insuranceExpiry,
+                      "do MMM yyyy",
+                    )
                     : "N/A"
                 }
               />
@@ -368,9 +369,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 value={
                   partner.legalStatus?.residencePermitExpiry
                     ? format(
-                        partner.legalStatus?.residencePermitExpiry,
-                        "do MMM yyyy",
-                      )
+                      partner.legalStatus?.residencePermitExpiry,
+                      "do MMM yyyy",
+                    )
                     : "N/A"
                 }
               />
@@ -378,11 +379,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("criminal_record_certification")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${
-                      partner.criminalRecord?.certificate
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
+                    className={`px-2 py-0.5 rounded text-xs ${partner.criminalRecord?.certificate
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-800"
+                      }`}
                   >
                     {partner.criminalRecord?.certificate
                       ? t("provided")
@@ -612,11 +612,10 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${
-                      partner.workPreferences?.hasEquipment?.isothermalBag
-                        ? "bg-[#DC3173]"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.isothermalBag
+                      ? "bg-[#DC3173]"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <span className="text-sm text-gray-700">
                     {t("isothermal_bag")}
@@ -624,21 +623,19 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${
-                      partner.workPreferences?.hasEquipment?.helmet
-                        ? "bg-[#DC3173]"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.helmet
+                      ? "bg-[#DC3173]"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <span className="text-sm text-gray-700">{t("helmet")}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`w-4 h-4 rounded-full ${
-                      partner.workPreferences?.hasEquipment?.powerBank
-                        ? "bg-[#DC3173]"
-                        : "bg-gray-300"
-                    }`}
+                    className={`w-4 h-4 rounded-full ${partner.workPreferences?.hasEquipment?.powerBank
+                      ? "bg-[#DC3173]"
+                      : "bg-gray-300"
+                      }`}
                   ></div>
                   <span className="text-sm text-gray-700">
                     {t("power_bank")}
@@ -674,9 +671,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 value={
                   partner.approvedOrRejectedOrBlockedAt
                     ? format(
-                        partner.approvedOrRejectedOrBlockedAt,
-                        "do MMM yyyy",
-                      )
+                      partner.approvedOrRejectedOrBlockedAt,
+                      "do MMM yyyy",
+                    )
                     : "N/A"
                 }
               />
@@ -784,6 +781,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
         onConfirm={handleDeletePartner}
+        isDeleting={isDeleting}
       />
 
       <ApproveOrRejectModal

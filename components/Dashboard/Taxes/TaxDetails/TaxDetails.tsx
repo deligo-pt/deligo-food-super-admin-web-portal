@@ -35,6 +35,7 @@ interface IProps {
 export default function TaxDetails({ tax }: IProps) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   const handleUpdateStatus = async (id: string, isActive: boolean) => {
@@ -66,6 +67,7 @@ export default function TaxDetails({ tax }: IProps) {
 
   const handleDeleteTax = async () => {
     const toastId = toast.loading("Deleting Tax...");
+    setIsDeleting(true);
 
     const result = await deleteTaxReq(tax._id);
 
@@ -81,7 +83,7 @@ export default function TaxDetails({ tax }: IProps) {
     toast.error(result.message || "Failed to delete tax", {
       id: toastId,
     });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   return (
@@ -236,6 +238,7 @@ export default function TaxDetails({ tax }: IProps) {
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
         onConfirm={handleDeleteTax}
+        isDeleting={isDeleting}
       />
     </motion.div>
   );

@@ -39,6 +39,8 @@ export default function AllCustomers({ customersResult }: IProps) {
     remarks: "",
   });
   const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const filterOptions = [
     {
       label: t("status"),
@@ -78,6 +80,7 @@ export default function AllCustomers({ customersResult }: IProps) {
 
   const deleteCustomer = async () => {
     const toastId = toast.loading("Deleting Customer...");
+    setIsDeleting(true);
 
     const result = await userSoftDeleteReq(deleteId);
 
@@ -93,7 +96,7 @@ export default function AllCustomers({ customersResult }: IProps) {
     toast.error(result.message || "Customer deletion failed", {
       id: toastId,
     });
-    console.log(result);
+    setIsDeleting(false);
   };
 
   const getStatusColor = (status: TUserStatus) => {
@@ -125,20 +128,20 @@ export default function AllCustomers({ customersResult }: IProps) {
 
       {/* Horizontal-scroll table container */}
       <Card className="p-0 overflow-x-auto rounded-xl shadow-sm border">
-        <table className="min-w-[1300px] w-full text-sm">
+        <table className="min-w-325 w-full text-sm">
           <thead className="bg-slate-100 text-slate-700 font-semibold">
             <tr>
-              <th className="px-4 py-3 text-left w-[60px]">#</th>
-              <th className="px-4 py-3 text-left w-[280px]">{t("customer")}</th>
-              <th className="px-4 py-3 text-center w-[120px]">
+              <th className="px-4 py-3 text-left w-15">#</th>
+              <th className="px-4 py-3 text-left w-70">{t("customer")}</th>
+              <th className="px-4 py-3 text-center w-30">
                 {t("orders_lg")}
               </th>
-              <th className="px-4 py-3 text-center w-[150px]">
+              <th className="px-4 py-3 text-center w-37.5">
                 {t("spend")} (€)
               </th>
-              <th className="px-4 py-3 text-center w-[150px]">{t("status")}</th>
-              <th className="px-4 py-3 text-center w-[150px]">{t("joined")}</th>
-              <th className="px-4 py-3 text-center w-[260px]">
+              <th className="px-4 py-3 text-center w-37.5">{t("status")}</th>
+              <th className="px-4 py-3 text-center w-37.5">{t("joined")}</th>
+              <th className="px-4 py-3 text-center w-65">
                 {t("actions")}
               </th>
             </tr>
@@ -270,6 +273,7 @@ export default function AllCustomers({ customersResult }: IProps) {
         open={!!deleteId}
         onOpenChange={closeDeleteModal}
         onConfirm={deleteCustomer}
+        isDeleting={isDeleting}
       />
 
       <ApproveOrRejectModal
