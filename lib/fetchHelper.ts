@@ -48,7 +48,7 @@ async function serverFetchHelper(
       cache: "no-store",
     }
   );
-  console.log("fetch response", response);
+
 
   if (response.status === 401) {
     console.log("Unauthorized! Redirecting to login...");

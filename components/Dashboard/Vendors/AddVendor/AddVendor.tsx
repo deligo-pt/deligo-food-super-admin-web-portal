@@ -133,6 +133,8 @@ export default function AddVendor({
     },
   });
 
+  const { formState: { isSubmitting } } = form;
+
   const daysOfWeek = [
     t("sunday"),
     t("monday"),
@@ -956,6 +958,7 @@ export default function AddVendor({
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
+              disabled={isSubmitting}
             >
               {t("submit_vendor")}
             </Button>
