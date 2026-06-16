@@ -70,9 +70,11 @@ export default function CategoryTable({ categoriesResult }: IProps) {
     isDeleted: false,
     field: "",
   });
+  const [buttonDisabled, setButtonDisabled] = useState(0);
 
   const updateActiveStatus = async () => {
     const toastId = toast.loading("Updating active status...");
+    setButtonDisabled(2);
 
     const result = await updateBusinessCategoryReq(statusInfo.categoryId, {
       isActive: statusInfo.isActive,
@@ -95,10 +97,12 @@ export default function CategoryTable({ categoriesResult }: IProps) {
       id: toastId,
     });
     console.log(result);
+    setButtonDisabled(0);
   };
 
   const softDeleteCategory = async () => {
     const toastId = toast.loading("Deleting category...");
+    setButtonDisabled(1);
 
     const result = await deleteBusinessCategoryReq(statusInfo.categoryId);
 
@@ -119,6 +123,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
       id: toastId,
     });
     console.log(result);
+    setButtonDisabled(0);
   };
 
   return (
@@ -280,7 +285,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
         }
       >
         <form>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-106.25">
             <DialogHeader>
               <DialogTitle>
                 {statusInfo.field === "isDeleted"
@@ -306,12 +311,13 @@ export default function CategoryTable({ categoriesResult }: IProps) {
               </DialogClose>
 
               {statusInfo.field === "isDeleted" ? (
-                <Button variant="destructive" onClick={softDeleteCategory}>
+                <Button variant="destructive" disabled={buttonDisabled === 1} onClick={softDeleteCategory}>
                   {t("delete")}
                 </Button>
               ) : !statusInfo.isActive ? (
                 <Button
                   onClick={updateActiveStatus}
+                  disabled={buttonDisabled === 2}
                   className="bg-yellow-600 hover:bg-yellow-500"
                 >
                   {t("deactivate")}
@@ -319,6 +325,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
               ) : (
                 <Button
                   onClick={updateActiveStatus}
+                  disabled={buttonDisabled === 2}
                   className="bg-[#DC3173] hover:bg-[#DC3173]/90"
                 >
                   {t("activate")}
