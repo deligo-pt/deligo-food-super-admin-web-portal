@@ -19,6 +19,7 @@ interface IProps {
     offerName: string;
     status: boolean;
   };
+  buttonDisabled: boolean;
 }
 
 const OfferStatusUpdateModal = ({
@@ -26,6 +27,7 @@ const OfferStatusUpdateModal = ({
   onOpenChange,
   onConfirm,
   statusInfo,
+  buttonDisabled
 }: IProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,6 +58,7 @@ const OfferStatusUpdateModal = ({
               )}
               onClick={onConfirm}
               type="submit"
+              disabled={buttonDisabled}
             >
               {statusInfo.status ? "Activate" : "Deactivate"}
             </Button>

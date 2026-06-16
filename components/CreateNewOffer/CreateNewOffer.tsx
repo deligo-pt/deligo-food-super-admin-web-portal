@@ -56,6 +56,7 @@ export default function CreateNewOffer() {
       userUsageLimit: "",
     },
   });
+  const { formState: { isSubmitting } } = form;
 
   const watchOfferType = useWatch({
     control: form.control,
@@ -91,7 +92,7 @@ export default function CreateNewOffer() {
 
   return (
     <div className="min-h-screen p-6 md:p-10" style={{ background: BG }}>
-      <div className="max-w-[900px] mx-auto space-y-10">
+      <div className="max-w-225 mx-auto space-y-10">
         <TitleHeader
           title={t("create_new_offer")}
           subtitle={t("add_promotion_boost_restuarant_sales")}
@@ -432,6 +433,7 @@ export default function CreateNewOffer() {
                   <Button
                     className="h-12 px-6 text-base text-white"
                     style={{ background: PRIMARY }}
+                    disabled={isSubmitting}
                   >
                     {t("create_offer")}
                   </Button>
