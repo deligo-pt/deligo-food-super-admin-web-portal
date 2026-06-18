@@ -111,7 +111,7 @@ export default function IngredientTable({
                   <DropdownMenuTrigger>
                     <MoreVertical className="h-4 w-4" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
+                  {/* <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
                         router.push("/admin/all-ingredients/" + ingredient._id)
@@ -128,7 +128,7 @@ export default function IngredientTable({
                     >
                       Delete
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
+                  </DropdownMenuContent> */}
                 </DropdownMenu>
               </TableCell>
             </TableRow>

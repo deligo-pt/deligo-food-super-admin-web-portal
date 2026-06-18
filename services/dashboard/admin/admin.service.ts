@@ -1,5 +1,6 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TAdmin } from "@/types/admin.type";
 import { catchAsync } from "@/utils/catchAsync";
@@ -37,4 +38,22 @@ export const getAllAdminsReq = async (
   return {
     data: [],
   };
+};
+
+export const getAllAdmin = async () => {
+  const url = `/admins`;
+
+  const result = await catchAsync<TAdmin[]>(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["admin-list"],
+        revalidate: 30,
+      },
+    });
+    return await res.json();
+  });
+
+  if (result?.success) return result;
+
+  return null;
 };

@@ -1448,6 +1448,24 @@ export const en = {
   deliveryChargeOutsideLisbon: "Delivery Charge Outside Lisbon",
   vatRate: "Vat Rate",
 
+  // permissonsc
+  // --> Create Permission
+  create_permission: "Create Permission",
+  configure_access_control_rules_for_staff: "Configure access control rules for staff",
+  permission_details: "Permission Details",
+  permission_name: "Permission Name",
+  display_name: "Display Name",
+  system_action_code: "System Action Code",
+  dashboard_module_group: "Dashboard Model Group",
+  system_status_and_restrictions: "System Status and Restriction",
+  globally_active_status: "Globally Active Status",
+  instantly_toggle_access: "Instantly toggle access visibility across the platform metrics.",
+  system_protected_core: "System Protected Core",
+  lock_entry_to_prevent_casual: "Lock entry to prevent casual dashboard mutation or unsafe deletions.",
+  // --> All permissions
+  all_permissions: "All Permissions",
+
+
   // profile
   personal_information: "Personal Information",
   account_activity: "Account Activity",
