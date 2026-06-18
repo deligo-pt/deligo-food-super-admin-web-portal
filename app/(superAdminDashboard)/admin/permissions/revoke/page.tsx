@@ -1,6 +1,6 @@
 import RevokePermissions from "@/components/Dashboard/Permissions/RevokePermissions";
 import { getAllAdmin } from "@/services/dashboard/admin/admin.service";
-import { getAllPermissionsReq } from "@/services/dashboard/permissions/permissons.service";
+import { getAllPermissionsReq } from "@/services/dashboard/permissions/permissions.service";
 
 
 const RevokePermission = async () => {

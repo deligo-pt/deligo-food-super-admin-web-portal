@@ -25,9 +25,12 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
+import { createPermissionReq } from "@/services/dashboard/permissions/permissions.service";
 import { MODULE_GROUPS, permissionActions, permissionValidation, } from "@/validations/permissions/permissons.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 const PRIMARY = "#DC3173";
@@ -36,6 +39,7 @@ type TPermissionForm = z.input<typeof permissionValidation>;
 
 export default function CreatePermission() {
     const { t } = useTranslation();
+    const router = useRouter();
 
     const form = useForm<TPermissionForm>({
         resolver: zodResolver(permissionValidation),
@@ -53,7 +57,17 @@ export default function CreatePermission() {
     const { formState: { isSubmitting } } = form;
 
     const onSubmit = async (data: TPermissionForm) => {
-        console.log("Permission Form Payload:", data);
+        const toastId = toast.loading("Creating permisson...");
+
+        const result = await createPermissionReq(data);
+
+        if (result?.success) {
+            toast.success(result?.message || "Permission created successfully", { id: toastId });
+            router.push('/admin/permissions');
+            return;
+        } else {
+            toast.error(result?.message || "Permission creation failed!", { id: toastId });
+        };
     };
 
     return (

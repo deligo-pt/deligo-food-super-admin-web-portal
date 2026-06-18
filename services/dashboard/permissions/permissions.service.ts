@@ -1,3 +1,5 @@
+'use server';
+
 import { serverFetch } from "@/lib/fetchHelper";
 import { TSystemPermission } from "@/types/permission.type";
 import { catchAsync } from "@/utils/catchAsync";
@@ -5,8 +7,18 @@ import { catchAsync } from "@/utils/catchAsync";
 
 export const createPermissionReq = async (payload: Record<string, unknown>) => {
     return await catchAsync<TSystemPermission>(async () => {
-        const response = await serverFetch.post("/permissions/create", payload);
-        return await response.json();
+        const response = await serverFetch.post("/permissions/create", {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result?.message || "Failed to create permission");
+        }
+
+        return result;
     });
 };
 
