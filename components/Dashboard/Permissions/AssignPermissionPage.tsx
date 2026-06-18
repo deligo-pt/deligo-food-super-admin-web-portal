@@ -58,8 +58,8 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
     };
 
     return (
-        <div className="min-h-screen p-6 md:p-10" style={{ background: CANVAS_BG_COLOR }}>
-            <div className="max-w-7xl mx-auto space-y-8">
+        <div className="min-h-screen">
+            <div className="space-y-8">
                 <TitleHeader
                     title={t("assign_permissions")}
                     subtitle={t("configure_and_map_access_control_levels_for_specific_administrative_roles")}
