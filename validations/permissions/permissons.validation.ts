@@ -90,3 +90,10 @@ export const permissionValidation = z.object({
     isSystemDefined: z.boolean().default(false),
     isActive: z.boolean().default(true),
 });
+
+export const updatePermissionValidation = z.object({
+    name: z.string().min(3, { message: "Permission name must be at least 3 characters." }),
+    displayName: z.string().optional(),
+    description: z.string().max(500, { message: "Description cannot exceed 500 characters." }).optional(),
+    isActive: z.boolean(),
+});

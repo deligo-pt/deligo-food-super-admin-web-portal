@@ -7,6 +7,8 @@ import { TSystemPermission } from '@/types/permission.type';
 import { TMeta } from '@/types';
 import PaginationComponent from '@/components/Filtering/PaginationComponent';
 import { motion } from "framer-motion";
+import { useState } from 'react';
+import UpdatePermissionModal from './UpdatePermissionModal';
 
 interface IProps {
     permissionsResult: { data: TSystemPermission[]; meta?: TMeta };
@@ -21,6 +23,19 @@ const sortOptions = [
 const Permissions = ({
     permissionsResult
 }: IProps) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedPermission, setSelectedPermission] = useState<TSystemPermission | null>(null);
+
+    const handleOpenEdit = (permission: TSystemPermission) => {
+        setSelectedPermission(permission);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseEdit = () => {
+        setIsModalOpen(false);
+        setSelectedPermission(null);
+    };
+
     return (
         <div className="space-y-6 max-w-full">
             {/* Page Title */}
@@ -35,7 +50,7 @@ const Permissions = ({
             />
 
             {/* Agreements Table */}
-            <PermissionsTable permissions={permissionsResult?.data || []} />
+            <PermissionsTable permissions={permissionsResult?.data || []} onOpenEditModal={handleOpenEdit} />
 
             {/* Pagination */}
             {!!permissionsResult?.meta?.totalPage && (
@@ -49,6 +64,17 @@ const Permissions = ({
                     />
                 </motion.div>
             )}
+
+            {/* Edit Permission modal */}
+            <UpdatePermissionModal
+                isOpen={isModalOpen}
+                onClose={handleCloseEdit}
+                permission={selectedPermission}
+                onSuccess={() => {
+                    // Add your Next.js on-demand revalidation trigger routines here
+                    // e.g., router.refresh();
+                }}
+            />
         </div>
     );
 };
