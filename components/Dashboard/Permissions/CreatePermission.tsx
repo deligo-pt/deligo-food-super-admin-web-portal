@@ -108,7 +108,7 @@ export default function CreatePermission() {
                                                 <FormItem>
                                                     <div className="space-y-2">
                                                         <FormLabel className="font-medium text-sm text-gray-700">
-                                                            {t("display_name_ui")}
+                                                            {t("display_name")}
                                                         </FormLabel>
                                                         <FormControl>
                                                             <Input
