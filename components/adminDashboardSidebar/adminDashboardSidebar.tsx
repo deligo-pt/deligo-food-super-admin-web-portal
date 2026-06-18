@@ -279,6 +279,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("roles_and_permissions"), path: "/admin/roles-permissions" },
         { name: t("create_permission"), path: "/admin/create-permission" },
         { name: t("all_permissions"), path: "/admin/permissions" },
+        { name: t("assign_permission"), path: "/admin/permissions/assign" },
       ],
     },
     {

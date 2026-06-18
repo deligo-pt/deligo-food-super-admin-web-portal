@@ -97,3 +97,11 @@ export const updatePermissionValidation = z.object({
     description: z.string().max(500, { message: "Description cannot exceed 500 characters." }).optional(),
     isActive: z.boolean(),
 });
+
+// Zod validation enforcing that at least one admin and one permission are targeted
+export const assignPermissionValidation = z.object({
+    adminId: z.string({ message: "Please select an administrative account." }).min(1, { error: "Please select at least one" }),
+    permissionIds: z.array(z.string()).min(1, { message: "Select at least one system permission level." }),
+});
+
+export type TAssignPermissionForm = z.infer<typeof assignPermissionValidation>;
