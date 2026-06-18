@@ -18,6 +18,7 @@ import { USER_ROLE } from "@/consts/user.const";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/otp.service";
 import {
+  onboardUserAndSendOtpReq,
   registerUserAndSendOtpReq,
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
@@ -97,7 +98,7 @@ export default function AddAdmin() {
         },
       );
 
-    const result = await registerUserAndSendOtpReq(
+    const result = await onboardUserAndSendOtpReq(
       {
         email,
         password,
@@ -110,6 +111,7 @@ export default function AddAdmin() {
         id: toastId,
       });
       setOtpSent(true);
+      setButtonDisabled(0);
       return;
     }
 
@@ -163,6 +165,7 @@ export default function AddAdmin() {
       const decoded = jwtDecode(result.data.accessToken) as { userId: string };
       setAdminId(decoded.userId);
       setEmailVerified(true);
+      setButtonDisabled(0);
       return;
     }
 

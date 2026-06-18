@@ -20,6 +20,20 @@ export const registerUserAndSendOtpReq = async (
   });
 };
 
+export const onboardUserAndSendOtpReq = async (
+  data: {
+    email: string;
+    password: string;
+    role: string;
+  },
+) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.post(`/auth/register/onboard`, {
+      data,
+    });
+  });
+};
+
 export const updateUserDataReq = async (
   endPoint: string,
   data: Partial<TVendor | TAgent | TDeliveryPartner | TAdmin>,
