@@ -78,23 +78,25 @@ export const updatePermissionReq = async (payload: Record<string, unknown>, perm
 };
 
 
-export const assignPermissionToAdminReq = async (adminId: string, payload: { permissionIds: string[] }) => {
-    return await catchAsync<any>(async () => {
+export const assignPermissionToAdminReq = async (adminId: string, permissionIds: string[]) => {
+    const payload = {
+        permissionIds,
+    };
+    console.log(payload);
+    return await catchAsync(async () => {
         const response = await serverFetch.patch(`/permissions/assign-permissions/${adminId}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(payload)
         });
+        const result = await response.json();
 
-        return await response.json();
+        return result;
     });
 };
 
 
 export const revokePermissionFromAdminReq = async (adminId: string, payload: { permissionIds: string[] }) => {
-    return await catchAsync<any>(async () => {
+    return await catchAsync(async () => {
         const response = await serverFetch.patch(`/permissions/revoke-permissions/${adminId}`, {
-            method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         });

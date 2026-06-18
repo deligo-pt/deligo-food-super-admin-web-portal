@@ -12,9 +12,10 @@ import { assignPermissionValidation, TAssignPermissionForm } from "@/validations
 import { PermissionsMatrix } from "./PermissionMatrix";
 import { TAdmin } from "@/types/admin.type";
 import { useCallback } from "react";
+import { toast } from "sonner";
+import { assignPermissionToAdminReq } from "@/services/dashboard/permissions/permissions.service";
 
 const PRIMARY_COLOR = "#DC3173";
-const CANVAS_BG_COLOR = "#FFF1F7";
 
 interface AssignPermissionsProps {
     admins: TAdmin[];
@@ -54,7 +55,17 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
     }, [setValue]);
 
     const onSubmit = async (data: TAssignPermissionForm) => {
-        console.log("Submitting Config Payload Target:", data);
+        const toastId = toast.loading("Assigning....");
+
+        const result = await assignPermissionToAdminReq(data?.adminId, data?.permissionIds);
+
+        if (result?.success) {
+            toast.success(result?.message || "Permission assigned successfully", { id: toastId });
+            reset();
+            return;
+        } else {
+            toast.error(result?.message || "Permission assigning failed!", { id: toastId });
+        };
     };
 
     return (

@@ -42,14 +42,12 @@ interface UpdatePermissionModalProps {
     isOpen: boolean;
     onClose: () => void;
     permission: TSystemPermission | null;
-    onSuccess?: (value: TUpdatePermissionForm) => void;
 }
 
 export default function UpdatePermissionModal({
     isOpen,
     onClose,
-    permission,
-    onSuccess,
+    permission
 }: UpdatePermissionModalProps) {
     const { t } = useTranslation();
     const router = useRouter();
