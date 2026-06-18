@@ -60,6 +60,24 @@ export const getSinglePermissionReq = async (permissionId: string) => {
 };
 
 
+export const updatePermissionReq = async (payload: Record<string, unknown>, permissionId: string) => {
+    return await catchAsync<TSystemPermission>(async () => {
+        const response = await serverFetch.patch(`/permissions/${permissionId}`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result?.message || "Failed to update permission");
+        }
+
+        return result;
+    });
+};
+
+
 export const assignPermissionToAdminReq = async (adminId: string, payload: { permissionIds: string[] }) => {
     return await catchAsync<any>(async () => {
         const response = await serverFetch.patch(`/permissions/assign-permissions/${adminId}`, {

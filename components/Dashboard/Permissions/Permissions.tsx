@@ -70,10 +70,6 @@ const Permissions = ({
                 isOpen={isModalOpen}
                 onClose={handleCloseEdit}
                 permission={selectedPermission}
-                onSuccess={() => {
-                    // Add your Next.js on-demand revalidation trigger routines here
-                    // e.g., router.refresh();
-                }}
             />
         </div>
     );

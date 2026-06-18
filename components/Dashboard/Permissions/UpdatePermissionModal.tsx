@@ -32,6 +32,8 @@ import { Button } from "@/components/ui/button";
 import { TSystemPermission } from "@/types/permission.type";
 import { useTranslation } from "@/hooks/use-translation";
 import { updatePermissionValidation } from "@/validations/permissions/permissons.validation";
+import { updatePermissionReq } from "@/services/dashboard/permissions/permissions.service";
+import { useRouter } from "next/navigation";
 
 
 type TUpdatePermissionForm = z.input<typeof updatePermissionValidation>;
@@ -40,7 +42,7 @@ interface UpdatePermissionModalProps {
     isOpen: boolean;
     onClose: () => void;
     permission: TSystemPermission | null;
-    onSuccess?: () => void;
+    onSuccess?: (value: TUpdatePermissionForm) => void;
 }
 
 export default function UpdatePermissionModal({
@@ -50,6 +52,7 @@ export default function UpdatePermissionModal({
     onSuccess,
 }: UpdatePermissionModalProps) {
     const { t } = useTranslation();
+    const router = useRouter();
 
     const form = useForm<TUpdatePermissionForm>({
         resolver: zodResolver(updatePermissionValidation),
@@ -76,23 +79,18 @@ export default function UpdatePermissionModal({
 
     const onSubmit = async (values: TUpdatePermissionForm) => {
         if (!permission?._id) return;
+        const toastId = toast.loading("Updating....")
 
-        try {
-            // Integration Note: Bind your direct update API call here
-            // const result = await updatePermissionReq(permission._id, values);
+        const result = await updatePermissionReq(values, permission?._id);
 
-            console.log("Submitting Permission Modification Payload:", values);
-
-            // Simulating a minor network latency block
-            await new Promise((resolve) => setTimeout(resolve, 800));
-
-            toast.success("System routing scope optimized successfully.");
-            if (onSuccess) onSuccess();
+        if (result?.success) {
+            toast.success(result?.message || "Permission updated successfully", { id: toastId });
+            router.push('/admin/permissions');
             onClose();
-        } catch (error) {
-            toast.error("Failed to modernize permission rule configurations.");
-            console.error("Permission Update Error Context:", error);
-        }
+            return;
+        } else {
+            toast.error(result?.message || "Permission updating failed!", { id: toastId });
+        };
     };
 
     return (
