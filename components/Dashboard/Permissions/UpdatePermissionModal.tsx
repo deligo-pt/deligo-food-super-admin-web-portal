@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 
 import { TSystemPermission } from "@/types/permission.type";
 import { useTranslation } from "@/hooks/use-translation";
-import { updatePermissionValidation } from "@/validations/permissions/permissons.validation";
+import { updatePermissionValidation } from "@/validations/permissions/permissions.validation";
 import { updatePermissionReq } from "@/services/dashboard/permissions/permissions.service";
 import { useRouter } from "next/navigation";
 

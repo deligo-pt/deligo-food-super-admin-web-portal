@@ -105,3 +105,11 @@ export const assignPermissionValidation = z.object({
 });
 
 export type TAssignPermissionForm = z.infer<typeof assignPermissionValidation>;
+
+
+export const revokePermissionValidation = z.object({
+    adminId: z.string().min(1, { message: "Please select an administrative account resource." }),
+    permissionActions: z.array(z.string()).min(1, { message: "Select at least one permission action to strip." }),
+});
+
+export type TRevokePermissionForm = z.infer<typeof revokePermissionValidation>;

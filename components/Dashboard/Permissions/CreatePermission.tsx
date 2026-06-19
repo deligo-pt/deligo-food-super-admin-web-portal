@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { createPermissionReq } from "@/services/dashboard/permissions/permissions.service";
-import { MODULE_GROUPS, permissionActions, permissionValidation, } from "@/validations/permissions/permissons.validation";
+import { MODULE_GROUPS, permissionActions, permissionValidation, } from "@/validations/permissions/permissions.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";

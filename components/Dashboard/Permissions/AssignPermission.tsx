@@ -8,7 +8,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { AdminListCardComponent } from "./AdminListCard";
 import { SelectionSummaryCard } from "./SelectionSummaryCard";
 import { TSystemPermission } from "@/types/permission.type";
-import { assignPermissionValidation, TAssignPermissionForm } from "@/validations/permissions/permissons.validation";
+import { assignPermissionValidation, TAssignPermissionForm } from "@/validations/permissions/permissions.validation";
 import { PermissionsMatrix } from "./PermissionMatrix";
 import { TAdmin } from "@/types/admin.type";
 import { useCallback } from "react";
@@ -56,8 +56,12 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
 
     const onSubmit = async (data: TAssignPermissionForm) => {
         const toastId = toast.loading("Assigning....");
+        const payload = {
+            permissionIds: data?.permissionIds,
+        };
 
-        const result = await assignPermissionToAdminReq(data?.adminId, data?.permissionIds);
+        const result = await assignPermissionToAdminReq(data?.adminId, payload);
+        console.log("result", result);
 
         if (result?.success) {
             toast.success(result?.message || "Permission assigned successfully", { id: toastId });
