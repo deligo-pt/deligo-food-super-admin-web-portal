@@ -101,11 +101,11 @@ export default function UpdatePermissionModal({
                             <Shield className="w-4 h-4" />
                         </div>
                         <DialogTitle className="text-xl font-black text-gray-900 tracking-tight">
-                            Edit Permission
+                            {t("edit_permission")}
                         </DialogTitle>
                     </div>
                     <DialogDescription className="text-gray-500 text-xs">
-                        Modify security rule parameters. Changes here update systemic metadata attributes instantly.
+                        {t("modify_security_rule_parameters")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -115,11 +115,11 @@ export default function UpdatePermissionModal({
                         <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                         <div className="space-y-0.5">
                             <p className="text-xs font-bold text-gray-700 uppercase tracking-tight font-mono">
-                                System Key Bindings (Locked)
+                                {t("system_key_bindings")}
                             </p>
                             <p className="text-xs text-gray-500 font-mono leading-relaxed">
-                                Module: <span className="text-gray-800 font-bold">{permission.module}</span> <br />
-                                Action: <span className="text-gray-800 font-bold">{permission.action}</span>
+                                {t("module")}: <span className="text-gray-800 font-bold">{permission.module}</span> <br />
+                                {t("action")}: <span className="text-gray-800 font-bold">{permission.action}</span>
                             </p>
                         </div>
                     </div>
@@ -135,7 +135,7 @@ export default function UpdatePermissionModal({
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="font-bold text-xs text-gray-700 uppercase tracking-wider">
-                                        System Rule Name
+                                        {t("system_rule_name")}
                                     </FormLabel>
                                     <FormControl>
                                         <Input
@@ -156,7 +156,7 @@ export default function UpdatePermissionModal({
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="font-bold text-xs text-gray-700 uppercase tracking-wider">
-                                        UI Friendly Name / Alias
+                                       {t("display_name")}
                                     </FormLabel>
                                     <FormControl>
                                         <Input
@@ -177,7 +177,7 @@ export default function UpdatePermissionModal({
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel className="font-bold text-xs text-gray-700 uppercase tracking-wider">
-                                        Intent & Scope Description
+                                        {t("intent_scope")}
                                     </FormLabel>
                                     <FormControl>
                                         <Textarea
@@ -199,10 +199,10 @@ export default function UpdatePermissionModal({
                                 <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-gray-100 p-4 shadow-sm bg-white">
                                     <div className="space-y-0.5">
                                         <FormLabel className="font-bold text-xs text-gray-800 uppercase tracking-wider">
-                                            Policy Enforcement State
+                                            {t("policy_enforcement_state")}
                                         </FormLabel>
                                         <FormDescription className="text-xs text-gray-400">
-                                            Disabling overrides associated mappings and prevents user routing clearance.
+                                            {t("disabling_overrides_associated")}
                                         </FormDescription>
                                     </div>
                                     <FormControl>
@@ -224,7 +224,7 @@ export default function UpdatePermissionModal({
                                 className="h-11 rounded-xl font-semibold text-sm border-gray-200 text-gray-600 px-5"
                                 disabled={isSubmitting}
                             >
-                                Cancel
+                                {t("cancel")}
                             </Button>
                             <Button
                                 type="submit"
@@ -232,7 +232,7 @@ export default function UpdatePermissionModal({
                                 style={{ backgroundColor: "#DC3173" }}
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? "Saving Config..." : "Save Changes"}
+                                {isSubmitting ? t("saving_permission") : t("save_changes")}
                             </Button>
                         </DialogFooter>
 

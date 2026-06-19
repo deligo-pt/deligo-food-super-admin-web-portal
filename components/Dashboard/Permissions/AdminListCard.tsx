@@ -30,7 +30,7 @@ const AdminListCard = ({ admins, selectedAdminId, onSelectAdmin }: AdminListCard
         <Card className="rounded-3xl bg-white border shadow-sm p-5 space-y-4">
             <div className="flex items-center space-x-2">
                 <span className="text-primary text-lg">🔒</span>
-                <h3 className="font-bold text-base text-gray-900">{t("select_admin_user")}</h3>
+                <h3 className="font-bold text-base text-gray-900">{t("select_admin")}</h3>
             </div>
 
             <Input

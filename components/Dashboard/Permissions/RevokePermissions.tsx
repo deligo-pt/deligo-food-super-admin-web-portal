@@ -15,6 +15,7 @@ import { RevocationMatrix } from "./RevocationMatrix";
 import { TAdmin } from "@/types/admin.type";
 import { revokePermissionValidation, TRevokePermissionForm } from "@/validations/permissions/permissions.validation";
 import { revokePermissionFromAdminReq } from "@/services/dashboard/permissions/permissions.service";
+import { useTranslation } from "@/hooks/use-translation";
 
 const REVOKE_COLOR = "#E11D48";
 
@@ -23,6 +24,7 @@ interface RevokePermissionsProps {
 }
 
 export default function RevokePermissions({ admins = [] }: RevokePermissionsProps) {
+    const { t } = useTranslation();
     const form = useForm<TRevokePermissionForm>({
         resolver: zodResolver(revokePermissionValidation),
         defaultValues: {
@@ -73,8 +75,8 @@ export default function RevokePermissions({ admins = [] }: RevokePermissionsProp
         <div className="min-h-screen">
             <div className="space-y-8">
                 <TitleHeader
-                    title="Revoke System Permissions"
-                    subtitle="Identify administrative targets to peel back explicit system authorization vectors cleanly."
+                    title={t("revoke_system_permissions")}
+                    subtitle={t("identify_administrative_targets")}
                 />
 
                 <Form {...form}>
@@ -99,9 +101,9 @@ export default function RevokePermissions({ admins = [] }: RevokePermissionsProp
                             {watchedPermissionActions.length > 0 && activeAdminProfile && (
                                 <div className="bg-white border border-red-100 rounded-3xl p-5 shadow-sm space-y-4">
                                     <div className="space-y-1">
-                                        <h4 className="font-bold text-sm text-gray-900">Revocation Summary</h4>
+                                        <h4 className="font-bold text-sm text-gray-900">{t("Revocation")}</h4>
                                         <p className="text-xs text-gray-400">
-                                            You are cutting <span className="font-bold text-red-600">{watchedPermissionActions.length}</span> clearance tokens from {activeAdminProfile?.name?.firstName}.
+                                            {t("you_are_cutting")} <span className="font-bold text-red-600">{watchedPermissionActions.length}</span> {t("clearance_tokens_from")}{activeAdminProfile?.name?.firstName}.
                                         </p>
                                     </div>
                                     <Button
@@ -111,7 +113,7 @@ export default function RevokePermissions({ admins = [] }: RevokePermissionsProp
                                         disabled={isSubmitting}
                                     >
                                         <Trash2 className="w-4 h-4" />
-                                        {isSubmitting ? "Stripping Scopes..." : "Confirm Revocation"}
+                                        {isSubmitting ? "Stripping Scopes..." : t("confirm_revocation")}
                                     </Button>
                                 </div>
                             )}
@@ -121,9 +123,9 @@ export default function RevokePermissions({ admins = [] }: RevokePermissionsProp
                             {!watchedAdminId ? (
                                 <div className="flex flex-col items-center justify-center p-20 text-center border-2 border-dashed border-red-200/60 rounded-3xl bg-white/70 backdrop-blur-sm">
                                     <span className="text-4xl mb-3">👤</span>
-                                    <h4 className="font-bold text-gray-700 text-base">Awaiting Admin Profile Target</h4>
+                                    <h4 className="font-bold text-gray-700 text-base">{t("awaiting_admin_profile_target")}</h4>
                                     <p className="text-xs text-gray-400 max-w-xs mt-1">
-                                        Please click an administrative profile item from the registry list on the left to verify real-time active rights.
+                                        {t("please_click_an_administrative_profile")}
                                     </p>
                                 </div>
                             ) : adminActiveActionStrings.length === 0 ? (
@@ -131,9 +133,9 @@ export default function RevokePermissions({ admins = [] }: RevokePermissionsProp
                                     <div className="w-12 h-12 bg-green-50 border border-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-4">
                                         <ShieldCheck className="w-6 h-6" />
                                     </div>
-                                    <h4 className="font-bold text-gray-800 text-base">No Permissions Assigned</h4>
+                                    <h4 className="font-bold text-gray-800 text-base">{t("no_permissions_assigned")}</h4>
                                     <p className="text-xs text-gray-400 max-w-sm mt-1">
-                                        {`This administrative profile doesn't hold any active access right overrides.`}
+                                        {t("this_administrative_profile_doesnt_hold")}
                                     </p>
                                 </div>
                             ) : (
@@ -143,7 +145,7 @@ export default function RevokePermissions({ admins = [] }: RevokePermissionsProp
                                     render={() => (
                                         <FormItem>
                                             <RevocationMatrix
-                                                adminPermissions={adminActiveActionStrings} // Passing the raw string array directly
+                                                adminPermissions={adminActiveActionStrings}
                                                 selectedPermissionActions={watchedPermissionActions}
                                                 onChangePermissions={handleMatrixSelectionChange}
                                                 adminId={watchedAdminId}

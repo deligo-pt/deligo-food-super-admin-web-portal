@@ -24,7 +24,7 @@ export function PermissionsMatrix({
       <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed rounded-3xl bg-white">
         <span className="text-4xl mb-2">🛡️</span>
         <h4 className="font-bold text-gray-700 text-lg">{t("no_permissions_available")}</h4>
-        <p className="text-sm text-gray-400 mt-1">No system permissions definitions found in registry.</p>
+        <p className="text-sm text-gray-400 mt-1">{t("no_system_permissions_definitions_found")}</p>
       </div>
     );
   }
@@ -92,7 +92,6 @@ export function PermissionsMatrix({
                         : "border-gray-100 bg-white hover:bg-gray-50/50"
                     )}
                   >
-                    {/* Wrapped checkbox container to completely intercept and halt event bubbling */}
                     <div onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={isChecked}

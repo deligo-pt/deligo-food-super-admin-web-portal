@@ -61,7 +61,6 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
         };
 
         const result = await assignPermissionToAdminReq(data?.adminId, payload);
-        console.log("result", result);
 
         if (result?.success) {
             toast.success(result?.message || "Permission assigned successfully", { id: toastId });
@@ -94,7 +93,7 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
                                         <AdminListCardComponent
                                             admins={admins}
                                             selectedAdminId={watchedAdminId}
-                                            onSelectAdmin={handleSelectAdmin} // ⚡ Clean reference passed here
+                                            onSelectAdmin={handleSelectAdmin}
                                         />
                                         <FormMessage className="px-2" />
                                     </FormItem>
@@ -106,7 +105,7 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
                                 permissions={permissions}
                                 selectedPermissionIds={watchedPermissionIds}
                                 selectedAdminId={watchedAdminId}
-                                onClearAll={handleClearAllPermissions} // ⚡ Clean reference passed here
+                                onClearAll={handleClearAllPermissions}
                                 isSubmitting={isSubmitting}
                                 submitColor={PRIMARY_COLOR}
                             />
@@ -119,11 +118,10 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
                                 name="permissionIds"
                                 render={() => (
                                     <FormItem>
-                                        {/* Inside AssignPermissionsPage.tsx */}
                                         <PermissionsMatrix
                                             permissions={permissions}
                                             selectedPermissionIds={watchedPermissionIds}
-                                            onChangePermissions={handlePermissionsMatrixChange} // ⚡ Clean reference passed here
+                                            onChangePermissions={handlePermissionsMatrixChange}
                                         />
                                         <FormMessage className="px-2" />
                                     </FormItem>

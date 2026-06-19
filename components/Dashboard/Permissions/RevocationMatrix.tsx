@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { ShieldX, AlertCircle } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface RevocationMatrixProps {
     adminPermissions: string[]; // Flat string array directly from the database
@@ -19,6 +20,7 @@ export function RevocationMatrix({
     onChangePermissions,
     adminId,
 }: RevocationMatrixProps) {
+    const { t } = useTranslation();
 
     // Automatically categorizes raw string keys into modules by parsing their names
     const modulesMap = useMemo(() => {
@@ -58,8 +60,8 @@ export function RevocationMatrix({
                         <ShieldX className="w-4 h-4" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-base text-gray-900">Granted Scopes Core</h3>
-                        <p className="text-xs text-gray-400 font-mono">Target Context ID: {adminId}</p>
+                        <h3 className="font-bold text-base text-gray-900">{t("granted_scopes_core")}</h3>
+                        <p className="text-xs text-gray-400 font-mono">{t("target_context_id")}: {adminId}</p>
                     </div>
                 </div>
 
@@ -70,14 +72,14 @@ export function RevocationMatrix({
                     onClick={handleSelectAllInAdminScope}
                     className="rounded-xl font-semibold text-xs text-red-600 border-red-100 bg-red-50/30 hover:bg-red-50 self-end sm:self-center"
                 >
-                    {selectedPermissionActions.length === adminPermissions.length ? "Deselect All Listed" : "Select All Available"}
+                    {selectedPermissionActions.length === adminPermissions.length ? t("deselect_all_listed") : t("select_all_available")}
                 </Button>
             </div>
 
             <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-3 flex gap-2.5 items-start">
                 <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-amber-700 leading-normal">
-                    Checking elements here queues them up for immediate deletion. Once submitted, the matching user credentials session payload loses routing permission instantly.
+                    {t("checking_elements_here_queues_them")}
                 </p>
             </div>
 

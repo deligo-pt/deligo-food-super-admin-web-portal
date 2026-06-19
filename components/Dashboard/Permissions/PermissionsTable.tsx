@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { TSystemPermission } from "@/types/permission.type";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
     permissions: TSystemPermission[];
@@ -26,6 +27,7 @@ interface IProps {
 }
 
 export default function PermissionsTable({ permissions = [], onOpenEditModal }: IProps) {
+    const { t } = useTranslation();
     const router = useRouter();
 
     return (
@@ -71,7 +73,7 @@ export default function PermissionsTable({ permissions = [], onOpenEditModal }: 
                                 className="text-gray-400 font-medium text-sm text-center py-12"
                                 colSpan={4}
                             >
-                                No platform security permissions defined.
+                                {t("manage_view_all_admin_permissions")}
                             </TableCell>
                         </TableRow>
                     ) : (
@@ -116,7 +118,7 @@ export default function PermissionsTable({ permissions = [], onOpenEditModal }: 
                                                 onClick={() => router.push(`/admin/permissions/${permission._id}`)}
                                             >
                                                 <Eye className="w-3.5 h-3.5" />
-                                                View
+                                                {t("view")}
                                             </DropdownMenuItem>
 
                                             {/* EDIT ACTION */}
@@ -125,7 +127,7 @@ export default function PermissionsTable({ permissions = [], onOpenEditModal }: 
                                                 onClick={() => onOpenEditModal?.(permission)}
                                             >
                                                 <Edit className="w-3.5 h-3.5" />
-                                                Edit
+                                                {t("edit")}
                                             </DropdownMenuItem>
 
                                         </DropdownMenuContent>
