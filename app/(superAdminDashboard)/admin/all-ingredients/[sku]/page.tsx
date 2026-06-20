@@ -5,10 +5,10 @@ import { TIngredient } from "@/types/ingredient.type";
 export default async function IngredientDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ sku: string }>;
 }) {
-  const { id } = await params;
-  const ingredientData: TIngredient = await getSingleIngredientReq(id);
+  const { sku } = await params;
+  const ingredientData: TIngredient = await getSingleIngredientReq(sku);
 
   return <IngredientDetails ingredientData={ingredientData} />;
 }

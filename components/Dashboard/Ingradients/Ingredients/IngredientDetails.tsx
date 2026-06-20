@@ -79,22 +79,12 @@ export default function IngredientDetails({ ingredientData }: IProps) {
   };
 
   return (
-    <div className="min-h-screen p-6">
-      {/* Back Button */}
-      <div className="mb-4">
-        <Link
-          href="/admin/all-ingredients"
-          className="inline-flex items-center gap-2 text-[#DC3173] hover:underline mb-4 transition-colors"
-        >
-          <ArrowLeft size={18} />
-          Back to Ingredients
-        </Link>
-      </div>
-
+    <div className="min-h-screen">
       {/* Header */}
       <TitleHeader
         title="Ingredient Details"
         subtitle="Details of the selected ingredient"
+        onBackClick={() => router.back()}
       />
 
       {/* Ingredient Info and Buttons */}

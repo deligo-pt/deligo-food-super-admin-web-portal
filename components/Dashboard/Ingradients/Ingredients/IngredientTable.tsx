@@ -38,7 +38,7 @@ export default function IngredientTable({
   onDelete,
 }: IProps) {
   const router = useRouter();
-
+  console.log("ingredients", ingredients);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -111,10 +111,10 @@ export default function IngredientTable({
                   <DropdownMenuTrigger>
                     <MoreVertical className="h-4 w-4" />
                   </DropdownMenuTrigger>
-                  {/* <DropdownMenuContent>
+                  <DropdownMenuContent>
                     <DropdownMenuItem
                       onClick={() =>
-                        router.push("/admin/all-ingredients/" + ingredient._id)
+                        router.push("/admin/all-ingredients/" + ingredient?.sku)
                       }
                     >
                       View
@@ -128,7 +128,7 @@ export default function IngredientTable({
                     >
                       Delete
                     </DropdownMenuItem>
-                  </DropdownMenuContent> */}
+                  </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
             </TableRow>

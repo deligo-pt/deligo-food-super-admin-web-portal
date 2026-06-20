@@ -1,5 +1,6 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TIngredient, TIngredientOrder } from "@/types/ingredient.type";
@@ -7,13 +8,34 @@ import { catchAsync } from "@/utils/catchAsync";
 
 /* 
 ==========================
-INGREDIENT ORDERS
+INGREDIENT
 ==========================
 */
 
-export const getSingleIngredientReq = async (id: string) => {
+// Service function formatted precisely as requested
+export const createIngredientReq = async (payload: Record<string, unknown>) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.post("/ingredients/create-ingredient", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result?.message || "Failed to create ingredient");
+    }
+
+    return result;
+  });
+};
+
+
+export const getSingleIngredientReq = async (sku: string) => {
   const result = await catchAsync<TIngredient>(async () => {
-    return await serverRequest.get(`/ingredients/${id}`);
+    return await serverRequest.get(`/ingredients/${sku}`);
   });
 
   if (result?.success) return result.data;
