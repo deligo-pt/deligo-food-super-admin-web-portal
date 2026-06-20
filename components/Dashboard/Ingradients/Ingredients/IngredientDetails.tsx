@@ -1,146 +1,63 @@
 "use client";
 
-import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
-import ImageUpload from "@/components/Dashboard/Sponsorships/ImageUpload";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { Clock, Edit2, EuroIcon, Package, Trash2, Calendar } from "lucide-react";
+
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
+import EditIngredientModal from "./EditIngredientModal"; // Adjust path if needed
+
 import { TIngredient } from "@/types/ingredient.type";
 import { formatPrice } from "@/utils/formatPrice";
-import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Clock,
-  Edit2,
-  EuroIcon,
-  Package,
-  Save,
-  Trash2,
-  XIcon,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import z from "zod";
+import { TTax } from "@/types/tax.type";
 
 interface IProps {
   ingredientData: TIngredient;
+  taxes: TTax[];
 }
 
-type TIngredientForm = z.infer<typeof ingredientSchema>;
-
-export default function IngredientDetails({ ingredientData }: IProps) {
-  const btnRef = useRef<HTMLButtonElement>(null);
+export default function IngredientDetails({ ingredientData, taxes }: IProps) {
   const router = useRouter();
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const form = useForm<TIngredientForm>({
-    resolver: zodResolver(ingredientSchema),
-    defaultValues: {
-      name: ingredientData.name,
-      category: ingredientData.category,
-      description: ingredientData.description,
-      price: ingredientData.price,
-      stock: ingredientData.stock,
-      minOrder: ingredientData.minOrder,
-      image: {
-        url: ingredientData.image,
-        file: null,
-      },
-    },
-  });
-
-  const onSubmit = (data: TIngredientForm) => {
-    setIsSaving(true);
-    const toastId = toast.loading("Saving changes...");
-
-    setTimeout(() => {
-      setIsSaving(false);
-      toast.success("Ingredient updated successfully!", { id: toastId });
-      console.log(data);
-      setIsEditing(false);
-      router.refresh();
-    }, 1500);
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen p-1 pb-10">
       {/* Header */}
       <TitleHeader
         title="Ingredient Details"
-        subtitle="Details of the selected ingredient"
+        subtitle={`SKU: ${ingredientData.sku}`}
         onBackClick={() => router.back()}
       />
 
-      {/* Ingredient Info and Buttons */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+      {/* Ingredient Info and Action Items */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 mt-4">
         <motion.h1
-          initial={{
-            opacity: 0,
-            x: -20,
-          }}
-          animate={{
-            opacity: 1,
-            x: 0,
-          }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
           className="text-3xl font-extrabold text-gray-900"
         >
           {ingredientData.name}
         </motion.h1>
         <div className="flex gap-3">
-          {isEditing ? (
-            <>
-              <button
-                onClick={() => btnRef.current?.click()}
-                className="flex items-center gap-2 px-6 py-2.5 bg-[#DC3173] text-white rounded-xl font-bold shadow-lg shadow-[#DC3173]/20 hover:bg-[#DC3173]/90 transition-all"
-                disabled={isSaving}
-              >
-                <Save size={18} />
-                Save Changes
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
-              >
-                <XIcon size={18} />
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
-              >
-                <Edit2 size={18} />
-                Edit
-              </button>
-              <button
-                type="button"
-                className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl font-medium hover:bg-red-100 transition-all"
-              >
-                <Trash2 size={18} />
-                Delete
-              </button>
-            </>
-          )}
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all"
+          >
+            <Edit2 size={18} />
+            Edit
+          </button>
+          <button
+            type="button"
+            className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl font-medium hover:bg-red-100 transition-all"
+          >
+            <Trash2 size={18} />
+            Delete
+          </button>
         </div>
       </div>
 
@@ -148,7 +65,7 @@ export default function IngredientDetails({ ingredientData }: IProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatsCard
           title="Current Stock"
-          value={ingredientData.stock?.toLocaleString()}
+          value={`${ingredientData.stock?.toLocaleString()} ${ingredientData.unit || "units"}`}
           icon={Package}
           delay={0}
         />
@@ -160,284 +77,189 @@ export default function IngredientDetails({ ingredientData }: IProps) {
         />
         <StatsCard
           title="Last Updated"
-          value={format(ingredientData.updatedAt, "do MMM yyyy, h:mm a")}
+          value={
+            ingredientData.updatedAt
+              ? format(new Date(ingredientData.updatedAt), "do MMM yyyy, h:mm a")
+              : "N/A"
+          }
           icon={Clock}
           delay={0.3}
         />
       </div>
 
-      <Form {...form}>
-        <form
-          id="saveIngredientForm"
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+      {/* Main Read-Only Content Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content Workspace */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:col-span-2 space-y-6"
         >
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.2,
-            }}
-            className="lg:col-span-2 space-y-8"
-          >
-            {/* Details Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">
-                Ingredient Details
-              </h2>
+          {/* Core Specs Card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Asset Specifications</h2>
 
-              <div className="flex flex-col md:flex-row gap-8">
-                <div className="w-32 h-32 rounded-2xl overflow-hidden">
-                  <Image
-                    src={ingredientData.image}
-                    alt={ingredientData.name}
-                    width={100}
-                    height={100}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">
-                      Name
-                    </label>
-                    {isEditing ? (
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input type="text" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ) : (
-                      <p className="text-gray-900 font-medium">
-                        {ingredientData.name}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">
-                      Category
-                    </label>
-                    {isEditing ? (
-                      <FormField
-                        control={form.control}
-                        name="category"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input type="text" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ) : (
-                      <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        {ingredientData.category}
-                      </span>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">
-                      Price per Unit
-                    </label>
-                    {isEditing ? (
-                      <FormField
-                        control={form.control}
-                        name="price"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min={0}
-                                step="any"
-                                {...field}
-                                value={String(field.value)}
-                                onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ) : (
-                      <p className="text-gray-900 font-medium">
-                        €{ingredientData.price.toFixed(2)}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">
-                      Minimum Order
-                    </label>
-                    {isEditing ? (
-                      <FormField
-                        control={form.control}
-                        name="minOrder"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                min={0}
-                                {...field}
-                                value={String(field.value)}
-                                onChange={(e) =>
-                                  field.onChange(Number(e.target.value))
-                                }
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ) : (
-                      <p className="text-gray-900 font-medium">
-                        {ingredientData.minOrder} units
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-500 mb-1">
-                      Description
-                    </label>
-                    {isEditing ? (
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Textarea {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ) : (
-                      <p className="text-gray-600">
-                        {ingredientData.description}
-                      </p>
-                    )}
-                  </div>
-
-                  {isEditing && (
-                    <div className="md:col-span-2">
-                      <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field, fieldState }) => (
-                          <FormItem>
-                            <FormControl>
-                              <ImageUpload
-                                label="Image"
-                                value={field.value.url}
-                                onChange={(file) => {
-                                  const url = file
-                                    ? URL.createObjectURL(file)
-                                    : "";
-                                  field.onChange({
-                                    file: file ? file : null,
-                                    url,
-                                  });
-                                }}
-                                isInvalid={fieldState.invalid}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
-
-                  <button ref={btnRef} className="hidden">
-                    Submit
-                  </button>
-                </div>
+            <div className="flex flex-col md:flex-row gap-8">
+              <div className="w-32 h-32 rounded-2xl overflow-hidden relative shrink-0 border border-gray-100 bg-gray-50">
+                <Image
+                  src={ingredientData.image || "/placeholder-fallback.png"}
+                  alt={ingredientData.name}
+                  width={128}
+                  height={128}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            </div>
-          </motion.div>
 
-          {/* Sidebar */}
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.3,
-            }}
-            className="space-y-6"
-          >
-            {/* Stock Management */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Stock Management
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                  <span className="text-gray-600">Current Level</span>
-                  <span className="font-bold text-gray-900 text-lg">
-                    {ingredientData.stock}
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Name</label>
+                  <p className="text-gray-900 font-semibold">{ingredientData.name}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Category</label>
+                  <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-800 uppercase tracking-wider">
+                    {ingredientData.category}
                   </span>
                 </div>
 
-                {isEditing && (
-                  <div className="pt-2">
-                    <label className="block text-sm font-medium text-gray-500 mb-2">
-                      Update Stock
-                    </label>
-                    <FormField
-                      control={form.control}
-                      name="stock"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={0}
-                              {...field}
-                              value={String(field.value)}
-                              onChange={(e) =>
-                                field.onChange(Number(e.target.value))
-                              }
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Price per Unit</label>
+                  <p className="text-gray-900 font-medium">€{ingredientData.price?.toFixed(2)}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Minimum Order</label>
+                  <p className="text-gray-900 font-medium">
+                    {ingredientData.minOrder}{" "}
+                    <span className="text-gray-400 font-normal text-xs">{ingredientData.unit}</span>
+                  </p>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Description</label>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {ingredientData.description ||
+                      "No descriptions available for this item asset catalog profile."}
+                  </p>
+                </div>
               </div>
             </div>
-          </motion.div>
-        </form>
-      </Form>
+          </div>
+
+          {/* Dynamic Bulk Discounts Table */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Bulk Discount Matrix</h3>
+              <p className="text-xs text-gray-400">
+                Layer tier volume incentives automatically across customer catalogs
+              </p>
+            </div>
+
+            <div className="overflow-hidden border border-gray-100 rounded-xl">
+              {ingredientData.bulkDiscount && ingredientData.bulkDiscount.length > 0 ? (
+                <table className="min-w-full divide-y divide-gray-100 text-left text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 font-medium text-gray-500">Volume Threshold</th>
+                      <th className="px-4 py-3 font-medium text-gray-500">Price Break Rate</th>
+                      <th className="px-4 py-3 font-medium text-gray-500">Target Savings</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 bg-white">
+                    {ingredientData.bulkDiscount.map((tier, idx) => {
+                      const basePrice = ingredientData.price || 0;
+                      const saving = basePrice - tier.discountPrice;
+                      return (
+                        <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                          <td className="px-4 py-3 font-medium text-gray-900">
+                            ≥ {tier.minQty} {ingredientData.unit || "units"}
+                          </td>
+                          <td className="px-4 py-3 text-emerald-600 font-semibold">
+                            €{tier.discountPrice.toFixed(2)} / unit
+                          </td>
+                          <td className="px-4 py-3 text-gray-400 text-xs">
+                            Saves €{saving.toFixed(2)} per item unit
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-sm text-gray-400 italic bg-gray-50/50 p-4 rounded-xl text-center">
+                  Base market tracking metrics apply globally. No dynamic tier price records mapped.
+                </p>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Sidebar Area */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="space-y-6"
+        >
+          {/* Live Pipeline Ratios & Stock Safeguards */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              Inventory Mappings
+            </h3>
+
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <span className="text-sm text-gray-500">Current Volume</span>
+                <span className="font-bold text-gray-900">
+                  {ingredientData.stock}{" "}
+                  <span className="text-xs text-gray-400 font-normal">{ingredientData.unit}</span>
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <span className="text-sm text-gray-500">Tax Class</span>
+                <span className="font-bold text-slate-700 text-sm">
+                  {ingredientData.tax?.taxRate
+                    ? `${ingredientData.tax.taxRate}% Rate Class`
+                    : "Exempt / Grounded"}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <span className="text-sm text-gray-500">Safety System Threshold</span>
+                <span className="font-bold text-red-600 bg-red-50 px-2.5 py-0.5 rounded-lg text-xs">
+                  &lt; {ingredientData.lowStockAlert} {ingredientData.unit}
+                </span>
+              </div>
+
+              {/* Freshness Lifecycle Metric Section */}
+              <div className="border-t border-dashed border-gray-100 pt-3">
+                <label className="text-sm font-medium text-gray-500 flex items-center gap-1.5 mb-1.5">
+                  <Calendar size={14} className="text-gray-400" /> Shelf Life Safeguard
+                </label>
+                <p className="text-sm font-semibold text-gray-800 bg-slate-50 p-3 rounded-xl">
+                  {ingredientData.shelfLifeDays
+                    ? `${ingredientData.shelfLifeDays} Days Estimated Preservation`
+                    : "Indefinite / Non-Perishable"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Reusable Edit Modal */}
+      <EditIngredientModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        ingredientData={ingredientData}
+        taxes={taxes}
+        onSuccess={() => {
+          router.refresh();
+        }}
+      />
     </div>
   );
 }

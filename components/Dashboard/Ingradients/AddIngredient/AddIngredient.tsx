@@ -19,9 +19,9 @@ import { TTax } from "@/types/tax.type";
 import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Save } from "lucide-react";
+import { Plus, Save, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import { useFieldArray, useForm, type Resolver } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -45,7 +45,15 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
       tax: "",
       description: "",
       image: "",
+      shelfLifeDays: undefined,
+      bulkDiscount: [],
     },
+  });
+
+  // Dynamic field array for managing optional tiered discounts
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "bulkDiscount",
   });
 
   const handleImageUpload = async (file: File | null) => {
@@ -109,6 +117,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
     if (result.success) {
       toast.success("Ingredient added successfully!", { id: toastId });
       form.reset();
+      removeFile();
       return;
     }
 
@@ -304,6 +313,108 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                 />
               </div>
 
+              <FormField
+                control={form.control}
+                name="shelfLifeDays"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Shelf Life (Days - Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="e.g. 180"
+                        // If the underlying state values are undefined/null, drop an empty string to clear the field input safely
+                        value={field.value ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          // Send it directly down to the hook-form handler; Zod will handle the preprocess normalization cleanly
+                          field.onChange(val === "" ? "" : Number(val));
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Dynamic Tiered Wholesaler Setup Pricing Section */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Bulk Discount Tiers (Optional)</h3>
+                    <p className="text-xs text-gray-400">Apply specialized system drops for dynamic purchasing lines</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => append({ minQty: 0, discountPrice: 0 })}
+                    className="flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-[#DC3173] hover:text-white transition-all px-3 py-2 rounded-xl text-slate-700"
+                  >
+                    <Plus size={14} /> Add Tier
+                  </button>
+                </div>
+
+                {fields.length === 0 && (
+                  <p className="text-sm text-gray-400 italic bg-gray-50 p-4 rounded-xl text-center">
+                    No discount tiers added yet. Base product tracking metrics will apply globally.
+                  </p>
+                )}
+
+                <div className="space-y-3">
+                  {fields.map((item, index) => (
+                    <div key={item.id} className="flex items-end gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                      <FormField
+                        control={form.control}
+                        name={`bulkDiscount.${index}.minQty`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-xs text-gray-500">Minimum Quantity</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={1}
+                                {...field}
+                                value={field.value || ""}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`bulkDiscount.${index}.discountPrice`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel className="text-xs text-gray-500">Discounted Price (€)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                step="any"
+                                min={0}
+                                {...field}
+                                value={field.value || ""}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="p-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors mb-0.5"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Description */}
               <FormField
                 control={form.control}
@@ -363,7 +474,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
             </form>
           </Form>
         </div>
-      </motion.div>
-    </div>
+      </motion.div >
+    </div >
   );
 }

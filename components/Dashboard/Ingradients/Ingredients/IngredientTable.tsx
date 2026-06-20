@@ -38,7 +38,7 @@ export default function IngredientTable({
   onDelete,
 }: IProps) {
   const router = useRouter();
-  console.log("ingredients", ingredients);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -87,25 +87,29 @@ export default function IngredientTable({
             <TableRow key={ingredient._id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-6 rounded overflow-hidden">
+                  <div className="w-12 h-12 rounded overflow-hidden relative shrink-0">
                     <Image
                       src={ingredient.image}
                       alt={ingredient.name}
-                      width={32}
-                      height={32}
+                      width={48}
+                      height={48}
                       className="rounded w-full h-full object-cover"
                     />
                   </div>
                   <div>
                     <div className="font-medium">{ingredient.name}</div>
-                    <div className="text-xs text-slate-500">
-                      {ingredient.category}
+                    <div className="text-xs text-slate-500 flex items-center gap-2">
+                      <span>{ingredient.category}</span>
+                      <span className="text-slate-300">|</span>
+                      <span className="font-mono bg-slate-100 px-1 rounded text-[10px]">{ingredient.sku}</span>
                     </div>
                   </div>
                 </div>
               </TableCell>
               <TableCell>€{ingredient.price}</TableCell>
-              <TableCell>{ingredient.stock}</TableCell>
+              <TableCell>
+                {ingredient.stock} <span className="text-xs text-slate-400 font-normal">{ingredient.unit}</span>
+              </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger>

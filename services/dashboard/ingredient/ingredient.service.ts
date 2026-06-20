@@ -12,7 +12,6 @@ INGREDIENT
 ==========================
 */
 
-// Service function formatted precisely as requested
 export const createIngredientReq = async (payload: Record<string, unknown>) => {
   return await catchAsync<null>(async () => {
     const response = await serverFetch.post("/ingredients/create-ingredient", {
@@ -32,6 +31,20 @@ export const createIngredientReq = async (payload: Record<string, unknown>) => {
   });
 };
 
+export const updateIngredientReq = async (payload: Record<string, unknown>, id: string) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.patch(`/ingredients/update-ingredient/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+
+    return result;
+  });
+};
 
 export const getSingleIngredientReq = async (sku: string) => {
   const result = await catchAsync<TIngredient>(async () => {

@@ -38,11 +38,14 @@ export const ingredientSchema = z.object({
     .default(1),
 
   image: z
-    .string()
     .url("Image must be a valid hosted URL string")
     .nonempty("Image is required"),
 
-  shelfLifeDays: z.number().min(0).optional(),
+  shelfLifeDays: z
+    .preprocess(
+      (val) => (val === "" || val === null || val === undefined ? undefined : Number(val)),
+      z.number().min(0).optional()
+    ),
 
   bulkDiscount: z
     .array(
