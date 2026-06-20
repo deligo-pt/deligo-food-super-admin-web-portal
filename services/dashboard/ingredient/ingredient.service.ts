@@ -90,6 +90,34 @@ export const getAllIngredientsReq = async (
   };
 };
 
+export const softDeleteIngredient = async (id: string) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.delete(`/ingredients/soft-delete/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    return result;
+  });
+};
+
+export const permanentDeleteIngredient = async (id: string) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.delete(`/ingredients/parmanent-delete/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    return result;
+  });
+};
+
 /* 
 ==========================
 INGREDIENT ORDERS

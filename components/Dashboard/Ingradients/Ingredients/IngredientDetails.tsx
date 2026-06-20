@@ -14,6 +14,9 @@ import EditIngredientModal from "./EditIngredientModal"; // Adjust path if neede
 import { TIngredient } from "@/types/ingredient.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { TTax } from "@/types/tax.type";
+import DeleteModal from "@/components/Modals/DeleteModal";
+import { toast } from "sonner";
+import { permanentDeleteIngredient, softDeleteIngredient } from "@/services/dashboard/ingredient/ingredient.service";
 
 interface IProps {
   ingredientData: TIngredient;
@@ -23,6 +26,43 @@ interface IProps {
 export default function IngredientDetails({ ingredientData, taxes }: IProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfig, setDeleteConfig] = useState<{
+    id: string;
+    type: "soft" | "permanent";
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteIngredient = async () => {
+    if (!deleteConfig) return;
+
+    setIsDeleting(true);
+    const toastId = toast.loading(
+      deleteConfig.type === "soft"
+        ? "Moving ingredient to trash..."
+        : "Permanently deleting ingredient..."
+    );
+
+    // Dynamically fire request based on configuration type
+    const result = deleteConfig.type === "soft"
+      ? await softDeleteIngredient(deleteConfig.id)
+      : await permanentDeleteIngredient(deleteConfig.id);
+
+    if (result?.success) {
+      toast.success(
+        result?.message || `Ingredient ${deleteConfig.type === "soft" ? "soft" : "permanently"} deleted successfully!`,
+        { id: toastId }
+      );
+      router.refresh();
+      setIsDeleting(false);
+      setDeleteConfig(null);
+      return;
+    } else {
+      setIsDeleting(false);
+      toast.error(result?.message || "Failed to complete deletion setup", { id: toastId });
+      return;
+    }
+  };
+
 
   return (
     <div className="min-h-screen p-1 pb-10">
@@ -53,10 +93,19 @@ export default function IngredientDetails({ ingredientData, taxes }: IProps) {
           </button>
           <button
             type="button"
+            onClick={() => setDeleteConfig({ id: ingredientData._id, type: "soft" })}
             className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl font-medium hover:bg-red-100 transition-all"
           >
             <Trash2 size={18} />
-            Delete
+            Soft <span className="hidden lg:block">Delete</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setDeleteConfig({ id: ingredientData._id, type: "permanent" })}
+            className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl font-medium hover:bg-red-100 transition-all"
+          >
+            <Trash2 size={18} />
+            Parmanent <span className="hidden lg:block">Delete</span>
           </button>
         </div>
       </div>
@@ -259,6 +308,19 @@ export default function IngredientDetails({ ingredientData, taxes }: IProps) {
         onSuccess={() => {
           router.refresh();
         }}
+      />
+
+      <DeleteModal
+        open={!!deleteConfig}
+        onOpenChange={(open) => !open && setDeleteConfig(null)}
+        onConfirm={handleDeleteIngredient}
+        isDeleting={isDeleting}
+        title={deleteConfig?.type === "permanent" ? "Permanent Deletion Alert" : "Soft Delete Confirmation"}
+        description={
+          deleteConfig?.type === "permanent"
+            ? "Are you absolutely sure? This action is irreversible and completely wipes the asset record from the cluster database."
+            : "Are you sure you want to flag this item? This operation moves the ingredient item to archive contexts safely."
+        }
       />
     </div>
   );

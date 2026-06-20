@@ -29,7 +29,7 @@ import { useRouter } from "next/navigation";
 interface IProps {
   ingredients: TIngredient[];
   onEdit: (ingredient: TIngredient) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, type: "soft" | "permanent") => void;
 }
 
 export default function IngredientTable({
@@ -115,7 +115,7 @@ export default function IngredientTable({
                   <DropdownMenuTrigger>
                     <MoreVertical className="h-4 w-4" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
+                  <DropdownMenuContent className="mr-8">
                     <DropdownMenuItem
                       onClick={() =>
                         router.push("/admin/all-ingredients/" + ingredient?.sku)
@@ -127,10 +127,17 @@ export default function IngredientTable({
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={() => onDelete(ingredient._id)}
+                      className="text-destructive font-medium cursor-pointer"
+                      onClick={() => onDelete(ingredient._id, "soft")}
                     >
-                      Delete
+                      Soft Delete
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      className="font-bold cursor-pointer bg-red-50/30 text-red-600 focus:bg-red-50"
+                      onClick={() => onDelete(ingredient._id, "permanent")}
+                    >
+                      Permanent Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

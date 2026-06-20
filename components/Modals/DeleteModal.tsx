@@ -15,9 +15,11 @@ interface IProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   isDeleting: boolean;
+  title?: string;
+  description?: string;
 }
 
-const DeleteModal = ({ open, onOpenChange, onConfirm, isDeleting }: IProps) => {
+const DeleteModal = ({ open, onOpenChange, onConfirm, isDeleting, title, description }: IProps) => {
   const { t } = useTranslation();
 
   return (
@@ -25,9 +27,9 @@ const DeleteModal = ({ open, onOpenChange, onConfirm, isDeleting }: IProps) => {
       <form>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("are_you_absolutely_sure")}</DialogTitle>
+            <DialogTitle>{title ? title : t("are_you_absolutely_sure")}</DialogTitle>
             <DialogDescription>
-              {t("this_action_cannot_be_undone")}
+              {description ? description : t("this_action_cannot_be_undone")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
