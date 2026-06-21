@@ -1,5 +1,5 @@
 import PermissionDetails from '@/components/Dashboard/Permissions/PermissionDetails';
-import { getSinglePermissionReq } from '@/services/dashboard/permissions/permissons.service';
+import { getSinglePermissionReq } from '@/services/dashboard/permissions/permissions.service';
 import React from 'react';
 
 const PermissionDetailsPage = async ({

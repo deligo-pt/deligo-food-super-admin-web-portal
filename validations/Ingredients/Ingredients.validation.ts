@@ -16,21 +16,43 @@ export const ingredientSchema = z.object({
   description: z.string().optional(),
 
   price: z
-    .number("Price must be a number")
+    .number({ error: "Price must be a number" })
     .min(0, "Price must be a positive number"),
 
+  tax: z.string().nonempty("Tax is required"),
+
+  unit: z.enum(["kg", "g", "litre", "ml", "piece", "packet", "box"], {
+    error: "Please select a valid unit",
+  }),
+
   stock: z
-    .number("Stock must be a number")
+    .number({ error: "Stock must be a number" })
     .min(0, "Stock must be a positive number"),
 
-  minOrder: z
-    .number("Minimum order quantity must be a number")
-    .min(1, "Minimum order quantity must be at least 1")
-    .optional(),
-  // taxId: z.string().nonempty("Tax is required"),
+  lowStockAlert: z.number().min(0, "Alert must be positive").optional().default(5),
 
-  image: z.object({
-    url: z.url("Image URL must be a valid URL"),
-    file: z.file("Image file is required").nullable(),
-  }),
+  minOrder: z
+    .number({ error: "Minimum order quantity must be a number" })
+    .min(1, "Minimum order quantity must be at least 1")
+    .optional()
+    .default(1),
+
+  image: z
+    .url("Image must be a valid hosted URL string")
+    .nonempty("Image is required"),
+
+  shelfLifeDays: z
+    .preprocess(
+      (val) => (val === "" || val === null || val === undefined ? undefined : Number(val)),
+      z.number().min(0).optional()
+    ),
+
+  bulkDiscount: z
+    .array(
+      z.object({
+        minQty: z.number().min(1),
+        discountPrice: z.number().min(0),
+      })
+    )
+    .optional(),
 });

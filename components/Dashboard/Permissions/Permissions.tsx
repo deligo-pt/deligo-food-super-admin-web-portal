@@ -9,6 +9,7 @@ import PaginationComponent from '@/components/Filtering/PaginationComponent';
 import { motion } from "framer-motion";
 import { useState } from 'react';
 import UpdatePermissionModal from './UpdatePermissionModal';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface IProps {
     permissionsResult: { data: TSystemPermission[]; meta?: TMeta };
@@ -23,6 +24,7 @@ const sortOptions = [
 const Permissions = ({
     permissionsResult
 }: IProps) => {
+    const {t} = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPermission, setSelectedPermission] = useState<TSystemPermission | null>(null);
 
@@ -40,8 +42,8 @@ const Permissions = ({
         <div className="space-y-6 max-w-full">
             {/* Page Title */}
             <TitleHeader
-                title={"All Permissions"}
-                subtitle={"Manage and view all admin permissions"}
+                title={t("all_permissions")}
+                subtitle={t("manage_view_all_admin_permissions")}
             />
 
             {/* Filters */}
@@ -70,10 +72,6 @@ const Permissions = ({
                 isOpen={isModalOpen}
                 onClose={handleCloseEdit}
                 permission={selectedPermission}
-                onSuccess={() => {
-                    // Add your Next.js on-demand revalidation trigger routines here
-                    // e.g., router.refresh();
-                }}
             />
         </div>
     );

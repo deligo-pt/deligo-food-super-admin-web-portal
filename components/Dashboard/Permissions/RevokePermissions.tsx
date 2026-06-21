@@ -1,12 +1,10 @@
 "use client";
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
 import { toast } from "sonner";
-import { Trash2, ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Trash2, ShieldCheck } from "lucide-react";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -15,92 +13,75 @@ import { Button } from "@/components/ui/button";
 import { AdminListCardComponent } from "./AdminListCard";
 import { RevocationMatrix } from "./RevocationMatrix";
 import { TAdmin } from "@/types/admin.type";
-import { TSystemPermission } from "@/types/permission.type";
+import { revokePermissionValidation, TRevokePermissionForm } from "@/validations/permissions/permissions.validation";
+import { revokePermissionFromAdminReq } from "@/services/dashboard/permissions/permissions.service";
 import { useTranslation } from "@/hooks/use-translation";
 
-const REVOKE_COLOR = "#E11D48"; // Danger Red accent color 
-
-// Simple validation schema enforcing targeting bounds
-const revokePermissionValidation = z.object({
-    adminId: z.string().min(1, { message: "Please select an administrative account resource." }),
-    permissionIds: z.array(z.string()).min(1, { message: "Select at least one permission block to strip." }),
-});
-
-type TRevokePermissionForm = z.infer<typeof revokePermissionValidation>;
+const REVOKE_COLOR = "#E11D48";
 
 interface RevokePermissionsProps {
     admins: TAdmin[];
-    permissions: TSystemPermission[];
 }
 
-export default function RevokePermissions({ admins = [], permissions = [] }: RevokePermissionsProps) {
+export default function RevokePermissions({ admins = [] }: RevokePermissionsProps) {
     const { t } = useTranslation();
-    const router = useRouter();
-    const [isConfirming, setIsConfirming] = useState(false);
-
     const form = useForm<TRevokePermissionForm>({
         resolver: zodResolver(revokePermissionValidation),
         defaultValues: {
             adminId: "",
-            permissionIds: [],
+            permissionActions: [],
         },
     });
 
-    const { formState: { isSubmitting }, control, setValue, handleSubmit } = form;
+    const { formState: { isSubmitting }, control, setValue, handleSubmit, reset } = form;
 
     const watchedAdminId = useWatch({ control, name: "adminId" });
-    const watchedPermissionIds = useWatch({ control, name: "permissionIds" });
+    const watchedPermissionActions = useWatch({ control, name: "permissionActions" });
 
-    // Locate the complete data model for the currently selected admin profile
+    // Directly isolate the single selected admin profile from state
     const activeAdminProfile = useMemo(() => {
         return admins.find((a) => a.userId === watchedAdminId) || null;
     }, [admins, watchedAdminId]);
 
-    // Handle Admin User Context selection updates safely
+    // Pull the raw dynamic permission strings assigned to this target admin profile
+    const adminActiveActionStrings = useMemo(() => {
+        return activeAdminProfile?.permissions || [];
+    }, [activeAdminProfile]);
+
     const handleSelectAdmin = useCallback((id: string) => {
         setValue("adminId", id, { shouldValidate: true });
-        setValue("permissionIds", []); // Clear target checklist whenever target changes
+        setValue("permissionActions", []);
     }, [setValue]);
 
-    // Handle changes safely inside the checked list array matrix
-    const handleMatrixSelectionChange = useCallback((ids: string[]) => {
-        setValue("permissionIds", ids, { shouldValidate: true, shouldDirty: true });
+    const handleMatrixSelectionChange = useCallback((actions: string[]) => {
+        setValue("permissionActions", actions, { shouldValidate: true, shouldDirty: true });
     }, [setValue]);
 
     const onSubmit = async (data: TRevokePermissionForm) => {
-        try {
-            console.log(`Target Routing Target: permissions/revoke-permissions/${data.adminId}`);
-            console.log("Payload Construction Summary:", { permissionIds: data.permissionIds });
+        const toastId = toast.loading("Revoking permission...");
+        const payload = { permissionActions: data?.permissionActions };
 
-            // Integration point linking up your dynamic endpoint invocation:
-            // await axios.patch(`permissions/revoke-permissions/${data.adminId}`, { permissionIds: data.permissionIds });
+        const result = await revokePermissionFromAdminReq(data?.adminId, payload);
 
-            await new Promise((resolve) => setTimeout(resolve, 1200));
-
-            toast.success(`Access scopes stripped safely from Admin account identifier: ${data.adminId}`);
-            form.reset();
-        } catch (error) {
-            toast.error("Failed to safely prune target configuration permissions matrix.");
-            console.error(error);
+        if (result?.success) {
+            toast.success(result?.message || "Permissions removed successfully.", { id: toastId });
+            reset();
+        } else {
+            toast.error(result?.message || "Revocation sequence encountered an issue.", { id: toastId });
         }
     };
 
     return (
         <div className="min-h-screen">
             <div className="space-y-8">
-
-                {/* TOP INTERACTIVE ACTION HEADER */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <TitleHeader
-                        title="Revoke System Permissions"
-                        subtitle="Identify administrative targets to peel back explicit system authorization vectors cleanly."
-                    />
-                </div>
+                <TitleHeader
+                    title={t("revoke_system_permissions")}
+                    subtitle={t("identify_administrative_targets")}
+                />
 
                 <Form {...form}>
                     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-                        {/* LEFT PROFILE & PANEL COLUMN */}
                         <div className="lg:col-span-4 space-y-6">
                             <FormField
                                 control={control}
@@ -117,13 +98,12 @@ export default function RevokePermissions({ admins = [], permissions = [] }: Rev
                                 )}
                             />
 
-                            {/* CONTEXT ACCELERATED SUMMARY BOX */}
-                            {watchedPermissionIds.length > 0 && activeAdminProfile && (
+                            {watchedPermissionActions.length > 0 && activeAdminProfile && (
                                 <div className="bg-white border border-red-100 rounded-3xl p-5 shadow-sm space-y-4">
                                     <div className="space-y-1">
-                                        <h4 className="font-bold text-sm text-gray-900">Revocation Summary</h4>
+                                        <h4 className="font-bold text-sm text-gray-900">{t("Revocation")}</h4>
                                         <p className="text-xs text-gray-400">
-                                            You are cutting <span className="font-bold text-red-600">{watchedPermissionIds.length}</span> clearance tokens from {activeAdminProfile?.name?.firstName}.
+                                            {t("you_are_cutting")} <span className="font-bold text-red-600">{watchedPermissionActions.length}</span> {t("clearance_tokens_from")}{activeAdminProfile?.name?.firstName}.
                                         </p>
                                     </div>
                                     <Button
@@ -133,31 +113,40 @@ export default function RevokePermissions({ admins = [], permissions = [] }: Rev
                                         disabled={isSubmitting}
                                     >
                                         <Trash2 className="w-4 h-4" />
-                                        {isSubmitting ? "Stripping Scopes..." : "Confirm Revocation"}
+                                        {isSubmitting ? "Stripping Scopes..." : t("confirm_revocation")}
                                     </Button>
                                 </div>
                             )}
                         </div>
 
-                        {/* RIGHT COLUMN: INTERACTIVE STRIP MATRIX SELECTION ROW */}
                         <div className="lg:col-span-8">
                             {!watchedAdminId ? (
                                 <div className="flex flex-col items-center justify-center p-20 text-center border-2 border-dashed border-red-200/60 rounded-3xl bg-white/70 backdrop-blur-sm">
                                     <span className="text-4xl mb-3">👤</span>
-                                    <h4 className="font-bold text-gray-700 text-base">Awaiting Admin Profile Target</h4>
+                                    <h4 className="font-bold text-gray-700 text-base">{t("awaiting_admin_profile_target")}</h4>
                                     <p className="text-xs text-gray-400 max-w-xs mt-1">
-                                        Please click an administrative profile item from the registry list on the left to verify real-time active rights.
+                                        {t("please_click_an_administrative_profile")}
+                                    </p>
+                                </div>
+                            ) : adminActiveActionStrings.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center p-20 text-center border-2 border-dashed border-gray-200 rounded-3xl bg-white">
+                                    <div className="w-12 h-12 bg-green-50 border border-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-4">
+                                        <ShieldCheck className="w-6 h-6" />
+                                    </div>
+                                    <h4 className="font-bold text-gray-800 text-base">{t("no_permissions_assigned")}</h4>
+                                    <p className="text-xs text-gray-400 max-w-sm mt-1">
+                                        {t("this_administrative_profile_doesnt_hold")}
                                     </p>
                                 </div>
                             ) : (
                                 <FormField
                                     control={control}
-                                    name="permissionIds"
+                                    name="permissionActions"
                                     render={() => (
                                         <FormItem>
                                             <RevocationMatrix
-                                                permissions={permissions}
-                                                selectedPermissionIds={watchedPermissionIds}
+                                                adminPermissions={adminActiveActionStrings}
+                                                selectedPermissionActions={watchedPermissionActions}
                                                 onChangePermissions={handleMatrixSelectionChange}
                                                 adminId={watchedAdminId}
                                             />

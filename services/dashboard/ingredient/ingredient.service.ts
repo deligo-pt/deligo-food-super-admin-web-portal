@@ -1,5 +1,6 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TIngredient, TIngredientOrder } from "@/types/ingredient.type";
@@ -7,13 +8,47 @@ import { catchAsync } from "@/utils/catchAsync";
 
 /* 
 ==========================
-INGREDIENT ORDERS
+INGREDIENT
 ==========================
 */
 
-export const getSingleIngredientReq = async (id: string) => {
+export const createIngredientReq = async (payload: Record<string, unknown>) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.post("/ingredients/create-ingredient", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result?.message || "Failed to create ingredient");
+    }
+
+    return result;
+  });
+};
+
+export const updateIngredientReq = async (payload: Record<string, unknown>, id: string) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.patch(`/ingredients/update-ingredient/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+
+    return result;
+  });
+};
+
+export const getSingleIngredientReq = async (sku: string) => {
   const result = await catchAsync<TIngredient>(async () => {
-    return await serverRequest.get(`/ingredients/${id}`);
+    return await serverRequest.get(`/ingredients/${sku}`);
   });
 
   if (result?.success) return result.data;
@@ -53,6 +88,34 @@ export const getAllIngredientsReq = async (
   return {
     data: [],
   };
+};
+
+export const softDeleteIngredient = async (id: string) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.delete(`/ingredients/soft-delete/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    return result;
+  });
+};
+
+export const permanentDeleteIngredient = async (id: string) => {
+  return await catchAsync<null>(async () => {
+    const response = await serverFetch.delete(`/ingredients/parmanent-delete/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    return result;
+  });
 };
 
 /* 

@@ -8,13 +8,14 @@ import { useForm, useWatch } from "react-hook-form";
 import { AdminListCardComponent } from "./AdminListCard";
 import { SelectionSummaryCard } from "./SelectionSummaryCard";
 import { TSystemPermission } from "@/types/permission.type";
-import { assignPermissionValidation, TAssignPermissionForm } from "@/validations/permissions/permissons.validation";
+import { assignPermissionValidation, TAssignPermissionForm } from "@/validations/permissions/permissions.validation";
 import { PermissionsMatrix } from "./PermissionMatrix";
 import { TAdmin } from "@/types/admin.type";
 import { useCallback } from "react";
+import { toast } from "sonner";
+import { assignPermissionToAdminReq } from "@/services/dashboard/permissions/permissions.service";
 
 const PRIMARY_COLOR = "#DC3173";
-const CANVAS_BG_COLOR = "#FFF1F7";
 
 interface AssignPermissionsProps {
     admins: TAdmin[];
@@ -54,7 +55,20 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
     }, [setValue]);
 
     const onSubmit = async (data: TAssignPermissionForm) => {
-        console.log("Submitting Config Payload Target:", data);
+        const toastId = toast.loading("Assigning....");
+        const payload = {
+            permissionIds: data?.permissionIds,
+        };
+
+        const result = await assignPermissionToAdminReq(data?.adminId, payload);
+
+        if (result?.success) {
+            toast.success(result?.message || "Permission assigned successfully", { id: toastId });
+            reset();
+            return;
+        } else {
+            toast.error(result?.message || "Permission assigning failed!", { id: toastId });
+        };
     };
 
     return (
@@ -79,7 +93,7 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
                                         <AdminListCardComponent
                                             admins={admins}
                                             selectedAdminId={watchedAdminId}
-                                            onSelectAdmin={handleSelectAdmin} // ⚡ Clean reference passed here
+                                            onSelectAdmin={handleSelectAdmin}
                                         />
                                         <FormMessage className="px-2" />
                                     </FormItem>
@@ -91,7 +105,7 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
                                 permissions={permissions}
                                 selectedPermissionIds={watchedPermissionIds}
                                 selectedAdminId={watchedAdminId}
-                                onClearAll={handleClearAllPermissions} // ⚡ Clean reference passed here
+                                onClearAll={handleClearAllPermissions}
                                 isSubmitting={isSubmitting}
                                 submitColor={PRIMARY_COLOR}
                             />
@@ -104,11 +118,10 @@ export default function AssignPermissions({ admins = [], permissions = [] }: Ass
                                 name="permissionIds"
                                 render={() => (
                                     <FormItem>
-                                        {/* Inside AssignPermissionsPage.tsx */}
                                         <PermissionsMatrix
                                             permissions={permissions}
                                             selectedPermissionIds={watchedPermissionIds}
-                                            onChangePermissions={handlePermissionsMatrixChange} // ⚡ Clean reference passed here
+                                            onChangePermissions={handlePermissionsMatrixChange}
                                         />
                                         <FormMessage className="px-2" />
                                     </FormItem>

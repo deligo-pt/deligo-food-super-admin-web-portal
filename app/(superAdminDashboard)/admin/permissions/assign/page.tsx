@@ -1,6 +1,6 @@
-import AssignPermissions from "@/components/Dashboard/Permissions/AssignPermissionPage";
+import AssignPermissions from "@/components/Dashboard/Permissions/AssignPermission";
 import { getAllAdmin } from "@/services/dashboard/admin/admin.service";
-import { getAllPermissionsReq } from "@/services/dashboard/permissions/permissons.service";
+import { getAllPermissionsReq } from "@/services/dashboard/permissions/permissions.service";
 
 
 const AssignPermission = async () => {

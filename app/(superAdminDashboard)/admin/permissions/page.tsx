@@ -1,5 +1,5 @@
 import Permissions from "@/components/Dashboard/Permissions/Permissions";
-import { getAllPermissionsReq } from "@/services/dashboard/permissions/permissons.service";
+import { getAllPermissionsReq } from "@/services/dashboard/permissions/permissions.service";
 import { IPermissionResponse } from "@/types/permission.type";
 import { queryStringFormatter } from "@/utils/formatter";
 

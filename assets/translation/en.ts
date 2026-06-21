@@ -1448,7 +1448,7 @@ export const en = {
   deliveryChargeOutsideLisbon: "Delivery Charge Outside Lisbon",
   vatRate: "Vat Rate",
 
-  // permissonsc
+  // permissions
   // --> Create Permission
   create_permission: "Create Permission",
   configure_access_control_rules_for_staff: "Configure access control rules for staff",
@@ -1464,7 +1464,42 @@ export const en = {
   lock_entry_to_prevent_casual: "Lock entry to prevent casual dashboard mutation or unsafe deletions.",
   // --> All permissions
   all_permissions: "All Permissions",
-
+  manage_view_all_admin_permissions: "Manage and view all admin permissions",
+  no_platform_security_permissions_defined: "No platform security permissions defined.",
+  // --> edit permission
+  edit_permission: "Edit Permission",
+  modify_security_rule_parameters: "Modify security rule parameters. Changes here update systemic metadata attributes instantly.",
+  system_key_bindings: "System Key Bindings (Locked)",
+  module: "Module",
+  system_rule_name: "System Rule Name",
+  intent_scope: "Intent & Scope Description",
+  policy_enforcement_state: "Policy Enforcement State",
+  disabling_overrides_associated: "Disabling overrides associated mappings and prevents user routing clearance.",
+  saving_permission: "Saving permission",
+  // --> Assign permissions
+  assign_permissions: "Assign Permissions",
+  configure_and_map_access_control_levels_for_specific_administrative_roles: "Configure and map access control levels for specific administrative roles",
+  select_admin: "Select Admin",
+  search_admins: "Search Admins",
+  select_all: "Select all",
+  no_system_permissions_definitions_found: "No system permissions definitions found in registry.",
+  //--> revoke permission
+  revoke_permission: "Revoke Permission",
+  revoke_system_permissions: "Revoke System Permissions",
+  identify_administrative_targets: "Identify administrative targets to peel back explicit system authorization vectors cleanly.",
+  revocation_summary: "Revocation Summary",
+  you_are_cutting: "You are cutting",
+  clearance_tokens_from: "clearance tokens from",
+  confirm_revocation: "Confirm Revocation",
+  awaiting_admin_profile_target: "Awaiting Admin Profile Target",
+  please_click_an_administrative_profile: "Please click an administrative profile item from the registry list on the left to verify real-time active rights.",
+  no_permissions_assigned: "No Permissions Assigned",
+  this_administrative_profile_doesnt_hold: "This administrative profile doesn't hold any active access right overrides.",
+  granted_scopes_core: "Granted Scopes Core",
+  target_context_id: "Target Context ID",
+  deselect_all_listed: "Deselect All Listed",
+  select_all_available: "Select All Available",
+  checking_elements_here_queues_them: "Checking elements here queues them up for immediate deletion. Once submitted, the matching user credentials session payload loses routing permission instantly.",
 
   // profile
   personal_information: "Personal Information",

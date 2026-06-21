@@ -1,19 +1,31 @@
 import { TVendor } from "@/types/user.type";
 
+export type TTax = {
+  _id: string;
+  taxRate: number;
+};
+
 export type TIngredient = {
   _id: string;
-  ingredientId: string;
-
+  sku: string;
   name: string;
   category: string;
   description?: string;
-
   price: number;
+  tax?: TTax;
+  unit: "kg" | "g" | "litre" | "ml" | "piece" | "packet" | "box";
   stock: number;
+  totalAddedQuantity?: number;
+  lowStockAlert?: number;
+  shelfLifeDays?: number;
   minOrder?: number;
-
   image: string;
-
+  status: "available" | "unavailable" | string;
+  isDeleted: boolean;
+  bulkDiscount?: {
+    minQty: number;
+    discountPrice: number;
+  }[];
   createdAt: string;
   updatedAt: string;
 };
