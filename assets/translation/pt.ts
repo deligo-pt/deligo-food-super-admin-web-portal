@@ -1444,6 +1444,7 @@ export const pt = {
   delivery_partner_commission: "Comissão do Parceiro de Entrega",
   percentage_paid_to_driver: "Percentagem paga ao estafeta",
   vendor_vat: "IVA do Vendedor",
+  service_charge: "Taxa de Serviço",
   order_rules: "Regras de Encomenda",
   define_constraints_for_customer_orders:
     "Definir restrições para encomendas de clientes",

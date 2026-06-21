@@ -43,6 +43,9 @@ export const globalSettingsSchema = z
       .number("Delivery partner commission must be a number")
       .min(0, "Delivery partner commission must be at least 0")
       .max(100, "Delivery partner commission cannot be more than 100"),
+    serviceCharge: z
+      .number("Service charge must be a number")
+      .nonnegative("Service charge must be at least 0"),
     vendorVatPercent: z
       .number("Vendor VAT percent must be a number")
       .min(0, "VAT percent must be at least 0")

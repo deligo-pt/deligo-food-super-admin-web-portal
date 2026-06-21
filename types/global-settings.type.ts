@@ -19,6 +19,7 @@ export type TGlobalSettings = {
     fleetManagerPercent: number;
     deliveryPartnerPercent: number;
     vendorVatPercent: number;
+    serviceCharge: number;
   };
 
   // Order Rules & Automation
