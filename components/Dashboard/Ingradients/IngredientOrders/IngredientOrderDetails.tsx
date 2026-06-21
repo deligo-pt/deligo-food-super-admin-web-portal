@@ -7,7 +7,6 @@ import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft,
   CheckCircle,
   Clock,
   Mail,
@@ -18,7 +17,6 @@ import {
   TruckIcon,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -46,9 +44,9 @@ export default function IngredientOrderDetails({ order }: IProps) {
     if (result?.success) {
       toast.success(
         result?.message ||
-          (status === "SHIPPED"
-            ? "Order status updated to SHIPPED"
-            : "Order status updated to DELIVERED"),
+        (status === "SHIPPED"
+          ? "Order status updated to SHIPPED"
+          : "Order status updated to DELIVERED"),
         { id: toastId },
       );
       router.refresh();
@@ -57,9 +55,9 @@ export default function IngredientOrderDetails({ order }: IProps) {
 
     toast.error(
       result?.message ||
-        (status === "SHIPPED"
-          ? "Failed to update order status to SHIPPED"
-          : "Failed to update order status to DELIVERED"),
+      (status === "SHIPPED"
+        ? "Failed to update order status to SHIPPED"
+        : "Failed to update order status to DELIVERED"),
       { id: toastId },
     );
     console.log(result);
@@ -86,6 +84,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
           </span>
         );
       case "PENDING":
+      default:
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold bg-amber-100 text-amber-700">
             <Clock size={14} /> Pending
@@ -94,149 +93,132 @@ export default function IngredientOrderDetails({ order }: IProps) {
     }
   };
 
+  // Safe generation of fallback milestone dates using historical properties
+  const orderTimeline = [
+    { status: "Placed", date: order.createdAt, completed: true },
+    { status: "Shipped", date: order.statusHistory?.shippedAt, completed: !!order.statusHistory?.shippedAt },
+    { status: "Delivered", date: order.statusHistory?.deliveredAt, completed: !!order.statusHistory?.deliveredAt },
+  ];
+
   return (
     <div className="min-h-screen">
-      {/* Back Button */}
-      <div className="mb-4">
-        <Link
-          href="/admin/ingredient-orders"
-          className="inline-flex items-center gap-2 text-[#DC3173] hover:underline mb-4 transition-colors"
-        >
-          <ArrowLeft size={18} />
-          Back to Ingredient Orders
-        </Link>
-      </div>
-
-      {/* Header */}
+      {/* Header Layout Component handling Badge layout cleanly without literal string errors */}
       <TitleHeader
-        title="Ingredient Order Details"
-        subtitle="Detailed information about the order"
+        title={`Order #${order.orderId}`}
+        subtitle={`Placed on ${format(new Date(order.createdAt), "do MMM yyyy, hh:mm a")}`}
+        onBackClick={() => router.back()}
       />
 
-      <div className="mb-4">
-        <div className="flex flex-col lg:flex-row justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
-              Order #{order.orderId}
-            </h1>
-            <p className="text-gray-500 mt-1">
-              Placed on {format(order.createdAt, "dd MMM, yyyy")}
-            </p>
-          </div>
-
-          <div>{getStatusBadge(order.orderStatus)}</div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-6">
         {/* Main Content */}
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           className="lg:col-span-2 space-y-6"
         >
           {/* Items Table */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
+            <div className="p-6 border-b border-gray-100 flex flex-row justify-between items-center">
               <h2 className="text-lg font-bold text-gray-900">Order Items</h2>
+              <div className="mt-2 mb-6">
+                {getStatusBadge(order.orderStatus)}
+              </div>
             </div>
-            <table className="w-full">
-              <thead className="bg-gray-50 text-left">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">
-                    Item
-                  </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">
-                    Qty
-                  </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">
-                    Unit Price
-                  </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">
-                    Total
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                <tr>
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {order.orderDetails?.ingredient?.name}
-                  </td>
-                  <td className="px-6 py-4 text-center text-gray-600">
-                    {order.orderDetails?.totalQuantity}
-                  </td>
-                  <td className="px-6 py-4 text-right text-gray-600">
-                    €{formatPrice(order.orderDetails?.ingredient?.price)}
-                  </td>
-                  <td className="px-6 py-4 text-right font-bold text-gray-900">
-                    €{formatPrice(order.orderDetails?.totalAmount)}
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot className="bg-gray-50">
-                <tr>
-                  <td
-                    colSpan={3}
-                    className="px-6 py-4 text-right font-medium text-gray-600"
-                  >
-                    Delivery Charge
-                  </td>
-                  <td className="px-6 py-4 text-right font-bold text-gray-900">
-                    €{formatPrice(order.delivery?.charge)}
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    colSpan={3}
-                    className="px-6 py-4 text-right font-bold text-lg text-gray-900"
-                  >
-                    Total
-                  </td>
-                  <td className="px-6 py-4 text-right font-bold text-lg text-[#DC3173]">
-                    €{formatPrice(order.grandTotal)}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 text-left">
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Item</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Qty</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Unit Price</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {order.orderDetails?.map((item, idx) => (
+                    <tr key={idx}>
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-gray-900">{item.name || item.ingredientId?.name}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">SKU: {item.sku}</div>
+                        {/* Optional Bulk Discount Guard */}
+                        {item.ingredientId?.bulkDiscount && item.ingredientId.bulkDiscount.length > 0 && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {item.ingredientId.bulkDiscount.map((discount, dIdx) => (
+                              <span key={dIdx} className="inline-block text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                                {discount.minQty}+ units: €{formatPrice(discount.discountPrice)}/{item.unit}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center text-gray-600 font-medium">
+                        {item.quantity} <span className="text-xs text-gray-400">{item.unit}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right text-gray-600">
+                        €{formatPrice(item.pricePerUnit)}
+                      </td>
+                      <td className="px-6 py-4 text-right font-bold text-gray-900">
+                        €{formatPrice(item.totalAmount)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tbody className="bg-gray-50/50 border-t border-gray-100 divide-y divide-gray-100">
+                  <tr>
+                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">Product Discount</td>
+                    <td className="px-6 py-3 text-right text-sm font-medium text-gray-700">
+                      -€{formatPrice(order.orderCalculation?.totalProductDiscount || 0)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">Tax amount ({order.orderDetails?.[0]?.taxRate || 0}%)</td>
+                    <td className="px-6 py-3 text-right text-sm font-medium text-gray-700">
+                      €{formatPrice(order.orderCalculation?.totalTaxAmount || 0)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">Delivery Charge</td>
+                    <td className="px-6 py-3 text-right text-sm font-medium text-gray-700">
+                      €{formatPrice(order.delivery?.charge || 0)}
+                    </td>
+                  </tr>
+                  <tr className="bg-gray-50">
+                    <td colSpan={3} className="px-6 py-4 text-right font-bold text-lg text-gray-900">Total</td>
+                    <td className="px-6 py-4 text-right font-extrabold text-lg text-[#DC3173]">
+                      €{formatPrice(order.grandTotal)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* Timeline */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">
-              Order Timeline
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-6">Order Timeline</h2>
             <div className="space-y-6">
-              {order.timeline?.map((step, index) => (
+              {orderTimeline.map((step, index) => (
                 <div key={index} className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step.completed ? "bg-[#DC3173] border-[#DC3173] text-white" : "bg-white border-gray-200 text-gray-300"}`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step.completed
+                        ? "bg-[#DC3173] border-[#DC3173] text-white"
+                        : "bg-white border-gray-200 text-gray-300"
+                        }`}
                     >
-                      {step.completed ? (
-                        <CheckCircle size={16} />
-                      ) : (
-                        <Clock size={16} />
-                      )}
+                      {step.completed ? <CheckCircle size={16} /> : <Clock size={16} />}
                     </div>
-                    {index < (order.timeline?.length || 0) - 1 && (
-                      <div
-                        className={`w-0.5 h-full my-2 ${step.completed ? "bg-[#DC3173]" : "bg-gray-200"}`}
-                      />
+                    {index < orderTimeline.length - 1 && (
+                      <div className={`w-0.5 h-12 my-1 ${step.completed ? "bg-[#DC3173]" : "bg-gray-200"}`} />
                     )}
                   </div>
-                  <div>
-                    <h4
-                      className={`font-bold ${step.completed ? "text-gray-900" : "text-gray-400"}`}
-                    >
+                  <div className="pt-0.5">
+                    <h4 className={`font-bold ${step.completed ? "text-gray-900" : "text-gray-400"}`}>
                       {step.status}
                     </h4>
-                    <p className="text-sm text-gray-500">{step.date}</p>
+                    <p className="text-sm text-gray-500">
+                      {step.date ? format(new Date(step.date), "dd MMM yyyy, hh:mm a") : "Pending execution"}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -246,96 +228,88 @@ export default function IngredientOrderDetails({ order }: IProps) {
 
         {/* Sidebar */}
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            delay: 0.2,
-          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
           className="space-y-6"
         >
           {/* Vendor Info */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Vendor Details
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Vendor Details</h2>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full overflow-hidden">
-                {order.vendor.profilePhoto ? (
+              <div className="w-12 h-12 rounded-full overflow-hidden shrink-0">
+                {order.vendorId?.profilePhoto ? (
                   <Image
-                    src={order.vendor.profilePhoto || ""}
-                    alt={order.vendor?.businessDetails?.businessName || ""}
+                    src={order.vendorId.profilePhoto}
+                    alt={order.vendorId?.businessDetails?.businessName || "Vendor"}
                     width={48}
                     height={48}
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] font-bold text-lg">
-                    {order.vendor?.businessDetails?.businessName?.charAt(0)}
+                    {order.vendorId?.businessDetails?.businessName?.charAt(0) || "V"}
                   </div>
                 )}
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">
-                  {order.vendor?.businessDetails?.businessName}
+                <h3 className="font-bold text-gray-900 line-clamp-1">
+                  {order.vendorId?.businessDetails?.businessName || "N/A"}
                 </h3>
-                <p className="text-sm text-gray-500">ID: #VEN-892</p>
+                <p className="text-xs text-gray-400">
+                  Manager: {order.vendorId?.name?.firstName} {order.vendorId?.name?.lastName}
+                </p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-gray-600">
-                <div className="p-2 bg-gray-50 rounded-lg">
+                <div className="p-2 bg-gray-50 rounded-lg shrink-0">
                   <Mail size={16} />
                 </div>
-                <span className="text-sm">{order.vendor?.email || "N/A"}</span>
+                <span className="text-sm break-all">{order.vendorId?.email || "N/A"}</span>
               </div>
               <div className="flex items-center gap-3 text-gray-600">
-                <div className="p-2 bg-gray-50 rounded-lg">
+                <div className="p-2 bg-gray-50 rounded-lg shrink-0">
                   <Phone size={16} />
                 </div>
-                <span className="text-sm">
-                  {order.vendor?.contactNumber || "N/A"}
-                </span>
+                <span className="text-sm">{order.vendorId?.contactNumber || "N/A"}</span>
               </div>
               <div className="flex items-start gap-3 text-gray-600">
                 <div className="p-2 bg-gray-50 rounded-lg shrink-0">
                   <MapPin size={16} />
                 </div>
                 <span className="text-sm">
-                  {order.vendor?.businessLocation?.street},{" "}
-                  {order.vendor?.businessLocation?.city},{" "}
-                  {order.vendor?.businessLocation?.country}
+                  {order.deliveryAddress?.street || order.vendorId?.businessLocation?.street},<br />
+                  {order.deliveryAddress?.city || order.vendorId?.businessLocation?.city},<br />
+                  {order.deliveryAddress?.country || order.vendorId?.businessLocation?.country}
                 </span>
               </div>
             </div>
           </div>
         </motion.div>
       </div>
+
+      {/* Action Controls */}
       <div className="mt-8 mb-4">
         {order.orderStatus === "CONFIRMED" && (
           <button
             onClick={() => updateStatus("SHIPPED")}
             disabled={isUpdating}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white border rounded-xl font-medium hover:bg-indigo-500/90 transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-500 transition-all disabled:opacity-50"
           >
             <TruckIcon size={18} />
-            Make Shipped
+            Mark Shipped
           </button>
         )}
         {order.orderStatus === "SHIPPED" && (
           <button
             onClick={() => updateStatus("DELIVERED")}
             disabled={isUpdating}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#DC3173] text-white border rounded-xl font-medium hover:bg-[#DC3173]/90 transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#DC3173] text-white rounded-xl font-medium hover:bg-[#DC3173]/90 transition-all disabled:opacity-50"
           >
             <TruckIcon size={18} />
-            Make Delivered
+            Mark Delivered
           </button>
         )}
       </div>

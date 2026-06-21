@@ -40,33 +40,98 @@ type TPaymentMethod =
   | "GOOGLE_PAY"
   | "OTHER";
 
+// Sub-types matching the incoming API payload layout
+export type TDeliveryAddress = {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  longitude: number;
+  latitude: number;
+  geoAccuracy: number;
+};
+
+export type TDeliveryDetails = {
+  charge: number;
+  vatRate: number;
+  vatAmount: number;
+  totalDeliveryCharge: number;
+};
+
+export type TOrderCalculation = {
+  totalOriginalPrice: number;
+  totalProductDiscount: number;
+  taxableAmount: number;
+  totalTaxAmount: number;
+};
+
+export type TOrderStatusHistory = {
+  shippedAt?: string;
+  deliveredAt?: string;
+};
+
+export type TBulkDiscount = {
+  minQty: number;
+  discountPrice: number;
+};
+
+export type TPopulatedIngredient = {
+  _id: string;
+  name: string;
+  category: string;
+  description: string;
+  sku: string;
+  price: number;
+  tax: string;
+  unit: string;
+  stock: number;
+  totalAddedQuantity: number;
+  lowStockAlert: number;
+  minOrder: number;
+  image: string;
+  status: "available" | "unavailable";
+  shelfLifeDays: number;
+  bulkDiscount: TBulkDiscount[];
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TIngredientOrderDetail = {
+  ingredientId: TPopulatedIngredient;
+  name: string;
+  sku: string;
+  unit: string;
+  quantity: number;
+  pricePerUnit: number;
+  taxRate: number;
+  taxAmount: number;
+  totalAmount: number;
+};
+
+// Main Response Type
 export type TIngredientOrder = {
   _id: string;
   orderId: string;
   transactionId: string;
+  adminId: string;
+  vendorId: TVendor;
 
   grandTotal: number;
-  isPaid: boolean;
-  orderDetails: {
-    ingredient: TIngredient;
-    totalAmount: number;
-    totalQuantity: number;
-  };
+  isDeleted: boolean;
 
-  vendor: Partial<TVendor>;
+  deliveryAddress: TDeliveryAddress;
+  delivery: TDeliveryDetails;
+  orderCalculation: TOrderCalculation;
+  statusHistory: TOrderStatusHistory;
+  orderDetails: TIngredientOrderDetail[];
 
   orderStatus: TOrderStatus;
   paymentMethod: TPaymentMethod;
   paymentStatus: TPaymentStatus;
 
-  delivery: { charge: number; distance: number; estimatedTime: number };
-
-  timeline?: {
-    status: string;
-    date: string;
-    completed: boolean;
-  }[];
-
   createdAt: string;
   updatedAt: string;
+  __v: number;
 };

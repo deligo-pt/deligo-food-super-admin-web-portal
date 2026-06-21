@@ -68,6 +68,7 @@ export default function GlobalSettings({
       fleetManagerCommissionPercent:
         settings?.commission?.fleetManagerPercent || 0,
       vendorVatPercent: settings?.commission?.vendorVatPercent || 0,
+      serviceCharge: settings?.commission?.serviceCharge || 0,
 
       // order
       minOrderAmount: settings?.order?.minAmount || 0,
@@ -125,6 +126,7 @@ export default function GlobalSettings({
         deliveryPartnerPercent: data.deliveryPartnerCommissionPercent,
         fleetManagerPercent: data.fleetManagerCommissionPercent,
         vendorVatPercent: data.vendorVatPercent,
+        serviceCharge: data.serviceCharge,
       },
       order: {
         minAmount: data.minOrderAmount,
@@ -580,78 +582,104 @@ export default function GlobalSettings({
                     )}
                   />
                 </div>
-                <FormField
-                  control={form.control}
-                  name="fleetManagerCommissionPercent"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label="Fleet Manager Commission"
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="%"
-                          description="Percentage paid to fleet manager"
-                          min={0}
-                          max={100}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="deliveryPartnerCommissionPercent"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("delivery_partner_commission")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="%"
-                          description={t("percentage_paid_to_driver")}
-                          min={0}
-                          max={100}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="vendorVatPercent"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("vendor_vat")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="%"
-                          description="VAT percentage added to vendor earnings"
-                          min={0}
-                          max={100}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="fleetManagerCommissionPercent"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormControl>
+                          <SettingsInput
+                            fieldState={fieldState}
+                            label="Fleet Manager Commission"
+                            type="number"
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            suffix="%"
+                            description="Percentage paid to fleet manager"
+                            min={0}
+                            max={100}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="deliveryPartnerCommissionPercent"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormControl>
+                          <SettingsInput
+                            fieldState={fieldState}
+                            label={t("delivery_partner_commission")}
+                            type="number"
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            suffix="%"
+                            description={t("percentage_paid_to_driver")}
+                            min={0}
+                            max={100}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="serviceCharge"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormControl>
+                          <SettingsInput
+                            fieldState={fieldState}
+                            label={t("service_charge")}
+                            type="number"
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            suffix="€"
+                            min={0}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vendorVatPercent"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <FormControl>
+                          <SettingsInput
+                            fieldState={fieldState}
+                            label={t("vendor_vat")}
+                            type="number"
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            suffix="%"
+                            description="VAT percentage added to vendor earnings"
+                            min={0}
+                            max={100}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </SettingsCard>
 

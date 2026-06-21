@@ -1403,6 +1403,7 @@ export const en = {
   delivery_partner_commission: "Delivery Partner Commission",
   percentage_paid_to_driver: "Percentage paid to the driver",
   vendor_vat: "Vendor VAT",
+  service_charge : "Service Charge",
   order_rules: "Order Rules",
   define_constraints_for_customer_orders:
     "Define constraints for customer orders",

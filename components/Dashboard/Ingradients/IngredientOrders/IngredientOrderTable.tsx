@@ -72,9 +72,8 @@ export default function IngredientOrderTable({ orders }: IProps) {
           : "Failed to update order status to DELIVERED"),
       { id: toastId },
     );
-    console.log(result);
   };
-
+console.log("ing order", orders);
   const getStatusBadge = (status: TIngredientOrder["orderStatus"]) => {
     switch (status) {
       case "DELIVERED":
@@ -172,9 +171,9 @@ export default function IngredientOrderTable({ orders }: IProps) {
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Avatar>
-                    <AvatarImage src={order.vendor?.profilePhoto} />
+                    <AvatarImage src={order.vendorId?.profilePhoto} />
                     <AvatarFallback>
-                      {order.vendor?.businessDetails?.businessName
+                      {order.vendorId?.businessDetails?.businessName
                         ?.split(" ")
                         ?.map((n) => n[0])
                         ?.join("")}
@@ -182,17 +181,18 @@ export default function IngredientOrderTable({ orders }: IProps) {
                   </Avatar>
                   <div>
                     <div className="font-medium">
-                      {order.vendor?.businessDetails?.businessName}
+                      {order.vendorId?.businessDetails?.businessName}
                     </div>
                     <div className="text-xs text-slate-500">
-                      {order.vendor?.email}
+                      {order.vendorId?.email}
                     </div>
                   </div>
                 </div>
               </TableCell>
               <TableCell>
-                {order.orderDetails?.ingredient?.name} (x
-                {order.orderDetails?.totalQuantity})
+                {order.orderDetails?.map((detail) =>
+                  `${detail.ingredientId?.name} (x${detail.quantity})`,
+                ).join(", ")}
               </TableCell>
               <TableCell>€{formatPrice(order.grandTotal)}</TableCell>
               <TableCell>{getStatusBadge(order.orderStatus)}</TableCell>
@@ -214,7 +214,7 @@ export default function IngredientOrderTable({ orders }: IProps) {
                     {order.orderStatus === "CONFIRMED" && (
                       <DropdownMenuItem
                         className=""
-                        onClick={() => updateStatus(order._id, "SHIPPED")}
+                        onClick={() => updateStatus(order.orderId, "SHIPPED")}
                       >
                         Update to SHIPPED
                       </DropdownMenuItem>
@@ -222,7 +222,7 @@ export default function IngredientOrderTable({ orders }: IProps) {
                     {order.orderStatus === "SHIPPED" && (
                       <DropdownMenuItem
                         className=""
-                        onClick={() => updateStatus(order._id, "DELIVERED")}
+                        onClick={() => updateStatus(order.orderId, "DELIVERED")}
                       >
                         Update to DELIVERED
                       </DropdownMenuItem>
