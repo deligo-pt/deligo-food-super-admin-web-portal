@@ -1403,7 +1403,7 @@ export const en = {
   delivery_partner_commission: "Delivery Partner Commission",
   percentage_paid_to_driver: "Percentage paid to the driver",
   vendor_vat: "Vendor VAT",
-  service_charge : "Service Charge",
+  service_charge: "Service Charge",
   order_rules: "Order Rules",
   define_constraints_for_customer_orders:
     "Define constraints for customer orders",
@@ -1474,7 +1474,7 @@ export const en = {
   module: "Module",
   system_rule_name: "System Rule Name",
   intent_scope: "Intent & Scope Description",
-  policy_enforcement_state: "Policy Enforcement State",
+  permission_active_status_toggle: "Permission Active Status Toggle",
   disabling_overrides_associated: "Disabling overrides associated mappings and prevents user routing clearance.",
   saving_permission: "Saving permission",
   // --> Assign permissions
@@ -1483,6 +1483,9 @@ export const en = {
   select_admin: "Select Admin",
   search_admins: "Search Admins",
   select_all: "Select all",
+  deselect_all: "Deselect all",
+  selected_permissions: "Selected Permissions",
+  no_permissions_available: "No permissions available",
   no_system_permissions_definitions_found: "No system permissions definitions found in registry.",
   //--> revoke permission
   revoke_permission: "Revoke Permission",

@@ -1520,7 +1520,7 @@ export const pt = {
   module: "Módulo",
   system_rule_name: "Nome da Regra do Sistema",
   intent_scope: "Descrição de Intenção e Escopo",
-  policy_enforcement_state: "Estado de Aplicação da Política",
+  permission_active_status_toggle: "Alternar Status Ativo da Permissão",
   disabling_overrides_associated: "A desativação substitui os mapeamentos associados e impede a liberação de rotas do usuário.",
   saving_permission: "Salvando permissão",
   // --> Assign permissions
@@ -1529,6 +1529,9 @@ export const pt = {
   select_admin: "Selecionar Administrador",
   search_admins: "Buscar Administradores",
   select_all: "Selecionar tudo",
+  deselect_all: "Desmarcar tudo",
+  selected_permissions: "Permissões Selecionadas",
+  no_permissions_available: "Nenhuma permissão disponível",
   no_system_permissions_definitions_found: "Nenhuma definição de permissões do sistema encontrada no registro.",
   //--> revoke permission
   revoke_permission: "Revogar Permissão",

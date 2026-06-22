@@ -93,7 +93,7 @@ export default function UpdatePermissionModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[540px] rounded-3xl p-6 bg-white gap-6 shadow-xl border-gray-100">
+            <DialogContent className="sm:max-w-135 rounded-3xl p-6 bg-white gap-6 shadow-xl border-gray-100 h-[90vh] overflow-y-scroll no-scrollbar">
 
                 <DialogHeader className="space-y-1.5 text-left">
                     <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export default function UpdatePermissionModal({
                 {/* IMMUTABLE SYSTEM BANNER INFO */}
                 {permission && (
                     <div className="bg-gray-50 border border-gray-100 rounded-2xl p-3.5 flex items-start gap-3">
-                        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
                         <div className="space-y-0.5">
                             <p className="text-xs font-bold text-gray-700 uppercase tracking-tight font-mono">
                                 {t("system_key_bindings")}
@@ -182,7 +182,7 @@ export default function UpdatePermissionModal({
                                     <FormControl>
                                         <Textarea
                                             placeholder="Provide functional context detailing what features this policy matrix controls..."
-                                            className="min-h-[100px] rounded-2xl bg-gray-50/50 border-gray-200 resize-none text-sm leading-relaxed"
+                                            className="min-h-25 rounded-2xl bg-gray-50/50 border-gray-200 resize-none text-sm leading-relaxed"
                                             {...field}
                                         />
                                     </FormControl>
@@ -199,7 +199,7 @@ export default function UpdatePermissionModal({
                                 <FormItem className="flex flex-row items-center justify-between rounded-2xl border border-gray-100 p-4 shadow-sm bg-white">
                                     <div className="space-y-0.5">
                                         <FormLabel className="font-bold text-xs text-gray-800 uppercase tracking-wider">
-                                            {t("policy_enforcement_state")}
+                                            {t("permission_active_status_toggle")}
                                         </FormLabel>
                                         <FormDescription className="text-xs text-gray-400">
                                             {t("disabling_overrides_associated")}
