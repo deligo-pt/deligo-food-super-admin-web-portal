@@ -64,6 +64,8 @@ export const en = {
   delivery_partner_payouts: "Delivery Partner Payouts",
   delivery_partner_analytics: "Delivery Partner Analytics",
 
+  create_cuisine: "Create Cuisine",
+  all_cuisines: "All Cuisines",
   business_categories: "Business Categories",
   add_business_categories: "Add Business Categories",
   all_business_categories: "All Business Categories",
@@ -743,6 +745,39 @@ export const en = {
   business_category: "Business Category",
   select_business_category: "Select Business Category",
   eg_pizza: "e.g. Pizza",
+
+  // cuisine
+  // --> create cuisine
+  create_different_types_cuisine: "Create different types of cuisine",
+  cuisine_name: "Cuisine name",
+  cuisine_image: "Cuisine Image",
+  //--> All cuisine
+  all_cuisine: "All Cuisine",
+  explore_all_different_type_cuisines: "Explore all different types of cuisines",
+  no_cuisine_available_to_show: "No cuisine available to show",
+  soft_delete: "Soft Delete",
+  already_soft_deleted: "Already soft deleted",
+  permanent_delete: "Permanent Delete",
+  //--> Edit cuisine
+  edit_cuisine_settings: "Edit Cuisine Settings",
+  modify_properties_for_this_item: "Modify properties for this item. Hit save to preserve changes.",
+  visibility_status: "Visibility Status",
+  active_status: "Active Status",
+  inactive_status: "Inactive Status",
+  // --> delete cuisine
+  warings_this_action_cannot_be_undone: "Warning: This action cannot be undone. It will completely scrub this record out of the database!",
+  // --> cuisine details
+  back_to_list: "Back to list",
+  slug : "slug",
+  soft_deleted : "Soft Deleted",
+  cuisine_asset_preview : "Cuisine Asset Preview",
+  no_image_uploaded : "No image uploaded",
+  properties : "Properties",
+  url_status_check :"Url Status Check",
+  valid_asset_path :"Valid Asset Path",
+  empty_source_reference :"Empty Source Reference",
+  audit_timelines : "Audit Timelines",
+  created_on :"Created On",
 
   // product categories
   // -> title

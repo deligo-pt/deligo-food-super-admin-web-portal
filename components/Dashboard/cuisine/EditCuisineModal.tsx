@@ -107,10 +107,10 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                 <div className="bg-linear-to-r from-[#DC3173] to-[#E95A9E] p-6 text-white">
                     <DialogHeader>
                         <DialogTitle className="text-2xl font-bold text-white">
-                            {t("Edit Cuisine Settings")}
+                            {t("edit_cuisine_settings")}
                         </DialogTitle>
                         <DialogDescription className="text-pink-100 mt-2">
-                            Modify properties for this item. Hit save to preserve changes.
+                            {t("modify_properties_for_this_item")}
                         </DialogDescription>
                     </DialogHeader>
                 </div>
@@ -128,7 +128,7 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                                         <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                                             <div className="flex items-center">
                                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                                <span className="ml-2">{t("Cuisine name")}</span>
+                                                <span className="ml-2">{t("cuisine_name")}</span>
                                             </div>
                                         </FormLabel>
                                         <FormControl>
@@ -152,7 +152,7 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                                         <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                                             <div className="flex items-center">
                                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                                <span className="ml-2">{t("Cuisine Image")}</span>
+                                                <span className="ml-2">{t("cuisine_image")}</span>
                                             </div>
                                         </FormLabel>
                                         <FormControl>
@@ -174,10 +174,10 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                                     <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-200 p-3 shadow-xs">
                                         <div className="space-y-0.5">
                                             <FormLabel className="text-sm font-medium text-gray-700">
-                                                {t("Visibility Status")}
+                                                {t("visibility_status")}
                                             </FormLabel>
                                             <div className="text-xs text-muted-foreground">
-                                                {watchIsActive ? t("Active Status") : t("Inactive Status")}
+                                                {watchIsActive ? t("active_status") : t("inactive_status")}
                                             </div>
                                         </div>
                                         <FormControl>
@@ -204,7 +204,7 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                                 {isLoading ? (
                                     <LoaderIcon className="w-4 h-4 animate-spin" />
                                 ) : (
-                                    t("Save Changes")
+                                    t("save_changes")
                                 )}
                             </Button>
                         </DialogFooter>

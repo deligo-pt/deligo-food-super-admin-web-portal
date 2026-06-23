@@ -176,11 +176,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <Grid size={18} />,
       items: [
         {
-          name: "Create Cuisine",
+          name: t("create_cuisine"),
           path: '/admin/cuisine/create'
         },
         {
-          name: "All Cuisines",
+          name: t("all_cuisines"),
           path: '/admin/cuisine/all'
         },
       ]

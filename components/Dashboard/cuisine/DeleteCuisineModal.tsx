@@ -86,22 +86,22 @@ export default function DeleteCuisineModal({ statusInfo, onClose, t }: DeleteMod
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>
-                        {statusInfo.field === "isDeleted" && t("Soft Delete")}
-                        {statusInfo.field === "isPermanentDelete" && t("Permanent Delete")}
-                        {statusInfo.field === "isActive" && (statusInfo.isActive ? t("Activate") : t("Deactivate"))}
-                        {" "}{t("Cuisine")}
+                        {statusInfo.field === "isDeleted" && t("soft_delete")}
+                        {statusInfo.field === "isPermanentDelete" && t("permanent_delete")}
+                        {statusInfo.field === "isActive" && (statusInfo.isActive ? t("activate") : t("deactivate"))}
+                        {" "}{t("cuisine")}
                     </DialogTitle>
                     <DialogDescription>
                         {statusInfo.field === "isPermanentDelete" ? (
                             <span className="text-red-500 font-medium">
-                                Warning: This action cannot be undone. It will completely scrub this record out of the database!
+                                {t("warings_this_action_cannot_be_undone")}
                             </span>
                         ) : (
                             `${t("Are you sure you want to change this action item status to")} ${statusInfo.field === "isDeleted"
-                                ? "Soft Delete"
+                                ? t("soft_delete")
                                 : statusInfo.isActive
-                                    ? "Active"
-                                    : "Inactive"
+                                    ? t("active")
+                                    : t("inactive")
                             }?`
                         )}
                     </DialogDescription>
@@ -113,13 +113,13 @@ export default function DeleteCuisineModal({ statusInfo, onClose, t }: DeleteMod
 
                     {statusInfo.field === "isDeleted" && (
                         <Button variant="destructive" disabled={isLoading} onClick={handleSoftDelete}>
-                            {t("Soft Delete")}
+                            {t("soft_delete")}
                         </Button>
                     )}
 
                     {statusInfo.field === "isPermanentDelete" && (
                         <Button className="bg-red-700 hover:bg-red-800 text-white" disabled={isLoading} onClick={handlePermanentDelete}>
-                            {t("Delete Permanently")}
+                            {t("permanent_delete")}
                         </Button>
                     )}
                     {statusInfo.field === "isActive" && (
@@ -128,7 +128,7 @@ export default function DeleteCuisineModal({ statusInfo, onClose, t }: DeleteMod
                             disabled={isLoading}
                             className={cn(statusInfo.isActive ? "bg-green-600 hover:bg-green-500" : "bg-amber-600 hover:bg-amber-500")}
                         >
-                            {statusInfo.isActive ? t("Activate") : t("Deactivate")}
+                            {statusInfo.isActive ? t("activate") : t("deactivate")}
                         </Button>
                     )}
                 </DialogFooter>

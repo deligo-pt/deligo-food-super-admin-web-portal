@@ -69,6 +69,8 @@ export const pt = {
   delivery_partner_payouts: "Pagamentos aos Parceiros de Entrega",
   delivery_partner_analytics: "Análises dos Parceiros de Entrega",
 
+  create_cuisine: "Criar Culinária",
+  all_cuisines: "Todas as Culinárias",
   business_categories: "Categorias de Negócio",
   add_business_categories: "Adicionar Categorias de Negócio",
   all_business_categories: "Todas as Categorias de Negócio",
@@ -760,6 +762,39 @@ export const pt = {
   category_lg: "Categoria",
   edit_business_category: "Editar categoria de negócio",
   update_business_category: "Atualizar categoria de negócio",
+
+  // cuisine
+  // --> create cuisine
+  create_different_types_cuisine: "Criar diferentes tipos de culinária",
+  cuisine_name: "Nome da culinária",
+  cuisine_image: "Imagem da culinária",
+  //--> All cuisine
+  all_cuisine: "Todas as Culinárias",
+  explore_all_different_type_cuisines: "Explorar todos os diferentes tipos de culinárias",
+  no_cuisine_available_to_show: "Nenhuma culinária disponível para exibir",
+  soft_delete: "Exclusão Lógica",
+  already_soft_deleted: "Já excluído logicamente",
+  permanent_delete: "Excluir Permanentemente",
+  //--> Edit cuisine
+  edit_cuisine_settings: "Editar Configurações da Culinária",
+  modify_properties_for_this_item: "Modifique as propriedades deste item. Clique em salvar para preservar as alterações.",
+  visibility_status: "Status de Visibilidade",
+  active_status: "Status Ativo",
+  inactive_status: "Status Inativo",
+  // --> delete cuisine
+  warings_this_action_cannot_be_undone: "Aviso: Esta ação não pode ser desfeita. Isso irá apagar completamente este registro do banco de dados!",
+  // --> cuisine details
+  back_to_list: "Voltar para a lista",
+  slug: "slug",
+  soft_deleted: "Excluído Logicamente",
+  cuisine_asset_preview: "Visualização do Arquivo da Culinária",
+  no_image_uploaded: "Nenhuma imagem enviada",
+  properties: "Propriedades",
+  url_status_check: "Verificação de Status da URL",
+  valid_asset_path: "Caminho do Arquivo Válido",
+  empty_source_reference: "Referência de Origem Vazia",
+  audit_timelines: "Linhas do Tempo de Auditoria",
+  created_on: "Criado Em",
 
   // add-product-category
   add_product_category: "Adicionar categoria de produto",

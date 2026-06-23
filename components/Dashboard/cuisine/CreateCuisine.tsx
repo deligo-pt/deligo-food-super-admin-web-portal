@@ -97,7 +97,7 @@ const CreateCuisine = () => {
                         delay: 0.2,
                     }}
                 >
-                    Create Cuisine
+                    {t("create_cuisine")}
                 </motion.h1>
                 <motion.p
                     className="text-pink-100 mt-2"
@@ -111,7 +111,7 @@ const CreateCuisine = () => {
                         delay: 0.3,
                     }}
                 >
-                    Create new cuisine based on places
+                    Create different types of cuisine
                 </motion.p>
             </div>
             <Form {...form}>
@@ -137,7 +137,7 @@ const CreateCuisine = () => {
                                     <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                                         <div className="flex items-center">
                                             <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                            <span className="ml-2">Cuisine name</span>
+                                            <span className="ml-2">{t("cuisine_name")}</span>
                                         </div>
                                     </FormLabel>
                                     <FormControl>
@@ -160,7 +160,7 @@ const CreateCuisine = () => {
                                     <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                                         <div className="flex items-center">
                                             <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                            <span className="ml-2">Cuisine Image</span>
+                                            <span className="ml-2">{t("cuisine_image")}</span>
                                         </div>
                                     </FormLabel>
                                     <FormControl>
@@ -191,7 +191,7 @@ const CreateCuisine = () => {
                             ) : (
                                 <>
                                     <PlusCircle className="w-5 h-5 mr-2" />
-                                    Create Cuisine
+                                    {t("create_cuisine")}
                                 </>
                             )}
                         </motion.button>

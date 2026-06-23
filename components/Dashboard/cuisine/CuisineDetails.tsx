@@ -47,7 +47,7 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                     onClick={() => router.back()}
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    {t("Back to list")}
+                    {t("back_to_list")}
                 </Button>
             </div>
 
@@ -61,13 +61,13 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                 <div className="bg-linear-to-r from-[#DC3173] to-[#E95A9E] p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <span className="text-xs font-semibold uppercase tracking-wider bg-white/20 px-2.5 py-1 rounded-full text-white">
-                            ID: {cuisine._id}
+                            {t("id")}: {cuisine._id}
                         </span>
                         <h1 className="text-3xl font-bold mt-2 uppercase tracking-wide">
                             {cuisine.name}
                         </h1>
                         <p className="text-pink-100 mt-1 text-sm font-mono">
-                            slug: {cuisine.slug}
+                            {t("slug")}: {cuisine.slug}
                         </p>
                     </div>
 
@@ -78,13 +78,13 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                             cuisine.isActive ? "bg-green-500 text-white" : "bg-amber-500 text-white"
                         )}>
                             <ToggleLeft className="w-3.5 h-3.5" />
-                            {cuisine.isActive ? t("Active") : t("Inactive")}
+                            {cuisine.isActive ? t("active") : t("inactive")}
                         </span>
 
                         {cuisine.isDeleted && (
                             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-500 text-white flex items-center gap-1.5 shadow-xs">
                                 <Trash2 className="w-3.5 h-3.5" />
-                                {t("Soft Deleted")}
+                                {t("soft_deleted")}
                             </span>
                         )}
                     </div>
@@ -95,7 +95,7 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                     <div className="md:col-span-5 flex flex-col space-y-2">
                         <label className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
                             <ImageIcon className="w-3.5 h-3.5" />
-                            {t("Cuisine Asset Preview")}
+                            {t("cuisine_asset_preview")}
                         </label>
 
                         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-50 border border-gray-200 shadow-inner flex items-center justify-center">
@@ -111,7 +111,7 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                             ) : (
                                 <div className="text-center p-6 text-gray-400">
                                     <ImageIcon className="w-12 h-12 mx-auto stroke-1 mb-2" />
-                                    <p className="text-sm">{t("No image uploaded")}</p>
+                                    <p className="text-sm">{t("no_image_uploaded")}</p>
                                 </div>
                             )}
                         </div>
@@ -122,27 +122,27 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                         <div className="space-y-4">
                             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5 border-b border-gray-100 pb-2">
                                 <FileTextIcon className="w-4 h-4 text-[#DC3173]" />
-                                {t("Properties")}
+                                {t("properties")}
                             </h3>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                    <p className="text-xs text-gray-400 uppercase">{t("Url Status Check")}</p>
+                                    <p className="text-xs text-gray-400 uppercase">{t("url_status_check")}</p>
                                     <p className="text-sm font-semibold text-emerald-600 mt-0.5 truncate max-w-full">
-                                        {cuisine.imageUrl ? t("Valid Asset Path") : t("Empty Source Reference")}
+                                        {cuisine.imageUrl ? t("valid_asset_path") : t("empty_source_reference")}
                                     </p>
                                 </div>
                                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-3">
                                     <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                                         <CheckCircle2 className="w-3.5 h-3.5 text-[#DC3173]" />
-                                        {t("Audit Timelines")}
+                                        {t("audit_timelines")}
                                     </h3>
 
                                     <div className="space-y-2.5 text-sm text-gray-600">
                                         <div className="flex items-center gap-3">
                                             <CalendarIcon className="w-4 h-4 text-gray-400 shrink-0" />
                                             <div>
-                                                <p className="text-xs text-gray-400">{t("Created On")}</p>
+                                                <p className="text-xs text-gray-400">{t("created_on")}</p>
                                                 <p className="font-medium text-gray-700">{formatDate(cuisine.createdAt)}</p>
                                             </div>
                                         </div>
@@ -150,7 +150,7 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                                         <div className="flex items-center gap-3">
                                             <Clock className="w-4 h-4 text-gray-400 shrink-0" />
                                             <div>
-                                                <p className="text-xs text-gray-400">{t("Last Updated")}</p>
+                                                <p className="text-xs text-gray-400">{t("last_updated")}</p>
                                                 <p className="font-medium text-gray-700">{formatDate(cuisine.updatedAt)}</p>
                                             </div>
                                         </div>

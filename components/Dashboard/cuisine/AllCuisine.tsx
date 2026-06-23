@@ -52,8 +52,8 @@ const AllCuisine = ({ cuisineResult }: IProps) => {
     return (
         <>
             <TitleHeader
-                title="All Cuisine"
-                subtitle="Explore all cuisine type based on different places"
+                title={t("all_cuisine")}
+                subtitle={t("explore_all_different_type_cuisines")}
             />
             <AllFilters sortOptions={sortOptions} />
 
@@ -91,7 +91,7 @@ const AllCuisine = ({ cuisineResult }: IProps) => {
                                         className="text-[#DC3173] text-lg text-center"
                                         colSpan={3}
                                     >
-                                        No cuisine available to show
+                                        {t("no_cuisine_available_to_show")}
                                     </TableCell>
                                 </TableRow>
                             )
@@ -142,7 +142,6 @@ const AllCuisine = ({ cuisineResult }: IProps) => {
                                                 {t("view")}
                                             </DropdownMenuItem>
 
-                                            {/* Open separate Edit Modal */}
                                             <DropdownMenuItem onClick={() => setSelectedEditCuisine(cuisine)}>
                                                 {t("edit")}
                                             </DropdownMenuItem>
