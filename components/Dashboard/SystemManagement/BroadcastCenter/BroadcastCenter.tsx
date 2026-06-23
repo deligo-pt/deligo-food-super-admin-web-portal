@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
@@ -91,7 +90,7 @@ export default function BroadcastCenter() {
   const handleSend = async () => {
     if (selectedRoles.length === 0)
       return toast.error("Please select at least one role.");
-    if (commType !== "EMAIL" && !title.trim())
+    if (!title.trim())
       return toast.error("Please enter a title.");
     if (!body.trim()) return toast.error("Please enter a message.");
     if (!notificationCategory)
@@ -106,6 +105,7 @@ export default function BroadcastCenter() {
 
       if (userSet && userSet.size > 0) {
         finalCustomUserIds.push(...Array.from(userSet));
+        finalTargetAudience.push(role);
       } else {
         finalTargetAudience.push(role);
       }
@@ -131,13 +131,14 @@ export default function BroadcastCenter() {
       }
     };
 
-    try {
-      const res = await broadcastNotificationReq(payload);
+    const res = await broadcastNotificationReq(payload);
+    if (res.success) {
       toast.success(res?.message, { id: toastId })
-    } catch (error: any) {
-      toast.error(error?.message || "Notification sent failed", { id: toastId })
-    } finally {
       setIsSubmitting(false);
+    } else {
+      toast.error(res?.message || "Notification sent failed", { id: toastId })
+      setIsSubmitting(false);
+      return;
     }
 
     setTimeout(() => {

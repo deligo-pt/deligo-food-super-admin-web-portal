@@ -77,7 +77,7 @@ export function RevocationMatrix({
             </div>
 
             <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-3 flex gap-2.5 items-start">
-                <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
                 <p className="text-xs text-amber-700 leading-normal">
                     {t("checking_elements_here_queues_them")}
                 </p>

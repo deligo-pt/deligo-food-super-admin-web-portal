@@ -171,6 +171,21 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       ],
     },
     {
+      id: 'cuisine',
+      title: "Cuisine",
+      icon: <Grid size={18} />,
+      items: [
+        {
+          name: t("create_cuisine"),
+          path: '/admin/cuisine/create'
+        },
+        {
+          name: t("all_cuisines"),
+          path: '/admin/cuisine/all'
+        },
+      ]
+    },
+    {
       id: "product-categories",
       title: t("product_categories"),
       icon: <SquareChartGantt size={18} />,
