@@ -28,4 +28,6 @@ export const updateCuisineValidation = z.object({
             url: z.string(),
         })
         .optional(),
+
+    isActive: z.boolean().optional()
 });

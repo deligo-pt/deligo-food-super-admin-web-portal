@@ -16,6 +16,7 @@ import { cuisineValidation } from "@/validations/category/cuisine.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { FileTextIcon, LoaderIcon, PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ type FormData = z.infer<typeof cuisineValidation>;
 
 const CreateCuisine = () => {
     const { t } = useTranslation();
+    const router = useRouter();
     const form = useForm<FormData>({
         resolver: zodResolver(cuisineValidation),
         defaultValues: {
@@ -52,7 +54,6 @@ const CreateCuisine = () => {
         };
 
         const result = await createCuisine(cuisineData, data.image?.file);
-        console.log("cuisine result", result);
 
         if (result?.success) {
             toast.success(result.message || "Cuisine created successfully!", {
@@ -60,6 +61,7 @@ const CreateCuisine = () => {
             });
             form.reset();
             setIsSubmitting(false);
+            router.push('/admin/cuisine/all')
             return;
         }
 
