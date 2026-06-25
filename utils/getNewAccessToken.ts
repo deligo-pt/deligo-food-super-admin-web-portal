@@ -42,13 +42,11 @@ export const getNewAccessToken = async () => {
     }
 
     const result = await response.json();
+    console.log("new acc token", result?.accessToken);
 
     cookieStore.set({
       name: "accessToken",
       value: result.accessToken,
-      maxAge: 60 * 60 * 24 * 7,
-      httpOnly: true,
-      path: "/",
     });
 
     return {
