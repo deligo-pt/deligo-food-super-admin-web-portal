@@ -4,6 +4,7 @@
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
 import UploadVendorDocuments from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -24,7 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { USER_ROLE } from "@/consts/user.const";
-import { restaurantCuisineOptions } from "@/consts/vendor.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
@@ -36,6 +36,7 @@ import {
 import { getSingleVendorReq } from "@/services/dashboard/vendor/vendor.service";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
+import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
@@ -46,11 +47,13 @@ import { jwtDecode } from "jwt-decode";
 import {
   BadgeCheck,
   Banknote,
+  Briefcase,
   CheckCircle,
   Eye,
   EyeOff,
   FileText,
   Mail,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -87,8 +90,10 @@ const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
 
 export default function AddVendor({
   businessCategories,
+  cuisines,
 }: {
   businessCategories: TBusinessCategory[];
+  cuisines: TCuisine[]
 }) {
   const { t } = useTranslation();
   const [emailVerified, setEmailVerified] = useState(false);
@@ -117,7 +122,7 @@ export default function AddVendor({
       phoneNumber: "",
       businessName: "",
       businessType: "",
-      restaurantCuisineType: "",
+      restaurantCuisineType: [],
       businessLicenseNumber: "",
       NIF: "",
       branches: "",
@@ -182,6 +187,7 @@ export default function AddVendor({
         id: toastId,
       });
       setOtpSent(true);
+      setButtonDisabled(0);
       return;
     }
 
@@ -231,16 +237,17 @@ export default function AddVendor({
         // 1. Decode the JWT to get the userId
         const decoded = jwtDecode(result.data.accessToken) as { userId: string };
         const currentUserId = decoded.userId;
-
+        console.log("currentuserId", currentUserId);
         setEmailVerified(true);
 
         // 2. Fetch the single vendor details using the userId
         try {
           const vendorResult = await getSingleVendorReq(currentUserId);
-          if (vendorResult && vendorResult.success) {
-            setVendorDetails(vendorResult.data); // Store vendor details in state
+          console.log("vendorResult", vendorResult);
+          if (vendorResult) {
+            setVendorDetails(vendorResult); // Store vendor details in state
           } else {
-            console.error("Failed to fetch vendor details:", vendorResult?.message);
+            console.error("Failed to fetch vendor details:", vendorResult?.userId);
           }
         } catch (vendorError) {
           // Log background error but don't break the successful OTP verification flow
@@ -626,52 +633,6 @@ export default function AddVendor({
                           )}
                         />
 
-                        {/* if business type is restaurant */}
-                        {businessType === "RESTAURANT" && (
-                          <FormField
-                            control={form.control}
-                            name="restaurantCuisineType"
-                            render={({ field, fieldState }) => (
-                              <FormItem>
-                                <FormLabel>Restaurant Cuisine Type</FormLabel>
-                                <FormControl>
-                                  <Select
-                                    value={field.value}
-                                    onValueChange={field.onChange}
-                                  >
-                                    <SelectTrigger
-                                      className={cn(
-                                        "px-3 h-8 w-full bg-white/90 text-gray-700 shadow-sm focus-visible:ring-2 focus-visible:ring-[#DC3173]/70 hover:shadow-md transition-all cursor-pointer  ",
-                                        fieldState.invalid
-                                          ? "border-destructive focus-visible:ring-destructive/20"
-                                          : "border-gray-300",
-                                      )}
-                                      style={{
-                                        height: "2.4rem",
-                                      }}
-                                    >
-                                      <SelectValue placeholder="Select Restaurant Cuisine" />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                      {restaurantCuisineOptions.map((type, idx) => (
-                                        <SelectItem
-                                          key={idx}
-                                          value={type.label}
-                                          className="capitalize"
-                                        >
-                                          {type.label}
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        )}
-
                         <FormField
                           control={form.control}
                           name="businessLicenseNumber"
@@ -707,6 +668,106 @@ export default function AddVendor({
                             </FormItem>
                           )}
                         />
+
+
+                        {/* if business type is restaurant */}
+                        {businessType === "RESTAURANT" && (
+                          <FormField
+                            control={form.control}
+                            name="restaurantCuisineType"
+                            render={({ field, fieldState }) => {
+                              const selectedCuisines = Array.isArray(field.value) ? field.value : [];
+
+                              // remove cuisine
+                              const handleRemoveCuisine = (cuisineToRemove: string) => {
+                                const updatedCuisines = selectedCuisines.filter(
+                                  (item) => item !== cuisineToRemove
+                                );
+                                field.onChange(updatedCuisines);
+                              };
+
+                              // add cuisine
+                              const handleSelectCuisine = (cuisineToAdd: string) => {
+                                if (!selectedCuisines.includes(cuisineToAdd)) {
+                                  field.onChange([...selectedCuisines, cuisineToAdd]);
+                                }
+                              };
+
+                              return (
+                                <FormItem className="col-span-2">
+                                  <FormLabel className="mb-2 block text-sm font-medium text-gray-700">
+                                    {t("restaurantCuisineType")} <span className="text-red-500">*</span>
+                                  </FormLabel>
+
+                                  {/* 4. Display Selected Badges ABOVE the Select Dropdown */}
+                                  {selectedCuisines.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mb-3 p-2 border border-dashed rounded-lg bg-gray-50/50">
+                                      {selectedCuisines.map((cuisine) => (
+                                        <Badge
+                                          key={cuisine}
+                                          variant="secondary"
+                                          className="flex items-center gap-1 bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 transition-all capitalize px-3 py-1 text-sm font-medium"
+                                        >
+                                          {cuisine}
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveCuisine(cuisine)}
+                                            className="rounded-full outline-none hover:bg-[#DC3173]/20 p-0.5"
+                                          >
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+
+                                  <div className="relative">
+                                    <Briefcase className="absolute left-3 top-3.5 text-[#DC3173]/80" />
+                                    <FormControl>
+                                      <Select
+                                        value=""
+                                        onValueChange={handleSelectCuisine}
+                                      >
+                                        <SelectTrigger
+                                          className={cn(
+                                            "pl-11 pr-4 h-12 w-full bg-white/90 text-gray-700 shadow-sm focus-visible:ring-2 focus-visible:ring-[#DC3173]/70 hover:shadow-md transition-all cursor-pointer",
+                                            fieldState.invalid ? "border-destructive focus-visible:ring-destructive/20" : "border-gray-300"
+                                          )}
+                                          style={{ height: "3rem" }}
+                                        >
+                                          <SelectValue placeholder="Select Multiple Cuisine" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                          {cuisines?.length < 1 ? (
+                                            <div className="p-2 text-sm text-gray-500">
+                                              {t("no_items_found")}
+                                            </div>
+                                          ) : (
+                                            cuisines?.map((type, idx) => {
+                                              const isAlreadySelected = selectedCuisines.includes(type?.name);
+                                              return (
+                                                <SelectItem
+                                                  key={idx}
+                                                  value={type?.name}
+                                                  className="capitalize"
+                                                  disabled={isAlreadySelected}
+                                                >
+                                                  {type?.name} {isAlreadySelected && "✓"}
+                                                </SelectItem>
+                                              );
+                                            })
+                                          )}
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                  </div>
+                                  <FormMessage />
+                                </FormItem>
+                              );
+                            }}
+                          />
+                        )}
 
                         <FormField
                           control={form.control}

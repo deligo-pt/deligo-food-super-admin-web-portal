@@ -274,12 +274,22 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessType || "N/A"}
                 </p>
               </div>
-              {vendor?.businessDetails?.businessType === "RESTAURANT" && <div>
-                <p className="text-sm text-gray-500">Restaurant Cuisine Type</p>
-                <p className="font-medium">
-                  {vendor?.businessDetails?.restaurantCuisineType || "N/A"}
-                </p>
-              </div>}
+              {vendor?.businessDetails?.businessType === "RESTAURANT" && (
+                <div>
+                  <p className="text-sm text-gray-500">Restaurant Cuisine Type</p>
+                  <p className="font-medium">
+                    {(() => {
+                      const cuisineData = vendor?.businessDetails?.restaurantCuisineType;
+
+                      if (!cuisineData || (Array.isArray(cuisineData) && cuisineData.length === 0)) {
+                        return "N/A";
+                      }
+
+                      return Array.isArray(cuisineData) ? cuisineData.join(", ") : cuisineData;
+                    })()}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-500">Total Branches</p>
                 <p className="font-medium">
