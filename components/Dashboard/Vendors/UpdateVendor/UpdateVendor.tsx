@@ -136,13 +136,27 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
   });
 
   useEffect(() => {
+    // for before only string type is catching for converting to array of string and for valid types
+    const rawCuisineData = vendorState?.businessDetails?.restaurantCuisineType;
+    let normalizedCuisines: string[] = [];
+
+    if (rawCuisineData) {
+      normalizedCuisines = Array.isArray(rawCuisineData) ? rawCuisineData : [rawCuisineData];
+    }
+
+    const validCuisineNames = cuisines?.map((c) => c?.name) || [];
+
+    const sanitizedCuisines = normalizedCuisines.filter((cuisineName) =>
+      validCuisineNames.includes(cuisineName)
+    );
+
     form.reset({
       firstName: vendorState.name?.firstName || "",
       lastName: vendorState.name?.lastName || "",
       phoneNumber: vendorState?.contactNumber || "",
       businessName: vendorState.businessDetails?.businessName || "",
       businessType: vendorState?.businessDetails?.businessType || "",
-      restaurantCuisineType: vendorState?.businessDetails?.restaurantCuisineType || [],
+      restaurantCuisineType: sanitizedCuisines,
       businessLicenseNumber:
         vendorState?.businessDetails?.businessLicenseNumber || "",
       NIF: vendorState?.businessDetails?.NIF || "",
@@ -163,7 +177,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       iban: vendorState?.bankDetails?.iban || "",
       swiftCode: vendorState?.bankDetails?.swiftCode || "",
     });
-  }, [vendorState, form]);
+  }, [vendorState, form, cuisines]);
 
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Updating vendor data...");
@@ -202,7 +216,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
         swiftCode: data.swiftCode,
       },
     } as Partial<TVendor>;
-
+    console.log("vendor data", vendorData);
     const updatedResult = await updateUserDataReq(
       `/vendors/${vendor.userId}`,
       vendorData,
