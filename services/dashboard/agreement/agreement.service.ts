@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { serverFetch } from "@/lib/fetchHelper";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 
 export const getAllVendorAgreements = async (queryString?: string) => {
@@ -24,6 +25,9 @@ export const getAllVendorAgreements = async (queryString?: string) => {
 
         return result || { success: false, data: [] };
     } catch (error: any) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
         console.error("Error inside getAllVendorAgreements execution context:", error);
         return {
             success: false,
@@ -52,6 +56,9 @@ export const getSingleAgreement = async (agreementId: string) => {
 
         return result?.data;
     } catch (error) {
+        if (isRedirectError(error)) {
+            throw error;
+        }
         console.error("Get Single Agreement Error:", error);
         throw error;
     }

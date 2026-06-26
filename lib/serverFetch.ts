@@ -62,10 +62,29 @@ const serverRequestHelper = async (
     const err = error as AxiosError;
 
     if (err.response?.status === 401) {
-      console.log("Unauthorized! Redirecting to login...");
 
-      redirect('/?clearSession=true');
+      const refreshed =
+        await getNewAccessToken();
+
+      if (!refreshed?.accessToken) {
+        redirect("/?clearSession=true");
+      }
+
+      const retryResponse =
+        await axiosInstance({
+          url,
+          ...options,
+          headers: await createHeaders(options),
+        });
+
+      return retryResponse.data;
     }
+
+    // if (err.response?.status === 401) {
+    //   console.log("Unauthorized! Redirecting to login...");
+
+    //   redirect('/?clearSession=true');
+    // }
 
 
     throw error;

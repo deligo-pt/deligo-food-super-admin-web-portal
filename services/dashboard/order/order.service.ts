@@ -5,6 +5,7 @@ import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TOrder } from "@/types/order.type";
 import { catchAsync } from "@/utils/catchAsync";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export const getAllOrdersReq = async (
   queries: Record<string, string | undefined>,
@@ -69,6 +70,9 @@ export const getAllOrders = async () => {
 
     return result;
   } catch (error: any) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.log(error);
     return {
       success: false,

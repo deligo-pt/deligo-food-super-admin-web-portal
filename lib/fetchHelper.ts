@@ -1,29 +1,27 @@
 import { cookies } from "next/headers";
-import { getNewAccessToken } from "@/utils/getNewAccessToken";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { getNewAccessToken } from "@/utils/getNewAccessToken";
 
 const backendUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "http://localhost:5000/api/v1";
 
-// CREATE HEADERS
 async function createHeaders(
   headers?: HeadersInit
 ) {
-
   const cookieStore = await cookies();
 
-  const cookieStr = cookieStore.toString();
+  const accessToken = cookieStore.get("accessToken")?.value || "";
 
-  const accessToken =
-    cookieStore.get("accessToken")?.value || "";
+  const cookieStr = cookieStore.toString();
 
   return {
     ...headers,
 
-    Authorization: accessToken
-      ? `Bearer ${accessToken}`
-      : "",
+    ...(accessToken && {
+      Authorization: `Bearer ${accessToken}`,
+    }),
 
     ...(cookieStr && {
       cookie: cookieStr,
@@ -31,32 +29,60 @@ async function createHeaders(
   };
 }
 
-// MAIN FETCH HELPER
 async function serverFetchHelper(
   endPoint: string,
   options: RequestInit = {},
 ): Promise<Response> {
-  const { headers, ...rest } = options;
+  try {
+    const { headers, ...rest } = options;
 
-  // FIRST REQUEST
-  const response = await fetch(
-    `${backendUrl}${endPoint}`,
-    {
-      credentials: "include",
-      headers: await createHeaders(headers),
-      ...rest
+    const response = await fetch(
+      `${backendUrl}${endPoint}`,
+      {
+        ...rest,
+        credentials: "include",
+        headers: await createHeaders(headers),
+      }
+    );
+
+    if (response.status !== 401) {
+      return response;
     }
-  );
 
+    // refresh token
+    const refreshed = await getNewAccessToken();
 
-  if (response.status === 401) {
-    console.log("Unauthorized! Redirecting to login...");
-    redirect("/?clearSession=true");
+    if (!refreshed?.accessToken) {
+      redirect("/?clearSession=true");
+    }
+
+    const retryResponse = await fetch(
+      `${backendUrl}${endPoint}`,
+      {
+        ...rest,
+        credentials: "include",
+        headers: await createHeaders(headers),
+      }
+    );
+
+    if (retryResponse.status === 401) {
+      redirect("/?clearSession=true");
+    }
+
+    return retryResponse;
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    console.error(
+      "Server Fetch Helper Error:",
+      error
+    );
+
+    throw error;
   }
-
-  return response;
 }
-
 
 export const serverFetch = {
   get: (endPoint: string, options: RequestInit = {}) =>

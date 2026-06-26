@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { serverFetch } from "@/lib/fetchHelper";
 import { queryStringFormatter } from "@/utils/formatter";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export const getSalesReportAnalytics = async (queryString?: string) => {
   try {
@@ -22,6 +23,9 @@ export const getSalesReportAnalytics = async (queryString?: string) => {
 
     return result?.data || {};
   } catch (error: any) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.log(error);
     return {
       success: false,
@@ -50,6 +54,9 @@ export const getOrderReportAnalytics = async (queryString?: string) => {
 
     return result?.data || {};
   } catch (error: any) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.log(error);
     return {
       success: false,
@@ -82,6 +89,9 @@ export const getCustomerReportAnalytics = async (
 
     return result?.data || {};
   } catch (error: any) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.log(error);
     return {
       success: false,
@@ -112,6 +122,9 @@ export const getVendorReportAnalytics = async (
 
     return result?.data || {};
   } catch (error: any) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.log(error);
     return {
       success: false,
@@ -144,6 +157,9 @@ export const getFleetManagerReportAnalytics = async (
 
     return result?.data || {};
   } catch (error: any) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.log(error);
     return {
       success: false,
@@ -176,6 +192,9 @@ export const getDeliverPartnerReportAnalytics = async (
 
     return result?.data || {};
   } catch (error: any) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     console.log(error);
     return {
       success: false,
