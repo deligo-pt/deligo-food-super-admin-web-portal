@@ -3,7 +3,6 @@ import axios, {
   AxiosRequestConfig,
 } from "axios";
 import { cookies } from "next/headers";
-import { getNewAccessToken } from "@/utils/getNewAccessToken";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
@@ -62,29 +61,10 @@ const serverRequestHelper = async (
     const err = error as AxiosError;
 
     if (err.response?.status === 401) {
+      console.log("Unauthorized! Redirecting to login...");
 
-      const refreshed =
-        await getNewAccessToken();
-
-      if (!refreshed?.accessToken) {
-        redirect("/?clearSession=true");
-      }
-
-      const retryResponse =
-        await axiosInstance({
-          url,
-          ...options,
-          headers: await createHeaders(options),
-        });
-
-      return retryResponse.data;
+      redirect('/?clearSession=true');
     }
-
-    // if (err.response?.status === 401) {
-    //   console.log("Unauthorized! Redirecting to login...");
-
-    //   redirect('/?clearSession=true');
-    // }
 
 
     throw error;
