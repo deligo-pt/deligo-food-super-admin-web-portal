@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { getNewAccessToken } from "@/utils/getNewAccessToken";
 
 const backendUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -45,31 +44,12 @@ async function serverFetchHelper(
       }
     );
 
-    if (response.status !== 401) {
-      return response;
-    }
-
-    // refresh token
-    const refreshed = await getNewAccessToken();
-
-    if (!refreshed?.accessToken) {
+    if (response.status === 401) {
+      console.log("Unauthorized! Redirecting to login...");
       redirect("/?clearSession=true");
     }
 
-    const retryResponse = await fetch(
-      `${backendUrl}${endPoint}`,
-      {
-        ...rest,
-        credentials: "include",
-        headers: await createHeaders(headers),
-      }
-    );
-
-    if (retryResponse.status === 401) {
-      redirect("/?clearSession=true");
-    }
-
-    return retryResponse;
+    return response;
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;

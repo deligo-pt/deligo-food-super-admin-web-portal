@@ -1,5 +1,5 @@
 import { TJwtPayload } from "@/types";
-import { jwtVerify } from "jose";
+import { errors, jwtVerify } from "jose";
 
 export async function verifyJWT(token: string, isRefreshToken = false) {
   try {
@@ -18,10 +18,21 @@ export async function verifyJWT(token: string, isRefreshToken = false) {
     return { success: true, data: payload as TJwtPayload };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    if (err.name === "TokenExpiredError") {
-      return { success: false, data: null, reason: "jwt expired" };
+    if (err instanceof errors.JWTExpired) {
+      return {
+        success: false,
+        data: null,
+        reason: "jwt expired",
+      };
     }
 
-    return { success: false, data: null, reason: err.message };
+    return {
+      success: false,
+      data: null,
+      reason:
+        err instanceof Error
+          ? err.message
+          : "Invalid token",
+    };
   }
 }

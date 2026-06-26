@@ -30,9 +30,8 @@ export const getNewAccessToken = async () => {
       `${backendUrl}/auth/refresh-token`,
       {
         method: "POST",
-        credentials: "include",
         headers: {
-          cookie: cookieStore.toString(),
+          cookie: `refreshToken=${refreshToken}`,
         },
       }
     );
@@ -42,15 +41,9 @@ export const getNewAccessToken = async () => {
     }
 
     const result = await response.json();
-    console.log("new acc token", result?.accessToken);
-
-    cookieStore.set({
-      name: "accessToken",
-      value: result.accessToken,
-    });
 
     return {
-      accessToken: result.accessToken,
+      accessToken: result?.data?.accessToken,
     };
   } catch {
     return null;
