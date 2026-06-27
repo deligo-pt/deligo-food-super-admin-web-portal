@@ -54,6 +54,7 @@ export const getAllProductCategoriesReq = async (
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
   const status = queries.status || "";
+  const lang = queries.lang || "en";
 
   const params = {
     limit,
@@ -67,14 +68,17 @@ export const getAllProductCategoriesReq = async (
     async () => {
       return await serverRequest.get("/categories/productCategory", {
         params,
+        headers: {
+          "Accept-Language": lang
+        }
       });
     },
   );
 
   if (result?.success)
     return {
-      data: result.data.data,
-      meta: result.data.meta,
+      data: result.data,
+      meta: result.meta,
     };
 
   return {

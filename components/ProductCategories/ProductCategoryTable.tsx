@@ -32,6 +32,7 @@ import {
   deleteProductCategoryReq,
   updateProductCategoryReq,
 } from "@/services/dashboard/category/product-category.service";
+import { useStore } from "@/store/store";
 import { TMeta } from "@/types";
 import { TProductCategory } from "@/types/category.type";
 import { getSortOptions } from "@/utils/sortOptions";
@@ -57,6 +58,7 @@ interface IProps {
 
 export default function CategoryTable({ categoriesResult }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState<{
@@ -161,95 +163,99 @@ export default function CategoryTable({ categoriesResult }: IProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categoriesResult?.data?.map((category) => (
-              <TableRow key={category._id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    {category.icon && (
-                      <div>
-                        <Image
-                          className="w-8 h-8 rounded-full object-cover"
-                          src={category.icon}
-                          alt={category.name}
-                          width={32}
-                          height={32}
-                        />
-                      </div>
+            {categoriesResult?.data?.map((category) => {
+              const name = category.name[lang];
+
+              return (
+                <TableRow key={category._id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {category.icon && (
+                        <div>
+                          <Image
+                            className="w-8 h-8 rounded-full object-cover"
+                            src={category.icon}
+                            alt={name as string}
+                            width={32}
+                            height={32}
+                          />
+                        </div>
+                      )}
+                      <p>{name}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>{(category?.description && category?.description?.length > 70) ? category?.description.slice(0, 70) + "...." : category?.description}</TableCell>
+                  <TableCell
+                    className={cn(
+                      category.isDeleted
+                        ? "text-red-500"
+                        : category.isActive
+                          ? "text-green-500"
+                          : "text-yellow-500",
                     )}
-                    <p>{category.name}</p>
-                  </div>
-                </TableCell>
-                <TableCell>{(category?.description && category?.description?.length > 70) ? category?.description.slice(0, 70) + "...." : category?.description}</TableCell>
-                <TableCell
-                  className={cn(
-                    category.isDeleted
-                      ? "text-red-500"
+                  >
+                    {category.isDeleted
+                      ? t("deleted")
                       : category.isActive
-                        ? "text-green-500"
-                        : "text-yellow-500",
-                  )}
-                >
-                  {category.isDeleted
-                    ? t("deleted")
-                    : category.isActive
-                      ? t("active")
-                      : t("inactive")}
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <MoreVertical className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        className=""
-                        onClick={() =>
-                          router.push(
-                            "/admin/product-categories/" + category._id,
-                          )
-                        }
-                      >
-                        {t("view")}
-                      </DropdownMenuItem>
-                      {category.isDeleted ? (
-                        <DropdownMenuItem className="text-red-500">
-                          {t("deleted")}
+                        ? t("active")
+                        : t("inactive")}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <MoreVertical className="h-4 w-4" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          className=""
+                          onClick={() =>
+                            router.push(
+                              "/admin/product-categories/" + category._id,
+                            )
+                          }
+                        >
+                          {t("view")}
                         </DropdownMenuItem>
-                      ) : (
-                        <>
-                          {!category.isDeleted && (
+                        {category.isDeleted ? (
+                          <DropdownMenuItem className="text-red-500">
+                            {t("deleted")}
+                          </DropdownMenuItem>
+                        ) : (
+                          <>
+                            {!category.isDeleted && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  setStatusInfo({
+                                    categoryId: category._id as string,
+                                    isDeleted: true,
+                                    field: "isDeleted",
+                                  })
+                                }
+                              >
+                                {t("delete")}
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               onClick={() =>
                                 setStatusInfo({
                                   categoryId: category._id as string,
-                                  isDeleted: true,
-                                  field: "isDeleted",
+                                  isActive: !category.isActive,
+                                  field: "isActive",
                                 })
                               }
                             >
-                              {t("delete")}
+                              {category.isActive
+                                ? t("deactivate")
+                                : t("activate")}
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            onClick={() =>
-                              setStatusInfo({
-                                categoryId: category._id as string,
-                                isActive: !category.isActive,
-                                field: "isActive",
-                              })
-                            }
-                          >
-                            {category.isActive
-                              ? t("deactivate")
-                              : t("activate")}
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
             {categoriesResult?.meta?.total === 0 && (
               <TableRow>
                 <TableCell
