@@ -9,7 +9,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { addBusinessCategoryReq } from "@/services/dashboard/category/business-category.service";
@@ -21,6 +20,7 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 type FormData = z.infer<typeof businessCategoryValidation>;
 
@@ -140,13 +140,20 @@ export function AddBusinessCategoryForm() {
                       <span className="ml-2">{t("category_name")}</span>
                     </div>
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={t("eg_restaurant")}
-                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
-                    />
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full p-3 h-auto border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300 bg-white">
+                        <SelectValue placeholder={t("eg_restaurant")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="STORE">STORE</SelectItem>
+                      <SelectItem value="RESTAURANT">RESTAURANT</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
