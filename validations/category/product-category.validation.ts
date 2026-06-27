@@ -45,9 +45,10 @@ export const productCategoryValidation = z.object({
 
 export const updateProductCategoryValidation = z.object({
   name: z
-    .string()
-    .min(2, "Category name must be at least 2 characters long")
-    .max(50, "Category name must be at most 50 characters long")
+    .object({
+      en: z.string().trim().max(50).optional(),
+      pt: z.string().trim().max(50).optional(),
+    })
     .optional(),
 
   description: z.string().optional(),

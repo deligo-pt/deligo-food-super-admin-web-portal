@@ -4,10 +4,10 @@ import { getSingleProductCategoryReq } from "@/services/dashboard/category/produ
 export default async function ProductCategoryDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<Record<string, string | undefined>>;
 }) {
-  const { id } = await params;
-  const category = await getSingleProductCategoryReq(id);
+  const { id, lang } = await params;
+  const category = await getSingleProductCategoryReq(id as string, lang as "en" | "pt");
 
   return (
     <div>

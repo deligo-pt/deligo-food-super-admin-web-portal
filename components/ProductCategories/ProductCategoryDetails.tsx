@@ -17,6 +17,7 @@ import {
   deleteProductCategoryReq,
   updateProductCategoryReq,
 } from "@/services/dashboard/category/product-category.service";
+import { useStore } from "@/store/store";
 import { TProductCategory } from "@/types/category.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -43,9 +44,12 @@ export default function ProductCategoryDetails({
   category: TProductCategory;
 }) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const [showEditModal, setShowEditModal] = useState(false);
   const [updateField, setUpdateField] = useState("");
   const router = useRouter();
+
+  const categoryName = category.name[lang];
 
   const onEditModalClose = () => {
     setShowEditModal(false);
@@ -221,7 +225,7 @@ export default function ProductCategoryDetails({
           >
             <Image
               src={category.icon}
-              alt={category.name}
+              alt={categoryName as string}
               className="w-full h-full object-cover"
               width={500}
               height={500}
@@ -237,7 +241,7 @@ export default function ProductCategoryDetails({
         </div>
         <div className="p-6">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-1">{category.name}</h2>
+            <h2 className="text-2xl font-bold mb-1">{categoryName}</h2>
             <div className="flex items-center text-gray-500 mb-4">
               <TagIcon size={16} className="mr-2" />
               <span>{category.slug}</span>
@@ -282,7 +286,7 @@ export default function ProductCategoryDetails({
       >
         <Dialog open={!!updateField} onOpenChange={() => setUpdateField("")}>
           <form>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-106.25">
               <DialogHeader>
                 <DialogTitle>
                   {updateField === "isDeleted"

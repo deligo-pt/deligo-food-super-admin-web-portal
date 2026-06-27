@@ -28,9 +28,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { updateProductCategoryReq } from "@/services/dashboard/category/product-category.service";
+import { useStore } from "@/store/store";
 import { TResponse } from "@/types";
 import { TBusinessCategory, TProductCategory } from "@/types/category.type";
 import { fetchData } from "@/utils/requests";
+import { translateObject } from "@/utils/translation/translationObject";
 import { updateProductCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -55,14 +57,19 @@ export default function EditProductCategoryModal({
   category,
 }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
   const [businessCategories, setBusinessCategories] = useState<
     TBusinessCategory[]
   >([]);
+
   const form = useForm<FormData>({
     resolver: zodResolver(updateProductCategoryValidation),
     defaultValues: {
-      name: category?.name || "",
+      name: {
+        en: category.name.en,
+        pt: category.name.pt,
+      },
       description: category?.description || "",
       image: { file: null, url: category?.icon || "" },
       businessCategoryId: category?.businessCategoryId || "",
@@ -81,8 +88,12 @@ export default function EditProductCategoryModal({
   const onSubmit = async (data: FormData) => {
     const toastId = toast.loading("Updating category...");
 
+    const { image, ...rest } = data;
+
+    const translated = await translateObject(rest, lang);
+
     const categoryData = {
-      name: data.name,
+      name: translated?.name ? translated?.name : data?.name,
       description: data.description,
     };
 
@@ -112,9 +123,9 @@ export default function EditProductCategoryModal({
     try {
       const result = (await fetchData(
         "/categories/businessCategory",
-      )) as unknown as TResponse<{ data: TBusinessCategory[] }>;
+      )) as unknown as TResponse<TBusinessCategory[]>;
       if (result?.success) {
-        setBusinessCategories(result?.data?.data);
+        setBusinessCategories(result?.data);
       }
     } catch (error) {
       console.log(error);
@@ -161,17 +172,15 @@ export default function EditProductCategoryModal({
                     className="space-y-6"
                   >
                     <div className="space-y-4">
-                      <FormField
+                      {lang === 'en' && <FormField
                         control={form.control}
-                        name="name"
+                        name="name.en"
                         render={({ field }) => (
                           <FormItem className="content-start">
                             <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                               <div className="flex items-center">
                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">
-                                  {t("category_name")}
-                                </span>
+                                <span className="ml-2">{t("category_name_english")}</span>
                               </div>
                             </FormLabel>
                             <FormControl>
@@ -184,7 +193,30 @@ export default function EditProductCategoryModal({
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
+
+                      {lang === 'pt' && <FormField
+                        control={form.control}
+                        name="name.pt"
+                        render={({ field }) => (
+                          <FormItem className="content-start">
+                            <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
+                              <div className="flex items-center">
+                                <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
+                                <span className="ml-2">{t("category_name_portugues")}</span>
+                              </div>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder={t("eg_pizza")}
+                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />}
 
                       <FormField
                         control={form.control}
@@ -254,7 +286,7 @@ export default function EditProductCategoryModal({
                                   />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {businessCategories.map(
+                                  {businessCategories?.map(
                                     (businessCategory) => (
                                       <SelectItem
                                         key={businessCategory._id}

@@ -86,9 +86,13 @@ export const getAllProductCategoriesReq = async (
   };
 };
 
-export const getSingleProductCategoryReq = async (id: string) => {
+export const getSingleProductCategoryReq = async (id: string, lang: "en" | "pt" = "en") => {
   const result = await catchAsync<TProductCategory>(async () => {
-    return await serverRequest.get(`/categories/productCategory/${id}`);
+    return await serverRequest.get(`/categories/productCategory/${id}`, {
+      headers: {
+        "Accept-Language": lang
+      }
+    });
   });
 
   if (result?.success) return result.data;
