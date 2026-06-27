@@ -13,7 +13,10 @@ export type TBusinessCategory = {
 
 export type TProductCategory = {
   _id: string;
-  name: string;
+  name: {
+    en?: string;
+    pt?: string;
+  };
   slug: string;
   description?: string;
   image?: string;

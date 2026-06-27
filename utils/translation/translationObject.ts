@@ -18,10 +18,7 @@ export async function translateObject<T>(
     const targetLang =
         targetLanguage.toUpperCase();
 
-    const {
-        texts,
-        paths,
-    } = extractFields(
+    const { texts, paths } = extractFields(
         object,
         sourceLanguage
     );
