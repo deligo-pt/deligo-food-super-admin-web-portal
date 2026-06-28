@@ -64,9 +64,13 @@ export const getAllCuisine = async (queryString?: string) => {
 };
 
 // Get Single Cuisine by ID
-export const getSingleCuisine = async (id: string) => {
+export const getSingleCuisine = async (id: string, lang: "en" | "pt") => {
     return catchAsync(async () => {
-        const res = await serverFetch.get(`/categories/cuisine/${id}`);
+        const res = await serverFetch.get(`/categories/cuisine/${id}`, {
+            headers: {
+                "Accept-Language": lang
+            }
+        });
         return await res.json();
     });
 };

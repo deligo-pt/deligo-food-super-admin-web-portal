@@ -1,12 +1,15 @@
 import ProductCategoryDetails from "@/components/ProductCategories/ProductCategoryDetails";
 import { getSingleProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 
-export default async function ProductCategoryDetailsPage({
-  params,
-}: {
-  params: Promise<Record<string, string | undefined>>;
-}) {
-  const { id, lang } = await params;
+interface IProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ lang?: string }>;
+}
+
+export default async function ProductCategoryDetailsPage({ params, searchParams }: IProps) {
+  const { id } = await params;
+  const { lang } = await searchParams;
+
   const category = await getSingleProductCategoryReq(id as string, lang as "en" | "pt");
 
   return (
