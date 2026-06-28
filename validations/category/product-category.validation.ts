@@ -18,18 +18,7 @@ export const productCategoryValidation = z.object({
     "Image is required",
   ),
   currentLang: z.enum(["en", "pt"]),
-})// Refinement logic to conditionally require the current language field
-  .refine(
-    (data) => {
-      const currentLanguage = data.currentLang;
-      const targetNameValue = data.name[currentLanguage];
-      return !!targetNameValue && targetNameValue.trim().length > 0;
-    },
-    {
-      message: "Category name is required for the active language",
-      path: ["name"], // Points directly to the name object container in your form
-    }
-  )
+})
   .superRefine((data, ctx) => {
     const currentLanguage = data.currentLang;
     const targetNameValue = data.name[currentLanguage];
@@ -38,7 +27,7 @@ export const productCategoryValidation = z.object({
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Category name is required",
-        path: ["name", currentLanguage], // Highlights the exact active field in your UI form
+        path: ["name", currentLanguage],
       });
     }
   });

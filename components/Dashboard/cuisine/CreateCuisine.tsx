@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/use-translation";
 import { createCuisine } from "@/services/dashboard/category/cuisine.service";
+import { useStore } from "@/store/store";
+import { translateObject } from "@/utils/translation/translationObject";
 import { cuisineValidation } from "@/validations/category/cuisine.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -26,12 +28,17 @@ type FormData = z.infer<typeof cuisineValidation>;
 
 const CreateCuisine = () => {
     const { t } = useTranslation();
+    const { lang } = useStore();
     const router = useRouter();
     const form = useForm<FormData>({
         resolver: zodResolver(cuisineValidation),
         defaultValues: {
-            name: "",
+            name: {
+                en: "",
+                pt: ""
+            },
             image: { file: null, url: "" },
+            currentLang: lang
         },
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,15 +53,23 @@ const CreateCuisine = () => {
     };
 
     const onSubmit = async (data: FormData) => {
+        console.log("hit")
         const toastId = toast.loading("Adding cuisine...");
         setIsSubmitting(true);
 
+        const { image, ...rest } = data;
+
+        const translated = await translateObject(rest, lang);
+
         const cuisineData = {
-            name: data.name,
+            name: {
+                en: translated.name.en ?? "",
+                pt: translated.name.pt ?? "",
+            },
         };
 
-        const result = await createCuisine(cuisineData, data.image?.file);
-
+        const result = await createCuisine(cuisineData, image?.file);
+        console.log("cuis result", result);
         if (result?.success) {
             toast.success(result.message || "Cuisine created successfully!", {
                 id: toastId,
@@ -129,9 +144,33 @@ const CreateCuisine = () => {
                     }}
                 >
                     <div className="space-y-4">
-                        <FormField
+                        
+                        {lang === "en" && <FormField
                             control={form.control}
-                            name="name"
+                            name="name.en"
+                            render={({ field }) => (
+                                <FormItem className="content-start">
+                                    <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
+                                        <div className="flex items-center">
+                                            <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
+                                            <span className="ml-2">Cusiine name english</span>
+                                        </div>
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder={t("eg_restaurant")}
+                                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />}
+
+                        {lang === "pt" && <FormField
+                            control={form.control}
+                            name="name.pt"
                             render={({ field }) => (
                                 <FormItem className="content-start">
                                     <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
@@ -150,7 +189,7 @@ const CreateCuisine = () => {
                                     <FormMessage />
                                 </FormItem>
                             )}
-                        />
+                        />}
 
                         <FormField
                             control={form.control}

@@ -6,7 +6,12 @@ import { catchAsync } from "@/utils/catchAsync";
 
 
 export const createCuisine = async (
-    data: { name: string },
+    data: {
+        name: {
+            en: string,
+            pt: string,
+        }
+    },
     image?: File | null,
 ) => {
     return catchAsync(async () => {
