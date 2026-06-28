@@ -53,7 +53,6 @@ const CreateCuisine = () => {
     };
 
     const onSubmit = async (data: FormData) => {
-        console.log("hit")
         const toastId = toast.loading("Adding cuisine...");
         setIsSubmitting(true);
 

@@ -26,11 +26,12 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { ImageUploader } from "@/components/AllBusinessCategories/BusinessCategoryImageUploader";
 import { TCuisine } from "@/types/cuisine.type";
 import { updateCuisineValidation } from "@/validations/category/cuisine.validation";
 import { updateCuisine } from "@/services/dashboard/category/cuisine.service";
+import { useStore } from "@/store/store";
+import { translateObject } from "@/utils/translation/translationObject";
 
 interface EditModalProps {
     isOpen: boolean;
@@ -42,6 +43,7 @@ interface EditModalProps {
 type FormData = z.infer<typeof updateCuisineValidation>;
 
 export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditModalProps) {
+    const { lang } = useStore();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -49,16 +51,19 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
     const form = useForm<FormData>({
         resolver: zodResolver(updateCuisineValidation),
         defaultValues: {
-            name: cuisine?.name || "",
+            name: {
+                en: cuisine?.name?.en || "",
+                pt: cuisine?.name?.pt || ""
+            },
             image: { file: null, url: cuisine?.imageUrl || "" },
-            isActive: cuisine?.isActive ?? true,
+            // isActive: cuisine?.isActive ?? true,
         },
     });
 
     // 2. Multi-field structural watch target definition
-    const [watchImage, watchIsActive] = useWatch({
+    const [watchImage] = useWatch({
         control: form.control,
-        name: ["image", "isActive"],
+        name: ["image"],
     });
 
     const onChangeImage = (image: { file: File | null; url: string }) => {
@@ -71,7 +76,7 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
             form.reset({
                 name: cuisine.name,
                 image: { file: null, url: cuisine.imageUrl || "" },
-                isActive: cuisine.isActive,
+                // isActive: cuisine.isActive,
             });
         }
     }, [cuisine, form]);
@@ -83,19 +88,26 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
         const toastId = toast.loading(t("Saving cuisine changes..."));
         setIsLoading(true);
 
+        const { image, ...rest } = data;
+
+        const translated = await translateObject(rest, lang);
+
         const payload = {
-            name: data.name,
-            isActive: data.isActive,
+            name: {
+                en: translated?.name?.en ?? cuisine?.name?.en,
+                pt: translated?.name?.pt ?? cuisine?.name?.pt
+            },
+            // isActive: data.isActive,
         };
 
-        const result = await updateCuisine(cuisine._id, payload, data.image?.file);
+        const result = await updateCuisine(cuisine._id, payload, image?.file);
 
         if (result?.success) {
-            toast.success(result.message || t("Cuisine updated successfully!"), { id: toastId });
+            toast.success(result.message || "Cuisine updated successfully!", { id: toastId });
             router.refresh();
             onClose();
         } else {
-            toast.error(result?.message || t("Failed to update cuisine"), { id: toastId });
+            toast.error(result?.message || "Failed to update cuisine", { id: toastId });
         }
         setIsLoading(false);
     };
@@ -122,7 +134,7 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                             {/* Name Input Field */}
                             <FormField
                                 control={form.control}
-                                name="name"
+                                name={`name.${lang}`}
                                 render={({ field }) => (
                                     <FormItem className="content-start">
                                         <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
@@ -167,7 +179,7 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                             />
 
                             {/* Toggle Activation Switch Field */}
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="isActive"
                                 render={({ field }) => (
@@ -188,7 +200,7 @@ export default function EditCuisineModal({ isOpen, onClose, cuisine, t }: EditMo
                                         </FormControl>
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
                         </div>
 
                         {/* Action Control Trigger Row */}

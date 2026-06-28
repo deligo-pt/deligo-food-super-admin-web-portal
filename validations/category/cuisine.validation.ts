@@ -29,11 +29,10 @@ export const cuisineValidation = z.object({
     });
 
 export const updateCuisineValidation = z.object({
-    name: z
-        .string()
-        .min(2, "Cuisine name must be at least 2 characters long")
-        .max(50, "Cuisine name must be at most 50 characters long")
-        .optional(),
+    name: z.object({
+        en: z.string().trim().max(50, "Max 50 characters allowed").optional(),
+        pt: z.string().trim().max(50, "Max 50 characters allowed").optional(),
+    }),
 
     image: z
         .object({
