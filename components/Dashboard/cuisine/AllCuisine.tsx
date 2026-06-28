@@ -32,6 +32,7 @@ import { useState } from "react";
 import DeleteCuisineModal, { IStatusInfo } from "./DeleteCuisineModal";
 import EditCuisineModal from "./EditCuisineModal";
 import { TCuisine } from "@/types/cuisine.type";
+import { useStore } from "@/store/store";
 
 interface IProps {
     cuisineResult: {
@@ -42,6 +43,7 @@ interface IProps {
 
 const AllCuisine = ({ cuisineResult }: IProps) => {
     const { t } = useTranslation();
+    const { lang } = useStore();
     const sortOptions = getSortOptions(t);
     const router = useRouter();
 
@@ -105,13 +107,13 @@ const AllCuisine = ({ cuisineResult }: IProps) => {
                                                 <Image
                                                     className="w-8 h-8 rounded-full object-cover"
                                                     src={cuisine.imageUrl}
-                                                    alt={cuisine.name}
+                                                    alt={cuisine.name?.[lang]}
                                                     width={32}
                                                     height={32}
                                                 />
                                             </div>
                                         )}
-                                        <p className="font-medium uppercase">{cuisine.name}</p>
+                                        <p className="font-medium uppercase">{cuisine?.name?.[lang]}</p>
                                     </div>
                                 </TableCell>
                                 <TableCell

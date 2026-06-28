@@ -29,9 +29,28 @@ export const createCuisine = async (
     });
 };
 
-export const getAllCuisine = async () => {
+export const getAllCuisine = async (queryString?: string) => {
+    let cleanQueryString = "";
+    let activeLang = "en";
+
+    if (queryString) {
+        const params = new URLSearchParams(queryString);
+
+        if (params.has("lang")) {
+            activeLang = params.get("lang") || "en";
+            params.delete("lang");
+        }
+
+        cleanQueryString = params.toString();
+    }
+
     const result = await catchAsync(async () => {
-        const res = await serverFetch.get("/categories/cuisine", {
+        const url = `/categories/cuisine${cleanQueryString ? `?${cleanQueryString}` : ""}`;
+
+        const res = await serverFetch.get(url, {
+            headers: {
+                "Accept-Language": activeLang,
+            },
             next: {
                 tags: ["cuisine-list"],
             },

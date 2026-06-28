@@ -1,7 +1,10 @@
 
 export type TCuisine = {
     _id: string;
-    name: string;
+    name: {
+        en: string;
+        pt: string;
+    };
     slug: string;
     imageUrl?: string;
     isActive: boolean;
