@@ -35,6 +35,7 @@ interface IProps {
   onEditClick: (tax: TTax) => void;
   onStatusChange: (id: string, status: boolean) => void;
   onDeleteClick: (id: string) => void;
+  onPermanentDelete: (id: string) => void;
 }
 
 export default function TaxTable({
@@ -42,6 +43,7 @@ export default function TaxTable({
   onEditClick,
   onStatusChange,
   onDeleteClick,
+  onPermanentDelete
 }: IProps) {
   const router = useRouter();
   const { lang } = useStore();
@@ -154,12 +156,18 @@ export default function TaxTable({
                         >
                           Activate
                         </DropdownMenuItem>
-                        <DropdownMenuItem
+                        {tax?.isDeleted === false ? <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => onDeleteClick(tax?._id)}
                         >
                           Delete
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> :
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => onPermanentDelete(tax?._id)}
+                          >
+                            Permanent Delete
+                          </DropdownMenuItem>}
                       </>
                     )}
                   </DropdownMenuContent>

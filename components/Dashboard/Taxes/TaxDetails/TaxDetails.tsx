@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   deleteTaxReq,
+  permanentDeleteTax,
   updateTaxReq,
 } from "@/services/dashboard/tax/tax.service";
 import { useStore } from "@/store/store";
@@ -37,6 +38,7 @@ export default function TaxDetails({ tax }: IProps) {
   const { lang } = useStore();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [permanentDeleteModalOpen, setPermanentDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
@@ -86,6 +88,29 @@ export default function TaxDetails({ tax }: IProps) {
       id: toastId,
     });
     setIsDeleting(false);
+  };
+
+  const handlePermanentDeleteTax = async () => {
+    const toastId = toast.loading("Deleting Tax...");
+    setIsDeleting(true);
+
+    const result = await permanentDeleteTax(tax?._id as string);
+
+    if (result.success) {
+      router.refresh();
+      toast.success(result.message || "Tax deleted successfully!", {
+        id: toastId,
+      });
+      setPermanentDeleteModalOpen(false);
+      setIsDeleting(false);
+      return;
+    }
+
+    toast.error(result.message || "Failed to delete tax", {
+      id: toastId,
+    });
+    setIsDeleting(false);
+    console.log(result);
   };
 
   return (
@@ -213,14 +238,22 @@ export default function TaxDetails({ tax }: IProps) {
                     <ShieldCheck className="h-4 w-4 mr-1" />
                     Activate
                   </Button>
-                  <Button
+                  {tax?.isDeleted === false ? <Button
                     size="sm"
                     variant="destructive"
                     onClick={() => setDeleteModalOpen(true)}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
                     Delete
-                  </Button>
+                  </Button> :
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setPermanentDeleteModalOpen(true)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Permanent Delete
+                    </Button>}
                 </>
               )}
             </div>
@@ -240,6 +273,14 @@ export default function TaxDetails({ tax }: IProps) {
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
         onConfirm={handleDeleteTax}
+        isDeleting={isDeleting}
+      />
+
+      {/* Permanent Delete Modal */}
+      <DeleteModal
+        open={permanentDeleteModalOpen}
+        onOpenChange={setPermanentDeleteModalOpen}
+        onConfirm={handlePermanentDeleteTax}
         isDeleting={isDeleting}
       />
     </motion.div>

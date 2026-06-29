@@ -8,6 +8,7 @@ import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import {
   deleteTaxReq,
+  permanentDeleteTax,
   updateTaxReq,
 } from "@/services/dashboard/tax/tax.service";
 import { TMeta } from "@/types";
@@ -31,6 +32,7 @@ const sortOptions = [
 export default function Taxes({ taxesResult }: IProps) {
   const [editTax, setEditTax] = useState<TTax | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [permanentDeleteId, setPermanentDeleteId] = useState<string | null>(null);
   const [buttonDisabled, setButtonDisabled] = useState(0);
   const router = useRouter();
 
@@ -85,6 +87,29 @@ export default function Taxes({ taxesResult }: IProps) {
     setButtonDisabled(0);
   };
 
+  const handlePermanentDeleteTax = async () => {
+    const toastId = toast.loading("Deleting Tax...");
+    setButtonDisabled(2);
+
+    const result = await permanentDeleteTax(permanentDeleteId as string);
+
+    if (result.success) {
+      router.push("/admin/all-taxes");
+      toast.success(result.message || "Tax deleted successfully!", {
+        id: toastId,
+      });
+      setPermanentDeleteId(null);
+      setButtonDisabled(0);
+      return;
+    }
+
+    toast.error(result.message || "Failed to delete tax", {
+      id: toastId,
+    });
+    console.log(result);
+    setButtonDisabled(0);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <TitleHeader
@@ -105,6 +130,7 @@ export default function Taxes({ taxesResult }: IProps) {
         onEditClick={(tax: TTax) => setEditTax(tax)}
         onStatusChange={handleUpdateStatus}
         onDeleteClick={(id: string) => setDeleteId(id)}
+        onPermanentDelete={(id: string) => setPermanentDeleteId(id)}
       />
 
       {!!taxesResult?.meta?.total && taxesResult?.meta?.total > 0 && (
@@ -126,6 +152,14 @@ export default function Taxes({ taxesResult }: IProps) {
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDeleteTax}
         isDeleting={buttonDisabled === 1 ? true : false}
+      />
+
+      {/* Permanent Delete Tax Modal */}
+      <DeleteModal
+        open={!!permanentDeleteId}
+        onOpenChange={(open) => !open && setPermanentDeleteId(null)}
+        onConfirm={handlePermanentDeleteTax}
+        isDeleting={buttonDisabled === 2 ? true : false}
       />
     </div>
   );
