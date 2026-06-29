@@ -1,43 +1,64 @@
 import { TAX_RATE } from "@/consts/tax.const";
+import { validateLocalizedField } from "@/consts/validation.const";
 import z from "zod";
 
-export const taxValidation = z
-  .object({
-    taxName: z
-      .string()
-      .min(2, "Tax name must be at least 2 characters long")
-      .max(50, "Tax name must be at most 50 characters long")
-      .nonempty("Tax name is required"),
+const localizedTextSchema = z.object({
+  en: z.string().max(50, "Cannot exceed 50 characters").optional(),
+  pt: z.string().max(50, "Cannot exceed 50 characters").optional()
+});
 
-    taxCode: z.enum(
-      Object.keys(TAX_RATE),
-      "Tax code must be one of NOR, INT, RED, or ISE",
+export const taxValidation = z.object({
+  taxName: localizedTextSchema,
+
+  taxCode: z.enum(
+    Object.keys(TAX_RATE),
+    "Tax code must be one of NOR, INT, RED, or ISE",
+  ),
+
+  taxRate: z
+    .number()
+    .min(0, "Tax rate must be at least 0")
+    .max(23, "Tax rate must be at most 23")
+    .refine(
+      (value) => Object.values(TAX_RATE).includes(value),
+      "Tax rate must be one of 0, 6, 13, or 23",
     ),
 
-    taxRate: z
-      .number()
-      .min(0, "Tax rate must be at least 0")
-      .max(23, "Tax rate must be at most 23")
-      .refine(
-        (value) => Object.values(TAX_RATE).includes(value),
-        "Tax rate must be one of 0, 6, 13, or 23",
-      ),
+  countryID: z
+    .string()
+    .min(2, "Country ID must be at least 2 characters long")
+    .max(50, "Country ID must be at most 50 characters long")
+    .optional(),
 
-    countryID: z
-      .string()
-      .min(2, "Country ID must be at least 2 characters long")
-      .max(50, "Country ID must be at most 50 characters long")
-      .optional(),
+  description: z.object({
+    en: z.string()
+      .max(500, "Description must be at most 500 characters long").optional(),
+    pt: z.string()
+      .max(500, "Description must be at most 500 characters long").optional()
+  }),
 
-    description: z
-      .string()
-      .min(10, "Description must be at least 10 characters long")
-      .max(500, "Description must be at most 500 characters long")
-      .nonempty("Description is required"),
+  taxExemptionCode: z.string().optional(),
 
-    taxExemptionCode: z.string().optional(),
+  taxExemptionReason: z.string().optional(),
 
-    taxExemptionReason: z.string().optional(),
+  currentLang: z.enum(["en", "pt"]),
+})
+  .superRefine((data, ctx) => {
+    validateLocalizedField(
+      data.taxName,
+      data.currentLang,
+      ctx,
+      ["taxName"],
+      "Tax name is required"
+    );
+
+    validateLocalizedField(
+      data.description,
+      data.currentLang,
+      ctx,
+      ["description"],
+      "Description is required"
+    );
   })
   .refine(
     (data) => {

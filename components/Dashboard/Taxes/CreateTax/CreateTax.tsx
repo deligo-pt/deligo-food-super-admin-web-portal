@@ -22,7 +22,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { TAX_RATE } from "@/consts/tax.const";
 import { cn } from "@/lib/utils";
 import { createTaxReq } from "@/services/dashboard/tax/tax.service";
+import { useStore } from "@/store/store";
 import { TTax } from "@/types/tax.type";
+import { translateObject } from "@/utils/translation/translationObject";
 import { taxValidation } from "@/validations/tax/tax.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -33,16 +35,24 @@ import z from "zod";
 type TaxForm = z.infer<typeof taxValidation>;
 
 export default function CreateTax() {
+  const { lang } = useStore();
   const form = useForm<TaxForm>({
     resolver: zodResolver(taxValidation),
-    defaultValues: {
-      taxName: "",
+    values: {
+      taxName: {
+        en: "",
+        pt: ""
+      },
       taxCode: "",
       taxRate: 0,
       countryID: "",
-      description: "",
+      description: {
+        en: "",
+        pt: ""
+      },
       taxExemptionCode: "",
       taxExemptionReason: "",
+      currentLang: lang
     },
   });
 
@@ -51,7 +61,23 @@ export default function CreateTax() {
   const handleCreateTax = async (data: TaxForm) => {
     const toastId = toast.loading("Creating Tax...");
 
-    const result = await createTaxReq(data as Partial<TTax>);
+    const translated = await translateObject(data, lang);
+
+    if (!translated) {
+      toast.error("Translation failed", { id: toastId });
+      return;
+    };
+
+    const payload = {
+      taxName: translated?.taxName,
+      taxCode: data.taxCode,
+      taxRate: data.taxRate,
+      countryID: data.countryID,
+      description: translated?.description,
+      taxExemptionCode: data.taxExemptionCode,
+    }
+
+    const result = await createTaxReq(payload as Partial<TTax>);
 
     if (result.success) {
       toast.success(result.message || "Tax created successfully!", {
@@ -84,8 +110,8 @@ export default function CreateTax() {
                 className="space-y-8"
               >
                 <div className="grid lg:grid-cols-2 gap-6">
-                  <FormField
-                    name="taxName"
+                  {lang === "en" && <FormField
+                    name="taxName.en"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
@@ -100,7 +126,24 @@ export default function CreateTax() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
+                  {lang === "pt" && <FormField
+                    name="taxName.pt"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tax Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Tax Name"
+                            className="w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
                   <FormField
                     name="taxCode"
                     control={form.control}
@@ -176,8 +219,8 @@ export default function CreateTax() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    name="description"
+                  {lang === "en" && <FormField
+                    name="description.en"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem className="lg:col-span-2">
@@ -192,7 +235,24 @@ export default function CreateTax() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
+                  {lang === "pt" && <FormField
+                    name="description.pt"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="lg:col-span-2">
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Description"
+                            className="w-full h-20"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
                   <FormField
                     name="taxExemptionCode"
                     control={form.control}

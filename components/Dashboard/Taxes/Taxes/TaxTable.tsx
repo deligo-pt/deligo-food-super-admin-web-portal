@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useStore } from "@/store/store";
 import { TTax } from "@/types/tax.type";
 import { motion } from "framer-motion";
 import {
@@ -43,6 +44,7 @@ export default function TaxTable({
   onDeleteClick,
 }: IProps) {
   const router = useRouter();
+  const { lang } = useStore();
 
   return (
     <motion.div
@@ -102,12 +104,12 @@ export default function TaxTable({
           )}
           {taxes?.map((tax) => (
             <TableRow key={tax._id}>
-              <TableCell>{tax.taxName}</TableCell>
-              <TableCell>{tax.taxCode}</TableCell>
-              <TableCell>{tax.taxRate}</TableCell>
-              <TableCell>{tax.countryID}</TableCell>
+              <TableCell>{tax?.taxName?.[lang]}</TableCell>
+              <TableCell>{tax?.taxCode}</TableCell>
+              <TableCell>{tax?.taxRate}</TableCell>
+              <TableCell>{tax?.countryID}</TableCell>
               <TableCell>
-                {tax.isActive ? (
+                {tax?.isActive ? (
                   <div className="flex gap-1 items-center text-green-500">
                     <CheckCircle size={16} /> Yes
                   </div>
@@ -126,7 +128,7 @@ export default function TaxTable({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       className=""
-                      onClick={() => router.push(`/admin/all-taxes/${tax._id}`)}
+                      onClick={() => router.push(`/admin/all-taxes/${tax?._id}`)}
                     >
                       View
                     </DropdownMenuItem>
@@ -139,7 +141,7 @@ export default function TaxTable({
                     {tax.isActive && (
                       <DropdownMenuItem
                         className="text-yellow-600"
-                        onClick={() => onStatusChange(tax._id, false)}
+                        onClick={() => onStatusChange(tax?._id, false)}
                       >
                         Deactivate
                       </DropdownMenuItem>
@@ -148,13 +150,13 @@ export default function TaxTable({
                       <>
                         <DropdownMenuItem
                           className="text-green-600"
-                          onClick={() => onStatusChange(tax._id, true)}
+                          onClick={() => onStatusChange(tax?._id, true)}
                         >
                           Activate
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => onDeleteClick(tax._id)}
+                          onClick={() => onDeleteClick(tax?._id)}
                         >
                           Delete
                         </DropdownMenuItem>

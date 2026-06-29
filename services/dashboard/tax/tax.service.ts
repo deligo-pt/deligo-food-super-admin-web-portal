@@ -40,6 +40,7 @@ export const getAllTaxesReq = async (
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
+  const lang = queries.lang || "en";
 
   const params = {
     limit,
@@ -51,13 +52,16 @@ export const getAllTaxesReq = async (
   const result = await catchAsync<{ data: TTax[]; meta: TMeta }>(async () => {
     return await serverRequest.get("/taxes", {
       params,
+      headers: {
+        "Accept-Language": lang
+      }
     });
   });
 
   if (result?.success)
     return {
-      data: result.data.data,
-      meta: result.data.meta,
+      data: result.data,
+      meta: result.meta,
     };
 
   return {

@@ -10,6 +10,7 @@ import {
   deleteTaxReq,
   updateTaxReq,
 } from "@/services/dashboard/tax/tax.service";
+import { useStore } from "@/store/store";
 import { TTax } from "@/types/tax.type";
 import { motion } from "framer-motion";
 import {
@@ -33,6 +34,7 @@ interface IProps {
 }
 
 export default function TaxDetails({ tax }: IProps) {
+  const { lang } = useStore();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -97,9 +99,9 @@ export default function TaxDetails({ tax }: IProps) {
           <div className="space-y-1">
             <CardTitle className="text-xl font-semibold flex items-center gap-2">
               <Utensils className="h-5 w-5 text-[#DC3173]" />
-              {tax.taxName}
+              {tax?.taxName[lang]}
             </CardTitle>
-            <p className="text-sm text-muted-foreground">{tax.description}</p>
+            <p className="text-sm text-muted-foreground">{tax?.description?.[lang]}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -107,9 +109,9 @@ export default function TaxDetails({ tax }: IProps) {
               variant="outline"
               className="border-[#DC3173] text-[#DC3173]"
             >
-              {tax.taxCode}
+              {tax?.taxCode}
             </Badge>
-            {tax.isActive ? (
+            {tax?.isActive ? (
               <ShieldCheck className="h-4 w-4 text-green-600" />
             ) : (
               <ShieldOff className="h-4 w-4 text-destructive" />
@@ -124,46 +126,46 @@ export default function TaxDetails({ tax }: IProps) {
             <div className="flex items-center gap-2">
               <Percent className="h-4 w-4 text-[#DC3173]" />
               <span className="text-muted-foreground">Tax Rate</span>
-              <span className="font-medium">{tax.taxRate}%</span>
+              <span className="font-medium">{tax?.taxRate}%</span>
             </div>
 
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-[#DC3173]" />
               <span className="text-muted-foreground">Country</span>
-              <span className="font-medium">{tax.countryID}</span>
+              <span className="font-medium">{tax?.countryID}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <Hash className="h-4 w-4 text-[#DC3173]" />
               <span className="text-muted-foreground">Tax Group</span>
-              <span className="font-medium">{tax.taxGroupID}</span>
+              <span className="font-medium">{tax?.taxGroupID}</span>
             </div>
 
-            {tax.TaxRegionID && (
+            {tax?.TaxRegionID && (
               <div className="flex items-center gap-2">
                 <Globe className="h-4 w-4 text-[#DC3173]" />
                 <span className="text-muted-foreground">Region</span>
-                <span className="font-medium">{tax.TaxRegionID}</span>
+                <span className="font-medium">{tax?.TaxRegionID}</span>
               </div>
             )}
           </div>
 
-          {(tax.taxExemptionCode || tax.taxExemptionReason) && (
+          {(tax?.taxExemptionCode || tax?.taxExemptionReason) && (
             <div className="rounded-xl bg-muted p-3 text-sm space-y-1">
               <div className="flex items-center gap-2 font-medium">
                 <ShieldOff className="h-4 w-4 text-[#DC3173]" />
                 Tax Exemption
               </div>
-              {tax.taxExemptionCode && (
+              {tax?.taxExemptionCode && (
                 <p>
                   <span className="text-muted-foreground">Code:</span>{" "}
                   {tax.taxExemptionCode}
                 </p>
               )}
-              {tax.taxExemptionReason && (
+              {tax?.taxExemptionReason && (
                 <p>
                   <span className="text-muted-foreground">Reason:</span>{" "}
-                  {tax.taxExemptionReason}
+                  {tax?.taxExemptionReason}
                 </p>
               )}
             </div>
@@ -174,7 +176,7 @@ export default function TaxDetails({ tax }: IProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Active</span>
-              {tax.isActive ? (
+              {tax?.isActive ? (
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
               ) : (
                 <XCircle className="h-4 w-4 text-destructive" />
@@ -191,7 +193,7 @@ export default function TaxDetails({ tax }: IProps) {
                 <Pencil className="h-4 w-4 mr-1" />
                 Edit
               </Button>
-              {tax.isActive && (
+              {tax?.isActive && (
                 <Button
                   size="sm"
                   className="bg-yellow-500 hover:bg-yellow-500/90"
@@ -201,7 +203,7 @@ export default function TaxDetails({ tax }: IProps) {
                   Deactivate
                 </Button>
               )}
-              {!tax.isActive && (
+              {!tax?.isActive && (
                 <>
                   <Button
                     size="sm"
