@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { createIngredientReq } from "@/services/dashboard/ingredient/ingredient.service";
 import { uploadImagesReq } from "@/services/upload/upload.service";
+import { useStore } from "@/store/store";
 import { TTax } from "@/types/tax.type";
 import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +29,7 @@ import z from "zod";
 type TIngredientForm = z.infer<typeof ingredientSchema>;
 
 export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
+  const { lang } = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>("");
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -210,7 +212,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                         <SelectContent>
                           {taxes?.map((tax) => (
                             <SelectItem key={tax._id} value={tax._id}>
-                              {tax.taxName} ({tax.taxRate}%)
+                              {tax.taxName?.[lang]} ({tax.taxRate}%)
                             </SelectItem>
                           ))}
                         </SelectContent>

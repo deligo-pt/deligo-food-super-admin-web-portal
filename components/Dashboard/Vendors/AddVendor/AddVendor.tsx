@@ -34,6 +34,7 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { getSingleVendorReq } from "@/services/dashboard/vendor/vendor.service";
+import { useStore } from "@/store/store";
 import { TResponse } from "@/types";
 import { TBusinessCategory } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
@@ -96,6 +97,7 @@ export default function AddVendor({
   cuisines: TCuisine[]
 }) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -745,15 +747,15 @@ export default function AddVendor({
                                             </div>
                                           ) : (
                                             cuisines?.map((type, idx) => {
-                                              const isAlreadySelected = selectedCuisines.includes(type?.name);
+                                              const isAlreadySelected = selectedCuisines.includes(type?.name?.[lang]);
                                               return (
                                                 <SelectItem
                                                   key={idx}
-                                                  value={type?.name}
+                                                  value={type?.name?.[lang]}
                                                   className="capitalize"
                                                   disabled={isAlreadySelected}
                                                 >
-                                                  {type?.name} {isAlreadySelected && "✓"}
+                                                  {type?.name?.[lang]} {isAlreadySelected && "✓"}
                                                 </SelectItem>
                                               );
                                             })

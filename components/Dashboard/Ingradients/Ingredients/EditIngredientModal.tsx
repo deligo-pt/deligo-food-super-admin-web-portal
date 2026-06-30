@@ -32,6 +32,7 @@ import { uploadImagesReq } from "@/services/upload/upload.service";
 import { TIngredient } from "@/types/ingredient.type";
 import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
 import { TTax } from "@/types/tax.type";
+import { useStore } from "@/store/store";
 
 interface EditIngredientModalProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ export default function EditIngredientModal({
   taxes,
   onSuccess,
 }: EditIngredientModalProps) {
+  const { lang } = useStore();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [previewImage, setPreviewImage] = useState(ingredientData.image || "");
@@ -244,7 +246,7 @@ export default function EditIngredientModal({
                       <SelectContent>
                         {taxes?.map((tax) => (
                           <SelectItem key={tax._id} value={tax._id}>
-                            {tax.taxName} ({tax.taxRate}%)
+                            {tax.taxName?.[lang]} ({tax.taxRate}%)
                           </SelectItem>
                         ))}
                       </SelectContent>

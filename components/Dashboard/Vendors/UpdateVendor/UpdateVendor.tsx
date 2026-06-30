@@ -28,6 +28,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
+import { useStore } from "@/store/store";
 import { TBusinessCategory } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
@@ -57,6 +58,7 @@ type TVendorForm = z.infer<typeof addVendorValidation>;
 export default function UpdateVendor({ businessCategories, vendor, cuisines }: IProps) {
   const [vendorState, setVendorState] = useState(vendor);
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: vendorState.businessLocation?.latitude || 0,
@@ -144,7 +146,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       normalizedCuisines = Array.isArray(rawCuisineData) ? rawCuisineData : [rawCuisineData];
     }
 
-    const validCuisineNames = cuisines?.map((c) => c?.name) || [];
+    const validCuisineNames = cuisines?.map((c) => c?.name?.[lang]) || [];
 
     const sanitizedCuisines = normalizedCuisines.filter((cuisineName) =>
       validCuisineNames.includes(cuisineName)
@@ -177,7 +179,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       iban: vendorState?.bankDetails?.iban || "",
       swiftCode: vendorState?.bankDetails?.swiftCode || "",
     });
-  }, [vendorState, form, cuisines]);
+  }, [vendorState, form, cuisines, lang]);
 
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Updating vendor data...");
@@ -216,7 +218,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
         swiftCode: data.swiftCode,
       },
     } as Partial<TVendor>;
-    console.log("vendor data", vendorData);
+
     const updatedResult = await updateUserDataReq(
       `/vendors/${vendor.userId}`,
       vendorData,
@@ -586,15 +588,15 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                               </div>
                                             ) : (
                                               cuisines?.map((type, idx) => {
-                                                const isAlreadySelected = selectedCuisines.includes(type?.name);
+                                                const isAlreadySelected = selectedCuisines.includes(type?.name?.[lang]);
                                                 return (
                                                   <SelectItem
                                                     key={idx}
-                                                    value={type?.name}
+                                                    value={type?.name?.[lang]}
                                                     className="capitalize"
                                                     disabled={isAlreadySelected}
                                                   >
-                                                    {type?.name} {isAlreadySelected && "✓"}
+                                                    {type?.name?.[lang]} {isAlreadySelected && "✓"}
                                                   </SelectItem>
                                                 );
                                               })
