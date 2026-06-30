@@ -51,7 +51,10 @@ export default function CreateTax() {
         pt: ""
       },
       taxExemptionCode: "",
-      taxExemptionReason: "",
+      taxExemptionReason: {
+        en: "",
+        pt: ""
+      },
       currentLang: lang
     },
   });
@@ -68,16 +71,31 @@ export default function CreateTax() {
       return;
     };
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       taxName: translated?.taxName,
       taxCode: data.taxCode,
       taxRate: data.taxRate,
       countryID: data.countryID,
       description: translated?.description,
       taxExemptionCode: data.taxExemptionCode,
+    };
+
+    const currentReasonValue = data.taxExemptionReason?.[lang as "en" | "pt"];
+
+    if (currentReasonValue && currentReasonValue.trim() !== "") {
+      const translatedReason = await translateObject(
+        { taxExemptionReason: data.taxExemptionReason },
+        lang
+      );
+
+      payload.taxExemptionReason = {
+        en: translatedReason?.taxExemptionReason?.en || data.taxExemptionReason.en,
+        pt: translatedReason?.taxExemptionReason?.pt || data.taxExemptionReason.pt,
+      };
     }
 
     const result = await createTaxReq(payload as Partial<TTax>);
+    console.log("rsult", result);
 
     if (result.success) {
       toast.success(result.message || "Tax created successfully!", {
@@ -270,8 +288,8 @@ export default function CreateTax() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    name="taxExemptionReason"
+                  {lang === "en" && <FormField
+                    name="taxExemptionReason.en"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
@@ -286,7 +304,24 @@ export default function CreateTax() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
+                  {lang === "pt" && <FormField
+                    name="taxExemptionReason.pt"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tax Exemption Reason</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Tax Exemption Reason"
+                            className="w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
                 </div>
                 <button
                   type="submit"

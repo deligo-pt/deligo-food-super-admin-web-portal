@@ -39,7 +39,7 @@ export const taxValidation = z.object({
 
   taxExemptionCode: z.string().optional(),
 
-  taxExemptionReason: z.string().optional(),
+  taxExemptionReason: localizedTextSchema,
 
   currentLang: z.enum(["en", "pt"]),
 })

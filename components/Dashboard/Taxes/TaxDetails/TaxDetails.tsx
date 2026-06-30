@@ -190,7 +190,7 @@ export default function TaxDetails({ tax }: IProps) {
               {tax?.taxExemptionReason && (
                 <p>
                   <span className="text-muted-foreground">Reason:</span>{" "}
-                  {tax?.taxExemptionReason}
+                  {tax?.taxExemptionReason?.[lang]}
                 </p>
               )}
             </div>

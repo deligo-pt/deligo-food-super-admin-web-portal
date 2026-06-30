@@ -65,7 +65,10 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
         pt: prevTax?.description?.pt || "",
       },
       taxExemptionCode: prevTax?.taxExemptionCode || "",
-      taxExemptionReason: prevTax?.taxExemptionReason || "",
+      taxExemptionReason: {
+        en: prevTax?.taxExemptionReason?.en || "",
+        pt: prevTax?.taxExemptionReason?.pt || "",
+      },
       currentLang: lang
     },
   });
@@ -254,7 +257,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   )}
                 />
                 <FormField
-                  name="taxExemptionReason"
+                  name={`taxExemptionReason.${lang}`}
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
