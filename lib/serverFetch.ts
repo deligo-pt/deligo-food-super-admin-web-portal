@@ -2,7 +2,7 @@ import axios, {
   AxiosError,
   AxiosRequestConfig,
 } from "axios";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
@@ -15,19 +15,17 @@ const axiosInstance = axios.create({
 });
 
 const createHeaders = async (
+  lang: string,
   options?: AxiosRequestConfig
 ) => {
-
   const cookieStore = await cookies();
-
-  const accessToken =
-    cookieStore.get("accessToken")?.value || "";
-
+  const accessToken = cookieStore.get("accessToken")?.value || "";
   const cookieStr = cookieStore.toString();
+
 
   return {
     ...(options?.headers || {}),
-
+    "Accept-Language": lang,
     ...(accessToken && {
       authorization: `Bearer ${accessToken}`,
     }),
@@ -43,11 +41,33 @@ const serverRequestHelper = async (
   options?: AxiosRequestConfig,
 ) => {
 
+  let activeLang = "en";
+
+  try {
+    const targetUrlParams = new URLSearchParams(url.split("?")[1]);
+    if (targetUrlParams.has("lang")) {
+      activeLang = targetUrlParams.get("lang") || "en";
+    } else {
+      const headersList = await headers();
+      const referer = headersList.get("referer");
+
+      if (referer) {
+        const refererUrl = new URL(referer);
+        const langQuery = refererUrl.searchParams.get("lang");
+        if (langQuery === "en" || langQuery === "pt") {
+          activeLang = langQuery;
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Failed to parse language query, defaulting to 'en'", e);
+  }
+
   try {
     const response = await axiosInstance({
       url,
       ...options,
-      headers: await createHeaders(options),
+      headers: await createHeaders(activeLang, options),
     });
 
     return response.data;
