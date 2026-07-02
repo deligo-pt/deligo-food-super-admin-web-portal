@@ -48,6 +48,4 @@ export const updateProductCategoryValidation = z.object({
       url: z.string(),
     })
     .optional(),
-
-  businessCategoryId: z.string().optional(),
 });

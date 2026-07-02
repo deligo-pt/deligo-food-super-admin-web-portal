@@ -18,27 +18,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { updateProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 import { useStore } from "@/store/store";
-import { TResponse } from "@/types";
-import { TBusinessCategoryResponse, TProductCategory } from "@/types/category.type";
-import { fetchData } from "@/utils/requests";
+import { TProductCategory } from "@/types/category.type";
 import { translateObject } from "@/utils/translation/translationObject";
 import { updateProductCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { FileTextIcon, PlusCircleIcon } from "lucide-react";
+import { FileTextIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -59,9 +49,6 @@ export default function EditProductCategoryModal({
   const { t } = useTranslation();
   const { lang } = useStore();
   const router = useRouter();
-  const [businessCategories, setBusinessCategories] = useState<
-    TBusinessCategoryResponse[]
-  >([]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(updateProductCategoryValidation),
@@ -72,7 +59,6 @@ export default function EditProductCategoryModal({
       },
       description: category?.description || "",
       image: { file: null, url: category?.icon || "" },
-      businessCategoryId: category?.businessCategoryId || "",
     },
   });
 
@@ -118,23 +104,6 @@ export default function EditProductCategoryModal({
     });
     console.log(result);
   };
-
-  const getBusinessCategories = async () => {
-    try {
-      const result = (await fetchData(
-        "/categories/businessCategory",
-      )) as unknown as TResponse<TBusinessCategoryResponse[]>;
-      if (result?.success) {
-        setBusinessCategories(result?.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    (() => getBusinessCategories())();
-  }, []);
 
   return (
     <AnimatePresence>
@@ -257,47 +226,6 @@ export default function EditProductCategoryModal({
                                 {...field}
                                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
                               />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="businessCategoryId"
-                        render={({ field }) => (
-                          <FormItem className="content-start">
-                            <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                              <div className="flex items-center">
-                                <PlusCircleIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">
-                                  {t("business_category")}
-                                </span>
-                              </div>
-                            </FormLabel>
-                            <FormControl>
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <SelectTrigger className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300">
-                                  <SelectValue
-                                    placeholder={t("select_business_category")}
-                                  />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {businessCategories?.map(
-                                    (businessCategory) => (
-                                      <SelectItem
-                                        key={businessCategory._id}
-                                        value={businessCategory._id}
-                                      >
-                                        {businessCategory.name?.[lang]}
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectContent>
-                              </Select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
