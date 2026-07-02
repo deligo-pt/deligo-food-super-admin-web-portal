@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
 import { useStore } from "@/store/store";
-import { TBusinessCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
@@ -48,7 +48,7 @@ import z from "zod";
 
 const DELIGO = "#DC3173";
 interface IProps {
-  businessCategories: TBusinessCategory[];
+  businessCategories: TBusinessCategoryResponse[];
   vendor: TVendor;
   cuisines: TCuisine[]
 }
@@ -111,7 +111,6 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       businessName: "",
       businessType: "",
       restaurantCuisineType: [],
-      businessLicenseNumber: "",
       NIF: "",
       branches: "1",
       openingHours: "",
@@ -157,10 +156,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       lastName: vendorState.name?.lastName || "",
       phoneNumber: vendorState?.contactNumber || "",
       businessName: vendorState.businessDetails?.businessName || "",
-      businessType: vendorState?.businessDetails?.businessType || "",
+      businessType: vendorState?.businessDetails?.businessTypeSlug || "",
       restaurantCuisineType: sanitizedCuisines,
-      businessLicenseNumber:
-        vendorState?.businessDetails?.businessLicenseNumber || "",
       NIF: vendorState?.businessDetails?.NIF || "",
       branches:
         vendorState?.businessDetails?.totalBranches?.toString() || "1",
@@ -179,7 +176,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       iban: vendorState?.bankDetails?.iban || "",
       swiftCode: vendorState?.bankDetails?.swiftCode || "",
     });
-  }, [vendorState, form, cuisines, lang]);
+  }, [vendorState, form, cuisines]);
 
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Updating vendor data...");
@@ -193,11 +190,10 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       businessDetails: {
         businessName: data.businessName,
         businessType: data.businessType,
-        ...(data?.businessType === "RESTAURANT" && {
+        ...(data?.businessType === "restaurant" && {
           restaurantCuisineType: data.restaurantCuisineType
         }),
         NIF: data.NIF?.toUpperCase(),
-        businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
         totalBranches: Number(data.branches),
         openingHours: data.openingHours,
         closingHours: data.closingHours,
@@ -445,8 +441,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                 <FormLabel>{t("business_type")}</FormLabel>
                                 <FormControl>
                                   <Select
-                                    onValueChange={field.onChange}
-                                    value={field.value || vendorState.businessDetails?.businessType || undefined}
+                                    onValueChange={(value) => field.onChange(value)}
+                                    value={field.value || vendorState.businessDetails?.businessTypeSlug || undefined}
                                   >
                                     <SelectTrigger
                                       className={cn(
@@ -464,32 +460,13 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                       {businessCategories?.map((category) => (
                                         <SelectItem
                                           key={category._id}
-                                          value={category.name}
+                                          value={category.slug}
                                         >
-                                          {category.name}
+                                          {category?.name?.[lang]}
                                         </SelectItem>
                                       ))}
                                     </SelectContent>
                                   </Select>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name="businessLicenseNumber"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>
-                                  {t("business_license_number")}
-                                </FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder={t("license_number")}
-                                    {...field}
-                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
