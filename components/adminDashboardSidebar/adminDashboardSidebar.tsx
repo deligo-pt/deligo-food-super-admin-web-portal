@@ -280,7 +280,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("email_and_notification_settings"),
           path: "/admin/email-notification-settings",
         },
-        { name: t("maintenance_mode"), path: "/admin/maintenance-mode" },
       ],
     },
     {
@@ -291,7 +290,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_admins"), path: "/admin/all-admins" },
         { name: t("activity_logs"), path: "/admin/activity-logs" },
         { name: t("login_history"), path: "/admin/login-history" },
-        { name: t("roles_and_permissions"), path: "/admin/roles-permissions" },
         { name: t("create_permission"), path: "/admin/create-permission" },
         { name: t("all_permissions"), path: "/admin/permissions" },
         { name: t("assign_permissions"), path: "/admin/permissions/assign" },
