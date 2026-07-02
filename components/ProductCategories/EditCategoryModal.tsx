@@ -30,7 +30,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { updateProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 import { useStore } from "@/store/store";
 import { TResponse } from "@/types";
-import { TBusinessCategory, TProductCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse, TProductCategory } from "@/types/category.type";
 import { fetchData } from "@/utils/requests";
 import { translateObject } from "@/utils/translation/translationObject";
 import { updateProductCategoryValidation } from "@/validations/category/product-category.validation";
@@ -60,7 +60,7 @@ export default function EditProductCategoryModal({
   const { lang } = useStore();
   const router = useRouter();
   const [businessCategories, setBusinessCategories] = useState<
-    TBusinessCategory[]
+    TBusinessCategoryResponse[]
   >([]);
 
   const form = useForm<FormData>({
@@ -123,7 +123,7 @@ export default function EditProductCategoryModal({
     try {
       const result = (await fetchData(
         "/categories/businessCategory",
-      )) as unknown as TResponse<TBusinessCategory[]>;
+      )) as unknown as TResponse<TBusinessCategoryResponse[]>;
       if (result?.success) {
         setBusinessCategories(result?.data);
       }
@@ -292,7 +292,7 @@ export default function EditProductCategoryModal({
                                         key={businessCategory._id}
                                         value={businessCategory._id}
                                       >
-                                        {businessCategory.name}
+                                        {businessCategory.name?.[lang]}
                                       </SelectItem>
                                     ),
                                   )}

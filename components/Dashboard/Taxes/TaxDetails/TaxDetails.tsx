@@ -2,6 +2,7 @@
 
 import EditTaxModal from "@/components/Dashboard/Taxes/Taxes/EditTaxModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -119,14 +120,19 @@ export default function TaxDetails({ tax }: IProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
+      <TitleHeader
+        title={tax?.taxName?.[lang]}
+        subtitle={tax?.description?.[lang]}
+        onBackClick={() => router.back()}
+      />
       <Card className="rounded-2xl shadow-md border-muted">
+
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <div className="space-y-1">
             <CardTitle className="text-xl font-semibold flex items-center gap-2">
               <Utensils className="h-5 w-5 text-[#DC3173]" />
-              {tax?.taxName[lang]}
+             Tax Details
             </CardTitle>
-            <p className="text-sm text-muted-foreground">{tax?.description?.[lang]}</p>
           </div>
 
           <div className="flex items-center gap-2">
