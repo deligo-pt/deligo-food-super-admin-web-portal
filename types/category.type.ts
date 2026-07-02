@@ -11,6 +11,22 @@ export type TBusinessCategory = {
   updatedAt?: Date;
 };
 
+export type TBusinessCategoryResponse = {
+  _id: string;
+  name: {
+    en?: string;
+    pt?: string;
+  };
+  slug: string;
+  description?: string;
+  icon?: string;
+  image?: string;
+  isActive: boolean;
+  isDeleted: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
 export type TProductCategory = {
   _id: string;
   name: {

@@ -21,7 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { addProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 import { useStore } from "@/store/store";
-import { TBusinessCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 import { translateObject } from "@/utils/translation/translationObject";
 import { productCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +44,7 @@ type FormData = z.infer<typeof productCategoryValidation>;
 export default function AddProductCategory({
   businessCategories,
 }: {
-  businessCategories: TBusinessCategory[];
+  businessCategories: TBusinessCategoryResponse[];
 }) {
   const { t } = useTranslation();
   const { lang } = useStore();
@@ -281,7 +281,7 @@ export default function AddProductCategory({
                             key={businessCategory._id}
                             value={businessCategory._id}
                           >
-                            {businessCategory.name}
+                            {businessCategory.name?.[lang]}
                           </SelectItem>
                         ))}
                       </SelectContent>

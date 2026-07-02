@@ -17,7 +17,8 @@ import {
   deleteBusinessCategoryReq,
   updateBusinessCategoryReq,
 } from "@/services/dashboard/category/business-category.service";
-import { TBusinessCategory } from "@/types/category.type";
+import { useStore } from "@/store/store";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -40,9 +41,10 @@ import { toast } from "sonner";
 export default function BusinessCategoryDetails({
   category,
 }: {
-  category: TBusinessCategory;
+  category: TBusinessCategoryResponse;
 }) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const [showEditModal, setShowEditModal] = useState(false);
   const [updateField, setUpdateField] = useState("");
   const router = useRouter();
@@ -224,7 +226,7 @@ export default function BusinessCategoryDetails({
           >
             <Image
               src={category.icon}
-              alt={category.name}
+              alt={category.name?.[lang] as string}
               className="w-full h-full object-cover"
               width={500}
               height={500}
@@ -240,7 +242,7 @@ export default function BusinessCategoryDetails({
         </div>
         <div className="p-6">
           <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-1">{category.name}</h2>
+            <h2 className="text-2xl font-bold mb-1">{category.name?.[lang]}</h2>
             <div className="flex items-center text-gray-500 mb-4">
               <TagIcon size={16} className="mr-2" />
               <span>{category.slug}</span>
@@ -285,7 +287,7 @@ export default function BusinessCategoryDetails({
       >
         <Dialog open={!!updateField} onOpenChange={() => setUpdateField("")}>
           <form>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-106.25">
               <DialogHeader>
                 <DialogTitle>
                   {updateField === "isDeleted"

@@ -14,11 +14,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { updateBusinessCategoryReq } from "@/services/dashboard/category/business-category.service";
-import { TBusinessCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 import { updateBusinessCategoryValidation } from "@/validations/category/business-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -31,7 +30,7 @@ import z from "zod";
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
-  category: TBusinessCategory;
+  category: TBusinessCategoryResponse;
 }
 
 type FormData = z.infer<typeof updateBusinessCategoryValidation>;
@@ -46,8 +45,10 @@ export default function EditBusinessCategoryModal({
   const form = useForm<FormData>({
     resolver: zodResolver(updateBusinessCategoryValidation),
     defaultValues: {
-      name: category?.name || "",
-      image: { file: null, url: category?.icon || "" },
+      image: {
+        file: null,
+        url: category?.icon || "",
+      },
       description: category?.description || "",
     },
   });
@@ -70,7 +71,6 @@ export default function EditBusinessCategoryModal({
     const toastId = toast.loading("Updating category...");
 
     const categoryData = {
-      name: data.name,
       description: data.description,
     };
 
@@ -132,31 +132,6 @@ export default function EditBusinessCategoryModal({
                     className="space-y-6"
                   >
                     <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem className="content-start">
-                            <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                              <div className="flex items-center">
-                                <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">
-                                  {t("category_name")}
-                                </span>
-                              </div>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder={t("eg_restaurant")}
-                                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
                       <FormField
                         control={form.control}
                         name="image"

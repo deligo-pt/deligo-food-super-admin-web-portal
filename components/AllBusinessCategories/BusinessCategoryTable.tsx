@@ -32,8 +32,9 @@ import {
   deleteBusinessCategoryReq,
   updateBusinessCategoryReq,
 } from "@/services/dashboard/category/business-category.service";
+import { useStore } from "@/store/store";
 import { TMeta } from "@/types";
-import { TBusinessCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 import { getSortOptions } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
@@ -50,13 +51,14 @@ import { toast } from "sonner";
 
 interface IProps {
   categoriesResult: {
-    data: TBusinessCategory[];
+    data: TBusinessCategoryResponse[];
     meta?: TMeta;
   };
 }
 
 export default function CategoryTable({ categoriesResult }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const sortOptions = getSortOptions(t);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState<{
@@ -172,13 +174,13 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                         <Image
                           className="w-8 h-8 rounded-full object-cover"
                           src={category.icon}
-                          alt={category.name}
+                          alt={category.name?.[lang] as string}
                           width={32}
                           height={32}
                         />
                       </div>
                     )}
-                    <p>{category.name}</p>
+                    <p>{category.name?.[lang]}</p>
                   </div>
                 </TableCell>
                 <TableCell>{category.description}</TableCell>
