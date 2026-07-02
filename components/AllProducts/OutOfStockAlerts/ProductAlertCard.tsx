@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -19,6 +20,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function ProductAlertCard({ product }: { product: TProduct }) {
+  const { lang } = useStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getProductAlertLevel = (
@@ -87,7 +89,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
           {product.images && product.images.length > 0 ? (
             <Image
               src={product.images?.[0]}
-              alt={product.name}
+              alt={product.name?.[lang]}
               className="w-full h-full object-cover"
               width={64}
               height={64}
@@ -103,14 +105,14 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
             <h3 className="text-lg font-bold text-gray-900 truncate">
-              {product.name}
+              {product.name?.[lang]}
             </h3>
             {alertBadge(getProductAlertLevel(product))}
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
-              {product.category.name}
+              {product.category.name?.[lang]}
             </span>
             <span className="text-xs text-gray-600 flex items-center gap-1">
               <Store size={12} />{" "}
@@ -179,7 +181,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
                   className="bg-white rounded-xl border border-gray-200 p-4"
                 >
                   <h4 className="text-sm font-bold text-gray-900 mb-3">
-                    {variation.name}
+                    {variation.name?.[lang]}
                   </h4>
                   <div className="space-y-2">
                     {variation.options.map((option, oIdx) => {
@@ -194,7 +196,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
                         >
                           <div className="flex items-center gap-3">
                             <span className="font-medium text-gray-700">
-                              {option.label}
+                              {option.label?.[lang]}
                             </span>
                             <span className="text-xs font-mono text-gray-400">
                               {option.sku}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
 import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
@@ -26,6 +27,7 @@ interface IProps {
 
 export default function ProductDetails({ product }: IProps) {
   const { t } = useTranslation();
+  const {lang} = useStore();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const getStockStatusColor = (status: string) => {
@@ -129,7 +131,7 @@ export default function ProductDetails({ product }: IProps) {
               <motion.img
                 key={currentImageIndex}
                 src={product.images[currentImageIndex]}
-                alt={product.name}
+                alt={product.name?.[lang]}
                 className="w-full h-full object-cover"
                 variants={imageVariants}
                 initial="hidden"
@@ -173,7 +175,7 @@ export default function ProductDetails({ product }: IProps) {
         {/* Product Info */}
         <div className="col-span-1 md:col-span-2 space-y-6">
           <motion.div variants={itemVariants as Variants}>
-            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{product.name?.[lang]}</h1>
             <div className="flex items-center mt-2 space-x-4">
               <span className="text-sm text-gray-500">
                 {t("sku")}: {product.sku}
@@ -268,7 +270,7 @@ export default function ProductDetails({ product }: IProps) {
               </h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
-              {product.description}
+              {product.description?.[lang]}
             </p>
           </motion.div>
           {/* Category & Brand */}
@@ -280,7 +282,7 @@ export default function ProductDetails({ product }: IProps) {
               <h3 className="text-sm font-medium text-gray-500">
                 {t("category")}
               </h3>
-              <p className="mt-1 text-gray-900">{product.category?.name}</p>
+              <p className="mt-1 text-gray-900">{product.category?.name?.[lang]}</p>
               {product.subCategory && (
                 <p className="mt-1 text-gray-700">
                   {t("sub")}: {product.subCategory}
@@ -308,10 +310,10 @@ export default function ProductDetails({ product }: IProps) {
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-medium">Name: </span>
-                      <span>{v.name}</span>
+                      <span>{v.name?.[lang]}</span>
                     </div>
                     <div className="flex items-start gap-4">
-                      <h4 className="font-semibold w-[200px]">
+                      <h4 className="font-semibold w-50">
                         Variation Options
                       </h4>
                       <div className="mt-0.5 flex-1">
@@ -322,7 +324,7 @@ export default function ProductDetails({ product }: IProps) {
                           >
                             <div>
                               <span className="font-semibold">Label: </span>
-                              <span>{option.label}</span>
+                              <span>{option.label?.[lang]}</span>
                             </div>
                             <div className="flex items-start gap-3">
                               <div>

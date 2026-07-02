@@ -125,7 +125,6 @@ export default function AddVendor({
       businessName: "",
       businessType: "",
       restaurantCuisineType: [],
-      businessLicenseNumber: "",
       NIF: "",
       branches: "",
       openingHours: "",
@@ -293,7 +292,6 @@ export default function AddVendor({
           restaurantCuisineType: data.restaurantCuisineType
         }),
         NIF: data.NIF?.toUpperCase(),
-        businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
         totalBranches: Number(data.branches),
         openingHours: data.openingHours,
         closingHours: data.closingHours,
@@ -629,25 +627,6 @@ export default function AddVendor({
                                     ))}
                                   </SelectContent>
                                 </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="businessLicenseNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>
-                                {t("business_license_number")}
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("license_number")}
-                                  {...field}
-                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
