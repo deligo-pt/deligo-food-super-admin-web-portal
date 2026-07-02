@@ -1,8 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { motion } from "framer-motion";
 import {
+  ArrowLeftCircle,
   CalendarIcon,
   CheckCircleIcon,
   ClockIcon,
@@ -13,6 +15,7 @@ import {
   TrashIcon,
   XCircleIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface IProps {
@@ -41,6 +44,7 @@ const sponsorTypeConfig = {
 };
 
 export function SponsorshipDetails({ sponsorship }: IProps) {
+  const router = useRouter();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const config = sponsorTypeConfig[sponsorship.sponsorType];
@@ -72,6 +76,15 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           opacity: 1,
         }}
       >
+        <div className="mb-4">
+          <Button
+            onClick={() => router.back()}
+            variant="link"
+            className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
+          >
+            <ArrowLeftCircle /> Go Back
+          </Button>
+        </div>
         {/* Banner Hero */}
         <motion.div
           initial={{

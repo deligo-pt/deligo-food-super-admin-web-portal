@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
 import { motion } from "framer-motion";
 import { Clock, ShoppingBag, Star, Tag } from "lucide-react";
@@ -14,6 +15,7 @@ interface IProps {
 
 export default function ProductCard({ product, onDelete }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
   const statusColors = {
     ACTIVE: "bg-green-100 text-green-800",
@@ -53,7 +55,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images?.[0]}
-            alt={product.name}
+            alt={product.name?.[lang]}
             className="w-full h-full object-cover"
             width={500}
             height={500}
@@ -78,7 +80,7 @@ export default function ProductCard({ product, onDelete }: IProps) {
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-lg font-bold text-gray-900 truncate">
-            {product.name}
+            {product.name?.[lang]}
           </h3>
           <div className="flex items-center">
             <Star
@@ -92,13 +94,13 @@ export default function ProductCard({ product, onDelete }: IProps) {
         </div>
         <div className="flex items-center text-sm text-gray-500 mb-2">
           <Tag className="h-4 w-4 mr-1" />
-          <span>{product.category?.name}</span>
+          <span>{product.category?.name?.[lang]}</span>
           {product.brand && (
             <span className="ml-2 text-gray-400">| {product.brand}</span>
           )}
         </div>
         <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {product.description}
+          {product.description?.[lang]}
         </p>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
