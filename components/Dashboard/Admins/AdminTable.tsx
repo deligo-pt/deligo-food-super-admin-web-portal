@@ -116,7 +116,7 @@ export default function AdminTable({
                       <DropdownMenuItem
                         className=""
                         onClick={() =>
-                          router.push("/admin/admin/" + admin.userId)
+                          router.push("/admin/all-admins/" + admin.userId)
                         }
                       >
                         View
