@@ -1,6 +1,8 @@
 "use client";
 
+import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
+import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { motion } from "framer-motion";
 import {
@@ -17,6 +19,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   sponsorship: TSponsorship;
@@ -46,6 +49,8 @@ const sponsorTypeConfig = {
 export function SponsorshipDetails({ sponsorship }: IProps) {
   const router = useRouter();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const config = sponsorTypeConfig[sponsorship.sponsorType];
   const IconComponent = config.icon;
@@ -65,6 +70,32 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
   const daysRemaining = Math.ceil(
     (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
   );
+
+  const closeDeleteModal = (open: boolean) => {
+    if (!open) {
+      setDeleteId("");
+    }
+  };
+
+  const deleteSponsorship = async () => {
+    const toastId = toast.loading("Deleting Sponsorship...");
+    setIsDeleting(true);
+
+    const result = await deleteSponsorshipReq(deleteId);
+
+    if (result.success) {
+      toast.success(result.message || "Sponsorship deleted successfully!", {
+        id: toastId,
+      });
+      router.refresh();
+      closeDeleteModal(false);
+      return;
+    }
+
+    toast.error(result.message || "Sponsorship delete failed", { id: toastId });
+    console.log(result);
+    setIsDeleting(false);
+  };
 
   return (
     <div className="min-h-screen">
@@ -212,7 +243,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             whileTap={{
               scale: 0.98,
             }}
-            // onClick={() => setShowDeleteConfirm(true)}
+            onClick={() => setDeleteId(sponsorship?._id)}
             className="bg-red-500 hover:bg-red-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors"
           >
             <TrashIcon className="w-4 h-4" />
@@ -443,6 +474,14 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Delete Modal */}
+      <DeleteModal
+        open={!!deleteId}
+        onOpenChange={closeDeleteModal}
+        onConfirm={deleteSponsorship}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
