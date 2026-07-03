@@ -27,8 +27,9 @@ interface IProps {
 
 export default function ProductDetails({ product }: IProps) {
   const { t } = useTranslation();
-  const {lang} = useStore();
+  const { lang } = useStore();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  console.log("ProductDetails product:", product);
 
   const getStockStatusColor = (status: string) => {
     switch (status) {
@@ -149,9 +150,8 @@ export default function ProductDetails({ product }: IProps) {
               {product.images.map((image, index) => (
                 <motion.div
                   key={index}
-                  className={`aspect-square rounded-md overflow-hidden cursor-pointer ${
-                    index === currentImageIndex ? "ring-2 ring-[#DC3173]" : ""
-                  }`}
+                  className={`aspect-square rounded-md overflow-hidden cursor-pointer ${index === currentImageIndex ? "ring-2 ring-[#DC3173]" : ""
+                    }`}
                   onClick={() => setCurrentImageIndex(index)}
                   whileHover={{
                     scale: 1.05,
@@ -162,7 +162,7 @@ export default function ProductDetails({ product }: IProps) {
                 >
                   <Image
                     src={image}
-                    alt={`${product.name} - view ${index + 1}`}
+                    alt={`${product.name?.[lang]} - view ${index + 1}`}
                     className="w-full h-full object-cover"
                     width={500}
                     height={500}
@@ -184,11 +184,10 @@ export default function ProductDetails({ product }: IProps) {
                 {t("id")}: {product.productId}
               </span>
               <div
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  product.isApproved
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isApproved
                     ? "bg-green-100 text-green-800"
                     : "bg-red-100 text-red-800"
-                }`}
+                  }`}
               >
                 {product.isApproved ? t("approved") : t("not_approved")}
               </div>
@@ -240,7 +239,7 @@ export default function ProductDetails({ product }: IProps) {
             )}
           </motion.div>
           {/* Stock */}
-          <motion.div variants={itemVariants as Variants}>
+          {product?.stock && <motion.div variants={itemVariants as Variants}>
             <div className="flex items-center gap-2 mb-2">
               <ShoppingBagIcon className="w-5 h-5 text-[#DC3173]" />
               <h2 className="text-lg font-semibold text-gray-900">
@@ -260,7 +259,7 @@ export default function ProductDetails({ product }: IProps) {
                 {product.stock.quantity} {product.stock.unit} {t("available")}
               </span>
             </div>
-          </motion.div>
+          </motion.div>}
           {/* Description */}
           <motion.div variants={itemVariants as Variants}>
             <div className="flex items-center gap-2 mb-2">
@@ -463,13 +462,12 @@ export default function ProductDetails({ product }: IProps) {
                     {[...Array(5)].map((_, i) => (
                       <StarIcon
                         key={i}
-                        className={`w-5 h-5 ${
-                          i < Math.floor(product?.rating?.average || 0)
+                        className={`w-5 h-5 ${i < Math.floor(product?.rating?.average || 0)
                             ? "text-amber-400 fill-amber-400"
                             : i < (product?.rating?.average || 0)
                               ? "text-amber-400 fill-amber-400 opacity-50"
                               : "text-gray-300"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -493,13 +491,12 @@ export default function ProductDetails({ product }: IProps) {
                 <p>
                   {t("status")}:{" "}
                   <span
-                    className={`font-medium ${
-                      product.isDeleted
+                    className={`font-medium ${product.isDeleted
                         ? "text-red-600"
                         : product.meta.status === "ACTIVE"
                           ? "text-green-600"
                           : "text-yellow-600"
-                    }`}
+                      }`}
                   >
                     {product.isDeleted ? "DELETED" : product.meta.status}
                   </span>
