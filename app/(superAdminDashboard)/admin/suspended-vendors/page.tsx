@@ -15,8 +15,8 @@ export default async function SuspendedVendorsPage({ searchParams }: IProps) {
   return (
     <Vendors
       vendorsResult={vendorsResult}
-      title="Suspended Vendors"
-      subtitle="All blocked vendors from the system"
+      title="suspended_vendors"
+      subtitle="manage_review_vendors_suspended_due_policy"
     />
   );
 }

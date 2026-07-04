@@ -39,7 +39,7 @@ export const pt = {
   pending_approvals: "Aprovações Pendentes",
   active_vendors: "Vendedores Ativos",
   suspended_vendors: "Vendedores Suspensos",
-  add_new_vendor: "Adicionar Novo Vendedor",
+  add_vendor: "Adicionar Vendedor",
   vendor_payouts: "Pagamentos aos Vendedores",
 
   fleet_managers: "Gestores de Frota",
@@ -221,8 +221,12 @@ export const pt = {
   no_top_rated_items_found: "Nenhum item bem avaliado encontrado",
   orders: "encomendas",
 
+  // add vendor
+  add_new_vendor: "Adicionar Novo Vendedor",
+  add_new_vendor_here: "Adicione um novo vendedor aqui",
+
   // all-vendors
-  manage_all_vendors: "Gerir todos os seus vendedores",
+  manage_all_registered_vendors: "Gerenciar todos os vendedores registrados",
   name: "Nome",
   phone: "Telefone",
   actions: "Ações",

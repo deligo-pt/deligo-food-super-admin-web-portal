@@ -364,8 +364,8 @@ export default function AddVendor({
         className="min-h-screen bg-slate-50"
       >
         <TitleHeader
-          title={t("add_new_vendor")}
-          subtitle="Add a new vendor here"
+          title={t("add_vendor")}
+          subtitle={t("add_new_vendor_here")}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

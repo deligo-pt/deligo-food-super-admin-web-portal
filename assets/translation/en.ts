@@ -30,12 +30,13 @@ export const en = {
 
   // sidebar
   dashboard: "Dashboard",
+
   vendors: "Vendors",
   all_vendors: "All vendors",
   pending_approvals: "Pending Approvals",
   active_vendors: "Active Vendors",
   suspended_vendors: "Suspended Vendors",
-  add_new_vendor: "Add New Vendor",
+  add_vendor: "Add Vendor",
   vendor_payouts: "Vendor Payouts",
 
   fleet_managers: "Fleet Managers",
@@ -205,8 +206,12 @@ export const en = {
   no_top_rated_items_found: "No top rated items found",
   orders: "orders",
 
+  // add-vendor
+  add_new_vendor: "Add New Vendor",
+  add_new_vendor_here: "Add a new Vendor here",
+
   // all-vendors
-  manage_all_vendors: "Manage your all vendors",
+  manage_all_registered_vendors: "Manage all registered vendors",
   name: "Name",
   phone: "Phone",
   actions: "Actions",
@@ -768,16 +773,16 @@ export const en = {
   warings_this_action_cannot_be_undone: "Warning: This action cannot be undone. It will completely scrub this record out of the database!",
   // --> cuisine details
   back_to_list: "Back to list",
-  slug : "slug",
-  soft_deleted : "Soft Deleted",
-  cuisine_asset_preview : "Cuisine Asset Preview",
-  no_image_uploaded : "No image uploaded",
-  properties : "Properties",
-  url_status_check :"Url Status Check",
-  valid_asset_path :"Valid Asset Path",
-  empty_source_reference :"Empty Source Reference",
-  audit_timelines : "Audit Timelines",
-  created_on :"Created On",
+  slug: "slug",
+  soft_deleted: "Soft Deleted",
+  cuisine_asset_preview: "Cuisine Asset Preview",
+  no_image_uploaded: "No image uploaded",
+  properties: "Properties",
+  url_status_check: "Url Status Check",
+  valid_asset_path: "Valid Asset Path",
+  empty_source_reference: "Empty Source Reference",
+  audit_timelines: "Audit Timelines",
+  created_on: "Created On",
 
   // product categories
   // -> title

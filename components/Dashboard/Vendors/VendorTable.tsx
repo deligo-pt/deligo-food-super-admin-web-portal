@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TVendor } from "@/types/user.type";
 import { motion } from "framer-motion";
 import {
@@ -41,6 +42,7 @@ export default function VendorTable({
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -55,30 +57,30 @@ export default function VendorTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <IdCard className="w-4" />
-                Name
+                {t("name")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Mail className="w-4" />
-                Email
+                {t("email")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Phone className="w-4" />
-                Phone
+                {t("phone")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Status
+                {t("status")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -89,7 +91,7 @@ export default function VendorTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No vendors found
+                {t("no_vendors_found")}
               </TableCell>
             </TableRow>
           )}
@@ -116,7 +118,7 @@ export default function VendorTable({
                           router.push("/admin/vendor/" + vendor.userId)
                         }
                       >
-                        View
+                        {t("view")}
                       </DropdownMenuItem>
                       {vendor.status === "SUBMITTED" && (
                         <DropdownMenuItem
@@ -128,7 +130,7 @@ export default function VendorTable({
                             )
                           }
                         >
-                          Approve
+                          {t("approve")}
                         </DropdownMenuItem>
                       )}
                       {vendor.status === "SUBMITTED" && (
@@ -141,7 +143,7 @@ export default function VendorTable({
                             )
                           }
                         >
-                          Reject
+                          {t("reject")}
                         </DropdownMenuItem>
                       )}
                       {vendor.status === "APPROVED" && (
@@ -154,7 +156,7 @@ export default function VendorTable({
                             )
                           }
                         >
-                          Block
+                          {t("block")}
                         </DropdownMenuItem>
                       )}
                       {vendor.status === "BLOCKED" && (
@@ -167,14 +169,14 @@ export default function VendorTable({
                             )
                           }
                         >
-                          Unblock
+                          {t("unblock")}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => handleDeleteId(vendor.userId)}
                       >
-                        Delete
+                        {t("delete")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
