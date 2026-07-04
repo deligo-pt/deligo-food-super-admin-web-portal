@@ -41,10 +41,16 @@ export const pt = {
   suspended_vendors: "Vendedores Suspensos",
   add_vendor: "Adicionar Vendedor",
   vendor_payouts: "Pagamentos aos Vendedores",
+  vendor_performance_analytics: "Análise de Desempenho do Vendedor",
+  vendor_agreements: "Contratos do Vendedor",
+  vendor_wallets: "Carteiras do Vendedor",
+  vendor_zones: "Zonas do Vendedor",
 
+  add_fleet_manager: "Adicionar Gerente de Frota",
   fleet_managers: "Gestores de Frota",
   all_fleet_managers: "Todos os Gestores de Frota",
   add_new_fleet_manager: "Adicionar Novo Gestor de Frota",
+  fleet_manager_payouts: "Pagamentos do Gerente de Frota",
   fleet_manager_wallet: "Carteira do Gestor de Frota",
   payout_requests: "Pedidos de Pagamento",
   zones_and_coverage_areas: "Zonas e Áreas de Cobertura",
@@ -56,9 +62,11 @@ export const pt = {
   customers: "Clientes",
   all_customers: "Todos os Clientes",
   active_customers: "Clientes Ativos",
+  customer_spends: "Gastos do Cliente",
   blocked_customers: "Clientes Bloqueados",
   customer_feedback: "Feedback dos Clientes",
 
+  add_delivery_partner: "Adicionar Parceiro de Entrega",
   delivery_partners: "Parceiros de Entrega",
   all_delivery_partners: "Todos os Parceiros de Entrega",
   delivery_partner_onboarding_requests:
@@ -66,9 +74,11 @@ export const pt = {
   active_delivery_partners: "Parceiros de Entrega Ativos",
   suspended_delivery_partners: "Parceiros de Entrega Suspensos",
   delivery_partner_performance: "Desempenho dos Parceiros de Entrega",
+  delivery_partner_wallets: "Carteiras do Parceiro de Entrega",
   delivery_partner_payouts: "Pagamentos aos Parceiros de Entrega",
   delivery_partner_analytics: "Análises dos Parceiros de Entrega",
 
+  cuisine: "Culinária",
   create_cuisine: "Criar Culinária",
   all_cuisines: "Todas as Culinárias",
   business_categories: "Categorias de Negócio",
@@ -91,6 +101,9 @@ export const pt = {
   platform_earnings: "Ganhos da Plataforma",
   driver_payouts: "Pagamentos aos Estafetas",
   transaction_history: "Histórico de Transações",
+  all_taxes: "Todos os Impostos",
+  create_tax: "Criar Imposto",
+  loyalty_points: "Pontos de Fidelidade",
   payment_disputes: "Disputas de Pagamento",
   tax_management: "Gestão Fiscal",
 
@@ -98,11 +111,18 @@ export const pt = {
   all_items: "Todos os Itens",
   out_of_stock_alerts: "Alertas de Rutura de Stock",
   restricted_items: "Itens Restritos",
+  all_ingredients: "Todos os Ingredientes",
+  add_ingredient: "Adicionar Ingrediente",
+  ingredient_orders: "Pedidos de Ingredientes",
 
   promotions_and_coupons: "Promoções e Cupões",
   active_campaigns: "Campanhas Ativas",
   create_new_offer: "Criar Nova Oferta",
+  all_offers: "Todas as Ofertas",
+  expired_offers: "Ofertas Expiradas",
   coupon_analytics: "Análise de Cupões",
+  sponsorships: "Patrocínios",
+  add_sponsorship: "Adicionar Patrocínio",
 
   analytics_and_insights: "Análises e Insights",
   sales_analytics: "Análise de Vendas",
@@ -129,12 +149,17 @@ export const pt = {
   chat_with_customers: "Chat com Clientes",
 
   reports: "Relatórios",
+  customer_report: "Relatório do Cliente",
+  delivery_partner_report: "Relatório do Parceiro de Entrega",
+  fleet_manager_report: "Relatório do Gerente de Frota",
   sales_report: "Relatório de Vendas",
   order_report: "Relatório de Encomendas",
   driver_performance_report: "Relatório de Desempenho dos Estafetas",
   vendor_report: "Relatório de Vendedores",
 
   settings: "Definições",
+  rewards_settings: "Configurações de Recompensas",
+  payouts_settings: "Configurações de Pagamentos",
   business_info: "Informações do Negócio",
   branding_and_theme: "Marca e Tema",
   localization: "Localização (Idioma e Moeda)",
@@ -142,6 +167,7 @@ export const pt = {
   legal_documents: "Documentos Legais (Termos, Privacidade)",
   global_settings: "Definições Globais",
 
+  all_sos: "Todos os SOS",
   sos_emergency: "SOS / Emergência",
   critical_alerts: "Alertas Críticos",
   contact_support_team: "Contactar Equipa de Suporte",
@@ -248,7 +274,6 @@ export const pt = {
   vendor: "Vendedor",
   owner: "Proprietário",
   city: "Cidade",
-  cuisine: "Cozinha",
   no_pending_vendors_found: "Nenhum vendedor pendente encontrado.",
 
   // active vendors

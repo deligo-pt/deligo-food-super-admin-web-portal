@@ -59,19 +59,19 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("vendors"),
       icon: <Utensils size={18} />,
       items: [
-        { name: "Add Vendor", path: "/admin/add-vendor" },
+        { name: t("add_vendor"), path: "/admin/add-vendor" },
         { name: t("all_vendors"), path: "/admin/all-vendors" },
         { name: t("active_vendors"), path: "/admin/active-vendors" },
         { name: t("pending_approvals"), path: "/admin/pending-approvals" },
         { name: t("suspended_vendors"), path: "/admin/suspended-vendors" },
         { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
         {
-          name: "Vendor Performance Analytics",
+          name: t("vendor_performance_analytics"),
           path: "/admin/vendor-performance",
         },
-        { name: "Vendor Agreements", path: "/admin/vendor-agreements" },
-        { name: "Vendor Wallets", path: "/admin/vendor-wallets" },
-        { name: "Vendor Zones", path: "/admin/vendor-zones" },
+        { name: t("vendor_agreements"), path: "/admin/vendor-agreements" },
+        { name: t("vendor_wallets"), path: "/admin/vendor-wallets" },
+        { name: t("vendor_zones"), path: "/admin/vendor-zones" },
       ],
     },
     {
@@ -79,10 +79,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("fleet_managers"),
       icon: <Users size={18} />,
       items: [
-        { name: "Add Fleet Manager", path: "/admin/add-fleet-manager" },
+        { name: t("add_fleet_manager"), path: "/admin/add-fleet-manager" },
         { name: t("all_fleet_managers"), path: "/admin/all-fleet-managers" },
         {
-          name: "Fleet Manager Payouts",
+          name: t("fleet_manager_payouts"),
           path: "/admin/fleet-manager-payouts",
         },
         {
@@ -108,7 +108,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_customers"), path: "/admin/all-customers" },
         { name: t("active_customers"), path: "/admin/active-customers" },
         { name: t("blocked_customers"), path: "/admin/blocked-customers" },
-        { name: "Customer Spends", path: "/admin/customer-spends" },
+        { name: t("customer_spends"), path: "/admin/customer-spends" },
         { name: t("customer_feedback"), path: "/admin/customer-feedback" },
       ],
     },
@@ -118,7 +118,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <Bike size={18} />,
       items: [
         {
-          name: "Add Delivery Partner",
+          name: t("add_delivery_partner"),
           path: "/admin/add-delivery-partner",
         },
         {
@@ -130,7 +130,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/active-delivery-partners",
         },
         {
-          name: "Pending Approvals",
+          name: t("pending_approvals"),
           path: "/admin/delivery-partner-onboarding-requests",
         },
         {
@@ -150,7 +150,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/delivery-partner-performance",
         },
         {
-          name: "Delivery Partner Wallets",
+          name: t("delivery_partner_wallets"),
           path: "/admin/delivery-partner-wallets",
         },
       ],
@@ -172,7 +172,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
     },
     {
       id: 'cuisine',
-      title: "Cuisine",
+      title: t("cuisine"),
       icon: <Grid size={18} />,
       items: [
         {
@@ -222,11 +222,11 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("platform_earnings"), path: "/admin/platform-earnings" },
         { name: t("transaction_history"), path: "/admin/transaction-history" },
         {
-          name: "All Taxes",
+          name: t("all_taxes"),
           path: "/admin/all-taxes",
         },
-        { name: "Create tax", path: "/admin/create-tax" },
-        { name: "Loyalty Points", path: "/admin/loyalty-points" },
+        { name: t("create_tax"), path: "/admin/create-tax" },
+        { name: t("loyalty_points"), path: "/admin/loyalty-points" },
       ],
     },
     {
@@ -237,26 +237,26 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_items"), path: "/admin/all-products" },
         { name: t("out_of_stock_alerts"), path: "/admin/out-of-stock-alerts" },
         { name: t("restricted_items"), path: "/admin/restricted-items" },
-        { name: "All Ingredients", path: "/admin/all-ingredients" },
-        { name: "Add Ingredient", path: "/admin/add-ingredient" },
-        { name: "Ingredient Orders", path: "/admin/ingredient-orders" },
+        { name: t("all_ingredients"), path: "/admin/all-ingredients" },
+        { name: t("add_ingredient"), path: "/admin/add-ingredient" },
+        { name: t("ingredient_orders"), path: "/admin/ingredient-orders" },
       ],
     },
     {
       id: "promotions-and-offers",
-      title: "Promotions & Offers",
+      title: t("promotions_and_coupons"),
       icon: <Ticket size={18} />,
       items: [
-        { name: "Add Offer", path: "/admin/create-new-offer" },
-        { name: "All Offers", path: "/admin/all-offers" },
+        { name: t("create_new_offer"), path: "/admin/create-new-offer" },
+        { name: t("all_offers"), path: "/admin/all-offers" },
         { name: t("active_campaigns"), path: "/admin/active-campaigns" },
-        { name: "Expired Offers", path: "/admin/expired-offers" },
-        { name: "Offer Analytics", path: "/admin/offer-analytics" },
+        { name: t("expired_offers"), path: "/admin/expired-offers" },
+        { name: t("coupon_analytics"), path: "/admin/coupon-analytics" },
         {
-          name: "Sponsorships",
+          name: t("sponsorships"),
           path: "/admin/sponsorships",
         },
-        { name: "Add Sponsorship", path: "/admin/add-sponsorship" },
+        { name: t("add_sponsorship"), path: "/admin/add-sponsorship" },
       ],
     },
     {
@@ -307,12 +307,12 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("reports"),
       icon: <NotepadText size={18} />,
       items: [
-        { name: "Customer Report", path: "/admin/customer-report" },
+        { name: t("customer_report"), path: "/admin/customer-report" },
         {
-          name: "Delivery Partner Report",
+          name: t("delivery_partner_report"),
           path: "/admin/delivery-partner-report",
         },
-        { name: "Fleet Manager Report", path: "/admin/fleet-manager-report" },
+        { name: t("fleet_manager_report"), path: "/admin/fleet-manager-report" },
         { name: t("order_report"), path: "/admin/order-report" },
         { name: t("sales_report"), path: "/admin/sales-report" },
         { name: t("vendor_report"), path: "/admin/vendor-report" },
@@ -324,8 +324,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <Settings size={18} />,
       items: [
         { name: t("global_settings"), path: "/admin/global-settings" },
-        { name: "Rewards Settings", path: "/admin/rewards-settings" },
-        { name: "Payouts Settings", path: "/admin/payout-settings" },
+        { name: t("rewards_settings"), path: "/admin/rewards-settings" },
+        { name: t("payouts_settings"), path: "/admin/payout-settings" },
         {
           name: t("notification_preferences"),
           path: "/admin/notification-preferences",
@@ -336,7 +336,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       id: "sos",
       title: t("sos_emergency"),
       icon: <AlertCircle size={18} />,
-      items: [{ name: "All SOS", path: "/admin/sos" }],
+      items: [{ name: t("all_sos"), path: "/admin/sos" }],
     },
   ];
 
