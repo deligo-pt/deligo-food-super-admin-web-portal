@@ -15,8 +15,8 @@ export default async function ActiveCustomersPage({ searchParams }: IProps) {
   return (
     <Customers
       customersResult={customersResult}
-      title="Active Customers"
-      subtitle="All active customers in the system"
+      title="active_customers"
+      subtitle="all_active_customers_in_system"
     />
   );
 }

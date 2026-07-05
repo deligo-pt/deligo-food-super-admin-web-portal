@@ -31,7 +31,7 @@ export default function CustomerFeedback({ feedbackResult }: IProps) {
       {/* Page Title */}
       <TitleHeader
         title={t("customer_feedback")}
-        subtitle="Feedbacks from the customers"
+        subtitle={t("feedbacks_from_customers")}
       />
 
       {/* Filters */}

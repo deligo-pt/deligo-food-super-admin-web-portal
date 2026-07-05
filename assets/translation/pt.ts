@@ -664,10 +664,12 @@ export const pt = {
   no_blocked_managers_found: "Nenhum gestor bloqueado encontrado.",
 
   // all-customers
+  manage_all_registered_customers: "Gerenciar todos os clientes registrados",
   customer: "Cliente",
   spend: "Gasto",
   joined: "Registado em",
   orders_lg: "Encomendas",
+  no_customers_found: "Nenhum cliente encontrado",
   // -> delete modal
   are_you_absolutely_sure: "Tem a certeza absoluta?",
   this_action_cannot_be_undone:
@@ -687,15 +689,31 @@ export const pt = {
   state: "Distrito",
   country: "País",
   zip_code: "Código postal",
+  show_all: "Mostrar Tudo",
   account_created: "Conta criada em",
   last_updated: "Última atualização",
   approved_rejected_blocked_at: "Aprovado/Rejeitado/Bloqueado em",
+
+  // active customers
+  all_active_customers_in_system: "Todos os clientes ativos no sistema",
+
+  // customer-spends
+  payment_history_of_customers: "Histórico de pagamentos dos clientes",
+  no_spends_found: "Nenhum gasto encontrado",
+  // --> details
+  back_to_transactions: "Voltar para Transações",
+  transactions_details: "Detalhes da Transação",
+  full_details_of_the_transaction: "Detalhes completos da transação",
+  payment_method: "Método de Pagamento",
+  delivery_address: "Endereço de Entrega",
+  items_ordered: "Itens Pedidos",
 
   // blocked customers
   results: "resultados",
   no_blocked_customers_found: "Nenhum cliente bloqueado encontrado.",
 
   // customer-feedback
+  feedbacks_from_customers: "Feedbacks dos clientes",
   total_feedback: "Total de feedback",
   positive: "Positivo",
   trend_7d: "Tendência (7 dias)",
@@ -708,6 +726,7 @@ export const pt = {
   tags: "Etiquetas",
   feedback_details: "Detalhes do feedback",
   view_full_feedback_nd_reply: "Ver feedback completo e responder",
+  no_feedback_found: "Nenhum feedback encontrado",
   attachments: "Anexos",
   admin_reply: "Resposta do administrador",
   feedback_id: "ID do feedback",

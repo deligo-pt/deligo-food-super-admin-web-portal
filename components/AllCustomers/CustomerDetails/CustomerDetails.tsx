@@ -232,7 +232,7 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
               className="text-[#DC3173] hover:underline text-sm cursor-pointer font-semibold"
               href={`/admin/all-orders/customer/${customer.userId}`}
             >
-              Show All
+              {t("show_all")}
             </Link>
           </div>
         </Section>

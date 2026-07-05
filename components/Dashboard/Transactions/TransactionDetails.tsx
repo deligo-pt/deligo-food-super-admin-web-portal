@@ -1,6 +1,7 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TTransaction } from "@/types/transaction.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -53,9 +54,8 @@ export default function TransactionDetails({
 }: {
   transaction: TTransaction;
 }) {
+  const { t } = useTranslation();
   const router = useRouter();
-
-  console.log(transaction);
 
   const config = typeConfig[transaction.type] || typeConfig.earning;
 
@@ -101,14 +101,14 @@ export default function TransactionDetails({
           className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium"
         >
           <ArrowLeftIcon className="w-4 h-4" />
-          Back to Transactions
+          {t("back_to_transactions")}
         </button>
       </motion.div>
 
       {/* Header */}
       <TitleHeader
-        title="Transaction Details"
-        subtitle="Full details of the transaction"
+        title={t("transactions_details")}
+        subtitle={t("full_details_of_the_transaction")}
       />
 
       {/* Hero */}
@@ -135,7 +135,7 @@ export default function TransactionDetails({
                   {config.label}
                 </span>
                 <span className="text-gray-400 text-xs font-mono">
-                  ID: {transaction.transactionId}
+                  {t("id")}: {transaction.transactionId}
                 </span>
               </div>
               <p className="text-xl font-bold text-gray-900">
@@ -179,25 +179,25 @@ export default function TransactionDetails({
         >
           <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
             <ShoppingBagIcon className="w-4 h-4 text-[#DC3173]" />
-            Order Details
+            {t("order_details")}
           </h3>
           <div className="space-y-3">
             {[
               {
-                label: "Order ID",
+                label: t("order_id"),
                 value: `#${transaction.orderId}`,
                 mono: true,
               },
               {
-                label: "Order Total",
+                label: t("order_total"),
                 value: `€${formatPrice(transaction.items?.reduce((acc, item) => acc + item.price * item.qty, 0) || 0)}`,
               },
               {
-                label: "Payment Method",
+                label: t("payment_method"),
                 value: transaction.paymentMethod,
               },
               {
-                label: "Delivery Address",
+                label: t("delivery_address"),
                 value: transaction.deliveryAddress,
               },
             ].map((item) => (
@@ -225,7 +225,7 @@ export default function TransactionDetails({
         >
           <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
             <UserIcon className="w-4 h-4 text-[#DC3173]" />
-            Customer
+            {t("customer")}
           </h3>
           <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl mb-4">
             <div className="w-12 h-12 bg-[#DC3173]/10 rounded-full flex items-center justify-center">
@@ -244,11 +244,11 @@ export default function TransactionDetails({
           <div className="space-y-3">
             {[
               {
-                label: "Payment",
+                label: t("payment"),
                 value: transaction.paymentMethod,
               },
               {
-                label: "Status",
+                label: t("status"),
                 value: "Verified Customer",
               },
             ].map((item) => (
@@ -275,7 +275,7 @@ export default function TransactionDetails({
       >
         <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
           <TagIcon className="w-4 h-4 text-[#DC3173]" />
-          Items Ordered
+          {t("items_ordered")}
         </h3>
         <div className="space-y-2 mb-4">
           {transaction.items?.map((item, i) => (

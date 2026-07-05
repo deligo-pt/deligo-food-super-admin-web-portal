@@ -514,7 +514,7 @@ export const en = {
 
   // fleet-zones
   fleet_zones: "Fleet Zones",
-  manage_zones_fleet_managers : "Manage zones of fleet managers",
+  manage_zones_fleet_managers: "Manage zones of fleet managers",
   search_zone_city_group: "Search zone, city, group or manager...",
   add_zone: "Add Zone",
   total_zones: "Total zones",
@@ -645,16 +645,18 @@ export const en = {
 
   // suspended/blocked-fleet-managers
   suspended_fleet_managers: "Suspended Fleet Managers",
-  all_blocked_fleet_managers_from_system:"All blocked fleet managers from the system" ,
+  all_blocked_fleet_managers_from_system: "All blocked fleet managers from the system",
   blocked_fleet_managers: "Blocked Fleet Managers",
   blocked_managers: "Blocked Managers",
   no_blocked_managers_found: "No blocked managers found.",
 
   // all-customers
+  manage_all_registered_customers: "Manage all registered customers",
   customer: "Customer",
   spend: "Spend",
   joined: "Joined",
   orders_lg: "Orders",
+  no_customers_found: "No customers found",
   // -> delete modal
   are_you_absolutely_sure: "Are you absolutely sure?",
   this_action_cannot_be_undone:
@@ -674,15 +676,31 @@ export const en = {
   state: "State",
   country: "Country",
   zip_code: "Zip Code",
+  show_all: "Show All",
   account_created: "Account Created",
   last_updated: "Last Updated",
   approved_rejected_blocked_at: "Approved/Rejected/Blocked At",
+
+  // active customers
+  all_active_customers_in_system: "All active customers in the system",
+
+  // customer-spends
+  payment_history_of_customers: "Payment history of customers",
+  no_spends_found: "No spends found",
+  // --> details
+  back_to_transactions: "Back to Transactions",
+  transactions_details: "Transaction Details",
+  full_details_of_the_transaction: "Full details of the transaction",
+  payment_method: "Payment Method",
+  delivery_address: "Delivery Address",
+  items_ordered: "Items Ordered",
 
   // blocked customers
   results: "results",
   no_blocked_customers_found: "No blocked customers found.",
 
   // customer-feedback
+  feedbacks_from_customers: "Feedbacks from the customers",
   total_feedback: "Total Feedback",
   positive: "Positive",
   trend_7d: "Trend (7d)",
@@ -695,6 +713,7 @@ export const en = {
   tags: "Tags",
   feedback_details: "Feedback Details",
   view_full_feedback_nd_reply: "View full feedback and reply",
+  no_feedback_found: "No feedback found",
   attachments: "Attachments",
   admin_reply: "Admin Reply",
   feedback_id: "Feedback ID",
