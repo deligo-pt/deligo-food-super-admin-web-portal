@@ -267,6 +267,26 @@ export const pt = {
   of: "de",
   page_sm: "página",
 
+  // vendor-details
+  restaurant_cuisine_type: "Tipo de Culinária do Restaurante",
+  street_address: "Endereço",
+  postal_code: "Código Postal",
+  business_location: "Local Comercial",
+  no_business_location_provided: "Nenhum local comercial informado",
+  no_bank_details_provided: "Nenhum dado bancário informado",
+  registered_on: "Registrado em",
+  submitted_on: "Enviado em",
+  last_logged_on: "Último login em",
+  created_offers: "Ofertas Criadas",
+  bogo_offer: "Oferta Leve 2 Pague 1",
+  percentage_offer: "Oferta de Porcentagem",
+  flat_offer: "Oferta de Desconto Fixo",
+  no_offers_created: "Nenhuma oferta criada ainda",
+  view_all: "Ver Tudo",
+
+  // approve or reject modal
+  are_you_sure_want_approve: "Tem certeza de que deseja aprovar?",
+
   // pending approvals
   pending_vendor_approvals: "Aprovações de vendedores pendentes",
   review_newly_registered_vendors:

@@ -9,6 +9,7 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { USER_STATUS } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
@@ -40,6 +41,7 @@ interface IProps {
 }
 
 export default function VendorDetails({ vendor, offerData }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
@@ -97,7 +99,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle /> Go Back
+          <ArrowLeftCircle />{t("go_back")}
         </Button>
       </div>
       <motion.div
@@ -154,7 +156,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             )}
             <div>
               <h1 className="text-2xl font-bold">
-                {vendor?.name?.firstName} {vendor?.name?.lastName}
+                {vendor?.name?.firstName || "N/"} {vendor?.name?.lastName || "A"}
               </h1>
               <p className="opacity-90">{vendor?.email}</p>
               {vendor?.contactNumber && (
@@ -171,14 +173,14 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                 onClick={() =>
                   router.push("/admin/vendor/edit/" + vendor.userId)
                 }
-                label="Edit"
+                label={t("edit")}
                 icon={<EditIcon size={18} />}
                 variant="primary"
               />
               {vendor.status === "SUBMITTED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("APPROVED")}
-                  label="Approve"
+                  label={t("approve")}
                   icon={<CheckIcon size={18} />}
                   variant="success"
                 />
@@ -186,7 +188,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               {vendor.status === "SUBMITTED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("REJECTED")}
-                  label="Reject"
+                  label={t("reject")}
                   icon={<XIcon size={18} />}
                   variant="warning"
                 />
@@ -194,7 +196,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               {vendor.status === "APPROVED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("BLOCKED")}
-                  label="Block"
+                  label={t("block")}
                   icon={<BanIcon size={18} />}
                   variant="warning"
                 />
@@ -202,42 +204,42 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               {vendor.status === "BLOCKED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("UNBLOCKED")}
-                  label="Unblock"
+                  label={t("unblock")}
                   icon={<CheckIcon size={18} />}
                   variant="primary"
                 />
               )}
               <ActionButton
                 onClick={() => setShowDeleteModal(true)}
-                label="Delete"
+                label={t("delete")}
                 icon={<TrashIcon size={18} />}
                 variant="danger"
               />
             </div>
           </div>
           <AgentOrVendorSection
-            title="Personal Details"
+            title={t("personal_details")}
             icon={<UserIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Full Name</p>
+                <p className="text-sm text-gray-500">{t("full_name")}</p>
                 <p className="font-medium">
                   {vendor?.name?.firstName || "N/A"}{" "}
                   {vendor?.name?.lastName || ""}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email</p>
+                <p className="text-sm text-gray-500">{t("email")}</p>
                 <p className="font-medium">{vendor?.email}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Contact Number</p>
+                <p className="text-sm text-gray-500">{t("contact_number")}</p>
                 <p className="font-medium">{vendor?.contactNumber || "N/A"}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email Verified</p>
+                <p className="text-sm text-gray-500">{t("email_verified")}</p>
                 <p className="font-medium">
                   {vendor?.isEmailVerified ? "Yes" : "No"}
                 </p>
@@ -245,38 +247,38 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             </div>
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Business Details"
+            title={t("business_details")}
             icon={<BuildingIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Business Name</p>
+                <p className="text-sm text-gray-500">{t("business_name")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">License Number</p>
+                <p className="text-sm text-gray-500">{t("license_number")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.businessLicenseNumber || "N/A"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">NIF Number</p>
+                <p className="text-sm text-gray-500">{t("nif")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.NIF || "N/A"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Business Type</p>
+                <p className="text-sm text-gray-500">{t("business_type")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.businessType || "N/A"}
                 </p>
               </div>
               {vendor?.businessDetails?.businessType === "RESTAURANT" && (
                 <div>
-                  <p className="text-sm text-gray-500">Restaurant Cuisine Type</p>
+                  <p className="text-sm text-gray-500">{t("restaurant_cuisine_type")}</p>
                   <p className="font-medium">
                     {(() => {
                       const cuisineData = vendor?.businessDetails?.restaurantCuisineType;
@@ -291,14 +293,14 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                 </div>
               )}
               <div>
-                <p className="text-sm text-gray-500">Total Branches</p>
+                <p className="text-sm text-gray-500">{t("total_branches")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.totalBranches || "N/A"}
                 </p>
               </div>
               {vendor?.businessDetails?.openingHours && (
                 <div>
-                  <p className="text-sm text-gray-500">Opening Hours</p>
+                  <p className="text-sm text-gray-500">{t("opening_hours")}</p>
                   <p className="font-medium">
                     {vendor?.businessDetails?.openingHours
                       ? /\b(AM|PM)\b/i.test(
@@ -318,7 +320,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                 </div>
               )}
               <div>
-                <p className="text-sm text-gray-500">Closing Hours</p>
+                <p className="text-sm text-gray-500">{t("closing_hours")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.closingHours
                     ? /\b(AM|PM)\b/i.test(vendor?.businessDetails?.closingHours)
@@ -335,7 +337,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Closing Days</p>
+                <p className="text-sm text-gray-500">{t("closing_days")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.closingDays || "N/A"}
                 </p>
@@ -343,38 +345,38 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             </div>
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Business Location"
+            title={t("business_location")}
             icon={<MapPinIcon size={20} />}
             defaultOpen={true}
           >
             {vendor?.businessLocation ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Street Address</p>
+                  <p className="text-sm text-gray-500">{t("street_address")}</p>
                   <p className="font-medium">
                     {vendor?.businessLocation.street || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Postal Code</p>
+                  <p className="text-sm text-gray-500">{t("postal_code")}</p>
                   <p className="font-medium">
                     {vendor?.businessLocation.postalCode || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">City</p>
+                  <p className="text-sm text-gray-500">{t("city")}</p>
                   <p className="font-medium">
                     {vendor?.businessLocation.city || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">State</p>
+                  <p className="text-sm text-gray-500">{t("state")}</p>
                   <p className="font-medium">
                     {vendor?.businessLocation.state || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Country</p>
+                  <p className="text-sm text-gray-500">{t("country")}</p>
                   <p className="font-medium">
                     {vendor?.businessLocation.country || "N/A"}
                   </p>
@@ -382,48 +384,48 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               </div>
             ) : (
               <p className="text-gray-500 italic">
-                No business location provided
+                {t("no_business_location_provided")}
               </p>
             )}
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Bank Details"
+            title={t("bank_details")}
             icon={<BriefcaseIcon size={20} />}
             defaultOpen={true}
           >
             {vendor?.bankDetails ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Bank Name</p>
+                  <p className="text-sm text-gray-500">{t("bank_name")}</p>
                   <p className="font-medium">{vendor.bankDetails?.bankName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Account Holder</p>
+                  <p className="text-sm text-gray-500">{t("account_holder")}</p>
                   <p className="font-medium">
                     {vendor.bankDetails?.accountHolderName}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">IBAN</p>
+                  <p className="text-sm text-gray-500">{t("iban")}</p>
                   <p className="font-medium">{vendor.bankDetails?.iban}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">SWIFT Code</p>
+                  <p className="text-sm text-gray-500">{t("swift_code")}</p>
                   <p className="font-medium">{vendor.bankDetails?.swiftCode}</p>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 italic">No bank details provided</p>
+              <p className="text-gray-500 italic">{t("no_bank_details_provided")}</p>
             )}
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Activity Logs"
+            title={t("activity_logs")}
             icon={<BriefcaseIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Registered On</p>
+                <p className="text-sm text-gray-500">{t("registered_on")}</p>
                 <p className="font-medium">
                   {vendor?.createdAt
                     ? format(vendor?.createdAt, "do MMM yyyy")
@@ -432,7 +434,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               </div>
               {vendor?.submittedForApprovalAt && (
                 <div>
-                  <p className="text-sm text-gray-500">Submitted On</p>
+                  <p className="text-sm text-gray-500">{t("submitted_on")}</p>
                   <p className="font-medium">
                     {vendor?.submittedForApprovalAt
                       ? format(vendor?.submittedForApprovalAt, "do MMM yyyy")
@@ -462,7 +464,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                 )}
               {vendor?.lastLoginAt && (
                 <div>
-                  <p className="text-sm text-gray-500">Last logged On</p>
+                  <p className="text-sm text-gray-500">{t("last_logged_on")}</p>
                   <p className="font-medium">
                     {vendor?.lastLoginAt
                       ? format(vendor?.lastLoginAt, "do MMM yyyy")
@@ -473,14 +475,14 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             </div>
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Documents"
+            title={t("documents")}
             icon={<FileTextIcon size={20} />}
             defaultOpen={true}
           >
             <VendorDetailsDoc documents={vendor?.documents as IVendorDocs} />
           </AgentOrVendorSection>
           <AgentOrVendorSection
-            title="Created Offers"
+            title={t("created_offers")}
             icon={<TicketIcon size={20} />}
             defaultOpen={true}
           >
@@ -491,12 +493,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   className="flex flex-col gap-2 border rounded-md p-4"
                 >
                   <p className="text-gray-500">{offer.title}</p>
-                  {offer.offerType === "BOGO" && <p>BOGO Offer</p>}
+                  {offer.offerType === "BOGO" && <p>{t("bogo_offer")}</p>}
                   {offer.offerType === "PERCENT" && (
-                    <p>Percentage Offer ({offer.discountValue}% Off)</p>
+                    <p>{t("percentage_offer")} ({offer.discountValue}% Off)</p>
                   )}
                   {offer.offerType === "FLAT" && (
-                    <p>Flat Offer (€{offer.discountValue} Off)</p>
+                    <p>{t("flat_offer")} (€{offer.discountValue} Off)</p>
                   )}
                   <p className="text-xs">
                     {offer.validFrom
@@ -511,7 +513,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               ))}
 
               {offerData?.length === 0 && (
-                <p className="text-gray-500 italic">No offers created</p>
+                <p className="text-gray-500 italic">{t("no_offers_created")}</p>
               )}
             </div>
             {offerData?.length > 0 && (
@@ -520,7 +522,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   className="text-[#DC3173] text-sm font-medium hover:underline"
                   href={`/admin/vendor/offers/${vendor.userId}`}
                 >
-                  View all
+                  {t("view_all")}
                 </Link>
               </div>
             )}

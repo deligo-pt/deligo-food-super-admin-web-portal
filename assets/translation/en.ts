@@ -159,7 +159,7 @@ export const en = {
   notification_preferences: "Notification Preferences",
   legal_documents: "Legal Documents (Terms, Privacy)",
   global_settings: "Global Settings",
-  
+
   all_sos: "All SOS",
   sos_emergency: "SOS / Emergency",
   critical_alerts: "Critical Alerts",
@@ -257,6 +257,26 @@ export const en = {
   page_lg: "Page",
   of: "of",
   page_sm: "page",
+
+  // vendor-details
+  restaurant_cuisine_type: "Restaurant Cuisine Type",
+  street_address: "Street Address",
+  postal_code: "Postal Code",
+  business_location: "Business Location",
+  no_business_location_provided: "No business location provided",
+  no_bank_details_provided: "No bank details provided",
+  registered_on: "Registered On",
+  submitted_on: "Submitted On",
+  last_logged_on: "Last logged On",
+  created_offers: "Created Offers",
+  bogo_offer: "BOGO Offer",
+  percentage_offer: "Percentage Offer",
+  flat_offer: "Flat Offer",
+  no_offers_created: "No offers created yet",
+  view_all: "View All",
+
+  // approve or reject modal
+  are_you_sure_want_approve: "Are you sure you want to approve?",
 
   // pending approvals
   pending_vendor_approvals: "Pending Vendor Approvals",
