@@ -725,6 +725,32 @@ export const en = {
   send_reply: "Send Reply",
 
   // delivery partners
+  // -> add delivery partner
+  add_new_delivery_partner: "Add New Delivery Partner",
+  create_new_delivery_partner_form: "Create a new delivery partner with the form below",
+  male: "Male",
+  female: "Female",
+  nif_number: "NIF Number",
+  passport_number: "Passport Number",
+  legal_address: "Legal Status",
+  residence_permit_expiry: "Residence Permit Expiry",
+  driving_license_expiry: "Driving License Expiry",
+  criminal_record_status: "Criminal Record Status",
+  have_criminal_record_certificate: "Have Criminal Record Certificate?",
+  issue_date: "Issue Date",
+  expiry_date: "Expiry Date",
+  work_preferences_equipments: "Work Preferences and Equipment",
+  preferred_working_zones: "Preferred Working Zones",
+  preferred_working_hours: "Preferred Working Hours",
+  morning: "Morning",
+  afternoon: "Afternoon",
+  evening: "Evening",
+  night: "Night",
+  full_day: "Full Day",
+  flexible: "Flexible",
+  delivery_equipments: "Delivery equipments",
+  other_platform_name_if_applicable: "Other Platform Name (If Applicable)",
+  document: "Document",
   // -> delivery partner title
   manage_your_all_delivery_partners: "Manage your all delivery partners",
   // -> content
@@ -755,9 +781,13 @@ export const en = {
   not_provided: "Not Provided",
   id_proof_front: "ID Proof Front",
   id_proof_back: "ID Proof Back",
-  driving_license: "Driving License",
+  driving_license_front: "Driving License Front",
+  driving_license_back: "Driving License Back",
   vehicle_registration: "Vehicle Registration",
   criminal_record_certificate: "Criminal Record Certificate",
+  activity: "Activity",
+  insurance_policy: "Insurance Policy",
+  my_photo: "My Photo",
   operational_date: "Operational Data",
   reviews: "reviews",
   total_earnings: "Total Earnings",
@@ -774,13 +804,22 @@ export const en = {
   helmet: "Helmet",
   power_bank: "Power Bank",
   submitted_for_approval: "Submitted For Approval",
+  update_delivery_partner: "Update Delivery Partner",
+
+  // all delivery partners
+  manage_all_registered_delivery_partners: "Manage all registered delivery partners",
 
   // active delivery partners
+  all_active_delivery_partners_system: "All active delivery partners in the system",
   all_active_partners: "All Active Partners",
   total: "total",
   no_partners_found: "No partners found.",
 
+  // delivery partner onboarding request
+  all_requested_delivery_partners_onboarding: "All Requested Delivery Partners for Onboarding",
+
   // suspended delivery partners
+  all_blocked_delivery_partners_from_platform: "All blocked delivery partners from the platform",
   total_suspended: "Total Suspended",
   reload: "Reload",
   partner: "Partner",
@@ -790,6 +829,11 @@ export const en = {
     "No suspended partners match your filters.",
 
   // delivery partner performance
+  delivery_partner_performance_analytics: "Delivery Partner Performance Analytics",
+  comprehensive_insights_into_delivery_partner: "Comprehensive insights into delivery partner performance",
+  monthly_performance_over_the_last_6_months: "Monthly performance over the last 6 months",
+  view_delivery_partners_performance_analytics: "View delivery partners performance analytics",
+  no_delivery_partner_found: "No delivery partner found",
   overview_of_delivery_partner_kpi_monthly:
     "Overview of delivery partner KPIs & monthly trends (Portugal)",
   search_by_name_city_id: "Search by name, city or ID...",
@@ -815,6 +859,7 @@ export const en = {
   view_violations: "View Violations",
 
   // delivery partner payouts
+  manage_all_delivery_partner_payouts_here: "Manage all delivery partner payouts here",
   approve_process_audit_partner:
     "Approve, process and audit partner payouts — Portugal",
   search_partner_id_city: "Search partner, id or city...",
@@ -847,6 +892,7 @@ export const en = {
   add_an_optional_note: "Add an optional note for this action",
 
   // delivery partner analytics
+  analyze_partner_availability_performance: "Analyze partner availability, performance tiers, and regional distribution",
   kpi_dashboard_trends_heatmap:
     "KPI dashboard, trends & heatmap — super admin view (Portugal)",
   search_partner_city: "Search partner or city...",
@@ -882,6 +928,9 @@ export const en = {
   deliveries_this_range: "deliveries this range",
   revenue: "Revenue",
   payout_history: "Payout History",
+
+  // delivery partner wallets
+  manage_all_the_delivery_partner_wallets: "Manage all the delivery partner wallets",
 
   // add-business-category
   add_business_category: "Add Business Category",

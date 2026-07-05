@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryPartnerPerformance } from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
@@ -33,6 +34,7 @@ interface IProps {
 }
 
 export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -41,9 +43,9 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2"
     >
-      <h3 className="text-xl font-semibold">Delivery Partners</h3>
+      <h3 className="text-xl font-semibold">{t("delivery_partners")}</h3>
       <p className="text-gray-700 mb-2">
-        View delivery partners performance analytics
+        {t("view_delivery_partners_performance_analytics")}
       </p>
 
       <div className="overflow-x-auto">
@@ -53,30 +55,30 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <BikeIcon className="w-4" />
-                  Partner
+                  {t("partner")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <PackageIcon className="w-4" />
-                  Deliveries
+                  {t("deliveries")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <EuroIcon className="w-4" />
-                  Earnings
+                  {t("earnings")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <StarIcon className="w-4" />
-                  Rating
+                  {t("rating")}
                 </div>
               </TableHead>
               <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
                 <Cog className="w-4" />
-                Actions
+                {t("actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -87,7 +89,7 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
                   className="text-[#DC3173] text-lg text-center"
                   colSpan={5}
                 >
-                  No delivery partners found
+                  {t("no_delivery_partner_found")}
                 </TableCell>
               </TableRow>
             )}
@@ -133,7 +135,7 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
                           )
                         }
                       >
-                        View
+                        {t("view")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

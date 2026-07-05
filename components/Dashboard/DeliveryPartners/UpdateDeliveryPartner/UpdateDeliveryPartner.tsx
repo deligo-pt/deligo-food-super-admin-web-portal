@@ -449,7 +449,7 @@ export default function UpdateDeliveryPartner({
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4">
-                        2. Personal Information
+                        2. {t("personal_information")}
                       </h2>
 
                       <div className="space-y-4 items-start">
@@ -458,7 +458,7 @@ export default function UpdateDeliveryPartner({
                           name="dateOfBirth"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Date Of Birth</FormLabel>
+                              <FormLabel>{t("date_of_birth")}</FormLabel>
                               <FormControl>
                                 <Input type="date" {...field} />
                               </FormControl>
@@ -472,7 +472,7 @@ export default function UpdateDeliveryPartner({
                           name="gender"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Gender</FormLabel>
+                              <FormLabel>{t("gender")}</FormLabel>
                               <FormControl>
                                 <Select
                                   onValueChange={field.onChange}
@@ -482,11 +482,11 @@ export default function UpdateDeliveryPartner({
                                     <SelectValue placeholder="Select a Gender" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="MALE">Male</SelectItem>
+                                    <SelectItem value="MALE">{t("male")}</SelectItem>
                                     <SelectItem value="FEMALE">
-                                      Female
+                                      {t("female")}
                                     </SelectItem>
-                                    <SelectItem value="OTHER">Other</SelectItem>
+                                    <SelectItem value="OTHER">{t("other")}</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -500,7 +500,7 @@ export default function UpdateDeliveryPartner({
                           name="nationality"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Nationality</FormLabel>
+                              <FormLabel>{t("nationality")}</FormLabel>
                               <FormControl>
                                 <Input placeholder="Nationality" {...field} />
                               </FormControl>
@@ -514,7 +514,7 @@ export default function UpdateDeliveryPartner({
                           name="nifNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>NIF Number</FormLabel>
+                              <FormLabel>{t("nif_number")}</FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -532,7 +532,7 @@ export default function UpdateDeliveryPartner({
                           name="passportNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Passport Number</FormLabel>
+                              <FormLabel>{t("passport_number")}</FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -562,7 +562,7 @@ export default function UpdateDeliveryPartner({
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        3. Address
+                        3. {t("address")}
                       </h2>
 
                       <BusinessLocationMap
@@ -684,7 +684,7 @@ export default function UpdateDeliveryPartner({
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      5. Legal Status
+                      5. {t("legal_address")}
                     </h2>
 
                     <div className="space-y-4 items-start">
@@ -693,7 +693,7 @@ export default function UpdateDeliveryPartner({
                         name="residencePermitType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Type</FormLabel>
+                            <FormLabel>{t("residence_permit_type")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -721,11 +721,11 @@ export default function UpdateDeliveryPartner({
                         name="residencePermitNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Number</FormLabel>
+                            <FormLabel>{t("residence_permit_number")}</FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder="Residence Permit Number"
+                                placeholder={t("residence_permit_number")}
                                 {...field}
                               />
                             </FormControl>
@@ -739,7 +739,7 @@ export default function UpdateDeliveryPartner({
                         name="residencePermitExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Expiry</FormLabel>
+                            <FormLabel>{t("residence_permit_expiry")}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} />
                             </FormControl>
@@ -764,7 +764,7 @@ export default function UpdateDeliveryPartner({
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      6. Vehicle Information
+                      6. {t("vehicle_information")}
                     </h2>
 
                     <div className="space-y-4 items-start">
@@ -773,7 +773,7 @@ export default function UpdateDeliveryPartner({
                         name="vehicleType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Vehicle Type</FormLabel>
+                            <FormLabel>{t("vehicle_type")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -811,7 +811,7 @@ export default function UpdateDeliveryPartner({
                         name="brand"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Brand</FormLabel>
+                            <FormLabel>{t("brand")}</FormLabel>
                             <FormControl>
                               <Input placeholder="Brand" {...field} />
                             </FormControl>
@@ -825,7 +825,7 @@ export default function UpdateDeliveryPartner({
                         name="model"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Model</FormLabel>
+                            <FormLabel>{t("model")}</FormLabel>
                             <FormControl>
                               <Input placeholder="Model" {...field} />
                             </FormControl>
@@ -839,11 +839,11 @@ export default function UpdateDeliveryPartner({
                         name="licensePlate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>License Plate</FormLabel>
+                            <FormLabel>{t("license_plate")}</FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder="License Plate"
+                                placeholder={t("license_plate")}
                                 {...field}
                               />
                             </FormControl>
@@ -857,11 +857,11 @@ export default function UpdateDeliveryPartner({
                         name="drivingLicenseNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Driving License Number</FormLabel>
+                            <FormLabel>{t("driving_license_number")}</FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder="Driving License Number"
+                                placeholder={t("driving_license_number")}
                                 {...field}
                               />
                             </FormControl>
@@ -875,7 +875,7 @@ export default function UpdateDeliveryPartner({
                         name="drivingLicenseExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Driving License Expiry</FormLabel>
+                            <FormLabel>{t("driving_license_expiry")}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} />
                             </FormControl>
@@ -889,7 +889,7 @@ export default function UpdateDeliveryPartner({
                         name="insurancePolicyNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Insurance Policy Number</FormLabel>
+                            <FormLabel>{t("insurance_policy_number")}</FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
@@ -907,7 +907,7 @@ export default function UpdateDeliveryPartner({
                         name="insuranceExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Insurance Expiry</FormLabel>
+                            <FormLabel>{t("insurance_expiry")}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} />
                             </FormControl>
@@ -932,7 +932,7 @@ export default function UpdateDeliveryPartner({
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      7. Criminal Record Status
+                      7. {t("criminal_record_status")}
                     </h2>
 
                     <div className="space-y-4 items-start">
@@ -942,7 +942,7 @@ export default function UpdateDeliveryPartner({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Have Criminal Record Certificate?
+                              {t("have_criminal_record_certificate")}
                             </FormLabel>
                             <FormControl>
                               <FormLabel
@@ -956,7 +956,7 @@ export default function UpdateDeliveryPartner({
                                   onChange={field.onChange}
                                   className="h-4 w-4"
                                 />
-                                Yes
+                                {t("yes")}
                               </FormLabel>
                             </FormControl>
                             <FormMessage />
@@ -969,7 +969,7 @@ export default function UpdateDeliveryPartner({
                         name="issueDate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Issue Date</FormLabel>
+                            <FormLabel>{t("issue_date")}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} />
                             </FormControl>
@@ -983,7 +983,7 @@ export default function UpdateDeliveryPartner({
                         name="expiryDate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Expiry Date</FormLabel>
+                            <FormLabel>{t("expiry_date")}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} />
                             </FormControl>
@@ -1008,12 +1008,12 @@ export default function UpdateDeliveryPartner({
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      8. Work Preferences and Equipments
+                      8. {t("work_preferences_equipments")}
                     </h2>
 
                     <div className="space-y-4 items-start">
                       <div className="space-y-2">
-                        <Label className="">Preferred Working Zones</Label>
+                        <Label className="">{t("preferred_working_zones")}</Label>
                         {watchZones?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-1">
                             {watchZones?.map((zone) => (
@@ -1078,7 +1078,7 @@ export default function UpdateDeliveryPartner({
                         name="preferredHours"
                         render={({ field, fieldState }) => (
                           <FormItem>
-                            <FormLabel>Preferred Working Hours</FormLabel>
+                            <FormLabel>{t("preferred_working_hours")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={(value) =>
@@ -1098,22 +1098,22 @@ export default function UpdateDeliveryPartner({
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="morning">
-                                    Morning (8AM-12PM)
+                                    {t("morning")} (8AM-12PM)
                                   </SelectItem>
                                   <SelectItem value="afternoon">
-                                    Afternoon (12PM-6PM)
+                                    {t("afternoon")} (12PM-6PM)
                                   </SelectItem>
                                   <SelectItem value="evening">
-                                    Evening (6PM-10PM)
+                                    {t("evening")} (6PM-10PM)
                                   </SelectItem>
                                   <SelectItem value="night">
-                                    Night (10PM-12AM)
+                                    {t("night")} (10PM-12AM)
                                   </SelectItem>
                                   <SelectItem value="fullday">
-                                    Full Day
+                                    {t("full_day")}
                                   </SelectItem>
                                   <SelectItem value="flexible">
-                                    Flexible
+                                    {t("flexible")}
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
@@ -1124,7 +1124,7 @@ export default function UpdateDeliveryPartner({
                       />
 
                       <div className="space-y-4 items-start">
-                        <Label className="">Delivery equipments</Label>
+                        <Label className="">{t("delivery_equipments")}</Label>
                         <div className="grid grid-cols-2 gap-3">
                           {equipment.map((item) => (
                             <FormField
@@ -1166,7 +1166,7 @@ export default function UpdateDeliveryPartner({
                         name="workedWithOtherPlatform"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Worked With Other Platforms</FormLabel>
+                            <FormLabel>{t("worked_with_other_platform")}</FormLabel>
                             <FormControl>
                               <FormLabel
                                 htmlFor="workedWithOtherPlatform"
@@ -1193,7 +1193,7 @@ export default function UpdateDeliveryPartner({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Other Platform Name (If Applicable)
+                              {t("other_platform_name_if_applicable")}
                             </FormLabel>
                             <FormControl>
                               <Input
@@ -1246,7 +1246,7 @@ export default function UpdateDeliveryPartner({
               style={{ background: DELIGO }}
               disabled={isSubmitting}
             >
-              Update Delivery Partner
+              {t("update_delivery_partner")}
             </Button>
           </div>
         )}

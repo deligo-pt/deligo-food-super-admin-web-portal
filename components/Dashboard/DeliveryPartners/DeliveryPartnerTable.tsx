@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import {
@@ -41,6 +42,7 @@ export default function DeliveryPartnerTable({
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -55,30 +57,30 @@ export default function DeliveryPartnerTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <IdCard className="w-4" />
-                Name
+                {t("name")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Mail className="w-4" />
-                Email
+                {t("email")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Phone className="w-4" />
-                Phone
+                {t("phone")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Status
+                {t("status")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -89,7 +91,7 @@ export default function DeliveryPartnerTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No partners found
+                {t("no_partners_found")}
               </TableCell>
             </TableRow>
           )}
@@ -118,7 +120,7 @@ export default function DeliveryPartnerTable({
                           )
                         }
                       >
-                        View
+                        {t("view")}
                       </DropdownMenuItem>
                       {partner.status === "SUBMITTED" && (
                         <DropdownMenuItem
@@ -130,7 +132,7 @@ export default function DeliveryPartnerTable({
                             )
                           }
                         >
-                          Approve
+                          {t("approve")}
                         </DropdownMenuItem>
                       )}
                       {partner.status === "SUBMITTED" && (
@@ -143,7 +145,7 @@ export default function DeliveryPartnerTable({
                             )
                           }
                         >
-                          Reject
+                          {t("reject")}
                         </DropdownMenuItem>
                       )}
                       {partner.status === "APPROVED" && (
@@ -156,7 +158,7 @@ export default function DeliveryPartnerTable({
                             )
                           }
                         >
-                          Block
+                          {t("block")}
                         </DropdownMenuItem>
                       )}
                       {partner.status === "BLOCKED" && (
@@ -169,14 +171,14 @@ export default function DeliveryPartnerTable({
                             )
                           }
                         >
-                          Unblock
+                          {t("unblock")}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => handleDeleteId(partner.userId)}
                       >
-                        Delete
+                        {t("delete")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

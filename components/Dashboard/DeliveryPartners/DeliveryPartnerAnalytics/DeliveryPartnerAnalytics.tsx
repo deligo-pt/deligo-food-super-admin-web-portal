@@ -3,6 +3,7 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryPartnerAnalyticsData } from "@/types/analytics/delivery-partner-analytics.type";
 import { formatPrice } from "@/utils/formatPrice";
 import {
@@ -29,6 +30,7 @@ interface IProps {
 }
 
 export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
+  const { t } = useTranslation();
   const {
     summary,
     statusDistribution,
@@ -38,11 +40,11 @@ export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
   } = analyticsData;
 
   return (
-    <div className="min-h-screen bg-[#FBFBFE] p-6 space-y-8">
+    <div className="min-h-screen bg-[#FBFBFE] space-y-8">
       {/* Header */}
       <TitleHeader
-        title="Delivery Partner Analytics"
-        subtitle="Analyze partner availability, performance tiers, and regional distribution"
+        title={t("delivery_partner_analytics")}
+        subtitle={t("analyze_partner_availability_performance")}
       />
 
       {/* Stats */}

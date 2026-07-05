@@ -6,6 +6,7 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
@@ -65,6 +66,7 @@ export default function DeliveryPartners({
   title,
   subtitle,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     partnerId: "",
@@ -112,7 +114,7 @@ export default function DeliveryPartners({
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader title={title} subtitle={subtitle} />
+      <TitleHeader title={t(`${title}`)} subtitle={t(`${subtitle}`)} />
 
       {/* Filters */}
       <AllFilters

@@ -738,6 +738,32 @@ export const pt = {
   send_reply: "Enviar resposta",
 
   // delivery partners
+  // -> add delivery partner
+  add_new_delivery_partner: "Adicionar Novo Parceiro de Entrega",
+  create_new_delivery_partner_form: "Crie un novo parceiro de entrega com o formulário abaixo",
+  male: "Masculino",
+  female: "Feminino",
+  nif_number: "Número do NIF",
+  passport_number: "Número do Passaporte",
+  legal_address: "Status Legal", // Use "Endereço Legal" if the intent was address instead of status
+  residence_permit_expiry: "Validade da Autorização de Residência",
+  driving_license_expiry: "Validade da Carteira de Habilitação",
+  criminal_record_status: "Status do Registro Criminal",
+  have_criminal_record_certificate: "Possui Certificado de Registro Criminal?",
+  issue_date: "Data de Emissão",
+  expiry_date: "Data de Validade",
+  work_preferences_equipments: "Preferências de Trabalho e Equipamentos",
+  preferred_working_zones: "Zonas de Trabalho Preferenciais",
+  preferred_working_hours: "Horários de Trabalho Preferenciais",
+  morning: "Manhã",
+  afternoon: "Tarde",
+  evening: "Final da Tarde",
+  night: "Noite",
+  full_day: "Dia Inteiro",
+  flexible: "Flexível",
+  delivery_equipments: "Equipamentos de Entrega",
+  other_platform_name_if_applicable: "Nome de Outra Plataforma (Se Aplicável)",
+  document: "Documento",
   // -> delivery partner title
   manage_your_all_delivery_partners: "Gerir todos os parceiros de entrega",
 
@@ -770,9 +796,13 @@ export const pt = {
   not_provided: "Não fornecido",
   id_proof_front: "Documento de identificação (frente)",
   id_proof_back: "Documento de identificação (verso)",
-  driving_license: "Carta de condução",
+  driving_license_front: "Frente da Carteira de Habilitação",
+  driving_license_back: "Verso da Carteira de Habilitação",
   vehicle_registration: "Documento do veículo",
   criminal_record_certificate: "Certificado de registo criminal",
+  activity: "Atividade",
+  insurance_policy: "Apolice de Seguro",
+  my_photo: "Minha Foto",
   operational_date: "Dados operacionais",
   reviews: "avaliações",
   total_earnings: "Ganhos totais",
@@ -789,13 +819,22 @@ export const pt = {
   helmet: "Capacete",
   power_bank: "Power bank",
   submitted_for_approval: "Submetido para aprovação",
+  update_delivery_partner: "Atualizar Parceiro de Entrega",
+
+  // all delivery partners
+  manage_all_registered_delivery_partners: "Gerenciar todos os parceiros de entrega registrados",
 
   // active delivery partners
+  all_active_delivery_partners_system: "Todos os parceiros de entrega ativos no sistema",
   all_active_partners: "Todos os parceiros ativos",
   total: "total",
   no_partners_found: "Nenhum parceiro encontrado.",
 
+  // delivery partner onboarding request
+  all_requested_delivery_partners_onboarding: "Todas as solicitações de integração de parceiros de entrega",
+
   // suspended delivery partners
+  all_blocked_delivery_partners_from_platform: "Todos os parceiros de entrega bloqueados na plataforma",
   total_suspended: "Total suspensos",
   reload: "Recarregar",
   partner: "Parceiro",
@@ -805,6 +844,11 @@ export const pt = {
     "Nenhum parceiro suspenso corresponde aos seus filtros.",
 
   // delivery partner performance
+  delivery_partner_performance_analytics: "Análise de Desempenho do Parceiro de Entrega",
+  comprehensive_insights_into_delivery_partner: "Informações detalhadas sobre o desempenho do parceiro de entrega",
+  monthly_performance_over_the_last_6_months: "Desempenho mensal nos últimos 6 meses",
+  view_delivery_partners_performance_analytics: "Visualizar análise de desempenho dos parceiros de entrega",
+  no_delivery_partner_found: "Nenhum parceiro de entrega encontrado",
   overview_of_delivery_partner_kpi_monthly:
     "Visão geral dos KPIs dos parceiros de entrega e tendências mensais (Portugal)",
   search_by_name_city_id: "Pesquisar por nome, cidade ou ID...",
@@ -830,6 +874,7 @@ export const pt = {
   view_violations: "Ver infrações",
 
   // delivery partner payouts
+  manage_all_delivery_partner_payouts_here: "Gerencie todos os pagamentos dos parceiros de entrega aqui",
   approve_process_audit_partner:
     "Aprovar, processar e auditar pagamentos de parceiros — Portugal",
   search_partner_id_city: "Pesquisar parceiro, ID ou cidade...",
@@ -863,6 +908,7 @@ export const pt = {
   add_an_optional_note: "Adicionar uma nota opcional para esta ação",
 
   // delivery partner analytics
+  analyze_partner_availability_performance: "Analise a disponibilidade do parceiro, níveis de desempenho e distribuição regional",
   kpi_dashboard_trends_heatmap:
     "Painel de KPIs, tendências e mapa de calor — vista super admin (Portugal)",
   search_partner_city: "Pesquisar parceiro ou cidade...",
@@ -898,6 +944,9 @@ export const pt = {
   deliveries_this_range: "entregas neste intervalo",
   revenue: "Receita",
   payout_history: "Histórico de pagamentos",
+
+  // delivery partner wallets
+  manage_all_the_delivery_partner_wallets: "Gerenciar todas as carteiras dos parceiros de entrega",
 
   // add-business-category
   add_business_category: "Adicionar categoria de negócio",

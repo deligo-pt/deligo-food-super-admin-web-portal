@@ -50,7 +50,7 @@ export default function Payouts({
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader title={t(title)} subtitle={t(`${subtitle}`)} />
+      <TitleHeader title={t(`${title}`)} subtitle={t(`${subtitle}`)} />
 
       {/* Filters */}
       <AllFilters
