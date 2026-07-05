@@ -376,15 +376,106 @@ export const pt = {
   payout_details: "Detalhes do pagamento",
   account_holder: "Titular da conta",
   close: "Fechar",
+  payment_date: "Data de Pagamento",
+  settle_payout: "Liquidar Pagamento",
+  //--> details
+  back_to_payouts: "Voltar para Pagamentos",
+  view_the_details_of_a_payout: "Visualizar os detalhes de um pagamento",
+  payout_amount: "Valor do Pagamento",
+  account_number: "Número da Conta",
+  bank_reference_id: "ID de Referência Bancária",
+  payout_proof: "Comprovante de Pagamento",
+  open_full_size: "Abrir em Tamanho Real",
+  timestamps: "Registros de Data/Hora",
+  license_no: "Nº da Licença",
+  vehicle: "Veículo",
+  payout_status: "Status do Pagamento",
+
+  // vendor performance
+  comprehensive_insights_into_restaurant_performance_and_trends: "Informações detalhadas sobre o desempenho e tendências do restaurante",
+  most_orders: "Mais Pedidos",
+  orders_this_month: "pedidos este mês",
+  highest_revenue: "Maior Receita",
+  orders_performance: "Desempenho de Pedidos",
+  monthly_performance_over: "Desempenho mensal nos últimos 12 meses",
+  month: "Mês",
+  no_of_orders: "Nº de Pedidos",
+  top_performers: "Melhores Resultados",
+  view_vendor_performance_analytics: "Visualizar análise de desempenho do vendedor",
+  orders_capital: "Pedidos",
+  // --> details
+  fry_express_performance: "Desempenho do Fry Express",
+  vendor_performance_details: "Detalhes de Desempenho do Vendedor",
+  avg_rating: "Avaliação Média",
+  total_products: "Total de Produtos",
+  orders_revenue_trend: "Tendência de Pedidos e Receita",
+  daily_performance_over_the_past_week: "Desempenho diário na última semana",
+
+  // vendor agreements
+  manage_and_view_all_vendor_agreements: "Gerenciar e visualizar todos os contratos do vendedor",
+  establishment: "Estabelecimento",
+  no_agreements_found: "Nenhum contrato encontrado",
+  //--> details
+  comprehensive_breakdown_original: "Detalhamento completo e referência da documentação original",
+  open_original_pdf: "Abrir PDF Original",
+  tax_registration: "Registro Fiscal",
+  official_nif_reference: "Referência Oficial do NIF",
+  document_status: "Status do Documento",
+  last_update: "Última Atualização",
+  system_timestamp: "Registro de Data/Hora do Sistema",
+  document_space_viewer_for: "Visualizador de espaço de documento para",
+  no_printable_target_path_found: "Nenhuma URL de caminho de destino para impressão foi encontrada",
+  verify_asset_cloud_uploads: "Verifique se os envios de arquivos na nuvem correspondem às configurações do objeto",
+
+  // vendor-wallets
+  manage_all_the_vendor_wallets: "Gerenciar todas as carteiras dos vendedores",
+  wallet_id: "ID da Carteira",
+  last_settlement: "Última Liquidação",
+  no_wallets_found: "Nenhuma carteira encontrada",
+  //---> details
+  back_to_wallets: "Voltar para Carteiras",
+  wallet_details: "Detalhes da Carteira",
+  view_the_details_of_wallet: "Visualizar os detalhes de uma carteira",
+  active_wallet: "Carteira Ativa",
+  lifetime_revenue: "Receita Total Acumulada",
+  unpaid_earnings: "Ganhos Não Pagos",
+  rider_payable: "A Pagar ao Entregador",
+  fleet_earnings: "Ganhos da Frota",
+  earnings_amount: "Valor dos Ganhos",
+  settlement_status: "Status da Liquidação",
+
+  // vendor zones
+  vendor_zones_coverage: "Zonas e Cobertura do Vendedor",
+  manage_service_areas_vendor_operations: "Gerenciar áreas de atendimento para operações do vendedor",
+  operational_zones: "Zonas Operacionais",
+  not_operational_zones: "Zonas Não Operacionais",
+  operational: "Operacional",
+  not_operational: "Não Operacional",
 
   // all-fleet-manager
   no_fleet_manager_found: "Nenhum gestor de frota encontrado",
+  no_fleet_managers_found: "Nenhum gerente de frota encontrado",
+  //---> fleet documents
+  view_full_file: "Visualizar Arquivo Completo",
+  no_document_uploaded: "Nenhum documento enviado",
 
   // add-fleet-manager
+  add_a_new_fleet_manager_here: "Adicione um novo gerente de frota aqui",
   fleet_manager_email: "Email do gestor de frota",
   submit_fleetManager: "Submeter gestor de frota",
 
+  // fleet manager payouts
+  manage_all_fleet_manager_payouts_here: "Gerencie todos os pagamentos dos gerentes de frota aqui",
+  // --> payout settlement
+  final_settlement: "Liquidação Final",
+  submit_proof_bank_reference_finalize: "Envie o comprovante e a referência bancária para finalizar este pagamento",
+  payout_proof_image: "Imagem do Comprovante de Pagamento",
+  click_to_upload_proof_image: "Clique para enviar a imagem do comprovante",
+  submit_settlement: "Enviar Liquidação",
+
   // fleet-manager-wallet
+  fleet_manager_wallets: "Carteiras do Gerente de Frota",
+  manage_all_fleet_manager_wallets: "Gerenciar todas as carteiras dos gerentes de frota",
   search_fleet_manager_id_reason: "Pesquisar gestor de frota, ID ou motivo...",
   all_status: "Todos os estados",
   failed: "Falhado",
@@ -433,6 +524,7 @@ export const pt = {
 
   // fleet-zones
   fleet_zones: "Zonas de frota",
+  manage_zones_fleet_managers: "Gerenciar zonas dos gerentes de frota",
   search_zone_city_group: "Pesquisar zona, cidade, grupo ou gestor...",
   add_zone: "Adicionar zona",
   total_zones: "Total de zonas",
@@ -459,7 +551,18 @@ export const pt = {
   update: "Atualizar",
   save: "Guardar",
 
-  // fleet-performance
+  // fleet manager performance
+  fleet_manager_performance_analytics: "Análise de Desempenho do Gerente de Frota",
+  comprehensive_insights_fleet_manager_performance: "Informações detalhadas sobre o desempenho do gerente de frota",
+  highest_earnings: "Maiores Ganhos",
+  daily_performance_over_7_days: "Desempenho diário nos últimos 7 dias",
+  days: "Dias",
+  earnings_performance: "Desempenho de Ganhos",
+  view_fleet_managers_performance_analytics: "Visualizar análise de desempenho dos gerentes de frota",
+  performance_capital: "Desempenho",
+  fleet_manager_performance_details: "Detalhes de Desempenho do Gerente de Frota",
+  total_drivers: "Total de Motoristas",
+  top_rated_delivery_partners: "Parceiros de Entrega Melhor Avaliados",
   last_7_days: "Últimos 7 dias",
   last_30_days: "Últimos 30 dias",
   custom: "Personalizado",
@@ -554,6 +657,8 @@ export const pt = {
     "Esta ação é irreversível para o lote em fila. Pode cancelar envios agendados no painel de tarefas agendadas.",
 
   // suspended/blocked-fleet-managers
+  suspended_fleet_managers: "Gerentes de Frota Suspensos",
+  all_blocked_fleet_managers_from_system: "Todos os gerentes de frota bloqueados no sistema",
   blocked_fleet_managers: "Gestores de frota bloqueados",
   blocked_managers: "Gestores bloqueados",
   no_blocked_managers_found: "Nenhum gestor bloqueado encontrado.",

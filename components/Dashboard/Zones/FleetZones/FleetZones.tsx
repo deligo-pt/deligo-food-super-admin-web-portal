@@ -25,7 +25,7 @@ export default function FleetZones({ zonesData }: IProps) {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
         title={t("fleet_zones")}
