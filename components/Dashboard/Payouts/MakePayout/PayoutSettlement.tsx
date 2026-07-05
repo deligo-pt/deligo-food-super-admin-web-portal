@@ -1,6 +1,7 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TResponse } from "@/types";
 import { TPayout } from "@/types/payout.type";
 import { catchAsync } from "@/utils/catchAsync";
@@ -30,6 +31,7 @@ interface IProps {
 }
 
 export default function PayoutSettlement({ payout }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -184,14 +186,14 @@ export default function PayoutSettlement({ payout }: IProps) {
             className="flex items-center gap-2 text-[#DC3173] transition-colors text-sm font-medium hover:underline"
           >
             <ArrowLeftIcon className="w-4 h-4" />
-            Go Back
+            {t("go_back")}
           </button>
         </motion.div>
 
         {/* Header */}
         <TitleHeader
-          title="Final Settlement"
-          subtitle="Submit proof and bank reference to finalize this payout"
+          title={t("final_settlement")}
+          subtitle={t("submit_proof_bank_reference_finalize")}
         />
 
         {/* Payout Summary Card */}
@@ -233,7 +235,7 @@ export default function PayoutSettlement({ payout }: IProps) {
             {/* File Upload */}
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                Payout Proof Image <span className="text-red-400">*</span>
+                {t("payout_proof_image")} <span className="text-red-400">*</span>
               </label>
               {!file ? (
                 <div
@@ -244,7 +246,7 @@ export default function PayoutSettlement({ payout }: IProps) {
                     <UploadCloudIcon className="w-7 h-7 text-gray-400" />
                   </div>
                   <p className="text-sm font-medium text-gray-700">
-                    Click to upload proof image
+                    {t("click_to_upload_proof_image")}
                   </p>
                   <p className="text-xs text-gray-400 mt-1">
                     PNG, JPG, JPEG up to 5MB
@@ -307,7 +309,7 @@ export default function PayoutSettlement({ payout }: IProps) {
             {/* Bank Reference ID */}
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                Bank Reference ID <span className="text-red-400">*</span>
+                {t("bank_reference_id")} <span className="text-red-400">*</span>
               </label>
               <div className="relative">
                 <HashIcon className="w-4 h-4 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -336,7 +338,7 @@ export default function PayoutSettlement({ payout }: IProps) {
             {/* Remarks */}
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                Remarks <span className="text-gray-300">(Optional)</span>
+                {t("remarks")} <span className="text-gray-300">(Optional)</span>
               </label>
               <div className="relative">
                 <MessageSquareIcon className="w-4 h-4 text-gray-400 absolute left-4 top-4" />
@@ -365,7 +367,7 @@ export default function PayoutSettlement({ payout }: IProps) {
               disabled={isSettling}
             >
               <SendIcon className="w-4 h-4" />
-              Submit Settlement
+              {t("submit_settlement")}
             </motion.button>
           </div>
         </motion.div>

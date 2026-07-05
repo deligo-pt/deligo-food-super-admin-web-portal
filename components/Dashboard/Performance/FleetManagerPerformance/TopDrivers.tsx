@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TTopRatedDeliveryPartner } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 import { BikeIcon, StarIcon } from "lucide-react";
@@ -9,6 +10,8 @@ interface IProps {
 }
 
 export default function TopRatedDeliveryPartners({ partners }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{
@@ -25,7 +28,7 @@ export default function TopRatedDeliveryPartners({ partners }: IProps) {
       className="bg-white rounded-lg shadow p-6 border border-gray-100"
     >
       <h3 className="text-lg font-semibold mb-4">
-        Top Rated Delivery Partners
+        {t("top_rated_delivery_partners")}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {partners?.map((partner, index) => (
@@ -63,7 +66,7 @@ export default function TopRatedDeliveryPartners({ partners }: IProps) {
                 </div>
               </div>
               <div className="flex justify-between items-center mt-6">
-                <span className="text-sm text-gray-600">Rating</span>
+                <span className="text-sm text-gray-600">{t("rating")}</span>
                 <div className="flex items-center">
                   <StarIcon
                     size={16}

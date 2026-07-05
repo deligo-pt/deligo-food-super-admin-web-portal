@@ -21,8 +21,8 @@ export default async function FleetManagerPayoutsPage({
   return (
     <Payouts
       payoutsResult={fleetManagerPayoutsResult}
-      title="Fleet Manager Payouts"
-      subtitle=" Manage all fleet manager payouts here"
+      title="fleet_manager_payouts"
+      subtitle="manage_all_fleet_manager_payouts_here"
       userRole={USER_ROLE.FLEET_MANAGER}
     />
   );

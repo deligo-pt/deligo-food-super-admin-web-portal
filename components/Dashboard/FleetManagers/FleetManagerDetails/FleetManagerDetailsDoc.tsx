@@ -1,3 +1,4 @@
+import { useTranslation } from "@/hooks/use-translation";
 import Image from "next/image";
 
 export interface IFleetDocs {
@@ -11,6 +12,7 @@ interface IProps {
 }
 
 export default function FleetManagerDetailsDoc({ documents }: IProps) {
+  const { t } = useTranslation();
   const docsArr = Object.keys(documents || {}) as (keyof IFleetDocs)[];
 
   return (
@@ -23,9 +25,9 @@ export default function FleetManagerDetailsDoc({ documents }: IProps) {
         return (
           <div key={doc} className="mb-6">
             <p className="text-sm text-gray-500 mb-2">
-              {doc === "idProofFront" && "ID Proof (Front)"}
-              {doc === "idProofBack" && "ID Proof (Back)"}
-              {doc === "businessLicense" && "Business License"}
+              {doc === "idProofFront" && t("id_proof_front")}
+              {doc === "idProofBack" && t("id_proof_back")}
+              {doc === "businessLicense" && t("business_license")}
             </p>
 
             <div className="grid grid-cols-2 gap-3">
@@ -55,7 +57,7 @@ export default function FleetManagerDetailsDoc({ documents }: IProps) {
                       rel="noopener noreferrer"
                       className="mt-2 text-sm text-[#DC3173] hover:underline inline-block"
                     >
-                      View Full File
+                     {t("view_full_file")}
                     </a>
                   </div>
                 );
@@ -66,7 +68,7 @@ export default function FleetManagerDetailsDoc({ documents }: IProps) {
       })}
 
       {docsArr.length === 0 && (
-        <p className="text-gray-500 italic">No documents uploaded</p>
+        <p className="text-gray-500 italic">{t("no_document_uploaded")}</p>
       )}
     </>
   );

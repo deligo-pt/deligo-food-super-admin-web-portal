@@ -298,7 +298,7 @@ export default function AddFleetManager() {
       >
         <TitleHeader
           title={t("add_new_fleet_manager")}
-          subtitle="Add a new fleet manager here"
+          subtitle={t("add_a_new_fleet_manager_here")}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

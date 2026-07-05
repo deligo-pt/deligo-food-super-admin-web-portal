@@ -14,6 +14,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { IAgreement } from "@/types/agreement.type";
 import { motion } from "framer-motion";
 import {
@@ -31,6 +32,7 @@ interface IProps {
 }
 
 export default function AgreementsTable({ agreements }: IProps) {
+    const { t } = useTranslation();
     const router = useRouter();
 
     // status badge helper function
@@ -57,30 +59,30 @@ export default function AgreementsTable({ agreements }: IProps) {
                         <TableHead>
                             <div className="text-[#DC3173] flex gap-2 items-center">
                                 <FileText className="w-4" />
-                                Establishment
+                                {t("establishment")}
                             </div>
                         </TableHead>
                         <TableHead>
                             <div className="text-[#DC3173] flex gap-2 items-center">
                                 <Mail className="w-4" />
-                                Email
+                                {t("email")}
                             </div>
                         </TableHead>
                         <TableHead>
                             <div className="text-[#DC3173] flex gap-2 items-center">
                                 <Phone className="w-4" />
-                                Phone
+                                {t("phone")}
                             </div>
                         </TableHead>
                         <TableHead>
                             <div className="text-[#DC3173] flex gap-2 items-center">
                                 <CircleCheckBig className="w-4" />
-                                Status
+                                {t("status")}
                             </div>
                         </TableHead>
                         <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
                             <Cog className="w-4" />
-                            Actions
+                            {t("actions")}
                         </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -91,7 +93,7 @@ export default function AgreementsTable({ agreements }: IProps) {
                                 className="text-[#DC3173] text-lg text-center"
                                 colSpan={5}
                             >
-                                No agreements found
+                                {t("no_agreements_found")}
                             </TableCell>
                         </TableRow>
                     )}
@@ -119,7 +121,7 @@ export default function AgreementsTable({ agreements }: IProps) {
                                                 router.push(`/admin/vendor-agreements/${agreement._id}`)
                                             }
                                         >
-                                            View
+                                            {t("view")}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>

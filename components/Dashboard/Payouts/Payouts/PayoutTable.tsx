@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { USER_ROLE } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { TPayout } from "@/types/payout.type";
 import { downloadFileFromAnyLink } from "@/utils/downloadFromLink";
 import { formatPrice } from "@/utils/formatPrice";
@@ -42,6 +43,7 @@ interface IProps {
 
 export default function PayoutTable({ payouts, userRole }: IProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const payoutLinks = {
     VENDOR: "/admin/vendor-payouts",
@@ -63,19 +65,19 @@ export default function PayoutTable({ payouts, userRole }: IProps) {
                 {userRole === USER_ROLE.VENDOR && (
                   <>
                     <Store className="w-4" />
-                    Vendor
+                    {t("vendor")}
                   </>
                 )}
                 {userRole === USER_ROLE.FLEET_MANAGER && (
                   <>
                     <UserCog className="w-4" />
-                    Fleet Manager
+                    {t("fleet_manager")}
                   </>
                 )}
                 {userRole === USER_ROLE.DELIVERY_PARTNER && (
                   <>
                     <Truck className="w-4" />
-                    Delivery Partner
+                    {t("delivery_partner")}
                   </>
                 )}
               </div>
@@ -83,36 +85,36 @@ export default function PayoutTable({ payouts, userRole }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarPlus className="w-4" />
-                Start Date
+                {t("start_date")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarMinus className="w-4" />
-                End Date
+                {t("end_date")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Euro className="w-4" />
-                Amount
+                {t("amount")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarCheck className="w-4" />
-                Payment Date
+                {t("payment_date")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <FileText className="w-4" />
-                Document
+                {t("document")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -123,7 +125,7 @@ export default function PayoutTable({ payouts, userRole }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={7}
               >
-                No payouts found
+                {t("no_payouts_found")}
               </TableCell>
             </TableRow>
           )}
@@ -193,7 +195,7 @@ export default function PayoutTable({ payouts, userRole }: IProps) {
                         )
                       }
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                     {payout.status === "PENDING" && (
                       <DropdownMenuItem
@@ -203,7 +205,7 @@ export default function PayoutTable({ payouts, userRole }: IProps) {
                           )
                         }
                       >
-                        Settle Payout
+                        {t("settle_payout")}
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>

@@ -365,16 +365,107 @@ export const en = {
   no_payouts_found: "No payouts found.",
   payout_details: "Payout Details",
   account_holder: "Account Holder",
-  close: "",
+  close: "Close",
+  payment_date: "Payment Date",
+  settle_payout: "Settle Payout",
+  //--> details
+  back_to_payouts: "Back to Payouts",
+  view_the_details_of_a_payout: "View the details of a payout",
+  payout_amount: "Payout Amount",
+  account_number: "Account Number",
+  bank_reference_id: "Bank Reference ID",
+  payout_proof: "Payout Proof",
+  open_full_size: "Open Full Size",
+  timestamps: "Timestamps",
+  license_no: "License No.",
+  vehicle: "Vehicle",
+  payout_status: "Payout Status",
+
+  // vendor performance
+  comprehensive_insights_into_restaurant_performance_and_trends: "Comprehensive insights into restaurant performance and trends",
+  most_orders: "Most Orders",
+  orders_this_month: "orders this month",
+  highest_revenue: "Highest Revenue",
+  orders_performance: "Orders Performance",
+  monthly_performance_over: "Monthly performance over the last 12 months",
+  month: "Month",
+  no_of_orders: "No of Orders",
+  top_performers: "Top Performers",
+  view_vendor_performance_analytics: "View vendor performance analytics",
+  orders_capital: "Orders",
+  // --> details
+  fry_express_performance: "Fry Express Performance",
+  vendor_performance_details: "Vendor Performance Details",
+  avg_rating: "Avg Rating",
+  total_products: "Total Products",
+  orders_revenue_trend: "Orders & Revenue Trend",
+  daily_performance_over_the_past_week: "Daily performance over the past week",
+
+  // vendor agreements
+  manage_and_view_all_vendor_agreements: "Manage and view all vendor agreements",
+  establishment: "Establishment",
+  no_agreements_found: "No agreements found",
+  //--> details
+  comprehensive_breakdown_original: "Comprehensive breakdown and original documentation reference",
+  open_original_pdf: "Open Original PDF",
+  tax_registration: " Tax Registration",
+  official_nif_reference: "Official NIF Reference",
+  document_status: "Document Status",
+  last_update: "Last Update",
+  system_timestamp: "System Timestamp",
+  document_space_viewer_for: "Document space viewer for",
+  no_printable_target_path_found: "No printable target path URL found",
+  verify_asset_cloud_uploads: "Verify asset cloud uploads match object configurations",
+
+  // vendor-wallets
+  manage_all_the_vendor_wallets: "Manage all the vendor wallets",
+  wallet_id: "Wallet ID",
+  last_settlement: "Last Settlement",
+  no_wallets_found: "No wallets found",
+  //---> details
+  back_to_wallets: "Back to Wallets",
+  wallet_details: "Wallet Details",
+  view_the_details_of_wallet: "View the details of a wallet",
+  active_wallet: "Active Wallet",
+  lifetime_revenue: "Lifetime Revenue",
+  unpaid_earnings: "Unpaid Earnings",
+  rider_payable: "Rider Payable",
+  fleet_earnings: "Fleet Earnings",
+  earnings_amount: "Earnings Amount",
+  settlement_status: "Settlement Status",
+
+  // vendor zones
+  vendor_zones_coverage: "Vendor Zones & Coverage",
+  manage_service_areas_vendor_operations: "Manage service areas for vendor operations",
+  operational_zones: "Operational Zones",
+  not_operational_zones: "Not Operational Zones",
+  operational: "Operational",
+  not_operational: "Not Operational",
 
   // all-fleet-manager
   no_fleet_manager_found: "No Fleet Manager found",
+  no_fleet_managers_found: "No fleet managers found",
+  //---> fleet documents
+  view_full_file: "View Full File",
+  no_document_uploaded: "No documents uploaded",
 
   // add-fleet-manager
+  add_a_new_fleet_manager_here: "Add a new fleet manager here",
   fleet_manager_email: "Fleet Manager Email",
   submit_fleetManager: "Submit FleetManager",
 
+  // fleet manager payouts
+  manage_all_fleet_manager_payouts_here: "Manage all fleet manager payouts here",
+  // --> payout settlement
+  final_settlement: "Final Settlement",
+  submit_proof_bank_reference_finalize: "Submit proof and bank reference to finalize this payout",
+  payout_proof_image: "Payout Proof Image",
+  click_to_upload_proof_image: "Click to upload proof image",
+  submit_settlement: "Submit Settlement",
+
   // fleet-manager-wallet
+  fleet_manager_wallets: "Fleet Manager Wallets",
+  manage_all_fleet_manager_wallets: "Manage all the fleet manager wallets",
   search_fleet_manager_id_reason: "Search fleet manager, ID or reason...",
   all_status: "All Status",
   failed: "Failed",
@@ -423,6 +514,7 @@ export const en = {
 
   // fleet-zones
   fleet_zones: "Fleet Zones",
+  manage_zones_fleet_managers : "Manage zones of fleet managers",
   search_zone_city_group: "Search zone, city, group or manager...",
   add_zone: "Add Zone",
   total_zones: "Total zones",
@@ -449,7 +541,18 @@ export const en = {
   update: "Update",
   save: "Save",
 
-  // fleet-performance
+  // fleet manager performance
+  fleet_manager_performance_analytics: "Fleet Manager Performance Analytics",
+  comprehensive_insights_fleet_manager_performance: "Comprehensive insights into fleet manager performance",
+  highest_earnings: "Highest Earnings",
+  daily_performance_over_7_days: "Daily performance over the last 7 days",
+  days: "Days",
+  earnings_performance: "Earnings Performance",
+  view_fleet_managers_performance_analytics: "View fleet managers performance analytics",
+  performance_capital: "Performance",
+  fleet_manager_performance_details: "Fleet Manager Performance Details",
+  total_drivers: "Total Drivers",
+  top_rated_delivery_partners: "Top Rated Delivery Partners",
   last_7_days: "Last 7 days",
   last_30_days: "Last 30 days",
   custom: "Custom",
@@ -541,6 +644,8 @@ export const en = {
     "This action is irreversible for the queued batch. You can cancel scheduled sends from the scheduled tasks panel.",
 
   // suspended/blocked-fleet-managers
+  suspended_fleet_managers: "Suspended Fleet Managers",
+  all_blocked_fleet_managers_from_system:"All blocked fleet managers from the system" ,
   blocked_fleet_managers: "Blocked Fleet Managers",
   blocked_managers: "Blocked Managers",
   no_blocked_managers_found: "No blocked managers found.",

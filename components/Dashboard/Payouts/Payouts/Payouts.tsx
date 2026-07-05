@@ -4,6 +4,7 @@ import PayoutTable from "@/components/Dashboard/Payouts/Payouts/PayoutTable";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TPayout } from "@/types/payout.type";
 import { motion } from "framer-motion";
@@ -44,10 +45,12 @@ export default function Payouts({
   subtitle,
   userRole,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader title={title} subtitle={subtitle} />
+      <TitleHeader title={t(title)} subtitle={t(`${subtitle}`)} />
 
       {/* Filters */}
       <AllFilters

@@ -8,6 +8,7 @@ import { TMeta } from "@/types";
 import { IAgreement } from "@/types/agreement.type";
 import { motion } from "framer-motion";
 import AgreementsTable from "./AgreementTable";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
     agreementsResult: { data: IAgreement[]; meta?: TMeta };
@@ -38,13 +39,14 @@ const filterOptions = [
 export default function Agreements({
     agreementsResult,
 }: IProps) {
+    const { t } = useTranslation();
 
     return (
         <div className="space-y-6 max-w-full">
             {/* Page Title */}
             <TitleHeader
-                title={"Vendor Agreements"}
-                subtitle={"Manage and view all vendor agreements"}
+                title={t("vendor_agreements")}
+                subtitle={t("manage_and_view_all_vendor_agreements")}
             />
 
             {/* Filters */}
