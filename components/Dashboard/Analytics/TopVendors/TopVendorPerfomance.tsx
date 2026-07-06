@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TTopVendors } from "@/types/analytics/top-vendors.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
@@ -10,6 +11,8 @@ interface IProps {
 }
 
 export default function TopVendorPerformance({ vendorPerformance }: IProps) {
+  const {t} = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -18,13 +21,13 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
     >
       <div className="mb-6">
-        <h3 className="text-lg font-bold text-gray-900">Vendor Performance</h3>
+        <h3 className="text-lg font-bold text-gray-900">{t("vendor_performance")}</h3>
         <p className="text-sm text-slate-500">
-          Deep dive into operational efficiency and quality
+          {t("deep_dive_into_operational_efficiency")}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+      <div className="grid grid-cols-1 gap-4 max-h-150 overflow-y-auto pr-2 custom-scrollbar">
         {vendorPerformance.map((vendor) => (
           <motion.div
             key={vendor.vendorId}
@@ -32,7 +35,7 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
             className="group p-5 border border-slate-100 rounded-2xl hover:border-blue-100 hover:shadow-md transition-all bg-white"
           >
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="flex-1 min-w-[200px]">
+              <div className="flex-1 min-w-50">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-lg">
                     {vendor.vendorName.charAt(0)}
@@ -42,7 +45,7 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
                       {vendor.vendorName}
                     </h4>
                     <p className="text-[10px] text-slate-400 font-mono">
-                      ID: {vendor.vendorId.slice(-8)}
+                      {t("id")}: {vendor.vendorId.slice(-8)}
                     </p>
                   </div>
                 </div>
@@ -50,7 +53,7 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
                   <div className="flex items-center gap-1.5">
                     <ShoppingBag className="w-3.5 h-3.5 text-slate-400" />
                     <span className="text-sm font-bold text-slate-700">
-                      {vendor.totalOrders} orders
+                      {vendor.totalOrders} {t("orders")}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm font-bold text-[#DC3173]">
@@ -59,10 +62,10 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 flex-[2]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 flex-2">
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                    Rating
+                    {t("rating")}
                   </p>
                   <div className="flex items-center gap-1 text-amber-500">
                     <Star className="w-4 h-4 fill-amber-500" />
@@ -74,7 +77,7 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
 
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                    Avg Prep
+                    {t("avg_prep")}
                   </p>
                   <div
                     className={`flex items-center gap-1 font-bold ${vendor.preparationTime > 30 ? "text-rose-500" : "text-slate-700"}`}
@@ -86,7 +89,7 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
 
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                    Satisfaction
+                    {t("satisfaction")}
                   </p>
                   <div className="flex items-center gap-1 text-emerald-600 font-bold">
                     <ThumbsUp className="w-4 h-4" />
@@ -96,7 +99,7 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
 
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                    Cancellation
+                    {t("cancellation")}
                   </p>
                   <div
                     className={`flex items-center gap-1 font-bold ${vendor.cancelRate > 5 ? "text-rose-600" : "text-slate-700"}`}

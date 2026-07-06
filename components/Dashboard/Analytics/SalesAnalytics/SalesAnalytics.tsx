@@ -4,6 +4,7 @@ import StatusDistributionCard from "@/components/common/StatusDistributionCard";
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TSalesAnalytics } from "@/types/analytics/sales-analytics.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { removeUnderscore } from "@/utils/formatter";
@@ -22,36 +23,37 @@ interface IProps {
 }
 
 export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
-  console.log(salesAnalytics);
+  const {t} = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Header */}
       <TitleHeader
-        title="Sales Analytics"
-        subtitle="Overview of revenue, orders, and business performance"
+        title={t("sales_analytics")}
+        subtitle={t("overview_revenue_orders_business_performance")}
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatsCard
-          title="Total Orders"
+          title={t("total_orders")}
           value={salesAnalytics.summary.totalOrders}
           icon={ShoppingBag}
         />
         <StatsCard
-          title="Total Revenue"
+          title={t("total_revenue")}
           value={`€${formatPrice(salesAnalytics.summary.totalRevenue)}`}
           icon={EuroIcon}
           delay={0.1}
         />
         <StatsCard
-          title="Avg Order Value"
+          title={t("avg_order_value")}
           value={`€${formatPrice(salesAnalytics.summary.averageOrderValue)}`}
           icon={TrendingUp}
           delay={0.2}
         />
         <StatsCard
-          title="Growth Rate"
+          title={t("growth_rate")}
           value={`${salesAnalytics.summary.growthRate}%`}
           icon={BarChart3}
           delay={0.3}
@@ -65,9 +67,9 @@ export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
       >
         <h3 className="text-lg font-bold text-gray-900 mb-2">
-          Monthly Revenue
+          {t("monthly_revenue")}
         </h3>
-        <p className="text-sm text-gray-500 mb-6">Revenue trend over months</p>
+        <p className="text-sm text-gray-500 mb-6">{t("revenue_trend_over_months")}</p>
 
         <AnalyticsChart
           data={salesAnalytics.monthly}
@@ -85,9 +87,9 @@ export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
         transition={{ delay: 0.1 }}
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
       >
-        <h3 className="text-lg font-bold text-gray-900 mb-2">Daily Orders</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-2">{t("daily_orders")}</h3>
         <p className="text-sm text-gray-500 mb-6">
-          Orders distribution over last 7 days
+          {t("orders_distribution_over_last_7_days")}
         </p>
 
         <AnalyticsChart
@@ -106,16 +108,16 @@ export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Order Status</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">{t("order_status")}</h3>
 
           <div className="space-y-3">
             <StatusDistributionCard
-              name="Completed"
+              name={t("completed")}
               value={salesAnalytics.statusDistribution.completed}
               color="#22C55E"
             />
             <StatusDistributionCard
-              name="Cancelled"
+              name={t("cancelled")}
               value={salesAnalytics.statusDistribution.cancelled}
               color="#EF4444"
             />
@@ -130,7 +132,7 @@ export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4">
-            Payment Methods
+           {t("payment_methods")}
           </h3>
 
           <div className="space-y-3">
@@ -155,7 +157,7 @@ export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <MapPin size={18} /> Revenue by Location
+            <MapPin size={18} /> {t("revenue_by_location")}
           </h3>
 
           <AnalyticsChart
@@ -175,7 +177,7 @@ export default function SalesAnalyticsPage({ salesAnalytics }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Store size={18} /> Revenue by Vendor
+            <Store size={18} /> {t("revenue_by_vendor")}
           </h3>
 
           <AnalyticsChart

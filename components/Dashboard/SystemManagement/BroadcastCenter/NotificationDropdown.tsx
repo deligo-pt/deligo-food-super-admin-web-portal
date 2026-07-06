@@ -20,6 +20,7 @@ import {
     Megaphone,
 } from "lucide-react";
 import { NOTIFICATION_TYPES, TNotificationType } from "@/types/notification.type";
+import { useTranslation } from '@/hooks/use-translation';
 
 interface NotificationDropdownProps {
     onValueChange: (value: TNotificationType) => void;
@@ -32,7 +33,7 @@ const NotificationDropdown = ({
     defaultValue,
     itemVariants
 }: NotificationDropdownProps) => {
-
+    const { t } = useTranslation();
     const getIcon = (type: TNotificationType) => {
         switch (type) {
             case "ORDER":
@@ -60,7 +61,7 @@ const NotificationDropdown = ({
             className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
         >
             <label className="block text-xs font-bold uppercase mb-2 tracking-wider">
-                Notification Category
+                {t("notification_category")}
             </label>
 
             <Select

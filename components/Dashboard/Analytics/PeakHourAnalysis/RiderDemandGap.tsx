@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TPeakHoursAnalysis } from "@/types/analytics/peak-hour-analysis.type";
 import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
@@ -17,6 +18,7 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const { t } = useTranslation();
   if (active && payload && payload.length) {
     const orders = payload[0].value;
     const riders = payload[1].value;
@@ -25,13 +27,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-white p-4 shadow-xl border border-slate-100 rounded-xl">
         <p className="text-xs font-bold text-slate-400 uppercase mb-3">
-          Time: {label}:00
+          {t("time")}: {label}:00
         </p>
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-10">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-[#DC3173]" />
-              <span className="text-sm text-slate-600">Orders</span>
+              <span className="text-sm text-slate-600">{t("orders_lg")}</span>
             </div>
             <span className="text-sm font-mono font-bold text-slate-800">
               {orders}
@@ -40,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <div className="flex items-center justify-between gap-10">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-[#2563eb]" />
-              <span className="text-sm text-slate-600">Riders</span>
+              <span className="text-sm text-slate-600">{t("riders")}</span>
             </div>
             <span className="text-sm font-mono font-bold text-slate-800">
               {riders}
@@ -49,7 +51,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
           {shortage > 0 && (
             <div className="mt-2 pt-2 border-t border-rose-100 flex items-center justify-between text-rose-600">
-              <span className="text-xs font-bold uppercase">Shortage</span>
+              <span className="text-xs font-bold uppercase">{t("shortage")}</span>
               <span className="text-sm font-black">{shortage}</span>
             </div>
           )}
@@ -65,6 +67,8 @@ export default function RiderDemandGapChart({
 }: {
   riderDemandGap: TPeakHoursAnalysis["riderDemandGap"];
 }) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -74,10 +78,10 @@ export default function RiderDemandGapChart({
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Rider Demand vs Availability
+            {t("rider_demand_vs_availability")}
           </h3>
           <p className="text-sm text-gray-500">
-            Hourly comparison of required vs available supply
+            {t("hourly_comparison_required_vs_available_supply")}
           </p>
         </div>
 
@@ -85,7 +89,7 @@ export default function RiderDemandGapChart({
           <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-50 border border-rose-100 rounded-lg">
             <AlertCircle className="w-4 h-4 text-rose-500" />
             <span className="text-xs font-bold text-rose-700 uppercase tracking-tight">
-              Shortage Detected
+              {t("shortage_detected")}
             </span>
           </div>
         )}
@@ -153,9 +157,9 @@ export default function RiderDemandGapChart({
       </div>
 
       <div className="mt-6 flex flex-wrap gap-4">
-        <div className="flex-1 min-w-[200px] p-4 bg-slate-50 rounded-xl border border-slate-100">
+        <div className="flex-1 min-w-50 p-4 bg-slate-50 rounded-xl border border-slate-100">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">
-            Total Demand
+            {t("total_demand")}
           </p>
           <p className="text-2xl font-mono font-bold text-slate-800">
             {riderDemandGap
@@ -163,9 +167,9 @@ export default function RiderDemandGapChart({
               .toLocaleString()}
           </p>
         </div>
-        <div className="flex-1 min-w-[200px] p-4 bg-rose-50/50 rounded-xl border border-rose-100">
+        <div className="flex-1 min-w-50 p-4 bg-rose-50/50 rounded-xl border border-rose-100">
           <p className="text-[10px] font-black text-rose-400 uppercase tracking-[0.2em] mb-1">
-            Total Shortage
+            {t("total_shortage")}
           </p>
           <p className="text-2xl font-mono font-bold text-rose-600">
             {riderDemandGap

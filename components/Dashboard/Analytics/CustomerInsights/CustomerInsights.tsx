@@ -5,6 +5,7 @@ import CustomersOrderFrequencyChart from "@/components/Dashboard/Analytics/Custo
 import CustomersPeakOrderTimeChart from "@/components/Dashboard/Analytics/CustomerInsights/CustomersPeakOrderTimeChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TCustomerInsights } from "@/types/analytics/customer-insights.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
@@ -22,36 +23,37 @@ interface IProps {
 }
 
 export default function CustomerInsightsPage({ customerInsights }: IProps) {
-  console.log(customerInsights);
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Header */}
       <TitleHeader
-        title="Customer Insights"
-        subtitle="Understand user behavior and engagement"
+        title={t("customer_insights")}
+        subtitle={t("understand_user_behaviour_and_engagement")}
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatsCard
-          title="New Customers"
+          title={t("new_customers")}
           value={customerInsights.summary.newCustomers}
           icon={UserPlus}
         />
         <StatsCard
-          title="Returning Customers"
+          title={t("returning_users")}
           value={customerInsights.summary.returningCustomers}
           icon={Users}
           delay={0.1}
         />
         <StatsCard
-          title="Churn Rate"
+          title={t("churn_rate")}
           value={`${customerInsights.summary.churnRate}%`}
           icon={TrendingDown}
           delay={0.2}
         />
         <StatsCard
-          title="Avg CLV"
+          title={t("avg_clv")}
           value={`€${formatPrice(customerInsights.summary.averageCLV)}`}
           icon={Euro}
           delay={0.3}
@@ -65,7 +67,7 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
       >
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <Clock size={18} /> Peak Order Time
+          <Clock size={18} /> {t("peak_order_time")}
         </h3>
         <CustomersPeakOrderTimeChart
           hourlyOrders={customerInsights.hourlyOrders}
@@ -80,7 +82,7 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Activity size={18} /> Order Frequency
+            <Activity size={18} /> {t("order_frequency")}
           </h3>
 
           <CustomersOrderFrequencyChart
@@ -96,7 +98,7 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Users size={18} /> Active Users
+            <Users size={18} /> {t("active_users")}
           </h3>
 
           <ActiveCustomersInsightsChart
@@ -112,7 +114,7 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
         transition={{ delay: 0.2 }}
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
       >
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Top Customers</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">{t("top_customers")}</h3>
 
         <div className="space-y-4">
           {customerInsights.topCustomers.map((customer) => (
@@ -123,7 +125,7 @@ export default function CustomerInsightsPage({ customerInsights }: IProps) {
               <div>
                 <p className="font-semibold text-gray-900">{customer.name}</p>
                 <p className="text-sm text-gray-500">
-                  {customer.totalOrders} orders
+                  {customer.totalOrders} {t("orders")}
                 </p>
               </div>
 

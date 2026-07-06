@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TTopVendors } from "@/types/analytics/top-vendors.type";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
@@ -45,6 +46,7 @@ export default function TopVendorRatingDistribution({
 }: {
   ratingDistribution: TTopVendors["ratingDistribution"];
 }) {
+  const {t} = useTranslation();
   const distributionData = [1, 2, 3, 4, 5].map((star) => ({
     rating: star,
     count: ratingDistribution.filter((v) => Math.round(v.rating) === star)
@@ -63,16 +65,16 @@ export default function TopVendorRatingDistribution({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-bold text-gray-900">
-            Rating Distribution
+            {t("rating_distribution")}
           </h3>
           <p className="text-sm text-gray-500">
-            Total volume across {totalVendors} vendors
+           {t("")} {totalVendors} {t("vendors")}
           </p>
         </div>
         <div className="flex items-center gap-1 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
           <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
           <span className="text-xs font-bold text-amber-700">
-            Vendor Quality
+            {t("vendor_quality")}
           </span>
         </div>
       </div>

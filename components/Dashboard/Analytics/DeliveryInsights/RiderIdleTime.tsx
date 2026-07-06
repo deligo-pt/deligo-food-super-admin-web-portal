@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryInsights } from "@/types/analytics/delivery-insights.type";
 import { motion } from "framer-motion";
 import { Activity, Coffee, Timer, User } from "lucide-react";
@@ -9,6 +10,7 @@ interface IProps {
 }
 
 export default function RiderIdleTime({ riderIdleTime }: IProps) {
+  const { t } = useTranslation();
   // Sorting riders by highest idle time first for better analytical value
   const sortedRiders = [...riderIdleTime].sort(
     (a, b) => b.idleTimeMinutes - a.idleTimeMinutes,
@@ -24,7 +26,7 @@ export default function RiderIdleTime({ riderIdleTime }: IProps) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Activity size={18} /> Rider Idle Time
+            <Activity size={18} /> {t("rider_idle_time")}
           </h3>
         </div>
         <div className="bg-orange-50 p-2 rounded-lg">
@@ -32,7 +34,7 @@ export default function RiderIdleTime({ riderIdleTime }: IProps) {
         </div>
       </div>
 
-      <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+      <div className="space-y-6 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
         {sortedRiders.map((rider, index) => {
           // Calculate color intensity based on time (e.g., > 60 mins is "Warning" zone)
           const isHighIdle = rider.idleTimeMinutes > 60;
@@ -56,7 +58,7 @@ export default function RiderIdleTime({ riderIdleTime }: IProps) {
                       {rider.riderName}
                     </p>
                     <p className="text-[10px] text-slate-400 mt-1 uppercase font-medium">
-                      ID: {rider.riderId.slice(-6)}
+                      {t("id")}: {rider.riderId.slice(-6)}
                     </p>
                   </div>
                 </div>
@@ -67,7 +69,7 @@ export default function RiderIdleTime({ riderIdleTime }: IProps) {
                     />
                     <span>{rider.idleTimeMinutes}</span>
                     <span className="text-[10px] text-slate-400 font-normal underline decoration-dotted">
-                      min
+                      {t("min")}
                     </span>
                   </div>
                 </div>

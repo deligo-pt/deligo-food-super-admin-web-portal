@@ -49,8 +49,10 @@ const CustomTooltip = ({
 
 export default function LunchVsDinnerChart({
   mealTimeComparison,
+  title
 }: {
   mealTimeComparison: TPeakHoursAnalysis["mealTimeComparison"];
+  title: string;
 }) {
   const chartData = mealTimeComparison.map((item) => ({
     ...item,
@@ -63,7 +65,7 @@ export default function LunchVsDinnerChart({
       animate={{ opacity: 1, y: 0 }}
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
     >
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Lunch vs Dinner</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-4">{title}</h3>
 
       <motion.div
         initial={{

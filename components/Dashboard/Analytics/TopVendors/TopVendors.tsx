@@ -6,6 +6,7 @@ import TopVendorPerformance from "@/components/Dashboard/Analytics/TopVendors/To
 import TopVendorRatingDistribution from "@/components/Dashboard/Analytics/TopVendors/TopVendorRatingDistribution";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TTopVendors } from "@/types/analytics/top-vendors.type";
 import { Star, Store, TrendingUp, XCircle } from "lucide-react";
 
@@ -14,7 +15,7 @@ interface IProps {
 }
 
 export default function TopVendorsPage({ topVendors }: IProps) {
-  console.log("Top Vendors Data:", topVendors);
+  const { t } = useTranslation();
   const totalVendors = topVendors.vendorPerformance.length;
 
   const topVendor = topVendors.topSellingVendors[0];
@@ -31,27 +32,27 @@ export default function TopVendorsPage({ topVendors }: IProps) {
     <div className="min-h-screen bg-gray-50/50 pb-20">
       {/* Header */}
       <TitleHeader
-        title="Top Vendors"
-        subtitle="Vendor ranking and performance insights"
+        title={t("top_vendors")}
+        subtitle={t("vendor_ranking_and_performance_insights")}
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatsCard title="Total Vendors" value={totalVendors} icon={Store} />
         <StatsCard
-          title="Top Vendor"
+          title={t("top_vendor")}
           value={topVendor?.vendorName || "-"}
           icon={TrendingUp}
           delay={0.1}
         />
         <StatsCard
-          title="Avg Rating"
+          title={t("avg_rating")}
           value={avgRating.toFixed(1)}
           icon={Star}
           delay={0.2}
         />
         <StatsCard
-          title="Avg Cancel Rate"
+          title={t("avg_cancel_rate")}
           value={`${avgCancelRate.toFixed(1)}%`}
           icon={XCircle}
           delay={0.3}
