@@ -16,8 +16,8 @@ export default async function ActiveCampaignsPage({ searchParams }: IProps) {
   return (
     <ActiveCampaigns
       offersResult={offersResult}
-      title="Active Campaigns"
-      subtitle="List of all active offers"
+      title="active_campaigns"
+      subtitle="list_of_all_active_offers"
     />
   );
 }

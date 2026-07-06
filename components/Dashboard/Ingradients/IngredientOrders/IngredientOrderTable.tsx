@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { updatedIngredientOrderStatusReq } from "@/services/dashboard/ingredient/ingredient.service";
 import { TIngredientOrder } from "@/types/ingredient.type";
 import { formatPrice } from "@/utils/formatPrice";
@@ -42,6 +43,7 @@ interface IProps {
 }
 
 export default function IngredientOrderTable({ orders }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const updateStatus = async (id: string, status: "SHIPPED" | "DELIVERED") => {
@@ -56,9 +58,9 @@ export default function IngredientOrderTable({ orders }: IProps) {
     if (result?.success) {
       toast.success(
         result?.message ||
-          (status === "SHIPPED"
-            ? "Order status updated to SHIPPED"
-            : "Order status updated to DELIVERED"),
+        (status === "SHIPPED"
+          ? "Order status updated to SHIPPED"
+          : "Order status updated to DELIVERED"),
         { id: toastId },
       );
       router.refresh();
@@ -67,13 +69,13 @@ export default function IngredientOrderTable({ orders }: IProps) {
 
     toast.error(
       result?.message ||
-        (status === "SHIPPED"
-          ? "Failed to update order status to SHIPPED"
-          : "Failed to update order status to DELIVERED"),
+      (status === "SHIPPED"
+        ? "Failed to update order status to SHIPPED"
+        : "Failed to update order status to DELIVERED"),
       { id: toastId },
     );
   };
-console.log("ing order", orders);
+
   const getStatusBadge = (status: TIngredientOrder["orderStatus"]) => {
     switch (status) {
       case "DELIVERED":
@@ -115,42 +117,42 @@ console.log("ing order", orders);
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Order ID
+               {t("order_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <StoreIcon className="w-4" />
-                Vendor
+                {t("vendor")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Warehouse className="w-4" />
-                Items
+                {t("items")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Total
+                {t("total")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CheckCircleIcon className="w-4" />
-                Status
+                {t("status")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Date
+                {t("date")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -161,7 +163,7 @@ console.log("ing order", orders);
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={7}
               >
-                No orders found
+                {t("no_orders_found")}
               </TableCell>
             </TableRow>
           )}
@@ -209,14 +211,14 @@ console.log("ing order", orders);
                         router.push("/admin/ingredient-orders/" + order.orderId)
                       }
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                     {order.orderStatus === "CONFIRMED" && (
                       <DropdownMenuItem
                         className=""
                         onClick={() => updateStatus(order.orderId, "SHIPPED")}
                       >
-                        Update to SHIPPED
+                      {t("update_to_shipped")}
                       </DropdownMenuItem>
                     )}
                     {order.orderStatus === "SHIPPED" && (
@@ -224,7 +226,7 @@ console.log("ing order", orders);
                         className=""
                         onClick={() => updateStatus(order.orderId, "DELIVERED")}
                       >
-                        Update to DELIVERED
+                        {t("update_to_delivered")}
                       </DropdownMenuItem>
                     )}
                     {/* <DropdownMenuItem

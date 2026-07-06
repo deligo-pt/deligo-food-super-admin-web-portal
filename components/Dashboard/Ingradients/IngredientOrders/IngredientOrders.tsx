@@ -30,8 +30,8 @@ export default function IngredientOrders({ ingredientOrdersData }: IProps) {
     <div className="min-h-screen">
       {/* Page Title */}
       <TitleHeader
-        title="Ingredient Orders"
-        subtitle="Manage and process vendor supply requests"
+        title={t("ingredient_orders")}
+        subtitle={t("manage_and_process_vendor_supply_requests")}
       />
 
       {/* Filters */}

@@ -177,7 +177,7 @@ export default function CreateNewOffer() {
                                   {t("flat_amount_off")}
                                 </SelectItem>
                                 <SelectItem value="FREE_DELIVERY">
-                                  Free Delivery
+                                  {t("free_delivery")}
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -333,7 +333,7 @@ export default function CreateNewOffer() {
                           <FormControl>
                             <div className="space-y-2">
                               <FormLabel className="font-medium text-sm text-gray-700">
-                                Maximum Usage Count
+                                {t("maximum_usage_count")}
                               </FormLabel>
                               <Input
                                 placeholder="Maximum usage count"
@@ -356,7 +356,7 @@ export default function CreateNewOffer() {
                           <FormControl>
                             <div className="space-y-2">
                               <FormLabel className="font-medium text-sm text-gray-700">
-                                Users Usage Limit
+                                {t("users_usage_limit")}
                               </FormLabel>
                               <Input
                                 placeholder="Users usage limit"

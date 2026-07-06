@@ -251,7 +251,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_offers"), path: "/admin/all-offers" },
         { name: t("active_campaigns"), path: "/admin/active-campaigns" },
         { name: t("expired_offers"), path: "/admin/expired-offers" },
-        { name: t("coupon_analytics"), path: "/admin/coupon-analytics" },
+        // { name: t("coupon_analytics"), path: "/admin/coupon-analytics" },
         {
           name: t("sponsorships"),
           path: "/admin/sponsorships",

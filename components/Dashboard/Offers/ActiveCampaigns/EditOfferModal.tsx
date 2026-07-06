@@ -113,7 +113,7 @@ export default function EditOfferModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
-        <DialogTitle className="text-2xl font-medium">Edit Offer</DialogTitle>
+        <DialogTitle className="text-2xl font-medium">{t("edit_offer")}</DialogTitle>
 
         <Form {...form}>
           <form
@@ -193,7 +193,7 @@ export default function EditOfferModal({
                               {t("buy_1_get_1")}
                             </SelectItem>
                             <SelectItem value="FREE_DELIVERY">
-                              Free Delivery
+                              {t("free_delivery")}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -350,7 +350,7 @@ export default function EditOfferModal({
                       <FormControl>
                         <div className="space-y-2">
                           <FormLabel className="font-medium text-sm text-gray-700">
-                            Maximum Usage Count
+                            {t("maximum_usage_count")}
                           </FormLabel>
                           <Input
                             placeholder="Maximum usage count"
@@ -373,7 +373,7 @@ export default function EditOfferModal({
                       <FormControl>
                         <div className="space-y-2">
                           <FormLabel className="font-medium text-sm text-gray-700">
-                            Users Usage Limit
+                            {t("users_usage_limit")}
                           </FormLabel>
                           <Input
                             placeholder="Users usage limit"
@@ -456,12 +456,12 @@ export default function EditOfferModal({
             {isSubmitting ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              "Update"
+              t("update")
             )}
           </Button>
           <DialogClose asChild>
             <Button type="button" variant="outline">
-              Cancel
+              {t("cancel")}
             </Button>
           </DialogClose>
         </DialogFooter>

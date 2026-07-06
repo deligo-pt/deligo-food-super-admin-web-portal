@@ -2,7 +2,10 @@ type TOfferType = "PERCENT" | "FLAT" | "FREE_DELIVERY" | "BOGO";
 
 export type TOffer = {
   _id: string;
-  title: string;
+  title: {
+    en?: string;
+    pt?: string;
+  };
   description?: string;
   // Offer type
   offerType: TOfferType;

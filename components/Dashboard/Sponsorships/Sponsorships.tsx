@@ -6,6 +6,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TMeta } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
@@ -50,6 +51,7 @@ export default function Sponsorships({
   title,
   subtitle,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [deleteId, setDeleteId] = useState("");
@@ -92,10 +94,10 @@ export default function Sponsorships({
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title={title}
-        subtitle={subtitle}
+        title={t(`${title}`)}
+        subtitle={t(`${subtitle}`)}
         buttonInfo={{
-          text: "Add Sponsorship",
+          text: t("add_sponsorship"),
           onClick: () => router.push("/admin/add-sponsorship"),
         }}
       />

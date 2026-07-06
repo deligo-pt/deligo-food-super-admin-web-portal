@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TIngredient } from "@/types/ingredient.type";
 import { motion } from "framer-motion";
 import {
@@ -37,6 +38,7 @@ export default function IngredientTable({
   onEdit,
   onDelete,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -51,24 +53,24 @@ export default function IngredientTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ComponentIcon className="w-4" />
-                Ingredient
+                {t("ingredient")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Price
+                {t("price")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Warehouse className="w-4" />
-                Stock
+                {t("stock")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -79,7 +81,7 @@ export default function IngredientTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={4}
               >
-                No ingredients found
+                {t("no_ingredients_found")}
               </TableCell>
             </TableRow>
           )}
@@ -121,23 +123,22 @@ export default function IngredientTable({
                         router.push("/admin/all-ingredients/" + ingredient?.sku)
                       }
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onEdit(ingredient)}>
-                      Edit
+                      {t("edit")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive font-medium cursor-pointer"
                       onClick={() => onDelete(ingredient._id, "soft")}
                     >
-                      Soft Delete
-                    </DropdownMenuItem>
+                      {t("soft_delete")}                    </DropdownMenuItem>
 
                     <DropdownMenuItem
                       className="font-bold cursor-pointer bg-red-50/30 text-red-600 focus:bg-red-50"
                       onClick={() => onDelete(ingredient._id, "permanent")}
                     >
-                      Permanent Delete
+                      {t("permanent_delete")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

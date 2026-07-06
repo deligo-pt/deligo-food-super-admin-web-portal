@@ -1047,11 +1047,26 @@ export const pt = {
   payment: "Pagamento",
   delivery_timeline: "Linha temporal da entrega",
   rider: "Estafeta",
+  flash: "Flash",
+  order_items: "Itens do Pedido",
+  qty: "Qtd",
+  subtotal: "Subtotal",
+  pickup_location: "Local de Coleta",
+  vendor_contact: "Contato do Vendedor",
+  customer_contact: "Contato do Cliente",
+  payment_summary: "Resumo do Pagamento",
+  includes_all_taxes: "Inclui todos os impostos",
+  customer_details: "Detalhes do Cliente",
+  orders_from: "Pedidos de",
+  customer_orders: "Pedidos do Cliente",
+  manage_customer_orders_here: "Gerencie os pedidos dos clientes aqui",
 
   // pending-orders
+  all_pending_orders_system: "Todos os pedidos pendentes no sistema",
   live_pending_orders: "Encomendas pendentes em tempo real",
 
   // preparing-orders
+  all_preparing_orders_in_system: "Todos os pedidos em preparação no sistema",
   live_kitchen_dashboard_assign_riders:
     "Painel de cozinha em tempo real — atribuir estafetas, acompanhar tempos e gerir atrasos.",
   export: "Exportar",
@@ -1063,11 +1078,13 @@ export const pt = {
   order_created: "Encomenda criada",
 
   // on the way orders
+  the_orders_that_on_the_way_to_customer: "Os pedidos que estão a caminho do cliente.",
   live_tracking_delivery_partner_location:
     "Acompanhamento em tempo real — localização do estafeta, ETA e coordenação com o cliente.",
   full_route_eta_partner_info: "Rota completa, ETA e informação do parceiro",
 
   // delivered-orders
+  successfully_delivered_orders_listed: "Os pedidos entregues com sucesso estão listados aqui.",
   delivered_orders_portugal: "Encomendas entregues (Portugal)",
   gestao_professional_das_encomendas:
     "Gestão profissional das encomendas entregues — otimizada para Portugal.",
@@ -1076,8 +1093,7 @@ export const pt = {
   payment_eur: "Pagamento (EUR)",
 
   // cancelled-orders
-  cancelled_orders_desc:
-    "Encomendas canceladas — monitorize motivos e parceiros para reduzir churn.",
+  cancelled_orders_desc: "Encomendas canceladas — monitorize motivos e parceiros para reduzir churn.",
   cancelled_at: "Cancelada em",
 
   // refund-requests
@@ -1091,6 +1107,7 @@ export const pt = {
     "Nota: ligar os botões aprovar/rejeitar à sua API de processamento de reembolsos.",
 
   // platform earnings
+  revenue_commissions_platform_fee_analytics: "Análise de receita, comissões e taxas da plataforma",
   track_platform_revenue_fees_simple:
     "Acompanhar receitas e taxas da plataforma com um layout simples e claro.",
   search_order_vendor_region: "Pesquisar encomenda, vendedor, região",
@@ -1102,6 +1119,14 @@ export const pt = {
   region: "Região",
   gross: "Bruto",
   platform_fee: "Taxa da plataforma",
+  this_week_commission: "Comissão desta Semana",
+  this_month_commission: "Comissão deste Mês",
+  monthly_commissions: "Comissões Mensais",
+  last_6_months_commission_chart: "Gráfico de comissões dos últimos 6 meses",
+  commissions: "Comissões",
+  commissions_in_total: "Total em Comissões",
+  transaction_id: "ID da Transação",
+  no_commissions_found: "Nenhuma comissão encontrada",
 
   // driver payouts
   search_driver_city_payout_method_status:
@@ -1109,6 +1134,7 @@ export const pt = {
   driver: "Estafeta",
 
   // transaction history
+  full_breakdown_earnings_payouts_fees: "Detalhamento completo de ganhos, pagamentos e taxas",
   full_ledger_platform_transactions_payouts:
     "Livro razão completo das transações da plataforma — pagamentos, levantamentos e reembolsos.",
   refresh: "Atualizar",
@@ -1122,19 +1148,26 @@ export const pt = {
   tx_id: "ID da transação",
   type: "Tipo",
   balance: "Saldo",
-  no_transactions_match_filters:
-    "Nenhuma transação corresponde aos seus filtros.",
+  no_transactions_match_filters: "Nenhuma transação corresponde aos seus filtros.",
+  no_transactions_found: "Nenhuma transação encontrada",
 
   // payment-disputes
+  track_and_resolve_payment_disputes: "Rastreie e resolva disputas de pagamento em toda a plataforma",
   systematic_dispute_management_action:
     "Gestão sistemática de disputas com controlos de ação e exportação pronta para auditoria.",
   resolved: "Resolvido",
+  total_disputes: "Total de Disputas",
+  open_disputes: "Disputas Abertas",
+  resolved_disputes: "Disputas Resolvidas",
+  total_amount_disputed: "Valor Total em Disputa",
+  all_disputes: "Todas as Disputas",
   pending_vendor: "Pendente do vendedor",
   pending_customer: "Pendente do cliente",
   last_90_days: "Últimos 90 dias",
   year_to_date: "Ano até à data",
   search_dispute_order_vendor:
     "Pesquisar disputa, encomenda, vendedor ou cliente",
+  no_disputes_found: "Nenhuma disputa encontrada",
   dispute_id: "ID da disputa",
   resolve: "Resolver",
   disputes: "disputas",
@@ -1146,6 +1179,11 @@ export const pt = {
   this_action_is_audit_logged: "Esta ação fica registada para auditoria.",
 
   // tax management
+  manage_all_the_taxes_in_system: "Gerenciar todos os impostos no sistema",
+  tax_code: "Código do Imposto",
+  rate: "Taxa",
+  country_id: "ID do País",
+  no_tax_found: "Nenhum imposto encontrado",
   vat_rules_reports_audit_logs:
     "Regras de IVA, relatórios e registos de auditoria.",
   new_rule: "Nova regra",
@@ -1167,6 +1205,21 @@ export const pt = {
   no_audit_entries: "Nenhum registo de auditoria.",
   dismiss: "Fechar",
   tax_rate: "Taxa de imposto",
+  // --> create tax
+  tax_form: "Formulário de Imposto",
+  // --> edit tax
+  edit_tax: "Editar Imposto",
+  make_changes_to_your_tax: "Faça alterações no seu imposto",
+  tax_name: "Nome do Imposto",
+  tax_exemption_code: "Código de Isenção Fiscal",
+  tax_exemption_reason: "Motivo da Isenção Fiscal",
+  // loyalty points
+  all_loyalty_points: "Todos os Pontos de Fidelidade",
+  the_points_earned_spent_users: "Os pontos acumulados e gastos pelos usuários",
+  current_points: "Pontos Atuais",
+  total_spent: "Total Gasto",
+  total_earned: "Total Acumulado",
+  no_point_found: "Nenhum ponto encontrado",
 
   // all-product/items
   food_items: "Itens alimentares",
@@ -1197,8 +1250,14 @@ export const pt = {
   based_on: "Com base em",
   review: "avaliação",
   origin: "Origem",
+  variations: "Variações",
+  variation_options: "Opções de Variação",
+  label: "Rótulo",
+  price: "Preço",
+  stock: "Estoque",
 
   // out_of_stock_alerts
+  monitor_products_variations_require_immediate: "Monitore produtos e variações que exigem reposição imediata",
   live_stock_monitoring_acroos_all_vendors:
     "Monitorização de stock em tempo real em todos os vendedores — painel admin premium Deligo.",
   search_item_vendor_category: "Pesquisar item, vendedor ou categoria...",
@@ -1208,6 +1267,10 @@ export const pt = {
   item: "Item",
   inventory: "Inventário",
   no_matching_results: "Nenhum resultado correspondente.",
+  current_stock: "Estoque Atual",
+  view_variation_stock: "Ver Estoque da Variação",
+  all_caught_up: "Tudo atualizado!",
+  no_out_of_stock_items_match_current_filters: "Nenhum item esgotado corresponde aos filtros atuais.",
 
   // restricted-items
   manage_items_vendors_allowed_sell:
@@ -1224,7 +1287,63 @@ export const pt = {
   save_changes: "Guardar alterações",
   add_item: "Adicionar item",
 
+  // add restricted item
+  add_restricted_item: "Adicionar Item Restrito",
+  item_name: "Nome do Item",
+  // edit 
+  edit_restricted_item: "Editar Item Restrito",
+
+  // all-ingredients
+  inventory_management_packaging_supplies: "Gerenciamento de estoque para embalagens e suprimentos",
+  ingredient: "Ingrediente",
+  no_ingredients_found: "Nenhum ingrediente encontrado",
+  // edit ingredient
+  edit_ingredient_specifications: "Editar Especificações do Ingrediente",
+  modify_catalog_parameters_wholesale_matrix: "Modificar parâmetros do catálogo e definições da matriz de atacado para o SKU",
+  price_per_unit: "Preço por Unidade",
+  measurement_unit: "Unidade de Medida",
+  low_stock_alert_level: "Nível de Alerta de Estoque Baixo",
+  minimum_order: "Pedido Mínimo",
+  catalog_description: "Descrição do Catálogo",
+  replace_thumbnail_asset_image: "Substituir Imagem de Miniatura do Arquivo",
+  low_stock_warning_limit: "Limite de Aviso de Estoque Baixo",
+  shelf_life_safeguard: "Garantia de Vida Útil (Dias)",
+  dynamic_discount_matrix: "Matriz de Desconto Dinâmico",
+  map_localized_pricing_offsets: "Mapear compensações de preços localizadas em relação aos limites de volume em lote",
+  add_tier: "Adicionar Nível",
+  no_active_discount_tiers_mapped_object_profile: "Nenhum nível de desconto ativo mapeado para este perfil de objeto.",
+  min_volume: "Volume Mínimo",
+  promo_rate: "Taxa Promocional",
+  // delete modal 
+  are_you_absolutely_sure_this_action_irreversible: "Você tem certeza absoluta? Esta ação é irreversível e apaga completamente o registro do arquivo do banco de dados do cluster.",
+  are_you_sure: "Tem certeza de que deseja sinalizar este item? Esta operação move o ingrediente para os contextos de arquivamento com segurança.",
+  // add ingredient
+  add_new_ingredient: "Adicionar Novo Ingrediente",
+  add_packaging_materials_ingredients: "Adicionar materiais de embalagem e ingredientes ao estoque.",
+  shelf_life_days: "Vida Útil (Dias - Opcional)",
+  bulk_discount_tiers: "Níveis de Desconto em Lote (Opcional)",
+  apply_specialized_system_drops: "Aplicar reduções de sistema especializadas para linhas de compra dinâmicas",
+  no_discount_tiers_added_yet: "Nenhum nível de desconto adicionado ainda. As métricas básicas de rastreamento do produto serão aplicadas globalmente.",
+  minimum_quantity: "Quantidade Mínima",
+  discounted_price: "Preço com Desconto",
+  ingredient_image: "Imagem do Ingrediente",
+  save_ingredient: "Salvar Ingrediente",
+  // ingredient orders
+  manage_and_process_vendor_supply_requests: "Gerenciar e processar solicitações de suprimentos do vendedor",
+  update_to_shipped: "Atualizar para ENVIADO",
+  update_to_delivered: "Atualizar para ENTREGUE",
+  // ingredient detials
+  placed_on: "Realizado em",
+  unit_price: "Preço Unitário",
+  product_discount: "Desconto do Produto",
+  tax_amount: "Valor do Imposto",
+  order_timeline: "Linha do Tempo do Pedido",
+  vendor_details: "Detalhes do Vendedor",
+  mark_shipped: "Marcar como Enviado",
+  mark_delivered: "Marcar como Entregue",
+
   // active-campaigns
+  list_of_all_active_offers: "Lista de todas as ofertas ativas",
   ongoing: "Em curso",
   upcomong: "Próximas",
   expired: "Expiradas",
@@ -1239,6 +1358,9 @@ export const pt = {
   off_lg: "DESCONTO",
   start_date: "Data de início",
   end_date: "Data de fim",
+
+  // expired offers
+  list_of_all_expired_offers: "Lista de todas as ofertas expiradas",
 
   // creaet-new-offer
   add_promotion_boost_restuarant_sales:
@@ -1255,10 +1377,37 @@ export const pt = {
   choose_an_item: "Escolher um item",
   validity: "Validade",
   minimum_order_amount: "Valor mínimo da encomenda",
+  maximum_usage_count: "Limite Máximo de Uso",
+  users_usage_limit: "Limite de Uso por Usuário",
   will_auto_apply: "Aplicar automaticamente?",
   promo_code: "Código promocional",
   enter_promo_code: "Introduzir código promocional",
   create_offer: "Criar oferta",
+
+  // all offers
+  manage_all_offers_here: "Gerenciar todas as ofertas aqui",
+  no_offers_found: "Nenhuma oferta encontrada",
+  expire_status: "Status de Expiração",
+  activating: "Ativando",
+  deactivating: "Desativando",
+  offer: "Oferta",
+  this_offer: "esta oferta",
+  // --> details
+  auto_applied: "Aplicado Automaticamente",
+  delete_offer: "Excluir Oferta",
+  min_order: "Pedido Mín.",
+  max_discount: "Desconto Máx.",
+  limit_user: "Limite/Usuário",
+  total_uses: "Total de Usos",
+  usage_progress: "Progresso de Uso",
+  validity_period: "Período de Validade",
+  this_offer_has_expired: "Esta oferta expirou",
+  bogo_details: "Detalhes do Leve 2 Pague 1",
+  buy: "Compre",
+  get_free: "Ganhe Grátis",
+  item_id: "ID do Item",
+  // edit offer
+  edit_offer: "Editar Oferta",
 
   // coupon-analytics
   performance_insights_coupon_campaigns:
@@ -1274,6 +1423,36 @@ export const pt = {
   used: "Utilizado",
   issued: "Emitido",
   usage_rate: "Taxa de utilização",
+
+  // add sponsorship
+  add_banner_ads_and_sponsored_content: "Adicionar anúncios em banner e conteúdo patrocinado",
+  create_a_new_banner_campaign: "Criar uma nova campanha de banner",
+  sponsor_name: "Nome do Patrocinador",
+  sponsor_type: "Tipo de Patrocinador",
+  select_a_type: "Selecione um tipo",
+  sponsor_url: "URL do Patrocinador (opcional)",
+  banner_image: "Imagem do Banner",
+  immediately_publish_this_sponsorship: "Publicar este patrocínio imediatamente",
+  create_sponsorship: "Criar Patrocínio",
+
+  // all sponsorships
+  all_sponsorships: "Todos os Patrocínios",
+  manage_all_sponsorships_here: "Gerenciar todos os patrocínios aqui",
+  banner: "Banner",
+  period: "Período",
+  no_sponsorships_found: "Nenhum patrocínio encontrado",
+  // --> details
+  currently_running: "Em andamento",
+  campaign_ended: "Campanha encerrada",
+  scheduled_to_start: "Agendado para começar",
+  campaign_completed: "Campanha concluída",
+  starts_in: "Começa em",
+  days_sm: "dias",
+  days_remaining: "dias restantes",
+  sponsorship_category: "Categoria do patrocínio",
+  campaign_timeline: "Linha do Tempo da Campanha",
+  start: "Início",
+  now: "Agora",
 
   // sales-analytics
   sales_analytics_nd_insights: "Análises e insights de vendas",

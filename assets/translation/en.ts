@@ -1136,7 +1136,7 @@ export const en = {
   track_and_resolve_payment_disputes: "Track and resolve payment disputes across the platform",
   systematic_dispute_management_action:
     "Systematic dispute management with action controls and audit-ready export.",
-  resolved: "",
+  resolved: "Resolved",
   total_disputes: "Total Disputes",
   open_disputes: "Open Disputes",
   resolved_disputes: "Resolved Disputes",
@@ -1229,8 +1229,14 @@ export const en = {
   based_on: "Based on",
   review: "review",
   origin: "Origin",
+  variations: "Variations",
+  variation_options: "Variation Options",
+  label: "Label",
+  price: "Price",
+  stock: "Stock",
 
   // out_of_stock_alerts
+  monitor_products_variations_require_immediate: "Monitor products and variations that require immediate restocking",
   live_stock_monitoring_acroos_all_vendors:
     "Live stock monitoring across all vendors — premium Deligo admin panel.",
   search_item_vendor_category: "Search item, vendor, category...",
@@ -1240,6 +1246,10 @@ export const en = {
   item: "Item",
   inventory: "Inventory",
   no_matching_results: "No matching results.",
+  current_stock: "Current Stock",
+  view_variation_stock: "View Variation Stock",
+  all_caught_up: "All caught up!",
+  no_out_of_stock_items_match_current_filters: "No out of stock items match your current filters.",
 
   // restricted-items
   manage_items_vendors_allowed_sell:
@@ -1256,7 +1266,63 @@ export const en = {
   save_changes: "Save Changes",
   add_item: "Add Item",
 
+  // add restricted item
+  add_restricted_item: "Add Restricted Item",
+  item_name: "Item Name",
+  // edit 
+  edit_restricted_item: "Edit Restricted Item",
+
+  // all-ingredients
+  inventory_management_packaging_supplies: "Inventory management for packaging and supplies",
+  ingredient: "Ingredient",
+  no_ingredients_found: "No ingredients found",
+  // edit ingredient
+  edit_ingredient_specifications: "Edit Ingredient Specifications",
+  modify_catalog_parameters_wholesale_matrix: "Modify catalog parameters and wholesale matrix definitions for SKU",
+  price_per_unit: "Price per Unit",
+  measurement_unit: "Measurement Unit",
+  low_stock_alert_level: "Low Stock Alert Level",
+  minimum_order: "Minimum Order",
+  catalog_description: "Catalog Description",
+  replace_thumbnail_asset_image: "Replace Thumbnail Asset Image",
+  low_stock_warning_limit: "Low Stock Warning Limit",
+  shelf_life_safeguard: "Shelf Life Safeguard (Days)",
+  dynamic_discount_matrix: "Dynamic Discount Matrix",
+  map_localized_pricing_offsets: "Map localized pricing offsets against bulk volume thresholds",
+  add_tier: "Add Tier",
+  no_active_discount_tiers_mapped_object_profile: " No active discount tiers mapped to this object profile.",
+  min_volume: "Min Volume",
+  promo_rate: "Promo Rate",
+  // delete modal 
+  are_you_absolutely_sure_this_action_irreversible: "Are you absolutely sure? This action is irreversible and completely wipes the asset record from the cluster database.",
+  are_you_sure: "Are you sure you want to flag this item? This operation moves the ingredient item to archive contexts safely.",
+  // add ingredient
+  add_new_ingredient: "Add New Ingredient",
+  add_packaging_materials_ingredients: "Add packaging materials and ingredients to the inventory.",
+  shelf_life_days: "Shelf Life (Days - Optional)",
+  bulk_discount_tiers: "Bulk Discount Tiers (Optional)",
+  apply_specialized_system_drops: "Apply specialized system drops for dynamic purchasing lines",
+  no_discount_tiers_added_yet: "No discount tiers added yet. Base product tracking metrics will apply globally.",
+  minimum_quantity: "Minimum Quantity",
+  discounted_price: "Discounted Price",
+  ingredient_image: "Ingredient Image",
+  save_ingredient: "Save Ingredient",
+  // ingredient orders
+  manage_and_process_vendor_supply_requests: "Manage and process vendor supply requests",
+  update_to_shipped: "Update to SHIPPED",
+  update_to_delivered: "Update to DELIVERED",
+  // ingredient detials
+  placed_on: "Placed on",
+  unit_price: "Unit Price",
+  product_discount: "Product Discount",
+  tax_amount: "Tax amount",
+  order_timeline: "Order Timeline",
+  vendor_details: "Vendor Details",
+  mark_shipped: "Mark Shipped",
+  mark_delivered: "Mark Delivered",
+
   // active-campaigns
+  list_of_all_active_offers: "List of all active offers",
   ongoing: "Ongoing",
   upcomong: "Upcoming",
   expired: "Expired",
@@ -1271,6 +1337,9 @@ export const en = {
   off_lg: "OFF",
   start_date: "Start Date",
   end_date: "End Date",
+
+  // expired offers
+  list_of_all_expired_offers: "List of all expired offers",
 
   // creaet-new-offer
   add_promotion_boost_restuarant_sales:
@@ -1287,10 +1356,37 @@ export const en = {
   choose_an_item: "Choose an Item",
   validity: "Validity",
   minimum_order_amount: "Minimum Order Amount",
+  maximum_usage_count: "Maximum Usage Count",
+  users_usage_limit: "Users Usage Limit",
   will_auto_apply: "Will Auto Apply?",
   promo_code: "Promo Code",
   enter_promo_code: "Enter promo code",
   create_offer: "Create Offer",
+
+  // all offers
+  manage_all_offers_here: "Manage all offers here",
+  no_offers_found: "No offers found",
+  expire_status: "Expire Status",
+  activating: "Activating",
+  deactivating: "Deactivating",
+  offer: "Offer",
+  this_offer: "this offer",
+  // --> details
+  auto_applied: "Auto-Applied",
+  delete_offer: "Delete Offer",
+  min_order: "Min Order",
+  max_discount: "Max Discount",
+  limit_user: "Limit/User",
+  total_uses: "Total Uses",
+  usage_progress: "Usage Progress",
+  validity_period: "Validity Period",
+  this_offer_has_expired: "This offer has expired",
+  bogo_details: "BOGO Details",
+  buy: "Buy",
+  get_free: "Get Free",
+  item_id: "Item ID",
+  // edit offer
+  edit_offer: "Edit Offer",
 
   // coupon-analytics
   performance_insights_coupon_campaigns:
@@ -1306,6 +1402,36 @@ export const en = {
   used: "Used",
   issued: "Issued",
   usage_rate: "Usage Rate",
+
+  // add sponsorship
+  add_banner_ads_and_sponsored_content: "Add banner ads and sponsored content",
+  create_a_new_banner_campaign: "Create a new banner campaign",
+  sponsor_name: "Sponsor Name",
+  sponsor_type: "Sponsor Type",
+  select_a_type: "Select a type",
+  sponsor_url: "Sponsor Url (optional)",
+  banner_image: "Banner Image",
+  immediately_publish_this_sponsorship: "Immediately publish this sponsorship",
+  create_sponsorship: "Create Sponsorship",
+
+  // all sponsorships
+  all_sponsorships: "All Sponsorships",
+  manage_all_sponsorships_here: "Manage all sponsorships here",
+  banner: "Banner",
+  period: "Period",
+  no_sponsorships_found: "No sponsorships found",
+  // --> details
+  currently_running: "Currently running",
+  campaign_ended: "Campaign ended",
+  scheduled_to_start: "Scheduled to start",
+  campaign_completed: "Campaign completed",
+  starts_in: "Starts in",
+  days_sm: "days",
+  days_remaining: "days remaining",
+  sponsorship_category: "Sponsorship category",
+  campaign_timeline: "Campaign Timeline",
+  start: "Start",
+  now: "Now",
 
   // sales-analytics
   sales_analytics_nd_insights: "Sales Analytics & Insights",
