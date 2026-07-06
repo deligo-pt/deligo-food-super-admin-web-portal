@@ -16,8 +16,8 @@ export default async function PendingOrdersPage({ searchParams }: IProps) {
   return (
     <Orders
       ordersResult={ordersResult}
-      title="Pending Orders"
-      subtitle="All pending orders in the system"
+      title="pending_orders"
+      subtitle="all_pending_orders_system"
     />
   );
 }

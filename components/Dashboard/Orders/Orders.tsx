@@ -27,7 +27,7 @@ export default function Orders({ ordersResult, title, subtitle }: IProps) {
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader title={title} subtitle={subtitle} />
+      <TitleHeader title={t(`${title}`)} subtitle={t(`${subtitle}`)} />
 
       {/* Filters */}
       <AllFilters sortOptions={sortOptions} />

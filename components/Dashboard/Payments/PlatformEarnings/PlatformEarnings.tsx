@@ -6,6 +6,7 @@ import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TPlaformEarningsData } from "@/types/payment.type";
 import { formatPrice } from "@/utils/formatPrice";
@@ -26,94 +27,8 @@ const sortOptions = [
   { label: "Oldest First", value: "createdAt" },
 ];
 
-// const platformsEarningsData: { data: TPlaformEarningsData; meta?: TMeta } = {
-//   data: {
-//     stats: {
-//       totalRevenue: 8420.23,
-//       totalPlatformCommission: 876.62,
-//       thisWeekCommission: 19.74,
-//       thisMonthCommission: 229.3,
-//     },
-//     monthlyCommissions: [
-//       {
-//         month: "Jul",
-//         commission: 1815,
-//       },
-//       {
-//         month: "Aug",
-//         commission: 2010,
-//       },
-//       {
-//         month: "Sep",
-//         commission: 1920,
-//       },
-//       {
-//         month: "Oct",
-//         commission: 2130,
-//       },
-//       {
-//         month: "Nov",
-//         commission: 2040,
-//       },
-//       {
-//         month: "Dec",
-//         commission: 1867,
-//       },
-//     ],
-//     commissions: [
-//       {
-//         _id: "SET-001",
-//         customer: {
-//           name: {
-//             firstName: "John",
-//             lastName: "Doe",
-//           },
-//         },
-//         transactionId: "SET-001",
-//         orderId: "ORD-001",
-//         amount: 10.5,
-//         platformFee: 2.5,
-//         createdAt: "2026-02-09T16:39:50.282Z",
-//       },
-//       {
-//         _id: "SET-002",
-//         customer: {
-//           name: {
-//             firstName: "John",
-//             lastName: "Doe",
-//           },
-//         },
-//         transactionId: "SET-002",
-//         orderId: "ORD-002",
-//         amount: 10.5,
-//         platformFee: 2.5,
-//         createdAt: "2026-02-09T16:39:50.282Z",
-//       },
-//       {
-//         _id: "SET-003",
-//         customer: {
-//           name: {
-//             firstName: "John",
-//             lastName: "Doe",
-//           },
-//         },
-//         transactionId: "SET-003",
-//         orderId: "ORD-003",
-//         amount: 10.5,
-//         platformFee: 2.5,
-//         createdAt: "2026-02-09T16:39:50.282Z",
-//       },
-//     ],
-//   },
-//   meta: {
-//     limit: 10,
-//     page: 1,
-//     total: 3,
-//     totalPage: 1,
-//   },
-// };
-
 export default function PlatformEarnings({ platformsEarningsData }: IProps) {
+  const { t } = useTranslation();
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -143,7 +58,7 @@ export default function PlatformEarnings({ platformsEarningsData }: IProps) {
   } as Variants;
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       <motion.div
         className="space-y-6"
         variants={containerVariants}
@@ -152,8 +67,8 @@ export default function PlatformEarnings({ platformsEarningsData }: IProps) {
       >
         {/* Header */}
         <TitleHeader
-          title="Platform Earnings"
-          subtitle="Revenue, commissions & platform fee analytics"
+          title={t("platform_earnings")}
+          subtitle={t("revenue_commissions_platform_fee_analytics")}
         />
 
         {/* Stat Cards */}
@@ -162,25 +77,25 @@ export default function PlatformEarnings({ platformsEarningsData }: IProps) {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           <StatsCard
-            title="Total Revenue"
+            title={t("total_revenue")}
             value={`€${formatPrice(platformsEarningsData?.data?.stats?.totalRevenue || 0)}`}
             icon={EuroIcon}
             delay={0.2}
           />
           <StatsCard
-            title="Platform Commission"
+            title={t("platform_commission")}
             value={`€${formatPrice(platformsEarningsData?.data?.stats?.totalPlatformCommission || 0)}`}
             icon={TrendingUpIcon}
             delay={0.4}
           />
           <StatsCard
-            title="This Week's Commission"
+            title={t("this_week_commission")}
             value={`€${formatPrice(platformsEarningsData?.data?.stats?.thisWeekCommission || 0)}`}
             icon={WalletIcon}
             delay={0.6}
           />
           <StatsCard
-            title="This Month's Commission"
+            title={t("this_month_commission")}
             value={`€${formatPrice(platformsEarningsData?.data?.stats?.thisMonthCommission || 0)}`}
             icon={CalendarIcon}
             delay={0.8}
@@ -193,10 +108,10 @@ export default function PlatformEarnings({ platformsEarningsData }: IProps) {
           className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Monthly Commssions
+            {t("monthly_commissions")}
           </h3>
           <p className="text-sm text-gray-500 mb-6">
-            Last 6 months commssion chart
+           {t("last_6_months_commission_chart")}
           </p>
           <AnalyticsChart
             data={platformsEarningsData?.data?.monthlyCommissions || []}
@@ -227,8 +142,8 @@ export default function PlatformEarnings({ platformsEarningsData }: IProps) {
               <EuroIcon size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Commissions</h2>
-              <p className="text-sm text-gray-500">10 Commissions in total</p>
+              <h2 className="text-lg font-bold text-gray-900">{t("commissions")}</h2>
+              <p className="text-sm text-gray-500">{platformsEarningsData?.meta?.total} {t("commissions_in_total")}</p>
             </div>
           </div>
 

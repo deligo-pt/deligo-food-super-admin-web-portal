@@ -16,8 +16,8 @@ export default async function OnTheWayOrdersPage({ searchParams }: IProps) {
   return (
     <Orders
       ordersResult={ordersResult}
-      title="On The Way Orders"
-      subtitle="The orders that are on the way to the customer."
+      title="on_the_way_orders"
+      subtitle="the_orders_that_on_the_way_to_customer"
     />
   );
 }

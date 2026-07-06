@@ -6,6 +6,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteTaxReq,
   permanentDeleteTax,
@@ -30,6 +31,7 @@ const sortOptions = [
 ];
 
 export default function Taxes({ taxesResult }: IProps) {
+  const { t } = useTranslation();
   const [editTax, setEditTax] = useState<TTax | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [permanentDeleteId, setPermanentDeleteId] = useState<string | null>(null);
@@ -113,10 +115,10 @@ export default function Taxes({ taxesResult }: IProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       <TitleHeader
-        title="All Taxes"
-        subtitle="Manage all the taxes in the system"
+        title={t("all_taxes")}
+        subtitle={t("manage_all_the_taxes_in_system")}
         buttonInfo={{
-          text: "Create",
+          text: t("create"),
           icon: PlusCircle,
           onClick: () => router.push("/admin/create-tax"),
         }}

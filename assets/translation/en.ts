@@ -1028,11 +1028,26 @@ export const en = {
   payment: "Payment",
   delivery_timeline: "Delivery Timeline",
   rider: "Rider",
+  flash: "Flash",
+  order_items: "Order Items",
+  qty: "Qty",
+  subtotal: "Subtotal",
+  pickup_location: "Pickup Location",
+  vendor_contact: "Vendor Contact",
+  customer_contact: "Customer Contact",
+  payment_summary: "Payment Summary",
+  includes_all_taxes: "Includes all taxes",
+  customer_details: "Customer Details",
+  orders_from: "Orders from",
+  customer_orders: "Customer Orders",
+  manage_customer_orders_here: "Manage customer orders here",
 
   // pending-orders
+  all_pending_orders_system: "All pending orders in the system",
   live_pending_orders: "Live Pending Orders",
 
-  // preparing-orders
+  // preparing-order
+  all_preparing_orders_in_system: "All preparing orders in the system",
   live_kitchen_dashboard_assign_riders:
     "Live kitchen dashboard — assign riders, track timers & manage delays.",
   export: "Export",
@@ -1044,11 +1059,13 @@ export const en = {
   order_created: "Order created",
 
   // on the way orders
+  the_orders_that_on_the_way_to_customer: "The orders that are on the way to the customer.",
   live_tracking_delivery_partner_location:
     "Live tracking — delivery partner location, ETA and customer coordination.",
   full_route_eta_partner_info: "Full route, ETA, partner info",
 
   // delivered-orders
+  successfully_delivered_orders_listed: "Successfully delivered orders are listed here.",
   delivered_orders_portugal: "Delivered Orders (Portugal)",
   gestao_professional_das_encomendas:
     "Gestão profissional das encomendas entregues — otimizado para Portugal.",
@@ -1057,8 +1074,7 @@ export const en = {
   payment_eur: "Payment (EUR)",
 
   // cancelled-orders
-  cancelled_orders_desc:
-    "Encomendas canceladas — monitorize motivos e parceiros para reduzir churn.",
+  cancelled_orders_desc: "Cancelled orders — monitor reasons and partners to reduce churn.",
   cancelled_at: "Cancelled At",
 
   // refund-requests
@@ -1072,6 +1088,7 @@ export const en = {
     "Note: connect approve/reject buttons to your refund processing API.",
 
   // platform earnings
+  revenue_commissions_platform_fee_analytics: "Revenue, commissions & platform fee analytics",
   track_platform_revenue_fees_simple:
     "Track platform revenue & fees in a simple clean layout.",
   search_order_vendor_region: "Search order, vendor, region",
@@ -1082,6 +1099,15 @@ export const en = {
   region: "Region",
   gross: "Gross",
   platform_fee: "Platform Fee",
+  this_week_commission: "This Week's Commission",
+  this_month_commission: "This Month's Commission",
+  monthly_commissions: "Monthly Commssions",
+  last_6_months_commission_chart: "Last 6 months commssion chart",
+  commissions: "Commissions",
+  commissions_in_total: "Commissions in total",
+  transaction_id: "Transaction ID",
+  no_commissions_found: "No commissions found",
+
 
   // driver payouts
   search_driver_city_payout_method_status:
@@ -1089,6 +1115,7 @@ export const en = {
   driver: "Driver",
 
   // transaction history
+  full_breakdown_earnings_payouts_fees: "Full breakdown of earnings, payouts, and fees",
   full_ledger_platform_transactions_payouts:
     "Full ledger of platform transactions — payouts, payments and refunds.",
   refresh: "Refresh",
@@ -1103,16 +1130,24 @@ export const en = {
   type: "Type",
   balance: "Balance",
   no_transactions_match_filters: "No transactions match your filters.",
+  no_transactions_found: "No transactions found",
 
   // payment-disputes
+  track_and_resolve_payment_disputes: "Track and resolve payment disputes across the platform",
   systematic_dispute_management_action:
     "Systematic dispute management with action controls and audit-ready export.",
   resolved: "",
+  total_disputes: "Total Disputes",
+  open_disputes: "Open Disputes",
+  resolved_disputes: "Resolved Disputes",
+  total_amount_disputed: "Total Amount Disputed",
+  all_disputes: "All Disputes",
   pending_vendor: "Pending Vendor",
   pending_customer: "Pending Customer",
   last_90_days: "Last 90 days",
   year_to_date: "Year to date",
   search_dispute_order_vendor: "Search dispute, order, vendor, customer",
+  no_disputes_found: "No disputes found",
   dispute_id: "Dispute ID",
   resolve: "Resolve",
   disputes: "disputes",
@@ -1124,6 +1159,11 @@ export const en = {
   this_action_is_audit_logged: "This action is audit-logged.",
 
   // tax management
+  manage_all_the_taxes_in_system: "Manage all the taxes in the system",
+  tax_code: "Tax Code",
+  rate: "Rate",
+  country_id: "Country ID",
+  no_tax_found: "No tax found",
   vat_rules_reports_audit_logs: "VAT rules, reports and audit logs.",
   new_rule: "New Rule",
   vat_collected_period: "VAT collected (period)",
@@ -1144,6 +1184,21 @@ export const en = {
   no_audit_entries: "No audit entries.",
   dismiss: "Dismiss",
   tax_rate: "Tax Rate",
+  // --> create tax
+  tax_form: "Tax Form",
+  // --> edit tax
+  edit_tax: "Edit Tax",
+  make_changes_to_your_tax: "Make changes to your tax",
+  tax_name: "Tax Name",
+  tax_exemption_code: "Tax Exemption Code",
+  tax_exemption_reason: "Tax Exemption Reason",
+  // loyalty points
+  all_loyalty_points: "All Loyalty Points",
+  the_points_earned_spent_users: "The points earned and spent by users",
+  current_points: "Current Points",
+  total_spent: "Total Spent",
+  total_earned: "Total Earned",
+  no_point_found: "No point found",
 
   // all-product/items
   food_items: "Food Items",

@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TLoyaltyPoint } from "@/types/loyalty-point.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -26,6 +27,8 @@ interface IProps {
 }
 
 export default function LoyaltyPointTable({ points }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,37 +41,37 @@ export default function LoyaltyPointTable({ points }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <User className="w-4" />
-                User
+                {t("user")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ShieldCheckIcon className="w-4" />
-                Role
+                {t("role")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CoinsIcon className="w-4" />
-                Current Points
+                {t("current_points")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ShoppingBagIcon className="w-4" />
-                Total Spent
+                {t("total_spent")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <TrendingUpIcon className="w-4" />
-                Total Earned
+                {t("total_earned")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Expiry Date
+                {t("expiry_date")}
               </div>
             </TableHead>
           </TableRow>
@@ -80,7 +83,7 @@ export default function LoyaltyPointTable({ points }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={6}
               >
-                No point found
+                {t("no_point_found")}
               </TableCell>
             </TableRow>
           )}

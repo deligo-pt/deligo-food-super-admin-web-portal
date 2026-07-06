@@ -95,7 +95,7 @@ export default function ProductCategoryDetails({
   };
 
   return (
-    <div className="p-4 md:p-6">
+    <div>
       <motion.div
         initial={{
           opacity: 0,
