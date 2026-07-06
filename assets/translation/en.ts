@@ -1619,18 +1619,18 @@ export const en = {
   users: "users",
   no_users_found: "No users found.",
   show_more: "Show More",
-  message_content:"Message Content",
-  message_title:"Message Title",
-  message_body:"Message Body",
-  chars:"chars",
-  notification_category:"Notification Category",
-  hide_preview:"Hide Preview",
-  show_preview:"Show Preview",
-  send_broadcast:"Send Broadcast",
-  best_practices:"Best Practices",
-  always_check_preview_before_broadcasting:"Always check preview before broadcasting.",
-  use_personalization_tags:"Use personalization tags like",
-  if_supported:"if supported.",
+  message_content: "Message Content",
+  message_title: "Message Title",
+  message_body: "Message Body",
+  chars: "chars",
+  notification_category: "Notification Category",
+  hide_preview: "Hide Preview",
+  show_preview: "Show Preview",
+  send_broadcast: "Send Broadcast",
+  best_practices: "Best Practices",
+  always_check_preview_before_broadcasting: "Always check preview before broadcasting.",
+  use_personalization_tags: "Use personalization tags like",
+  if_supported: "if supported.",
   select_user_type: "Select User Type",
   email_subject: "Email Subject",
   send_email: "Send Email",
@@ -1659,6 +1659,8 @@ export const en = {
   scheduled: "Scheduled",
 
   // all admins
+  add_admin: "Add Admin",
+  manage_all_the_existing_admins: "Manage all the existing admins",
   manage_users_who_can_access_administer:
     "Manage users who can access and administer the Deligo platform.",
   create: "Create",
@@ -1666,6 +1668,23 @@ export const en = {
   admin: "Admin",
   role: "Role",
   no_admins_found_match: "No admins found matching your search.",
+  no_admins_found: "No admins found",
+  system_role_configuration: "System Role Configurations",
+  system_id: "System ID (userId)",
+  assigned_role: "Assigned Role",
+  update_protection_lock: "Update Protection Lock",
+  account_marked_deleted: "Account Marked Deleted",
+  security_capability_permissions_tokens: "Security Capability Permissions Tokens",
+  no_tailored_capability_constraints: "No tailored capability constraints mapped. Inherits structural values natively.",
+  location_details: "Location Details",
+  geo_coordinates: "Geo-Coordinates (Lat / Long)",
+  no_operational_location_address_details_provided: "No operational location address details provided.",
+  last_modification_status_update: "Last Modification Status Update",
+  decision_audit_mapped_at: "Decision Audit Mapped At",
+  action_enforced_by_log_id: "Action Enforced By Log ID",
+  internal_workflow_remarks: "Internal Workflow Remarks",
+  no_recorded_history_notes: 'No recorded history notes.',
+  no_verified_identity_credentials_refernece_documents: "No verified identity credentials or reference documents are available for this administrator tier.",
 
   // roles-permissions
   control_access_levels_permissions:
@@ -1713,11 +1732,14 @@ export const en = {
   browser_os: "Browser / OS",
 
   // support-tickets
+  manage_and_respond_support_requests: "Manage and respond to support requests from all platform users",
   manage_issues: "Manage issues",
   search_tickets: "Search tickets...",
   user: "User",
   write_a_reply: "Write a reply...",
   send: "Send",
+  no_tickets_found: "No tickets found",
+  try_adjusting_your_search_or_filters: "Try adjusting your search or filters",
 
   // chat-with-vendors
   active_conversations: "Active conversations",
@@ -1743,6 +1765,14 @@ export const en = {
 
   // chat-with-customers
   search_customers: "Search customers...",
+
+  // customer report
+  overview_of_all_registered_customers_activity: "Overview of all registered customers and their activity",
+  select_date_range: "Select Date Range",
+  customer_growth: "Customer Growth",
+  new_customer_registration_over_time: "New customer registrations over time",
+  no_of_customers: "No of Customers",
+  apply: "Apply",
 
   // sales-report
   overview_revenue_orders_metrics:
@@ -1772,6 +1802,10 @@ export const en = {
   zone_analytics: "Zone Analytics",
   quick_filters: "Quick Filters",
   top_zone: "Top Zone",
+  order_trend: "Orders Trend",
+  zone_heatmap: "Zone Heatmap",
+  less_busy: "Less Busy",
+  very_busy: "Very Busy",
 
   // drivers performance report
   drivers_performance: "Drivers Performance",
@@ -1795,6 +1829,7 @@ export const en = {
   message_low_rated_drivers: "Message low-rated drivers",
 
   // vendor-report
+  overview_of_all_registered_vendors_status: "Overview of all registered vendors and their status",
   vendor_analytics: "Vendor Analytics",
   total_revenue_euro: "Total Revenue (€)",
   revenue_over_time: "Revenue Over Time",
@@ -1805,6 +1840,30 @@ export const en = {
     "Click a vendor to view detailed analytics",
   hourly_orders_today_average: "Hourly Orders (Today average)",
   open_vendor: "Open Vendor",
+  approved_vendors: "Approved Vendors",
+  pending_vendors: "Pending Vendors",
+  blocked_rejected_vendors: "Blocked/Rejected Vendors",
+  vendor_growth: "Vendor Growth",
+  new_vendor_registration_over_time: "New vendor registrations over time",
+  no_of_vendors: "No of Vendors",
+
+  // delivery partner report
+  overview_of_all_delivery_partners_performance: "Overview of all delivery partners and their performance",
+  export_as_pdf: "Export as PDF",
+  export_as_csv: "Export as CSV",
+  active_partners: "Active Partners",
+  partner_growth: "Partner Growth",
+  new_partner_registration_over_time: "New partner registrations over time",
+  no_of_partners: "No of Partners",
+  vehicle_distribution: "Vehicle Distribution",
+
+  // fleet manager report
+  overview_of_all_fleet_managers_operations: "Overview of all fleet managers and their operations",
+  total_managers: "Total Managers",
+  approved_managers: "Approved Managers",
+  fleet_manager_growth: "Fleet Manager Growth",
+  new_manager_registration_over_time: "New manager registrations over time",
+  no_of_managers: "No of Managers",
 
   // business-info
   real_time_overview_deligo_performance:
@@ -1917,6 +1976,8 @@ export const en = {
   commissions_and_fees: "Commissions & Fees",
   set_platform_earnings_tax_rates: "Set platform earnings and tax rates",
   platform_commission: "Platform Commission",
+  platform_vat: "Platform VAT",
+  fleet_manager_commission: "Fleet Manager Commission",
   percentage_taken_from_each_order_total:
     "Percentage taken from each order total",
   delivery_partner_commission: "Delivery Partner Commission",
@@ -1947,6 +2008,7 @@ export const en = {
   time_before_otp_expires: "Time before OTP expires and needs regeneration",
   offers_and_promotions: "Offers & Promotions",
   control_global_discount_settings: "Control global discount settings",
+  enable_offers: "Enable Offers",
   enable_coupons: "Enable Coupons",
   allow_customers_use_promo: "Allow customers to use promo codes at checkout",
   enable_global_offers: "Enable Global Offers",
@@ -1968,6 +2030,55 @@ export const en = {
   deliveryChargeOutsideLisbon: "Delivery Charge Outside Lisbon",
   vatRate: "Vat Rate",
 
+  // reward settings
+  configure_loyalty_referral_rewards: "Configure loyalty and referral rewards here",
+  loyalty_and_rewards: "Loyalty & Rewards",
+  configure_points_bonuses_referral: "Configure points, bonuses, and referral rewards",
+  customer_rewards: "Customer Rewards",
+  points_per_spent: "Points per € spent",
+  points_earned_per_euro_spent: "Points earned per euro spent",
+  rider_rewards: "Rider Rewards",
+  points_per_delivery: "Points per delivery",
+  referral_points: "Referral points",
+  new_rider_welcome_bonus: "New rider welcome bonus",
+  points_expiry: "Points Expiry",
+  referral_milestones: "Referral Milestones",
+  configure_referral_milestones_rewards: "Configure referral milestones and rewards",
+  customer_referral_milestones: "Customer Referral Milestones",
+  friends_required: "Friends required",
+  reward_value: "Reward value",
+  min_order_per_friend: "Min order per friend",
+  add_milestone: "Add Milestone",
+
+  // payout settings
+  configure_payout_options_here: "Configure payout options here",
+  payout_automation: "Payout Automation",
+  configure_automatic_payout_generation: "Configure automatic payout generation",
+  auto_payout_generation: "Auto Payout Generation",
+  auto_generate_payouts: "Auto-generate payouts",
+  automatically_generate_payouts_based_on_schedule: "Automatically generate payouts based on the schedule and criteria you set.",
+  payout_criteria: "Payout Criteria",
+  minimum_payout_amount: "Minimum payout amount",
+  payout_window_days: "Payout window days",
+  payout_schedule: "Payout Schedule",
+  configure_payout_schedule: "Configure payout schedule",
+  payout_days: "Payout Days",
+
+  // sos
+  sos_alerts:"SOS Alerts",
+  monitor_and_resolve_critical_incidents:"Monitor and resolve critical incidents",
+  vendor_sos:"Vendor SOS",
+  critical_issues_reported_by_restaurants:"Critical issues reported by restaurants and merchants. Includes kitchen fires, stock outages, or device failures.",
+  fleet_manager_sos:"Fleet Manager SOS",
+  operational_emergencies_from_logistics_hubs:"Operational emergencies from logistics hubs. Vehicle breakdowns, accident reports, and route blockages.",
+  delivery_partner_sos:"Delivery Partner SOS",
+  urgent_safety_alerts_from_riders_on_the_road:"Urgent safety alerts from riders on the road. Medical emergencies, harassment, or severe weather conditions.",
+  active_alerts:"active alerts",
+  no_active_emergencies:"No active emergencies",
+  all_system_operational_sector:"All systems operational in this sector.",
+  investigate:"Investigate",
+  false_alarm:"False Alarm",
+
   // permissions
   // --> Create Permission
   create_permission: "Create Permission",
@@ -1986,6 +2097,7 @@ export const en = {
   all_permissions: "All Permissions",
   manage_view_all_admin_permissions: "Manage and view all admin permissions",
   no_platform_security_permissions_defined: "No platform security permissions defined.",
+  system_action_key: "System Action Key",
   // --> edit permission
   edit_permission: "Edit Permission",
   modify_security_rule_parameters: "Modify security rule parameters. Changes here update systemic metadata attributes instantly.",

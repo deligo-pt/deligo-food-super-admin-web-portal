@@ -13,8 +13,8 @@ export default async function AllAdminsPage({ searchParams }: IProps) {
     <Admins
       adminsResult={adminsResult}
       showFilters={true}
-      title="All Admins"
-      subtitle="Manage all the existing admins"
+      title="all_admins"
+      subtitle="manage_all_the_existing_admins"
     />
   );
 }

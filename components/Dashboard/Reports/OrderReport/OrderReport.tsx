@@ -42,7 +42,7 @@ const OrderReport = ({ orderReportAnalytics }: IProps) => {
           <div className="flex items-center gap-3">
             {/* Date Filter */}
             <SelectDateRangeFilter
-              placeholder="Select Date Range"
+              placeholder={t("select_date_range")}
               onCustomRangeSelect={() => setIsCustomDate(true)}
             />
 
@@ -83,11 +83,11 @@ const OrderReport = ({ orderReportAnalytics }: IProps) => {
 
       {/* Bar Chart - Orders Trend */}
       <CustomizedCharts
-        title="Orders Trend"
+        title={t("order_trend")}
         description=""
         data={orderReportAnalytics.ordersTrend || []}
-        xLabel="Time"
-        yLabel="No of Orders"
+        xLabel={t("time")}
+        yLabel={t("no_of_orders")}
         delay={0.3}
         xKey="time"
         yKey="orders"
@@ -108,7 +108,7 @@ const OrderReport = ({ orderReportAnalytics }: IProps) => {
         }}
         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
       >
-        <h3 className="text-lg font-bold text-gray-900 mb-6">Orders By Zone</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-6">{t("orders_by_zone")}</h3>
 
         <div className="grid md:grid-cols-3 gap-6">
           {orderReportAnalytics.ordersByZone.map((zone, i) => (

@@ -6,6 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTranslation } from "@/hooks/use-translation";
 import { DownloadIcon, FileSpreadsheetIcon, FileTextIcon } from "lucide-react";
 
 interface IProps {
@@ -14,11 +15,13 @@ interface IProps {
 }
 
 export default function ExportPopover({ onPDFClick, onCSVClick }: IProps) {
+  const {t} = useTranslation();
+
   return (
     <Popover>
       <PopoverTrigger className="bg-white text-[#DC3173] hover:bg-slate-100 hover:text-[#DC3173]/90 px-4 py-2 rounded-md font-medium flex items-center gap-2 cursor-pointer print:hidden">
         <DownloadIcon className="h-5 w-5" />
-        Export
+        {t("export")}
       </PopoverTrigger>
       <PopoverContent className="w-fit p-2">
         {onPDFClick && (
@@ -29,7 +32,7 @@ export default function ExportPopover({ onPDFClick, onCSVClick }: IProps) {
               onClick={onPDFClick}
             >
               <FileTextIcon className="h-4 w-4" />
-              Export as PDF
+              {t("export_as_pdf")}
             </Button>
           </div>
         )}
@@ -41,7 +44,7 @@ export default function ExportPopover({ onPDFClick, onCSVClick }: IProps) {
               onClick={onCSVClick}
             >
               <FileSpreadsheetIcon className="h-4 w-4" />
-              Export as CSV
+              {t("export_as_csv")}
             </Button>
           </div>
         )}

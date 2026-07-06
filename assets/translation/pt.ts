@@ -1684,7 +1684,9 @@ export const pt = {
   maintenance_mode_disabled: "O modo de manutenção está desativado",
   scheduled: "Agendado",
 
-  // all admins
+  // all admin
+  add_admin: "Adicionar Administrador",
+  manage_all_the_existing_admins: "Gerenciar todos os administradores existentes",
   manage_users_who_can_access_administer:
     "Gerir utilizadores que podem aceder e administrar a plataforma Deligo.",
   create: "Criar",
@@ -1693,6 +1695,23 @@ export const pt = {
   role: "Função",
   no_admins_found_match:
     "Nenhum administrador encontrado que corresponda à pesquisa.",
+  no_admins_found: "Nenhum administrador encontrado",
+  system_role_configuration: "Configurações de Cargos do Sistema",
+  system_id: "ID do Sistema (userId)",
+  assigned_role: "Cargo Atribuído",
+  update_protection_lock: "Bloqueio de Proteção de Atualização",
+  account_marked_deleted: "Conta Marcada como Excluída",
+  security_capability_permissions_tokens: "Tokens de Permissões de Recursos de Segurança",
+  no_tailored_capability_constraints: "Nenhuma restrição de recurso personalizada mapeada. Herda os valores estruturais nativamente.",
+  location_details: "Detalhes da Localização",
+  geo_coordinates: "Coordenadas Geográficas (Lat / Long)",
+  no_operational_location_address_details_provided: "Nenhum detalhe de endereço de localização operacional informado.",
+  last_modification_status_update: "Última Atualização do Status de Modificação",
+  decision_audit_mapped_at: "Auditoria de Decisão Mapeada em",
+  action_enforced_by_log_id: "Ação Aplicada pelo ID do Log",
+  internal_workflow_remarks: "Observações do Fluxo de Trabalho Interno",
+  no_recorded_history_notes: "Nenhuma nota de histórico registrada.",
+  no_verified_identity_credentials_refernece_documents: "Nenhuma credencial de identidade verificada ou documento de referência disponível para este nível de administrador.",
 
   // roles-permissions
   control_access_levels_permissions:
@@ -1740,11 +1759,14 @@ export const pt = {
   browser_os: "Navegador / SO",
 
   // support-tickets
+  manage_and_respond_support_requests: "Gerenciar e responder a solicitações de suporte de todos os usuários da plataforma",
   manage_issues: "Gerir ocorrências",
   search_tickets: "Pesquisar tickets...",
   user: "Utilizador",
   write_a_reply: "Escrever uma resposta...",
   send: "Enviar",
+  no_tickets_found: "Nenhum tíquete encontrado",
+  try_adjusting_your_search_or_filters: "Tente ajustar sua busca ou filtros",
 
   // chat-with-vendors
   active_conversations: "Conversas ativas",
@@ -1771,6 +1793,14 @@ export const pt = {
 
   // chat-with-customers
   search_customers: "Pesquisar clientes...",
+
+  // customer report
+  overview_of_all_registered_customers_activity: "Visão geral de todos os clientes registrados e suas atividades",
+  select_date_range: "Selecionar Intervalo de Datas",
+  customer_growth: "Crescimento de Clientes",
+  new_customer_registration_over_time: "Novos registros de clientes ao longo do tempo",
+  no_of_customers: "Nº de Clientes",
+  apply: "Aplicar",
 
   // sales-report
   overview_revenue_orders_metrics:
@@ -1800,6 +1830,10 @@ export const pt = {
   zone_analytics: "Análise por zona",
   quick_filters: "Filtros rápidos",
   top_zone: "Zona principal",
+  order_trend: "Tendência de Pedidos",
+  zone_heatmap: "Mapa de Calor por Zona",
+  less_busy: "Menos Movimentado",
+  very_busy: "Muito Movimentado",
 
   // drivers performance report
   drivers_performance: "Desempenho dos Estafetas",
@@ -1823,6 +1857,7 @@ export const pt = {
   message_low_rated_drivers: "Enviar mensagem a estafetas com baixa avaliação",
 
   // vendor-report
+  overview_of_all_registered_vendors_status: "Visão geral de todos os vendedores registrados e seus status",
   vendor_analytics: "Análise de Vendedores",
   total_revenue_euro: "Receita Total (€)",
   revenue_over_time: "Receita ao longo do tempo",
@@ -1833,6 +1868,30 @@ export const pt = {
     "Clique num vendedor para ver análises detalhadas",
   hourly_orders_today_average: "Encomendas por hora (média de hoje)",
   open_vendor: "Abrir vendedor",
+  approved_vendors: "Vendedores Aprovados",
+  pending_vendors: "Vendedores Pendentes",
+  blocked_rejected_vendors: "Vendedores Bloqueados/Rejeitados",
+  vendor_growth: "Crescimento de Vendedores",
+  new_vendor_registration_over_time: "Novos registros de vendedores ao longo do tempo",
+  no_of_vendors: "Nº de Vendedores",
+
+  // delivery partner report
+  overview_of_all_delivery_partners_performance: "Visão geral de todos os parceiros de entrega e seus desempenhos",
+  export_as_pdf: "Exportar como PDF",
+  export_as_csv: "Exportar como CSV",
+  active_partners: "Parceiros Ativos",
+  partner_growth: "Crescimento de Parceiros",
+  new_partner_registration_over_time: "Novos registros de parceiros ao longo do tempo",
+  no_of_partners: "Nº de Parceiros",
+  vehicle_distribution: "Distribuição de Veículos",
+
+  // fleet manager report
+  overview_of_all_fleet_managers_operations: "Visão geral de todos os gerentes de frota e suas operações",
+  total_managers: "Total de Gerentes",
+  approved_managers: "Gerentes Aprovados",
+  fleet_manager_growth: "Crescimento de Gerentes de Frota",
+  new_manager_registration_over_time: "Novos registros de gerentes ao longo do tempo",
+  no_of_managers: "Nº de Gerentes",
 
   // business-info
   real_time_overview_deligo_performance:
@@ -1949,6 +2008,8 @@ export const pt = {
   set_platform_earnings_tax_rates:
     "Definir ganhos da plataforma e taxas de imposto",
   platform_commission: "Comissão da Plataforma",
+  platform_vat: "IVA da Plataforma",
+  fleet_manager_commission: "Comissão do Gerente de Frota",
   percentage_taken_from_each_order_total:
     "Percentagem retirada de cada total de encomenda",
   delivery_partner_commission: "Comissão do Parceiro de Entrega",
@@ -1980,6 +2041,7 @@ export const pt = {
     "Tempo antes do OTP expirar e necessitar de regeneração",
   offers_and_promotions: "Ofertas & Promoções",
   control_global_discount_settings: "Controlar definições globais de desconto",
+  enable_offers: "Ativar Ofertas",
   enable_coupons: "Ativar Cupons",
   allow_customers_use_promo:
     "Permitir que clientes usem códigos promocionais no checkout",
@@ -2004,6 +2066,56 @@ export const pt = {
   deliveryChargeInsideLisbon: "Taxa de Entrega Dentro de Lisboa",
   deliveryChargeOutsideLisbon: "Taxa de Entrega Fora de Lisboa",
   vatRate: "Taxa de IVA",
+
+  // reward settings
+  configure_loyalty_referral_rewards: "Configure as recompensas de fidelidade e indicação aqui",
+  loyalty_and_rewards: "Fidelidade e Recompensas",
+  configure_points_bonuses_referral: "Configure pontos, bônus e recompensas de indicação",
+  customer_rewards: "Recompensas do Cliente",
+  points_per_spent: "Pontos por € gasto",
+  points_earned_per_euro_spent: "Pontos acumulados por euro gasto",
+  rider_rewards: "Recompensas do Entregador",
+  points_per_delivery: "Pontos por entrega",
+  referral_points: "Pontos de indicação",
+  new_rider_welcome_bonus: "Bônus de boas-vindas para novos entregadores",
+  points_expiry: "Expiração de Pontos",
+  referral_milestones: "Metas de Indicação",
+  configure_referral_milestones_rewards: "Configure as metas de indicação e suas recompensas",
+  customer_referral_milestones: "Metas de Indicação do Cliente",
+  friends_required: "Amigos necessários",
+  reward_value: "Valor da recompensa",
+  min_order_per_friend: "Pedido mín. por amigo",
+  add_milestone: "Adicionar Meta",
+
+  // payout settings
+  configure_payout_options_here: "Configure as opções de pagamento aqui",
+  payout_automation: "Automação de Pagamentos",
+  configure_automatic_payout_generation: "Configurar geração automática de pagamentos",
+  auto_payout_generation: "Geração Automática de Pagamentos",
+  auto_generate_payouts: "Gerar pagamentos automaticamente",
+  automatically_generate_payouts_based_on_schedule: "Gere pagamentos de forma automática com base no cronograma e nos critérios definidos por você.",
+  payout_criteria: "Critérios de Pagamento",
+  minimum_payout_amount: "Valor mínimo de pagamento",
+  payout_window_days: "Dias da janela de pagamento",
+  payout_schedule: "Cronograma de Pagamento",
+  configure_payout_schedule: "Configurar cronograma de pagamento",
+  payout_days: "Dias de Pagamento",
+
+  // sos
+  sos_alerts: "Alertas de SOS",
+  monitor_and_resolve_critical_incidents: "Monitore e resolva incidentes críticos",
+  vendor_sos: "SOS do Vendedor",
+  critical_issues_reported_by_restaurants: "Problemas críticos relatados por restaurantes e comerciantes. Inclui incêndios na cozinha, falta de estoque ou falhas em dispositivos.",
+  fleet_manager_sos: "SOS do Gerente de Frota",
+  operational_emergencies_from_logistics_hubs: "Emergências operacionais de hubs logísticos. Inclui quebras de veículos, relatórios de acidentes e bloqueios de rotas.",
+  delivery_partner_sos: "SOS do Parceiro de Entrega",
+  urgent_safety_alerts_from_riders_on_the_road: "Alertas urgentes de segurança dos entregadores na rua. Inclui emergências médicas, assédio ou condições climáticas severas.",
+  active_alerts: "alertas ativos",
+  no_active_emergencies: "Nenhuma emergência ativa",
+  all_system_operational_sector: "Todos os sistemas operacionais neste setor.",
+  investigate: "Investigar",
+  false_alarm: "Alarme Falso",
+  system_action_key: "Chave de Ação do Sistema",
 
   // permissions
   // --> Create Permission

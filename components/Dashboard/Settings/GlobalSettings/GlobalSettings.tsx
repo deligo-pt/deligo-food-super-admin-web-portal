@@ -566,7 +566,7 @@ export default function GlobalSettings({
                         <FormControl>
                           <SettingsInput
                             fieldState={fieldState}
-                            label="Platform VAT"
+                            label={t("platform_vat")}
                             type="number"
                             value={field.value}
                             onChange={(e) =>
@@ -591,7 +591,7 @@ export default function GlobalSettings({
                         <FormControl>
                           <SettingsInput
                             fieldState={fieldState}
-                            label="Fleet Manager Commission"
+                            label={t("fleet_manager_commission")}
                             type="number"
                             value={field.value}
                             onChange={(e) =>
@@ -979,7 +979,7 @@ export default function GlobalSettings({
                       <FormItem>
                         <FormControl>
                           <SettingsToggle
-                            label="Enable Offers"
+                            label={t("enable_offers")}
                             description={t("activate_sitewide_promotional")}
                             checked={field.value}
                             onChange={(val) => field.onChange(val)}

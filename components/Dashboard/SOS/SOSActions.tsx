@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/hooks/use-translation";
 import { updateSOSStatusReq } from "@/services/dashboard/SOS/sos.service";
 import { TSosStatus } from "@/types/sos.type";
 import { CheckCircle, TriangleAlert, UserSearch } from "lucide-react";
@@ -16,6 +17,7 @@ export default function SOSActions({
   sosId,
   onStatusUpdateSuccess,
 }: IProps) {
+  const {t} = useTranslation();
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,7 +62,7 @@ export default function SOSActions({
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500/90"
           >
             <UserSearch size={16} />
-            Investigate
+            {t("investigate")}
           </button>
         )}
         {status !== "RESOLVED" && (
@@ -70,7 +72,7 @@ export default function SOSActions({
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#DC3173] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#DC3173]/90"
           >
             <CheckCircle size={16} />
-            Resolve
+            {t("resolve")}
           </button>
         )}
         {status !== "FALSE_ALARM" && status !== "RESOLVED" && (
@@ -80,7 +82,7 @@ export default function SOSActions({
             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-yellow-500/90"
           >
             <TriangleAlert size={16} />
-            False Alarm
+            {t("false_alarm")}
           </button>
         )}
       </div>

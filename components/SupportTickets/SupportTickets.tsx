@@ -122,7 +122,7 @@ export default function SupportTickets({ ticketData }: IProps) {
       {/* Header */}
       <TitleHeader
         title={t("support_tickets")}
-        subtitle="Manage and respond to support requests from all platform users"
+        subtitle={t("manage_and_respond_support_requests")}
       />
 
       <AllFilters sortOptions={sortOptions} />
@@ -143,10 +143,10 @@ export default function SupportTickets({ ticketData }: IProps) {
               <MessageSquareIcon size={32} />
             </div>
             <h3 className="text-lg font-medium text-gray-900">
-              No tickets found
+              {t("no_tickets_found")}
             </h3>
             <p className="text-gray-500">
-              Try adjusting your search or filters
+              {t("try_adjusting_your_search_or_filters")}
             </p>
           </div>
         )}

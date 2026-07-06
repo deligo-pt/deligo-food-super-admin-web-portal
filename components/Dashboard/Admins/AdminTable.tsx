@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TAdmin } from "@/types/admin.type";
 import { motion } from "framer-motion";
 import {
@@ -43,6 +44,7 @@ export default function AdminTable({
   handleDeleteId,
 }: IProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <motion.div
@@ -56,30 +58,30 @@ export default function AdminTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <IdCard className="w-4" />
-                Name
+                {t("name")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Mail className="w-4" />
-                Email
+                {t("email")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ShieldUser className="w-4" />
-                Role
+                {t("role")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Status
+                {t("status")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -90,7 +92,7 @@ export default function AdminTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No admins found
+                {t("no_admins_found")}
               </TableCell>
             </TableRow>
           )}
@@ -119,7 +121,7 @@ export default function AdminTable({
                           router.push("/admin/all-admins/" + admin.userId)
                         }
                       >
-                        View
+                        {t("view")}
                       </DropdownMenuItem>
                       {admin.status === "APPROVED" && (
                         <DropdownMenuItem
@@ -131,7 +133,7 @@ export default function AdminTable({
                             )
                           }
                         >
-                          Block
+                          {t("block")}
                         </DropdownMenuItem>
                       )}
                       {admin.status === "BLOCKED" && (
@@ -144,14 +146,14 @@ export default function AdminTable({
                             )
                           }
                         >
-                          Unblock
+                          {t("unblock")}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => handleDeleteId(admin.userId)}
                       >
-                        Delete
+                        {t("delete")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
