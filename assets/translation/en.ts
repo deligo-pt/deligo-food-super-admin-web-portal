@@ -274,6 +274,9 @@ export const en = {
   flat_offer: "Flat Offer",
   no_offers_created: "No offers created yet",
   view_all: "View All",
+  edit_vendor_details: "Edit Vendor Details",
+  update_vendor_details_information: "Update vendor details and information",
+
 
   // approve or reject modal
   are_you_sure_want_approve: "Are you sure you want to approve?",
@@ -353,6 +356,7 @@ export const en = {
   submit_vendor: "Submit Vendor",
 
   // vendor-payouts
+  manage_all_vendor_payouts_here: "Manage all vendor payouts here",
   search_vendor_city_payout:
     "Search by vendor, city, payout method, status or id...",
   search: "Search",
@@ -443,6 +447,7 @@ export const en = {
   not_operational: "Not Operational",
 
   // all-fleet-manager
+  manage_all_registered_fleet_managers: "Manage all registered fleet managers",
   no_fleet_manager_found: "No Fleet Manager found",
   no_fleet_managers_found: "No fleet managers found",
   //---> fleet documents
@@ -697,6 +702,7 @@ export const en = {
 
   // blocked customers
   results: "results",
+  all_blocked_customers_in_system: "All blocked customers in the system",
   no_blocked_customers_found: "No blocked customers found.",
 
   // customer-feedback
@@ -1185,6 +1191,7 @@ export const en = {
   dismiss: "Dismiss",
   tax_rate: "Tax Rate",
   // --> create tax
+  create_a_new_tax_rule: "Create a new tax rule",
   tax_form: "Tax Form",
   // --> edit tax
   edit_tax: "Edit Tax",
@@ -1973,6 +1980,7 @@ export const en = {
   min_charge: "Min Charge",
   max_charge: "Max Charge",
   maximum_delivery_distance: "Maximum Delivery Distance",
+  delivery_vat_rate: "Delivery VAT Rate",
   commissions_and_fees: "Commissions & Fees",
   set_platform_earnings_tax_rates: "Set platform earnings and tax rates",
   platform_commission: "Platform Commission",
@@ -2065,19 +2073,19 @@ export const en = {
   payout_days: "Payout Days",
 
   // sos
-  sos_alerts:"SOS Alerts",
-  monitor_and_resolve_critical_incidents:"Monitor and resolve critical incidents",
-  vendor_sos:"Vendor SOS",
-  critical_issues_reported_by_restaurants:"Critical issues reported by restaurants and merchants. Includes kitchen fires, stock outages, or device failures.",
-  fleet_manager_sos:"Fleet Manager SOS",
-  operational_emergencies_from_logistics_hubs:"Operational emergencies from logistics hubs. Vehicle breakdowns, accident reports, and route blockages.",
-  delivery_partner_sos:"Delivery Partner SOS",
-  urgent_safety_alerts_from_riders_on_the_road:"Urgent safety alerts from riders on the road. Medical emergencies, harassment, or severe weather conditions.",
-  active_alerts:"active alerts",
-  no_active_emergencies:"No active emergencies",
-  all_system_operational_sector:"All systems operational in this sector.",
-  investigate:"Investigate",
-  false_alarm:"False Alarm",
+  sos_alerts: "SOS Alerts",
+  monitor_and_resolve_critical_incidents: "Monitor and resolve critical incidents",
+  vendor_sos: "Vendor SOS",
+  critical_issues_reported_by_restaurants: "Critical issues reported by restaurants and merchants. Includes kitchen fires, stock outages, or device failures.",
+  fleet_manager_sos: "Fleet Manager SOS",
+  operational_emergencies_from_logistics_hubs: "Operational emergencies from logistics hubs. Vehicle breakdowns, accident reports, and route blockages.",
+  delivery_partner_sos: "Delivery Partner SOS",
+  urgent_safety_alerts_from_riders_on_the_road: "Urgent safety alerts from riders on the road. Medical emergencies, harassment, or severe weather conditions.",
+  active_alerts: "active alerts",
+  no_active_emergencies: "No active emergencies",
+  all_system_operational_sector: "All systems operational in this sector.",
+  investigate: "Investigate",
+  false_alarm: "False Alarm",
 
   // permissions
   // --> Create Permission

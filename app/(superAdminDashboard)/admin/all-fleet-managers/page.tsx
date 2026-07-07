@@ -13,8 +13,8 @@ export default async function AllFleetManagersPage({ searchParams }: IProps) {
     <FleetManagers
       agentsResult={agentsResult}
       showFilters={true}
-      title="All Fleet Managers"
-      subtitle="Manage all registered fleet managers"
+      title="all_fleet_managers"
+      subtitle="manage_all_registered_fleet_managers"
     />
   );
 }

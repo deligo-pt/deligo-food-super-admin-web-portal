@@ -120,7 +120,7 @@ export default function CreateTax() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <TitleHeader title="Create Tax" subtitle="Create a new tax rule" />
+        <TitleHeader title={t("create_tax")} subtitle={t("create_a_new_tax_rule")} />
         <Card className="py-0">
           <CardContent className="space-y-6 bg-white shadow-xl p-6 rounded-xl">
             <h1 className="text-3xl font-extrabold text-[#DC3173]">{t("tax_form")}</h1>

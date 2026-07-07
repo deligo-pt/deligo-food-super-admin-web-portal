@@ -393,7 +393,7 @@ export default function FleetManagerDetails({ agent }: IProps) {
           </Section>
           <div className="mt-8 border-t pt-6 border-gray-200">
             <ActionButton
-              onClick={() => router.push("/admin/all-agents")}
+              onClick={() => router.push("/admin/all-fleet-managers")}
               label={t("go_back")}
               icon={<ArrowLeftCircle />}
               variant="primary"

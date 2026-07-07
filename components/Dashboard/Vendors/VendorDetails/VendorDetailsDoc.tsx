@@ -1,3 +1,4 @@
+import { useTranslation } from "@/hooks/use-translation";
 import Image from "next/image";
 
 export interface IVendorDocs {
@@ -14,6 +15,7 @@ interface IProps {
 }
 
 export default function VendorDetailsDoc({ documents }: IProps) {
+  const { t } = useTranslation();
   const docsArr = Object.keys(documents || {}) as (keyof IVendorDocs)[];
 
   return (
@@ -26,12 +28,12 @@ export default function VendorDetailsDoc({ documents }: IProps) {
         return (
           <div key={doc} className="mb-6">
             <p className="text-sm text-gray-500 mb-2">
-              {doc === "idProofFront" && "ID Proof Front"}
-              {doc === "idProofBack" && "ID Proof Back"}
-              {doc === "businessLicenseDoc" && "Business License"}
-              {doc === "taxDoc" && "Tax Document"}
-              {doc === "storePhoto" && "Store Photo"}
-              {doc === "menuUpload" && "Menu / Brochure"}
+              {doc === "idProofFront" && t("id_proof_front")}
+              {doc === "idProofBack" && t("id_proof_back")}
+              {doc === "businessLicenseDoc" && t("business_license")}
+              {doc === "taxDoc" && t("tax_document")}
+              {doc === "storePhoto" && t("store_photo")}
+              {doc === "menuUpload" && t("menu_brochure")}
             </p>
 
             <div className="grid grid-cols-2 gap-3">
@@ -61,7 +63,7 @@ export default function VendorDetailsDoc({ documents }: IProps) {
                       rel="noopener noreferrer"
                       className="mt-2 text-sm text-[#DC3173] hover:underline inline-block"
                     >
-                      View Full File
+                      {t("view_full_file")}
                     </a>
                   </div>
                 );
@@ -73,7 +75,7 @@ export default function VendorDetailsDoc({ documents }: IProps) {
 
       {docsArr.length === 0 && (
         <p className="text-gray-500 italic col-span-2">
-          No documents uploaded
+          {t("no_documents_uploaded")}
         </p>
       )}
     </>

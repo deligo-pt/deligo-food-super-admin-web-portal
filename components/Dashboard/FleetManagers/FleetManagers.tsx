@@ -119,7 +119,7 @@ export default function FleetManagers({
         title={t(`${title}`)}
         subtitle={t(`${subtitle}`)}
         buttonInfo={{
-          text: "Add Fleet Manager",
+          text: t("add_fleet_manager"),
           onClick: () => router.push("/admin/add-fleet-manager"),
         }}
       />

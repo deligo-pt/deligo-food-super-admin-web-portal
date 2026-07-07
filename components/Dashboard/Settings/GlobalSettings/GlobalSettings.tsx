@@ -505,7 +505,7 @@ export default function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Delivery VAT Rate"
+                          label={t("delivery_vat_rate")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>

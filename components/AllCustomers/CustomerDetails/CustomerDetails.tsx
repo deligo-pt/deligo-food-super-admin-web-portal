@@ -225,7 +225,7 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
             </div>
           </div>
         </Section>
-        <Section title="Orders" icon={<Package />}>
+        <Section title={t("orders_lg")} icon={<Package />}>
           <CustomerOrdersSection orders={orders} />
           <div className="text-center my-3">
             <Link

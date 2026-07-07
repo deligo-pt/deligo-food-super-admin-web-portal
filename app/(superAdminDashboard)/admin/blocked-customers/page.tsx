@@ -15,8 +15,8 @@ export default async function BlockedCustomersPage({ searchParams }: IProps) {
   return (
     <Customers
       customersResult={customersResult}
-      title="Active Customers"
-      subtitle="All active customers in the system"
+      title="blocked_customers"
+      subtitle="all_blocked_customers_in_system"
     />
   );
 }

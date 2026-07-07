@@ -283,6 +283,8 @@ export const pt = {
   flat_offer: "Oferta de Desconto Fixo",
   no_offers_created: "Nenhuma oferta criada ainda",
   view_all: "Ver Tudo",
+  edit_vendor_details: "Editar Detalhes do Vendedor",
+  update_vendor_details_information: "Atualizar dados e informações do vendedor",
 
   // approve or reject modal
   are_you_sure_want_approve: "Tem certeza de que deseja aprovar?",
@@ -363,6 +365,7 @@ export const pt = {
   submit_vendor: "Submeter vendedor",
 
   // vendor-payouts
+  manage_all_vendor_payouts_here: "Gerencie todos os pagamentos dos vendedores aqui",
   search_vendor_city_payout:
     "Pesquisar por vendedor, cidade, método de pagamento, estado ou ID...",
   search: "Pesquisar",
@@ -453,6 +456,7 @@ export const pt = {
   not_operational: "Não Operacional",
 
   // all-fleet-manager
+  manage_all_registered_fleet_managers: "Gerenciar todos os gerentes de frota registrados",
   no_fleet_manager_found: "Nenhum gestor de frota encontrado",
   no_fleet_managers_found: "Nenhum gerente de frota encontrado",
   //---> fleet documents
@@ -710,6 +714,7 @@ export const pt = {
 
   // blocked customers
   results: "resultados",
+  all_blocked_customers_in_system: "Todos os clientes bloqueados no sistema",
   no_blocked_customers_found: "Nenhum cliente bloqueado encontrado.",
 
   // customer-feedback
@@ -1206,6 +1211,7 @@ export const pt = {
   dismiss: "Fechar",
   tax_rate: "Taxa de imposto",
   // --> create tax
+  create_a_new_tax_rule: "Criar uma nova regra fiscal",
   tax_form: "Formulário de Imposto",
   // --> edit tax
   edit_tax: "Editar Imposto",
@@ -2004,6 +2010,7 @@ export const pt = {
   min_charge: "Cobrança Mínima",
   max_charge: "Cobrança Máxima",
   maximum_delivery_distance: "Distância Máxima de Entrega",
+  delivery_vat_rate: "Taxa de IVA de Entrega",
   commissions_and_fees: "Comissões & Taxas",
   set_platform_earnings_tax_rates:
     "Definir ganhos da plataforma e taxas de imposto",
