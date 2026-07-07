@@ -6,7 +6,10 @@ export type TOffer = {
     en?: string;
     pt?: string;
   };
-  description?: string;
+  description?: {
+    en?: string;
+    pt?: string;
+  };
   // Offer type
   offerType: TOfferType;
   // Discount values

@@ -24,7 +24,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { createOfferReq } from "@/services/dashboard/offer/offer.service";
+import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
+import { translateObject } from "@/utils/translation/translationObject";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -38,12 +40,19 @@ const BG = "#FFF1F7";
 type TOfferForm = z.infer<typeof offerValidation>;
 
 export default function CreateNewOffer() {
+  const { lang } = useStore();
   const { t } = useTranslation();
   const form = useForm<TOfferForm>({
     resolver: zodResolver(offerValidation),
     defaultValues: {
-      title: "",
-      description: "",
+      title: {
+        en: "",
+        pt: ""
+      },
+      description: {
+        en: "",
+        pt: ""
+      },
       offerType: "PERCENT",
       discountValue: 0,
       maxDiscountAmount: 0,
@@ -54,6 +63,7 @@ export default function CreateNewOffer() {
       isAutoApply: false,
       maxUsageCount: "",
       userUsageLimit: "",
+      currentLang: lang
     },
   });
   const { formState: { isSubmitting } } = form;
@@ -65,15 +75,20 @@ export default function CreateNewOffer() {
 
   const onSubmit = async (data: TOfferForm) => {
     const toastId = toast.loading("Creating offer...");
+    const translated = await translateObject(data, lang);
+
+    const { maxUsageCount, userUsageLimit, currentLang, ...restData } = data;
 
     const payload = {
-      ...data,
-      ...(data.maxUsageCount?.length
-        ? { maxUsageCount: Number(data.maxUsageCount) }
-        : {}),
-      ...(data.userUsageLimit?.length
-        ? { userUsageLimit: Number(data.userUsageLimit) }
-        : {}),
+      ...restData,
+      title: translated.title,
+      description: translated.description,
+      ...(maxUsageCount && {
+        maxUsageCount: Number(maxUsageCount),
+      }),
+      ...(userUsageLimit && {
+        userUsageLimit: Number(userUsageLimit),
+      }),
     } as Partial<TOffer>;
 
     const result = await createOfferReq(payload);
@@ -110,11 +125,14 @@ export default function CreateNewOffer() {
                   <h2 className="font-bold text-lg">{t("offer_details")}</h2>
                   <Separator />
 
-                  <FormField
+                  {lang === "en" && <FormField
                     control={form.control}
-                    name="title"
+                    name="title.en"
                     render={({ field }) => (
                       <FormItem>
+                        <FormLabel className="font-medium text-sm text-gray-700">
+                          {t("offer_title_eg")}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             placeholder={t("offer_title_eg")}
@@ -125,13 +143,36 @@ export default function CreateNewOffer() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
 
-                  <FormField
+                  {lang === "pt" && <FormField
                     control={form.control}
-                    name="description"
+                    name="title.pt"
                     render={({ field }) => (
                       <FormItem>
+                        <FormLabel className="font-medium text-sm text-gray-700">
+                          {t("offer_title_eg")}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t("offer_title_eg")}
+                            className="h-12 text-base"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
+
+                  {lang === 'en' && <FormField
+                    control={form.control}
+                    name="description.en"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-medium text-sm text-gray-700">
+                          {t("offer_description")}
+                        </FormLabel>
                         <FormControl>
                           <Textarea
                             placeholder={t("offer_description")}
@@ -143,7 +184,28 @@ export default function CreateNewOffer() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
+
+                  {lang === 'pt' && <FormField
+                    control={form.control}
+                    name="description.pt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-medium text-sm text-gray-700">
+                          {t("offer_description")}
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder={t("offer_description")}
+                            className="text-base"
+                            rows={4}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
 
                   <FormField
                     control={form.control}
@@ -195,6 +257,9 @@ export default function CreateNewOffer() {
                       name="discountValue"
                       render={({ field }) => (
                         <FormItem>
+                          <FormLabel className="font-medium text-sm text-gray-700">
+                            {t("discount_eg_20")}
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder={t("discount_eg_20")}
@@ -220,6 +285,9 @@ export default function CreateNewOffer() {
                       name="discountValue"
                       render={({ field }) => (
                         <FormItem>
+                          <FormLabel className="font-medium text-sm text-gray-700">
+                            {t("flat_discount")}
+                          </FormLabel>
                           <FormControl>
                             <Input
                               placeholder={t("flat_discount")}

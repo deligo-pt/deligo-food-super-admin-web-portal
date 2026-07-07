@@ -29,7 +29,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { updateOfferReq } from "@/services/dashboard/offer/offer.service";
+import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
+import { translateObject } from "@/utils/translation/translationObject";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -53,12 +55,19 @@ export default function EditOfferModal({
   prevValues,
 }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
   const form = useForm<TOfferForm>({
     resolver: zodResolver(offerValidation),
     defaultValues: {
-      title: prevValues.title || "",
-      description: prevValues.description || "",
+      title: {
+        en: prevValues?.title?.en || "",
+        pt: prevValues?.title?.pt || "",
+      },
+      description: {
+        en: prevValues?.description?.en || "",
+        pt: prevValues?.description?.pt || "",
+      },
       offerType:
         (prevValues.offerType as "PERCENT" | "FLAT" | "FREE_DELIVERY") ||
         "PERCENT",
@@ -69,6 +78,7 @@ export default function EditOfferModal({
       minOrderAmount: prevValues.minOrderAmount || 0,
       code: prevValues.code || "",
       isAutoApply: prevValues.isAutoApply || false,
+      currentLang: lang
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,15 +91,21 @@ export default function EditOfferModal({
   const onSubmit = async (data: TOfferForm) => {
     setIsSubmitting(true);
     const toastId = toast.loading("Updating offer...");
+    const translated = await translateObject(data, lang);
+
+    const { maxUsageCount, userUsageLimit, currentLang, ...restData } = data;
 
     const offerData = {
-      ...data,
-      ...(data.maxUsageCount?.length
-        ? { maxUsageCount: Number(data.maxUsageCount) }
-        : {}),
-      ...(data.userUsageLimit?.length
-        ? { userUsageLimit: Number(data.userUsageLimit) }
-        : {}),
+      ...restData,
+      title: translated.title,
+      description: translated.description,
+
+      ...(maxUsageCount && {
+        maxUsageCount: Number(maxUsageCount),
+      }),
+      ...(userUsageLimit && {
+        userUsageLimit: Number(userUsageLimit),
+      }),
     } as Partial<TOffer>;
 
     const result = await updateOfferReq(prevValues._id, offerData);
@@ -127,9 +143,12 @@ export default function EditOfferModal({
 
               <FormField
                 control={form.control}
-                name="title"
+                name={`title.${lang}`}
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel className="font-medium text-sm text-gray-700">
+                      {t("offer_title_eg")}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder={t("offer_title_eg")}
@@ -144,9 +163,12 @@ export default function EditOfferModal({
 
               <FormField
                 control={form.control}
-                name="description"
+                name={`description.${lang}`}
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel className="font-medium text-sm text-gray-700">
+                      {t("offer_description")}
+                    </FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder={t("offer_description")}
@@ -189,9 +211,9 @@ export default function EditOfferModal({
                             <SelectItem value="FLAT">
                               {t("flat_amount_off")}
                             </SelectItem>
-                            <SelectItem value="BOGO">
+                            {/* <SelectItem value="BOGO">
                               {t("buy_1_get_1")}
-                            </SelectItem>
+                            </SelectItem> */}
                             <SelectItem value="FREE_DELIVERY">
                               {t("free_delivery")}
                             </SelectItem>
@@ -211,6 +233,9 @@ export default function EditOfferModal({
                   name="discountValue"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel className="font-medium text-sm text-gray-700">
+                        {t("discount_eg_20")}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder={t("discount_eg_20")}
@@ -237,6 +262,9 @@ export default function EditOfferModal({
                   name="discountValue"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel className="font-medium text-sm text-gray-700">
+                        {t("flat_discount")}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder={t("flat_discount")}

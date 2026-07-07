@@ -1,14 +1,19 @@
+import { validateLocalizedField } from "@/consts/validation.const";
 import { z } from "zod";
+
+const localizedTextSchema = z.object({
+  en: z.string().max(50, "Cannot exceed 50 characters").optional(),
+  pt: z.string().max(50, "Cannot exceed 50 characters").optional()
+});
 
 export const offerValidation = z
   .object({
-    title: z.string().min(3, "Title must be at least 3 characters long"),
+    title: localizedTextSchema,
 
-    description: z
-      .string()
-      .min(2, "Description must be at least 2 characters long")
-      .max(500, "Description must be at most 500 characters long")
-      .optional(),
+    description: z.object({
+      en: z.string().max(500, "Cannot exceed 500 characters").optional(),
+      pt: z.string().max(500, "Cannot exceed 500 characters").optional()
+    }),
 
     offerType: z.enum(
       ["PERCENT", "FLAT", "FREE_DELIVERY"],
@@ -17,7 +22,7 @@ export const offerValidation = z
 
     discountValue: z
       .number()
-      .min(1, "Discount value must be at least 1")
+      // .min(1, "Discount value must be at least 1")
       .optional(),
 
     maxDiscountAmount: z
@@ -40,14 +45,36 @@ export const offerValidation = z
     maxUsageCount: z.string().optional(),
 
     userUsageLimit: z.string().optional(),
+
+    currentLang: z.enum(["en", "pt"]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    validateLocalizedField(
+      data.title,
+      data.currentLang as "en" | "pt",
+      ctx,
+      ["title"],
+      "Title is required"
+    );
+    validateLocalizedField(
+      data.description,
+      data.currentLang as "en" | "pt",
+      ctx,
+      ["description"],
+      "Description is required"
+    );
   })
   .refine(
+    (data) =>
+      data.offerType === "FREE_DELIVERY" || (data?.discountValue && data?.discountValue > 0),
+    {
+      message: "Discount value must be at least 1",
+      path: ["discountValue"],
+    }
+  )
+  .refine(
     (data) => {
-      if (
-        data.offerType === "PERCENT" &&
-        data.discountValue &&
-        data.discountValue > 100
-      ) {
+      if (data.offerType === "PERCENT" && data.discountValue && data.discountValue > 100) {
         return false;
       }
       return true;
