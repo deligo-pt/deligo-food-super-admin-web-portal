@@ -8,6 +8,7 @@ import {
   deleteOfferReq,
   updateOfferReq,
 } from "@/services/dashboard/offer/offer.service";
+import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
 import { motion } from "framer-motion";
 import {
@@ -64,6 +65,7 @@ const offerTypeConfig = {
 export default function OfferDetails({ offer }: IProps) {
   const router = useRouter();
   const { t } = useTranslation();
+  const { lang } = useStore();
 
   const [copied, setCopied] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -235,7 +237,7 @@ export default function OfferDetails({ offer }: IProps) {
                     }}
                     className="text-3xl md:text-4xl font-bold text-white"
                   >
-                    {offer.title}
+                    {offer.title?.[lang]}
                   </motion.h1>
                 </div>
               </div>
@@ -287,7 +289,7 @@ export default function OfferDetails({ offer }: IProps) {
                 }}
                 className="mt-6 text-white/90 text-lg max-w-2xl"
               >
-                {offer.description}
+                {offer.description?.[lang]}
               </motion.p>
             )}
           </div>
@@ -626,7 +628,7 @@ export default function OfferDetails({ offer }: IProps) {
         onConfirm={handleUpdateStatus}
         statusInfo={{
           offerId: offer._id,
-          offerName: offer.title,
+          offerName: offer.title?.[lang] as string,
           status: !offer.isActive,
         }}
         buttonDisabled={buttonDisabled}

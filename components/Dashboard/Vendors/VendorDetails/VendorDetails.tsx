@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
+import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
 import { format, parse } from "date-fns";
@@ -42,6 +43,7 @@ interface IProps {
 
 export default function VendorDetails({ vendor, offerData }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
@@ -492,13 +494,13 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   key={offer._id}
                   className="flex flex-col gap-2 border rounded-md p-4"
                 >
-                  <p className="text-gray-500">{offer.title}</p>
+                  <p className="text-gray-500">{offer.title?.[lang]}</p>
                   {offer.offerType === "BOGO" && <p>{t("bogo_offer")}</p>}
                   {offer.offerType === "PERCENT" && (
-                    <p>{t("percentage_offer")} ({offer.discountValue}% Off)</p>
+                    <p>{t("percentage_offer")} ({offer.discountValue}% {t("off")})</p>
                   )}
                   {offer.offerType === "FLAT" && (
-                    <p>{t("flat_offer")} (€{offer.discountValue} Off)</p>
+                    <p>{t("flat_offer")} (€{offer.discountValue} {t("off")})</p>
                   )}
                   <p className="text-xs">
                     {offer.validFrom
