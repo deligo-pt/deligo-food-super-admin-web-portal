@@ -86,7 +86,7 @@ export default function CreateRestrictedItemModal({
       <form>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Restricted Item</DialogTitle>
+            <DialogTitle>{t("add_restricted_item")}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -99,7 +99,7 @@ export default function CreateRestrictedItemModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Item Name</FormLabel>
+                    <FormLabel>{t("item_name")}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g. Cuban Cigars"
@@ -117,7 +117,7 @@ export default function CreateRestrictedItemModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t("category_lg")}</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
@@ -144,7 +144,7 @@ export default function CreateRestrictedItemModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Reason</FormLabel>
+                    <FormLabel>{t("reason")}</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={3}
@@ -170,7 +170,7 @@ export default function CreateRestrictedItemModal({
               disabled={isSubmitting}
               className="bg-[#DC3173] hover:bg-[#DC3173]/90"
             >
-              Add
+              {t("add")}
             </Button>
           </DialogFooter>
         </DialogContent>

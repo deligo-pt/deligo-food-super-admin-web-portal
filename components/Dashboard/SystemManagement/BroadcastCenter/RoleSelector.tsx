@@ -6,6 +6,7 @@ import { BikeIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon, LoaderCircleIcon, 
 import { useEffect, useState } from 'react';
 import { getAllUsersReq } from '@/services/dashboard/system-management/email-notification-settings.service';
 import { TUser } from './BroadcastCenter';
+import { useTranslation } from '@/hooks/use-translation';
 
 
 type RoleType = keyof Pick<
@@ -26,31 +27,31 @@ interface IProps {
 const ROLES = [
     {
         id: "VENDOR",
-        label: "Vendors",
+        label: "vendors",
         icon: StoreIcon,
         color: "blue",
     },
     {
         id: "FLEET_MANAGER",
-        label: "Fleet Managers",
+        label: "fleet_managers",
         icon: UsersIcon,
         color: "purple",
     },
     {
         id: "CUSTOMER",
-        label: "Customers",
+        label: "customers",
         icon: UserIcon,
         color: "emerald",
     },
     {
         id: "DELIVERY_PARTNER",
-        label: "Delivery Partners",
+        label: "delivery_partners",
         icon: BikeIcon,
         color: "amber",
     },
     {
         id: "ADMIN",
-        label: "Admins",
+        label: "admins",
         icon: ShieldIcon,
         color: "red",
     },
@@ -74,6 +75,7 @@ const Avatar = ({ name, colorClass }: { name: string; colorClass: string }) => {
 };
 
 export default function RoleSelector({ selectedRoles, setSelectedRoles, selectedUsers, setSelectedUsers, expandedPanels, setExpandedPanels, itemVariants }: IProps) {
+    const { t } = useTranslation();
 
     const [targetModes, setTargetModes] = useState<
         Record<RoleType, "all" | "specific">
@@ -247,10 +249,10 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
         >
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                    Target Audience
+                    {t("target_audience")}
                 </h2>
                 <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
-                    {selectedRoles.length} selected
+                    {selectedRoles.length} {t("selected")}
                 </span>
             </div>
 
@@ -286,10 +288,10 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                 <p
                                     className={`font-bold text-sm ${isSelected ? "text-gray-900" : "text-gray-700"}`}
                                 >
-                                    {role.label}
+                                    {t(`${role?.label}`)}
                                 </p>
                                 <p className="text-xs text-gray-500 mt-0.5">
-                                    {usersData[role?.id]?.meta?.total || 0} users
+                                    {usersData[role?.id]?.meta?.total || 0} {t("users")}
                                 </p>
                             </div>
                             {isSelected && (
@@ -364,7 +366,7 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                 <span
                                                     className={`text-xs px-2 py-0.5 rounded-full ${colors.bg} text-white font-medium ml-2`}
                                                 >
-                                                    {selectedCount} selected
+                                                    {selectedCount} {t("selected")}
                                                 </span>
                                             )}
                                         </div>
@@ -374,7 +376,7 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                 onClick={() => handleTargetMode(roleId, "all")}
                                                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "all" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"}`}
                                             >
-                                                All Users
+                                                {t("all_users")}
                                             </button>
                                             <button
                                                 onClick={() =>
@@ -382,7 +384,7 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                 }
                                                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${mode === "specific" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"}`}
                                             >
-                                                Select Specific
+                                                {t("select_specific")}
                                             </button>
                                         </div>
                                     </div>
@@ -433,8 +435,8 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                             {filteredUsers?.data?.every((u) =>
                                                                 selectedUsers[roleId].has(u.userId),
                                                             ) && filteredUsers?.data?.length > 0
-                                                                ? "Deselect All"
-                                                                : "Select All"}
+                                                                ? t("deselect_all")
+                                                                : t("select_all")}
                                                         </button>
                                                         <button
                                                             onClick={() =>
@@ -485,7 +487,7 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                                 >
                                                                     {filteredUsers?.meta?.total === 0 ? (
                                                                         <p className="text-sm text-gray-500 text-center py-4">
-                                                                            No users found.
+                                                                            {t("no_users_found")}
                                                                         </p>
                                                                     ) : (
                                                                         filteredUsers?.data?.map((user) => {
@@ -554,7 +556,7 @@ export default function RoleSelector({ selectedRoles, setSelectedRoles, selected
                                                                                     size="sm"
                                                                                     className={`text-xs cursor-pointer hover:opacity-90 ${colors.bg} hover:${colors.bg} transition-colors`}
                                                                                 >
-                                                                                    Show More
+                                                                                    {t("show_more")}
                                                                                 </Button>
                                                                             </div>
                                                                         )}

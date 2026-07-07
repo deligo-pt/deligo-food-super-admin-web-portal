@@ -16,8 +16,8 @@ export default async function CancelledOrdersPage({ searchParams }: IProps) {
   return (
     <Orders
       ordersResult={ordersResult}
-      title="Cancelled Orders"
-      subtitle="All cancelled orders"
+      title="cancelled_orders"
+      subtitle="cancelled_orders_desc"
     />
   );
 }

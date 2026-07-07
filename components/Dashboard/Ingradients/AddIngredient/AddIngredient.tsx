@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useTranslation } from "@/hooks/use-translation";
 import { createIngredientReq } from "@/services/dashboard/ingredient/ingredient.service";
 import { uploadImagesReq } from "@/services/upload/upload.service";
 import { useStore } from "@/store/store";
@@ -29,6 +30,7 @@ import z from "zod";
 type TIngredientForm = z.infer<typeof ingredientSchema>;
 
 export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
+  const { t } = useTranslation();
   const { lang } = useStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>("");
@@ -127,10 +129,10 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       <TitleHeader
-        title="Add New Ingredient"
-        subtitle="Add packaging materials and ingredients to the inventory."
+        title={t("add_new_ingredient")}
+        subtitle={t("add_packaging_materials_ingredients")}
       />
 
       <motion.div
@@ -149,7 +151,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t("name")}</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g. Premium Extra Virgin Olive Oil" {...field} />
                       </FormControl>
@@ -164,7 +166,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>{t("category_lg")}</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g. Oils & Vinegars" {...field} />
                       </FormControl>
@@ -179,7 +181,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price per Unit (€)</FormLabel>
+                      <FormLabel>{t("price_per_unit")} (€)</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="e.g. 12.50"
@@ -202,7 +204,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax rate</FormLabel>
+                      <FormLabel>{t("tax_rate")}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="w-full h-10!">
@@ -228,7 +230,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Measurement Unit</FormLabel>
+                      <FormLabel>{t("measurement_unit")}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="w-full h-10!">
@@ -254,7 +256,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Stock</FormLabel>
+                      <FormLabel>{t("stock")}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="e.g. 150"
@@ -276,7 +278,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   name="lowStockAlert"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Low Stock Alert Level</FormLabel>
+                      <FormLabel>{t("low_stock_alert_level")}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="e.g. 15"
@@ -298,7 +300,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   name="minOrder"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Minimum Order</FormLabel>
+                      <FormLabel>{t("minimum_order")}</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="e.g. 2"
@@ -320,7 +322,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                 name="shelfLifeDays"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Shelf Life (Days - Optional)</FormLabel>
+                    <FormLabel>{t("shelf_life_days")}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -343,21 +345,21 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">Bulk Discount Tiers (Optional)</h3>
-                    <p className="text-xs text-gray-400">Apply specialized system drops for dynamic purchasing lines</p>
+                    <h3 className="text-lg font-bold text-gray-900">{t("bulk_discount_tiers")}</h3>
+                    <p className="text-xs text-gray-400">{t("apply_specialized_system_drops")}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => append({ minQty: 0, discountPrice: 0 })}
                     className="flex items-center gap-1 text-xs font-bold bg-slate-100 hover:bg-[#DC3173] hover:text-white transition-all px-3 py-2 rounded-xl text-slate-700"
                   >
-                    <Plus size={14} /> Add Tier
+                    <Plus size={14} />{t("add_tier")}
                   </button>
                 </div>
 
                 {fields.length === 0 && (
                   <p className="text-sm text-gray-400 italic bg-gray-50 p-4 rounded-xl text-center">
-                    No discount tiers added yet. Base product tracking metrics will apply globally.
+                    {t("no_discount_tiers_added_yet")}
                   </p>
                 )}
 
@@ -369,7 +371,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                         name={`bulkDiscount.${index}.minQty`}
                         render={({ field }) => (
                           <FormItem className="flex-1">
-                            <FormLabel className="text-xs text-gray-500">Minimum Quantity</FormLabel>
+                            <FormLabel className="text-xs text-gray-500">{t("minimum_quantity")}</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -389,7 +391,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                         name={`bulkDiscount.${index}.discountPrice`}
                         render={({ field }) => (
                           <FormItem className="flex-1">
-                            <FormLabel className="text-xs text-gray-500">Discounted Price (€)</FormLabel>
+                            <FormLabel className="text-xs text-gray-500">{t("discounted_price")} (€)</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -423,7 +425,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t("description")}</FormLabel>
                     <FormControl>
                       <Textarea placeholder="Brief details about the ingredient..." {...field} />
                     </FormControl>
@@ -440,7 +442,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                   <FormItem>
                     <FormControl>
                       <ImageUpload
-                        label="Ingredient Image"
+                        label={t("ingredient_image")}
                         value={previewImage}
                         onChange={(file) => {
                           if (file) {
@@ -470,7 +472,7 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
                     : "bg-[#DC3173] hover:bg-[#DC3173]/90 hover:shadow-[#DC3173]/30"
                     }`}
                 >
-                  {isSubmitting ? "Saving..." : <><Save size={20} /> Save Ingredient</>}
+                  {isSubmitting ? "Saving..." : <><Save size={20} /> {t("save_ingredient")}</>}
                 </button>
               </div>
             </form>

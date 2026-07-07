@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -39,6 +40,7 @@ export default function SponsorshipTable({
   handleDeleteId,
   handleOpenEditModal,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -53,36 +55,36 @@ export default function SponsorshipTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ImageIcon className="w-4" />
-                Banner
+                {t("banner")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Building2 className="w-4" />
-                Name
+                {t("name")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Building2 className="w-4" />
-                Type
+                {t("type")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Status
+                {t("status")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Period
+                {t("period")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -93,7 +95,7 @@ export default function SponsorshipTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No sponsorships found
+                {t("no_sponsorships_found")}
               </TableCell>
             </TableRow>
           )}
@@ -111,7 +113,7 @@ export default function SponsorshipTable({
               <TableCell>{sponsorship.sponsorName}</TableCell>
               <TableCell>{sponsorship.sponsorType}</TableCell>
               <TableCell>
-                {sponsorship.isActive ? "Active" : "Inactive"}
+                {sponsorship.isActive ? t("active") : t("inactive")}
               </TableCell>
               <TableCell>
                 {format(sponsorship.startDate, "do MMM yyyy")} -{" "}
@@ -128,18 +130,18 @@ export default function SponsorshipTable({
                         router.push(`/admin/sponsorships/${sponsorship._id}`)
                       }
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => handleOpenEditModal(sponsorship)}
                     >
-                      Edit
+                      {t("edit")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => handleDeleteId(sponsorship._id)}
                     >
-                      Delete
+                      {t("delete")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

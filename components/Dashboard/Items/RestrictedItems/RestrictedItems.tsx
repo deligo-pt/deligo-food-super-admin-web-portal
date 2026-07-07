@@ -7,6 +7,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteRestrictedItemReq } from "@/services/dashboard/product/restricted-item.service";
 import { TMeta } from "@/types";
 import { TRestrictedItem } from "@/types/product.type";
@@ -27,6 +28,7 @@ const sortOptions = [
 ];
 
 export default function RestrictedItems({ restrictedItemsData }: IProps) {
+  const {t} = useTranslation();
   const router = useRouter();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<TRestrictedItem | null>(null);
@@ -59,10 +61,10 @@ export default function RestrictedItems({ restrictedItemsData }: IProps) {
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title="Restricted Items"
-        subtitle="Manage items vendors are not allowed to sell on Deligo"
+        title={t("restricted_items")}
+        subtitle={t("manage_items_vendors_allowed_sell")}
         buttonInfo={{
-          text: "Add Item",
+          text: t("add_item"),
           onClick: () => setIsAddModalOpen(true),
         }}
       />

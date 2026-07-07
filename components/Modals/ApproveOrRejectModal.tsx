@@ -62,7 +62,8 @@ export default function ApproveOrRejectModal({
       setRemarks("");
       onOpenChange(false);
       toast.success(
-        status === "APPROVED"
+        result.message ||
+          status === "APPROVED"
           ? "Approved successfully!"
           : status === "REJECTED"
             ? "Rejected successfully!"
@@ -103,7 +104,7 @@ export default function ApproveOrRejectModal({
             </DialogTitle>
             <DialogDescription>
               {status === "APPROVED"
-                ? "Are you sure you want to approve?"
+                ? t("are_you_sure_want_approve")
                 : t("let_them_know_why_you_are") + " "}
               {status === "REJECTED" && "rejecting"}
               {status === "BLOCKED" && "blocking"}

@@ -92,8 +92,8 @@ export default function RewardsSettings({
         <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="">
           {/* Header */}
           <TitleHeader
-            title="Rewards Settings"
-            subtitle="Configure loyalty and referral rewards here"
+            title={t("rewards_settings")}
+            subtitle={t("configure_loyalty_referral_rewards")}
             extraComponent={
               <motion.button
                 initial={{
@@ -144,15 +144,15 @@ export default function RewardsSettings({
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <SettingsCard
-              title="Loyalty & Rewards"
-              description="Configure points, bonuses, and referral rewards"
+              title={t("loyalty_and_rewards")}
+              description={t("configure_points_bonuses_referral")}
               icon={Gift}
               delay={0.55}
             >
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                    Customer Rewards
+                    {t("customer_rewards")}
                   </h3>
 
                   <FormField
@@ -163,14 +163,14 @@ export default function RewardsSettings({
                         <FormControl>
                           <SettingsInput
                             fieldState={fieldState}
-                            label="Points per € spent"
+                            label={t("points_per_spent")}
                             type="number"
                             value={field.value}
                             onChange={(e) =>
                               field.onChange(parseFloat(e.target.value))
                             }
                             suffix="pts"
-                            description="Points earned per euro spent"
+                            description={t("points_earned_per_euro_spent")}
                             min={0}
                           />
                         </FormControl>
@@ -182,7 +182,7 @@ export default function RewardsSettings({
 
                 <div>
                   <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                    Rider Rewards
+                    {t("rider_rewards")}
                   </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -194,7 +194,7 @@ export default function RewardsSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="Points per delivery"
+                              label={t("points_per_delivery")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
@@ -217,7 +217,7 @@ export default function RewardsSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="Referral points"
+                              label={t("referral_points")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
@@ -240,7 +240,7 @@ export default function RewardsSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="New rider welcome bonus"
+                              label={t("new_rider_welcome_bonus")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
@@ -263,7 +263,7 @@ export default function RewardsSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="Points Expiry"
+                              label={t("points_expiry")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
@@ -282,15 +282,15 @@ export default function RewardsSettings({
               </div>
             </SettingsCard>
             <SettingsCard
-              title="Referral Milestones"
-              description="Configure referral milestones and rewards"
+              title={t("referral_milestones")}
+              description={t("configure_referral_milestones_rewards")}
               icon={Gift}
               delay={0.55}
             >
               {/* Referral Milestones */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                  Customer Referral Milestones
+                  {t("customer_referral_milestones")}
                 </h3>
 
                 <ReferralMilestoneSettings form={form} />

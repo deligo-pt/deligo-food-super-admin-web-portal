@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TAgent } from "@/types/user.type";
 import { motion } from "framer-motion";
 import {
@@ -41,6 +42,7 @@ export default function FleetManagerTable({
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -55,30 +57,30 @@ export default function FleetManagerTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <IdCard className="w-4" />
-                Name
+                {t("name")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Mail className="w-4" />
-                Email
+                {t("email")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Phone className="w-4" />
-                Phone
+                {t("phone")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Status
+                {t("status")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -89,7 +91,7 @@ export default function FleetManagerTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No fleet managers found
+                {t("no_fleet_managers_found")}
               </TableCell>
             </TableRow>
           )}
@@ -116,7 +118,7 @@ export default function FleetManagerTable({
                           router.push("/admin/agent/" + agent.userId)
                         }
                       >
-                        View
+                        {t("view")}
                       </DropdownMenuItem>
                       {agent.status === "SUBMITTED" && (
                         <DropdownMenuItem
@@ -128,7 +130,7 @@ export default function FleetManagerTable({
                             )
                           }
                         >
-                          Approve
+                          {t("approve")}
                         </DropdownMenuItem>
                       )}
                       {agent.status === "SUBMITTED" && (
@@ -141,7 +143,7 @@ export default function FleetManagerTable({
                             )
                           }
                         >
-                          Reject
+                          {t("reject")}
                         </DropdownMenuItem>
                       )}
                       {agent.status === "APPROVED" && (
@@ -154,7 +156,7 @@ export default function FleetManagerTable({
                             )
                           }
                         >
-                          Block
+                          {t("block")}
                         </DropdownMenuItem>
                       )}
                       {agent.status === "BLOCKED" && (
@@ -167,14 +169,14 @@ export default function FleetManagerTable({
                             )
                           }
                         >
-                          Unblock
+                          {t("unblock")}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
                         className="text-destructive"
                         onClick={() => handleDeleteId(agent.userId)}
                       >
-                        Delete
+                        {t("delete")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

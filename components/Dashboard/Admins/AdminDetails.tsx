@@ -15,6 +15,7 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { TAdmin } from '@/types/admin.type';
+import { useTranslation } from '@/hooks/use-translation';
 
 // Reusable Subcomponent
 const InfoField = ({ label, value }: { label: string; value: string | number | undefined | null }) => (
@@ -68,6 +69,7 @@ const AccordionSection = ({
 );
 
 const AdminDetails = ({ admin }: { admin: TAdmin }) => {
+    const { t } = useTranslation();
     const router = useRouter();
 
     const [panels, setPanels] = useState({
@@ -108,7 +110,7 @@ const AdminDetails = ({ admin }: { admin: TAdmin }) => {
                     onClick={() => router.back()}
                     className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0 py-0 h-4 cursor-pointer font-medium bg-transparent border-none"
                 >
-                    <ArrowLeftCircle className="w-5 h-5" /> Go Back
+                    <ArrowLeftCircle className="w-5 h-5" /> {t("go_back")}
                 </button>
             </div>
 
@@ -168,28 +170,28 @@ const AdminDetails = ({ admin }: { admin: TAdmin }) => {
                         onToggle={() => togglePanel('personal')}
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                            <InfoField label="Full Name" value={`${admin?.name?.firstName || ''} ${admin?.name?.lastName || ''}`.trim() || 'N/A'} />
-                            <InfoField label="Email" value={admin?.email} />
-                            <InfoField label="Contact Number" value={admin?.contactNumber} />
-                            <InfoField label="Email Verified" value={admin?.isEmailVerified ? "Yes" : "No"} />
+                            <InfoField label={t("full_name")} value={`${admin?.name?.firstName || ''} ${admin?.name?.lastName || ''}`.trim() || 'N/A'} />
+                            <InfoField label={t('email')} value={admin?.email} />
+                            <InfoField label={t("contact_number")} value={admin?.contactNumber} />
+                            <InfoField label={t("email_verified")} value={admin?.isEmailVerified ? t("yes") : t("no")} />
                         </div>
                     </AccordionSection>
 
                     {/* Section 2: Business / System Profile Roles */}
                     <AccordionSection
-                        title="System Role Configurations"
+                        title={t("system_role_configuration")}
                         icon={ShieldAlert}
                         isOpen={panels.permissions}
                         onToggle={() => togglePanel('permissions')}
                     >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 mb-4">
-                            <InfoField label="System ID (userId)" value={admin?.userId} />
-                            <InfoField label="Assigned Role" value={admin?.role?.replace('_', ' ')} />
-                            <InfoField label="Update Protection Lock" value={admin?.isUpdateLocked ? "Active (Locked)" : "Inactive (Open)"} />
-                            <InfoField label="Account Marked Deleted" value={admin?.isDeleted ? "Yes" : "No"} />
+                            <InfoField label={t("system_id")} value={admin?.userId} />
+                            <InfoField label={t("assigned_role")} value={admin?.role?.replace('_', ' ')} />
+                            <InfoField label={t("update_protection_lock")} value={admin?.isUpdateLocked ? "Active (Locked)" : "Inactive (Open)"} />
+                            <InfoField label={t("account_marked_deleted")} value={admin?.isDeleted ? t("yes") : t("no")} />
                         </div>
                         <div className="mt-4 border-t border-gray-50 pt-4">
-                            <span className="text-gray-400 block text-xs font-medium mb-2">Security Capability Permissions Tokens</span>
+                            <span className="text-gray-400 block text-xs font-medium mb-2">{t("security_capability_permissions_tokens")}</span>
                             {admin?.permissions && admin.permissions.length > 0 ? (
                                 <div className="flex flex-wrap gap-1.5">
                                     {admin.permissions.map((perm, index) => (
@@ -199,59 +201,59 @@ const AdminDetails = ({ admin }: { admin: TAdmin }) => {
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-xs text-gray-400 italic">No tailored capability constraints mapped. Inherits structural values natively.</p>
+                                <p className="text-xs text-gray-400 italic">{t("no_tailored_capability_constraints")}</p>
                             )}
                         </div>
                     </AccordionSection>
 
                     {/* Section 3: Location Details */}
                     <AccordionSection
-                        title="Location Details"
+                        title={t("location_details")}
                         icon={MapPin}
                         isOpen={panels.location}
                         onToggle={() => togglePanel('location')}
                     >
                         {admin?.address && (admin.address.street || admin.address.city || admin.address.country) ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                                <InfoField label="Street Address" value={admin.address.street} />
-                                <InfoField label="Postal Code" value={admin.address.postalCode} />
-                                <InfoField label="City" value={admin.address.city} />
-                                <InfoField label="State" value={admin.address.state} />
-                                <InfoField label="Country" value={admin.address.country} />
-                                <InfoField label="Geo-Coordinates (Lat / Long)" value={admin.address.latitude && admin.address.longitude ? `${admin.address.latitude}, ${admin.address.longitude}` : 'No GPS Data'} />
+                                <InfoField label={t("street_address")} value={admin.address.street} />
+                                <InfoField label={t("postal_code")} value={admin.address.postalCode} />
+                                <InfoField label={t("city")} value={admin.address.city} />
+                                <InfoField label={t("state")} value={admin.address.state} />
+                                <InfoField label={t("country")} value={admin.address.country} />
+                                <InfoField label={t("geo_coordinates")} value={admin.address.latitude && admin.address.longitude ? `${admin.address.latitude}, ${admin.address.longitude}` : 'No GPS Data'} />
                             </div>
                         ) : (
-                            <p className="text-xs text-gray-400 italic py-1">No operational location address details provided.</p>
+                            <p className="text-xs text-gray-400 italic py-1">{t("no_operational_location_address_details_provided")}</p>
                         )}
                     </AccordionSection>
 
                     {/* Section 4: Workflow Activity Logs */}
                     <AccordionSection
-                        title="Activity Logs"
+                        title={t("activity_logs")}
                         icon={History}
                         isOpen={panels.activity}
                         onToggle={() => togglePanel('activity')}
                     >
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-8">
-                            <InfoField label="Registered On" value={formatDate(admin?.createdAt as Date)} />
-                            <InfoField label="Last Modification Status Update" value={formatDate(admin?.updatedAt as Date)} />
-                            <InfoField label="Decision Audit Mapped At" value={formatDate(admin?.approvedOrRejectedOrBlockedAt as Date)} />
-                            <InfoField label="Action Enforced By Log ID" value={admin?.approvedBy || admin?.rejectedBy || admin?.blockedBy || 'N/A'} />
+                            <InfoField label={t("registered_on")} value={formatDate(admin?.createdAt as Date)} />
+                            <InfoField label={t("last_modification_status_update")} value={formatDate(admin?.updatedAt as Date)} />
+                            <InfoField label={t("decision_audit_mapped_at")} value={formatDate(admin?.approvedOrRejectedOrBlockedAt as Date)} />
+                            <InfoField label={t("action_enforced_by_log_id")} value={admin?.approvedBy || admin?.rejectedBy || admin?.blockedBy || 'N/A'} />
                             <div className="md:col-span-2">
-                                <InfoField label="Internal Workflow Remarks" value={admin?.remarks || 'No recorded history notes.'} />
+                                <InfoField label={t("internal_workflow_remarks")} value={admin?.remarks || t("no_recorded_history_notes")} />
                             </div>
                         </div>
                     </AccordionSection>
 
                     {/* Section 5: Documents */}
                     <AccordionSection
-                        title="Documents"
+                        title={t("documents")}
                         icon={FileText}
                         isOpen={panels.documents}
                         onToggle={() => togglePanel('documents')}
                     >
                         <div className="text-center py-6 bg-gray-50/50 rounded-lg border border-dashed border-gray-200">
-                            <p className="text-xs text-gray-400 font-medium">No verified identity credentials or reference documents are available for this administrator tier.</p>
+                            <p className="text-xs text-gray-400 font-medium">{t("no_verified_identity_credentials_refernece_documents")}</p>
                         </div>
                     </AccordionSection>
 

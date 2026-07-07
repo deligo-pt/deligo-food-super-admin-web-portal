@@ -3,10 +3,12 @@
 import SettingsInput from "@/components/Dashboard/Settings/GlobalSettings/SettingsInput";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form";
+import { useTranslation } from "@/hooks/use-translation";
 import { useFieldArray } from "react-hook-form";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ReferralMilestoneSettings({ form }: any) {
+  const {t} = useTranslation();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "customerReferralMilestones",
@@ -27,7 +29,7 @@ export default function ReferralMilestoneSettings({ form }: any) {
               render={({ field, fieldState }) => (
                 <SettingsInput
                   fieldState={fieldState}
-                  label="Friends required"
+                  label={t("friends_required")}
                   type="number"
                   value={field.value}
                   onChange={(e) => field.onChange(parseInt(e.target.value))}
@@ -43,7 +45,7 @@ export default function ReferralMilestoneSettings({ form }: any) {
               render={({ field, fieldState }) => (
                 <SettingsInput
                   fieldState={fieldState}
-                  label="Reward value"
+                  label={t("reward_value")}
                   type="number"
                   value={field.value}
                   onChange={(e) => field.onChange(parseFloat(e.target.value))}
@@ -59,7 +61,7 @@ export default function ReferralMilestoneSettings({ form }: any) {
               render={({ field, fieldState }) => (
                 <SettingsInput
                   fieldState={fieldState}
-                  label="Min order per friend"
+                  label={t("min_order_per_friend")}
                   type="number"
                   value={field.value}
                   onChange={(e) => field.onChange(parseFloat(e.target.value))}
@@ -94,7 +96,7 @@ export default function ReferralMilestoneSettings({ form }: any) {
               variant="destructive"
               onClick={() => remove(index)}
             >
-              Remove
+              {t("remove")}
             </Button>
           </div>
         </div>
@@ -112,7 +114,7 @@ export default function ReferralMilestoneSettings({ form }: any) {
           })
         }
       >
-        + Add Milestone
+        + {t("add_milestone")}
       </Button>
     </div>
   );

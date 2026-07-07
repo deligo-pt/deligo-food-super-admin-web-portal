@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TRating } from "@/types/rating.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -38,6 +39,8 @@ export default function CustomerFeedbackTable({
   feedback,
   openDetailsSheet,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -50,36 +53,36 @@ export default function CustomerFeedbackTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <UserIcon className="w-4" />
-                Customer
+                {t("customer")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <QuoteIcon className="w-4" />
-                Comment
+                {t("comment")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <StarIcon className="w-4" />
-                Rating
+                {t("rating")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Date
+                {t("date")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <TagsIcon className="w-4" />
-                Tags
+                {t("tags")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -90,7 +93,7 @@ export default function CustomerFeedbackTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No feedback found
+                {t("no_feedback_found")}
               </TableCell>
             </TableRow>
           )}
@@ -110,7 +113,7 @@ export default function CustomerFeedbackTable({
                   <div>
                     <h3>
                       {f.reviewerId?.name?.firstName ||
-                      f.reviewerId?.name?.lastName
+                        f.reviewerId?.name?.lastName
                         ? `${f.reviewerId?.name?.firstName} ${f.reviewerId?.name?.lastName}`
                         : "N/A"}
                     </h3>
@@ -143,7 +146,7 @@ export default function CustomerFeedbackTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => openDetailsSheet(f)}>
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

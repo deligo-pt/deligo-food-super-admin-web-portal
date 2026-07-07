@@ -295,7 +295,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                   : !statusInfo.isActive
                     ? t("deactivate")
                     : t("activate")}{" "}
-                {t("category")}
+                {t("category_lg")}
               </DialogTitle>
               <DialogDescription>
                 {t("are_you_sure_want_to")}{" "}

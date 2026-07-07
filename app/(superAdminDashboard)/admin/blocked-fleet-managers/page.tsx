@@ -17,8 +17,8 @@ export default async function BlockedFleetManagersPage({
   return (
     <FleetManagers
       agentsResult={agentsResult}
-      title="Suspended Fleet Managers"
-      subtitle="All blocked fleet managers from the system"
+      title="suspended_fleet_managers"
+      subtitle="all_blocked_fleet_managers_from_system"
     />
   );
 }

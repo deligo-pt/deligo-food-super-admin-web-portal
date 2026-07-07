@@ -5,6 +5,7 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useStore } from "@/store/store";
 import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
@@ -47,9 +48,11 @@ const filterOptions = [
 ];
 
 export default function VendorOffers({ vendor, offersResult }: IProps) {
+  const { lang } = useStore();
+
   return (
     <div className="min-h-screen p-6 md:p-10" style={{ background: BG }}>
-      <div className="max-w-[1100px] mx-auto space-y-12">
+      <div className="max-w-275 mx-auto space-y-12">
         <TitleHeader
           title={`${vendor.name?.firstName} ${vendor.name?.lastName}'s Offers`}
           subtitle={`All offers from (${vendor.email})`}
@@ -80,7 +83,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
 
                       <div>
                         <h2 className="text-2xl font-bold text-gray-800">
-                          {offer.title}
+                          {offer.title?.[lang]}
                         </h2>
 
                         <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
@@ -96,7 +99,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
                       </div>
                     </div>
 
-                    <div className="text-right md:min-w-[200px]">
+                    <div className="text-right md:min-w-50">
                       <p className="text-sm text-gray-500">Total Used</p>
                       <p className="text-3xl font-bold text-gray-900">
                         {offer.usageCount}

@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
@@ -37,6 +38,7 @@ import z from "zod";
 type TSponsorshipForm = z.infer<typeof sponsorshipValidation>;
 
 export default function AddSponsorship() {
+  const { t } = useTranslation();
   const form = useForm<TSponsorshipForm>({
     resolver: zodResolver(sponsorshipValidation),
     defaultValues: {
@@ -97,17 +99,17 @@ export default function AddSponsorship() {
   };
 
   return (
-    <div className="p-6">
+    <div className="">
       {/* Header */}
       <TitleHeader
-        title="Add Sponsorship"
-        subtitle="Add banner ads and sponsored content"
+        title={t("add_sponsorship")}
+        subtitle={t("add_banner_ads_and_sponsored_content")}
       />
 
       {/* Add Form */}
       <SettingsCard
-        title="Add Sponsorship"
-        description="Create a new banner campaign"
+        title={t("add_sponsorship")}
+        description={t("create_a_new_banner_campaign")}
         icon={Plus}
         className="sticky top-8"
       >
@@ -121,7 +123,7 @@ export default function AddSponsorship() {
                   <FormControl>
                     <SettingsInput
                       fieldState={fieldState}
-                      label="Sponsor Name"
+                      label={t("sponsor_name")}
                       placeholder="e.g. ABC Group"
                       value={field.value}
                       onChange={field.onChange}
@@ -140,7 +142,7 @@ export default function AddSponsorship() {
                   <FormControl>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                        Sponsor Type
+                        {t("sponsor_type")}
                       </label>
                       <Select
                         value={field.value}
@@ -153,7 +155,7 @@ export default function AddSponsorship() {
                             fieldState.invalid && "border-destructive",
                           )}
                         >
-                          <SelectValue placeholder="Select a type" />
+                          <SelectValue placeholder={t("select_a_type")} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Ads">Ads</SelectItem>
@@ -177,7 +179,7 @@ export default function AddSponsorship() {
                     <SettingsInput
                       fieldState={fieldState}
                       type="date"
-                      label="Start Date"
+                      label={t("start_date")}
                       value={format(field.value, "yyyy-MM-dd")}
                       onChange={(e) => field.onChange(new Date(e.target.value))}
                     />
@@ -196,7 +198,7 @@ export default function AddSponsorship() {
                     <SettingsInput
                       fieldState={fieldState}
                       type="date"
-                      label="End Date"
+                      label={t("end_date")}
                       value={format(field.value, "yyyy-MM-dd")}
                       onChange={(e) => field.onChange(new Date(e.target.value))}
                     />
@@ -214,7 +216,7 @@ export default function AddSponsorship() {
                   <FormControl>
                     <SettingsInput
                       fieldState={fieldState}
-                      label="Sponsor Url (optional)"
+                      label={t("sponsor_url")}
                       placeholder="e.g. https://example.com"
                       value={field.value}
                       onChange={field.onChange}
@@ -233,6 +235,7 @@ export default function AddSponsorship() {
                   <FormControl>
                     <ImageUpload
                       value={sponsorBannerPreview}
+                      label={t("banner_image")}
                       onChange={(file) => {
                         const url = file ? URL.createObjectURL(file) : "";
                         setSponsorBannerPreview(
@@ -256,8 +259,8 @@ export default function AddSponsorship() {
                   <FormControl>
                     <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                       <SettingsToggle
-                        label="Active Status"
-                        description="Immediately publish this sponsorship"
+                        label={t("active_status")}
+                        description={t("immediately_publish_this_sponsorship")}
                         checked={field.value as boolean}
                         onChange={(val) => field.onChange(val)}
                       />
@@ -285,7 +288,7 @@ export default function AddSponsorship() {
               ) : (
                 <>
                   <Plus size={20} />
-                  Create Sponsorship
+                  {t("create_sponsorship")}
                 </>
               )}
             </motion.button>

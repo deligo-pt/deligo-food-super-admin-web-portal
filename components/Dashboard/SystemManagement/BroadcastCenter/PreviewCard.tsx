@@ -2,6 +2,7 @@
 import { AnimatePresence } from "framer-motion";
 import { BellIcon, MailIcon } from "lucide-react";
 import { motion } from 'framer-motion';
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
     commType: "PUSH" | "BOTH" | "EMAIL";
@@ -11,6 +12,7 @@ interface IProps {
 }
 
 export default function PreviewCard({ commType, title, message, showPreview }: IProps) {
+    const {t} = useTranslation();
 
     return (
         <AnimatePresence>
@@ -41,7 +43,7 @@ export default function PreviewCard({ commType, title, message, showPreview }: I
                                 <div className="w-3 h-3 rounded-full bg-green-400" />
                             </div>
                             <span className="text-xs font-medium text-gray-500 ml-2">
-                                Preview
+                                {t("preview")}
                             </span>
                         </div>
 
@@ -53,7 +55,7 @@ export default function PreviewCard({ commType, title, message, showPreview }: I
                                             <MailIcon className="w-5 h-5 text-[#DC3173]" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-gray-500">Title</p>
+                                            <p className="text-xs text-gray-500">{t("title")}</p>
                                             <p className="font-bold text-gray-900">
                                                 {title || "No Title"}
                                             </p>

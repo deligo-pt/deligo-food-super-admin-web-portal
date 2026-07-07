@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TAX_RATE } from "@/consts/tax.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { createTaxReq } from "@/services/dashboard/tax/tax.service";
 import { useStore } from "@/store/store";
@@ -35,6 +36,7 @@ import z from "zod";
 type TaxForm = z.infer<typeof taxValidation>;
 
 export default function CreateTax() {
+  const { t } = useTranslation();
   const { lang } = useStore();
   const form = useForm<TaxForm>({
     resolver: zodResolver(taxValidation),
@@ -118,10 +120,10 @@ export default function CreateTax() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <TitleHeader title="Create Tax" subtitle="Create a new tax rule" />
+        <TitleHeader title={t("create_tax")} subtitle={t("create_a_new_tax_rule")} />
         <Card className="py-0">
           <CardContent className="space-y-6 bg-white shadow-xl p-6 rounded-xl">
-            <h1 className="text-3xl font-extrabold text-[#DC3173]">Tax Form</h1>
+            <h1 className="text-3xl font-extrabold text-[#DC3173]">{t("tax_form")}</h1>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleCreateTax)}
@@ -133,7 +135,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Name</FormLabel>
+                        <FormLabel>{t("tax_name")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -150,7 +152,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Name</FormLabel>
+                        <FormLabel>{t("tax_name")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -167,7 +169,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <FormItem>
-                        <FormLabel>Tax Code</FormLabel>
+                        <FormLabel>{t("tax_code")}</FormLabel>
                         <FormControl>
                           <Select
                             value={field.value}
@@ -205,7 +207,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Rate</FormLabel>
+                        <FormLabel>{t("tax_rate")}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -225,7 +227,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Country ID</FormLabel>
+                        <FormLabel>{t("country_id")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -242,7 +244,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem className="lg:col-span-2">
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{t("description")}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
@@ -259,7 +261,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem className="lg:col-span-2">
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{t("description")}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
@@ -276,7 +278,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Exemption Code</FormLabel>
+                        <FormLabel>{t("tax_exemption_code")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -293,7 +295,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Exemption Reason</FormLabel>
+                        <FormLabel>{t("tax_exemption_reason")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -310,7 +312,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Exemption Reason</FormLabel>
+                        <FormLabel>{t("tax_exemption_reason")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -328,7 +330,7 @@ export default function CreateTax() {
                   disabled={isSubmitting}
                   className="bg-[#DC3173] text-white py-2 px-4 rounded-lg w-full"
                 >
-                  Create Tax
+                  {t("create_tax")}
                 </button>
               </form>
             </Form>

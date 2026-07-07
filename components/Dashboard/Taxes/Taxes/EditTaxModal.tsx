@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TAX_RATE } from "@/consts/tax.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { updateTaxReq } from "@/services/dashboard/tax/tax.service";
 import { useStore } from "@/store/store";
@@ -49,6 +50,7 @@ interface IProps {
 type TaxForm = z.infer<typeof taxValidation>;
 
 export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
+  const { t } = useTranslation();
   const { lang } = useStore();
   const form = useForm<TaxForm>({
     resolver: zodResolver(taxValidation),
@@ -119,8 +121,8 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
       <form>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Tax</DialogTitle>
-            <DialogDescription>Make changes to your tax</DialogDescription>
+            <DialogTitle>{t("edit_tax")}</DialogTitle>
+            <DialogDescription>{t("make_changes_to_your_tax")}</DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
@@ -135,7 +137,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax Name</FormLabel>
+                      <FormLabel>{t("tax_name")}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -152,7 +154,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel>Tax Code</FormLabel>
+                      <FormLabel>{t("tax_code")}</FormLabel>
                       <FormControl>
                         <Select
                           value={field.value}
@@ -190,7 +192,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax Rate</FormLabel>
+                      <FormLabel>{t("tax_rate")}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -210,7 +212,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country ID</FormLabel>
+                      <FormLabel>{t("country_id")}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -227,7 +229,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="lg:col-span-2">
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>{t("description")}</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
@@ -244,7 +246,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax Exemption Code</FormLabel>
+                      <FormLabel>{t("tax_exemption_code")}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -261,7 +263,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tax Exemption Reason</FormLabel>
+                      <FormLabel>{t("tax_exemption_reason")}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -280,7 +282,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Cancel
+                {t("cancel")}
               </Button>
             </DialogClose>
             <Button
@@ -289,7 +291,7 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
               className="bg-[#DC3173] hover:bg-[#DC3173]/90"
               disabled={isSubmitting}
             >
-              Update
+              {t("update")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryInsights } from "@/types/analytics/delivery-insights.type";
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
@@ -9,6 +10,8 @@ interface IProps {
 }
 
 export default function AreaPerformance({ areaPerformance }: IProps) {
+  const {t} = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -16,10 +19,10 @@ export default function AreaPerformance({ areaPerformance }: IProps) {
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
     >
       <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <MapPin size={18} /> Area Performance
+        <MapPin size={18} /> {t("area_performance")}
       </h3>
 
-      <div className="max-h-[320px] overflow-y-auto space-y-3 pr-2">
+      <div className="max-h-80 overflow-y-auto space-y-3 pr-2">
         {areaPerformance.map((area) => (
           <div
             key={area.area}
@@ -28,12 +31,12 @@ export default function AreaPerformance({ areaPerformance }: IProps) {
             <div>
               <p className="font-medium text-gray-900">{area.area}</p>
               <p className="text-xs text-gray-500">
-                Late: {area.latePercentage}%
+                {t("late")}: {area.latePercentage}%
               </p>
             </div>
 
             <div className="text-right">
-              <p className="font-bold text-[#DC3173]">{area.averageTime} min</p>
+              <p className="font-bold text-[#DC3173]">{area.averageTime} {t("min")}</p>
             </div>
           </div>
         ))}

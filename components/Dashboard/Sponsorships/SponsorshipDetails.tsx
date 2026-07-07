@@ -2,6 +2,7 @@
 
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { motion } from "framer-motion";
@@ -47,6 +48,7 @@ const sponsorTypeConfig = {
 };
 
 export function SponsorshipDetails({ sponsorship }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [deleteId, setDeleteId] = useState("");
@@ -113,7 +115,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             variant="link"
             className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
           >
-            <ArrowLeftCircle /> Go Back
+            <ArrowLeftCircle /> {t("go_back")}
           </Button>
         </div>
         {/* Banner Hero */}
@@ -247,7 +249,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             className="bg-red-500 hover:bg-red-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors"
           >
             <TrashIcon className="w-4 h-4" />
-            Delete
+            {t("delete")}
           </motion.button>
         </motion.div>
 
@@ -270,7 +272,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-900 text-sm font-medium uppercase tracking-wider">
-                Status
+                {t("status")}
               </h3>
               {sponsorship.isActive ? (
                 <CheckCircleIcon className="w-5 h-5 text-[#DC3173]" />
@@ -283,10 +285,10 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             </p>
             <p className="text-slate-700 text-sm mt-1">
               {isLive
-                ? "Currently running"
+                ? t("currently_running")
                 : isExpired
-                  ? "Campaign ended"
-                  : "Scheduled to start"}
+                  ? t("campaign_ended")
+                  : t("scheduled_to_start")}
             </p>
           </motion.div>
 
@@ -307,17 +309,17 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-900 text-sm font-medium uppercase tracking-wider">
-                Duration
+                {t("duration")}
               </h3>
               <ClockIcon className="w-5 h-5 text-[#DC3173]" />
             </div>
-            <p className="text-2xl font-bold">{totalDays} Days</p>
+            <p className="text-2xl font-bold">{totalDays} {t("days")}</p>
             <p className="text-slate-700 text-sm mt-1">
               {isExpired
-                ? "Campaign completed"
+                ? t("campaign_completed")
                 : isUpcoming
-                  ? `Starts in ${Math.abs(daysElapsed)} days`
-                  : `${daysRemaining} days remaining`}
+                  ? `${t("starts_in")} ${Math.abs(daysElapsed)} ${t("days_sm")}`
+                  : `${daysRemaining} ${t("days_remaining")}`}
             </p>
           </motion.div>
 
@@ -338,12 +340,12 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-900 text-sm font-medium uppercase tracking-wider">
-                Type
+                {t("type")}
               </h3>
               <IconComponent className={`w-5 h-5 ${config.text}`} />
             </div>
             <p className="text-2xl font-bold">{sponsorship.sponsorType}</p>
-            <p className="text-slate-700 text-sm mt-1">Sponsorship category</p>
+            <p className="text-slate-700 text-sm mt-1">{t("sponsorship_category")}</p>
           </motion.div>
         </div>
 
@@ -364,7 +366,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
         >
           <h3 className="text-white font-semibold mb-8 flex items-center gap-2">
             <CalendarIcon className="w-5 h-5 text-[#DC3173]" />
-            Campaign Timeline
+            {t("campaign_timeline")}
           </h3>
 
           <div className="relative">
@@ -394,7 +396,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
               <div className="text-left">
                 <div className="w-4 h-4 rounded-full bg-[#DC3173] mb-3 shadow-lg shadow-[#DC3173]/50" />
                 <p className="text-slate-800 text-xs uppercase tracking-wider mb-1">
-                  Start
+                  {t("start")}
                 </p>
                 <p className="font-semibold">
                   {start.toLocaleDateString("en-US", {
@@ -418,9 +420,9 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
                     className="w-4 h-4 rounded-full bg-green-500 mb-3 mx-auto shadow-lg shadow-green-500/50"
                   />
                   <p className="text-slate-800 text-xs uppercase tracking-wider mb-1">
-                    Now
+                    {t("now")}
                   </p>
-                  <p className="text-green-400 font-semibold">Live</p>
+                  <p className="text-green-400 font-semibold">{t("live")}</p>
                 </div>
               )}
 
@@ -429,7 +431,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
                   className={`w-4 h-4 rounded-full mb-3 ml-auto ${isExpired ? "bg-slate-800" : "bg-slate-600"}`}
                 />
                 <p className="text-slate-800 text-xs uppercase tracking-wider mb-1">
-                  End
+                  {t("end")}
                 </p>
                 <p className="font-semibold">
                   {end.toLocaleDateString("en-US", {
@@ -457,7 +459,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           className="flex flex-wrap gap-6 text-sm text-slate-700"
         >
           <div>
-            <span className="text-slate-900">Created:</span>{" "}
+            <span className="text-slate-900">{t("created")}:</span>{" "}
             {new Date(sponsorship.createdAt).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
@@ -465,7 +467,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             })}
           </div>
           <div>
-            <span className="text-slate-900">Last Updated:</span>{" "}
+            <span className="text-slate-900">{t("last_updated")}:</span>{" "}
             {new Date(sponsorship.updatedAt).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",

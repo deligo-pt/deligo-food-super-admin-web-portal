@@ -16,8 +16,8 @@ export default async function VendorPayoutsPage({ searchParams }: IProps) {
   return (
     <Payouts
       payoutsResult={vendorPayoutsResult}
-      title="Vendor Payouts"
-      subtitle=" Manage all vendor payouts here"
+      title="vendor_payouts"
+      subtitle="manage_all_vendor_payouts_here"
       userRole={USER_ROLE.VENDOR}
     />
   );

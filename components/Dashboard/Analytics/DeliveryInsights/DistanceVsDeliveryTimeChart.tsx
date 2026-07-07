@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryInsights } from "@/types/analytics/delivery-insights.type";
 import { motion } from "framer-motion";
 import {
@@ -20,6 +21,8 @@ interface IProps {
 export default function DistanceVsDeliveryTimeChart({
   distanceTimeAnalysis,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -28,10 +31,10 @@ export default function DistanceVsDeliveryTimeChart({
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
     >
       <h3 className="text-lg font-bold text-gray-900 mb-2">
-        Distance vs Delivery Time
+        {t("distance_vs_delivery_time")}
       </h3>
       <p className="text-sm text-gray-500 mb-6">
-        Relationship between distance and time
+        {t("relationship_between_distance_time")}
       </p>
 
       {/* <AnalyticsChart

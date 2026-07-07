@@ -4,6 +4,7 @@ import DeliveryPartnerWalletTable from "@/components/Dashboard/Wallets/DeliveryP
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TDeliveryPartnerWallet } from "@/types/wallet.type";
 import { motion } from "framer-motion";
@@ -18,12 +19,14 @@ const sortOptions = [
 ];
 
 export default function DeliveryPartnerWallets({ walletsResult }: IProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-full">
+    <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title="Delivery Partner Wallets"
-        subtitle="Manage all the delivery partner wallets"
+        title={t("delivery_partner_wallets")}
+        subtitle={t("manage_all_the_delivery_partner_wallets")}
       />
 
       {/* Filters */}

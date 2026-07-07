@@ -42,25 +42,25 @@ export default function PermissionsTable({ permissions = [], onOpenEditModal }: 
                         <TableHead className="h-11">
                             <div className="text-[#DC3173] flex gap-2 items-center font-bold text-xs uppercase tracking-wider">
                                 <FileText className="w-3.5 h-3.5" />
-                                Permission Name
+                                {t("permission_name")}
                             </div>
                         </TableHead>
                         <TableHead className="h-11">
                             <div className="text-[#DC3173] flex gap-2 items-center font-bold text-xs uppercase tracking-wider">
                                 <Shield className="w-3.5 h-3.5" />
-                                System Action Key
+                                {t("system_action_key")}
                             </div>
                         </TableHead>
                         <TableHead className="h-11">
                             <div className="text-[#DC3173] flex gap-2 items-center font-bold text-xs uppercase tracking-wider">
                                 <ShieldAlert className="w-3.5 h-3.5" />
-                                Status
+                                {t("status")}
                             </div>
                         </TableHead>
                         <TableHead className="text-right h-11">
                             <div className="text-[#DC3173] flex gap-2 items-center justify-end font-bold text-xs uppercase tracking-wider">
                                 <Cog className="w-3.5 h-3.5" />
-                                Actions
+                                {t("actions")}
                             </div>
                         </TableHead>
                     </TableRow>
@@ -83,7 +83,7 @@ export default function PermissionsTable({ permissions = [], onOpenEditModal }: 
                                 className="hover:bg-gray-50/50 border-b border-gray-100 transition-colors"
                             >
                                 {/* NAME */}
-                                <TableCell className="font-bold text-sm text-gray-900 max-w-[240px] truncate">
+                                <TableCell className="font-bold text-sm text-gray-900 max-w-60 truncate">
                                     {permission.name}
                                 </TableCell>
 

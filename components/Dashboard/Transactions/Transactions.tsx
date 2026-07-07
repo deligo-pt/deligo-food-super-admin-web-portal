@@ -21,11 +21,11 @@ export default function Transactions({ transactionsResult }: IProps) {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-full">
+    <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
         title={t("transaction_history")}
-        subtitle="Full breakdown of earnings, payouts, and fees"
+        subtitle={t("full_breakdown_earnings_payouts_fees")}
       />
 
       {/* Filters */}

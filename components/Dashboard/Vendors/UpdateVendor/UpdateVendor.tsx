@@ -274,8 +274,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
   return (
     <>
       <TitleHeader
-        title="Edit Vendor Details"
-        subtitle="Update vendor details and information"
+        title={t("edit_vendor_details")}
+        subtitle={t("update_vendor_details_information")}
         onBackClick={() => router.back()}
       />
 

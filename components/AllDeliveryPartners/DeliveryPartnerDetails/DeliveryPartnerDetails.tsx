@@ -194,7 +194,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         </div>
       </motion.div>
       <div className="bg-gray-50 p-6 rounded-b-lg">
-        <Section title="Personal Details" icon={<User />} defaultOpen={true}>
+        <Section title={t("personal_details")} icon={<User />} defaultOpen={true}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>
               <InfoRow label={t("full_name")} value={fullName} />
@@ -425,7 +425,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
 
             <div>
               <div className="mb-2 text-gray-500 text-sm">
-                Driving License Front
+                {t("driving_license_front")}
               </div>
               {partner.documents?.drivingLicenseFront ? (
                 <ImagePreview
@@ -439,7 +439,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
 
             <div>
               <div className="mb-2 text-gray-500 text-sm">
-                Driving License Back
+                {t("driving_license_back")}
               </div>
               {partner.documents?.drivingLicenseBack ? (
                 <ImagePreview
@@ -480,7 +480,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             </div>
 
             <div>
-              <div className="mb-2 text-gray-500 text-sm">Activity</div>
+              <div className="mb-2 text-gray-500 text-sm">{t('activity')}</div>
               {partner.documents?.activity ? (
                 <ImagePreview url={partner.documents.activity} alt="Activity" />
               ) : (
@@ -489,7 +489,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             </div>
 
             <div>
-              <div className="mb-2 text-gray-500 text-sm">Insurance Policy</div>
+              <div className="mb-2 text-gray-500 text-sm">{t("insurance_policy")}</div>
               {partner.documents?.insurancePolicy ? (
                 <ImagePreview
                   url={partner.documents.insurancePolicy}
@@ -501,7 +501,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             </div>
 
             <div>
-              <div className="mb-2 text-gray-500 text-sm">My Photo</div>
+              <div className="mb-2 text-gray-500 text-sm">{t("my_photo")}</div>
               {partner.documents?.myPhoto ? (
                 <ImagePreview url={partner.documents.myPhoto} alt="My Photo" />
               ) : (

@@ -4,6 +4,7 @@ import OrderItemsTable from "@/components/Dashboard/Orders/OrderDetails/OrderIte
 import OrderPricingSummary from "@/components/Dashboard/Orders/OrderDetails/OrderPricingSummary";
 import { Badge } from "@/components/ui/badge";
 import { ORDER_STATUS } from "@/consts/order.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
@@ -24,6 +25,7 @@ interface IProps {
 }
 
 export default function OrderDetails({ order }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const containerVariants = {
@@ -91,7 +93,7 @@ export default function OrderDetails({ order }: IProps) {
                 <h1 className="text-2xl font-bold">Order #{order.orderId}</h1>
                 {order.flash && (
                   <span className="px-2 py-0.5 bg-yellow-400 text-yellow-900 text-xs font-bold rounded uppercase">
-                    Flash
+                    {t("flash")}
                   </span>
                 )}
               </div>
@@ -131,7 +133,7 @@ export default function OrderDetails({ order }: IProps) {
                 <div className="flex items-center gap-2 mb-4 text-[#DC3173]">
                   <StoreIcon className="w-5 h-5" />
                   <h3 className="font-semibold text-gray-900">
-                    Pickup Location
+                    {t("pickup_location")}
                   </h3>
                 </div>
                 <div className="space-y-3">
@@ -148,7 +150,7 @@ export default function OrderDetails({ order }: IProps) {
                     </span>
                   </div>
                   <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
-                    Vendor Contact: {order.vendorId.contactNumber}
+                    {t("vendor_contact")}: {order.vendorId.contactNumber}
                   </div>
                 </div>
               </motion.div>
@@ -161,7 +163,7 @@ export default function OrderDetails({ order }: IProps) {
                 <div className="flex items-center gap-2 mb-4 text-[#DC3173]">
                   <MapPinIcon className="w-5 h-5" />
                   <h3 className="font-semibold text-gray-900">
-                    Delivery Address
+                    {t("delivery_address")}
                   </h3>
                 </div>
                 <div className="space-y-3">
@@ -179,7 +181,7 @@ export default function OrderDetails({ order }: IProps) {
                     </span>
                   </div>
                   <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
-                    Customer Contact: {order.customerId.contactNumber}
+                    {t("customer_contact")}: {order.customerId.contactNumber}
                   </div>
                 </div>
               </motion.div>
@@ -201,7 +203,7 @@ export default function OrderDetails({ order }: IProps) {
               <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
                 <UserIcon className="w-4 h-4 text-[#DC3173]" />
                 <h3 className="font-semibold text-gray-900 text-sm">
-                  Customer Details
+                  {t("customer_details")}
                 </h3>
               </div>
               <div className="p-4 flex items-center gap-4">
@@ -239,7 +241,7 @@ export default function OrderDetails({ order }: IProps) {
                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
                   <BikeIcon className="w-4 h-4 text-[#DC3173]" />
                   <h3 className="font-semibold text-gray-900 text-sm">
-                    Delivery Partner
+                    {t("delivery_partner")}
                   </h3>
                 </div>
                 <div className="p-4 flex items-center gap-4">

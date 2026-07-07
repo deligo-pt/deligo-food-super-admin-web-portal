@@ -1,6 +1,7 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { IAgreement } from "@/types/agreement.type";
 import {
     Calendar,
@@ -15,6 +16,7 @@ interface IProps {
 }
 
 export default function AgreementDetails({ agreement }: IProps) {
+    const { t } = useTranslation();
     const router = useRouter();
     const targetingPdfUrl = agreement.signedPdfPath || agreement.draftPdfPath;
 
@@ -37,7 +39,7 @@ export default function AgreementDetails({ agreement }: IProps) {
             {/* 1. TitleHeader Integration with Action Buttons */}
             <TitleHeader
                 title={agreement.establishmentName || "N/A"}
-                subtitle="Comprehensive breakdown and original documentation reference"
+                subtitle={t("comprehensive_breakdown_original")}
                 onBackClick={() => router.push("/admin/vendor-agreements")}
                 extraComponent={
                     targetingPdfUrl && (
@@ -48,7 +50,7 @@ export default function AgreementDetails({ agreement }: IProps) {
                             className="bg-white text-[#DC3173] hover:bg-slate-50 px-4 py-2.5 rounded-lg font-medium text-sm flex items-center gap-2 shadow-sm transition-all border border-slate-100"
                         >
                             <ExternalLinkIcon className="h-4 w-4" />
-                            Open Original PDF
+                            {t("open_original_pdf")}
                         </a>
                     )
                 }
@@ -60,12 +62,12 @@ export default function AgreementDetails({ agreement }: IProps) {
                 <div className="bg-white shadow-xs border border-slate-100/80 rounded-2xl p-6 flex items-center justify-between">
                     <div className="space-y-1">
                         <p className="text-sm font-semibold text-slate-800 tracking-tight">
-                            Tax Registration
+                            {t("tax_registration")}
                         </p>
                         <p className="text-xl font-bold text-slate-900">
                             {agreement.nif || "N/A"}
                         </p>
-                        <p className="text-xs text-slate-400 font-medium">Official NIF Reference</p>
+                        <p className="text-xs text-slate-400 font-medium">{t("official_nif_reference")}</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 shrink-0">
                         <ShieldCheck className="w-6 h-6" />
@@ -76,7 +78,7 @@ export default function AgreementDetails({ agreement }: IProps) {
                 <div className="bg-white shadow-xs border border-slate-100/80 rounded-2xl p-6 flex items-center justify-between">
                     <div className="space-y-1">
                         <p className="text-sm font-semibold text-slate-800 tracking-tight">
-                            Document Status
+                            {t("document_status")}
                         </p>
                         <p className={`text-xl capitalize ${statusMeta.text}`}>
                             {agreement.status}
@@ -92,7 +94,7 @@ export default function AgreementDetails({ agreement }: IProps) {
                 <div className="bg-white shadow-xs border border-slate-100/80 rounded-2xl p-6 flex items-center justify-between">
                     <div className="space-y-1">
                         <p className="text-sm font-semibold text-slate-800 tracking-tight">
-                            Last Update
+                            {t("last_update")}
                         </p>
                         <p className="text-xl font-bold text-slate-900">
                             {agreement.updatedAt
@@ -103,7 +105,7 @@ export default function AgreementDetails({ agreement }: IProps) {
                                 })
                                 : "N/A"}
                         </p>
-                        <p className="text-xs text-slate-400 font-medium">System Timestamp</p>
+                        <p className="text-xs text-slate-400 font-medium">{t("system_timestamp")}</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
                         <Calendar className="w-6 h-6" />
@@ -118,15 +120,15 @@ export default function AgreementDetails({ agreement }: IProps) {
                         <iframe
                             src={`${targetingPdfUrl}#toolbar=1&navpanes=0`}
                             className="w-full h-full border-none"
-                            title={`Document space viewer for ${agreement.establishmentName}`}
+                            title={`${t("document_space_viewer_for")} ${agreement.establishmentName}`}
                             allow="autoplay"
                         />
                     ) : (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-4">
                             <FileCheck className="w-12 h-12 text-slate-600 mb-2" />
-                            <p className="font-medium">No printable target path URL found</p>
+                            <p className="font-medium">{t("no_printable_target_path_found")}</p>
                             <p className="text-xs text-slate-500 mt-1">
-                                Verify asset cloud uploads match object configurations
+                                {t("verify_asset_cloud_uploads")}
                             </p>
                         </div>
                     )}

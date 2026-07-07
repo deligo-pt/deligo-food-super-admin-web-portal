@@ -15,8 +15,8 @@ export default async function ActiveVendorsPage({ searchParams }: IProps) {
   return (
     <Vendors
       vendorsResult={vendorsResult}
-      title="Active Vendors"
-      subtitle="All approved vendors in the system"
+      title="active_vendors"
+      subtitle="manage_live_vendors_deligo_portugal"
     />
   );
 }

@@ -3,10 +3,12 @@
 import EditOfferModal from "@/components/Dashboard/Offers/ActiveCampaigns/EditOfferModal";
 import OfferStatusUpdateModal from "@/components/Dashboard/Offers/ActiveCampaigns/OfferStatusUpdateModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteOfferReq,
   updateOfferReq,
 } from "@/services/dashboard/offer/offer.service";
+import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
 import { motion } from "framer-motion";
 import {
@@ -62,6 +64,8 @@ const offerTypeConfig = {
 
 export default function OfferDetails({ offer }: IProps) {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { lang } = useStore();
 
   const [copied, setCopied] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -233,7 +237,7 @@ export default function OfferDetails({ offer }: IProps) {
                     }}
                     className="text-3xl md:text-4xl font-bold text-white"
                   >
-                    {offer.title}
+                    {offer.title?.[lang]}
                   </motion.h1>
                 </div>
               </div>
@@ -266,7 +270,7 @@ export default function OfferDetails({ offer }: IProps) {
                 {offer.isAutoApply && (
                   <span className="flex items-center gap-1 text-white/90 text-sm">
                     <ZapIcon className="w-4 h-4" />
-                    Auto-Applied
+                    {t("auto_applied")}
                   </span>
                 )}
               </motion.div>
@@ -285,7 +289,7 @@ export default function OfferDetails({ offer }: IProps) {
                 }}
                 className="mt-6 text-white/90 text-lg max-w-2xl"
               >
-                {offer.description}
+                {offer.description?.[lang]}
               </motion.p>
             )}
           </div>
@@ -315,7 +319,7 @@ export default function OfferDetails({ offer }: IProps) {
             className="bg-indigo-500 hover:bg-indigo-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
           >
             <EditIcon className="w-4 h-4" />
-            Edit
+            {t("edit")}
           </motion.button>
           {offer.isActive && (
             <motion.button
@@ -329,7 +333,7 @@ export default function OfferDetails({ offer }: IProps) {
               className="bg-yellow-500 hover:bg-yellow-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
             >
               <BanIcon className="w-4 h-4" />
-              Deactive
+              {t("deactivate")}
             </motion.button>
           )}
           {!offer.isActive && (
@@ -344,7 +348,7 @@ export default function OfferDetails({ offer }: IProps) {
               className="bg-[#DC3173] hover:bg-[#DC3173]/-90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
             >
               <ShieldIcon className="w-4 h-4" />
-              Activate
+              {t("activate")}
             </motion.button>
           )}
           <motion.button
@@ -358,7 +362,7 @@ export default function OfferDetails({ offer }: IProps) {
             className="bg-red-500 hover:bg-red-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
           >
             <TrashIcon className="w-4 h-4" />
-            Delete Offer
+            {t("delete_offer")}
           </motion.button>
         </motion.div>
 
@@ -380,7 +384,7 @@ export default function OfferDetails({ offer }: IProps) {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-500 mb-1">Promo Code</p>
+                <p className="text-sm text-slate-500 mb-1">{t("promo_code")}</p>
                 <p className="text-2xl font-mono font-bold text-slate-800 tracking-widest">
                   {offer.code}
                 </p>
@@ -410,24 +414,24 @@ export default function OfferDetails({ offer }: IProps) {
           {[
             {
               icon: ShoppingBagIcon,
-              label: "Min Order",
+              label: t("min_order"),
               value: offer.minOrderAmount ? `€${offer.minOrderAmount}` : 0,
             },
             {
               icon: TargetIcon,
-              label: "Max Discount",
+              label: t("max_discount"),
               value: offer.maxDiscountAmount
                 ? `€${offer.maxDiscountAmount}`
                 : 0,
             },
             {
               icon: UsersIcon,
-              label: "Limit/User",
+              label: t("limit_user"),
               value: offer.userUsageLimit || "Unlimited",
             },
             {
               icon: TrendingUpIcon,
-              label: "Total Uses",
+              label: t("total_uses"),
               value: `${offer.usageCount || 0}${offer.maxUsageCount ? `/${offer.maxUsageCount}` : ""}`,
             },
           ].map((stat, index) => (
@@ -472,9 +476,9 @@ export default function OfferDetails({ offer }: IProps) {
             className="bg-white rounded-2xl p-6 shadow-lg mb-6 border border-slate-100"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-slate-800">Usage Progress</h3>
+              <h3 className="font-semibold text-slate-800">{t("usage_progress")}</h3>
               <span className="text-sm text-slate-500">
-                {offer.usageCount || 0} of {offer.maxUsageCount} used
+                {offer.usageCount || 0} {t("of")} {offer.maxUsageCount} {t("used")}
               </span>
             </div>
             <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
@@ -512,13 +516,13 @@ export default function OfferDetails({ offer }: IProps) {
         >
           <h3 className="font-semibold text-slate-800 mb-6 flex items-center gap-2">
             <CalendarIcon className="w-5 h-5 text-[#DC3173]" />
-            Validity Period
+            {t("validity_period")}
           </h3>
 
           <div className="relative">
             <div className="flex justify-between text-sm mb-3">
               <div>
-                <p className="text-slate-500">Start Date</p>
+                <p className="text-slate-500">{t("start_date")}</p>
                 <p className="font-semibold text-slate-800">
                   {start.toLocaleDateString("en-US", {
                     month: "short",
@@ -528,7 +532,7 @@ export default function OfferDetails({ offer }: IProps) {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-slate-500">End Date</p>
+                <p className="text-slate-500">{t("end_date")}</p>
                 <p className="font-semibold text-slate-800">
                   {end.toLocaleDateString("en-US", {
                     month: "short",
@@ -559,7 +563,7 @@ export default function OfferDetails({ offer }: IProps) {
               <ClockIcon className="w-4 h-4 text-slate-400 mr-2" />
               <span className="text-sm text-slate-500">
                 {isExpired
-                  ? "This offer has expired"
+                  ? t("this_offer_has_expired")
                   : isUpcoming
                     ? `Starts in ${Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))} days`
                     : `${Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))} days remaining`}
@@ -586,25 +590,25 @@ export default function OfferDetails({ offer }: IProps) {
           >
             <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
               <GiftIcon className="w-5 h-5 text-purple-600" />
-              BOGO Details
+              {t("bogo_details")}
             </h3>
             <div className="flex items-center gap-4">
               <div className="bg-white rounded-xl p-4 flex-1 text-center shadow-sm">
                 <p className="text-3xl font-bold text-purple-600">
                   {offer.bogo.buyQty}
                 </p>
-                <p className="text-sm text-slate-500">Buy</p>
+                <p className="text-sm text-slate-500">{t("buy")}</p>
               </div>
               <SparklesIcon className="w-6 h-6 text-purple-400" />
               <div className="bg-white rounded-xl p-4 flex-1 text-center shadow-sm">
                 <p className="text-3xl font-bold text-pink-600">
                   {offer.bogo.getQty}
                 </p>
-                <p className="text-sm text-slate-500">Get Free</p>
+                <p className="text-sm text-slate-500">{t("get_free")}</p>
               </div>
             </div>
             <p className="text-sm text-slate-500 mt-4 text-center">
-              Item ID: <span className="font-mono">{offer.bogo.productId}</span>
+              {t("item_id")}: <span className="font-mono">{offer.bogo.productId}</span>
             </p>
           </motion.div>
         )}
@@ -624,7 +628,7 @@ export default function OfferDetails({ offer }: IProps) {
         onConfirm={handleUpdateStatus}
         statusInfo={{
           offerId: offer._id,
-          offerName: offer.title,
+          offerName: offer.title?.[lang] as string,
           status: !offer.isActive,
         }}
         buttonDisabled={buttonDisabled}

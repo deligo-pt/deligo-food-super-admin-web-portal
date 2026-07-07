@@ -9,6 +9,7 @@ import {
   SelectDateRangeFilter,
 } from "@/components/Filtering/SelectDateRangeFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { IDeliveryPartnerReportAnalytics } from "@/types/report.type";
 import { generateDeliveryPartnerReportCSV } from "@/utils/csv/deliveryPartnerReportCSV ";
 import { formatPrice } from "@/utils/formatPrice";
@@ -25,6 +26,7 @@ interface IProps {
 export default function DeliveryPartnerReport({
   deliveryPartnerReportAnalytics,
 }: IProps) {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const currentTimeframe = searchParams.get("timeframe") || "";
   const [isCustomDate, setIsCustomDate] = useState(
@@ -36,13 +38,13 @@ export default function DeliveryPartnerReport({
       <div className="print:pt-4">
         {/* Header */}
         <TitleHeader
-          title="Delivery Partner Report"
-          subtitle="Overview of all delivery partners and their performance"
+          title={t("delivery_partner_report")}
+          subtitle={t("overview_of_all_delivery_partners_performance")}
           extraComponent={
             <div className="flex items-center gap-3">
               {/* Date Filter */}
               <SelectDateRangeFilter
-                placeholder="Select Date Range"
+                placeholder={t("select_date_range")}
                 onCustomRangeSelect={() => setIsCustomDate(true)}
               />
 
@@ -70,24 +72,24 @@ export default function DeliveryPartnerReport({
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
-            title="Total Partners"
+            title={t("total_partners")}
             value={deliveryPartnerReportAnalytics.stats?.totalPartners || 0}
             icon={Bike}
           />
           <StatsCard
-            title="Active Partners"
+            title={t("active_partners")}
             value={deliveryPartnerReportAnalytics.stats?.approvedPartners || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
-            title="Total Deliveries"
+            title={t("total_deliveries")}
             value={deliveryPartnerReportAnalytics.stats?.totalDeliveries || 0}
             icon={Package}
             delay={0.2}
           />
           <StatsCard
-            title="Total Earnings"
+            title={t("total_earnings")}
             value={`€${formatPrice(deliveryPartnerReportAnalytics.stats?.totalEarnings || 0)}`}
             icon={EuroIcon}
             delay={0.3}
@@ -97,11 +99,11 @@ export default function DeliveryPartnerReport({
         {/* Charts */}
         <CustomizedCharts
           type="area"
-          title="Partner Growth"
-          description="New partner registrations over time"
+          title={t("partner_growth")}
+          description={t("new_partner_registration_over_time")}
           data={deliveryPartnerReportAnalytics?.partnerGrowths || []}
-          xLabel="Time"
-          yLabel="No of Partners"
+          xLabel={t("time")}
+          yLabel={t("no_of_partners")}
           xKey="time"
           yKey="managers"
           delay={0.2}
@@ -123,7 +125,7 @@ export default function DeliveryPartnerReport({
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4">
-            Vehicle Distribution
+            {t("vehicle_distribution")}
           </h3>
           <div className="space-y-3">
             <StatusDistributionCard
@@ -138,7 +140,7 @@ export default function DeliveryPartnerReport({
               name="E-Bike"
               value={
                 deliveryPartnerReportAnalytics?.vehicleDistribution?.[
-                  "E-BIKE"
+                "E-BIKE"
                 ] || 0
               }
               color="#f59e0b"

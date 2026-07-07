@@ -25,29 +25,29 @@ export default function FleetZones({ zonesData }: IProps) {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
         title={t("fleet_zones")}
-        subtitle="Manage zones of fleet managers"
+        subtitle={t("manage_zones_fleet_managers")}
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <StatsCard
-          title="Total Zones"
+          title={t("total_zones")}
           value={zonesData.data?.length}
           icon={MapPin}
           delay={0}
         />
         <StatsCard
-          title="Operational Zones"
+          title={t("operational_zones")}
           value={operationalZones}
           icon={CircleCheckBig}
           delay={0.1}
         />
         <StatsCard
-          title="Not Operational Zones"
+          title={t("not_operational_zones")}
           value={notOperationalZones}
           icon={CircleOff}
           delay={0.2}
@@ -68,7 +68,7 @@ export default function FleetZones({ zonesData }: IProps) {
         ))}
       </div>
       {zonesData.data?.length === 0 && (
-        <div className="text-center text-gray-500">No zones found</div>
+        <div className="text-center text-gray-500">{t("no_zones_found")}</div>
       )}
     </div>
   );

@@ -125,7 +125,7 @@ const CreateCuisine = () => {
                         delay: 0.3,
                     }}
                 >
-                    Create different types of cuisine
+                    {t("create_different_types_cuisine")}
                 </motion.p>
             </div>
             <Form {...form}>
@@ -143,7 +143,7 @@ const CreateCuisine = () => {
                     }}
                 >
                     <div className="space-y-4">
-                        
+
                         {lang === "en" && <FormField
                             control={form.control}
                             name="name.en"
@@ -152,7 +152,7 @@ const CreateCuisine = () => {
                                     <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                                         <div className="flex items-center">
                                             <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                            <span className="ml-2">Cusiine name english</span>
+                                            <span className="ml-2">{t("cuisine_name")}</span>
                                         </div>
                                     </FormLabel>
                                     <FormControl>

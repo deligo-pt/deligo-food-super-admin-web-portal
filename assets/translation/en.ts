@@ -30,17 +30,24 @@ export const en = {
 
   // sidebar
   dashboard: "Dashboard",
+
   vendors: "Vendors",
   all_vendors: "All vendors",
   pending_approvals: "Pending Approvals",
   active_vendors: "Active Vendors",
   suspended_vendors: "Suspended Vendors",
-  add_new_vendor: "Add New Vendor",
+  add_vendor: "Add Vendor",
   vendor_payouts: "Vendor Payouts",
+  vendor_performance_analytics: "Vendor Performance Analytics",
+  vendor_agreements: "Vendor Agreements",
+  vendor_wallets: "Vendor Wallets",
+  vendor_zones: "Vendor Zones",
 
+  add_fleet_manager: "Add Fleet Manager",
   fleet_managers: "Fleet Managers",
   all_fleet_managers: "All Fleet Managers",
   add_new_fleet_manager: "Add New Fleet Manager",
+  fleet_manager_payouts: "Fleet Manager Payouts",
   fleet_manager_wallet: "Fleet Manager Wallet",
   payout_requests: "Payout Requests",
   zones_and_coverage_areas: "Zones & Coverage Areas",
@@ -53,17 +60,21 @@ export const en = {
   all_customers: "All Customers",
   active_customers: "Active Customers",
   blocked_customers: "Blocked Customers",
+  customer_spends: "Customer Spends",
   customer_feedback: "Customer Feedback",
 
+  add_delivery_partner: "Add Delivery Partner",
   delivery_partners: "Delivery Partners",
   all_delivery_partners: "All Delivery Partners",
   delivery_partner_onboarding_requests: "Delivery Partner Onboarding Requests",
   active_delivery_partners: "Active Delivery Partners",
   suspended_delivery_partners: "Suspended Delivery Partners",
   delivery_partner_performance: "Delivery Partner Performance",
+  delivery_partner_wallets: "Delivery Partner Wallets",
   delivery_partner_payouts: "Delivery Partner Payouts",
   delivery_partner_analytics: "Delivery Partner Analytics",
 
+  cuisine: "Cuisine",
   create_cuisine: "Create Cuisine",
   all_cuisines: "All Cuisines",
   business_categories: "Business Categories",
@@ -81,10 +92,14 @@ export const en = {
   delivered_orders: "Delivered Orders",
   cancelled_orders: "Cancelled Orders",
   refund_requests: "Refund Requests",
+
   payments_and_earnings: "Payments & Earnings",
   platform_earnings: "Platform Earnings",
   driver_payouts: "Driver Payouts",
   transaction_history: "Transaction History",
+  all_taxes: "All Taxes",
+  create_tax: "Create Tax",
+  loyalty_points: "Loyalty Points",
   payment_disputes: "Payment Disputes",
   tax_management: "Tax Management",
 
@@ -92,10 +107,19 @@ export const en = {
   all_items: "All Items",
   out_of_stock_alerts: "Out-of-Stock Alerts",
   restricted_items: "Restricted Items",
+  all_ingredients: "All Ingredients",
+  add_ingredient: "Add Ingredient",
+  ingredient_orders: "Ingredient Orders",
+
   promotions_and_coupons: "Promotions & Coupons",
   active_campaigns: "Active Campaigns",
   create_new_offer: "Create New Offer",
+  all_offers: "All Offers",
+  expired_offers: "Expired Offers",
   coupon_analytics: "Coupon Analytics",
+  sponsorships: "Sponsorships",
+  add_sponsorship: "Add Sponsorship",
+
   analytics_and_insights: "Analytics & Insights",
   sales_analytics: "Sales Analytics",
   delivery_insights: "Delivery Insights",
@@ -116,18 +140,27 @@ export const en = {
   chat_with_fleet_managers: "Chat With Fleet Managers",
   chat_with_drivers: "Chat With Drivers",
   chat_with_customers: "Chat With Customers",
+
   reports: "Reports",
+  customer_report: "Customer Report",
+  delivery_partner_report: "Delivery Partner Report",
+  fleet_manager_report: "Fleet Manager Report",
   sales_report: "Sales Report",
   order_report: "Order Report",
   driver_performance_report: "Driver Performance Report",
   vendor_report: "Vendor Report",
+
   settings: "Settings",
+  rewards_settings: "Rewards Settings",
+  payouts_settings: "Payouts Settings",
   business_info: "Business Info",
   branding_and_theme: "Branding & Theme",
   localization: "Localization (Language & Currency)",
   notification_preferences: "Notification Preferences",
   legal_documents: "Legal Documents (Terms, Privacy)",
   global_settings: "Global Settings",
+
+  all_sos: "All SOS",
   sos_emergency: "SOS / Emergency",
   critical_alerts: "Critical Alerts",
   contact_support_team: "Contact Support Team",
@@ -205,8 +238,12 @@ export const en = {
   no_top_rated_items_found: "No top rated items found",
   orders: "orders",
 
+  // add-vendor
+  add_new_vendor: "Add New Vendor",
+  add_new_vendor_here: "Add a new Vendor here",
+
   // all-vendors
-  manage_all_vendors: "Manage your all vendors",
+  manage_all_registered_vendors: "Manage all registered vendors",
   name: "Name",
   phone: "Phone",
   actions: "Actions",
@@ -221,6 +258,29 @@ export const en = {
   of: "of",
   page_sm: "page",
 
+  // vendor-details
+  restaurant_cuisine_type: "Restaurant Cuisine Type",
+  street_address: "Street Address",
+  postal_code: "Postal Code",
+  business_location: "Business Location",
+  no_business_location_provided: "No business location provided",
+  no_bank_details_provided: "No bank details provided",
+  registered_on: "Registered On",
+  submitted_on: "Submitted On",
+  last_logged_on: "Last logged On",
+  created_offers: "Created Offers",
+  bogo_offer: "BOGO Offer",
+  percentage_offer: "Percentage Offer",
+  flat_offer: "Flat Offer",
+  no_offers_created: "No offers created yet",
+  view_all: "View All",
+  edit_vendor_details: "Edit Vendor Details",
+  update_vendor_details_information: "Update vendor details and information",
+
+
+  // approve or reject modal
+  are_you_sure_want_approve: "Are you sure you want to approve?",
+
   // pending approvals
   pending_vendor_approvals: "Pending Vendor Approvals",
   review_newly_registered_vendors:
@@ -228,7 +288,6 @@ export const en = {
   vendor: "Vendor",
   owner: "Owner",
   city: "City",
-  cuisine: "Cuisine",
   no_pending_vendors_found: "No pending vendors found.",
 
   // active vendors
@@ -297,6 +356,7 @@ export const en = {
   submit_vendor: "Submit Vendor",
 
   // vendor-payouts
+  manage_all_vendor_payouts_here: "Manage all vendor payouts here",
   search_vendor_city_payout:
     "Search by vendor, city, payout method, status or id...",
   search: "Search",
@@ -309,16 +369,108 @@ export const en = {
   no_payouts_found: "No payouts found.",
   payout_details: "Payout Details",
   account_holder: "Account Holder",
-  close: "",
+  close: "Close",
+  payment_date: "Payment Date",
+  settle_payout: "Settle Payout",
+  //--> details
+  back_to_payouts: "Back to Payouts",
+  view_the_details_of_a_payout: "View the details of a payout",
+  payout_amount: "Payout Amount",
+  account_number: "Account Number",
+  bank_reference_id: "Bank Reference ID",
+  payout_proof: "Payout Proof",
+  open_full_size: "Open Full Size",
+  timestamps: "Timestamps",
+  license_no: "License No.",
+  vehicle: "Vehicle",
+  payout_status: "Payout Status",
+
+  // vendor performance
+  comprehensive_insights_into_restaurant_performance_and_trends: "Comprehensive insights into restaurant performance and trends",
+  most_orders: "Most Orders",
+  orders_this_month: "orders this month",
+  highest_revenue: "Highest Revenue",
+  orders_performance: "Orders Performance",
+  monthly_performance_over: "Monthly performance over the last 12 months",
+  month: "Month",
+  no_of_orders: "No of Orders",
+  top_performers: "Top Performers",
+  view_vendor_performance_analytics: "View vendor performance analytics",
+  orders_capital: "Orders",
+  // --> details
+  fry_express_performance: "Fry Express Performance",
+  vendor_performance_details: "Vendor Performance Details",
+  avg_rating: "Avg Rating",
+  total_products: "Total Products",
+  orders_revenue_trend: "Orders & Revenue Trend",
+  daily_performance_over_the_past_week: "Daily performance over the past week",
+
+  // vendor agreements
+  manage_and_view_all_vendor_agreements: "Manage and view all vendor agreements",
+  establishment: "Establishment",
+  no_agreements_found: "No agreements found",
+  //--> details
+  comprehensive_breakdown_original: "Comprehensive breakdown and original documentation reference",
+  open_original_pdf: "Open Original PDF",
+  tax_registration: " Tax Registration",
+  official_nif_reference: "Official NIF Reference",
+  document_status: "Document Status",
+  last_update: "Last Update",
+  system_timestamp: "System Timestamp",
+  document_space_viewer_for: "Document space viewer for",
+  no_printable_target_path_found: "No printable target path URL found",
+  verify_asset_cloud_uploads: "Verify asset cloud uploads match object configurations",
+
+  // vendor-wallets
+  manage_all_the_vendor_wallets: "Manage all the vendor wallets",
+  wallet_id: "Wallet ID",
+  last_settlement: "Last Settlement",
+  no_wallets_found: "No wallets found",
+  //---> details
+  back_to_wallets: "Back to Wallets",
+  wallet_details: "Wallet Details",
+  view_the_details_of_wallet: "View the details of a wallet",
+  active_wallet: "Active Wallet",
+  lifetime_revenue: "Lifetime Revenue",
+  unpaid_earnings: "Unpaid Earnings",
+  rider_payable: "Rider Payable",
+  fleet_earnings: "Fleet Earnings",
+  earnings_amount: "Earnings Amount",
+  settlement_status: "Settlement Status",
+
+  // vendor zones
+  vendor_zones_coverage: "Vendor Zones & Coverage",
+  manage_service_areas_vendor_operations: "Manage service areas for vendor operations",
+  operational_zones: "Operational Zones",
+  not_operational_zones: "Not Operational Zones",
+  operational: "Operational",
+  not_operational: "Not Operational",
 
   // all-fleet-manager
+  manage_all_registered_fleet_managers: "Manage all registered fleet managers",
   no_fleet_manager_found: "No Fleet Manager found",
+  no_fleet_managers_found: "No fleet managers found",
+  //---> fleet documents
+  view_full_file: "View Full File",
+  no_document_uploaded: "No documents uploaded",
 
   // add-fleet-manager
+  add_a_new_fleet_manager_here: "Add a new fleet manager here",
   fleet_manager_email: "Fleet Manager Email",
   submit_fleetManager: "Submit FleetManager",
 
+  // fleet manager payouts
+  manage_all_fleet_manager_payouts_here: "Manage all fleet manager payouts here",
+  // --> payout settlement
+  final_settlement: "Final Settlement",
+  submit_proof_bank_reference_finalize: "Submit proof and bank reference to finalize this payout",
+  payout_proof_image: "Payout Proof Image",
+  click_to_upload_proof_image: "Click to upload proof image",
+  submit_settlement: "Submit Settlement",
+
   // fleet-manager-wallet
+  fleet_manager_wallets: "Fleet Manager Wallets",
+  manage_all_fleet_manager_wallets: "Manage all the fleet manager wallets",
   search_fleet_manager_id_reason: "Search fleet manager, ID or reason...",
   all_status: "All Status",
   failed: "Failed",
@@ -367,6 +519,7 @@ export const en = {
 
   // fleet-zones
   fleet_zones: "Fleet Zones",
+  manage_zones_fleet_managers: "Manage zones of fleet managers",
   search_zone_city_group: "Search zone, city, group or manager...",
   add_zone: "Add Zone",
   total_zones: "Total zones",
@@ -393,7 +546,18 @@ export const en = {
   update: "Update",
   save: "Save",
 
-  // fleet-performance
+  // fleet manager performance
+  fleet_manager_performance_analytics: "Fleet Manager Performance Analytics",
+  comprehensive_insights_fleet_manager_performance: "Comprehensive insights into fleet manager performance",
+  highest_earnings: "Highest Earnings",
+  daily_performance_over_7_days: "Daily performance over the last 7 days",
+  days: "Days",
+  earnings_performance: "Earnings Performance",
+  view_fleet_managers_performance_analytics: "View fleet managers performance analytics",
+  performance_capital: "Performance",
+  fleet_manager_performance_details: "Fleet Manager Performance Details",
+  total_drivers: "Total Drivers",
+  top_rated_delivery_partners: "Top Rated Delivery Partners",
   last_7_days: "Last 7 days",
   last_30_days: "Last 30 days",
   custom: "Custom",
@@ -485,15 +649,19 @@ export const en = {
     "This action is irreversible for the queued batch. You can cancel scheduled sends from the scheduled tasks panel.",
 
   // suspended/blocked-fleet-managers
+  suspended_fleet_managers: "Suspended Fleet Managers",
+  all_blocked_fleet_managers_from_system: "All blocked fleet managers from the system",
   blocked_fleet_managers: "Blocked Fleet Managers",
   blocked_managers: "Blocked Managers",
   no_blocked_managers_found: "No blocked managers found.",
 
   // all-customers
+  manage_all_registered_customers: "Manage all registered customers",
   customer: "Customer",
   spend: "Spend",
   joined: "Joined",
   orders_lg: "Orders",
+  no_customers_found: "No customers found",
   // -> delete modal
   are_you_absolutely_sure: "Are you absolutely sure?",
   this_action_cannot_be_undone:
@@ -513,15 +681,32 @@ export const en = {
   state: "State",
   country: "Country",
   zip_code: "Zip Code",
+  show_all: "Show All",
   account_created: "Account Created",
   last_updated: "Last Updated",
   approved_rejected_blocked_at: "Approved/Rejected/Blocked At",
 
+  // active customers
+  all_active_customers_in_system: "All active customers in the system",
+
+  // customer-spends
+  payment_history_of_customers: "Payment history of customers",
+  no_spends_found: "No spends found",
+  // --> details
+  back_to_transactions: "Back to Transactions",
+  transactions_details: "Transaction Details",
+  full_details_of_the_transaction: "Full details of the transaction",
+  payment_method: "Payment Method",
+  delivery_address: "Delivery Address",
+  items_ordered: "Items Ordered",
+
   // blocked customers
   results: "results",
+  all_blocked_customers_in_system: "All blocked customers in the system",
   no_blocked_customers_found: "No blocked customers found.",
 
   // customer-feedback
+  feedbacks_from_customers: "Feedbacks from the customers",
   total_feedback: "Total Feedback",
   positive: "Positive",
   trend_7d: "Trend (7d)",
@@ -534,6 +719,7 @@ export const en = {
   tags: "Tags",
   feedback_details: "Feedback Details",
   view_full_feedback_nd_reply: "View full feedback and reply",
+  no_feedback_found: "No feedback found",
   attachments: "Attachments",
   admin_reply: "Admin Reply",
   feedback_id: "Feedback ID",
@@ -545,6 +731,32 @@ export const en = {
   send_reply: "Send Reply",
 
   // delivery partners
+  // -> add delivery partner
+  add_new_delivery_partner: "Add New Delivery Partner",
+  create_new_delivery_partner_form: "Create a new delivery partner with the form below",
+  male: "Male",
+  female: "Female",
+  nif_number: "NIF Number",
+  passport_number: "Passport Number",
+  legal_address: "Legal Status",
+  residence_permit_expiry: "Residence Permit Expiry",
+  driving_license_expiry: "Driving License Expiry",
+  criminal_record_status: "Criminal Record Status",
+  have_criminal_record_certificate: "Have Criminal Record Certificate?",
+  issue_date: "Issue Date",
+  expiry_date: "Expiry Date",
+  work_preferences_equipments: "Work Preferences and Equipment",
+  preferred_working_zones: "Preferred Working Zones",
+  preferred_working_hours: "Preferred Working Hours",
+  morning: "Morning",
+  afternoon: "Afternoon",
+  evening: "Evening",
+  night: "Night",
+  full_day: "Full Day",
+  flexible: "Flexible",
+  delivery_equipments: "Delivery equipments",
+  other_platform_name_if_applicable: "Other Platform Name (If Applicable)",
+  document: "Document",
   // -> delivery partner title
   manage_your_all_delivery_partners: "Manage your all delivery partners",
   // -> content
@@ -575,9 +787,13 @@ export const en = {
   not_provided: "Not Provided",
   id_proof_front: "ID Proof Front",
   id_proof_back: "ID Proof Back",
-  driving_license: "Driving License",
+  driving_license_front: "Driving License Front",
+  driving_license_back: "Driving License Back",
   vehicle_registration: "Vehicle Registration",
   criminal_record_certificate: "Criminal Record Certificate",
+  activity: "Activity",
+  insurance_policy: "Insurance Policy",
+  my_photo: "My Photo",
   operational_date: "Operational Data",
   reviews: "reviews",
   total_earnings: "Total Earnings",
@@ -594,13 +810,22 @@ export const en = {
   helmet: "Helmet",
   power_bank: "Power Bank",
   submitted_for_approval: "Submitted For Approval",
+  update_delivery_partner: "Update Delivery Partner",
+
+  // all delivery partners
+  manage_all_registered_delivery_partners: "Manage all registered delivery partners",
 
   // active delivery partners
+  all_active_delivery_partners_system: "All active delivery partners in the system",
   all_active_partners: "All Active Partners",
   total: "total",
   no_partners_found: "No partners found.",
 
+  // delivery partner onboarding request
+  all_requested_delivery_partners_onboarding: "All Requested Delivery Partners for Onboarding",
+
   // suspended delivery partners
+  all_blocked_delivery_partners_from_platform: "All blocked delivery partners from the platform",
   total_suspended: "Total Suspended",
   reload: "Reload",
   partner: "Partner",
@@ -610,6 +835,11 @@ export const en = {
     "No suspended partners match your filters.",
 
   // delivery partner performance
+  delivery_partner_performance_analytics: "Delivery Partner Performance Analytics",
+  comprehensive_insights_into_delivery_partner: "Comprehensive insights into delivery partner performance",
+  monthly_performance_over_the_last_6_months: "Monthly performance over the last 6 months",
+  view_delivery_partners_performance_analytics: "View delivery partners performance analytics",
+  no_delivery_partner_found: "No delivery partner found",
   overview_of_delivery_partner_kpi_monthly:
     "Overview of delivery partner KPIs & monthly trends (Portugal)",
   search_by_name_city_id: "Search by name, city or ID...",
@@ -635,6 +865,7 @@ export const en = {
   view_violations: "View Violations",
 
   // delivery partner payouts
+  manage_all_delivery_partner_payouts_here: "Manage all delivery partner payouts here",
   approve_process_audit_partner:
     "Approve, process and audit partner payouts — Portugal",
   search_partner_id_city: "Search partner, id or city...",
@@ -667,6 +898,7 @@ export const en = {
   add_an_optional_note: "Add an optional note for this action",
 
   // delivery partner analytics
+  analyze_partner_availability_performance: "Analyze partner availability, performance tiers, and regional distribution",
   kpi_dashboard_trends_heatmap:
     "KPI dashboard, trends & heatmap — super admin view (Portugal)",
   search_partner_city: "Search partner or city...",
@@ -702,6 +934,9 @@ export const en = {
   deliveries_this_range: "deliveries this range",
   revenue: "Revenue",
   payout_history: "Payout History",
+
+  // delivery partner wallets
+  manage_all_the_delivery_partner_wallets: "Manage all the delivery partner wallets",
 
   // add-business-category
   add_business_category: "Add Business Category",
@@ -768,16 +1003,16 @@ export const en = {
   warings_this_action_cannot_be_undone: "Warning: This action cannot be undone. It will completely scrub this record out of the database!",
   // --> cuisine details
   back_to_list: "Back to list",
-  slug : "slug",
-  soft_deleted : "Soft Deleted",
-  cuisine_asset_preview : "Cuisine Asset Preview",
-  no_image_uploaded : "No image uploaded",
-  properties : "Properties",
-  url_status_check :"Url Status Check",
-  valid_asset_path :"Valid Asset Path",
-  empty_source_reference :"Empty Source Reference",
-  audit_timelines : "Audit Timelines",
-  created_on :"Created On",
+  slug: "slug",
+  soft_deleted: "Soft Deleted",
+  cuisine_asset_preview: "Cuisine Asset Preview",
+  no_image_uploaded: "No image uploaded",
+  properties: "Properties",
+  url_status_check: "Url Status Check",
+  valid_asset_path: "Valid Asset Path",
+  empty_source_reference: "Empty Source Reference",
+  audit_timelines: "Audit Timelines",
+  created_on: "Created On",
 
   // product categories
   // -> title
@@ -799,11 +1034,26 @@ export const en = {
   payment: "Payment",
   delivery_timeline: "Delivery Timeline",
   rider: "Rider",
+  flash: "Flash",
+  order_items: "Order Items",
+  qty: "Qty",
+  subtotal: "Subtotal",
+  pickup_location: "Pickup Location",
+  vendor_contact: "Vendor Contact",
+  customer_contact: "Customer Contact",
+  payment_summary: "Payment Summary",
+  includes_all_taxes: "Includes all taxes",
+  customer_details: "Customer Details",
+  orders_from: "Orders from",
+  customer_orders: "Customer Orders",
+  manage_customer_orders_here: "Manage customer orders here",
 
   // pending-orders
+  all_pending_orders_system: "All pending orders in the system",
   live_pending_orders: "Live Pending Orders",
 
-  // preparing-orders
+  // preparing-order
+  all_preparing_orders_in_system: "All preparing orders in the system",
   live_kitchen_dashboard_assign_riders:
     "Live kitchen dashboard — assign riders, track timers & manage delays.",
   export: "Export",
@@ -815,11 +1065,13 @@ export const en = {
   order_created: "Order created",
 
   // on the way orders
+  the_orders_that_on_the_way_to_customer: "The orders that are on the way to the customer.",
   live_tracking_delivery_partner_location:
     "Live tracking — delivery partner location, ETA and customer coordination.",
   full_route_eta_partner_info: "Full route, ETA, partner info",
 
   // delivered-orders
+  successfully_delivered_orders_listed: "Successfully delivered orders are listed here.",
   delivered_orders_portugal: "Delivered Orders (Portugal)",
   gestao_professional_das_encomendas:
     "Gestão profissional das encomendas entregues — otimizado para Portugal.",
@@ -828,8 +1080,7 @@ export const en = {
   payment_eur: "Payment (EUR)",
 
   // cancelled-orders
-  cancelled_orders_desc:
-    "Encomendas canceladas — monitorize motivos e parceiros para reduzir churn.",
+  cancelled_orders_desc: "Cancelled orders — monitor reasons and partners to reduce churn.",
   cancelled_at: "Cancelled At",
 
   // refund-requests
@@ -843,6 +1094,7 @@ export const en = {
     "Note: connect approve/reject buttons to your refund processing API.",
 
   // platform earnings
+  revenue_commissions_platform_fee_analytics: "Revenue, commissions & platform fee analytics",
   track_platform_revenue_fees_simple:
     "Track platform revenue & fees in a simple clean layout.",
   search_order_vendor_region: "Search order, vendor, region",
@@ -853,6 +1105,15 @@ export const en = {
   region: "Region",
   gross: "Gross",
   platform_fee: "Platform Fee",
+  this_week_commission: "This Week's Commission",
+  this_month_commission: "This Month's Commission",
+  monthly_commissions: "Monthly Commssions",
+  last_6_months_commission_chart: "Last 6 months commssion chart",
+  commissions: "Commissions",
+  commissions_in_total: "Commissions in total",
+  transaction_id: "Transaction ID",
+  no_commissions_found: "No commissions found",
+
 
   // driver payouts
   search_driver_city_payout_method_status:
@@ -860,6 +1121,7 @@ export const en = {
   driver: "Driver",
 
   // transaction history
+  full_breakdown_earnings_payouts_fees: "Full breakdown of earnings, payouts, and fees",
   full_ledger_platform_transactions_payouts:
     "Full ledger of platform transactions — payouts, payments and refunds.",
   refresh: "Refresh",
@@ -874,16 +1136,24 @@ export const en = {
   type: "Type",
   balance: "Balance",
   no_transactions_match_filters: "No transactions match your filters.",
+  no_transactions_found: "No transactions found",
 
   // payment-disputes
+  track_and_resolve_payment_disputes: "Track and resolve payment disputes across the platform",
   systematic_dispute_management_action:
     "Systematic dispute management with action controls and audit-ready export.",
-  resolved: "",
+  resolved: "Resolved",
+  total_disputes: "Total Disputes",
+  open_disputes: "Open Disputes",
+  resolved_disputes: "Resolved Disputes",
+  total_amount_disputed: "Total Amount Disputed",
+  all_disputes: "All Disputes",
   pending_vendor: "Pending Vendor",
   pending_customer: "Pending Customer",
   last_90_days: "Last 90 days",
   year_to_date: "Year to date",
   search_dispute_order_vendor: "Search dispute, order, vendor, customer",
+  no_disputes_found: "No disputes found",
   dispute_id: "Dispute ID",
   resolve: "Resolve",
   disputes: "disputes",
@@ -895,6 +1165,11 @@ export const en = {
   this_action_is_audit_logged: "This action is audit-logged.",
 
   // tax management
+  manage_all_the_taxes_in_system: "Manage all the taxes in the system",
+  tax_code: "Tax Code",
+  rate: "Rate",
+  country_id: "Country ID",
+  no_tax_found: "No tax found",
   vat_rules_reports_audit_logs: "VAT rules, reports and audit logs.",
   new_rule: "New Rule",
   vat_collected_period: "VAT collected (period)",
@@ -915,6 +1190,22 @@ export const en = {
   no_audit_entries: "No audit entries.",
   dismiss: "Dismiss",
   tax_rate: "Tax Rate",
+  // --> create tax
+  create_a_new_tax_rule: "Create a new tax rule",
+  tax_form: "Tax Form",
+  // --> edit tax
+  edit_tax: "Edit Tax",
+  make_changes_to_your_tax: "Make changes to your tax",
+  tax_name: "Tax Name",
+  tax_exemption_code: "Tax Exemption Code",
+  tax_exemption_reason: "Tax Exemption Reason",
+  // loyalty points
+  all_loyalty_points: "All Loyalty Points",
+  the_points_earned_spent_users: "The points earned and spent by users",
+  current_points: "Current Points",
+  total_spent: "Total Spent",
+  total_earned: "Total Earned",
+  no_point_found: "No point found",
 
   // all-product/items
   food_items: "Food Items",
@@ -945,8 +1236,14 @@ export const en = {
   based_on: "Based on",
   review: "review",
   origin: "Origin",
+  variations: "Variations",
+  variation_options: "Variation Options",
+  label: "Label",
+  price: "Price",
+  stock: "Stock",
 
   // out_of_stock_alerts
+  monitor_products_variations_require_immediate: "Monitor products and variations that require immediate restocking",
   live_stock_monitoring_acroos_all_vendors:
     "Live stock monitoring across all vendors — premium Deligo admin panel.",
   search_item_vendor_category: "Search item, vendor, category...",
@@ -956,6 +1253,10 @@ export const en = {
   item: "Item",
   inventory: "Inventory",
   no_matching_results: "No matching results.",
+  current_stock: "Current Stock",
+  view_variation_stock: "View Variation Stock",
+  all_caught_up: "All caught up!",
+  no_out_of_stock_items_match_current_filters: "No out of stock items match your current filters.",
 
   // restricted-items
   manage_items_vendors_allowed_sell:
@@ -972,7 +1273,63 @@ export const en = {
   save_changes: "Save Changes",
   add_item: "Add Item",
 
+  // add restricted item
+  add_restricted_item: "Add Restricted Item",
+  item_name: "Item Name",
+  // edit 
+  edit_restricted_item: "Edit Restricted Item",
+
+  // all-ingredients
+  inventory_management_packaging_supplies: "Inventory management for packaging and supplies",
+  ingredient: "Ingredient",
+  no_ingredients_found: "No ingredients found",
+  // edit ingredient
+  edit_ingredient_specifications: "Edit Ingredient Specifications",
+  modify_catalog_parameters_wholesale_matrix: "Modify catalog parameters and wholesale matrix definitions for SKU",
+  price_per_unit: "Price per Unit",
+  measurement_unit: "Measurement Unit",
+  low_stock_alert_level: "Low Stock Alert Level",
+  minimum_order: "Minimum Order",
+  catalog_description: "Catalog Description",
+  replace_thumbnail_asset_image: "Replace Thumbnail Asset Image",
+  low_stock_warning_limit: "Low Stock Warning Limit",
+  shelf_life_safeguard: "Shelf Life Safeguard (Days)",
+  dynamic_discount_matrix: "Dynamic Discount Matrix",
+  map_localized_pricing_offsets: "Map localized pricing offsets against bulk volume thresholds",
+  add_tier: "Add Tier",
+  no_active_discount_tiers_mapped_object_profile: " No active discount tiers mapped to this object profile.",
+  min_volume: "Min Volume",
+  promo_rate: "Promo Rate",
+  // delete modal 
+  are_you_absolutely_sure_this_action_irreversible: "Are you absolutely sure? This action is irreversible and completely wipes the asset record from the cluster database.",
+  are_you_sure: "Are you sure you want to flag this item? This operation moves the ingredient item to archive contexts safely.",
+  // add ingredient
+  add_new_ingredient: "Add New Ingredient",
+  add_packaging_materials_ingredients: "Add packaging materials and ingredients to the inventory.",
+  shelf_life_days: "Shelf Life (Days - Optional)",
+  bulk_discount_tiers: "Bulk Discount Tiers (Optional)",
+  apply_specialized_system_drops: "Apply specialized system drops for dynamic purchasing lines",
+  no_discount_tiers_added_yet: "No discount tiers added yet. Base product tracking metrics will apply globally.",
+  minimum_quantity: "Minimum Quantity",
+  discounted_price: "Discounted Price",
+  ingredient_image: "Ingredient Image",
+  save_ingredient: "Save Ingredient",
+  // ingredient orders
+  manage_and_process_vendor_supply_requests: "Manage and process vendor supply requests",
+  update_to_shipped: "Update to SHIPPED",
+  update_to_delivered: "Update to DELIVERED",
+  // ingredient detials
+  placed_on: "Placed on",
+  unit_price: "Unit Price",
+  product_discount: "Product Discount",
+  tax_amount: "Tax amount",
+  order_timeline: "Order Timeline",
+  vendor_details: "Vendor Details",
+  mark_shipped: "Mark Shipped",
+  mark_delivered: "Mark Delivered",
+
   // active-campaigns
+  list_of_all_active_offers: "List of all active offers",
   ongoing: "Ongoing",
   upcomong: "Upcoming",
   expired: "Expired",
@@ -987,6 +1344,9 @@ export const en = {
   off_lg: "OFF",
   start_date: "Start Date",
   end_date: "End Date",
+
+  // expired offers
+  list_of_all_expired_offers: "List of all expired offers",
 
   // creaet-new-offer
   add_promotion_boost_restuarant_sales:
@@ -1003,10 +1363,37 @@ export const en = {
   choose_an_item: "Choose an Item",
   validity: "Validity",
   minimum_order_amount: "Minimum Order Amount",
+  maximum_usage_count: "Maximum Usage Count",
+  users_usage_limit: "Users Usage Limit",
   will_auto_apply: "Will Auto Apply?",
   promo_code: "Promo Code",
   enter_promo_code: "Enter promo code",
   create_offer: "Create Offer",
+
+  // all offers
+  manage_all_offers_here: "Manage all offers here",
+  no_offers_found: "No offers found",
+  expire_status: "Expire Status",
+  activating: "Activating",
+  deactivating: "Deactivating",
+  offer: "Offer",
+  this_offer: "this offer",
+  // --> details
+  auto_applied: "Auto-Applied",
+  delete_offer: "Delete Offer",
+  min_order: "Min Order",
+  max_discount: "Max Discount",
+  limit_user: "Limit/User",
+  total_uses: "Total Uses",
+  usage_progress: "Usage Progress",
+  validity_period: "Validity Period",
+  this_offer_has_expired: "This offer has expired",
+  bogo_details: "BOGO Details",
+  buy: "Buy",
+  get_free: "Get Free",
+  item_id: "Item ID",
+  // edit offer
+  edit_offer: "Edit Offer",
 
   // coupon-analytics
   performance_insights_coupon_campaigns:
@@ -1023,10 +1410,50 @@ export const en = {
   issued: "Issued",
   usage_rate: "Usage Rate",
 
+  // add sponsorship
+  add_banner_ads_and_sponsored_content: "Add banner ads and sponsored content",
+  create_a_new_banner_campaign: "Create a new banner campaign",
+  sponsor_name: "Sponsor Name",
+  sponsor_type: "Sponsor Type",
+  select_a_type: "Select a type",
+  sponsor_url: "Sponsor Url (optional)",
+  banner_image: "Banner Image",
+  immediately_publish_this_sponsorship: "Immediately publish this sponsorship",
+  create_sponsorship: "Create Sponsorship",
+
+  // all sponsorships
+  all_sponsorships: "All Sponsorships",
+  manage_all_sponsorships_here: "Manage all sponsorships here",
+  banner: "Banner",
+  period: "Period",
+  no_sponsorships_found: "No sponsorships found",
+  // --> details
+  currently_running: "Currently running",
+  campaign_ended: "Campaign ended",
+  scheduled_to_start: "Scheduled to start",
+  campaign_completed: "Campaign completed",
+  starts_in: "Starts in",
+  days_sm: "days",
+  days_remaining: "days remaining",
+  sponsorship_category: "Sponsorship category",
+  campaign_timeline: "Campaign Timeline",
+  start: "Start",
+  now: "Now",
+
   // sales-analytics
+  overview_revenue_orders_business_performance: "Overview of revenue, orders, and business performance",
   sales_analytics_nd_insights: "Sales Analytics & Insights",
   overview_orders_revenue_top_regions:
     "Overview of orders, revenue and top regions — tailored for Portugal (Deligo).",
+  growth_rate: "Growth Rate",
+  monthly_revenue: "Monthly Revenue",
+  revenue_trend_over_months: "Revenue trend over months",
+  daily_orders: "Daily Orders",
+  orders_distribution_over_last_7_days: "Orders distribution over last 7 days",
+  order_status: "Order Status",
+  payment_methods: "Payment Methods",
+  revenue_by_location: "Revenue by Location",
+  revenue_by_vendor: "Revenue by Vendor",
   last_24_hours: "Last 24 hours",
   previous_period: "previous period",
   avg_order_value: "Avg Order Value",
@@ -1063,8 +1490,19 @@ export const en = {
   imporving_routing: "Improved routing",
 
   // delivery insights
+  optimize_delivery_performance_rider_efficiency: "Optimize delivery performance and rider efficiency",
   driver_performance_sla_heat_zones:
     "Driver performance, SLA, heat zones and hourly load — focused for Portugal.",
+  late_deliveries: "Late Deliveries",
+  failed_deliveries: "Failed Deliveries",
+  deliveries_handled_by_each_rider: "Deliveries handled by each rider",
+  successfull_deliveries: "Successfull Deliveries",
+  distance_vs_delivery_time: "Distance vs Delivery Time",
+  relationship_between_distance_time: "Relationship between distance and time",
+  area_performance: "Area Performance",
+  rider_idle_time: "Rider Idle Time",
+  failed_delivery_reasons: "Failed Delivery Reasons",
+  no_rejected_deliveries: "No rejected deliveries",
   all_drivers: "All drivers",
   on_time_rate: "On-time Rate",
   good_monitor_peak_hours: "Good — monitor peak hours",
@@ -1090,6 +1528,7 @@ export const en = {
   zone: "Zone",
 
   // customer-insights
+  understand_user_behaviour_and_engagement: "Understand user behavior and engagement",
   customer_engagement_loyalty_device_usage:
     "Customer engagement, loyalty, device usage, and geographic distribution — Portugal.",
   new_customers: "New Customers",
@@ -1099,6 +1538,7 @@ export const en = {
   avg_orders_user: "Avg Orders / User",
   consistant: "Consistent",
   churn_rate: "Churn Rate",
+  avg_clv: "Avg CLV",
   track_low_activity_users: "Track low‑activity users",
   user_growth: "User Growth",
   new_vs_returning_users: "New vs Returning users — growth trend",
@@ -1109,8 +1549,26 @@ export const en = {
   mobile_first_customers: "Mobile‑first customers",
   re_engagement_potential: "Re‑engagement potential",
   recent_customers: "Recent Customers",
+  peak_order_time: "Peak Order Time",
+  order_frequency: "Order Frequency",
+  active_users: "Active Users",
+  top_customers: "Top Customers",
 
   // top-vendors
+  vendor_ranking_and_performance_insights: "Vendor ranking and performance insights",
+  top_vendor: "Top Vendor",
+  avg_cancel_rate: "Avg Cancel Rate",
+  top_selling_vendors: "Top Selling Vendors",
+  revenue_and_volume_leaders: "Revenue and volume leaders",
+  revenue_by_top_vendors: "Revenue by Top Vendors",
+  vendor_performance: "Vendor Performance",
+  deep_dive_into_operational_efficiency: "Deep dive into operational efficiency and quality",
+  avg_prep: "Avg Prep",
+  satisfaction: "Satisfaction",
+  cancellation: "Cancellation",
+  rating_distribution: "Rating Distribution",
+  total_volume_acroos: "Total volume across",
+  vendor_quality: "Vendor Quality",
   curated_ranking_the_best_performing_restaurants:
     "Curated ranking of the best-performing restaurants — Portugal (Deligo).",
   search_name_zone: "Search name or zone (Ctrl/Cmd+K)",
@@ -1125,10 +1583,26 @@ export const en = {
 
   // peak-hours-analysis
   peak_hours_analysis: "Peak Hours Analysis",
+  understand_demand_patterns_optimize_operations: "Understand demand patterns and optimize operations",
   real_time_demand_spikes_hourly_order:
     "Real-time demand spikes & hourly order patterns — Portugal.",
   current_week: "Current week",
   peak_hour: "Peak Hour",
+  peak_day: "Peak Day",
+  dinner_dominance: "Dinner Dominance",
+  max_rider_shortage: "Max Rider Shortage",
+  orders_per_hour: "Orders per Hour",
+  identify_peak_demand_times: "Identify peak demand times",
+  lunch_vs_dinner: "Lunch vs Dinner",
+  day_wise_orders: "Day-wise Orders",
+  rider_demand_vs_availability: "Rider Demand vs Availability",
+  hourly_comparison_required_vs_available_supply: "Hourly comparison of required vs available supply",
+  shortage_detected: "Shortage Detected",
+  total_demand: "Total Demand",
+  total_shortage: "Total Shortage",
+  riders: "Riders",
+  shortage: "Shortage",
+  peak_heatmap: "Peak Heatmap (Top Slots)",
   lowest_hour: "Lowest Hour",
   most_active_day: "Most Active Day",
   weekly_volume: "Weekly Volume",
@@ -1145,8 +1619,25 @@ export const en = {
   restaurants: "Restaurants",
   admins: "Admins",
   email_broadcast: "Email Broadcast",
-  send_announcements_alerts_promotional_emails:
-    "Send announcements, alerts, or promotional emails to specific user groups.",
+  send_announcements_alerts_promotional_emails: "Send announcements, alerts, or promotional messages to specific user groups across the platform.",
+  communication_type: "Communication Type",
+  target_audience: "Target Audience",
+  select_specific: "Select Specific",
+  users: "users",
+  no_users_found: "No users found.",
+  show_more: "Show More",
+  message_content: "Message Content",
+  message_title: "Message Title",
+  message_body: "Message Body",
+  chars: "chars",
+  notification_category: "Notification Category",
+  hide_preview: "Hide Preview",
+  show_preview: "Show Preview",
+  send_broadcast: "Send Broadcast",
+  best_practices: "Best Practices",
+  always_check_preview_before_broadcasting: "Always check preview before broadcasting.",
+  use_personalization_tags: "Use personalization tags like",
+  if_supported: "if supported.",
   select_user_type: "Select User Type",
   email_subject: "Email Subject",
   send_email: "Send Email",
@@ -1175,6 +1666,8 @@ export const en = {
   scheduled: "Scheduled",
 
   // all admins
+  add_admin: "Add Admin",
+  manage_all_the_existing_admins: "Manage all the existing admins",
   manage_users_who_can_access_administer:
     "Manage users who can access and administer the Deligo platform.",
   create: "Create",
@@ -1182,6 +1675,23 @@ export const en = {
   admin: "Admin",
   role: "Role",
   no_admins_found_match: "No admins found matching your search.",
+  no_admins_found: "No admins found",
+  system_role_configuration: "System Role Configurations",
+  system_id: "System ID (userId)",
+  assigned_role: "Assigned Role",
+  update_protection_lock: "Update Protection Lock",
+  account_marked_deleted: "Account Marked Deleted",
+  security_capability_permissions_tokens: "Security Capability Permissions Tokens",
+  no_tailored_capability_constraints: "No tailored capability constraints mapped. Inherits structural values natively.",
+  location_details: "Location Details",
+  geo_coordinates: "Geo-Coordinates (Lat / Long)",
+  no_operational_location_address_details_provided: "No operational location address details provided.",
+  last_modification_status_update: "Last Modification Status Update",
+  decision_audit_mapped_at: "Decision Audit Mapped At",
+  action_enforced_by_log_id: "Action Enforced By Log ID",
+  internal_workflow_remarks: "Internal Workflow Remarks",
+  no_recorded_history_notes: 'No recorded history notes.',
+  no_verified_identity_credentials_refernece_documents: "No verified identity credentials or reference documents are available for this administrator tier.",
 
   // roles-permissions
   control_access_levels_permissions:
@@ -1229,11 +1739,14 @@ export const en = {
   browser_os: "Browser / OS",
 
   // support-tickets
+  manage_and_respond_support_requests: "Manage and respond to support requests from all platform users",
   manage_issues: "Manage issues",
   search_tickets: "Search tickets...",
   user: "User",
   write_a_reply: "Write a reply...",
   send: "Send",
+  no_tickets_found: "No tickets found",
+  try_adjusting_your_search_or_filters: "Try adjusting your search or filters",
 
   // chat-with-vendors
   active_conversations: "Active conversations",
@@ -1259,6 +1772,14 @@ export const en = {
 
   // chat-with-customers
   search_customers: "Search customers...",
+
+  // customer report
+  overview_of_all_registered_customers_activity: "Overview of all registered customers and their activity",
+  select_date_range: "Select Date Range",
+  customer_growth: "Customer Growth",
+  new_customer_registration_over_time: "New customer registrations over time",
+  no_of_customers: "No of Customers",
+  apply: "Apply",
 
   // sales-report
   overview_revenue_orders_metrics:
@@ -1288,6 +1809,10 @@ export const en = {
   zone_analytics: "Zone Analytics",
   quick_filters: "Quick Filters",
   top_zone: "Top Zone",
+  order_trend: "Orders Trend",
+  zone_heatmap: "Zone Heatmap",
+  less_busy: "Less Busy",
+  very_busy: "Very Busy",
 
   // drivers performance report
   drivers_performance: "Drivers Performance",
@@ -1311,6 +1836,7 @@ export const en = {
   message_low_rated_drivers: "Message low-rated drivers",
 
   // vendor-report
+  overview_of_all_registered_vendors_status: "Overview of all registered vendors and their status",
   vendor_analytics: "Vendor Analytics",
   total_revenue_euro: "Total Revenue (€)",
   revenue_over_time: "Revenue Over Time",
@@ -1321,6 +1847,30 @@ export const en = {
     "Click a vendor to view detailed analytics",
   hourly_orders_today_average: "Hourly Orders (Today average)",
   open_vendor: "Open Vendor",
+  approved_vendors: "Approved Vendors",
+  pending_vendors: "Pending Vendors",
+  blocked_rejected_vendors: "Blocked/Rejected Vendors",
+  vendor_growth: "Vendor Growth",
+  new_vendor_registration_over_time: "New vendor registrations over time",
+  no_of_vendors: "No of Vendors",
+
+  // delivery partner report
+  overview_of_all_delivery_partners_performance: "Overview of all delivery partners and their performance",
+  export_as_pdf: "Export as PDF",
+  export_as_csv: "Export as CSV",
+  active_partners: "Active Partners",
+  partner_growth: "Partner Growth",
+  new_partner_registration_over_time: "New partner registrations over time",
+  no_of_partners: "No of Partners",
+  vehicle_distribution: "Vehicle Distribution",
+
+  // fleet manager report
+  overview_of_all_fleet_managers_operations: "Overview of all fleet managers and their operations",
+  total_managers: "Total Managers",
+  approved_managers: "Approved Managers",
+  fleet_manager_growth: "Fleet Manager Growth",
+  new_manager_registration_over_time: "New manager registrations over time",
+  no_of_managers: "No of Managers",
 
   // business-info
   real_time_overview_deligo_performance:
@@ -1430,9 +1980,12 @@ export const en = {
   min_charge: "Min Charge",
   max_charge: "Max Charge",
   maximum_delivery_distance: "Maximum Delivery Distance",
+  delivery_vat_rate: "Delivery VAT Rate",
   commissions_and_fees: "Commissions & Fees",
   set_platform_earnings_tax_rates: "Set platform earnings and tax rates",
   platform_commission: "Platform Commission",
+  platform_vat: "Platform VAT",
+  fleet_manager_commission: "Fleet Manager Commission",
   percentage_taken_from_each_order_total:
     "Percentage taken from each order total",
   delivery_partner_commission: "Delivery Partner Commission",
@@ -1463,6 +2016,7 @@ export const en = {
   time_before_otp_expires: "Time before OTP expires and needs regeneration",
   offers_and_promotions: "Offers & Promotions",
   control_global_discount_settings: "Control global discount settings",
+  enable_offers: "Enable Offers",
   enable_coupons: "Enable Coupons",
   allow_customers_use_promo: "Allow customers to use promo codes at checkout",
   enable_global_offers: "Enable Global Offers",
@@ -1484,6 +2038,55 @@ export const en = {
   deliveryChargeOutsideLisbon: "Delivery Charge Outside Lisbon",
   vatRate: "Vat Rate",
 
+  // reward settings
+  configure_loyalty_referral_rewards: "Configure loyalty and referral rewards here",
+  loyalty_and_rewards: "Loyalty & Rewards",
+  configure_points_bonuses_referral: "Configure points, bonuses, and referral rewards",
+  customer_rewards: "Customer Rewards",
+  points_per_spent: "Points per € spent",
+  points_earned_per_euro_spent: "Points earned per euro spent",
+  rider_rewards: "Rider Rewards",
+  points_per_delivery: "Points per delivery",
+  referral_points: "Referral points",
+  new_rider_welcome_bonus: "New rider welcome bonus",
+  points_expiry: "Points Expiry",
+  referral_milestones: "Referral Milestones",
+  configure_referral_milestones_rewards: "Configure referral milestones and rewards",
+  customer_referral_milestones: "Customer Referral Milestones",
+  friends_required: "Friends required",
+  reward_value: "Reward value",
+  min_order_per_friend: "Min order per friend",
+  add_milestone: "Add Milestone",
+
+  // payout settings
+  configure_payout_options_here: "Configure payout options here",
+  payout_automation: "Payout Automation",
+  configure_automatic_payout_generation: "Configure automatic payout generation",
+  auto_payout_generation: "Auto Payout Generation",
+  auto_generate_payouts: "Auto-generate payouts",
+  automatically_generate_payouts_based_on_schedule: "Automatically generate payouts based on the schedule and criteria you set.",
+  payout_criteria: "Payout Criteria",
+  minimum_payout_amount: "Minimum payout amount",
+  payout_window_days: "Payout window days",
+  payout_schedule: "Payout Schedule",
+  configure_payout_schedule: "Configure payout schedule",
+  payout_days: "Payout Days",
+
+  // sos
+  sos_alerts: "SOS Alerts",
+  monitor_and_resolve_critical_incidents: "Monitor and resolve critical incidents",
+  vendor_sos: "Vendor SOS",
+  critical_issues_reported_by_restaurants: "Critical issues reported by restaurants and merchants. Includes kitchen fires, stock outages, or device failures.",
+  fleet_manager_sos: "Fleet Manager SOS",
+  operational_emergencies_from_logistics_hubs: "Operational emergencies from logistics hubs. Vehicle breakdowns, accident reports, and route blockages.",
+  delivery_partner_sos: "Delivery Partner SOS",
+  urgent_safety_alerts_from_riders_on_the_road: "Urgent safety alerts from riders on the road. Medical emergencies, harassment, or severe weather conditions.",
+  active_alerts: "active alerts",
+  no_active_emergencies: "No active emergencies",
+  all_system_operational_sector: "All systems operational in this sector.",
+  investigate: "Investigate",
+  false_alarm: "False Alarm",
+
   // permissions
   // --> Create Permission
   create_permission: "Create Permission",
@@ -1502,6 +2105,7 @@ export const en = {
   all_permissions: "All Permissions",
   manage_view_all_admin_permissions: "Manage and view all admin permissions",
   no_platform_security_permissions_defined: "No platform security permissions defined.",
+  system_action_key: "System Action Key",
   // --> edit permission
   edit_permission: "Edit Permission",
   modify_security_rule_parameters: "Modify security rule parameters. Changes here update systemic metadata attributes instantly.",

@@ -5,6 +5,7 @@ import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion, Variants } from "framer-motion";
 import {
@@ -107,6 +108,7 @@ const sortOptions = [
 ];
 
 export default function PaymentDisputes() {
+  const { t } = useTranslation();
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -136,7 +138,7 @@ export default function PaymentDisputes() {
   } as Variants;
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       <motion.div
         className="space-y-6"
         variants={containerVariants}
@@ -145,8 +147,8 @@ export default function PaymentDisputes() {
       >
         {/* Header */}
         <TitleHeader
-          title="Payment Disputes"
-          subtitle="Track and resolve payment disputes across the platform"
+          title={t("payment_disputes")}
+          subtitle={t("track_and_resolve_payment_disputes")}
         />
 
         {/* Stat Cards */}
@@ -155,25 +157,25 @@ export default function PaymentDisputes() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           <StatsCard
-            title="Total Disputes"
+            title={t("total_disputes")}
             value={disputesData.data?.stats?.totalDisputes}
             icon={FileTextIcon}
             delay={0}
           />
           <StatsCard
-            title="Open Disputes"
+            title={t("open_disputes")}
             value={disputesData.data?.stats?.openDisputes}
             icon={AlertCircleIcon}
             delay={0}
           />
           <StatsCard
-            title="Resolved Disputes"
+            title={t("resolved_disputes")}
             value={disputesData.data?.stats?.resolvedDisputes}
             icon={CheckCircle2Icon}
             delay={0}
           />
           <StatsCard
-            title="Total Amount Disputed"
+            title={t("total_amount_disputed")}
             value={`€${formatPrice(disputesData.data?.stats?.totalAmountDisputes)}`}
             icon={XCircleIcon}
             delay={0}
@@ -184,7 +186,7 @@ export default function PaymentDisputes() {
           variants={itemVariants}
           className="bg-white shadow-md rounded-2xl p-4 md:p-6"
         >
-          <h3 className="text-xl font-medium mb-4">All Disputes</h3>
+          <h3 className="text-xl font-medium mb-4">{t("all_disputes")}</h3>
 
           {/* Filters */}
           <AllFilters sortOptions={sortOptions} />

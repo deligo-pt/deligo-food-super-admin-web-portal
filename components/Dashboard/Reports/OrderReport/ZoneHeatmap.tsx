@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { IOrderReportAnalytics } from "@/types/report.type";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
@@ -11,6 +12,7 @@ interface IProps {
 }
 
 export default function ZoneHeatmap({ zoneHeatmap }: IProps) {
+  const { t } = useTranslation();
   const processedData = useMemo(() => {
     const map: Record<string, Record<number, number>> = {};
     let maxOrders = 1;
@@ -33,12 +35,12 @@ export default function ZoneHeatmap({ zoneHeatmap }: IProps) {
       transition={{ delay: 0.4 }}
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 overflow-x-auto"
     >
-      <h3 className="font-bold text-gray-900 mb-6">Zone Heatmap</h3>
+      <h3 className="font-bold text-gray-900 mb-6">{t("zone_heatmap")}</h3>
 
-      <div className="min-w-[1000px]">
+      <div className="min-w-250">
         {/* Header: Hours */}
         <div className="grid grid-cols-[120px_repeat(24,1fr)] gap-1 mb-2">
-          <div className="text-xs font-medium text-gray-400">Zones</div>
+          <div className="text-xs font-medium text-gray-400">{t("zones")}</div>
           {hours.map((h) => (
             <div
               key={h}
@@ -82,7 +84,7 @@ export default function ZoneHeatmap({ zoneHeatmap }: IProps) {
                   >
                     {/* Tooltip */}
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 bg-gray-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap">
-                      {zone} @ {h}:00 — {count} orders
+                      {zone} @ {h}:00 — {count} {t("orders")}
                     </div>
                   </div>
                 );
@@ -93,7 +95,7 @@ export default function ZoneHeatmap({ zoneHeatmap }: IProps) {
 
         {/* Legend */}
         <div className="flex items-center justify-end gap-2 mt-6 text-xs text-gray-500">
-          <span>Less Busy</span>
+          <span>{t("less_busy")}</span>
           <div className="flex gap-1">
             {[0.1, 0.3, 0.5, 0.7, 0.9].map((op) => (
               <div
@@ -103,7 +105,7 @@ export default function ZoneHeatmap({ zoneHeatmap }: IProps) {
               />
             ))}
           </div>
-          <span>Very Busy</span>
+          <span>{t("very_busy")}</span>
         </div>
       </div>
     </motion.div>

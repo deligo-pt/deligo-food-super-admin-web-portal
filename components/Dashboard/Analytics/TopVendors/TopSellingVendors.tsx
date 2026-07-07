@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TTopVendors } from "@/types/analytics/top-vendors.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
@@ -10,6 +11,7 @@ interface IProps {
 }
 
 export default function TopSellingVendors({ topSellingVendors }: IProps) {
+  const { t } = useTranslation();
   const sortedVendors = [...topSellingVendors].sort(
     (a, b) => b.totalRevenue - a.totalRevenue,
   );
@@ -26,9 +28,9 @@ export default function TopSellingVendors({ topSellingVendors }: IProps) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-bold text-gray-900">
-            Top Selling Vendors
+            {t("top_selling_vendors")}
           </h3>
-          <p className="text-sm text-gray-500">Revenue and volume leaders</p>
+          <p className="text-sm text-gray-500">{t("revenue_and_volume_leaders")}</p>
         </div>
         <div className="bg-emerald-50 p-2 rounded-lg">
           <TrendingUp className="w-5 h-5 text-emerald-500" />
@@ -40,13 +42,13 @@ export default function TopSellingVendors({ topSellingVendors }: IProps) {
           <thead>
             <tr className="text-left border-b border-slate-50">
               <th className="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                Vendor
+                {t("vendor")}
               </th>
               <th className="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
-                Orders
+                {t("orders_lg")}
               </th>
               <th className="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
-                Revenue
+                {t("revenue")}
               </th>
             </tr>
           </thead>
@@ -77,7 +79,7 @@ export default function TopSellingVendors({ topSellingVendors }: IProps) {
                         {vendor.vendorName}
                       </p>
                       <p className="text-[10px] text-slate-400 font-mono uppercase">
-                        ID: {vendor.vendorId.slice(-6)}
+                        {t("id")}: {vendor.vendorId.slice(-6)}
                       </p>
                     </div>
                   </div>

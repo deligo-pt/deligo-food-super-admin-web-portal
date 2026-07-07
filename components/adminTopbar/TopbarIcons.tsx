@@ -111,17 +111,10 @@ export default function TopbarIcons({ admin }: IProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const LANGS = [
-    { code: "en", label: "English" },
-    { code: "pt", label: "Português" },
-    { code: "es", label: "Español" },
-  ];
-
   return (
     <>
       {/* Language */}
-
-      <div className="relative hidden sm:block z-1002">
+      <div className="relative z-1002">
         <Select
           value={lang}
           onValueChange={(value: "en" | "pt") => handleLangChange(value)}

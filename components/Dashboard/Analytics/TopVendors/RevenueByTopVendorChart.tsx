@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TTopVendors } from "@/types/analytics/top-vendors.type";
 import { motion } from "framer-motion";
 import {
@@ -17,6 +18,8 @@ export default function RevenueByTopVendorChart({
 }: {
   topSellingVendors: TTopVendors["topSellingVendors"];
 }) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -25,7 +28,7 @@ export default function RevenueByTopVendorChart({
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
     >
       <h3 className="text-lg font-bold text-gray-900 mb-2">
-        Revenue by Top Vendors
+        {t("revenue_by_top_vendors")}
       </h3>
 
       <motion.div

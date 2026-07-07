@@ -21,11 +21,11 @@ export default function CustomerSpends({ customerSpendsResult }: IProps) {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-full">
+    <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title="Customer Spends"
-        subtitle="Payment history of customers"
+        title={t("customer_spends")}
+        subtitle={t("payment_history_of_customers")}
       />
 
       {/* Filters */}

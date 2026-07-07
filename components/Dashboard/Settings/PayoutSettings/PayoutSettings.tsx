@@ -105,8 +105,8 @@ export default function PayoutSettings({
         <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="">
           {/* Header */}
           <TitleHeader
-            title="Payouts Settings"
-            subtitle="Configure payout options here"
+            title={t("payouts_settings")}
+            subtitle={t("configure_payout_options_here")}
             extraComponent={
               <motion.button
                 initial={{
@@ -157,15 +157,15 @@ export default function PayoutSettings({
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <SettingsCard
-              title="Payout Automation"
-              description="Configure automatic payout generation"
+              title={t("payout_automation")}
+              description={t("configure_automatic_payout_generation")}
               icon={Gift}
               delay={0.55}
             >
               <div className="space-y-6">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                    Auto Payout Generation
+                    {t("auto_payout_generation")}
                   </h3>
 
                   {/* <FormField
@@ -199,8 +199,8 @@ export default function PayoutSettings({
                         <FormItem>
                           <FormControl>
                             <SettingsToggle
-                              label="Auto-generate payouts"
-                              description="Automatically generate payouts based on the schedule and criteria you set."
+                              label={t("auto_generate_payouts")}
+                              description={t("automatically_generate_payouts_based_on_schedule")}
                               checked={field.value}
                               onChange={(val) => field.onChange(val)}
                             />
@@ -214,7 +214,7 @@ export default function PayoutSettings({
 
                 <div>
                   <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                    Payout Criteria
+                    {t("payout_criteria")}
                   </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -226,7 +226,7 @@ export default function PayoutSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="Minimum payout amount"
+                              label={t("minimum_payout_amount")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
@@ -249,7 +249,7 @@ export default function PayoutSettings({
                           <FormControl>
                             <SettingsInput
                               fieldState={fieldState}
-                              label="Payout window days"
+                              label={t("payout_window_days")}
                               type="number"
                               value={field.value}
                               onChange={(e) =>
@@ -269,14 +269,14 @@ export default function PayoutSettings({
             </SettingsCard>
 
             <SettingsCard
-              title="Payout Schedule"
-              description="Configure payout schedule"
+              title={t("payout_schedule")}
+              description={t('configure_payout_schedule')}
               icon={Gift}
               delay={0.55}
             >
               <div>
                 <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase">
-                  Payout Days
+                  {t("payout_days")}
                 </h3>
                 <FormField
                   control={form.control}

@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TVendorPerformance } from "@/types/performance.type";
 import { motion } from "framer-motion";
 import {
@@ -32,6 +33,7 @@ interface IProps {
 }
 
 export default function VendorPerformanceTable({ vendors }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -40,8 +42,8 @@ export default function VendorPerformanceTable({ vendors }: IProps) {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2"
     >
-      <h3 className="text-xl font-semibold">Vendors</h3>
-      <p className="text-gray-700 mb-2">View vendor performance analytics</p>
+      <h3 className="text-xl font-semibold">{t("vendors")}</h3>
+      <p className="text-gray-700 mb-2">{t("view_vendor_performance_analytics")}</p>
 
       <div className="overflow-x-auto">
         <Table className="max-w-full">
@@ -50,30 +52,30 @@ export default function VendorPerformanceTable({ vendors }: IProps) {
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <StoreIcon className="w-4" />
-                  Vendor
+                  {t("vendor")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <PackageIcon className="w-4" />
-                  Orders
+                  {t("orders_capital")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <EuroIcon className="w-4" />
-                  Revenue
+                  {t("revenue")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <StarIcon className="w-4" />
-                  Rating
+                  {t("rating")}
                 </div>
               </TableHead>
               <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
                 <Cog className="w-4" />
-                Actions
+                {t("actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -84,7 +86,7 @@ export default function VendorPerformanceTable({ vendors }: IProps) {
                   className="text-[#DC3173] text-lg text-center"
                   colSpan={5}
                 >
-                  No vendors found
+                  {t("no_vendors_found")}
                 </TableCell>
               </TableRow>
             )}
@@ -126,7 +128,7 @@ export default function VendorPerformanceTable({ vendors }: IProps) {
                           )
                         }
                       >
-                        View
+                        {t("view")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

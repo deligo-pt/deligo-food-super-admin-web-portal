@@ -17,8 +17,8 @@ export default async function SuspendedDeliveryPartnersPage({
   return (
     <DeliveryPartners
       partnersResult={partnersResult}
-      title="Suspended Delivery Partners"
-      subtitle="All blocked delivery partners from the platform"
+      title="suspended_delivery_partners"
+      subtitle="all_blocked_delivery_partners_from_platform"
     />
   );
 }

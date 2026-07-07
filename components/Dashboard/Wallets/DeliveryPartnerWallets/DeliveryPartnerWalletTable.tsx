@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryPartnerWallet } from "@/types/wallet.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -34,13 +35,14 @@ interface IProps {
 }
 
 export default function DeliveryPartnerWalletTable({ wallets }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
+      className="bg-white shadow-md rounded-2xl mb-2 overflow-x-auto"
     >
       <Table className="max-w-full">
         <TableHeader>
@@ -48,30 +50,30 @@ export default function DeliveryPartnerWalletTable({ wallets }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Wallet ID
+                {t("wallet_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <BikeIcon className="w-4" />
-                Delivery Partner
+                {t("delivery_partner")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Balance
+                {t("balance")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Last Settlement
+                {t("last_settlement")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -82,7 +84,7 @@ export default function DeliveryPartnerWalletTable({ wallets }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No wallets found
+                {t("no_wallets_found")}
               </TableCell>
             </TableRow>
           )}
@@ -127,7 +129,7 @@ export default function DeliveryPartnerWalletTable({ wallets }: IProps) {
                         )
                       }
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

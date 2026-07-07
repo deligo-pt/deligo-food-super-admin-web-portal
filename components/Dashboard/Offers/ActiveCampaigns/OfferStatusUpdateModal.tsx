@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 
 interface IProps {
@@ -29,24 +30,26 @@ const OfferStatusUpdateModal = ({
   statusInfo,
   buttonDisabled
 }: IProps) => {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <form>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {statusInfo.status ? "Activating" : "Deactivating"} Offer:{" "}
+              {statusInfo.status ? t("activating") : t("deactivating")} {t("offer")}:{" "}
               {statusInfo.offerName}
             </DialogTitle>
             <DialogDescription>
-              You are about to {statusInfo.status ? "activate" : "deactivate"}{" "}
-              this offer
+              {t("you_are_about_to")} {statusInfo.status ? t("activate") : t("deactivate")}{" "}
+              {t("this_offer")}
             </DialogDescription>
           </DialogHeader>{" "}
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Cancel
+                {t("cancel")}
               </Button>
             </DialogClose>
             <Button
@@ -60,7 +63,7 @@ const OfferStatusUpdateModal = ({
               type="submit"
               disabled={buttonDisabled}
             >
-              {statusInfo.status ? "Activate" : "Deactivate"}
+              {statusInfo.status ? t("activate") : t("deactivate")}
             </Button>
           </DialogFooter>
         </DialogContent>

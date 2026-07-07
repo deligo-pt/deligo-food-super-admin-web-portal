@@ -7,6 +7,7 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteOfferReq,
   updateOfferReq,
@@ -71,6 +72,7 @@ export default function ActiveCampaigns({
   title,
   subtitle,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [deleteId, setDeleteId] = useState("");
   const [selectedOffer, setSelectedOffer] = useState<TOffer | null>(null);
@@ -153,7 +155,7 @@ export default function ActiveCampaigns({
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader title={title} subtitle={subtitle} />
+      <TitleHeader title={t(`${title}`)} subtitle={t(`${subtitle}`)} />
 
       {/* Filters */}
       <AllFilters

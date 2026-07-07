@@ -5,6 +5,7 @@ import { SOSDetailModal } from "@/components/Dashboard/SOS/SOSDetailModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { USER_ROLE } from "@/consts/user.const";
 import { useSOSSocket } from "@/hooks/use-sos-socket";
+import { useTranslation } from "@/hooks/use-translation";
 import { getAllSOSReq } from "@/services/dashboard/SOS/sos.service";
 import { TMeta } from "@/types";
 import { SOSType, TSOS, TSOSStats } from "@/types/sos.type";
@@ -20,6 +21,7 @@ interface IProps {
 }
 
 export function SOS({ accessToken, SOSStats }: IProps) {
+  const {t} = useTranslation();
   const router = useRouter();
   const [SOSData, setSOSData] = useState<{ data: TSOS[]; meta?: TMeta }>({
     data: [],
@@ -69,8 +71,8 @@ export function SOS({ accessToken, SOSStats }: IProps) {
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Header Section */}
         <TitleHeader
-          title="SOS Alerts"
-          subtitle="Monitor and resolve critical incidents"
+          title={t("sos_alerts")}
+          subtitle={t("monitor_and_resolve_critical_incidents")}
         />
 
         {/* Stats Summary */}
@@ -138,24 +140,24 @@ export function SOS({ accessToken, SOSStats }: IProps) {
           className="grid grid-cols-1 gap-8 md:grid-cols-3"
         >
           <SOSCard
-            title="Vendor SOS"
-            description="Critical issues reported by restaurants and merchants. Includes kitchen fires, stock outages, or device failures."
+            title={t("vendor_sos")}
+            description={t("critical_issues_reported_by_restaurants")}
             icon={ShoppingBag}
             count={SOSStats.Vendor}
             onClick={() => handleCardClick(USER_ROLE.VENDOR)}
           />
 
           <SOSCard
-            title="Fleet Manager SOS"
-            description="Operational emergencies from logistics hubs. Vehicle breakdowns, accident reports, and route blockages."
+            title={t("fleet_manager_sos")}
+            description={t("operational_emergencies_from_logistics_hubs")}
             icon={Truck}
             count={SOSStats.FleetManager}
             onClick={() => handleCardClick(USER_ROLE.FLEET_MANAGER)}
           />
 
           <SOSCard
-            title="Delivery Partner SOS"
-            description="Urgent safety alerts from riders on the road. Medical emergencies, harassment, or severe weather conditions."
+            title={t("delivery_partner_sos")}
+            description={t("urgent_safety_alerts_from_riders_on_the_road")}
             icon={Bike}
             count={SOSStats.DeliveryPartner}
             onClick={() => handleCardClick(USER_ROLE.DELIVERY_PARTNER)}

@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TTransaction } from "@/types/transaction.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -28,6 +29,7 @@ interface IProps {
 }
 
 export default function CustomerSpendTable({ spends }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -42,30 +44,30 @@ export default function CustomerSpendTable({ spends }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <UserIcon className="w-4" />
-                Customer
+                {t("customer")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <PackageIcon className="w-4" />
-                Items
+                {t("items")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Amount
+                {t("amount")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Date
+                {t("date")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -76,7 +78,7 @@ export default function CustomerSpendTable({ spends }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No spends found
+                {t("no_spends_found")}
               </TableCell>
             </TableRow>
           )}
@@ -105,7 +107,7 @@ export default function CustomerSpendTable({ spends }: IProps) {
                   className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"
                 >
                   <EyeIcon />
-                  View
+                  {t("view")}
                 </Button>
               </TableCell>
             </TableRow>

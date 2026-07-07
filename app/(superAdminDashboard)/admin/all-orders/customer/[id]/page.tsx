@@ -32,10 +32,10 @@ export default async function CustomerOrdersPage({
       ordersResult={ordersResult}
       title={
         customer.name?.firstName || customer.name?.lastName
-          ? `Orders from ${customer?.name?.firstName} ${customer?.name?.lastName}`
-          : "Customer Orders"
+          ? `orders_from ${customer?.name?.firstName} ${customer?.name?.lastName}`
+          : "customer_orders"
       }
-      subtitle="Manage customer orders here"
+      subtitle="manage_customer_orders_here"
     />
   );
 }

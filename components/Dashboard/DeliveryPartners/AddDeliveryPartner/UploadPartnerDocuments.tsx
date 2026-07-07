@@ -49,52 +49,52 @@ export default function UploadPartnerDocuments({
     label: string;
     prefersImagePreview: boolean;
   }[] = [
-    {
-      key: "idProofFront",
-      label: t("id_proof_front"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "idProofBack",
-      label: t("id_proof_back"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "drivingLicenseFront",
-      label: "Driving License Front",
-      prefersImagePreview: true,
-    },
-    {
-      key: "drivingLicenseBack",
-      label: "Driving License Back",
-      prefersImagePreview: true,
-    },
-    {
-      key: "vehicleRegistration",
-      label: t("vehicle_registration"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "criminalRecordCertificate",
-      label: t("criminal_record_certification"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "activity",
-      label: "Activity",
-      prefersImagePreview: false,
-    },
-    {
-      key: "insurancePolicy",
-      label: "Insurance Policy",
-      prefersImagePreview: true,
-    },
-    {
-      key: "myPhoto",
-      label: "My Photo",
-      prefersImagePreview: true,
-    },
-  ];
+      {
+        key: "idProofFront",
+        label: t("id_proof_front"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "idProofBack",
+        label: t("id_proof_back"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "drivingLicenseFront",
+        label: t("driving_license_front"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "drivingLicenseBack",
+        label: t("driving_license_back"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "vehicleRegistration",
+        label: t("vehicle_registration"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "criminalRecordCertificate",
+        label: t("criminal_record_certification"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "activity",
+        label: t("activity"),
+        prefersImagePreview: false,
+      },
+      {
+        key: "insurancePolicy",
+        label: t("insurance_policy"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "myPhoto",
+        label: t("my_photo"),
+        prefersImagePreview: true,
+      },
+    ];
 
   const openPicker = (key: DocKey) => {
     const el = inputsRef.current[key];
@@ -177,18 +177,16 @@ export default function UploadPartnerDocuments({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
-            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${
-              isSelected
-                ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
-                : "bg-white"
-            }`}
+            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${isSelected
+              ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
+              : "bg-white"
+              }`}
           >
             <div className="flex items-center gap-4 w-full">
               {!isSelected && (
                 <div
-                  className={`w-14 h-14 rounded-lg flex items-center justify-center ${
-                    isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
-                  }`}
+                  className={`w-14 h-14 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
+                    }`}
                 >
                   {d.prefersImagePreview ? (
                     <ImageIcon className="w-6 h-6 text-[#DC3173]" />
@@ -219,7 +217,7 @@ export default function UploadPartnerDocuments({
                         onClick={() => openPicker(d.key)}
                         className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
                       >
-                        <RefreshCcw className="w-3 h-3 text-[#DC3173]" /> Change
+                        <RefreshCcw className="w-3 h-3 text-[#DC3173]" /> {t("change")}
                       </button>
                     </div>
                   )}
@@ -271,7 +269,7 @@ export default function UploadPartnerDocuments({
             </div>
 
             {!isSelected && (
-              <div className="flex items-center justify-end gap-3 w-[170px]!">
+              <div className="flex items-center justify-end gap-3 w-42.5!">
                 <button
                   type="button"
                   onClick={() => openPicker(d.key)}

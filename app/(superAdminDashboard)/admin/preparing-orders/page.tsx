@@ -16,8 +16,8 @@ export default async function PreparingOrdersPage({ searchParams }: IProps) {
   return (
     <Orders
       ordersResult={ordersResult}
-      title="Preparing Orders"
-      subtitle="All preparing orders in the system"
+      title="preparing_orders"
+      subtitle="all_preparing_orders_in_system"
     />
   );
 }

@@ -29,7 +29,6 @@ export default function ProductDetails({ product }: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  console.log("ProductDetails product:", product);
 
   const getStockStatusColor = (status: string) => {
     switch (status) {
@@ -279,7 +278,7 @@ export default function ProductDetails({ product }: IProps) {
           >
             <div>
               <h3 className="text-sm font-medium text-gray-500">
-                {t("category")}
+                {t("category_lg")}
               </h3>
               <p className="mt-1 text-gray-900">{product.category?.name?.[lang]}</p>
               {product.subCategory && (
@@ -290,7 +289,7 @@ export default function ProductDetails({ product }: IProps) {
             </div>
             {product.brand && (
               <div>
-                <h3 className="text-sm font-medium text-gray-500">Brand</h3>
+                <h3 className="text-sm font-medium text-gray-500">{t("brand")}</h3>
                 <p className="mt-1 text-gray-900">{product.brand}</p>
               </div>
             )}
@@ -301,19 +300,19 @@ export default function ProductDetails({ product }: IProps) {
               <div className="flex items-center gap-2 mb-2">
                 <PackageIcon className="w-5 h-5 text-[#DC3173]" />
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Variations
+                  {t("variations")}
                 </h2>
               </div>
               {product.variations?.map((v, i) => (
                 <div key={i}>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium">Name: </span>
+                      <span className="font-medium">{t("name")}: </span>
                       <span>{v.name?.[lang]}</span>
                     </div>
                     <div className="flex items-start gap-4">
                       <h4 className="font-semibold w-50">
-                        Variation Options
+                        {t("variation_options")}
                       </h4>
                       <div className="mt-0.5 flex-1">
                         {v.options.map((option, index) => (
@@ -322,16 +321,16 @@ export default function ProductDetails({ product }: IProps) {
                             className="flex justify-between items-start gap-3 text-sm"
                           >
                             <div>
-                              <span className="font-semibold">Label: </span>
+                              <span className="font-semibold">{t("label")}: </span>
                               <span>{option.label?.[lang]}</span>
                             </div>
                             <div className="flex items-start gap-3">
                               <div>
-                                <span className="font-semibold">Price: </span>
+                                <span className="font-semibold">{t("price")}: </span>
                                 <span>€{option.price}</span>
                               </div>
                               <div>
-                                <span className="font-semibold">Stock: </span>
+                                <span className="font-semibold">{t("stock")}: </span>
                                 <span>{option.stockQuantity}</span>
                               </div>
                             </div>

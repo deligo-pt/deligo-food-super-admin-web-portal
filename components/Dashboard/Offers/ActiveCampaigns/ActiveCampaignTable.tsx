@@ -14,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -46,6 +48,8 @@ export default function CampaignTable({
   handleOpenEditModal,
   handleDeleteId,
 }: IProps) {
+  const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
 
   return (
@@ -60,42 +64,42 @@ export default function CampaignTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <StoreIcon className="w-4" />
-                Title
+                {t("title")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <TagsIcon className="w-4" />
-                Type
+                {t("type")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <PercentIcon className="w-4" />
-                Discount
+                {t("discount")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Clock className="w-4" />
-                Duration
+                {t("duration")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Active Status
+                {t("active_status")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Hourglass className="w-4" />
-                Expire Status
+                {t("expire_status")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -106,13 +110,13 @@ export default function CampaignTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={7}
               >
-                No offers found
+                {t("no_offers_found")}
               </TableCell>
             </TableRow>
           )}
           {offers?.map((offer) => (
             <TableRow key={offer._id}>
-              <TableCell>{offer.title}</TableCell>
+              <TableCell>{offer?.title?.[lang]}</TableCell>
               <TableCell>{offer.offerType}</TableCell>
               <TableCell>
                 {offer.offerType === "PERCENT"
@@ -143,36 +147,36 @@ export default function CampaignTable({
                         router.push("/admin/all-offers/" + offer._id)
                       }
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => handleOpenEditModal(offer)}
                     >
-                      Edit
+                      {t("edit")}
                     </DropdownMenuItem>
                     {offer.isActive && (
                       <DropdownMenuItem
                         onClick={() =>
-                          handleStatusInfo(offer._id, offer.title, false)
+                          handleStatusInfo(offer._id, offer.title?.[lang] as string, false)
                         }
                       >
-                        Deactivate
+                        {t("deactivate")}
                       </DropdownMenuItem>
                     )}
                     {!offer.isActive && (
                       <DropdownMenuItem
                         onClick={() =>
-                          handleStatusInfo(offer._id, offer.title, true)
+                          handleStatusInfo(offer._id, offer.title?.[lang] as string, true)
                         }
                       >
-                        Activate
+                        {t("activate")}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => handleDeleteId(offer._id)}
                     >
-                      Delete
+                      {t("delete")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
