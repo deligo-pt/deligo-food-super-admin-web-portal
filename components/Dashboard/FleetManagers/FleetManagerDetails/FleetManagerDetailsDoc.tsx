@@ -5,6 +5,9 @@ export interface IFleetDocs {
   businessLicense?: string[];
   idProofFront?: string[];
   idProofBack?: string[];
+  activityDocument?: string[];
+  myPhoto?: string[];
+  proofOfAddress?: string[];
 }
 
 interface IProps {
@@ -12,6 +15,7 @@ interface IProps {
 }
 
 export default function FleetManagerDetailsDoc({ documents }: IProps) {
+  console.log("documents", documents);
   const { t } = useTranslation();
   const docsArr = Object.keys(documents || {}) as (keyof IFleetDocs)[];
 
@@ -28,6 +32,9 @@ export default function FleetManagerDetailsDoc({ documents }: IProps) {
               {doc === "idProofFront" && t("id_proof_front")}
               {doc === "idProofBack" && t("id_proof_back")}
               {doc === "businessLicense" && t("business_license")}
+              {doc === "activityDocument" && t("activity_document")}
+              {doc === "myPhoto" && t("my_photo")}
+              {doc === "proofOfAddress" && t("proof_of_address")}
             </p>
 
             <div className="grid grid-cols-2 gap-3">
@@ -57,7 +64,7 @@ export default function FleetManagerDetailsDoc({ documents }: IProps) {
                       rel="noopener noreferrer"
                       className="mt-2 text-sm text-[#DC3173] hover:underline inline-block"
                     >
-                     {t("view_full_file")}
+                      {t("view_full_file")}
                     </a>
                   </div>
                 );
