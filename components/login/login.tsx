@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import ClearSessionModal from "@/components/login/ClearSessionModal";
@@ -64,40 +65,47 @@ export default function SuperAdminLoginPage({
   }) => {
     const toastId = toast.loading("Logging in...");
 
-    const deviceDetails = await getDeviceInfo();
+    try {
+      const deviceDetails = await getDeviceInfo();
 
-    const result = await loginReq({ ...payload, deviceDetails });
+      const result = await loginReq({ ...payload, deviceDetails });
 
-    if (result?.success) {
-      const decoded = jwtDecode(result.data.accessToken) as { role: string };
+      if (result?.success) {
+        const decoded = jwtDecode(result.data.accessToken) as { role: string };
 
-      if (decoded.role === "SUPER_ADMIN" || decoded.role === "ADMIN") {
-        setCookie("accessToken", result.data.accessToken, 7);
-        setCookie("refreshToken", result.data.refreshToken, 365);
-        toast.success("Login successful!", { id: toastId });
+        if (decoded.role === "SUPER_ADMIN" || decoded.role === "ADMIN") {
+          setCookie("accessToken", result.data.accessToken, 7);
+          setCookie("refreshToken", result.data.refreshToken, 365);
+          toast.success("Login successful!", { id: toastId });
 
-        // get and save fcm token
-        setTimeout(() => {
-          getAndSaveFcmToken(result.data.accessToken);
-        }, 1000);
+          // get and save fcm token
+          setTimeout(() => {
+            getAndSaveFcmToken(result.data.accessToken);
+          }, 1000);
 
-        if (redirect) {
-          router.push(redirect);
+          if (redirect) {
+            router.push(redirect);
+            return;
+          }
+
+          router.push("/admin/dashboard");
           return;
         }
 
-        router.push("/admin/dashboard");
+        toast.error("You are not a super admin", { id: toastId });
+        return;
+      } else {
+        if (result?.err?.statusCode === 403 && result?.err?.errorKey === "LIMIT_EXCEEDED") {
+          toast.error("Device limit exceeded. Click remove and continue login or try again later", { id: toastId });
+          setShowModal(true);
+          return;
+        }
+        toast.error(result?.message, { id: toastId });
         return;
       }
-
-      toast.error("You are not a super admin", { id: toastId });
-      return;
-    }
-
-    toast.error(result.message, { id: toastId });
-
-    if (result.message === "LIMIT_EXCEEDED") {
-      setShowModal(true);
+    } catch (err: any) {
+      console.log("login err :", err);
+      toast.error(err.message || err?.response?.message || "Login failed", { id: toastId });
     }
   };
 
