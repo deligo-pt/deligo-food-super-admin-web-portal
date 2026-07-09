@@ -73,6 +73,7 @@ export default function ApproveOrRejectModal({
         { id: toastId },
       );
       router.refresh();
+      setIsSubmitting(false);
       return;
     }
 
