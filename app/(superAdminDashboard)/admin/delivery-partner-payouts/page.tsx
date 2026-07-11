@@ -21,8 +21,8 @@ export default async function DeliveryPartnerPayoutsPage({
   return (
     <Payouts
       payoutsResult={deliveryPartnerPayoutsResult}
-      title="delivery_partner_payouts"
-      subtitle="manage_all_delivery_partner_payouts_here"
+      title="rider_payouts"
+      subtitle="manage_all_rider_payouts_here"
       userRole={USER_ROLE.DELIVERY_PARTNER}
     />
   );

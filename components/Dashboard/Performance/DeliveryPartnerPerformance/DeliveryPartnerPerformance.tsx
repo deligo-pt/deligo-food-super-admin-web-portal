@@ -25,8 +25,8 @@ export default function DeliveryPartnerPerformance({
     <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title={t("delivery_partner_performance_analytics")}
-        subtitle={t("comprehensive_insights_into_delivery_partner")}
+        title={t("rider_performance_analytics")}
+        subtitle={t("comprehensive_insights_into_rider")}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

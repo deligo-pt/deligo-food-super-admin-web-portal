@@ -43,8 +43,8 @@ export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
     <div className="min-h-screen bg-[#FBFBFE] space-y-8">
       {/* Header */}
       <TitleHeader
-        title={t("delivery_partner_analytics")}
-        subtitle={t("analyze_partner_availability_performance")}
+        title={t("rider_analytics")}
+        subtitle={t("analyze_rider_availability_performance")}
       />
 
       {/* Stats */}

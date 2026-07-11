@@ -21,6 +21,7 @@ import {
   CircleCheckBig,
   Cog,
   IdCard,
+  ListIcon,
   Mail,
   MoreVertical,
   Phone,
@@ -44,7 +45,6 @@ export default function DeliveryPartnerTable({
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  console.log("partners", partners);
 
   return (
     <motion.div
@@ -59,6 +59,12 @@ export default function DeliveryPartnerTable({
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <IdCard className="w-4" />
                 {t("name")}
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
+                <ListIcon className="w-4" />
+                {t("associated_fleet")}
               </div>
             </TableHead>
             <TableHead>
@@ -98,6 +104,9 @@ export default function DeliveryPartnerTable({
           )}
           {partners?.map((partner) => (
             <TableRow key={partner._id}>
+              <TableCell>
+                {partner?.registeredBy?.id?.name?.firstName} {partner?.registeredBy?.id?.name?.lastName}
+              </TableCell>
               <TableCell>
                 {partner.name?.firstName} {partner.name?.lastName}
               </TableCell>

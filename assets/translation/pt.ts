@@ -66,17 +66,16 @@ export const pt = {
   blocked_customers: "Clientes Bloqueados",
   customer_feedback: "Feedback dos Clientes",
 
-  add_delivery_partner: "Adicionar Parceiro de Entrega",
-  delivery_partners: "Parceiros de Entrega",
-  all_delivery_partners: "Todos os Parceiros de Entrega",
-  delivery_partner_onboarding_requests:
-    "Pedidos de Adesão de Parceiros de Entrega",
-  active_delivery_partners: "Parceiros de Entrega Ativos",
-  suspended_delivery_partners: "Parceiros de Entrega Suspensos",
-  delivery_partner_performance: "Desempenho dos Parceiros de Entrega",
-  delivery_partner_wallets: "Carteiras do Parceiro de Entrega",
-  delivery_partner_payouts: "Pagamentos aos Parceiros de Entrega",
-  delivery_partner_analytics: "Análises dos Parceiros de Entrega",
+  add_rider: "Adicionar Entregador",
+  riders: "Entregadores",
+  all_riders: "Todos os Entregadores",
+  rider_onboarding_requests: "Solicitações de Integração de Entregadores",
+  active_riders: "Entregadores Ativos",
+  suspended_riders: "Entregadores Suspensos",
+  rider_performance: "Desempenho dos Entregadores",
+  rider_wallets: "Carteiras dos Entregadores",
+  rider_payouts: "Pagamentos aos Entregadores",
+  rider_analytics: "Análises de Entregadores",
 
   cuisine: "Culinária",
   create_cuisine: "Criar Culinária",
@@ -582,11 +581,9 @@ export const pt = {
   on_time: "Dentro do prazo",
   cancel_rate: "Taxa de cancelamento",
   fleet_health: "Estado da frota",
-  active_riders: "Estafetas ativos",
   average_rating: "Avaliação média",
   deliveries_nd_earnings_trend: "Tendência de entregas e ganhos",
   earnings_area_last_period: "Área de ganhos (último período)",
-  rider_performance: "Desempenho dos estafetas",
   top_5: "(Top 5)",
   deliveries: "Entregas",
   rider_comparison: "Comparação de estafetas (Entregas)",
@@ -748,8 +745,8 @@ export const pt = {
 
   // delivery partners
   // -> add delivery partner
-  add_new_delivery_partner: "Adicionar Novo Parceiro de Entrega",
-  create_new_delivery_partner_form: "Crie un novo parceiro de entrega com o formulário abaixo",
+  add_new_rider: "Adicionar Novo Entregador",
+  create_new_rider_form: "Crie um novo entregador com o formulário abaixo",
   male: "Masculino",
   female: "Feminino",
   nif_number: "Número do NIF",
@@ -831,32 +828,32 @@ export const pt = {
   update_delivery_partner: "Atualizar Parceiro de Entrega",
 
   // all delivery partners
-  manage_all_registered_delivery_partners: "Gerenciar todos os parceiros de entrega registrados",
+  manage_all_registered_riders: "Gerenciar todos os entregadores registrados",
+  associated_fleet: "Frota Associada",
 
   // active delivery partners
-  all_active_delivery_partners_system: "Todos os parceiros de entrega ativos no sistema",
-  all_active_partners: "Todos os parceiros ativos",
+  all_active_riders_system: "Todos os entregadores ativos no sistema",
+  all_active_riders: "Todos os entregadores ativos",
   total: "total",
   no_partners_found: "Nenhum parceiro encontrado.",
 
   // delivery partner onboarding request
-  all_requested_delivery_partners_onboarding: "Todas as solicitações de integração de parceiros de entrega",
+  all_requested_riders_onboarding: "Todos os entregadores solicitados para integração",
 
-  // suspended delivery partners
-  all_blocked_delivery_partners_from_platform: "Todos os parceiros de entrega bloqueados na plataforma",
+  // suspended riders
+  all_blocked_riders_from_platform: "Todos os entregadores bloqueados da plataforma",
   total_suspended: "Total suspensos",
   reload: "Recarregar",
   partner: "Parceiro",
   suspended_at: "Suspenso em",
   reactivate: "Reativar",
-  no_suspended_partners_match_your_filters:
-    "Nenhum parceiro suspenso corresponde aos seus filtros.",
+  no_suspended_riders_match_your_filters: "Nenhum entregador suspenso atende aos seus filtros.",
 
   // delivery partner performance
-  delivery_partner_performance_analytics: "Análise de Desempenho do Parceiro de Entrega",
-  comprehensive_insights_into_delivery_partner: "Informações detalhadas sobre o desempenho do parceiro de entrega",
+  rider_performance_analytics: "Análise de Desempenho do Entregador",
+  comprehensive_insights_into_rider: "Informações detalhadas sobre o desempenho dos entregadores",
   monthly_performance_over_the_last_6_months: "Desempenho mensal nos últimos 6 meses",
-  view_delivery_partners_performance_analytics: "Visualizar análise de desempenho dos parceiros de entrega",
+  view_riders_performance_analytics: "Ver análises de desempenho dos entregadores",
   no_delivery_partner_found: "Nenhum parceiro de entrega encontrado",
   overview_of_delivery_partner_kpi_monthly:
     "Visão geral dos KPIs dos parceiros de entrega e tendências mensais (Portugal)",
@@ -883,7 +880,7 @@ export const pt = {
   view_violations: "Ver infrações",
 
   // delivery partner payouts
-  manage_all_delivery_partner_payouts_here: "Gerencie todos os pagamentos dos parceiros de entrega aqui",
+  manage_all_rider_payouts_here: "Gerencie todos os pagamentos de entregadores aqui",
   approve_process_audit_partner:
     "Aprovar, processar e auditar pagamentos de parceiros — Portugal",
   search_partner_id_city: "Pesquisar parceiro, ID ou cidade...",
@@ -917,7 +914,7 @@ export const pt = {
   add_an_optional_note: "Adicionar uma nota opcional para esta ação",
 
   // delivery partner analytics
-  analyze_partner_availability_performance: "Analise a disponibilidade do parceiro, níveis de desempenho e distribuição regional",
+  analyze_rider_availability_performance: "Análise a disponibilidade, níveis de desempenho e distribuição regional dos entregadores",
   kpi_dashboard_trends_heatmap:
     "Painel de KPIs, tendências e mapa de calor — vista super admin (Portugal)",
   search_partner_city: "Pesquisar parceiro ou cidade...",
@@ -955,7 +952,7 @@ export const pt = {
   payout_history: "Histórico de pagamentos",
 
   // delivery partner wallets
-  manage_all_the_delivery_partner_wallets: "Gerenciar todas as carteiras dos parceiros de entrega",
+  manage_all_the_rider_wallets: "Gerencie todas as carteiras dos entregadores",
 
   // add-business-category
   add_business_category: "Adicionar categoria de negócio",
@@ -1626,7 +1623,6 @@ export const pt = {
   shortage_detected: "Escassez Detectada",
   total_demand: "Demanda Total",
   total_shortage: "Escassez Total",
-  riders: "Entregadores",
   shortage: "Escassez",
   peak_heatmap: "Mapa de Calor de Pico (Melhores Horários)",
   lowest_hour: "Hora mais baixa",
