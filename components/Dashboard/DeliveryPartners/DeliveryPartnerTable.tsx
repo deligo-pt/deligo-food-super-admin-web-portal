@@ -21,6 +21,7 @@ import {
   CircleCheckBig,
   Cog,
   IdCard,
+  ListIcon,
   Mail,
   MoreVertical,
   Phone,
@@ -62,6 +63,12 @@ export default function DeliveryPartnerTable({
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
+                <ListIcon className="w-4" />
+                {t("associated_fleet")}
+              </div>
+            </TableHead>
+            <TableHead>
+              <div className="text-[#DC3173] flex gap-2 items-center">
                 <Mail className="w-4" />
                 {t("email")}
               </div>
@@ -97,6 +104,9 @@ export default function DeliveryPartnerTable({
           )}
           {partners?.map((partner) => (
             <TableRow key={partner._id}>
+              <TableCell>
+                {partner?.registeredBy?.id?.name?.firstName} {partner?.registeredBy?.id?.name?.lastName}
+              </TableCell>
               <TableCell>
                 {partner.name?.firstName} {partner.name?.lastName}
               </TableCell>

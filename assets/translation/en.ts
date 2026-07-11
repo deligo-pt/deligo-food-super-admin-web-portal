@@ -63,16 +63,16 @@ export const en = {
   customer_spends: "Customer Spends",
   customer_feedback: "Customer Feedback",
 
-  add_delivery_partner: "Add Delivery Partner",
-  delivery_partners: "Delivery Partners",
-  all_delivery_partners: "All Delivery Partners",
-  delivery_partner_onboarding_requests: "Delivery Partner Onboarding Requests",
-  active_delivery_partners: "Active Delivery Partners",
-  suspended_delivery_partners: "Suspended Delivery Partners",
-  delivery_partner_performance: "Delivery Partner Performance",
-  delivery_partner_wallets: "Delivery Partner Wallets",
-  delivery_partner_payouts: "Delivery Partner Payouts",
-  delivery_partner_analytics: "Delivery Partner Analytics",
+  add_rider: "Add Rider",
+  riders: "Riders",
+  all_riders: "All Riders",
+  rider_onboarding_requests: "Rider Onboarding Requests",
+  active_riders: "Active Riders",
+  suspended_riders: "Suspended Riders",
+  rider_performance: "Rider Performance",
+  rider_wallets: "Rider Wallets",
+  rider_payouts: "Rider Payouts",
+  rider_analytics: "Rider Analytics",
 
   cuisine: "Cuisine",
   create_cuisine: "Create Cuisine",
@@ -453,6 +453,10 @@ export const en = {
   //---> fleet documents
   view_full_file: "View Full File",
   no_document_uploaded: "No documents uploaded",
+  // --> fleet riders
+  all_registered_riders: "All registered Riders",
+  userId: "User ID",
+  no_riders_registered_yet: "No riders registered yet",
 
   // add-fleet-manager
   add_a_new_fleet_manager_here: "Add a new fleet manager here",
@@ -569,11 +573,9 @@ export const en = {
   on_time: "On-time",
   cancel_rate: "Cancel Rate",
   fleet_health: "Fleet health",
-  active_riders: "Active Riders",
   average_rating: "Average rating",
   deliveries_nd_earnings_trend: "Deliveries & Earnings Trend",
   earnings_area_last_period: "Earnings Area (last period)",
-  rider_performance: "Rider Performance",
   top_5: "(Top 5)",
   deliveries: "Deliveries",
   rider_comparison: "Rider Comparison (Deliveries)",
@@ -732,8 +734,8 @@ export const en = {
 
   // delivery partners
   // -> add delivery partner
-  add_new_delivery_partner: "Add New Delivery Partner",
-  create_new_delivery_partner_form: "Create a new delivery partner with the form below",
+  add_new_rider: "Add New Rider",
+  create_new_rider_form: "Create a new rider with the form below",
   male: "Male",
   female: "Female",
   nif_number: "NIF Number",
@@ -813,32 +815,32 @@ export const en = {
   update_delivery_partner: "Update Delivery Partner",
 
   // all delivery partners
-  manage_all_registered_delivery_partners: "Manage all registered delivery partners",
+  manage_all_registered_riders: "Manage all registered riders",
+  associated_fleet: "Associated Fleet",
 
   // active delivery partners
-  all_active_delivery_partners_system: "All active delivery partners in the system",
-  all_active_partners: "All Active Partners",
+  all_active_riders_system: "All active riders in the system",
+  all_active_riders: "All Active riders",
   total: "total",
   no_partners_found: "No partners found.",
 
   // delivery partner onboarding request
-  all_requested_delivery_partners_onboarding: "All Requested Delivery Partners for Onboarding",
+  all_requested_riders_onboarding: "All Requested riders for Onboarding",
 
-  // suspended delivery partners
-  all_blocked_delivery_partners_from_platform: "All blocked delivery partners from the platform",
+  // suspended riders
+  all_blocked_riders_from_platform: "All blocked riders from the platform",
   total_suspended: "Total Suspended",
   reload: "Reload",
   partner: "Partner",
   suspended_at: "Suspended At",
   reactivate: "Reactivate",
-  no_suspended_partners_match_your_filters:
-    "No suspended partners match your filters.",
+  no_suspended_riders_match_your_filters: "No suspended riders match your filters.",
 
   // delivery partner performance
-  delivery_partner_performance_analytics: "Delivery Partner Performance Analytics",
-  comprehensive_insights_into_delivery_partner: "Comprehensive insights into delivery partner performance",
+  rider_performance_analytics: "Rider Performance Analytics",
+  comprehensive_insights_into_rider: "Comprehensive insights into rider performance",
   monthly_performance_over_the_last_6_months: "Monthly performance over the last 6 months",
-  view_delivery_partners_performance_analytics: "View delivery partners performance analytics",
+  view_riders_performance_analytics: "View riders performance analytics",
   no_delivery_partner_found: "No delivery partner found",
   overview_of_delivery_partner_kpi_monthly:
     "Overview of delivery partner KPIs & monthly trends (Portugal)",
@@ -865,7 +867,7 @@ export const en = {
   view_violations: "View Violations",
 
   // delivery partner payouts
-  manage_all_delivery_partner_payouts_here: "Manage all delivery partner payouts here",
+  manage_all_rider_payouts_here: "Manage all rider payouts here",
   approve_process_audit_partner:
     "Approve, process and audit partner payouts — Portugal",
   search_partner_id_city: "Search partner, id or city...",
@@ -898,7 +900,7 @@ export const en = {
   add_an_optional_note: "Add an optional note for this action",
 
   // delivery partner analytics
-  analyze_partner_availability_performance: "Analyze partner availability, performance tiers, and regional distribution",
+  analyze_rider_availability_performance: "Analyze rider availability, performance tiers, and regional distribution",
   kpi_dashboard_trends_heatmap:
     "KPI dashboard, trends & heatmap — super admin view (Portugal)",
   search_partner_city: "Search partner or city...",
@@ -936,7 +938,7 @@ export const en = {
   payout_history: "Payout History",
 
   // delivery partner wallets
-  manage_all_the_delivery_partner_wallets: "Manage all the delivery partner wallets",
+  manage_all_the_rider_wallets: "Manage all the rider wallets",
 
   // add-business-category
   add_business_category: "Add Business Category",
@@ -1600,7 +1602,6 @@ export const en = {
   shortage_detected: "Shortage Detected",
   total_demand: "Total Demand",
   total_shortage: "Total Shortage",
-  riders: "Riders",
   shortage: "Shortage",
   peak_heatmap: "Peak Heatmap (Top Slots)",
   lowest_hour: "Lowest Hour",

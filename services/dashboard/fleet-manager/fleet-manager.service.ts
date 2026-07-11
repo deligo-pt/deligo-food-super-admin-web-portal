@@ -45,7 +45,5 @@ export const getSingleFleetManagerReq = async (id: string) => {
     return await serverRequest.get(`/fleet-managers/${id}`);
   });
 
-  if (result?.success) return result.data;
-
-  return {};
+  return result;
 };

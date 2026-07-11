@@ -13,23 +13,17 @@ export const loginReq = async (data: {
   forceLogin?: boolean;
   deviceDetails: TDeviceDetails;
 }) => {
-  return catchAsync<{ accessToken: string; refreshToken: string }>(async () => {
-    const response = await fetch(`${BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result?.message || "Failed to login");
-    }
-
-    return result;
+  const response = await fetch(`${BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
   });
+
+  const result = await response.json();
+
+  return result;
 };
 
 export const logoutReq = async () => {

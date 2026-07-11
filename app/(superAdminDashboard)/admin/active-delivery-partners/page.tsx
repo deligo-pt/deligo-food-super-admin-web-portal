@@ -17,8 +17,8 @@ export default async function ActiveDeliveryPartnersPage({
   return (
     <DeliveryPartners
       partnersResult={partnersResult}
-      title="active_delivery_partners"
-      subtitle="all_active_delivery_partners_system"
+      title="active_riders"
+      subtitle="all_active_riders_system"
     />
   );
 }

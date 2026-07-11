@@ -18,21 +18,27 @@ interface IProps {
 export default function PeakHoursPage({ peakHourAnalysis }: IProps) {
   const { t } = useTranslation();
 
-  const peakHour = peakHourAnalysis.hourlyOrders.reduce((a, b) =>
-    a.orderCount > b.orderCount ? a : b,
-  );
+  const peakHour = peakHourAnalysis.hourlyOrders?.length
+    ? peakHourAnalysis.hourlyOrders.reduce((a, b) =>
+      a.orderCount > b.orderCount ? a : b
+    )
+    : null;
 
-  const peakDay = peakHourAnalysis.dayWiseOrders.reduce((a, b) =>
-    a.orderCount > b.orderCount ? a : b,
-  );
+  const peakDay = peakHourAnalysis.dayWiseOrders?.length
+    ? peakHourAnalysis.dayWiseOrders.reduce((a, b) =>
+      a.orderCount > b.orderCount ? a : b,
+    )
+    : null;
 
   const dinner = peakHourAnalysis.mealTimeComparison.find(
     (m) => m.type === "DINNER",
   );
 
-  const maxShortage = peakHourAnalysis.riderDemandGap.reduce((a, b) =>
-    a.shortage > b.shortage ? a : b,
-  );
+  const maxShortage = peakHourAnalysis.riderDemandGap?.length
+    ? peakHourAnalysis.riderDemandGap.reduce((a, b) =>
+      a.shortage > b.shortage ? a : b,
+    )
+    : null;
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-20">
@@ -46,12 +52,12 @@ export default function PeakHoursPage({ peakHourAnalysis }: IProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatsCard
           title={t("peak_hour")}
-          value={`${peakHour.hour}:00`}
+          value={`${peakHour?.hour}:00`}
           icon={Clock}
         />
         <StatsCard
           title={t("peak_day")}
-          value={peakDay.day}
+          value={peakDay?.day as string}
           icon={CalendarDays}
           delay={0.1}
         />
@@ -63,7 +69,7 @@ export default function PeakHoursPage({ peakHourAnalysis }: IProps) {
         />
         <StatsCard
           title={t("max_rider_shortage")}
-          value={`${maxShortage.shortage}`}
+          value={`${maxShortage?.shortage || 0}`}
           icon={AlertTriangle}
           delay={0.3}
         />

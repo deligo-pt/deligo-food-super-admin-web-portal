@@ -25,8 +25,8 @@ export default function DeliveryPartnerWallets({ walletsResult }: IProps) {
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title={t("delivery_partner_wallets")}
-        subtitle={t("manage_all_the_delivery_partner_wallets")}
+        title={t("rider_wallets")}
+        subtitle={t("manage_all_the_rider_wallets")}
       />
 
       {/* Filters */}

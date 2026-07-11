@@ -15,8 +15,8 @@ export default async function AllDeliveryPartnersPage({
     <DeliveryPartners
       partnersResult={partnersResult}
       showFilters={true}
-      title="all_delivery_partners"
-      subtitle="manage_all_registered_delivery_partners"
+      title="all_riders"
+      subtitle="manage_all_registered_riders"
     />
   );
 }

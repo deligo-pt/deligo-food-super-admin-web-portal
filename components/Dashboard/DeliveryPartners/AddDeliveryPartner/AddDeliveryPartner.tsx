@@ -402,8 +402,8 @@ export default function AddDeliveryPartner() {
         className="min-h-screen bg-slate-50"
       >
         <TitleHeader
-          title={t("add_new_delivery_partner")}
-          subtitle={t("create_new_delivery_partner_form")}
+          title={t("add_new_rider")}
+          subtitle={t("create_new_rider_form")}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
