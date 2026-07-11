@@ -44,6 +44,7 @@ export default function DeliveryPartnerTable({
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  console.log("partners", partners);
 
   return (
     <motion.div

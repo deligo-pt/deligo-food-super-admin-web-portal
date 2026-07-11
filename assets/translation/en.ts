@@ -453,6 +453,10 @@ export const en = {
   //---> fleet documents
   view_full_file: "View Full File",
   no_document_uploaded: "No documents uploaded",
+  // --> fleet riders
+  all_registered_riders: "All registered Riders",
+  userId: "User ID",
+  no_riders_registered_yet: "No riders registered yet",
 
   // add-fleet-manager
   add_a_new_fleet_manager_here: "Add a new fleet manager here",

@@ -462,6 +462,10 @@ export const pt = {
   //---> fleet documents
   view_full_file: "Visualizar Arquivo Completo",
   no_document_uploaded: "Nenhum documento enviado",
+  // --> fleet riders
+  all_registered_riders: "Todos os entregadores registrados",
+  userId: "ID do Usuário",
+  no_riders_registered_yet: "Nenhum entregador registrado ainda",
 
   // add-fleet-manager
   add_a_new_fleet_manager_here: "Adicione um novo gerente de frota aqui",

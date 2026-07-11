@@ -114,19 +114,19 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
     },
     {
       id: "driverss",
-      title: t("delivery_partners"),
+      title: "Riders",
       icon: <Bike size={18} />,
       items: [
         {
-          name: t("add_delivery_partner"),
+          name: t("add_rider"),
           path: "/admin/add-delivery-partner",
         },
         {
-          name: t("all_delivery_partners"),
+          name: t("all_riders"),
           path: "/admin/all-delivery-partners",
         },
         {
-          name: t("active_delivery_partners"),
+          name: t("active_riders"),
           path: "/admin/active-delivery-partners",
         },
         {
@@ -134,23 +134,23 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/delivery-partner-onboarding-requests",
         },
         {
-          name: t("suspended_delivery_partners"),
+          name: t("suspended_riders"),
           path: "/admin/suspended-delivery-partners",
         },
         {
-          name: t("delivery_partner_analytics"),
+          name: t("rider_analytics"),
           path: "/admin/delivery-partner-analytics",
         },
         {
-          name: t("delivery_partner_payouts"),
+          name: t("rider_payouts"),
           path: "/admin/delivery-partner-payouts",
         },
         {
-          name: t("delivery_partner_performance"),
+          name: t("rider_performance"),
           path: "/admin/delivery-partner-performance",
         },
         {
-          name: t("delivery_partner_wallets"),
+          name: t("rider_wallets"),
           path: "/admin/delivery-partner-wallets",
         },
       ],
