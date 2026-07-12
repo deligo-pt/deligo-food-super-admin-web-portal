@@ -13,7 +13,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
-import { getSortOptions } from "@/utils/sortOptions";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Check, Eye, Slash, Trash } from "lucide-react";
@@ -27,10 +27,11 @@ interface IProps {
 }
 
 type TUserStatus = keyof typeof USER_STATUS;
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function AllCustomers({ customersResult }: IProps) {
   const { t } = useTranslation();
-  const sortOptions = getSortOptions(t);
+  const sortOptions = getSortOptions(t, sortFields);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     customerId: "",

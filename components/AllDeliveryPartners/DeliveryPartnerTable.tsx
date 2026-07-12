@@ -22,7 +22,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
-import { getSortOptions } from "@/utils/sortOptions";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -39,6 +39,7 @@ import { toast } from "sonner";
 interface IProps {
   deliveryPartnersResult: { data: TDeliveryPartner[]; meta?: TMeta };
 }
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function DeliveryPartnerTable({
   deliveryPartnersResult,
@@ -52,7 +53,7 @@ export default function DeliveryPartnerTable({
   });
   const [deleteId, setDeleteId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
-  const sortOptions = getSortOptions(t);
+  const sortOptions = getSortOptions(t, sortFields);
   const filterOptions = [
     {
       label: t("status"),

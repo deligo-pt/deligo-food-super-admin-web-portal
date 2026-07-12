@@ -7,6 +7,7 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { formatPrice } from "@/utils/formatPrice";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion, Variants } from "framer-motion";
 import {
   AlertCircleIcon,
@@ -102,13 +103,11 @@ const disputesData = {
   },
 };
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function PaymentDisputes() {
   const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
   const containerVariants = {
     hidden: {
       opacity: 0,

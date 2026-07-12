@@ -100,13 +100,13 @@ export default function AllFilters({
       className="mb-1"
     >
       <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
-        <SearchFilter paramName="searchTerm" placeholder="Search..." />
+        <SearchFilter paramName="searchTerm" placeholder={t("searching")} />
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <div className="w-full lg:w-48">
             <SelectFilter
               paramName="sortBy"
               options={sortOptions}
-              placeholder="Sort By"
+              placeholder={t("sort_by")}
             />
           </div>
           {extraSelectFilter && (
@@ -123,14 +123,13 @@ export default function AllFilters({
           {filterOptions && (
             <Button
               variant="outline"
-              className={`flex items-center ${
-                showFilters ||
+              className={`flex items-center ${showFilters ||
                 Object.entries(paramFilters)?.filter(
                   (filter) => filter[1] !== "",
                 )?.length > 0
-                  ? "border-[#DC3173] text-[#DC3173]"
-                  : ""
-              }`}
+                ? "border-[#DC3173] text-[#DC3173]"
+                : ""
+                }`}
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="mr-2 h-4 w-4" />
@@ -165,15 +164,15 @@ export default function AllFilters({
         )}
         {Object.entries(paramFilters)?.filter((filter) => filter[1] !== "")
           ?.length > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearAllFilters}
-            className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
-          >
-            <RefreshCcw className="h-3 w-3 mr-1" /> {t("clear_all")}
-          </Button>
-        )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearAllFilters}
+              className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
+            >
+              <RefreshCcw className="h-3 w-3 mr-1" /> {t("clear_all")}
+            </Button>
+          )}
       </div>
 
       <AnimatePresence>

@@ -10,7 +10,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TAdmin } from "@/types/admin.type";
-import { getSortOptions } from "@/utils/sortOptions";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Ban, Check, Eye, PlusCircle, Trash } from "lucide-react";
@@ -21,6 +21,7 @@ import { toast } from "sonner";
 
 // Admin type
 type Role = "ADMIN" | "SUPER_ADMIN";
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 interface IProps {
   adminsResult: { data: TAdmin[]; meta?: TMeta };
@@ -28,7 +29,7 @@ interface IProps {
 
 export default function AllAdmins({ adminsResult }: IProps) {
   const { t } = useTranslation();
-  const sortOptions = getSortOptions(t);
+  const sortOptions = getSortOptions(t, sortFields);
   const filterOptions = [
     {
       label: t("status"),

@@ -716,7 +716,7 @@ export default function AddVendor({
                                           )}
                                           style={{ height: "3rem" }}
                                         >
-                                          <SelectValue placeholder="Select Multiple Cuisine" />
+                                          <SelectValue placeholder={t("select_multiple_cuisine")} />
                                         </SelectTrigger>
 
                                         <SelectContent>

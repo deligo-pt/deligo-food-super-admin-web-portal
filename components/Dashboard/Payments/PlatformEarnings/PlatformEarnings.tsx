@@ -10,6 +10,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TPlaformEarningsData } from "@/types/payment.type";
 import { formatPrice } from "@/utils/formatPrice";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion, Variants } from "framer-motion";
 import {
   CalendarIcon,
@@ -22,13 +23,11 @@ interface IProps {
   platformsEarningsData: { data: TPlaformEarningsData; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function PlatformEarnings({ platformsEarningsData }: IProps) {
   const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -111,7 +110,7 @@ export default function PlatformEarnings({ platformsEarningsData }: IProps) {
             {t("monthly_commissions")}
           </h3>
           <p className="text-sm text-gray-500 mb-6">
-           {t("last_6_months_commission_chart")}
+            {t("last_6_months_commission_chart")}
           </p>
           <AnalyticsChart
             data={platformsEarningsData?.data?.monthlyCommissions || []}

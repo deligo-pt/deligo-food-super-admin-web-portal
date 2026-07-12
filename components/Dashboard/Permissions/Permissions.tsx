@@ -10,21 +10,18 @@ import { motion } from "framer-motion";
 import { useState } from 'react';
 import UpdatePermissionModal from './UpdatePermissionModal';
 import { useTranslation } from '@/hooks/use-translation';
+import { getSortOptions, SortOptionKey } from '@/utils/sortOptions';
 
 interface IProps {
     permissionsResult: { data: TSystemPermission[]; meta?: TMeta };
 }
-
-const sortOptions = [
-    { label: "Newest First", value: "-createdAt" },
-    { label: "Oldest First", value: "createdAt" },
-    { label: "Establishment (A-Z)", value: "establishmentName" },
-];
+const sortFields = ["newest", "oldest", "establishment"] as SortOptionKey[];
 
 const Permissions = ({
     permissionsResult
 }: IProps) => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
+    const sortOptions = getSortOptions(t, sortFields);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPermission, setSelectedPermission] = useState<TSystemPermission | null>(null);
 

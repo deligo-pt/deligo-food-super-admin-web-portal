@@ -23,6 +23,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 
 // Brand color
 const DELIGO = "#DC3173";
@@ -30,15 +31,13 @@ const DELIGO = "#DC3173";
 interface IProps {
   ordersResult: { data: TOrder[]; meta?: TMeta };
 }
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function AllOrders({ ordersResult }: IProps) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<TOrder | null>(null);
   const [exporting, setExporting] = useState(false);
-  const sortOptions = [
-    { label: t("newest_first"), value: "-createdAt" },
-    { label: t("oldest_first"), value: "createdAt" },
-  ];
+  const sortOptions = getSortOptions(t, sortFields);
 
   // Export CSV
   function exportCSV() {

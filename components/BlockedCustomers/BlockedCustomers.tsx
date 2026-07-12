@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TCustomer } from "@/types/user.type";
-import { getSortOptions } from "@/utils/sortOptions";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Eye, Unlock } from "lucide-react";
@@ -20,10 +20,11 @@ import { useState } from "react";
 interface IProps {
   customersResult: { data: TCustomer[]; meta?: TMeta };
 }
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function BlockedCustomers({ customersResult }: IProps) {
   const { t } = useTranslation();
-  const sortOptions = getSortOptions(t);
+  const sortOptions = getSortOptions(t, sortFields);
   const [statusInfo, setStatusInfo] = useState({
     customerId: "",
     customerName: "",

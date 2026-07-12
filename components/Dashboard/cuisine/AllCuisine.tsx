@@ -21,7 +21,7 @@ import {
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { TMeta } from "@/types";
-import { getSortOptions } from "@/utils/sortOptions";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { CircleCheckBig, Cog, ListIcon, MoreVertical } from "lucide-react";
 import Image from "next/image";
@@ -40,11 +40,12 @@ interface IProps {
         meta?: TMeta;
     };
 }
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 const AllCuisine = ({ cuisineResult }: IProps) => {
     const { t } = useTranslation();
     const { lang } = useStore();
-    const sortOptions = getSortOptions(t);
+    const sortOptions = getSortOptions(t, sortFields);
     const router = useRouter();
 
     // Modal Control States

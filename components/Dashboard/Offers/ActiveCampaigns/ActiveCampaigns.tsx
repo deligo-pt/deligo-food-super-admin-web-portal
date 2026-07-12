@@ -14,6 +14,7 @@ import {
 } from "@/services/dashboard/offer/offer.service";
 import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -26,10 +27,7 @@ interface IProps {
   showFilters?: boolean;
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 const filterOptions = [
   {
@@ -74,6 +72,7 @@ export default function ActiveCampaigns({
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = getSortOptions(t, sortFields);
   const [deleteId, setDeleteId] = useState("");
   const [selectedOffer, setSelectedOffer] = useState<TOffer | null>(null);
   const [statusInfo, setStatusInfo] = useState({

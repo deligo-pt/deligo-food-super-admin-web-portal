@@ -14,6 +14,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import AllFilters from "../Filtering/AllFilters";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
+
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA", "priceHL", "priceLH", "highestRated", "lowestRated"] as SortOptionKey[];
 
 export default function Products({
   initialData,
@@ -29,17 +32,7 @@ export default function Products({
     product?: TProduct | null;
   }>({ id: null, action: null });
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const sortOptions = [
-    { label: t("newest_first"), value: "-createdAt" },
-    { label: t("oldest_first"), value: "createdAt" },
-    { label: t("name_a_z"), value: "name" },
-    { label: t("name_z_a"), value: "-name" },
-    { label: t("price_high_low"), value: "-pricing.finalPrice" },
-    { label: t("price_low_high"), value: "pricing.finalPrice" },
-    { label: t("highest_rated"), value: "-rating.average" },
-    { label: t("lowest_rated"), value: "rating.average" },
-  ];
+  const sortOptions = getSortOptions(t, sortFields);
 
   const filterOptions = [
     {
