@@ -36,9 +36,9 @@ export default function Products({
 
   const filterOptions = [
     {
-      label: t("availability_status"),
+      label: "availability_status",
       key: "status",
-      placeholder: t("select_status"),
+      placeholder: "Select Status",
       type: "select",
       items: [
         {

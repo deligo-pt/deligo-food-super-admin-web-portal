@@ -69,7 +69,7 @@ const NotificationDropdown = ({
                 defaultValue={defaultValue}
             >
                 <SelectTrigger className="w-full bg-gray-50 border-slate-200 focus:ring-[#DC3173] focus:border-[#DC3173]">
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder={t("select_type")} />
                 </SelectTrigger>
 
                 <SelectContent>

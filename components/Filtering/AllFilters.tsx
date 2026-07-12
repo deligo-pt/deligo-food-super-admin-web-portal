@@ -197,33 +197,38 @@ export default function AllFilters({
           >
             <div className="mt-4 p-4 border rounded-lg bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {filterOptions?.map((options, i) => (
-                  <div key={i}>
-                    <label className="block text-sm font-medium mb-1">
-                      {options.label}
-                    </label>
-                    <Select
-                      value={activeFilters[options.key]}
-                      onValueChange={(value) =>
-                        setActiveFilters((prevFilters) => ({
-                          ...prevFilters,
-                          [options.key]: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={options.placeholder} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {options?.items?.map((item, i2) => (
-                          <SelectItem key={i2} value={item.value}>
-                            {item.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
+                {filterOptions?.map((options, i) => {
+                  const placeholder = options.placeholder.trim().toLowerCase().replace(/\s+/g, "_");
+
+                  return (
+                    <div key={i}>
+                      <label className="block text-sm font-medium mb-1">
+                        {`${t(`${options.label.toLowerCase()}`)}`}
+                        {/* {options.label} */}
+                      </label>
+                      <Select
+                        value={activeFilters[options.key]}
+                        onValueChange={(value) =>
+                          setActiveFilters((prevFilters) => ({
+                            ...prevFilters,
+                            [options.key]: value,
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={`${t(`${placeholder}`)}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options?.items?.map((item, i2) => (
+                            <SelectItem key={i2} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )
+                })}
               </div>
               <div className="mt-4 flex justify-end">
                 <Button

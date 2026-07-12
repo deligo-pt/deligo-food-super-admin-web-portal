@@ -24,7 +24,7 @@ export default function VendorZones({ zonesData }: IProps) {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
         title={t("vendor_zones_coverage")}

@@ -31,7 +31,7 @@ const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 const filterOptions = [
   {
-    label: "Active Status",
+    label: "active_status",
     key: "activeStatus",
     placeholder: "Select Status",
     type: "select",
@@ -47,7 +47,7 @@ const filterOptions = [
     ],
   },
   {
-    label: "Validity Status",
+    label: "validity_status",
     key: "validStatus",
     placeholder: "Select Status",
     type: "select",

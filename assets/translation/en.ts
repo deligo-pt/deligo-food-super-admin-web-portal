@@ -743,12 +743,16 @@ export const en = {
   // -> add delivery partner
   add_new_rider: "Add New Rider",
   create_new_rider_form: "Create a new rider with the form below",
+  select_a_gender: "Select a Gender",
   male: "Male",
   female: "Female",
   nif_number: "NIF Number",
   passport_number: "Passport Number",
+  search_address_here: "Search address here...",
   legal_address: "Legal Status",
   residence_permit_expiry: "Residence Permit Expiry",
+  select_permit_type: "Select a permit type",
+  select_vehicle_type: "Select a vehicle type",
   driving_license_expiry: "Driving License Expiry",
   criminal_record_status: "Criminal Record Status",
   have_criminal_record_certificate: "Have Criminal Record Certificate?",
@@ -756,7 +760,9 @@ export const en = {
   expiry_date: "Expiry Date",
   work_preferences_equipments: "Work Preferences and Equipment",
   preferred_working_zones: "Preferred Working Zones",
+  add_a_zone: "Add a zone",
   preferred_working_hours: "Preferred Working Hours",
+  select_preferred_hours: "Select Preferred Hours",
   morning: "Morning",
   afternoon: "Afternoon",
   evening: "Evening",
@@ -1007,6 +1013,7 @@ export const en = {
   modify_properties_for_this_item: "Modify properties for this item. Hit save to preserve changes.",
   visibility_status: "Visibility Status",
   active_status: "Active Status",
+  validity_status: "Validity Status",
   inactive_status: "Inactive Status",
   // --> delete cuisine
   warings_this_action_cannot_be_undone: "Warning: This action cannot be undone. It will completely scrub this record out of the database!",
@@ -1427,6 +1434,9 @@ export const en = {
   select_a_type: "Select a type",
   sponsor_url: "Sponsor Url (optional)",
   banner_image: "Banner Image",
+  click_to_change: "Click to change",
+  drop_image_here: "Drop image here",
+  click_or_drag_image: "Click or drag image",
   immediately_publish_this_sponsorship: "Immediately publish this sponsorship",
   create_sponsorship: "Create Sponsorship",
 
@@ -1635,9 +1645,12 @@ export const en = {
   show_more: "Show More",
   message_content: "Message Content",
   message_title: "Message Title",
+  short_catchy_title: "Short, catchy title ...",
+  write_your_message_here: "Write your message here...",
   message_body: "Message Body",
   chars: "chars",
   notification_category: "Notification Category",
+  select_type: "Select type",
   hide_preview: "Hide Preview",
   show_preview: "Show Preview",
   send_broadcast: "Send Broadcast",
@@ -1728,6 +1741,7 @@ export const en = {
   // activity-logs
   track_every_important_action_inside:
     "Track every important action inside the Deligo admin system.",
+  search_admin_email_action: "Search admin, email, action...",
   info: "Info",
   export_logs: "Export Logs",
   action: "Action",
@@ -2093,6 +2107,7 @@ export const en = {
   all_system_operational_sector: "All systems operational in this sector.",
   investigate: "Investigate",
   false_alarm: "False Alarm",
+  view_alerts:"View Alerts",
 
   // permissions
   // --> Create Permission

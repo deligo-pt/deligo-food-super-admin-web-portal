@@ -754,12 +754,16 @@ export const pt = {
   // -> add delivery partner
   add_new_rider: "Adicionar Novo Entregador",
   create_new_rider_form: "Crie um novo entregador com o formulário abaixo",
+  select_a_gender: "Selecione um gênero",
   male: "Masculino",
   female: "Feminino",
   nif_number: "Número do NIF",
   passport_number: "Número do Passaporte",
+  search_address_here: "Pesquisar endereço aqui...",
   legal_address: "Status Legal", // Use "Endereço Legal" if the intent was address instead of status
   residence_permit_expiry: "Validade da Autorização de Residência",
+  select_permit_type: "Selecione um tipo de licença",
+  select_vehicle_type: "Selecione um tipo de veículo",
   driving_license_expiry: "Validade da Carteira de Habilitação",
   criminal_record_status: "Status do Registro Criminal",
   have_criminal_record_certificate: "Possui Certificado de Registro Criminal?",
@@ -767,7 +771,9 @@ export const pt = {
   expiry_date: "Data de Validade",
   work_preferences_equipments: "Preferências de Trabalho e Equipamentos",
   preferred_working_zones: "Zonas de Trabalho Preferenciais",
+  add_a_zone: "Adicionar uma zona",
   preferred_working_hours: "Horários de Trabalho Preferenciais",
+  select_preferred_hours: "Selecione os horários preferidos",
   morning: "Manhã",
   afternoon: "Tarde",
   evening: "Final da Tarde",
@@ -1015,6 +1021,7 @@ export const pt = {
   modify_properties_for_this_item: "Modifique as propriedades deste item. Clique em salvar para preservar as alterações.",
   visibility_status: "Status de Visibilidade",
   active_status: "Status Ativo",
+  validity_status: "Status de Validade",
   inactive_status: "Status Inativo",
   // --> delete cuisine
   warings_this_action_cannot_be_undone: "Aviso: Esta ação não pode ser desfeita. Isso irá apagar completamente este registro do banco de dados!",
@@ -1446,6 +1453,9 @@ export const pt = {
   select_a_type: "Selecione um tipo",
   sponsor_url: "URL do Patrocinador (opcional)",
   banner_image: "Imagem do Banner",
+  click_to_change: "Clique para alterar",
+  drop_image_here: "Solte a imagem aqui",
+  click_or_drag_image: "Clique ou arraste a imagem",
   immediately_publish_this_sponsorship: "Publicar este patrocínio imediatamente",
   create_sponsorship: "Criar Patrocínio",
 
@@ -1656,9 +1666,12 @@ export const pt = {
   show_more: "Mostrar Mais",
   message_content: "Conteúdo da Mensagem",
   message_title: "Título da Mensagem",
+  short_catchy_title: "Título curto e atrativo...",
+  write_your_message_here: "Escreva sua mensagem aqui...",
   message_body: "Corpo da Mensagem",
   chars: "caracteres",
   notification_category: "Categoria da Notificação",
+  select_type: "Selecione o tipo",
   hide_preview: "Ocultar Pré-visualização",
   show_preview: "Mostrar Pré-visualização",
   send_broadcast: "Enviar Transmissão",
@@ -1753,6 +1766,7 @@ export const pt = {
   // activity-logs
   track_every_important_action_inside:
     "Monitorizar todas as ações importantes dentro do sistema de administração da Deligo.",
+  search_admin_email_action: "Pesquisar administrador, e-mail, ação...",
   info: "Informação",
   export_logs: "Exportar Registos",
   action: "Ação",
@@ -2128,6 +2142,7 @@ export const pt = {
   all_system_operational_sector: "Todos os sistemas operacionais neste setor.",
   investigate: "Investigar",
   false_alarm: "Alarme Falso",
+  view_alerts: "Ver Alertas",
   system_action_key: "Chave de Ação do Sistema",
 
   // permissions

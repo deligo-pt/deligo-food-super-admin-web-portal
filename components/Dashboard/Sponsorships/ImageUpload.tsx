@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Image as ImageIcon, Upload, X } from "lucide-react";
@@ -18,6 +19,7 @@ export default function ImageUpload({
   label = "Banner Image",
   isInvalid,
 }: IProps) {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleDragOver = (e: React.DragEvent) => {
@@ -114,7 +116,7 @@ export default function ImageUpload({
                 height={300}
               />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <p className="text-white font-medium">Click to change</p>
+                <p className="text-white font-medium">{t("click_to_change")}</p>
               </div>
               <Button
                 type="button"
@@ -146,7 +148,7 @@ export default function ImageUpload({
                 {isDragging ? <Upload size={24} /> : <ImageIcon size={24} />}
               </div>
               <p className="text-sm font-medium text-gray-600">
-                {isDragging ? "Drop image here" : "Click or drag image"}
+                {isDragging ? t("drop_image_here") : t("click_or_drag_image")}
               </p>
               <p className="text-xs text-gray-400 mt-1">
                 PNG, JPG, WEBP up to 5MB

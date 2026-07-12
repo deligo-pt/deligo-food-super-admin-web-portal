@@ -65,10 +65,8 @@ export function SOS({ accessToken, SOSStats }: IProps) {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 text-gray-900 font-sans">
-      {/* Top Accent Bar */}
-      <div className="h-2 w-full bg-[#DC3173]" />
 
-      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <main className="mx-auto">
         {/* Header Section */}
         <TitleHeader
           title={t("sos_alerts")}

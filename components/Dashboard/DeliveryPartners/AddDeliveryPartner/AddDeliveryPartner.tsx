@@ -640,7 +640,7 @@ export default function AddDeliveryPartner() {
                                   defaultValue={field.value}
                                 >
                                   <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a Gender" />
+                                    <SelectValue placeholder={t("select_a_gender")} />
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="MALE">{t("male")}</SelectItem>
@@ -729,6 +729,7 @@ export default function AddDeliveryPartner() {
                       <BusinessLocationMap
                         form={form}
                         setLocationCoordinates={setLocationCoordinates}
+                        t={t}
                       />
                     </Card>
                   </motion.div>
@@ -861,7 +862,7 @@ export default function AddDeliveryPartner() {
                                 defaultValue={field.value}
                               >
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Select a permit type" />
+                                  <SelectValue placeholder={t("select_permit_type")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {permitTypes.map((type) => (
@@ -941,7 +942,7 @@ export default function AddDeliveryPartner() {
                                 defaultValue={field.value}
                               >
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Select a vehicle type" />
+                                  <SelectValue placeholder={t("select_vehicle_type")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {[
@@ -974,7 +975,7 @@ export default function AddDeliveryPartner() {
                           <FormItem>
                             <FormLabel>{t("brand")}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Brand" {...field} />
+                              <Input placeholder={t("brand")} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -988,7 +989,7 @@ export default function AddDeliveryPartner() {
                           <FormItem>
                             <FormLabel>{t("model")}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Model" {...field} />
+                              <Input placeholder={t("model")} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1211,7 +1212,7 @@ export default function AddDeliveryPartner() {
                                     type="text"
                                     value={zone}
                                     onChange={(e) => setZone(e.target.value)}
-                                    placeholder="Add a zone"
+                                    placeholder={t("add_a_zone")}
                                     onKeyUp={(e) => {
                                       if (e.key === "Enter") {
                                         e.preventDefault();
@@ -1255,7 +1256,7 @@ export default function AddDeliveryPartner() {
                                       : "border-gray-300",
                                   )}
                                 >
-                                  <SelectValue placeholder="Select Preferred Hours" />
+                                  <SelectValue placeholder={t("select_preferred_hours")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="morning">
@@ -1340,7 +1341,7 @@ export default function AddDeliveryPartner() {
                                   onChange={field.onChange}
                                   className="h-4 w-4"
                                 />
-                                Yes
+                                {t("yes")}
                               </FormLabel>
                             </FormControl>
                             <FormMessage />

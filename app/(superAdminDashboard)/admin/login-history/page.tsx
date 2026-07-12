@@ -215,7 +215,7 @@ export default function LoginHistoryPage() {
                 setQuery(e.target.value);
                 setPage(1);
               }}
-              placeholder="Search by admin, email, ip, city..."
+              placeholder={t("search_admin_email_action")}
               className="ml-2 outline-none w-72"
             />
           </div>

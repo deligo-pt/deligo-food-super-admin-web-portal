@@ -130,8 +130,8 @@ export const getPlatformEarningsReq = async (
   );
 
   return {
-    data: result.data.data || [],
-    meta: result.data.meta,
+    data: result.data || [],
+    meta: result.meta,
   };
 };
 
