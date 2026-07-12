@@ -1685,6 +1685,11 @@ export const en = {
   maintenance_mode_disabled: "Maintenance mode is disabled",
   scheduled: "Scheduled",
 
+  // add admin
+  add_new_admin: "Add New Admin",
+  add_a_new_admin_to_the_system: "Add a new admin to the system",
+  admin_email: "Admin email",
+
   // all admins
   add_admin: "Add Admin",
   manage_all_the_existing_admins: "Manage all the existing admins",
@@ -2107,7 +2112,7 @@ export const en = {
   all_system_operational_sector: "All systems operational in this sector.",
   investigate: "Investigate",
   false_alarm: "False Alarm",
-  view_alerts:"View Alerts",
+  view_alerts: "View Alerts",
 
   // permissions
   // --> Create Permission
@@ -2115,9 +2120,14 @@ export const en = {
   configure_access_control_rules_for_staff: "Configure access control rules for staff",
   permission_details: "Permission Details",
   permission_name: "Permission Name",
+  manage_analytics: "e.g., Manage Analytics",
   display_name: "Display Name",
+  control_order_panel: "Control Order panel",
   system_action_code: "System Action Code",
+  select_system_action: "Select System Action",
   dashboard_module_group: "Dashboard Model Group",
+  select_module_category: "Select Module Category",
+  describe_what_access_capabilities: "Describe what access capabilities this permission unlocks for backend admin configurations...",
   system_status_and_restrictions: "System Status and Restriction",
   globally_active_status: "Globally Active Status",
   instantly_toggle_access: "Instantly toggle access visibility across the platform metrics.",

@@ -15,11 +15,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { USER_ROLE } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/otp.service";
 import {
   onboardUserAndSendOtpReq,
-  registerUserAndSendOtpReq,
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
@@ -53,6 +53,7 @@ function isValidPassword(password: string) {
 }
 
 export default function AddAdmin() {
+  const { t } = useTranslation();
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -238,8 +239,8 @@ export default function AddAdmin() {
         className="min-h-screen p-6 bg-slate-50"
       >
         <TitleHeader
-          title="Add New Admin"
-          subtitle="Add a new admin to the system"
+          title={t("add_new_admin")}
+          subtitle={t("add_a_new_admin_to_the_system")}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -258,7 +259,7 @@ export default function AddAdmin() {
                 style={{ borderColor: DELIGO }}
               >
                 <h2 className="text-xl font-semibold mb-4">
-                  1. Account Information
+                  1. {t("account_information")}
                 </h2>
 
                 <div className="space-y-4 items-start">
@@ -267,9 +268,9 @@ export default function AddAdmin() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>{t("first_name")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="First Name" {...field} />
+                          <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -281,9 +282,9 @@ export default function AddAdmin() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>{t("last_name")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Last Name" {...field} />
+                          <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -291,11 +292,11 @@ export default function AddAdmin() {
                   />
 
                   <div>
-                    <Label>Email</Label>
+                    <Label>{t('email')}</Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
-                        placeholder="Admin Email"
+                        placeholder={t("admin_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
@@ -307,7 +308,7 @@ export default function AddAdmin() {
                           onClick={sendOtp}
                           className="w-32"
                         >
-                          <Mail className="w-4 h-4 mr-2" /> Send OTP
+                          <Mail className="w-4 h-4 mr-2" /> {t("send_otp")}
                         </Button>
                       )}
                       {otpSent && !emailVerified && (
@@ -318,12 +319,12 @@ export default function AddAdmin() {
                           onClick={resendOtp}
                           className="w-32"
                         >
-                          Resend {timer > 0 && `(${formatTime(timer)})`}
+                          {t("resend")} {timer > 0 && `(${formatTime(timer)})`}
                         </Button>
                       )}
                       {emailVerified && (
                         <span className="text-green-600 flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4" /> Verified
+                          <CheckCircle className="w-4 h-4" /> {t("verified")}
                         </span>
                       )}
                     </div>
@@ -331,10 +332,10 @@ export default function AddAdmin() {
 
                   {otpSent && !emailVerified && (
                     <div>
-                      <Label className="mb-2">OTP</Label>
+                      <Label className="mb-2">{t("otp")}</Label>
                       <div className="flex items-center gap-3">
                         <Input
-                          placeholder="Enter OTP"
+                          placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
                         />
@@ -345,18 +346,18 @@ export default function AddAdmin() {
                           onClick={verifyOtp}
                           className="w-32"
                         >
-                          <BadgeCheck className="w-4 h-4 mr-2" /> Verify OTP
+                          <BadgeCheck className="w-4 h-4 mr-2" /> {t("verify_otp")}
                         </Button>
                       </div>
                     </div>
                   )}
 
                   <div>
-                    <Label className="mb-2">Password</Label>
+                    <Label className="mb-2">{t("password")}</Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
-                        placeholder="Password"
+                        placeholder={t("password")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
@@ -376,7 +377,7 @@ export default function AddAdmin() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">Phone Number</Label>
+                  <Label className="mb-2">{t("phone_number")}</Label>
                   <div className="relative">
                     <FormField
                       control={form.control}
@@ -406,7 +407,7 @@ export default function AddAdmin() {
                                   position: "relative",
                                 }}
                                 inputProps={{
-                                  placeholder: "Phone Number",
+                                  placeholder: t("phone_number"),
                                   disabled: true,
                                 }}
                               />
@@ -463,12 +464,13 @@ export default function AddAdmin() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      2. Address
+                      2. {t("address")}
                     </h2>
 
                     <BusinessLocationMap
                       form={form}
                       setLocationCoordinates={setLocationCoordinates}
+                      t={t}
                     />
                   </Card>
                 </motion.div>
@@ -485,7 +487,7 @@ export default function AddAdmin() {
               style={{ background: DELIGO }}
               disabled={buttonDisabled === 4}
             >
-              Add Admin
+              {t("add_admin")}
             </Button>
           </div>
         )}

@@ -1709,6 +1709,11 @@ export const pt = {
   maintenance_mode_disabled: "O modo de manutenção está desativado",
   scheduled: "Agendado",
 
+  // add admin
+  add_new_admin: "Adicionar Novo Administrador",
+  add_a_new_admin_to_the_system: "Adicionar um novo administrador ao sistema",
+  admin_email: "E-mail do administrador",
+
   // all admin
   add_admin: "Adicionar Administrador",
   manage_all_the_existing_admins: "Gerenciar todos os administradores existentes",
@@ -2151,9 +2156,14 @@ export const pt = {
   configure_access_control_rules_for_staff: "Configurar regras de controle de acesso para a equipe",
   permission_details: "Detalhes da Permissão",
   permission_name: "Nome da Permissão",
+  manage_analytics: "ex.: Gerenciar Análises",
   display_name: "Nome de Exibição",
+  control_order_panel: "Controlar painel de pedidos",
   system_action_code: "Código de Ação do Sistema",
+  select_system_action: "Selecionar Ação do Sistema",
   dashboard_module_group: "Grupo de Módulos do Dashboard",
+  select_module_category: "Selecionar Categoria do Módulo",
+  describe_what_access_capabilities: "Descreva quais permissões de acesso essa configuração libera para os administradores no backend...",
   system_status_and_restrictions: "Status do Sistema e Restrições",
   globally_active_status: "Status Ativo Globalmente",
   instantly_toggle_access: "Alterna instantaneamente a visibilidade do acesso nas métricas da plataforma.",
