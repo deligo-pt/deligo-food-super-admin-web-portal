@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -716,14 +717,29 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                           <FormField
                             control={form.control}
                             name="bankName"
-                            render={({ field }) => (
+                            render={({ field, fieldState }) => (
                               <FormItem>
                                 <FormLabel>{t("bank_name")}</FormLabel>
                                 <FormControl>
-                                  <Input
-                                    placeholder={t("bank_name")}
-                                    {...field}
-                                  />
+                                  <Select onValueChange={field.onChange} value={field.value || vendor?.bankDetails?.bankName || "undefined"}>
+                                    <SelectTrigger
+                                      className={cn(
+                                        "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
+                                        fieldState.invalid
+                                          ? "border-red-500"
+                                          : "border-gray-300",
+                                      )}
+                                    >
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {bankNames.map((value) => (
+                                        <SelectItem key={value} value={value}>
+                                          {value}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
