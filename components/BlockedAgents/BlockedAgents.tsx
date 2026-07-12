@@ -18,18 +18,18 @@ import { TAgent } from "@/types/user.type";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/hooks/use-translation";
-import { getSortOptions } from "@/utils/sortOptions";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 
 const DELIGO = "#DC3173";
 
 interface IProps {
   agentsResult: { data: TAgent[]; meta?: TMeta };
 }
-
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function BlockedFleetManagers({ agentsResult }: IProps) {
   const { t } = useTranslation();
-  const sortOptions = getSortOptions(t);
+  const sortOptions = getSortOptions(t, sortFields);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState({
     agentId: "",

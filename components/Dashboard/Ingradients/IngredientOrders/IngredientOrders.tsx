@@ -7,20 +7,19 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TIngredientOrder } from "@/types/ingredient.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 
 interface IProps {
   ingredientOrdersData: { data: TIngredientOrder[]; meta?: TMeta };
 }
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function IngredientOrders({ ingredientOrdersData }: IProps) {
   // const [deleteId, setDeleteId] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  const sortOptions = [
-    { label: t("newest_first"), value: "-createdAt" },
-    { label: t("oldest_first"), value: "createdAt" },
-  ];
+  const sortOptions = getSortOptions(t, sortFields);
 
   // const handleDeleteOrder = async () => {
   //   console.log(deleteId);
@@ -40,7 +39,7 @@ export default function IngredientOrders({ ingredientOrdersData }: IProps) {
       {/* Order Table */}
       <IngredientOrderTable
         orders={ingredientOrdersData?.data || []}
-        // onDeleteClick={(id: string) => setDeleteId(id)}
+      // onDeleteClick={(id: string) => setDeleteId(id)}
       />
 
       {/* Pagination */}

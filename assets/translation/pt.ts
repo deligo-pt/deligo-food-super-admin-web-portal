@@ -181,8 +181,13 @@ export const pt = {
   price_low_high: "Preço (do mais baixo para o mais alto)",
   highest_rated: "Melhor avaliados",
   lowest_rated: "Pior avaliados",
+  establishment_a_z: "Estabelecimento (A-Z)",
+  tax_name_a_z: "Nome do Imposto (A-Z)",
+  tax_name_z_a: "Nome do Imposto (Z-A)",
 
   // filtering
+  searching: "Pesquisar...",
+  sort_by: "Ordenar por",
   status: "Estado",
   select_status: "Selecionar estado",
   availability_status: "Estado de disponibilidade",
@@ -332,6 +337,8 @@ export const pt = {
   business_name: "Nome do negócio",
   business_type: "Tipo de negócio",
   select_business_type: "Selecionar tipo de negócio",
+  restaurantCuisineType: "Tipo de Culinária do Restaurante",
+  select_multiple_cuisine: "Selecionar Múltiplas Culinárias",
   business_license_number: "Número da licença comercial",
   license_number: "Número da licença",
   nif: "NIF",
@@ -747,12 +754,16 @@ export const pt = {
   // -> add delivery partner
   add_new_rider: "Adicionar Novo Entregador",
   create_new_rider_form: "Crie um novo entregador com o formulário abaixo",
+  select_a_gender: "Selecione um gênero",
   male: "Masculino",
   female: "Feminino",
   nif_number: "Número do NIF",
   passport_number: "Número do Passaporte",
+  search_address_here: "Pesquisar endereço aqui...",
   legal_address: "Status Legal", // Use "Endereço Legal" if the intent was address instead of status
   residence_permit_expiry: "Validade da Autorização de Residência",
+  select_permit_type: "Selecione um tipo de licença",
+  select_vehicle_type: "Selecione um tipo de veículo",
   driving_license_expiry: "Validade da Carteira de Habilitação",
   criminal_record_status: "Status do Registro Criminal",
   have_criminal_record_certificate: "Possui Certificado de Registro Criminal?",
@@ -760,7 +771,9 @@ export const pt = {
   expiry_date: "Data de Validade",
   work_preferences_equipments: "Preferências de Trabalho e Equipamentos",
   preferred_working_zones: "Zonas de Trabalho Preferenciais",
+  add_a_zone: "Adicionar uma zona",
   preferred_working_hours: "Horários de Trabalho Preferenciais",
+  select_preferred_hours: "Selecione os horários preferidos",
   morning: "Manhã",
   afternoon: "Tarde",
   evening: "Final da Tarde",
@@ -1008,6 +1021,7 @@ export const pt = {
   modify_properties_for_this_item: "Modifique as propriedades deste item. Clique em salvar para preservar as alterações.",
   visibility_status: "Status de Visibilidade",
   active_status: "Status Ativo",
+  validity_status: "Status de Validade",
   inactive_status: "Status Inativo",
   // --> delete cuisine
   warings_this_action_cannot_be_undone: "Aviso: Esta ação não pode ser desfeita. Isso irá apagar completamente este registro do banco de dados!",
@@ -1439,6 +1453,9 @@ export const pt = {
   select_a_type: "Selecione um tipo",
   sponsor_url: "URL do Patrocinador (opcional)",
   banner_image: "Imagem do Banner",
+  click_to_change: "Clique para alterar",
+  drop_image_here: "Solte a imagem aqui",
+  click_or_drag_image: "Clique ou arraste a imagem",
   immediately_publish_this_sponsorship: "Publicar este patrocínio imediatamente",
   create_sponsorship: "Criar Patrocínio",
 
@@ -1597,7 +1614,6 @@ export const pt = {
   search_name_zone: "Pesquisar nome ou zona (Ctrl/Cmd+K)",
   table: "Tabela",
   grid: "Grelha",
-  sort_by: "Ordenar por",
   results_lg: "Resultados",
   paused: "Em pausa",
   promote: "Promover",
@@ -1650,9 +1666,12 @@ export const pt = {
   show_more: "Mostrar Mais",
   message_content: "Conteúdo da Mensagem",
   message_title: "Título da Mensagem",
+  short_catchy_title: "Título curto e atrativo...",
+  write_your_message_here: "Escreva sua mensagem aqui...",
   message_body: "Corpo da Mensagem",
   chars: "caracteres",
   notification_category: "Categoria da Notificação",
+  select_type: "Selecione o tipo",
   hide_preview: "Ocultar Pré-visualização",
   show_preview: "Mostrar Pré-visualização",
   send_broadcast: "Enviar Transmissão",
@@ -1689,6 +1708,11 @@ export const pt = {
     "Os utilizadores verão informações sobre a indisponibilidade agendada.",
   maintenance_mode_disabled: "O modo de manutenção está desativado",
   scheduled: "Agendado",
+
+  // add admin
+  add_new_admin: "Adicionar Novo Administrador",
+  add_a_new_admin_to_the_system: "Adicionar um novo administrador ao sistema",
+  admin_email: "E-mail do administrador",
 
   // all admin
   add_admin: "Adicionar Administrador",
@@ -1747,6 +1771,7 @@ export const pt = {
   // activity-logs
   track_every_important_action_inside:
     "Monitorizar todas as ações importantes dentro do sistema de administração da Deligo.",
+  search_admin_email_action: "Pesquisar administrador, e-mail, ação...",
   info: "Informação",
   export_logs: "Exportar Registos",
   action: "Ação",
@@ -2122,6 +2147,7 @@ export const pt = {
   all_system_operational_sector: "Todos os sistemas operacionais neste setor.",
   investigate: "Investigar",
   false_alarm: "Alarme Falso",
+  view_alerts: "Ver Alertas",
   system_action_key: "Chave de Ação do Sistema",
 
   // permissions
@@ -2130,9 +2156,14 @@ export const pt = {
   configure_access_control_rules_for_staff: "Configurar regras de controle de acesso para a equipe",
   permission_details: "Detalhes da Permissão",
   permission_name: "Nome da Permissão",
+  manage_analytics: "ex.: Gerenciar Análises",
   display_name: "Nome de Exibição",
+  control_order_panel: "Controlar painel de pedidos",
   system_action_code: "Código de Ação do Sistema",
+  select_system_action: "Selecionar Ação do Sistema",
   dashboard_module_group: "Grupo de Módulos do Dashboard",
+  select_module_category: "Selecionar Categoria do Módulo",
+  describe_what_access_capabilities: "Descreva quais permissões de acesso essa configuração libera para os administradores no backend...",
   system_status_and_restrictions: "Status do Sistema e Restrições",
   globally_active_status: "Status Ativo Globalmente",
   instantly_toggle_access: "Alterna instantaneamente a visibilidade do acesso nas métricas da plataforma.",

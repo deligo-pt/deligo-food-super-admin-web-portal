@@ -57,6 +57,7 @@ interface IProps {
   setLocationCoordinates: Dispatch<
     SetStateAction<{ latitude: number; longitude: number }>
   >;
+  t: (key: string) => string;
 }
 
 const defaultLocation = { lat: 38.7223, lng: -9.1393 };
@@ -65,6 +66,7 @@ const BusinessLocationMap = ({
   form,
   businessLocation,
   setLocationCoordinates,
+  t
 }: IProps) => {
   const map = useMap();
   const places = useMapsLibrary("places");
@@ -152,7 +154,7 @@ const BusinessLocationMap = ({
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search address here..."
+          placeholder={t("search_address_here")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();

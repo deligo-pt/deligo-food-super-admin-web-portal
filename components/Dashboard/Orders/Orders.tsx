@@ -7,6 +7,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 
 interface IProps {
@@ -15,14 +16,11 @@ interface IProps {
   title: string;
   subtitle?: string;
 }
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function Orders({ ordersResult, title, subtitle }: IProps) {
   const { t } = useTranslation();
-
-  const sortOptions = [
-    { label: t("newest_first"), value: "-createdAt" },
-    { label: t("oldest_first"), value: "createdAt" },
-  ];
+  const sortOptions = getSortOptions(t, sortFields);
 
   return (
     <div className="space-y-6 max-w-full">

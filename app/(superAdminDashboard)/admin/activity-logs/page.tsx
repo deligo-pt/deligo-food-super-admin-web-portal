@@ -120,7 +120,7 @@ export default function ActivityLogsPage() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search admin, email, action..."
+              placeholder={t("search_admin_email_action")}
               className="outline-none w-full"
             />
           </div>

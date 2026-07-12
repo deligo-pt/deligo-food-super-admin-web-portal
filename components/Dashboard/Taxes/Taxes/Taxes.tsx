@@ -14,6 +14,7 @@ import {
 } from "@/services/dashboard/tax/tax.service";
 import { TMeta } from "@/types";
 import { TTax } from "@/types/tax.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,15 +24,11 @@ interface IProps {
   taxesResult: { data: TTax[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "taxName" },
-  { label: "Name (Z-A)", value: "-taxName" },
-];
+const sortFields = ["newest", "oldest", "taxNameAZ", "taxNameZA"] as SortOptionKey[];
 
 export default function Taxes({ taxesResult }: IProps) {
   const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
   const [editTax, setEditTax] = useState<TTax | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [permanentDeleteId, setPermanentDeleteId] = useState<string | null>(null);

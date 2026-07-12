@@ -20,20 +20,19 @@ import {
   permanentDeleteIngredient
 } from "@/services/dashboard/ingredient/ingredient.service";
 import { useTranslation } from "@/hooks/use-translation";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 
 interface IProps {
   ingredientsData: { data: TIngredient[]; meta?: TMeta };
   taxes: TTax[];
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function Ingredients({ ingredientsData, taxes }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = getSortOptions(t, sortFields);
 
   // Track both the ID and deletion strategy type together
   const [deleteConfig, setDeleteConfig] = useState<{

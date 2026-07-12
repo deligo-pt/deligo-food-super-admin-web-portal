@@ -9,16 +9,13 @@ import { IAgreement } from "@/types/agreement.type";
 import { motion } from "framer-motion";
 import AgreementsTable from "./AgreementTable";
 import { useTranslation } from "@/hooks/use-translation";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 
 interface IProps {
     agreementsResult: { data: IAgreement[]; meta?: TMeta };
 }
 
-const sortOptions = [
-    { label: "Newest First", value: "-createdAt" },
-    { label: "Oldest First", value: "createdAt" },
-    { label: "Establishment (A-Z)", value: "establishmentName" },
-];
+const sortFields = ["newest", "oldest", "establishment"] as SortOptionKey[];
 
 const filterOptions = [
     {
@@ -40,6 +37,7 @@ export default function Agreements({
     agreementsResult,
 }: IProps) {
     const { t } = useTranslation();
+    const sortOptions = getSortOptions(t, sortFields);
 
     return (
         <div className="space-y-6 max-w-full">

@@ -8,6 +8,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TRating } from "@/types/rating.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -15,13 +16,11 @@ interface IProps {
   feedbackResult: { data: TRating[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function CustomerFeedback({ feedbackResult }: IProps) {
   const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
   const [selectedFeedback, setSelectedFeedback] = useState<TRating | null>(
     null,
   );

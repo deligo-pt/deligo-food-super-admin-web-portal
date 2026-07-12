@@ -13,6 +13,7 @@ import { TAdminSupportMessage, TConversationStatus } from "@/types/chat.type";
 import { TSupportTicket, TTicketStatus } from "@/types/support.type";
 import { getCookie } from "@/utils/cookies";
 import { fetchData } from "@/utils/requests";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { AnimatePresence } from "framer-motion";
 import { MessageSquareIcon } from "lucide-react";
 import { useState } from "react";
@@ -26,13 +27,11 @@ const STATUS: Record<TConversationStatus, string> = {
 interface IProps {
   ticketData: { data: TSupportTicket[]; meta?: TMeta };
 }
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function SupportTickets({ ticketData }: IProps) {
   const { t } = useTranslation();
-  const sortOptions = [
-    { label: t("newest_first"), value: "-createdAt" },
-    { label: t("oldest_first"), value: "createdAt" },
-  ];
+  const sortOptions = getSortOptions(t, sortFields);
 
   const [ticket, setTicket] = useState<TSupportTicket | null>(null);
   const [tickets, setTickets] = useState<TSupportTicket[]>(

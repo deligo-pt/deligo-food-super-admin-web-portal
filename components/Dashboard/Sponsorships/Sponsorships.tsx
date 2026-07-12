@@ -10,6 +10,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TMeta } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,14 +23,11 @@ interface IProps {
   subtitle?: string;
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 const filterOptions = [
   {
-    label: "Active Status",
+    label: "active_status",
     key: "status",
     placeholder: "Select Status",
     type: "select",
@@ -53,6 +51,7 @@ export default function Sponsorships({
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = getSortOptions(t, sortFields);
 
   const [deleteId, setDeleteId] = useState("");
   const [selectedSponsorship, setSelectedSponsorship] =

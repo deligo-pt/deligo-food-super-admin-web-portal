@@ -35,7 +35,7 @@ import {
 import { useStore } from "@/store/store";
 import { TMeta } from "@/types";
 import { TBusinessCategoryResponse } from "@/types/category.type";
-import { getSortOptions } from "@/utils/sortOptions";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
   CircleCheckBig,
@@ -55,11 +55,12 @@ interface IProps {
     meta?: TMeta;
   };
 }
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function CategoryTable({ categoriesResult }: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
-  const sortOptions = getSortOptions(t);
+  const sortOptions = getSortOptions(t, sortFields);
   const router = useRouter();
   const [statusInfo, setStatusInfo] = useState<{
     categoryId: string;

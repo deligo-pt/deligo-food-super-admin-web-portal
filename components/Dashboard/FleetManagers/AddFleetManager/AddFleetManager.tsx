@@ -701,6 +701,7 @@ export default function AddFleetManager() {
                     <BusinessLocationMap
                       form={form}
                       setLocationCoordinates={setLocationCoordinates}
+                      t={t}
                     />
                   </Card>
                 </motion.div>

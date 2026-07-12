@@ -103,7 +103,7 @@ export default function CreatePermission() {
                                                         </FormLabel>
                                                         <FormControl>
                                                             <Input
-                                                                placeholder="e.g., Manage Analytics"
+                                                                placeholder={t("manage_analytics")}
                                                                 className="h-12 text-base"
                                                                 {...field}
                                                             />
@@ -126,7 +126,7 @@ export default function CreatePermission() {
                                                         </FormLabel>
                                                         <FormControl>
                                                             <Input
-                                                                placeholder="Control Order panel"
+                                                                placeholder={t("control_order_panel")}
                                                                 className="h-12 text-base"
                                                                 {...field}
                                                             />
@@ -160,7 +160,7 @@ export default function CreatePermission() {
                                                                         fieldState.invalid ? "border-destructive" : ""
                                                                     )}
                                                                 >
-                                                                    <SelectValue placeholder="Select System Action" />
+                                                                    <SelectValue placeholder={t("select_system_action")} />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
@@ -198,7 +198,7 @@ export default function CreatePermission() {
                                                                         fieldState.invalid ? "border-destructive" : ""
                                                                     )}
                                                                 >
-                                                                    <SelectValue placeholder="Select Module Category" />
+                                                                    <SelectValue placeholder={t("select_module_category")} />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
@@ -228,7 +228,7 @@ export default function CreatePermission() {
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Textarea
-                                                            placeholder="Describe what access capabilities this permission unlocks for backend admin configurations..."
+                                                            placeholder={t("describe_what_access_capabilities")}
                                                             className="text-base"
                                                             rows={4}
                                                             {...field}

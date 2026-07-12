@@ -7,19 +7,18 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TDeliveryPartnerWallet } from "@/types/wallet.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 
 interface IProps {
   walletsResult: { data: TDeliveryPartnerWallet[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function DeliveryPartnerWallets({ walletsResult }: IProps) {
   const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
 
   return (
     <div className="space-y-6 max-w-full">

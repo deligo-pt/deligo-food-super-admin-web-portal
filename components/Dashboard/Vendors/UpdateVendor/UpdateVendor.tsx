@@ -813,6 +813,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                         form={form}
                         businessLocation={vendorState.businessLocation}
                         setLocationCoordinates={setLocationCoordinates}
+                        t={t}
                       />
                     </Card>
                   </motion.div>

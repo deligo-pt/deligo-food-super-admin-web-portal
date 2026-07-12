@@ -5,10 +5,12 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/use-translation";
 import { useStore } from "@/store/store";
 import { TMeta } from "@/types";
 import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { CalendarClock, Flame, Percent, Tag } from "lucide-react";
@@ -23,10 +25,7 @@ interface IProps {
     meta?: TMeta;
   };
 }
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 const filterOptions = [
   {
@@ -49,6 +48,8 @@ const filterOptions = [
 
 export default function VendorOffers({ vendor, offersResult }: IProps) {
   const { lang } = useStore();
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
 
   return (
     <div className="min-h-screen p-6 md:p-10" style={{ background: BG }}>

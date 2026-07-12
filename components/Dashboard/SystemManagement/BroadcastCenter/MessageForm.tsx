@@ -36,7 +36,7 @@ export default function MessageForm({
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Short, catchy title ..."
+                        placeholder={t("short_catchy_title")}
                         className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#DC3173] focus:ring-1 focus:ring-[#DC3173] outline-none transition-all"
                     />
                 </div>
@@ -53,7 +53,7 @@ export default function MessageForm({
                     <textarea
                         value={body}
                         onChange={(e) => setBody(e.target.value)}
-                        placeholder="Write your message here..."
+                        placeholder={t("write_your_message_here")}
                         rows={6}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#DC3173] focus:ring-1 focus:ring-[#DC3173] outline-none transition-all resize-none"
                     />

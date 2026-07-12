@@ -7,6 +7,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TPayout } from "@/types/payout.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 
 interface IProps {
@@ -16,10 +17,7 @@ interface IProps {
   userRole: "VENDOR" | "FLEET_MANAGER" | "DELIVERY_PARTNER";
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 const extraSelectFilter = {
   key: "status",
@@ -46,6 +44,7 @@ export default function Payouts({
   userRole,
 }: IProps) {
   const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
 
   return (
     <div className="space-y-6 max-w-full">

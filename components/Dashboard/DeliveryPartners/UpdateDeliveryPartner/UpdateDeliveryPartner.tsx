@@ -568,6 +568,7 @@ export default function UpdateDeliveryPartner({
                       <BusinessLocationMap
                         form={form}
                         setLocationCoordinates={setLocationCoordinates}
+                        t={t}
                       />
                     </Card>
                   </motion.div>

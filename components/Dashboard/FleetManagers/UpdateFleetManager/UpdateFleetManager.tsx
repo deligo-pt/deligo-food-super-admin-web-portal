@@ -508,6 +508,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                       <BusinessLocationMap
                         form={form}
                         setLocationCoordinates={setLocationCoordinates}
+                        t={t}
                       />
                     </Card>
                   </motion.div>
