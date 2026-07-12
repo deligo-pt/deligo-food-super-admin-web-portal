@@ -16,7 +16,7 @@ export const addFleetManagerValidation = z
       .nonempty("Last name is required"),
 
     gender: z.enum(["MALE", "FEMALE", "OTHER"]),
-    
+
     // prefixPhoneNumber: z.string(),
 
     phoneNumber: z.string()

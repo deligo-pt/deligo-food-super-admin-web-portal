@@ -15,8 +15,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
 import { TFleetDocKey } from "@/types/document.type";
@@ -24,7 +27,7 @@ import { TAgent } from "@/types/user.type";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Banknote, FileText } from "lucide-react";
+import { Banknote, FileText, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -98,6 +101,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
     form.reset({
       firstName: fleetManagerState.name?.firstName || "",
       lastName: fleetManagerState.name?.lastName || "",
+      gender: fleetManagerState?.gender || "",
       phoneNumber: fleetManagerState?.contactNumber || "",
       businessName:
         fleetManagerState.businessDetails?.businessName || "",
@@ -277,6 +281,41 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                       </div>
                     </div>
 
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field, fieldState }) => (
+                        <FormItem className="content-start">
+                          <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="flex items-center">
+                              <UserIcon className="w-5 h-5 text-[#DC3173]" />
+                              <span className="ml-2">{t("gender")}</span>
+                            </div>
+                          </FormLabel>
+                          <FormControl>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <SelectTrigger
+                                className={cn(
+                                  "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
+                                  fieldState.invalid
+                                    ? "border-red-500"
+                                    : "border-gray-300",
+                                )}
+                              >
+                                <SelectValue placeholder="Select Gender" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="MALE">{t("male")}</SelectItem>
+                                <SelectItem value="FEMALE">{t("female")}</SelectItem>
+                                <SelectItem value="OTHER">{t("other")}</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <Label className="mb-2">{t("phone_number")}</Label>
                     <FormField
                       control={form.control}
@@ -410,14 +449,29 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                           <FormField
                             control={form.control}
                             name="bankName"
-                            render={({ field }) => (
+                            render={({ field, fieldState }) => (
                               <FormItem>
                                 <FormLabel>{t("bank_name")}</FormLabel>
                                 <FormControl>
-                                  <Input
-                                    placeholder={t("bank_name")}
-                                    {...field}
-                                  />
+                                  <Select onValueChange={field.onChange} value={field.value || fleetManager?.bankDetails?.bankName || "undefined"}>
+                                    <SelectTrigger
+                                      className={cn(
+                                        "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
+                                        fieldState.invalid
+                                          ? "border-red-500"
+                                          : "border-gray-300",
+                                      )}
+                                    >
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {bankNames.map((value) => (
+                                        <SelectItem key={value} value={value}>
+                                          {value}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
