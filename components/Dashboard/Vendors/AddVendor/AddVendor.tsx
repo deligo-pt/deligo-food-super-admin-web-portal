@@ -971,6 +971,7 @@ export default function AddVendor({
                     <BusinessLocationMap
                       form={form}
                       setLocationCoordinates={setLocationCoordinates}
+                      t={t}
                     />
                   </Card>
                 </motion.div>
