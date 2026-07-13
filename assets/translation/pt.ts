@@ -66,16 +66,16 @@ export const pt = {
   blocked_customers: "Clientes Bloqueados",
   customer_feedback: "Feedback dos Clientes",
 
-  add_rider: "Adicionar Entregador",
-  riders: "Entregadores",
-  all_riders: "Todos os Entregadores",
-  rider_onboarding_requests: "Solicitações de Integração de Entregadores",
-  active_riders: "Entregadores Ativos",
-  suspended_riders: "Entregadores Suspensos",
-  rider_performance: "Desempenho dos Entregadores",
-  rider_wallets: "Carteiras dos Entregadores",
-  rider_payouts: "Pagamentos aos Entregadores",
-  rider_analytics: "Análises de Entregadores",
+  add_rider: "Adicionar Estafeta",
+  riders: "Estafetas",
+  all_riders: "Todos os Estafetas",
+  rider_onboarding_requests: "Solicitações de Integração de Estafetas",
+  active_riders: "Estafetas Ativos",
+  suspended_riders: "Estafetas Suspensos",
+  rider_performance: "Desempenho dos Estafetas",
+  rider_wallets: "Carteiras dos Estafetas",
+  rider_payouts: "Pagamentos aos Estafetas",
+  rider_analytics: "Análises de Estafetas",
 
   cuisine: "Culinária",
   create_cuisine: "Criar Culinária",
@@ -448,7 +448,7 @@ export const pt = {
   active_wallet: "Carteira Ativa",
   lifetime_revenue: "Receita Total Acumulada",
   unpaid_earnings: "Ganhos Não Pagos",
-  rider_payable: "A Pagar ao Entregador",
+  rider_payable: "A Pagar ao Estafeta",
   fleet_earnings: "Ganhos da Frota",
   earnings_amount: "Valor dos Ganhos",
   settlement_status: "Status da Liquidação",
@@ -469,9 +469,9 @@ export const pt = {
   view_full_file: "Visualizar Arquivo Completo",
   no_document_uploaded: "Nenhum documento enviado",
   // --> fleet riders
-  all_registered_riders: "Todos os entregadores registrados",
+  all_registered_riders: "Todos os Estafetas registrados",
   userId: "ID do Usuário",
-  no_riders_registered_yet: "Nenhum entregador registrado ainda",
+  no_riders_registered_yet: "Nenhum Estafetas registrado ainda",
 
   // add-fleet-manager
   add_a_new_fleet_manager_here: "Adicione um novo gerente de frota aqui",
@@ -752,8 +752,8 @@ export const pt = {
 
   // delivery partners
   // -> add delivery partner
-  add_new_rider: "Adicionar Novo Entregador",
-  create_new_rider_form: "Crie um novo entregador com o formulário abaixo",
+  add_new_rider: "Adicionar Novo Estafeta",
+  create_new_rider_form: "Crie um novo Estafeta com o formulário abaixo",
   select_a_gender: "Selecione um gênero",
   male: "Masculino",
   female: "Feminino",
@@ -841,32 +841,32 @@ export const pt = {
   update_delivery_partner: "Atualizar Parceiro de Entrega",
 
   // all delivery partners
-  manage_all_registered_riders: "Gerenciar todos os entregadores registrados",
+  manage_all_registered_riders: "Gerenciar todos os Estafetas registrados",
   associated_fleet: "Frota Associada",
 
   // active delivery partners
-  all_active_riders_system: "Todos os entregadores ativos no sistema",
-  all_active_riders: "Todos os entregadores ativos",
+  all_active_riders_system: "Todos os Estafetas ativos no sistema",
+  all_active_riders: "Todos os Estafetas ativos",
   total: "total",
   no_partners_found: "Nenhum parceiro encontrado.",
 
   // delivery partner onboarding request
-  all_requested_riders_onboarding: "Todos os entregadores solicitados para integração",
+  all_requested_riders_onboarding: "Todos os Estafetas solicitados para integração",
 
   // suspended riders
-  all_blocked_riders_from_platform: "Todos os entregadores bloqueados da plataforma",
+  all_blocked_riders_from_platform: "Todos os estafetas bloqueados da plataforma",
   total_suspended: "Total suspensos",
   reload: "Recarregar",
   partner: "Parceiro",
   suspended_at: "Suspenso em",
   reactivate: "Reativar",
-  no_suspended_riders_match_your_filters: "Nenhum entregador suspenso atende aos seus filtros.",
+  no_suspended_riders_match_your_filters: "Nenhum estafetas suspenso atende aos seus filtros.",
 
   // delivery partner performance
-  rider_performance_analytics: "Análise de Desempenho do Entregador",
-  comprehensive_insights_into_rider: "Informações detalhadas sobre o desempenho dos entregadores",
+  rider_performance_analytics: "Análise de Desempenho do Estafeta",
+  comprehensive_insights_into_rider: "Informações detalhadas sobre o desempenho dos Estafetas",
   monthly_performance_over_the_last_6_months: "Desempenho mensal nos últimos 6 meses",
-  view_riders_performance_analytics: "Ver análises de desempenho dos entregadores",
+  view_riders_performance_analytics: "Ver análises de desempenho dos Estafetas",
   no_delivery_partner_found: "Nenhum parceiro de entrega encontrado",
   overview_of_delivery_partner_kpi_monthly:
     "Visão geral dos KPIs dos parceiros de entrega e tendências mensais (Portugal)",
@@ -893,7 +893,7 @@ export const pt = {
   view_violations: "Ver infrações",
 
   // delivery partner payouts
-  manage_all_rider_payouts_here: "Gerencie todos os pagamentos de entregadores aqui",
+  manage_all_rider_payouts_here: "Gerencie todos os pagamentos de Estafetas aqui",
   approve_process_audit_partner:
     "Aprovar, processar e auditar pagamentos de parceiros — Portugal",
   search_partner_id_city: "Pesquisar parceiro, ID ou cidade...",
@@ -927,7 +927,7 @@ export const pt = {
   add_an_optional_note: "Adicionar uma nota opcional para esta ação",
 
   // delivery partner analytics
-  analyze_rider_availability_performance: "Análise a disponibilidade, níveis de desempenho e distribuição regional dos entregadores",
+  analyze_rider_availability_performance: "Análise a disponibilidade, níveis de desempenho e distribuição regional dos Estafetas",
   kpi_dashboard_trends_heatmap:
     "Painel de KPIs, tendências e mapa de calor — vista super admin (Portugal)",
   search_partner_city: "Pesquisar parceiro ou cidade...",
@@ -965,7 +965,7 @@ export const pt = {
   payout_history: "Histórico de pagamentos",
 
   // delivery partner wallets
-  manage_all_the_rider_wallets: "Gerencie todas as carteiras dos entregadores",
+  manage_all_the_rider_wallets: "Gerencie todas as carteiras dos Estafetas",
 
   // add-business-category
   add_business_category: "Adicionar categoria de negócio",
@@ -1528,17 +1528,17 @@ export const pt = {
   imporving_routing: "Roteamento melhorado",
 
   // delivery insights
-  optimize_delivery_performance_rider_efficiency: "Otimize o desempenho de entrega e a eficiência dos entregadores",
+  optimize_delivery_performance_rider_efficiency: "Otimize o desempenho de entrega e a eficiência dos Estafetas",
   driver_performance_sla_heat_zones:
     "Desempenho dos estafetas, SLA, zonas de calor e carga horária — focado em Portugal.",
   late_deliveries: "Entregas Atrasadas",
   failed_deliveries: "Entregas Falhas",
-  deliveries_handled_by_each_rider: "Entregas realizadas por cada entregador",
+  deliveries_handled_by_each_rider: "Entregas realizadas por cada Estafeta",
   successfull_deliveries: "Entregas Bem-sucedidas",
   distance_vs_delivery_time: "Distância vs Tempo de Entrega",
   relationship_between_distance_time: "Relação entre distância e tempo",
   area_performance: "Desempenho por Área",
-  rider_idle_time: "Tempo de Inatividade do Entregador",
+  rider_idle_time: "Tempo de Inatividade do Estafeta",
   failed_delivery_reasons: "Motivos de Falha na Entrega",
   no_rejected_deliveries: "Nenhuma entrega rejeitada",
   all_drivers: "Todos os estafetas",
@@ -1629,12 +1629,12 @@ export const pt = {
   peak_hour: "Hora de pico",
   peak_day: "Dia de Pico",
   dinner_dominance: "Dominância do Jantar",
-  max_rider_shortage: "Escassez Máxima de Entregadores",
+  max_rider_shortage: "Escassez Máxima de Estafetas",
   orders_per_hour: "Pedidos por Hora",
   identify_peak_demand_times: "Identifique os horários de pico de demanda",
   lunch_vs_dinner: "Almoço vs Jantar",
   day_wise_orders: "Pedidos por Dia",
-  rider_demand_vs_availability: "Demanda vs Disponibilidade de Entregadores",
+  rider_demand_vs_availability: "Demanda vs Disponibilidade de Estafetas",
   hourly_comparison_required_vs_available_supply: "Comparação horária entre a oferta necessária e a disponível",
   shortage_detected: "Escassez Detectada",
   total_demand: "Demanda Total",
@@ -2106,10 +2106,10 @@ export const pt = {
   customer_rewards: "Recompensas do Cliente",
   points_per_spent: "Pontos por € gasto",
   points_earned_per_euro_spent: "Pontos acumulados por euro gasto",
-  rider_rewards: "Recompensas do Entregador",
+  rider_rewards: "Recompensas do Estafeta",
   points_per_delivery: "Pontos por entrega",
   referral_points: "Pontos de indicação",
-  new_rider_welcome_bonus: "Bônus de boas-vindas para novos entregadores",
+  new_rider_welcome_bonus: "Bônus de boas-vindas para novos Estafetas",
   points_expiry: "Expiração de Pontos",
   referral_milestones: "Metas de Indicação",
   configure_referral_milestones_rewards: "Configure as metas de indicação e suas recompensas",
@@ -2141,7 +2141,7 @@ export const pt = {
   fleet_manager_sos: "SOS do Gerente de Frota",
   operational_emergencies_from_logistics_hubs: "Emergências operacionais de hubs logísticos. Inclui quebras de veículos, relatórios de acidentes e bloqueios de rotas.",
   delivery_partner_sos: "SOS do Parceiro de Entrega",
-  urgent_safety_alerts_from_riders_on_the_road: "Alertas urgentes de segurança dos entregadores na rua. Inclui emergências médicas, assédio ou condições climáticas severas.",
+  urgent_safety_alerts_from_riders_on_the_road: "Alertas urgentes de segurança dos Estafetas na rua. Inclui emergências médicas, assédio ou condições climáticas severas.",
   active_alerts: "alertas ativos",
   no_active_emergencies: "Nenhuma emergência ativa",
   all_system_operational_sector: "Todos os sistemas operacionais neste setor.",
