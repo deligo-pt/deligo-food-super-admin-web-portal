@@ -45,7 +45,6 @@ import {
   EyeOff,
   FileText,
   Mail,
-  UserIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -389,41 +388,6 @@ export default function AddFleetManager() {
                       )}
                     </div>
                   </div>
-
-                  <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field, fieldState }) => (
-                      <FormItem className="content-start">
-                        <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                          <div className="flex items-center">
-                            <UserIcon className="w-5 h-5 text-[#DC3173]" />
-                            <span className="ml-2">{t("gender")}</span>
-                          </div>
-                        </FormLabel>
-                        <FormControl>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <SelectTrigger
-                              className={cn(
-                                "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
-                                fieldState.invalid
-                                  ? "border-red-500"
-                                  : "border-gray-300",
-                              )}
-                            >
-                              <SelectValue placeholder="Select Gender" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="MALE">{t("male")}</SelectItem>
-                              <SelectItem value="FEMALE">{t("female")}</SelectItem>
-                              <SelectItem value="OTHER">{t("other")}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
                   {otpSent && !emailVerified && (
                     <div>

@@ -114,7 +114,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
     },
     {
       id: "driverss",
-      title: "Riders",
+      title: t("riders"),
       icon: <Bike size={18} />,
       items: [
         {
