@@ -47,11 +47,10 @@ const DELIGO = "#DC3173";
 type TDeliveryPartnerForm = z.infer<typeof deliveryPartnerValidation>;
 
 const permitTypes = [
-  "D2 Visa",
-  "D4 Student Visa",
   "Temporary Residence",
   "Permanent Residence",
   "EU Citizen",
+  "Passport",
   "Other",
 ];
 

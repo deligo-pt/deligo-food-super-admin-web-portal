@@ -8,7 +8,6 @@ export type TAgent = {
   userId: string;
   role: "FLEET_MANAGER";
   email: string;
-  gender: "MALE" | "FEMALE" | "OTHER";
 
   status: keyof typeof USER_STATUS;
   isEmailVerified: boolean;
