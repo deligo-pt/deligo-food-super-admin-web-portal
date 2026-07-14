@@ -4,20 +4,19 @@ import AddVendor from "@/components/Dashboard/Vendors/AddVendor/AddVendor";
 import { serverRequest } from "@/lib/serverFetch";
 import { getAllCuisine } from "@/services/dashboard/category/cuisine.service";
 import { TResponse } from "@/types";
-import { TBusinessCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 
 export default async function AddVendorPage() {
-  let businessCategories: TBusinessCategory[] = [];
+  let businessCategories: TBusinessCategoryResponse[] = [];
   const result = await getAllCuisine();
-
 
   try {
     const result = (await serverRequest.get(
       "/categories/businessCategory",
-    )) as unknown as TResponse<{ data: TBusinessCategory[] }>;
+    )) as unknown as TResponse<TBusinessCategoryResponse[]>;
 
     if (result?.success) {
-      businessCategories = result?.data?.data;
+      businessCategories = result?.data;
     }
   } catch (err) {
     console.log("Server fetch error:", err);
