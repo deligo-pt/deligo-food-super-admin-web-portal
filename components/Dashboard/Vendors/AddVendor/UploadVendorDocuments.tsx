@@ -22,6 +22,20 @@ import { TVendorDocKey } from "@/types/document.type";
 import { toast } from "sonner";
 import { TVendor } from "@/types/user.type";
 
+const OPTIONAL_DOCS: TVendorDocKey[] = [
+  "myPhoto",
+  "storePhoto",
+  "menuUpload",
+  "agoserisHaccpCertificate",
+];
+
+const REQUIRED_DOCS: TVendorDocKey[] = [
+  "businessLicenseDoc",
+  "taxDoc",
+  "idProofFront",
+  "idProofBack",
+];
+
 export default function UploadVendorDocuments({
   vendor,
   previews,

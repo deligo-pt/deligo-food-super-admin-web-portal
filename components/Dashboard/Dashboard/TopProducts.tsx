@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TTopRatedItems } from "@/types/analytics.type";
 import { motion } from "framer-motion";
 import { StarIcon } from "lucide-react";
@@ -12,6 +13,7 @@ interface IProps {
 
 const TopProducts = ({ topRatedItems }: IProps) => {
   const { t } = useTranslation();
+  const { lang } = useStore();
 
   return (
     <div className="bg-white rounded-lg shadow p-6 border border-gray-100">
@@ -46,14 +48,14 @@ const TopProducts = ({ topRatedItems }: IProps) => {
             <div className="h-32 w-full overflow-hidden">
               <Image
                 src={item.images?.[0] || ""}
-                alt={item.name}
+                alt={item.name?.[lang]}
                 className="w-full h-full object-cover"
                 width={500}
                 height={500}
               />
             </div>
             <div className="p-4">
-              <h4 className="font-medium">{item.name}</h4>
+              <h4 className="font-medium">{item.name?.[lang]}</h4>
               <div className="flex justify-between items-center mt-2">
                 <div className="flex items-center">
                   <StarIcon

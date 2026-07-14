@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { setLanguageCookie } from "@/utils/language";
 
 const PRIMARY = "#DC3173";
 
@@ -51,6 +52,9 @@ export default function TopbarIcons({ admin }: IProps) {
 
   const handleLangChange = (value: "en" | "pt") => {
     setLang(value);
+
+    // Save cookie
+    setLanguageCookie(value);
 
     const params = new URLSearchParams(searchParams.toString());
     params.set("lang", value);

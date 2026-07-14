@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
+import { restaurantCuisineOptions } from "@/consts/vendor.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
@@ -62,8 +63,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
   const { lang } = useStore();
   const router = useRouter();
   const [locationCoordinates, setLocationCoordinates] = useState({
-    latitude: vendorState.businessLocation?.latitude || 0,
-    longitude: vendorState.businessLocation?.longitude || 0,
+    latitude: vendor.businessLocation?.latitude || 0,
+    longitude: vendor.businessLocation?.longitude || 0,
   });
   const [previews, setPreviews] = useState<
     Record<TVendorDocKey, string[] | null>
@@ -94,13 +95,13 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       : null,
   });
   const daysOfWeek = [
-    t("sunday"),
-    t("monday"),
-    t("tuesday"),
-    t("wednesday"),
-    t("thursday"),
-    t("friday"),
-    t("saturday"),
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
   ];
 
   const form = useForm<TVendorForm>({
@@ -139,45 +140,48 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
   useEffect(() => {
     // for before only string type is catching for converting to array of string and for valid types
-    const rawCuisineData = vendorState?.businessDetails?.restaurantCuisineType;
+    const rawCuisineData = vendor?.businessDetails?.restaurantCuisineType;
     let normalizedCuisines: string[] = [];
 
     if (rawCuisineData) {
       normalizedCuisines = Array.isArray(rawCuisineData) ? rawCuisineData : [rawCuisineData];
     }
 
-    const validCuisineNames = cuisines?.map((c) => c?.name?.[lang]) || [];
+    const cuisineSlugs = normalizedCuisines.map((storedName) => {
+      const cuisine = cuisines?.find(
+        (c) => c.name?.[lang] === storedName
+      );
 
-    const sanitizedCuisines = normalizedCuisines.filter((cuisineName) =>
-      validCuisineNames.includes(cuisineName)
-    );
+      return cuisine?.slug;
+    })
+      .filter(Boolean) as string[];
 
     form.reset({
-      firstName: vendorState.name?.firstName || "",
-      lastName: vendorState.name?.lastName || "",
-      phoneNumber: vendorState?.contactNumber || "",
-      businessName: vendorState.businessDetails?.businessName || "",
-      businessType: vendorState?.businessDetails?.businessTypeSlug || "",
-      restaurantCuisineType: sanitizedCuisines,
-      NIF: vendorState?.businessDetails?.NIF || "",
+      firstName: vendor.name?.firstName || "",
+      lastName: vendor.name?.lastName || "",
+      phoneNumber: vendor?.contactNumber || "",
+      businessName: vendor.businessDetails?.businessName || "",
+      businessType: vendor?.businessDetails?.businessTypeSlug || "",
+      restaurantCuisineType: cuisineSlugs,
+      NIF: vendor?.businessDetails?.NIF || "",
       branches:
-        vendorState?.businessDetails?.totalBranches?.toString() || "1",
-      openingHours: vendorState?.businessDetails?.openingHours || "",
-      closingHours: vendorState?.businessDetails?.closingHours || "",
-      closingDays: vendorState?.businessDetails?.closingDays || [],
-      street: vendorState?.businessLocation?.street || "",
-      city: vendorState?.businessLocation?.city || "",
-      postalCode: vendorState?.businessLocation?.postalCode || "",
-      country: vendorState?.businessLocation?.country || "",
-      latitude: vendorState?.businessLocation?.latitude ?? 0,
-      longitude: vendorState?.businessLocation?.longitude ?? 0,
-      bankName: vendorState?.bankDetails?.bankName || "",
+        vendor?.businessDetails?.totalBranches?.toString() || "1",
+      openingHours: vendor?.businessDetails?.openingHours || "",
+      closingHours: vendor?.businessDetails?.closingHours || "",
+      closingDays: vendor?.businessDetails?.closingDays || [],
+      street: vendor?.businessLocation?.street || "",
+      city: vendor?.businessLocation?.city || "",
+      postalCode: vendor?.businessLocation?.postalCode || "",
+      country: vendor?.businessLocation?.country || "",
+      latitude: vendor?.businessLocation?.latitude ?? 0,
+      longitude: vendor?.businessLocation?.longitude ?? 0,
+      bankName: vendor?.bankDetails?.bankName || "",
       accountHolderName:
-        vendorState?.bankDetails?.accountHolderName || "",
-      iban: vendorState?.bankDetails?.iban || "",
-      swiftCode: vendorState?.bankDetails?.swiftCode || "",
+        vendor?.bankDetails?.accountHolderName || "",
+      iban: vendor?.bankDetails?.iban || "",
+      swiftCode: vendor?.bankDetails?.swiftCode || "",
     });
-  }, [vendorState, form, cuisines]);
+  }, [vendor, form, cuisines, lang]);
 
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Updating vendor data...");
@@ -492,12 +496,13 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                           />
 
                           {/* if business type is restaurant */}
-                          {businessType === "RESTAURANT" && (
+                          {businessType === "restaurant" && (
                             <FormField
                               control={form.control}
                               name="restaurantCuisineType"
                               render={({ field, fieldState }) => {
                                 const selectedCuisines = Array.isArray(field.value) ? field.value : [];
+                                const getCuisineName = (slug: string) => cuisines?.find((c) => c.slug === slug)?.name?.[lang] ?? slug;
 
                                 // remove cuisine
                                 const handleRemoveCuisine = (cuisineToRemove: string) => {
@@ -523,16 +528,16 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                     {/* 4. Display Selected Badges ABOVE the Select Dropdown */}
                                     {selectedCuisines.length > 0 && (
                                       <div className="flex flex-wrap gap-2 mb-3 p-2 border border-dashed rounded-lg bg-gray-50/50">
-                                        {selectedCuisines.map((cuisine) => (
+                                        {selectedCuisines.map((slug) => (
                                           <Badge
-                                            key={cuisine}
+                                            key={slug}
                                             variant="secondary"
                                             className="flex items-center gap-1 bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 transition-all capitalize px-3 py-1 text-sm font-medium"
                                           >
-                                            {cuisine}
+                                            {getCuisineName(slug)}
                                             <button
                                               type="button"
-                                              onClick={() => handleRemoveCuisine(cuisine)}
+                                              onClick={() => handleRemoveCuisine(slug)}
                                               className="rounded-full outline-none hover:bg-[#DC3173]/20 p-0.5"
                                             >
                                               <X className="h-3 w-3" />
@@ -566,11 +571,11 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                               </div>
                                             ) : (
                                               cuisines?.map((type, idx) => {
-                                                const isAlreadySelected = selectedCuisines.includes(type?.name?.[lang]);
+                                                const isAlreadySelected = selectedCuisines.includes(type?.slug);
                                                 return (
                                                   <SelectItem
                                                     key={idx}
-                                                    value={type?.name?.[lang]}
+                                                    value={type?.slug}
                                                     className="capitalize"
                                                     disabled={isAlreadySelected}
                                                   >

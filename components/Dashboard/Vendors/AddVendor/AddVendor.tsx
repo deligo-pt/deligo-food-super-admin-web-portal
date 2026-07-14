@@ -37,7 +37,7 @@ import {
 import { getSingleVendorReq } from "@/services/dashboard/vendor/vendor.service";
 import { useStore } from "@/store/store";
 import { TResponse } from "@/types";
-import { TBusinessCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
@@ -94,7 +94,7 @@ export default function AddVendor({
   businessCategories,
   cuisines,
 }: {
-  businessCategories: TBusinessCategory[];
+  businessCategories: TBusinessCategoryResponse[];
   cuisines: TCuisine[]
 }) {
   const { t } = useTranslation();
@@ -289,7 +289,7 @@ export default function AddVendor({
       businessDetails: {
         businessName: data.businessName,
         businessType: data.businessType,
-        ...(data?.businessType === "RESTAURANT" && {
+        ...(data?.businessType === "restaurant" && {
           restaurantCuisineType: data.restaurantCuisineType
         }),
         NIF: data.NIF?.toUpperCase(),
@@ -621,9 +621,9 @@ export default function AddVendor({
                                     {businessCategories?.map((category) => (
                                       <SelectItem
                                         key={category._id}
-                                        value={category.name}
+                                        value={category.slug}
                                       >
-                                        {category.name}
+                                        {category?.name?.[lang]}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
@@ -653,12 +653,13 @@ export default function AddVendor({
 
 
                         {/* if business type is restaurant */}
-                        {businessType === "RESTAURANT" && (
+                        {businessType === "restaurant" && (
                           <FormField
                             control={form.control}
                             name="restaurantCuisineType"
                             render={({ field, fieldState }) => {
                               const selectedCuisines = Array.isArray(field.value) ? field.value : [];
+                              const getCuisineName = (slug: string) => cuisines?.find((c) => c.slug === slug)?.name?.[lang] ?? slug;
 
                               // remove cuisine
                               const handleRemoveCuisine = (cuisineToRemove: string) => {
@@ -684,16 +685,16 @@ export default function AddVendor({
                                   {/* 4. Display Selected Badges ABOVE the Select Dropdown */}
                                   {selectedCuisines.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mb-3 p-2 border border-dashed rounded-lg bg-gray-50/50">
-                                      {selectedCuisines.map((cuisine) => (
+                                      {selectedCuisines.map((slug) => (
                                         <Badge
-                                          key={cuisine}
+                                          key={slug}
                                           variant="secondary"
                                           className="flex items-center gap-1 bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 transition-all capitalize px-3 py-1 text-sm font-medium"
                                         >
-                                          {cuisine}
+                                          {getCuisineName(slug)}
                                           <button
                                             type="button"
-                                            onClick={() => handleRemoveCuisine(cuisine)}
+                                            onClick={() => handleRemoveCuisine(slug)}
                                             className="rounded-full outline-none hover:bg-[#DC3173]/20 p-0.5"
                                           >
                                             <X className="h-3 w-3" />
@@ -727,11 +728,11 @@ export default function AddVendor({
                                             </div>
                                           ) : (
                                             cuisines?.map((type, idx) => {
-                                              const isAlreadySelected = selectedCuisines.includes(type?.name?.[lang]);
+                                              const isAlreadySelected = selectedCuisines.includes(type?.slug);
                                               return (
                                                 <SelectItem
                                                   key={idx}
-                                                  value={type?.name?.[lang]}
+                                                  value={type?.slug}
                                                   className="capitalize"
                                                   disabled={isAlreadySelected}
                                                 >
