@@ -18,7 +18,7 @@ import {
   updateDocumentsReq,
 } from "@/services/auth/register-user.service";
 import { uploadImagesReq } from "@/services/upload/upload.service";
-import { TFilePreview, TVendorDocKey } from "@/types/document.type";
+import { TVendorDocKey } from "@/types/document.type";
 import { toast } from "sonner";
 import { TVendor } from "@/types/user.type";
 
@@ -42,9 +42,9 @@ export default function UploadVendorDocuments({
   setPreviews,
 }: {
   vendor: TVendor | null;
-  previews: Record<TVendorDocKey, TFilePreview[] | null>;
+  previews: Record<TVendorDocKey, string[] | null>;
   setPreviews: React.Dispatch<
-    React.SetStateAction<Record<TVendorDocKey, TFilePreview[] | null>>
+    React.SetStateAction<Record<TVendorDocKey, string[] | null>>
   >;
 }) {
   const { t } = useTranslation();
@@ -222,9 +222,9 @@ export default function UploadVendorDocuments({
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      {visibleDocuments?.map((d, idx) => {
-        const preview = previews[d.key];
-        const isSelected = !(!preview || preview?.length === 0);
+      {visibleDocuments.map((d, idx) => {
+        const previewFiles = previews[d.key];
+        const isSelected = !(!previewFiles || previewFiles?.length === 0);
         return (
           <motion.div
             key={d.key}
@@ -232,11 +232,11 @@ export default function UploadVendorDocuments({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
             className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${isSelected
-              ? "border-[#DC3173]/30 bg-[#FFF7FB]"
+              ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
               : "bg-white"
               }`}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 w-full">
               <div
                 className={`w-14 h-14 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
                   }`}
@@ -248,106 +248,97 @@ export default function UploadVendorDocuments({
                 )}
               </div>
 
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-gray-800">
-                  {d.label} {REQUIRED_DOCS.includes(d.key) && <span className="text-[#DC3173]">*</span>}
+              <div className="min-w-0 w-full">
+                <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
+                  {d.label}
+                  {isSelected && (
+                    <button
+                      type="button"
+                      onClick={() => openPicker(d.key)}
+                      className="inline-flex items-center gap-2 p-0 text-sm font-medium text-[#DC3173]  hover:underline"
+                    >
+                      <Plus className="w-3 h-3 text-[#DC3173]" /> Add More
+                    </button>
+                  )}
+
+                  <input
+                    ref={(el) => {
+                      inputsRef.current[d.key] = el;
+                    }}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                    onChange={(e) =>
+                      handleFileChange(
+                        d.key,
+                        e.target.files ? e.target.files[0] : null,
+                      )
+                    }
+                  />
                 </div>
                 <div className="text-xs text-gray-500 mt-1 space-y-1">
-                  {preview?.map((f, i) => (
-                    <div className="flex items-center gap-2" key={i}>
-                      {f.isImage && f.url ? (
+                  {(previewFiles || [])?.map((url, i) => (
+                    <div className="flex items-center gap-2 w-full" key={i}>
+                      {/\.(jpg|jpeg|png|webp|gif|avif)$/i.test(url) ? (
                         <div className="flex items-center gap-2 border p-1 rounded-md">
                           <Image
-                            src={f.url}
-                            alt={
-                              f.file?.name ||
-                              getActualFileName(f.url || "")
-                            }
+                            src={url}
+                            alt="document"
                             width={56}
                             height={40}
-                            className="object-cover rounded-md border w-14 h-8"
+                            className="object-cover rounded-md border"
                             unoptimized
                           />
                           <div className="truncate">
-                            {f.file?.name ||
-                              getActualFileName(f.url || "")}
+                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
                           <File className="w-4 h-4 text-gray-500" />
                           <div className="truncate">
-                            {f.file?.name ||
-                              getActualFileName(f.url || "")}
+                            {url.length > 30 ? getActualFileName(url)?.slice(0, 30) : getActualFileName(url)}
                           </div>
                         </div>
                       )}
-                      <div className="flex items-center gap-2">
+
+                      <div className="flex items-center gap-2 w-full">
                         <button
-                          onClick={() =>
-                            f.url
-                              ? window.open(f.url, "_blank")
-                              : alert(f.file?.name)
-                          }
-                          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
+                          type="button"
+                          onClick={() => window.open(url, "_blank")}
+                          className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs"
                         >
-                          <Eye className="w-3 h-3 text-[#DC3173]" />{" "}
+                          <Eye className="w-4 h-4 text-[#DC3173]" />
                           {t("view")}
                         </button>
 
                         <button
                           type="button"
                           onClick={() => removeFile(d.key, i)}
-                          className="px-2 py-1 rounded-md text-xs cursor-pointer"
+                          className="px-2 py-1 rounded-md text-xs"
                         >
                           {t("remove")}
                         </button>
                       </div>
                     </div>
                   ))}
-
                   {!isSelected && <span>{t("no_file_selected")}</span>}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* hidden native input */}
-              <input
-                ref={(el) => {
-                  inputsRef.current[d.key] = el;
-                }}
-                type="file"
-                accept="image/*,application/pdf"
-                className="hidden"
-                onChange={(e) =>
-                  handleFileChange(
-                    d.key,
-                    e.target.files ? e.target.files[0] : null,
-                  )
-                }
-              />
-
-              {isSelected ? (
-                <>
-                  <button
-                    onClick={() => openPicker(d.key)}
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm border border-gray-200 hover:shadow"
-                  >
-                    <Plus className="w-4 h-4 text-[#DC3173]" />{" "}
-                    {t("addMoreCTA")}
-                  </button>
-                </>
-              ) : (
+            {!isSelected && (
+              <div className="flex items-center justify-end gap-3 w-42.5!">
                 <button
+                  type="button"
                   onClick={() => openPicker(d.key)}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#DC3173] border border-[#DC3173]/20 hover:bg-[#DC3173]/5 transition"
                 >
                   <UploadCloud className="w-4 h-4" />
                   {t("select_file")}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         );
       })}
