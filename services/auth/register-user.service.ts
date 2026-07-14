@@ -3,6 +3,7 @@
 import { serverRequest } from "@/lib/serverFetch";
 import { TAdmin } from "@/types/admin.type";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
+import { TFilePreview } from "@/types/document.type";
 import { TAgent, TVendor } from "@/types/user.type";
 import { catchAsync } from "@/utils/catchAsync";
 
@@ -47,7 +48,7 @@ export const updateUserDataReq = async (
 
 export const updateDocumentsReq = async (
   endPoint: string,
-  data: { docImageTitle: string; docImageUrls: string[] },
+  data: { docImageTitle: string; docImageUrls: TFilePreview[] },
 ) => {
   return catchAsync<null>(async () => {
     return await serverRequest.patch(endPoint, {
@@ -58,7 +59,7 @@ export const updateDocumentsReq = async (
 
 export const deleteDocumentReq = async (
   endPoint: string,
-  data: { docImageTitle: string; imageUrl: string },
+  data: { docImageTitle: string; imageUrl: TFilePreview },
 ) => {
   return catchAsync<null>(async () => {
     return await serverRequest.delete(endPoint, {

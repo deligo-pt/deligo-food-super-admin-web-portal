@@ -95,13 +95,13 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       : null,
   });
   const daysOfWeek = [
-    t("sunday"),
-    t("monday"),
-    t("tuesday"),
-    t("wednesday"),
-    t("thursday"),
-    t("friday"),
-    t("saturday"),
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
   ];
 
   const form = useForm<TVendorForm>({
