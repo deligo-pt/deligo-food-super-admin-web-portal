@@ -51,8 +51,8 @@ interface IProps {
     city: string;
     postalCode: string;
     country: string;
-    latitude?: number;
-    longitude?: number;
+    latitude: number;
+    longitude: number;
   };
   setLocationCoordinates: Dispatch<
     SetStateAction<{ latitude: number; longitude: number }>

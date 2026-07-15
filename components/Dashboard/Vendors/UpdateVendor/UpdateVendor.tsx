@@ -859,8 +859,10 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
                       <UploadVendorDocuments
                         vendor={vendor}
+                        businessType={businessType}
                         previews={previews}
                         setPreviews={setPreviews}
+                        isSubmitting={isSubmitting}
                       />
                     </Card>
                   </motion.div>

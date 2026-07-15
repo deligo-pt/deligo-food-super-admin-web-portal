@@ -2,7 +2,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadVendorDocuments from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
+import UploadVendorDocuments, { REQUIRED_DOCS } from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,7 @@ import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
+import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -89,6 +90,7 @@ const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
   menuUpload: null,
   agoserisHaccpCertificate: null,
 };
+const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "storePhoto", "menuUpload"];
 
 export default function AddVendor({
   businessCategories,
@@ -135,6 +137,8 @@ export default function AddVendor({
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
       bankName: "",
       accountHolderName: "",
       iban: "",
@@ -239,13 +243,11 @@ export default function AddVendor({
         // 1. Decode the JWT to get the userId
         const decoded = jwtDecode(result.data.accessToken) as { userId: string };
         const currentUserId = decoded.userId;
-        console.log("currentuserId", currentUserId);
         setEmailVerified(true);
 
         // 2. Fetch the single vendor details using the userId
         try {
           const vendorResult = await getSingleVendorReq(currentUserId);
-          console.log("vendorResult", vendorResult);
           if (vendorResult) {
             setVendorDetails(vendorResult); // Store vendor details in state
           } else {
@@ -279,6 +281,26 @@ export default function AddVendor({
 
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Adding vendor...");
+
+    if (!vendorDetails) {
+      return;
+    };
+
+    try {
+      // Fill in defaults for any optional doc the user skipped
+      for (const key of OPTIONAL_DEFAULTS) {
+        if (!previews[key] || previews[key]!.length === 0) {
+          await uploadDefaultDocument(key, vendorDetails?.userId);
+        }
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to set default documents",
+        { id: toastId }
+      );
+      console.log(err);
+      return;
+    }
 
     const vendorData = {
       name: {
@@ -330,6 +352,8 @@ export default function AddVendor({
         toast.success(approveResult.message || "Vendor added successfully!", {
           id: toastId,
         });
+        setOtpSent(false);
+        setEmailVerified(false);
         return;
       }
 
@@ -357,6 +381,12 @@ export default function AddVendor({
       form.setValue("phoneNumber", "+351", { shouldValidate: true });
     }
   }, [form]);
+
+  const isDocumentsValid = REQUIRED_DOCS.every(
+    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
+  );
+
+  const isSubmitDisabled = !isDocumentsValid || isSubmitting;
 
   return (
     <Form {...form}>
@@ -394,7 +424,7 @@ export default function AddVendor({
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormLabel>{t("first_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -408,7 +438,7 @@ export default function AddVendor({
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormLabel>{t("last_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -418,7 +448,7 @@ export default function AddVendor({
                   />
 
                   <div>
-                    <Label>{t("email")}</Label>
+                    <Label>{t("email")} <span className="text-[#DC3173]">*</span></Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
@@ -458,7 +488,7 @@ export default function AddVendor({
 
                   {otpSent && !emailVerified && (
                     <div>
-                      <Label className="mb-2">{t("otp")}</Label>
+                      <Label className="mb-2">{t("otp")} <span className="text-[#DC3173]">*</span></Label>
                       <div className="flex items-center gap-3">
                         <Input
                           placeholder={t("enter_otp")}
@@ -480,7 +510,7 @@ export default function AddVendor({
                   )}
 
                   <div>
-                    <Label className="mb-2">{t("password")}</Label>
+                    <Label className="mb-2">{t("password")} <span className="text-[#DC3173]">*</span></Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
@@ -504,7 +534,7 @@ export default function AddVendor({
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
+                  <Label className="mb-2">{t("phone_number")} <span className="text-[#DC3173]">*</span></Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -582,7 +612,7 @@ export default function AddVendor({
                           name="businessName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("business_name")}</FormLabel>
+                              <FormLabel>{t("business_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("business_name")}
@@ -599,7 +629,7 @@ export default function AddVendor({
                           name="businessType"
                           render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("business_type")}</FormLabel>
+                              <FormLabel>{t("business_type")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Select
                                   onValueChange={field.onChange}
@@ -639,7 +669,7 @@ export default function AddVendor({
                           name="NIF"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("nif")}</FormLabel>
+                              <FormLabel>{t("nif")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("tax_identification_number")}
@@ -757,7 +787,7 @@ export default function AddVendor({
                           name="branches"
                           render={({ field }) => (
                             <FormItem className="col-span-2">
-                              <FormLabel>{t("total_branches")}</FormLabel>
+                              <FormLabel>{t("total_branches")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
@@ -778,7 +808,7 @@ export default function AddVendor({
                             <FormItem>
                               <div className="relative">
                                 <FormLabel className="mb-2">
-                                  {t("opening_hours")}
+                                  {t("opening_hours")} <span className="text-[#DC3173]">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -800,7 +830,7 @@ export default function AddVendor({
                             <FormItem>
                               <div className="relative">
                                 <FormLabel className="mb-2">
-                                  {t("closing_hours")}
+                                  {t("closing_hours")} <span className="text-[#DC3173]">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -822,7 +852,7 @@ export default function AddVendor({
                             <FormItem className="col-span-2">
                               <div>
                                 <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                  {t("closing_days")}
+                                  {t("closing_days")} <span className="text-[#DC3173]">*</span>
                                 </FormLabel>
                                 <div className="flex flex-wrap gap-2">
                                   {daysOfWeek.map((day) => (
@@ -881,7 +911,7 @@ export default function AddVendor({
                           name="bankName"
                           render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("bank_name")}</FormLabel>
+                              <FormLabel>{t("bank_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                   <SelectTrigger
@@ -913,7 +943,7 @@ export default function AddVendor({
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("account_holder_name")}</FormLabel>
+                              <FormLabel>{t("account_holder_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
@@ -930,7 +960,7 @@ export default function AddVendor({
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("iban")}</FormLabel>
+                              <FormLabel>{t("iban")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input placeholder={t("iban")} {...field} />
                               </FormControl>
@@ -944,7 +974,7 @@ export default function AddVendor({
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("swift_code")}</FormLabel>
+                              <FormLabel>{t("swift_code")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("swift_code")}
@@ -1013,8 +1043,10 @@ export default function AddVendor({
 
                     <UploadVendorDocuments
                       vendor={vendorDetails}
+                      businessType={businessType}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>
@@ -1029,7 +1061,7 @@ export default function AddVendor({
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
-              disabled={isSubmitting}
+              disabled={isSubmitDisabled}
             >
               {t("submit_vendor")}
             </Button>
