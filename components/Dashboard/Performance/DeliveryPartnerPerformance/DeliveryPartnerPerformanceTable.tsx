@@ -43,9 +43,9 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2"
     >
-      <h3 className="text-xl font-semibold">{t("delivery_partners")}</h3>
+      <h3 className="text-xl font-semibold">{t("riders")}</h3>
       <p className="text-gray-700 mb-2">
-        {t("view_delivery_partners_performance_analytics")}
+        {t("view_riders_performance_analytics")}
       </p>
 
       <div className="overflow-x-auto">

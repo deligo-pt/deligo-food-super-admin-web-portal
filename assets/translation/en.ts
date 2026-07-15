@@ -348,6 +348,9 @@ export const en = {
   business_location_information: "Business Location Information",
   search_business_address: "Search your business address...",
   documents_nd_verification: "Documents & Verification",
+  note: "Note",
+  vehicle_type_bicycle: "If your vehicle type is Bicyle or E-Bike,then you don't have to submit Driving Licenses and Vehicle Registation documents",
+  vehicle_type_not_bicycle: "If your vehicle type is not Bicycle or E-Bike,then you have to submit Driving Licenses and Vehicle Registration documents for further assurance. If you don't submit, the authorities will not be responsible for it.",
   vendor_photo: "Vendor Photo",
   fleet_manager_photo: "Fleet Manager Photo",
   business_license: "Business License",
@@ -359,7 +362,7 @@ export const en = {
   agoserisHaccpCertificate: "AGOSERIS HACCP Certificate",
   no_file_selected: "No file selected",
   remove: "Remove",
-  add_more :"Add More",
+  add_more: "Add More",
   select_file: "Select file",
   submit_vendor: "Submit Vendor",
 

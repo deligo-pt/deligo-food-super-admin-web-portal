@@ -79,6 +79,8 @@ export default function AddAdmin() {
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
     },
   });
 
@@ -268,7 +270,7 @@ export default function AddAdmin() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -282,7 +284,7 @@ export default function AddAdmin() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -292,7 +294,7 @@ export default function AddAdmin() {
                   />
 
                   <div>
-                    <Label>{t('email')}</Label>
+                    <Label>{t('email')} <span className="text-red-600">*</span></Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
@@ -332,7 +334,7 @@ export default function AddAdmin() {
 
                   {otpSent && !emailVerified && (
                     <div>
-                      <Label className="mb-2">{t("otp")}</Label>
+                      <Label className="mb-2">{t("otp")} <span className="text-red-600">*</span></Label>
                       <div className="flex items-center gap-3">
                         <Input
                           placeholder={t("enter_otp")}
@@ -353,7 +355,7 @@ export default function AddAdmin() {
                   )}
 
                   <div>
-                    <Label className="mb-2">{t("password")}</Label>
+                    <Label className="mb-2">{t("password")} <span className="text-red-600">*</span></Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
@@ -377,7 +379,7 @@ export default function AddAdmin() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
+                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
                   <div className="relative">
                     <FormField
                       control={form.control}

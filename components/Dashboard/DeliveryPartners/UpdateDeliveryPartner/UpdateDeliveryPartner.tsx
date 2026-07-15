@@ -131,6 +131,8 @@ export default function UpdateDeliveryPartner({
       city: partner.address?.city || "",
       postalCode: partner.address?.postalCode || "",
       country: partner.address?.country || "",
+      latitude: partner?.address?.latitude || 0,
+      longitude: partner?.address?.longitude || 0,
       vehicleType: partner.vehicleInfo?.vehicleType || "SCOOTER",
       brand: partner.vehicleInfo?.brand || "",
       model: partner.vehicleInfo?.model || "",
@@ -1246,6 +1248,7 @@ export default function UpdateDeliveryPartner({
                       partnerId={partner.userId}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>

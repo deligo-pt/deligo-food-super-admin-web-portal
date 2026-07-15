@@ -30,7 +30,7 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
-import { TFleetDocKey } from "@/types/document.type";
+import { FLEET_REQUIRED_DOCS, TFleetDocKey } from "@/types/document.type";
 import { TAgent } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
@@ -291,6 +291,12 @@ export default function AddFleetManager() {
       form.setValue("phoneNumber", "+351", { shouldValidate: true });
     }
   }, [form]);
+
+  const isDocumentsValid = FLEET_REQUIRED_DOCS.every(
+    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
+  );
+
+  const isSubmitDisabled = isSubmitting || !isDocumentsValid;
 
   return (
     <Form {...form}>
@@ -725,7 +731,7 @@ export default function AddFleetManager() {
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
-              disabled={isSubmitting}
+              disabled={isSubmitDisabled}
             >
               {t("submit_fleetManager")}
             </Button>

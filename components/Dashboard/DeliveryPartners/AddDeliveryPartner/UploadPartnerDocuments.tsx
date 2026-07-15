@@ -16,7 +16,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 type DocKey =
@@ -34,15 +34,18 @@ export default function UploadPartnerDocuments({
   partnerId,
   previews,
   setPreviews,
+  isSubmitting
 }: {
   partnerId: string;
   previews: Record<TPartnerDocKey, TFilePreview | null>;
   setPreviews: React.Dispatch<
     React.SetStateAction<Record<TPartnerDocKey, TFilePreview | null>>
   >;
+  isSubmitting: boolean;
 }) {
   const { t } = useTranslation();
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const [processing, setProcessing] = useState(false);
 
   const DOCUMENTS: {
     key: DocKey;
@@ -105,9 +108,11 @@ export default function UploadPartnerDocuments({
     if (!f) return;
 
     const toastId = toast.loading("Uploading...");
+    setProcessing(true);
 
     if (f.size > 5 * 1024 * 1024) {
       toast.error("File size should be less than 5MB", { id: toastId });
+      setProcessing(false);
       return;
     }
 
@@ -146,12 +151,13 @@ export default function UploadPartnerDocuments({
           isImage,
         },
       }));
-
+      setProcessing(false);
       return;
     }
 
     toast.error(uploadResult.message || "File upload failed", { id: toastId });
     console.log(uploadResult);
+    setProcessing(false);
   };
 
   function getActualFileName(url: string): string {
@@ -198,7 +204,7 @@ export default function UploadPartnerDocuments({
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
-                  {d.label}
+                  <p>{d.label}<span className="text-red-600">*</span></p>
                   {isSelected && (
                     <div>
                       <button
@@ -214,6 +220,7 @@ export default function UploadPartnerDocuments({
                       </button>
                       <button
                         type="button"
+                        disabled={isSubmitting || processing}
                         onClick={() => openPicker(d.key)}
                         className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
                       >
@@ -272,6 +279,7 @@ export default function UploadPartnerDocuments({
               <div className="flex items-center justify-end gap-3 w-42.5!">
                 <button
                   type="button"
+                  disabled={isSubmitting || processing}
                   onClick={() => openPicker(d.key)}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#DC3173] border border-[#DC3173]/20 hover:bg-[#DC3173]/5 transition"
                 >

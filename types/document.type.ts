@@ -32,3 +32,24 @@ export type TFilePreview = {
   url: string | null;
   isImage: boolean;
 };
+
+export const PARTNER_REQUIRED_DOCS: TPartnerDocKey[] = [
+  "myPhoto",
+  "idProofFront",
+  "idProofBack",
+  "drivingLicenseFront",
+  "drivingLicenseBack",
+  "vehicleRegistration",
+  "criminalRecordCertificate",
+  "activity",
+  "insurancePolicy",
+];
+
+export const FLEET_REQUIRED_DOCS: TFleetDocKey[] = [
+  "myPhoto",
+  "businessLicense",
+  "idProofFront",
+  "idProofBack",
+  "proofOfAddress",
+  "activityDocument",
+];
