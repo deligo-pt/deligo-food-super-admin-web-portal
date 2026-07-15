@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/select";
 import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
-import { restaurantCuisineOptions } from "@/consts/vendor.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
@@ -34,7 +33,7 @@ import { useStore } from "@/store/store";
 import { TBusinessCategoryResponse } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
-import { TVendor } from "@/types/user.type";
+import { TBusinessLocation, TVendor } from "@/types/user.type";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -832,9 +831,10 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
                       <BusinessLocationMap
                         form={form}
-                        businessLocation={vendorState.businessLocation}
+                        businessLocation={vendorState.businessLocation as TBusinessLocation}
                         setLocationCoordinates={setLocationCoordinates}
                         t={t}
+
                       />
                     </Card>
                   </motion.div>
