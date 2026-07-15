@@ -2,6 +2,7 @@
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TTransaction } from "@/types/transaction.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -55,6 +56,7 @@ export default function TransactionDetails({
   transaction: TTransaction;
 }) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
 
   const config = typeConfig[transaction.type] || typeConfig.earning;
@@ -89,7 +91,7 @@ export default function TransactionDetails({
 
   return (
     <motion.div
-      className="min-h-screen p-6 space-y-6"
+      className="min-h-screen space-y-6"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -233,8 +235,8 @@ export default function TransactionDetails({
             </div>
             <div>
               <p className="font-bold text-gray-900">
-                {transaction.customer?.name?.firstName}{" "}
-                {transaction.customer?.name?.lastName}
+                {transaction.customer?.name?.firstName || "N/"}{" "}
+                {transaction.customer?.name?.lastName || "A"}
               </p>
               <p className="text-sm text-gray-400">
                 {transaction.customer?.contactNumber || "-"}
@@ -288,7 +290,7 @@ export default function TransactionDetails({
                   x{item.qty}
                 </span>
                 <span className="text-sm font-medium text-gray-900">
-                  {item.name}
+                  {item.name?.[lang]}
                 </span>
               </div>
               <span className="text-sm font-bold text-gray-900">
