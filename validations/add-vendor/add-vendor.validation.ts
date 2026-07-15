@@ -90,8 +90,9 @@ export const addVendorValidation = z
       .min(2, "Country must be at least 2 characters")
       .max(50, "Country must be at most 50 characters"),
 
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
+    latitude: z.number({ error: "Latitude is required" }),
+
+    longitude: z.number({ error: "Logitude is required" }),
 
     bankName: z
       .string()

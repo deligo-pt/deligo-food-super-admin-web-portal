@@ -51,8 +51,8 @@ interface IProps {
     city: string;
     postalCode: string;
     country: string;
-    latitude?: number;
-    longitude?: number;
+    latitude: number;
+    longitude: number;
   };
   setLocationCoordinates: Dispatch<
     SetStateAction<{ latitude: number; longitude: number }>
@@ -203,7 +203,7 @@ const BusinessLocationMap = ({
             name={field.name as keyof LocationFormType}
             render={({ field: formField }) => (
               <FormItem>
-                <FormLabel>{field.label}</FormLabel>
+                <FormLabel>{field.label} <span className="text-red-600">*</span></FormLabel>
                 <FormControl>
                   <Input
                     {...formField}

@@ -105,10 +105,10 @@ export default function DeliveryPartnerTable({
           {partners?.map((partner) => (
             <TableRow key={partner._id}>
               <TableCell>
-                {partner?.registeredBy?.id?.name?.firstName} {partner?.registeredBy?.id?.name?.lastName}
+                {partner.name?.firstName} {partner.name?.lastName}
               </TableCell>
               <TableCell>
-                {partner.name?.firstName} {partner.name?.lastName}
+                {partner?.registeredBy?.id?.name?.firstName} {partner?.registeredBy?.id?.name?.lastName}
               </TableCell>
               <TableCell>{partner.email}</TableCell>
               <TableCell>{partner.contactNumber}</TableCell>

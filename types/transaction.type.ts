@@ -11,9 +11,11 @@ export type TTransaction = {
   status?: string;
 
   orderId?: string;
-  orderTotal?: string;
+  orderGrandTotal?: string;
   platformFee?: string;
-  netEarning?: string;
+  vendorNetEarning?: string;
+  riderNetEarnings?: string;
+  fleetEarnings?: string;
   customer?: {
     name: {
       firstName: string;
@@ -27,7 +29,10 @@ export type TTransaction = {
   deliveryAddress?: string;
 
   items?: {
-    name: string;
+    name: {
+      en: string;
+      pt: string;
+    };
     qty: number;
     price: number;
   }[];

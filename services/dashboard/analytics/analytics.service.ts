@@ -45,9 +45,7 @@ export const getPerformanceAnalyticsReq = async <T>(
     });
   });
 
-  if (result.success) return { data: result.data, meta: result.meta };
-
-  return { data: {}, meta: {} };
+  return { data: result.data, meta: result.meta };
 };
 
 export const getSinglePerformanceReq = async <T>(endPoint: string) => {

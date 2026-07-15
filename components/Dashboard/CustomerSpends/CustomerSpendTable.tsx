@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TTransaction } from "@/types/transaction.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -30,6 +31,7 @@ interface IProps {
 
 export default function CustomerSpendTable({ spends }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
 
   return (
@@ -86,13 +88,13 @@ export default function CustomerSpendTable({ spends }: IProps) {
             <TableRow key={s._id}>
               <TableCell>
                 {!s.customer?.name?.firstName || !s.customer?.name?.lastName
-                  ? "-"
+                  ? "N/A"
                   : `${s.customer?.name?.firstName} ${s.customer?.name?.lastName}`}
               </TableCell>
               <TableCell>
                 {s.items?.map((item, i) => (
                   <p key={i}>
-                    {item?.name} (x{item.qty})
+                    {item?.name?.[lang]} (x{item.qty})
                   </p>
                 ))}
               </TableCell>

@@ -126,7 +126,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
     console.log(result);
     setButtonDisabled(0);
   };
-
+  console.log("cate", categoriesResult);
   return (
     <>
       <AllFilters sortOptions={sortOptions} />

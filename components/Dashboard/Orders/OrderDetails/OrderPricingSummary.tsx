@@ -57,7 +57,7 @@ export default function OrderPricingSummary({ order }: IProps) {
               <SmartphoneIcon className="w-5 h-5 text-gray-500" />
             )}
             <span className="font-medium">
-              {paymentMethod === "CARD" ? "Credit Card" : "Mobile Payment"}
+              {t("method")}: <span className="font-bold">{paymentMethod}</span>
             </span>
           </div>
           <span

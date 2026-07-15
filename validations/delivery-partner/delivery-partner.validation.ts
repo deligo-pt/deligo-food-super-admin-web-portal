@@ -1,212 +1,215 @@
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { z } from "zod";
 
-export const deliveryPartnerValidation = z
-  .object({
-    firstName: z
-      .string()
-      .min(2, "First name must be at least 2 characters long")
-      .max(30, "First name must be at most 30 characters long")
-      .nonempty("First name is required"),
+// ---- Vehicle-specific schema (as provided) ----
 
-    lastName: z
-      .string()
-      .min(2, "Last name must be at least 2 characters long")
-      .max(30, "Last name must be at most 30 characters long")
-      .nonempty("Last name is required"),
+const optionalString = z
+  .string()
+  .min(2, "Must be at least 2 characters")
+  .optional()
+  .or(z.literal(""));
 
-    // prefixPhoneNumber: z.string(),
+const baseVehicleFields = {
+  brand: optionalString,
+  model: optionalString,
+};
 
-    phoneNumber: z.string()
-      .min(10, "Phone number is required")
-      .refine((val) => {
-        try {
-          const phone = parsePhoneNumberFromString(val);
-          return phone?.isValid() ?? false;
-        } catch {
-          return false;
-        }
-      }, "Invalid phone number for the selected country"),
+const motorVehicleFields = {
+  licensePlate: z.string().min(2, "License plate is required"),
+  drivingLicenseNumber: z.string().min(2, "Driving license number is required"),
+  drivingLicenseExpiry: z.string().refine(
+    (v) => !isNaN(Date.parse(v)),
+    "Invalid date"
+  ),
+  insurancePolicyNumber: z.string().min(2, "Insurance policy number is required"),
+  insuranceExpiry: z.string().refine(
+    (v) => !isNaN(Date.parse(v)),
+    "Invalid date"
+  ),
+};
 
-    dateOfBirth: z
-      .string()
-      .refine((value) => {
-        return Date.parse(value);
-      }, "Invalid date format")
-      .nonempty("Date of birth is required"),
+export const vehicleInfoValidation = z.discriminatedUnion("vehicleType", [
+  z.object({
+    ...baseVehicleFields,
+    vehicleType: z.literal("BICYCLE"),
+  }),
 
-    gender: z.enum(["MALE", "FEMALE", "OTHER"], "Gender is required"),
+  z.object({
+    ...baseVehicleFields,
+    vehicleType: z.literal("E-BIKE"),
+  }),
 
-    nationality: z
-      .string()
-      .nonempty("Nationality is required")
-      .min(2, "Nationality must be at least 2 characters")
-      .max(50, "Nationality must be at most 50 characters"),
+  z.object({
+    ...baseVehicleFields,
+    ...motorVehicleFields,
+    vehicleType: z.literal("SCOOTER"),
+  }),
 
-    nifNumber: z
-      .string()
-      .min(9, "NIF number must be at least 9 characters")
-      .nonempty("NIF number is required"),
+  z.object({
+    ...baseVehicleFields,
+    ...motorVehicleFields,
+    vehicleType: z.literal("MOTORBIKE"),
+  }),
 
-    passportNumber: z
-      .string()
-      .min(5, "Passport number must be at least 5 characters")
-      .optional(),
+  z.object({
+    ...baseVehicleFields,
+    ...motorVehicleFields,
+    vehicleType: z.literal("CAR"),
+  }),
+]);
 
-    street: z
-      .string()
-      .nonempty("Street Address is required")
-      .min(5, "Street Address must be at least 5 characters")
-      .max(100, "Street Address must be at most 100 characters"),
+// ---- Everything else, unrelated to vehicle fields ----
 
-    city: z
-      .string()
-      .nonempty("City is required")
-      .min(2, "City must be at least 2 characters")
-      .max(50, "City must be at most 50 characters"),
+const deliveryPartnerBaseValidation = z.object({
+  firstName: z
+    .string()
+    .min(2, "First name must be at least 2 characters long")
+    .max(30, "First name must be at most 30 characters long")
+    .nonempty("First name is required"),
 
-    postalCode: z
-      .string()
-      .nonempty("Postal code is required")
-      .min(1, "Postal code must be at least 1 characters")
-      .max(10, "Postal code must be at most 10 characters"),
+  lastName: z
+    .string()
+    .min(2, "Last name must be at least 2 characters long")
+    .max(30, "Last name must be at most 30 characters long")
+    .nonempty("Last name is required"),
 
-    country: z
-      .string()
-      .nonempty("Country is required")
-      .min(2, "Country must be at least 2 characters")
-      .max(50, "Country must be at most 50 characters"),
+  phoneNumber: z.string()
+    .min(10, "Phone number is required")
+    .refine((val) => {
+      try {
+        const phone = parsePhoneNumberFromString(val);
+        return phone?.isValid() ?? false;
+      } catch {
+        return false;
+      }
+    }, "Invalid phone number for the selected country"),
 
-    vehicleType: z.enum(
-      ["BICYCLE", "E-BIKE", "SCOOTER", "MOTORBIKE", "CAR"],
-      "Vehicle type is required",
-    ),
-
-    brand: z
-      .string()
-      .min(2, "Brand must be at least 2 character")
-      .max(50, "Brand must be at most 50 characters")
-      .optional(),
-
-    model: z
-      .string()
-      .min(2, "Brand must be at least 2 character")
-      .max(50, "Brand must be at most 50 characters")
-      .optional(),
-
-    licensePlate: z
-      .string()
-      .min(2, "Brand must be at least 2 character")
-      .max(50, "Brand must be at most 50 characters")
-      .optional(),
-
-    drivingLicenseNumber: z
-      .string()
-      .min(2, "Brand must be at least 2 character")
-      .max(50, "Brand must be at most 50 characters")
-      .optional(),
-
-    drivingLicenseExpiry: z
-      .string()
-      .refine((value) => {
-        return Date.parse(value);
-      }, "Invalid date format")
-      .optional(),
-
-    insurancePolicyNumber: z
-      .string()
-      .min(2, "Brand must be at least 2 character")
-      .max(50, "Brand must be at most 50 characters")
-      .optional(),
-
-    insuranceExpiry: z.string().refine((value) => {
+  dateOfBirth: z
+    .string()
+    .refine((value) => {
       return Date.parse(value);
-    }, "Invalid date format"),
+    }, "Invalid date format")
+    .nonempty("Date of birth is required"),
 
-    bankName: z
-      .string()
-      .min(2, "Bank name must be at least 2 characters")
-      .max(50, "Bank name must be at most 50 characters")
-      .nonempty("Bank name is required"),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"], "Gender is required"),
 
-    accountHolderName: z
-      .string()
-      .min(2, "Account holder name must be at least 2 characters")
-      .max(100, "Account holder name must be at most 100 characters")
-      .nonempty("Account holder name is required"),
+  nationality: z
+    .string()
+    .nonempty("Nationality is required")
+    .min(2, "Nationality must be at least 2 characters")
+    .max(50, "Nationality must be at most 50 characters"),
 
-    iban: z
-      .string()
-      .min(15, "IBAN must be at least 15 characters")
-      .max(34, "IBAN must be at most 34 characters"),
+  nifNumber: z
+    .string()
+    .min(9, "NIF number must be at least 9 characters")
+    .nonempty("NIF number is required"),
 
-    swiftCode: z
-      .string()
-      .min(8, "SWIFT code must be at least 8 characters")
-      .max(11, "SWIFT code must be at most 11 characters"),
+  passportNumber: z
+    .string()
+    .min(5, "Passport number must be at least 5 characters")
+    .optional(),
 
-    preferredZones: z.array(z.string(), "Preferred zones are required"),
+  street: z
+    .string()
+    .nonempty("Street Address is required")
+    .min(5, "Street Address must be at least 5 characters")
+    .max(100, "Street Address must be at most 100 characters"),
 
-    preferredHours: z.array(z.string(), "Preferred hours are required"),
+  city: z
+    .string()
+    .nonempty("City is required")
+    .min(2, "City must be at least 2 characters")
+    .max(50, "City must be at most 50 characters"),
 
-    isothermalBag: z.boolean("Isothermal bag is required"),
+  postalCode: z
+    .string()
+    .nonempty("Postal code is required")
+    .min(1, "Postal code must be at least 1 characters")
+    .max(10, "Postal code must be at most 10 characters"),
 
-    helmet: z.boolean("Helmet is required"),
+  country: z
+    .string()
+    .nonempty("Country is required")
+    .min(2, "Country must be at least 2 characters")
+    .max(50, "Country must be at most 50 characters"),
 
-    powerBank: z.boolean("Power bank is required"),
+  latitude: z.number({ error: "Latitude is required" }),
 
-    workedWithOtherPlatform: z.boolean(
-      "Worked with other platform is required",
-    ),
+  longitude: z.number({ error: "Logitude is required" }),
 
-    otherPlatformName: z.string().optional(),
+  bankName: z
+    .string()
+    .min(2, "Bank name must be at least 2 characters")
+    .max(50, "Bank name must be at most 50 characters")
+    .nonempty("Bank name is required"),
 
-    residencePermitType: z
-      .string()
-      .min(2, "Residence permit type must be at least 2 characters")
-      .max(50, "Residence permit type must be at most 50 characters")
-      .nonempty("Residence permit type is required"),
+  accountHolderName: z
+    .string()
+    .min(2, "Account holder name must be at least 2 characters")
+    .max(100, "Account holder name must be at most 100 characters")
+    .nonempty("Account holder name is required"),
 
-    residencePermitNumber: z
-      .string()
-      .min(2, "ARC / título de residência number must be at least 2 characters")
-      .max(
-        50,
-        "ARC / título de residência number must be at most 50 characters",
-      )
-      .nonempty("ARC / título de residência number is required"),
+  iban: z
+    .string()
+    .min(15, "IBAN must be at least 15 characters")
+    .max(34, "IBAN must be at most 34 characters"),
 
-    residencePermitExpiry: z
-      .string()
-      .refine((value) => {
-        return Date.parse(value);
-      }, "Invalid date format")
-      .nonempty("Date of birth is required"),
+  swiftCode: z
+    .string()
+    .min(8, "SWIFT code must be at least 8 characters")
+    .max(11, "SWIFT code must be at most 11 characters"),
 
-    haveCriminalRecordCertificate: z.boolean(
-      "Criminal record certificate is required",
-    ),
+  preferredZones: z.array(z.string(), "Preferred zones are required"),
 
-    issueDate: z.string().optional(),
+  preferredHours: z.array(z.string(), "Preferred hours are required"),
 
-    expiryDate: z.string().optional(),
-  })
-  .refine((data) => {
-    if (
-      data.vehicleType === "CAR" ||
-      data.vehicleType === "SCOOTER" ||
-      data.vehicleType === "MOTORBIKE"
-    ) {
-      return (
-        data.licensePlate !== "" &&
-        data.drivingLicenseNumber !== "" &&
-        data.drivingLicenseExpiry !== "" &&
-        data.insurancePolicyNumber !== "" &&
-        data.insuranceExpiry !== ""
-      );
-    }
-    return true;
-  }, "License plate, driving license number, driving license expiry, insurance policy number and insurance expiry is required if vehicle type is car, scooter or bike")
+  isothermalBag: z.boolean("Isothermal bag is required"),
+
+  helmet: z.boolean("Helmet is required"),
+
+  powerBank: z.boolean("Power bank is required"),
+
+  workedWithOtherPlatform: z.boolean(
+    "Worked with other platform is required",
+  ),
+
+  otherPlatformName: z.string().optional(),
+
+  residencePermitType: z
+    .string()
+    .min(2, "Residence permit type must be at least 2 characters")
+    .max(50, "Residence permit type must be at most 50 characters")
+    .nonempty("Residence permit type is required"),
+
+  residencePermitNumber: z
+    .string()
+    .min(2, "ARC / título de residência number must be at least 2 characters")
+    .max(
+      50,
+      "ARC / título de residência number must be at most 50 characters",
+    )
+    .nonempty("ARC / título de residência number is required"),
+
+  residencePermitExpiry: z
+    .string()
+    .refine((value) => {
+      return Date.parse(value);
+    }, "Invalid date format")
+    .nonempty("Date of birth is required"),
+
+  haveCriminalRecordCertificate: z.boolean(
+    "Criminal record certificate is required",
+  ),
+
+  issueDate: z.string().optional(),
+
+  expiryDate: z.string().optional(),
+});
+
+// ---- Merge base + vehicle union, then apply cross-field refinements ----
+
+export const deliveryPartnerValidation = z
+  .intersection(deliveryPartnerBaseValidation, vehicleInfoValidation)
   .refine(
     (data) => {
       if (data.workedWithOtherPlatform && !data.otherPlatformName) {
@@ -236,7 +239,6 @@ export const deliveryPartnerValidation = z
       if (data.issueDate) {
         return Date.parse(data.issueDate);
       }
-
       return true;
     },
     {
@@ -261,7 +263,6 @@ export const deliveryPartnerValidation = z
       if (data.expiryDate) {
         return Date.parse(data.expiryDate);
       }
-
       return true;
     },
     {

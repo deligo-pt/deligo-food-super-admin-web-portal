@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
@@ -33,8 +34,8 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
-import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
-import { formatTime } from "@/utils/formatTime";
+import { PARTNER_REQUIRED_DOCS, TFilePreview, TPartnerDocKey } from "@/types/document.type";
+import { formatTime, getTodayDateString } from "@/utils/formatTime";
 import { deliveryPartnerValidation } from "@/validations/delivery-partner/delivery-partner.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -51,6 +52,8 @@ import {
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import "react-international-phone/style.css";
 import { toast } from "sonner";
 import z from "zod";
@@ -140,6 +143,8 @@ export default function AddDeliveryPartner() {
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
       vehicleType: "SCOOTER",
       brand: "",
       model: "",
@@ -168,9 +173,11 @@ export default function AddDeliveryPartner() {
     },
   });
 
-  const [watchZones] = useWatch({
+  const { formState: { isSubmitting } } = form;
+
+  const [watchZones, vehicleType, haveCriminalRecordCertificate, residencePermitType] = useWatch({
     control: form.control,
-    name: ["preferredZones"],
+    name: ["preferredZones", "vehicleType", "haveCriminalRecordCertificate", "residencePermitType"],
   });
 
   const addZone = () => {
@@ -243,7 +250,6 @@ export default function AddDeliveryPartner() {
         return;
       }
       toast.error(result.message, { id: toastId });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "OTP resend failed", {
         id: toastId,
@@ -285,6 +291,36 @@ export default function AddDeliveryPartner() {
     const toastId = toast.loading("Adding partner...");
     setButtonDisabled(4);
 
+    const isMotorVehicle = (
+      type: typeof data.vehicleType
+    ): type is "CAR" | "SCOOTER" | "MOTORBIKE" =>
+      type === "CAR" || type === "SCOOTER" || type === "MOTORBIKE";
+
+    const vehicleInfo = isMotorVehicle(data.vehicleType)
+      ? {
+        vehicleType: data.vehicleType,
+        brand: data.brand,
+        model: data.model,
+        licensePlate: (data as any).licensePlate
+          ? (data as any).licensePlate.toUpperCase()
+          : undefined,
+        drivingLicenseNumber: (data as any).drivingLicenseNumber
+          ? (data as any).drivingLicenseNumber.toUpperCase()
+          : undefined,
+        drivingLicenseExpiry: (data as any).drivingLicenseExpiry,
+        insurancePolicyNumber: (data as any).insurancePolicyNumber
+          ? (data as any).insurancePolicyNumber.toUpperCase()
+          : undefined,
+        insuranceExpiry: (data as any).insuranceExpiry
+          ? new Date((data as any).insuranceExpiry)
+          : undefined,
+      }
+      : {
+        vehicleType: data.vehicleType,
+        brand: data.brand,
+        model: data.model,
+      };
+
     const partnerData = {
       name: {
         firstName: data.firstName,
@@ -317,16 +353,9 @@ export default function AddDeliveryPartner() {
         iban: data.iban?.toUpperCase(),
         swiftCode: data.swiftCode?.toUpperCase(),
       },
-      vehicleInfo: {
-        vehicleType: data.vehicleType,
-        brand: data.brand,
-        model: data.model,
-        licensePlate: data.licensePlate?.toUpperCase(),
-        drivingLicenseNumber: data.drivingLicenseNumber?.toUpperCase(),
-        drivingLicenseExpiry: data.drivingLicenseExpiry,
-        insurancePolicyNumber: data.insurancePolicyNumber?.toUpperCase(),
-        insuranceExpiry: new Date(data.insuranceExpiry),
-      },
+
+      vehicleInfo,
+
       criminalRecord: {
         certificate: data.haveCriminalRecordCertificate,
         issueDate: new Date(data.issueDate as string),
@@ -395,6 +424,11 @@ export default function AddDeliveryPartner() {
     }
   }, [form]);
 
+  const isDocumentsValid = PARTNER_REQUIRED_DOCS.every(
+    (key) => previews[key] !== null);
+
+  const isSubmitDisabled = isSubmitting || !isDocumentsValid
+
   return (
     <Form {...form}>
       <form
@@ -431,7 +465,7 @@ export default function AddDeliveryPartner() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -445,7 +479,7 @@ export default function AddDeliveryPartner() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -455,7 +489,7 @@ export default function AddDeliveryPartner() {
                   />
 
                   <div>
-                    <Label>{t("email")}</Label>
+                    <Label>{t("email")} <span className="text-red-600">*</span></Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
@@ -495,7 +529,7 @@ export default function AddDeliveryPartner() {
 
                   {otpSent && !emailVerified && (
                     <div>
-                      <Label className="mb-2">{t("otp")}</Label>
+                      <Label className="mb-2">{t("otp")} <span className="text-red-600">*</span></Label>
                       <div className="flex items-center gap-3">
                         <Input
                           placeholder={t("enter_otp")}
@@ -517,7 +551,7 @@ export default function AddDeliveryPartner() {
                   )}
 
                   <div>
-                    <Label className="mb-2">{t("password")}</Label>
+                    <Label className="mb-2">{t("password")} <span className="text-red-600">*</span></Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
@@ -541,7 +575,7 @@ export default function AddDeliveryPartner() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
+                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -619,9 +653,9 @@ export default function AddDeliveryPartner() {
                           name="dateOfBirth"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("date_of_birth")}</FormLabel>
+                              <FormLabel>{t("date_of_birth")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
-                                <Input type="date" {...field} />
+                                <Input type="date" {...field} max={getTodayDateString()} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -633,7 +667,7 @@ export default function AddDeliveryPartner() {
                           name="gender"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("gender")}</FormLabel>
+                              <FormLabel>{t("gender")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Select
                                   onValueChange={field.onChange}
@@ -661,7 +695,7 @@ export default function AddDeliveryPartner() {
                           name="nationality"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("nationality")}</FormLabel>
+                              <FormLabel>{t("nationality")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input placeholder={t("nationality")} {...field} />
                               </FormControl>
@@ -675,7 +709,7 @@ export default function AddDeliveryPartner() {
                           name="nifNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("nif_number")}</FormLabel>
+                              <FormLabel>{t("nif_number")}<span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -693,7 +727,7 @@ export default function AddDeliveryPartner() {
                           name="passportNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("passport_number")}</FormLabel>
+                              <FormLabel>{t("passport_number")}<span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -757,7 +791,7 @@ export default function AddDeliveryPartner() {
                           name="bankName"
                           render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("bank_name")}</FormLabel>
+                              <FormLabel>{t("bank_name")}<span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                   <SelectTrigger
@@ -789,7 +823,7 @@ export default function AddDeliveryPartner() {
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("account_holder_name")}</FormLabel>
+                              <FormLabel>{t("account_holder_name")}<span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
@@ -806,7 +840,7 @@ export default function AddDeliveryPartner() {
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("iban")}</FormLabel>
+                              <FormLabel>{t("iban")}<span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -824,7 +858,7 @@ export default function AddDeliveryPartner() {
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("swift_code")}</FormLabel>
+                              <FormLabel>{t("swift_code")}<span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -870,7 +904,7 @@ export default function AddDeliveryPartner() {
                         name="residencePermitType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("residence_permit_type")}</FormLabel>
+                            <FormLabel>{t("residence_permit_type")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -898,11 +932,11 @@ export default function AddDeliveryPartner() {
                         name="residencePermitNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("residence_permit_number")}</FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder={t("residence_permit_number")}
+                                placeholder={residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}
                                 {...field}
                               />
                             </FormControl>
@@ -916,9 +950,9 @@ export default function AddDeliveryPartner() {
                         name="residencePermitExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("residence_permit_expiry")}</FormLabel>
+                            <FormLabel>{t("residence_permit_expiry")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -950,7 +984,7 @@ export default function AddDeliveryPartner() {
                         name="vehicleType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("vehicle_type")}</FormLabel>
+                            <FormLabel>{t("vehicle_type")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -1011,12 +1045,12 @@ export default function AddDeliveryPartner() {
                         )}
                       />
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="licensePlate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("license_plate")}</FormLabel>
+                            <FormLabel>{t("license_plate")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
@@ -1027,14 +1061,14 @@ export default function AddDeliveryPartner() {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="drivingLicenseNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("driving_license_number")}</FormLabel>
+                            <FormLabel>{t("driving_license_number")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
@@ -1045,28 +1079,28 @@ export default function AddDeliveryPartner() {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="drivingLicenseExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("driving_license_expiry")}</FormLabel>
+                            <FormLabel>{t("driving_license_expiry")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="insurancePolicyNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("insurance_policy_number")}</FormLabel>
+                            <FormLabel>{t("insurance_policy_number")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
@@ -1077,21 +1111,21 @@ export default function AddDeliveryPartner() {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="insuranceExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("insurance_expiry")}</FormLabel>
+                            <FormLabel>{t("insurance_expiry")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
                     </div>
                   </Card>
                 </motion.div>
@@ -1141,33 +1175,33 @@ export default function AddDeliveryPartner() {
                         )}
                       />
 
-                      <FormField
+                      {haveCriminalRecordCertificate && <FormField
                         control={form.control}
                         name="issueDate"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>{t("issue_date")}</FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} max={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {haveCriminalRecordCertificate && <FormField
                         control={form.control}
                         name="expiryDate"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>{t("expiry_date")}</FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
                     </div>
                   </Card>
                 </motion.div>
@@ -1190,7 +1224,7 @@ export default function AddDeliveryPartner() {
 
                     <div className="space-y-4 items-start">
                       <div className="space-y-2">
-                        <Label className="">{t("preferred_working_zones")}</Label>
+                        <Label className="">{t("preferred_working_zones")}<span className="text-red-600">*</span></Label>
                         {watchZones?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-1">
                             {watchZones?.map((zone) => (
@@ -1255,7 +1289,7 @@ export default function AddDeliveryPartner() {
                         name="preferredHours"
                         render={({ field, fieldState }) => (
                           <FormItem>
-                            <FormLabel>{t("preferred_working_hours")}</FormLabel>
+                            <FormLabel>{t("preferred_working_hours")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={(value) =>
@@ -1399,14 +1433,33 @@ export default function AddDeliveryPartner() {
                     className="p-6 shadow-md border-t-4"
                     style={{ borderColor: DELIGO }}
                   >
-                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <h2 className="text-xl font-semibold flex items-center gap-2">
                       9. {t("documents_nd_verification")}
                     </h2>
+                    <motion.div
+                      initial={{
+                        opacity: 0,
+                        y: 20,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        duration: 0.5,
+                      }}
+                      className="bg-[#DC3173]/10 p-5 rounded-lg w-full text-[#DC3173] italic"
+                    >
+                      <h2 className="text-lg font-semibold">{t("note")} : </h2>
+                      <p className="text-sm">- {t("vehicle_type_bicycle")}</p>
+                      <p className="text-sm">- {t("vehicle_type_not_bicycle")}</p>
+                    </motion.div>
 
                     <UploadPartnerDocuments
                       partnerId={partnerId}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>
@@ -1421,9 +1474,9 @@ export default function AddDeliveryPartner() {
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
-              disabled={buttonDisabled === 4}
+              disabled={buttonDisabled === 4 || isSubmitDisabled}
             >
-              {t("add_delivery_partner")}
+              {t("add_rider")}
             </Button>
           </div>
         )}

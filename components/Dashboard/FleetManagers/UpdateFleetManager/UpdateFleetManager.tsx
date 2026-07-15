@@ -88,6 +88,8 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       city: fleetManager.businessLocation?.city || "",
       postalCode: fleetManager.businessLocation?.postalCode || "",
       country: fleetManager.businessLocation?.country || "",
+      latitude: fleetManager?.businessLocation?.latitude || 0,
+      longitude: fleetManager?.businessLocation?.longitude || 0,
       bankName: fleetManager.bankDetails?.bankName || "",
       accountHolderName: fleetManager.bankDetails?.accountHolderName || "",
       iban: fleetManager.bankDetails?.iban || "",
@@ -168,6 +170,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
         if (approveResult.success) {
           form.reset();
           router.refresh();
+          router.push(`/admin/agent/${fleetManager.userId}`)
           toast.success(
             approveResult.message || "Fleet manager updated successfully!",
             {
@@ -185,6 +188,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       }
 
       form.reset();
+      router.push(`/admin/agent/${fleetManager.userId}`)
       toast.success(
         updatedResult.message || "Fleet manager updated successfully!",
         {
@@ -553,6 +557,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                         fleetManagerId={fleetManager.userId}
                         previews={previews}
                         setPreviews={setPreviews}
+                        isSubmitting={isSubmitting}
                       />
                     </Card>
                   </motion.div>

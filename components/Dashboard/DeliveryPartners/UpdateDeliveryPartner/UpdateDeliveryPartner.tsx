@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
@@ -131,6 +132,8 @@ export default function UpdateDeliveryPartner({
       city: partner.address?.city || "",
       postalCode: partner.address?.postalCode || "",
       country: partner.address?.country || "",
+      latitude: partner?.address?.latitude || 0,
+      longitude: partner?.address?.longitude || 0,
       vehicleType: partner.vehicleInfo?.vehicleType || "SCOOTER",
       brand: partner.vehicleInfo?.brand || "",
       model: partner.vehicleInfo?.model || "",
@@ -197,6 +200,36 @@ export default function UpdateDeliveryPartner({
   const onSubmit = async (data: TDeliveryPartnerForm) => {
     const toastId = toast.loading("Updating partner...");
 
+    const isMotorVehicle = (
+      type: typeof data.vehicleType
+    ): type is "CAR" | "SCOOTER" | "MOTORBIKE" =>
+      type === "CAR" || type === "SCOOTER" || type === "MOTORBIKE";
+
+    const vehicleInfo = isMotorVehicle(data.vehicleType)
+      ? {
+        vehicleType: data.vehicleType,
+        brand: data.brand,
+        model: data.model,
+        licensePlate: (data as any).licensePlate
+          ? (data as any).licensePlate.toUpperCase()
+          : undefined,
+        drivingLicenseNumber: (data as any).drivingLicenseNumber
+          ? (data as any).drivingLicenseNumber.toUpperCase()
+          : undefined,
+        drivingLicenseExpiry: (data as any).drivingLicenseExpiry,
+        insurancePolicyNumber: (data as any).insurancePolicyNumber
+          ? (data as any).insurancePolicyNumber.toUpperCase()
+          : undefined,
+        insuranceExpiry: (data as any).insuranceExpiry
+          ? new Date((data as any).insuranceExpiry)
+          : undefined,
+      }
+      : {
+        vehicleType: data.vehicleType,
+        brand: data.brand,
+        model: data.model,
+      };
+
     const partnerData = {
       name: {
         firstName: data.firstName,
@@ -229,16 +262,9 @@ export default function UpdateDeliveryPartner({
         iban: data.iban?.toUpperCase(),
         swiftCode: data.swiftCode?.toUpperCase(),
       },
-      vehicleInfo: {
-        vehicleType: data.vehicleType,
-        brand: data.brand,
-        model: data.model,
-        licensePlate: data.licensePlate?.toUpperCase(),
-        drivingLicenseNumber: data.drivingLicenseNumber?.toUpperCase(),
-        drivingLicenseExpiry: data.drivingLicenseExpiry,
-        insurancePolicyNumber: data.insurancePolicyNumber?.toUpperCase(),
-        insuranceExpiry: new Date(data.insuranceExpiry),
-      },
+
+      vehicleInfo,
+
       criminalRecord: {
         certificate: data.haveCriminalRecordCertificate,
         issueDate: new Date(data.issueDate as string),
@@ -1246,6 +1272,7 @@ export default function UpdateDeliveryPartner({
                       partnerId={partner.userId}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>

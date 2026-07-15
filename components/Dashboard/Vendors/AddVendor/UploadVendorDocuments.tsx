@@ -10,7 +10,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useTranslation } from "@/hooks/use-translation";
 import {
@@ -22,33 +22,53 @@ import { TVendorDocKey } from "@/types/document.type";
 import { toast } from "sonner";
 import { TVendor } from "@/types/user.type";
 
-const OPTIONAL_DOCS: TVendorDocKey[] = [
-  "myPhoto",
-  "storePhoto",
-  "menuUpload",
-  "agoserisHaccpCertificate",
-];
-
-const REQUIRED_DOCS: TVendorDocKey[] = [
+// Exported so parent (AddVendor) can validate required docs before enabling submit
+export const REQUIRED_DOCS: TVendorDocKey[] = [
   "businessLicenseDoc",
   "taxDoc",
   "idProofFront",
   "idProofBack",
 ];
 
+export const OPTIONAL_DOCS: TVendorDocKey[] = [
+  "myPhoto",
+  "storePhoto",
+  "menuUpload",
+  "agoserisHaccpCertificate",
+];
+
+// Matches UploadDocuments' documentLimits exactly
+const DOCUMENT_LIMITS: Partial<Record<TVendorDocKey, number>> = {
+  myPhoto: 1,
+  idProofFront: 1,
+  idProofBack: 1,
+  agoserisHaccpCertificate: 1,
+
+  businessLicenseDoc: 3,
+  taxDoc: 3,
+  storePhoto: 3,
+  menuUpload: 3,
+};
+const DEFAULT_LIMIT = 3;
+
 export default function UploadVendorDocuments({
   vendor,
+  businessType,
   previews,
   setPreviews,
+  isSubmitting
 }: {
   vendor: TVendor | null;
+  businessType: string;
   previews: Record<TVendorDocKey, string[] | null>;
   setPreviews: React.Dispatch<
     React.SetStateAction<Record<TVendorDocKey, string[] | null>>
   >;
+  isSubmitting: boolean;
 }) {
   const { t } = useTranslation();
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const [processing, setProcessing] = useState(false);
 
   const DOCUMENTS: {
     key: TVendorDocKey;
@@ -65,23 +85,14 @@ export default function UploadVendorDocuments({
       { key: "agoserisHaccpCertificate", label: t("agoserisHaccpCertificate"), prefersImagePreview: true },
     ];
 
-  const uploadLimits: Partial<Record<TVendorDocKey, number>> = {
-    myPhoto: 1,
-    agoserisHaccpCertificate: 1,
+  const visibleDocuments = DOCUMENTS.filter((doc) => {
+    if (doc.key !== "agoserisHaccpCertificate") return true;
 
-    // these can have up to 3 files
-    businessLicenseDoc: 3,
-    taxDoc: 3,
-    idProofFront: 3,
-    idProofBack: 3,
-    storePhoto: 3,
-    menuUpload: 3,
-  };
-  const DEFAULT_LIMIT = 3;
+    const effectiveBusinessType =
+      businessType ?? vendor?.businessDetails?.businessType;
 
-  const visibleDocuments = DOCUMENTS.filter(
-    (doc) => !(vendor?.businessDetails?.businessType === "STORE" && doc.key === "agoserisHaccpCertificate")
-  );
+    return effectiveBusinessType === "restaurant";
+  });
 
   const openPicker = (key: TVendorDocKey) => {
     const el = inputsRef.current[key];
@@ -99,19 +110,29 @@ export default function UploadVendorDocuments({
     }
 
     const toastId = toast.loading("Uploading...");
+    setProcessing(true);
 
     const currentFiles = previews[key] || [];
 
-    const limit = uploadLimits[key] ?? DEFAULT_LIMIT;
+    let limit = DOCUMENT_LIMITS[key] ?? DEFAULT_LIMIT;
+
+    // HACCP certificate only applies to restaurants
+    if (
+      key === "agoserisHaccpCertificate" &&
+      businessType !== "restaurant"
+    ) {
+      limit = 0;
+    }
 
     if (currentFiles.length >= limit) {
+      const label = DOCUMENTS.find((d) => d.key === key)?.label ?? "document";
       toast.error(
         limit === 1
-          ? `You can only upload one ${key} document`
+          ? `You can only upload one ${label}`
           : `You can only upload a maximum of ${limit} documents`,
         { id: toastId }
       );
-
+      setProcessing(false);
       return;
     }
 
@@ -121,6 +142,7 @@ export default function UploadVendorDocuments({
       toast.error(uploadResult.message || "File upload failed", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -130,6 +152,7 @@ export default function UploadVendorDocuments({
       toast.error("Upload failed: no file URL returned", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -150,6 +173,7 @@ export default function UploadVendorDocuments({
       toast.error(updateResult.message || "File upload failed", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -159,6 +183,7 @@ export default function UploadVendorDocuments({
       ...p,
       [key]: [...(p[key] || []), newUrl],
     }));
+    setProcessing(false);
   };
 
   const removeFile = async (key: TVendorDocKey, index: number) => {
@@ -169,6 +194,7 @@ export default function UploadVendorDocuments({
     const url = currentFiles[index];
 
     const toastId = toast.loading("Deleting...");
+    setProcessing(true);
 
     const endpoint = `/vendors/${vendor?.userId}/docImage`;
     const result = await deleteDocumentReq(endpoint, {
@@ -180,6 +206,7 @@ export default function UploadVendorDocuments({
       toast.error(result.message || "File deletion failed", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -193,6 +220,7 @@ export default function UploadVendorDocuments({
     if (inputsRef.current[key]) {
       inputsRef.current[key]!.value = "";
     }
+    setProcessing(false);
   };
 
   useEffect(() => {
@@ -250,7 +278,12 @@ export default function UploadVendorDocuments({
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
-                  {d.label}
+                  <span>
+                    {d.label}{" "}
+                    {REQUIRED_DOCS.includes(d.key) && (
+                      <span className="text-[#DC3173]">*</span>
+                    )}
+                  </span>
                   {isSelected && (
                     <button
                       type="button"
@@ -314,6 +347,7 @@ export default function UploadVendorDocuments({
 
                         <button
                           type="button"
+                          disabled={processing || isSubmitting}
                           onClick={() => removeFile(d.key, i)}
                           className="px-2 py-1 rounded-md text-xs"
                         >
@@ -332,6 +366,7 @@ export default function UploadVendorDocuments({
                 <button
                   type="button"
                   onClick={() => openPicker(d.key)}
+                  disabled={isSubmitting || processing}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#DC3173] border border-[#DC3173]/20 hover:bg-[#DC3173]/5 transition"
                 >
                   <UploadCloud className="w-4 h-4" />

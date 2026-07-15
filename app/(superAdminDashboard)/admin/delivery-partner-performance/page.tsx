@@ -18,7 +18,7 @@ export default async function DeliveryPartnerPerformancePage({
 
   return (
     <DeliveryPartnerPerformance
-      partnerPerformanceData={partnerPerformanceData.data}
+      partnerPerformanceData={partnerPerformanceData}
     />
   );
 }
