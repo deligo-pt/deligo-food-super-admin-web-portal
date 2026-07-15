@@ -112,6 +112,8 @@ export default function AddFleetManager() {
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
       bankName: "",
       accountHolderName: "",
       iban: "",
@@ -327,7 +329,7 @@ export default function AddFleetManager() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -341,7 +343,7 @@ export default function AddFleetManager() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -351,7 +353,7 @@ export default function AddFleetManager() {
                   />
 
                   <div>
-                    <Label>{t("email")}</Label>
+                    <Label>{t("email")} <span className="text-red-600">*</span></Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
@@ -413,7 +415,7 @@ export default function AddFleetManager() {
                   )}
 
                   <div>
-                    <Label className="mb-2">{t("password")}</Label>
+                    <Label className="mb-2">{t("password")} <span className="text-red-600">*</span></Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
@@ -437,7 +439,7 @@ export default function AddFleetManager() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
+                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -514,7 +516,7 @@ export default function AddFleetManager() {
                           name="businessName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("business_name")}</FormLabel>
+                              <FormLabel>{t("business_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("business_name")}
@@ -532,7 +534,7 @@ export default function AddFleetManager() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                {t("business_license_number")}
+                                {t("business_license_number")} <span className="text-red-600">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Input
@@ -572,7 +574,7 @@ export default function AddFleetManager() {
                           name="bankName"
                           render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("bank_name")}</FormLabel>
+                              <FormLabel>{t("bank_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                   <SelectTrigger
@@ -604,7 +606,7 @@ export default function AddFleetManager() {
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("account_holder_name")}</FormLabel>
+                              <FormLabel>{t("account_holder_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
@@ -621,7 +623,7 @@ export default function AddFleetManager() {
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("iban")}</FormLabel>
+                              <FormLabel>{t("iban")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input placeholder={t("iban")} {...field} />
                               </FormControl>
@@ -635,7 +637,7 @@ export default function AddFleetManager() {
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("swift_code")}</FormLabel>
+                              <FormLabel>{t("swift_code")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("swift_code")}
@@ -708,6 +710,7 @@ export default function AddFleetManager() {
                       fleetManagerId={fleetManagerId}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>

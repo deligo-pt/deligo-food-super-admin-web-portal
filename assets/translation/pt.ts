@@ -367,6 +367,7 @@ export const pt = {
   agoserisHaccpCertificate: "Certificado HACCP Agoseris",
   no_file_selected: "Nenhum ficheiro selecionado",
   remove: "Remover",
+  add_more: "Adicionar Mais",
   select_file: "Selecionar ficheiro",
   submit_vendor: "Submeter vendedor",
 

@@ -359,6 +359,7 @@ export const en = {
   agoserisHaccpCertificate: "AGOSERIS HACCP Certificate",
   no_file_selected: "No file selected",
   remove: "Remove",
+  add_more :"Add More",
   select_file: "Select file",
   submit_vendor: "Submit Vendor",
 

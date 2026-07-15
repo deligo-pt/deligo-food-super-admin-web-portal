@@ -203,7 +203,7 @@ const BusinessLocationMap = ({
             name={field.name as keyof LocationFormType}
             render={({ field: formField }) => (
               <FormItem>
-                <FormLabel>{field.label}</FormLabel>
+                <FormLabel>{field.label} <span className="text-red-600">*</span></FormLabel>
                 <FormControl>
                   <Input
                     {...formField}

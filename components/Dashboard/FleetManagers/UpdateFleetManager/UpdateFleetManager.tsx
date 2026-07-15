@@ -553,6 +553,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                         fleetManagerId={fleetManager.userId}
                         previews={previews}
                         setPreviews={setPreviews}
+                        isSubmitting={isSubmitting}
                       />
                     </Card>
                   </motion.div>

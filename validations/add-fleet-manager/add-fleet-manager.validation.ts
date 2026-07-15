@@ -64,6 +64,10 @@ export const addFleetManagerValidation = z
       .min(2, "Country must be at least 2 characters")
       .max(50, "Country must be at most 50 characters"),
 
+    latitude: z.number({ error: "Latitude is required" }),
+
+    longitude: z.number({ error: "Logitude is required" }),
+
     bankName: z
       .string()
       .min(2, "Bank name must be at least 2 characters")
