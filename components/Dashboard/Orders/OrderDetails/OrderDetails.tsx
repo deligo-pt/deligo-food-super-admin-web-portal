@@ -149,9 +149,13 @@ export default function OrderDetails({ order }: IProps) {
                       {order.pickupAddress?.postalCode}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
-                    {t("vendor_contact")}: {order.vendorId.contactNumber}
-                  </div>
+                  {order.vendorId.contactNumber ? <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
+                    {t("vendor_contact")}: <span className="font-bold">{order.vendorId.contactNumber}</span>
+                  </div> : (
+                    <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
+                      {t("vendor_id")}: <span className="font-bold">{order.vendorId.userId}</span>
+                    </div>
+                  )}
                 </div>
               </motion.div>
 
@@ -180,9 +184,13 @@ export default function OrderDetails({ order }: IProps) {
                       {order.deliveryAddress.postalCode}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
-                    {t("customer_contact")}: {order.customerId.contactNumber}
-                  </div>
+                  {order?.customerId?.contactNumber ? <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
+                    {t("customer_contact")}: <span className="font-bold">{order.customerId.contactNumber}</span>
+                  </div> : (
+                    <div className="text-sm text-gray-500 pt-2 border-t border-gray-100 mt-2">
+                      {t("customer_id")}: <span className="font-bold">{order.customerId.userId}</span>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </div>
