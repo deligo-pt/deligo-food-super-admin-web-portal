@@ -5,12 +5,12 @@ export type TWallet = {
   _id: string;
   walletId: string;
   userId: unknown;
-  userModel: "Customer" | "Vendor" | "FleetManager" | "DeliveryPartner";
+  userModel: "Admin" | "Customer" | "Vendor" | "FleetManager" | "DeliveryPartner";
   lastSettlementDate?: string;
-  totalUnpaidEarnings: number;
-  totalRiderPayable: number;
-  totalFleetEarnings: number;
-  totalEarnings: number;
+  currentBalance: number;
+  currentTaxLiability: number;
+  lifetimeTaxProcessed: number;
+  lifetimeEarnings: number;
 
   createdAt: string;
   updatedAt: string;

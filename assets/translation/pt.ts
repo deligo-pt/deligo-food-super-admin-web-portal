@@ -456,6 +456,8 @@ export const pt = {
   fleet_earnings: "Ganhos da Frota",
   earnings_amount: "Valor dos Ganhos",
   settlement_status: "Status da Liquidação",
+  current_tax_liability: "Obrigações Fiscais Atuais",
+  lifetime_tax_processed: "Total de Impostos Processados",
 
   // vendor zones
   vendor_zones_coverage: "Zonas e Cobertura do Vendedor",

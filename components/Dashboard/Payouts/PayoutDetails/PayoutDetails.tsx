@@ -148,14 +148,6 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  {t("account_number")}
-                </p>
-                <p className="font-semibold text-gray-900">
-                  {payout.userId?.bankDetails?.accountNumber || "-"}
-                </p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
                   {t("iban")}
                 </p>
                 <p className="font-mono font-semibold text-gray-900 tracking-wider">
