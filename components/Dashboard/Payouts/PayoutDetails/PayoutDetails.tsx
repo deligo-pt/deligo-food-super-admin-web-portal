@@ -30,7 +30,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       {/* Back Button */}
       <div className="mb-4">
         <span

@@ -34,7 +34,7 @@ import {
 } from "@/services/dashboard/category/product-category.service";
 import { useStore } from "@/store/store";
 import { TMeta } from "@/types";
-import { TProductCategory } from "@/types/category.type";
+import { TProductCategoryResponse } from "@/types/category.type";
 import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import {
@@ -51,7 +51,7 @@ import { toast } from "sonner";
 
 interface IProps {
   categoriesResult: {
-    data: TProductCategory[];
+    data: TProductCategoryResponse[];
     meta?: TMeta;
   };
 };
@@ -126,7 +126,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
     console.log(result);
     setButtonDisabled(0);
   };
-  console.log("cate", categoriesResult);
+
   return (
     <>
       <AllFilters sortOptions={sortOptions} />
@@ -143,6 +143,12 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <ListIcon className="w-4" />
                   {t("name")}
+                </div>
+              </TableHead>
+              <TableHead>
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                  <InfoIcon className="w-4" />
+                  {t("business_type")}
                 </div>
               </TableHead>
               <TableHead>
@@ -185,7 +191,8 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                       <p>{name}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{(category?.description && category?.description?.length > 70) ? category?.description.slice(0, 70) + "...." : category?.description}</TableCell>
+                  <TableCell>{category?.businessCategoryId?.name?.[lang]}</TableCell>
+                  <TableCell>{(category?.description && category?.description?.length > 70) ? category?.description.slice(0, 70) + "...." : category?.description || "N/A"}</TableCell>
                   <TableCell
                     className={cn(
                       category.isDeleted
