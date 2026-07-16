@@ -184,7 +184,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
                     <p>{category.name?.[lang]}</p>
                   </div>
                 </TableCell>
-                <TableCell>{category.description}</TableCell>
+                <TableCell>{category.description || "N/A"}</TableCell>
                 <TableCell
                   className={cn(
                     category.isDeleted

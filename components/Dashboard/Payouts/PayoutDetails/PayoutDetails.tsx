@@ -30,7 +30,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       {/* Back Button */}
       <div className="mb-4">
         <span
@@ -144,14 +144,6 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                 </p>
                 <p className="font-semibold text-gray-900">
                   {payout.userId?.bankDetails?.accountHolderName || "-"}
-                </p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  {t("account_number")}
-                </p>
-                <p className="font-semibold text-gray-900">
-                  {payout.userId?.bankDetails?.accountNumber || "-"}
                 </p>
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">

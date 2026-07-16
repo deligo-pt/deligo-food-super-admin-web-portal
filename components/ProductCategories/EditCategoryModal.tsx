@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { updateProductCategoryReq } from "@/services/dashboard/category/product-category.service";
 import { useStore } from "@/store/store";
-import { TProductCategory } from "@/types/category.type";
+import { TProductCategoryResponse } from "@/types/category.type";
 import { translateObject } from "@/utils/translation/translationObject";
 import { updateProductCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,7 +36,7 @@ import z from "zod";
 interface IProps {
   isOpen: boolean;
   onClose: () => void;
-  category: TProductCategory;
+  category: TProductCategoryResponse;
 }
 
 type FormData = z.infer<typeof updateProductCategoryValidation>;
@@ -149,7 +149,7 @@ export default function EditProductCategoryModal({
                             <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
                               <div className="flex items-center">
                                 <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
-                                <span className="ml-2">{t("category_name_english")}</span>
+                                <span className="ml-2">{t("category_name")}</span>
                               </div>
                             </FormLabel>
                             <FormControl>

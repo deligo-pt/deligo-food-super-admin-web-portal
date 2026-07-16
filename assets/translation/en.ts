@@ -448,6 +448,8 @@ export const en = {
   fleet_earnings: "Fleet Earnings",
   earnings_amount: "Earnings Amount",
   settlement_status: "Settlement Status",
+  current_tax_liability: "Current Tax Liability",
+  lifetime_tax_processed: "Lifetime Tax Processed",
 
   // vendor zones
   vendor_zones_coverage: "Vendor Zones & Coverage",

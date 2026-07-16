@@ -44,6 +44,28 @@ export type TProductCategory = {
   updatedAt?: Date;
 };
 
+export type TProductCategoryResponse = {
+  _id: string;
+  name: {
+    en?: string;
+    pt?: string;
+  };
+  slug: string;
+  description?: string;
+  image?: string;
+  icon?: string;
+  businessCategoryId: {
+    name: {
+      en: string;
+      pt: string;
+    }
+  },
+  isActive: boolean;
+  isDeleted: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
 export type TBusinessCategoryQueryParams = {
   limit?: number;
   page?: number;

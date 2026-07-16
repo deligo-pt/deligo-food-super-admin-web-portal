@@ -29,7 +29,7 @@ export default function WalletDetails({ wallet, payoutsData }: IProps) {
   const { t } = useTranslation();
   const brandColor = "#DC3173";
   const router = useRouter();
-
+  console.log("wallet", wallet);
   return (
     <div className="min-h-screen">
       {/* Back Button */}
@@ -81,7 +81,7 @@ export default function WalletDetails({ wallet, payoutsData }: IProps) {
                   className="text-5xl font-black tracking-tight"
                   style={{ color: brandColor }}
                 >
-                  €{formatPrice(wallet.totalEarnings || 0)}
+                  €{formatPrice(wallet.lifetimeEarnings || 0)}
                 </h2>
                 <span className="inline-block mt-2 px-2 py-0.5 text-[10px] font-bold text-white uppercase rounded bg-[#DC3173]">
                   {t("lifetime_revenue")}
@@ -95,26 +95,26 @@ export default function WalletDetails({ wallet, payoutsData }: IProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-gray-50">
               <div>
                 <p className="text-xs text-gray-400 font-medium mb-1">
-                  {t("unpaid_earnings")}
+                  {t("current_balance")}
                 </p>
                 <p className="text-xl font-bold text-gray-800">
-                  €{formatPrice(wallet.totalUnpaidEarnings || 0)}
+                  €{formatPrice(wallet?.currentBalance || 0)}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 font-medium mb-1">
-                  {t("rider_payable")}
+                  {t("current_tax_liability")}
                 </p>
                 <p className="text-xl font-bold text-gray-800">
-                  €{formatPrice(wallet.totalRiderPayable || 0)}
+                  €{formatPrice(wallet?.currentTaxLiability || 0)}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 font-medium mb-1">
-                  {t("fleet_earnings")}
+                  {t("lifetime_tax_processed")}
                 </p>
                 <p className="text-xl font-bold text-gray-800">
-                  €{formatPrice(wallet.totalFleetEarnings || 0)}
+                  €{formatPrice(wallet?.lifetimeTaxProcessed || 0)}
                 </p>
               </div>
             </div>

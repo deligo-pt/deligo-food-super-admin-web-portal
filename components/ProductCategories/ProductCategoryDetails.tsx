@@ -18,7 +18,7 @@ import {
   updateProductCategoryReq,
 } from "@/services/dashboard/category/product-category.service";
 import { useStore } from "@/store/store";
-import { TProductCategory } from "@/types/category.type";
+import { TProductCategoryResponse } from "@/types/category.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -37,11 +37,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Badge } from "../ui/badge";
 
 export default function ProductCategoryDetails({
   category,
 }: {
-  category: TProductCategory;
+  category: TProductCategoryResponse;
 }) {
   const { t } = useTranslation();
   const { lang } = useStore();
@@ -240,16 +241,35 @@ export default function ProductCategoryDetails({
           />
         </div>
         <div className="p-6">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-1">{categoryName}</h2>
-            <div className="flex items-center text-gray-500 mb-4">
-              <TagIcon size={16} className="mr-2" />
-              <span>{category.slug}</span>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            {/* Left Content: Title & Details */}
+            <div className="space-y-3 max-w-2xl">
+              <div>
+                <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1.5">
+                  {categoryName}
+                </h2>
+                <div className="flex items-center text-sm font-medium text-gray-400">
+                  <TagIcon size={14} className="mr-1.5 stroke-[2.5]" />
+                  <span>{category.slug}</span>
+                </div>
+              </div>
+
+              {category.description && (
+                <div className="flex items-start gap-2 text-sm text-gray-600 leading-relaxed bg-gray-50/50 p-3 rounded-lg border border-gray-100">
+                  <FileTextIcon size={16} className="text-gray-400 shrink-0 mt-0.5" />
+                  <p>{category.description}</p>
+                </div>
+              )}
             </div>
-            {category.description && (
-              <div className="flex gap-2 text-gray-700 mb-4">
-                <FileTextIcon size={18} className="shrink-0 mt-1" />
-                <p>{category.description}</p>
+
+            {/* Right Content: Business Type Badge */}
+            {category?.businessCategoryId?.name?.[lang] && (
+              <div className="sm:self-start">
+                <Badge className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full shadow-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  <span className="text-gray-400 font-normal lowercase mr-0.5">{t("type")}:</span>
+                  {category.businessCategoryId.name[lang]}
+                </Badge>
               </div>
             )}
           </div>

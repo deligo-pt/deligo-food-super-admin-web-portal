@@ -24,8 +24,12 @@ const extraSelectFilter = {
   placeholder: "Select Payment Status",
   type: "select",
   isAllNeeded: false,
-  defaultValue: "PAID",
+  defaultValue: "All",
   options: [
+    {
+      label: "All",
+      value: "All",
+    },
     {
       label: "Pending",
       value: "PENDING",

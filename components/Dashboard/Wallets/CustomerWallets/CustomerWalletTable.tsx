@@ -108,7 +108,7 @@ export default function CustomerWalletTable({ wallets }: IProps) {
                   </div>
                 </div>
               </TableCell>
-              <TableCell>€{formatPrice(w.totalUnpaidEarnings || 0)}</TableCell>
+              <TableCell>€{formatPrice(w.currentBalance || 0)}</TableCell>
               <TableCell>
                 {w.lastSettlementDate
                   ? format(w.lastSettlementDate, "do MMM yyyy")
