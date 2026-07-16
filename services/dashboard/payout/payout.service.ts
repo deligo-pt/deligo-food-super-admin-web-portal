@@ -27,7 +27,7 @@ export const getAllPayoutsReq = async <T>(
     | "Vendor"
     | "FleetManager"
     | "DeliveryPartner";
-  console.log("status", status);
+
   const params = {
     limit,
     page,
