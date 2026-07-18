@@ -1796,6 +1796,7 @@ export const pt = {
   ip_location: "IP / Localização",
   device: "Dispositivo",
   browser_os: "Navegador / SO",
+  view_details: "Ver Detalhes",
 
   // support-tickets
   manage_and_respond_support_requests: "Gerenciar e responder a solicitações de suporte de todos os usuários da plataforma",
