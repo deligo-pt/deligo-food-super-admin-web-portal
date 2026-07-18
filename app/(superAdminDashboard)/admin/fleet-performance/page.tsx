@@ -15,6 +15,6 @@ export default async function FleetPerformancePage({ searchParams }: IProps) {
   }>("fleet-performance-analytics", queries);
 
   return (
-    <FleetManagerPerformance fleetPerformanceData={fleetPerformanceData.data} />
+    <FleetManagerPerformance fleetPerformanceData={fleetPerformanceData} />
   );
 }

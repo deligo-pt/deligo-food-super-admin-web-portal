@@ -45,7 +45,7 @@ export default function TopVendorPerformance({ vendorPerformance }: IProps) {
                       {vendor.vendorName}
                     </h4>
                     <p className="text-[10px] text-slate-400 font-mono">
-                      {t("id")}: {vendor.vendorId.slice(-8)}
+                      {t("id")}: {vendor.vendorId}
                     </p>
                   </div>
                 </div>
