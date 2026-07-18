@@ -1771,6 +1771,7 @@ export const en = {
   ip_location: "IP / Location",
   device: "Device",
   browser_os: "Browser / OS",
+  view_details: "View Details",
 
   // support-tickets
   manage_and_respond_support_requests: "Manage and respond to support requests from all platform users",
