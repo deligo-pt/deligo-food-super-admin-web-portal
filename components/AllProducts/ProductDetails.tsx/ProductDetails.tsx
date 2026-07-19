@@ -32,7 +32,7 @@ export default function ProductDetails({ product }: IProps) {
   const { lang } = useStore();
   const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  console.log("product", product);
+
 
   const getStockStatusColor = (status: string) => {
     switch (status) {
