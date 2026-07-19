@@ -57,7 +57,7 @@ export default function LoginHistory({ loginHistories }: IProps) {
 
     return (
         <div className="min-h-screen bg-rose-50/10">
-            <div className="mx-auto max-w-7xl space-y-6">
+            <div className="space-y-6">
 
                 {/* Header Block matching visual tone */}
                 <TitleHeader
@@ -104,12 +104,12 @@ export default function LoginHistory({ loginHistories }: IProps) {
                                             {t("time")}
                                         </div>
                                     </th>
-                                    {/* <th className="p-4 text-right font-medium text-[#DC3173]">
+                                    <th className="p-4 text-right font-medium text-[#DC3173]">
                                         <div className="flex items-center justify-end gap-1.5">
                                             <Settings size={14} />
                                             {t("actions")}
                                         </div>
-                                    </th> */}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-rose-50">
@@ -165,15 +165,15 @@ export default function LoginHistory({ loginHistories }: IProps) {
                                         </td>
 
                                         {/* Action button redirecting to details page */}
-                                        {/* <td className="p-4 text-right">
+                                        <td className="p-4 text-right">
                                             <Link
-                                                href={`/login-history/${item._id}`}
+                                                href={`/admin/login-history/${item._id}`}
                                                 className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-1.5 text-xs font-medium text-[#DC3173] hover:bg-rose-50 shadow-xs transition-all active:scale-98"
                                             >
                                                 <Eye size={14} />
                                                 {t("view_details")}
                                             </Link>
-                                        </td> */}
+                                        </td>
                                     </tr>
                                 ))}
 
