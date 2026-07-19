@@ -214,8 +214,8 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
   return (
     <>
       <TitleHeader
-        title="Edit Fleet Manager Details"
-        subtitle="Update fleet manager details and information"
+        title={t("edit_fleet_manager_details")}
+        subtitle={t("update_fleet_manager_update_and_information")}
         onBackClick={() => router.back()}
       />
       <Form {...form}>

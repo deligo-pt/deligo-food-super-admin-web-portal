@@ -275,6 +275,8 @@ export const pt = {
   restaurant_cuisine_type: "Tipo de Culinária do Restaurante",
   street_address: "Endereço",
   postal_code: "Código Postal",
+  latitude: "Latitude",
+  longitude: "Longitude",
   business_location: "Local Comercial",
   no_business_location_provided: "Nenhum local comercial informado",
   no_bank_details_provided: "Nenhum dado bancário informado",
@@ -471,6 +473,9 @@ export const pt = {
   manage_all_registered_fleet_managers: "Gerenciar todos os gerentes de frota registrados",
   no_fleet_manager_found: "Nenhum gestor de frota encontrado",
   no_fleet_managers_found: "Nenhum gerente de frota encontrado",
+  //--> edit fleet details
+  edit_fleet_manager_details: "Editar Detalhes do Gerente de Frota",
+  update_fleet_manager_update_and_information: "Atualizar detalhes e informações do gerente de frota",
   //---> fleet documents
   view_full_file: "Visualizar Arquivo Completo",
   no_document_uploaded: "Nenhum documento enviado",

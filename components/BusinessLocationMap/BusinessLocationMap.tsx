@@ -26,15 +26,6 @@ import {
 } from "@vis.gl/react-google-maps";
 import { UseFormReturn } from "react-hook-form";
 
-const formFields = [
-  { label: "Street Address", name: "street" },
-  { label: "City", name: "city" },
-  { label: "Postal Code", name: "postalCode" },
-  { label: "Country", name: "country" },
-  { label: "Latitude", name: "latitude" },
-  { label: "Longitude", name: "longitude" },
-];
-
 type LocationFormType = {
   street: string;
   city: string;
@@ -68,6 +59,14 @@ const BusinessLocationMap = ({
   setLocationCoordinates,
   t
 }: IProps) => {
+  const formFields = [
+    { label: t("street_address"), name: "street" },
+    { label: t("city"), name: "city" },
+    { label: t("postal_code"), name: "postalCode" },
+    { label: t("country"), name: "country" },
+    { label: t("latitude"), name: "latitude" },
+    { label: t("longitude"), name: "longitude" },
+  ];
   const map = useMap();
   const places = useMapsLibrary("places");
 

@@ -267,6 +267,8 @@ export const en = {
   restaurant_cuisine_type: "Restaurant Cuisine Type",
   street_address: "Street Address",
   postal_code: "Postal Code",
+  latitude: "Latitude",
+  longitude: "Longitude",
   business_location: "Business Location",
   no_business_location_provided: "No business location provided",
   no_bank_details_provided: "No bank details provided",
@@ -463,6 +465,9 @@ export const en = {
   manage_all_registered_fleet_managers: "Manage all registered fleet managers",
   no_fleet_manager_found: "No Fleet Manager found",
   no_fleet_managers_found: "No fleet managers found",
+  //--> edit fleet details
+  edit_fleet_manager_details: "Edit Fleet Manager Details",
+  update_fleet_manager_update_and_information: "Update fleet manager details and information",
   //---> fleet documents
   view_full_file: "View Full File",
   no_document_uploaded: "No documents uploaded",
