@@ -1267,6 +1267,7 @@ export const pt = {
 
   // product details
   product_details: "Detalhes do produto",
+  view_comprehensive_information_inventory: "Visualize informações completas, status de estoque e métricas de desempenho deste produto",
   sku: "SKU",
   not_approved: "Não aprovado",
   pricing: "Preços",

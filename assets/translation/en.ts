@@ -1248,6 +1248,7 @@ export const en = {
 
   // product details
   product_details: "Product Details",
+  view_comprehensive_information_inventory: "View comprehensive information, inventory status, and performance metrics for this product",
   sku: "SKU",
   not_approved: "Not Approved",
   pricing: "Pricing",

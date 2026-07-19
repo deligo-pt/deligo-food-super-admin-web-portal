@@ -15,7 +15,10 @@ export type TOrder = {
   // Items
   items: {
     productId: {
-      name: string;
+      name: {
+        en: string;
+        pt: string;
+      };
       productId: string;
       _id: string;
     };
