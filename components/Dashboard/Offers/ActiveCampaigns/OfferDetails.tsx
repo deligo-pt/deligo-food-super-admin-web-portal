@@ -3,6 +3,7 @@
 import EditOfferModal from "@/components/Dashboard/Offers/ActiveCampaigns/EditOfferModal";
 import OfferStatusUpdateModal from "@/components/Dashboard/Offers/ActiveCampaigns/OfferStatusUpdateModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteOfferReq,
@@ -12,6 +13,7 @@ import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
 import { motion } from "framer-motion";
 import {
+  ArrowLeftCircle,
   BanIcon,
   CalendarIcon,
   CheckIcon,
@@ -166,6 +168,13 @@ export default function OfferDetails({ offer }: IProps) {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100">
+      <Button
+        onClick={() => router.back()}
+        variant="link"
+        className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
+      >
+        <ArrowLeftCircle /> {t("go_back")}
+      </Button>
       <motion.div
         initial={{
           opacity: 0,
