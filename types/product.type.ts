@@ -57,7 +57,10 @@ export type TProduct = {
     _id: string;
     businessDetails: {
       businessName: string;
-      businessType: string;
+      businessType: {
+        name: LocalizedString;
+        slug: string;
+      };
     };
     businessLocation: {
       latitude: number;

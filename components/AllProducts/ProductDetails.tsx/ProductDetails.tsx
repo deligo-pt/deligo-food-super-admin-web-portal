@@ -33,7 +33,6 @@ export default function ProductDetails({ product }: IProps) {
   const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-
   const getStockStatusColor = (status: string) => {
     switch (status) {
       case "In Stock":
@@ -361,7 +360,7 @@ export default function ProductDetails({ product }: IProps) {
                   {product.vendorId?.businessDetails?.businessName}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {product.vendorId?.businessDetails?.businessType}
+                  {product.vendorId?.businessDetails?.businessType?.name?.[lang]}
                 </p>
               </div>
             </div>
