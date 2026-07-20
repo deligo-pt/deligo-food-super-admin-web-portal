@@ -841,6 +841,15 @@ export const en = {
   // all delivery partners
   manage_all_registered_riders: "Manage all registered riders",
   associated_fleet: "Associated Fleet",
+  //-->assign fleet and approve rider
+  approve_rider: "Approve Rider",
+  rider_city: "Rider City",
+  showing_available_fleet_managers: "Showing available fleet managers in this exact area.",
+  loading_fleet_managers_in: "Loading fleet managers in ",
+  business: "Business",
+  select: "Select",
+  no_fleet_managers_found_in: "No fleet managers found in",
+  assign_and_approve: "Assign & Approve",
 
   // active delivery partners
   all_active_riders_system: "All active riders in the system",

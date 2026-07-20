@@ -110,8 +110,8 @@ export default function ApproveRiderModal({
                         {t("approve_rider")} — {partnerName}
                     </DialogTitle>
                     <DialogDescription>
-                        Rider City: <span className="font-semibold text-gray-900 capitalize">{city || "Unknown"}</span>.
-                        Showing available fleet managers in this exact area.
+                        {t("rider_city")}: <span className="font-semibold text-gray-900 capitalize">{city || "N/A"}</span>.
+                        {t("showing_available_fleet_managers")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -123,7 +123,7 @@ export default function ApproveRiderModal({
                     {isLoadingFleets ? (
                         <div className="flex flex-col items-center justify-center p-12 text-sm text-gray-400 gap-2">
                             <Loader2 className="animate-spin" style={{ color: "#DC3173" }} size={24} />
-                            Loading fleet managers in {city}...
+                            {t("loading_fleet_managers_in")} {city}...
                         </div>
                     ) : (
                         <Table>
@@ -133,22 +133,22 @@ export default function ApproveRiderModal({
                             >
                                 <TableRow className="hover:bg-transparent">
                                     <TableHead style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center gap-1 font-semibold"><User size={13} /> Manager</div>
+                                        <div className="flex items-center gap-1 font-semibold"><User size={13} /> {t("manager")}</div>
                                     </TableHead>
                                     <TableHead style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center gap-1 font-semibold"><Building2 size={13} /> Business</div>
+                                        <div className="flex items-center gap-1 font-semibold"><Building2 size={13} /> {t("business")}</div>
                                     </TableHead>
                                     <TableHead style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center gap-1 font-semibold"><MapPin size={13} /> City</div>
+                                        <div className="flex items-center gap-1 font-semibold"><MapPin size={13} /> {t("city")}</div>
                                     </TableHead>
                                     <TableHead className="text-right" style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center justify-end gap-1 font-semibold"><Briefcase size={13} /> Select</div>
+                                        <div className="flex items-center justify-end gap-1 font-semibold"><Briefcase size={13} /> {t("select")}</div>
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody className="text-gray-600">
                                 {fleets.map((fleet) => {
-                                    const fullName = `${fleet.name?.firstName || ""} ${fleet.name?.lastName || ""}`.trim() || "Unnamed Manager";
+                                    const fullName = `${fleet.name?.firstName || ""} ${fleet.name?.lastName || ""}`.trim() || "N/A";
                                     const isSelected = selectedFleetId === fleet._id;
 
                                     return (
@@ -189,7 +189,7 @@ export default function ApproveRiderModal({
                                 {fleets.length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={4} className="p-8 text-center text-xs text-gray-400 hover:bg-transparent">
-                                            No fleet managers found in {city}.
+                                            {t("no_fleet_managers_found_in")} {city}.
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -212,7 +212,7 @@ export default function ApproveRiderModal({
                         onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
                         onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                     >
-                        Assign & Approve
+                        {t("assign_and_approve")}
                     </Button>
                 </DialogFooter>
 

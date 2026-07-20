@@ -854,6 +854,15 @@ export const pt = {
   // all delivery partners
   manage_all_registered_riders: "Gerenciar todos os Estafetas registrados",
   associated_fleet: "Frota Associada",
+  //-->assign fleet and approve rider
+  approve_rider: "Aprovar Entregador",
+  rider_city: "Cidade do Entregador",
+  showing_available_fleet_managers: "Mostrando gerentes de frota disponíveis nesta área exata.",
+  loading_fleet_managers_in: "Carregando gerentes de frota em ",
+  business: "Negócio",
+  select: "Selecionar",
+  no_fleet_managers_found_in: "Nenhum gerente de frota encontrado em",
+  assign_and_approve: "Atribuir e Aprovar",
 
   // active delivery partners
   all_active_riders_system: "Todos os Estafetas ativos no sistema",

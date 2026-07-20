@@ -5,6 +5,7 @@ import InfoRow from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/Inf
 import Section from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/Section";
 import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/StatusBadge";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
+import ApproveRiderModal from "@/components/Modals/ApproveRiderModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
@@ -48,11 +49,12 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [approveModal, setApproveModal] = useState(false);
   const router = useRouter();
   const fullName =
     `${partner.name?.firstName || ""} ${partner.name?.lastName || ""}`.trim() ||
     t("no_name_provided");
-
+  console.log("delivery details", partner);
   const getVehicleIcon = () => {
     switch (partner.vehicleInfo?.vehicleType) {
       case "BICYCLE":
@@ -702,7 +704,13 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           {partner.status === "SUBMITTED" && (
             <>
               <motion.button
-                onClick={() => setApproveStatus("APPROVED")}
+                onClick={() => {
+                  if (partner?.registeredBy?.id) {
+                    setApproveStatus("APPROVED")
+                  } else {
+                    setApproveModal(true);
+                  }
+                }}
                 whileHover={{
                   scale: 1.05,
                 }}
@@ -782,6 +790,15 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         onOpenChange={setShowDeleteModal}
         onConfirm={handleDeletePartner}
         isDeleting={isDeleting}
+      />
+
+      {/* Approve rider*/}
+      <ApproveRiderModal
+        open={approveModal}
+        onOpenChange={() => setApproveModal(false)}
+        partnerId={partner.userId}
+        partnerName={`${partner?.name?.firstName} ${partner?.name?.lastName}`}
+        city={partner?.address?.city as string}
       />
 
       <ApproveOrRejectModal
