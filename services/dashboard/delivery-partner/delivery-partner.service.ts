@@ -48,3 +48,16 @@ export const getSingleDeliveryPartnerReq = async (id: string) => {
 
   return {};
 };
+
+// assign - fleet - manager
+export const assignFleetAndApproveRiderReq = async (payload: { fleetManagerId: string }, userId: string) => {
+  const url = `/delivery-partners/${userId}/assign-fleet-manager`;
+
+  const result = catchAsync(async () => {
+    return await serverRequest.patch(url, {
+      data: payload
+    });
+  });
+
+  return result;
+};

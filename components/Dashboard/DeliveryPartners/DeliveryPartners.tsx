@@ -4,6 +4,7 @@ import DeliveryPartnerTable from "@/components/Dashboard/DeliveryPartners/Delive
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
+import ApproveRiderModal from "@/components/Modals/ApproveRiderModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
@@ -70,6 +71,13 @@ export default function DeliveryPartners({
     partnerName: "",
     status: "",
   });
+  const [approveInfo, setApproveInfo] = useState({
+    partnerId: "",
+    partnerName: "",
+    city: "",
+    status: "",
+  });
+
   const [deleteId, setDeleteId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -78,6 +86,13 @@ export default function DeliveryPartners({
     partnerName: string,
     status: string,
   ) => setStatusInfo({ partnerId, partnerName, status });
+
+  const handleApproveInfo = (
+    partnerId: string,
+    partnerName: string,
+    city: string,
+    status: string,
+  ) => setApproveInfo({ partnerId, partnerName, city, status });
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -123,6 +138,7 @@ export default function DeliveryPartners({
       <DeliveryPartnerTable
         partners={partnersResult?.data || []}
         handleStatusInfo={handleStatusInfo}
+        handleApproveInfo={handleApproveInfo}
         handleDeleteId={handleDeleteId}
       />
 
@@ -145,6 +161,15 @@ export default function DeliveryPartners({
         onOpenChange={closeDeleteModal}
         onConfirm={handleDeletePartner}
         isDeleting={isDeleting}
+      />
+
+      {/* Approve rider*/}
+      <ApproveRiderModal
+        open={approveInfo.partnerId.length > 0 && approveInfo.status === "APPROVED"}
+        onOpenChange={() => setApproveInfo({ partnerId: "", partnerName: "", city: "", status: "" })}
+        partnerId={approveInfo.partnerId}
+        partnerName={approveInfo.partnerName}
+        city={approveInfo.city}
       />
 
       {/* Approve or Reject or Block Modal */}
