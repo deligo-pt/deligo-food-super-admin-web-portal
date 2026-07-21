@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TOrder } from "@/types/order.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -33,8 +34,9 @@ interface IProps {
 
 export default function OrderTable({ orders }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
-
+console.log("orders", orders);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -122,9 +124,9 @@ export default function OrderTable({ orders }: IProps) {
                 </div>
               </TableCell>
               <TableCell>
-                {order.items?.map((i, index) => (
+                {order?.items?.map((i, index) => (
                   <span key={index}>
-                    {i.productId?.name} x {i.itemSummary?.quantity}
+                    {i.productId?.name?.[lang]} x {i.itemSummary?.quantity}
                   </span>
                 ))}
               </TableCell>

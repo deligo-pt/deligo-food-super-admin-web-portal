@@ -1,5 +1,6 @@
 "use client";
 
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
@@ -19,6 +20,7 @@ import {
   XCircleIcon,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface IProps {
@@ -28,6 +30,7 @@ interface IProps {
 export default function ProductDetails({ product }: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
+  const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const getStockStatusColor = (status: string) => {
@@ -112,14 +115,11 @@ export default function ProductDetails({ product }: IProps) {
       animate="visible"
     >
       {/* Header */}
-      <div className="bg-linear-to-r from-[#DC3173] to-[#e45a92] p-6 flex justify-between items-center">
-        <motion.h1
-          className="text-2xl font-bold text-white"
-          variants={itemVariants as Variants}
-        >
-          {t("product_details")}
-        </motion.h1>
-      </div>
+      <TitleHeader
+        title={t("product_details")}
+        subtitle={t("view_comprehensive_information_inventory")}
+        onBackClick={() => router.back()}
+      />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
         {/* Product Images */}
         <motion.div
@@ -184,8 +184,8 @@ export default function ProductDetails({ product }: IProps) {
               </span>
               <div
                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isApproved
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
                   }`}
               >
                 {product.isApproved ? t("approved") : t("not_approved")}
@@ -329,10 +329,10 @@ export default function ProductDetails({ product }: IProps) {
                                 <span className="font-semibold">{t("price")}: </span>
                                 <span>€{option.price}</span>
                               </div>
-                              <div>
+                              {option.stockQuantity && <div>
                                 <span className="font-semibold">{t("stock")}: </span>
                                 <span>{option.stockQuantity}</span>
-                              </div>
+                              </div>}
                             </div>
                           </div>
                         ))}
@@ -360,7 +360,7 @@ export default function ProductDetails({ product }: IProps) {
                   {product.vendorId?.businessDetails?.businessName}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {product.vendorId?.businessDetails?.businessType}
+                  {product.vendorId?.businessDetails?.businessType?.name?.[lang]}
                 </p>
               </div>
             </div>
@@ -462,10 +462,10 @@ export default function ProductDetails({ product }: IProps) {
                       <StarIcon
                         key={i}
                         className={`w-5 h-5 ${i < Math.floor(product?.rating?.average || 0)
-                            ? "text-amber-400 fill-amber-400"
-                            : i < (product?.rating?.average || 0)
-                              ? "text-amber-400 fill-amber-400 opacity-50"
-                              : "text-gray-300"
+                          ? "text-amber-400 fill-amber-400"
+                          : i < (product?.rating?.average || 0)
+                            ? "text-amber-400 fill-amber-400 opacity-50"
+                            : "text-gray-300"
                           }`}
                       />
                     ))}
@@ -491,10 +491,10 @@ export default function ProductDetails({ product }: IProps) {
                   {t("status")}:{" "}
                   <span
                     className={`font-medium ${product.isDeleted
-                        ? "text-red-600"
-                        : product.meta.status === "ACTIVE"
-                          ? "text-green-600"
-                          : "text-yellow-600"
+                      ? "text-red-600"
+                      : product.meta.status === "ACTIVE"
+                        ? "text-green-600"
+                        : "text-yellow-600"
                       }`}
                   >
                     {product.isDeleted ? "DELETED" : product.meta.status}

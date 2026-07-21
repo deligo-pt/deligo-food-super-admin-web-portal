@@ -267,6 +267,8 @@ export const en = {
   restaurant_cuisine_type: "Restaurant Cuisine Type",
   street_address: "Street Address",
   postal_code: "Postal Code",
+  latitude: "Latitude",
+  longitude: "Longitude",
   business_location: "Business Location",
   no_business_location_provided: "No business location provided",
   no_bank_details_provided: "No bank details provided",
@@ -463,6 +465,9 @@ export const en = {
   manage_all_registered_fleet_managers: "Manage all registered fleet managers",
   no_fleet_manager_found: "No Fleet Manager found",
   no_fleet_managers_found: "No fleet managers found",
+  //--> edit fleet details
+  edit_fleet_manager_details: "Edit Fleet Manager Details",
+  update_fleet_manager_update_and_information: "Update fleet manager details and information",
   //---> fleet documents
   view_full_file: "View Full File",
   no_document_uploaded: "No documents uploaded",
@@ -836,6 +841,15 @@ export const en = {
   // all delivery partners
   manage_all_registered_riders: "Manage all registered riders",
   associated_fleet: "Associated Fleet",
+  //-->assign fleet and approve rider
+  approve_rider: "Approve Rider",
+  rider_city: "Rider City",
+  showing_available_fleet_managers: "Showing available fleet managers in this exact area.",
+  loading_fleet_managers_in: "Loading fleet managers in ",
+  business: "Business",
+  select: "Select",
+  no_fleet_managers_found_in: "No fleet managers found in",
+  assign_and_approve: "Assign & Approve",
 
   // active delivery partners
   all_active_riders_system: "All active riders in the system",
@@ -1243,6 +1257,7 @@ export const en = {
 
   // product details
   product_details: "Product Details",
+  view_comprehensive_information_inventory: "View comprehensive information, inventory status, and performance metrics for this product",
   sku: "SKU",
   not_approved: "Not Approved",
   pricing: "Pricing",
@@ -1772,6 +1787,28 @@ export const en = {
   device: "Device",
   browser_os: "Browser / OS",
   view_details: "View Details",
+  //-> details
+  back_to_login_history: "Back to Login History",
+  login_history_details: "Login History Details",
+  reviewing_session_log_for: "Reviewing session log for",
+  identity_authentication: "Identity Authentication",
+  email_address: "Email Address",
+  user_id: "User ID",
+  session_id: "Session ID",
+  network_location: "Network Location",
+  ip_address: "IP Address",
+  geographic_location: "Geographic Location",
+  raw_user_agent: "Raw User Agent",
+  session_status: "Session Status",
+  verification_success: "Verification Success",
+  verification_failed: "Verification Failed",
+  authenticated_at: "Authenticated At",
+  active_duration: "Active Duration",
+  environment: "Environment",
+  device_type: "Device Type",
+  browser: "Browser",
+  operating_system: "Operating System",
+  record_not_found: "Record not found",
 
   // support-tickets
   manage_and_respond_support_requests: "Manage and respond to support requests from all platform users",

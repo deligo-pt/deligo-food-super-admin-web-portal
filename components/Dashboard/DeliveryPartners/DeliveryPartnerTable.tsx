@@ -35,12 +35,19 @@ interface IProps {
     partnerName: string,
     status: string,
   ) => void;
+  handleApproveInfo: (
+    partnerId: string,
+    partnerName: string,
+    city: string,
+    status: string,
+  ) => void;
   handleDeleteId: (id: string) => void;
 }
 
 export default function DeliveryPartnerTable({
   partners,
   handleStatusInfo,
+  handleApproveInfo,
   handleDeleteId,
 }: IProps) {
   const { t } = useTranslation();
@@ -134,13 +141,22 @@ export default function DeliveryPartnerTable({
                       </DropdownMenuItem>
                       {partner.status === "SUBMITTED" && (
                         <DropdownMenuItem
-                          onClick={() =>
-                            handleStatusInfo(
-                              partner.userId as string,
-                              `${partner.name?.firstName} ${partner.name?.lastName}`,
-                              "APPROVED",
-                            )
-                          }
+                          onClick={() => {
+                            if (partner?.registeredBy?.id?.userId) {
+                              handleStatusInfo(
+                                partner.userId as string,
+                                `${partner.name?.firstName} ${partner.name?.lastName}`,
+                                "APPROVED",
+                              )
+                            } else {
+                              handleApproveInfo(
+                                partner.userId as string,
+                                `${partner.name?.firstName} ${partner.name?.lastName}`,
+                                partner?.address?.city as string,
+                                "APPROVED",
+                              )
+                            }
+                          }}
                         >
                           {t("approve")}
                         </DropdownMenuItem>

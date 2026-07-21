@@ -28,3 +28,19 @@ export const getAllLoginHistory = async (queryString?: string) => {
 
     return result;
 };
+
+export const getSingleLoginHistory = async (id?: string) => {
+    const url = `/login-histories/${id}`;
+
+    const result = await catchAsync<TLoginHistory[]>(async () => {
+        const res = await serverFetch.get(url, {
+            next: {
+                tags: ["login-history-list"],
+                revalidate: 30,
+            },
+        });
+        return await res.json();
+    });
+
+    return result?.data;
+};

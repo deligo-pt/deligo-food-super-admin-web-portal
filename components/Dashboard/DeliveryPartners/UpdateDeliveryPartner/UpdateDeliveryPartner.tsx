@@ -36,6 +36,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon, XIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
@@ -86,6 +87,7 @@ export default function UpdateDeliveryPartner({
   partner: TDeliveryPartner;
 }) {
   const { t } = useTranslation();
+  const router = useRouter();
   const [zone, setZone] = useState("");
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
@@ -344,6 +346,7 @@ export default function UpdateDeliveryPartner({
         <TitleHeader
           title="Update Delivery Partner"
           subtitle="Update the delivery partner information with the form below"
+          onBackClick={() => router.back()}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

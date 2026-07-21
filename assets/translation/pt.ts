@@ -275,6 +275,8 @@ export const pt = {
   restaurant_cuisine_type: "Tipo de Culinária do Restaurante",
   street_address: "Endereço",
   postal_code: "Código Postal",
+  latitude: "Latitude",
+  longitude: "Longitude",
   business_location: "Local Comercial",
   no_business_location_provided: "Nenhum local comercial informado",
   no_bank_details_provided: "Nenhum dado bancário informado",
@@ -471,6 +473,9 @@ export const pt = {
   manage_all_registered_fleet_managers: "Gerenciar todos os gerentes de frota registrados",
   no_fleet_manager_found: "Nenhum gestor de frota encontrado",
   no_fleet_managers_found: "Nenhum gerente de frota encontrado",
+  //--> edit fleet details
+  edit_fleet_manager_details: "Editar Detalhes do Gerente de Frota",
+  update_fleet_manager_update_and_information: "Atualizar detalhes e informações do gerente de frota",
   //---> fleet documents
   view_full_file: "Visualizar Arquivo Completo",
   no_document_uploaded: "Nenhum documento enviado",
@@ -849,6 +854,15 @@ export const pt = {
   // all delivery partners
   manage_all_registered_riders: "Gerenciar todos os Estafetas registrados",
   associated_fleet: "Frota Associada",
+  //-->assign fleet and approve rider
+  approve_rider: "Aprovar Entregador",
+  rider_city: "Cidade do Entregador",
+  showing_available_fleet_managers: "Mostrando gerentes de frota disponíveis nesta área exata.",
+  loading_fleet_managers_in: "Carregando gerentes de frota em ",
+  business: "Negócio",
+  select: "Selecionar",
+  no_fleet_managers_found_in: "Nenhum gerente de frota encontrado em",
+  assign_and_approve: "Atribuir e Aprovar",
 
   // active delivery partners
   all_active_riders_system: "Todos os Estafetas ativos no sistema",
@@ -1262,6 +1276,7 @@ export const pt = {
 
   // product details
   product_details: "Detalhes do produto",
+  view_comprehensive_information_inventory: "Visualize informações completas, status de estoque e métricas de desempenho deste produto",
   sku: "SKU",
   not_approved: "Não aprovado",
   pricing: "Preços",
@@ -1797,6 +1812,28 @@ export const pt = {
   device: "Dispositivo",
   browser_os: "Navegador / SO",
   view_details: "Ver Detalhes",
+  //-> details
+  back_to_login_history: "Voltar para o Histórico de Login",
+  login_history_details: "Detalhes do Histórico de Login",
+  reviewing_session_log_for: "Revisando o log de sessão de",
+  identity_authentication: "Autenticação de Identidade",
+  email_address: "Endereço de E-mail",
+  user_id: "ID do Usuário",
+  session_id: "ID da Sessão",
+  network_location: "Localização da Rede",
+  ip_address: "Endereço IP",
+  geographic_location: "Localização Geográfica",
+  raw_user_agent: "User Agent Bruto",
+  session_status: "Status da Sessão",
+  verification_success: "Sucesso na Verificação",
+  verification_failed: "Falha na Verificação",
+  authenticated_at: "Autenticado em",
+  active_duration: "Duração Ativa",
+  environment: "Ambiente",
+  device_type: "Tipo de Dispositivo",
+  browser: "Navegador",
+  operating_system: "Sistema Operacional",
+  record_not_found: "Registro não encontrado",
 
   // support-tickets
   manage_and_respond_support_requests: "Gerenciar e responder a solicitações de suporte de todos os usuários da plataforma",

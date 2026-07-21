@@ -13,6 +13,7 @@ export const getAllFleetManagersReq = async (
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
   const status = queries.status || "";
+  const city = queries.city || "";
 
   const params = {
     limit,
@@ -20,6 +21,7 @@ export const getAllFleetManagersReq = async (
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
     ...(status ? { status: status } : {}),
+    ...(city ? { city: city } : {}),
     isDeleted: false,
   };
 

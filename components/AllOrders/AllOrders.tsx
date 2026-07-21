@@ -24,6 +24,7 @@ import { TMeta } from "@/types";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
 import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
+import { useStore } from "@/store/store";
 
 // Brand color
 const DELIGO = "#DC3173";
@@ -35,6 +36,7 @@ const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function AllOrders({ ordersResult }: IProps) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const [selected, setSelected] = useState<TOrder | null>(null);
   const [exporting, setExporting] = useState(false);
   const sortOptions = getSortOptions(t, sortFields);
@@ -59,8 +61,8 @@ export default function AllOrders({ ordersResult }: IProps) {
       o.orderId,
       o.customerId?.name?.firstName + " " + o.customerId?.name?.lastName,
       o.deliveryPartnerId?.name?.firstName +
-        " " +
-        o.deliveryPartnerId?.name?.lastName,
+      " " +
+      o.deliveryPartnerId?.name?.lastName,
       o.finalAmount?.toLocaleString(),
       o.orderStatus,
       o.deliveryAddress?.city,
@@ -69,12 +71,12 @@ export default function AllOrders({ ordersResult }: IProps) {
       format(o.createdAt, "do MMM yyyy"),
       o.deliveredAt ?? "-",
       o.deliveryAddress?.street +
-        ", " +
-        o.deliveryAddress?.postalCode +
-        ", " +
-        o.deliveryAddress?.city +
-        ", " +
-        o.deliveryAddress?.country,
+      ", " +
+      o.deliveryAddress?.postalCode +
+      ", " +
+      o.deliveryAddress?.city +
+      ", " +
+      o.deliveryAddress?.country,
     ]);
 
     const csv = [head, ...rows]
@@ -181,27 +183,27 @@ export default function AllOrders({ ordersResult }: IProps) {
           <table className="w-full text-sm max-w-full">
             <thead className="bg-slate-100 text-slate-700 font-semibold">
               <tr>
-                <th className="px-4 py-2 text-left w-[140px]">
+                <th className="px-4 py-2 text-left w-35">
                   {t("order_id")}
                 </th>
-                <th className="px-4 py-2 text-left w-[260px]">
+                <th className="px-4 py-2 text-left w-65">
                   {t("customer")}
                 </th>
                 {/* <th className="px-4 py-2 text-left w-[260px]">Partner</th> */}
-                <th className="px-4 py-2 text-center w-[100px]">
+                <th className="px-4 py-2 text-center w-25">
                   {t("amount")}
                 </th>
-                <th className="px-4 py-2 text-center w-[120px]">
+                <th className="px-4 py-2 text-center w-30">
                   {t("status")}
                 </th>
                 {/* <th className="px-4 py-2 text-center w-[120px]">City</th> */}
-                <th className="px-4 py-2 text-center w-[80px]">{t("items")}</th>
+                <th className="px-4 py-2 text-center w-20">{t("items")}</th>
                 {/* <th className="px-4 py-2 text-center w-[120px]">Payment</th> */}
-                <th className="px-4 py-2 text-center w-[160px]">
+                <th className="px-4 py-2 text-center w-40">
                   {t("created")}
                 </th>
                 {/* <th className="px-4 py-2 text-center w-[160px]">Delivered</th> */}
-                <th className="px-4 py-2 text-center w-[120px]">
+                <th className="px-4 py-2 text-center w-30">
                   {t("actions")}
                 </th>
               </tr>
@@ -273,7 +275,7 @@ export default function AllOrders({ ordersResult }: IProps) {
                   <td className="px-4 py-3 text-center flex flex-col">
                     {o.items?.map((i, index) => (
                       <span key={index}>
-                        {i.productId?.name} x {i.quantity}
+                        {i.productId?.name?.[lang]} x {i.quantity}
                       </span>
                     ))}
                   </td>
@@ -461,7 +463,7 @@ export default function AllOrders({ ordersResult }: IProps) {
                   <p className="font-semibold">
                     {selected.items?.map((item, i) => (
                       <span key={i}>
-                        {item?.productId?.name} x {item?.quantity}
+                        {item?.productId?.name?.[lang]} x {item?.quantity}
                       </span>
                     ))}
                   </p>
