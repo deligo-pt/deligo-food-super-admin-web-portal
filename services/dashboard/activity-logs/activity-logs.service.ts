@@ -1,5 +1,5 @@
 import { serverFetch } from "@/lib/fetchHelper";
-import { ActivityLogResponse } from "@/types/activity-logs.type";
+import { ActivityLogResponse, IActivityLog } from "@/types/activity-logs.type";
 import { catchAsync } from "@/utils/catchAsync";
 
 
@@ -17,4 +17,21 @@ export const getAllActivityLogs = async (queryString?: string) => {
     });
 
     return result;
+};
+
+
+export const getSingleActivityLog = async (id: string) => {
+    const url = `/activity-logs/${id}`;
+
+    const result = await catchAsync<IActivityLog>(async () => {
+        const res = await serverFetch.get(url, {
+            next: {
+                tags: ["activity-logs"],
+                revalidate: 30,
+            },
+        });
+        return await res.json();
+    });
+
+    return result?.data;
 };

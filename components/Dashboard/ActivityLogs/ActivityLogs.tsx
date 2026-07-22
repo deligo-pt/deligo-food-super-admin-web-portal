@@ -182,7 +182,7 @@ export default function ActivityLogsPage({ logsData }: IProps) {
 
                                     {/* 5. DETAILS BUTTON */}
                                     <TableCell className="py-3 text-right pr-6">
-                                        <Link href={`/activity-logs/${log._id}`}>
+                                        <Link href={`/admin/activity-logs/${log._id}`}>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
