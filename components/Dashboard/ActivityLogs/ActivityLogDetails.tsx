@@ -79,7 +79,7 @@ export default function ActivityLogDetails({ log }: IProps) {
         return (
             <div className="flex flex-col items-center justify-center min-h-100 space-y-4">
                 <p className="text-gray-500">{t("no_log_details_found")}</p>
-                <Link href="/activity-logs">
+                <Link href="/admin/activity-logs">
                     <Button className="bg-[#DC3173] hover:bg-[#b8265e] text-white">
                         <ArrowLeft size={16} className="mr-2" />
                         {t("back_to_logs")}
@@ -128,7 +128,7 @@ export default function ActivityLogDetails({ log }: IProps) {
 
                             <div className="text-xs text-gray-400 font-mono bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100 flex items-center gap-1">
                                 <Hash size={12} />
-                                <span>ID: {log._id}</span>
+                                <span>{t("id")}: {log._id}</span>
                             </div>
                         </div>
                     </CardHeader>
@@ -252,7 +252,7 @@ export default function ActivityLogDetails({ log }: IProps) {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 space-y-1">
                                 <span className="text-xs text-gray-400 flex items-center gap-1">
                                     <Calendar size={13} />
@@ -270,16 +270,6 @@ export default function ActivityLogDetails({ log }: IProps) {
                                 </span>
                                 <p className="font-medium text-gray-800 text-xs sm:text-sm">
                                     {formatDate(log.updatedAt)}
-                                </p>
-                            </div>
-
-                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 space-y-1">
-                                <span className="text-xs text-gray-400 flex items-center gap-1">
-                                    <Hash size={13} />
-                                    {t("schema_version")}
-                                </span>
-                                <p className="font-medium text-gray-800 text-xs sm:text-sm">
-                                    __v: {log.__v ?? 0}
                                 </p>
                             </div>
                         </div>

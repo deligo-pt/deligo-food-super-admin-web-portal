@@ -1801,6 +1801,20 @@ export const pt = {
   target: "Alvo",
   detailed_info: "Informação Detalhada",
   timestamp: "Data e Hora",
+  no_logs_found: "Nenhum registro encontrado",
+  //--> details
+  back_to_logs: "Voltar para os registros",
+  back_to_activity_logs: "Voltar para o Histórico de Atividades",
+  user_information: "Informações do Usuário",
+  unknown_user: "Usuário Desconhecido",
+  auth_user_id: "ID de Autenticação do Usuário",
+  action_details: "Detalhes da Ação",
+  action_performed: "Ação Realizada",
+  target_entity: "Entidade de Destino",
+  log_type: "Tipo de Registro",
+  system_timestamps: "Carimbos de Data/Hora do Sistema",
+  created_at: "Criado em",
+  updated_at: "Atualizado em",
 
   // login-history
   see_recent_sign_ins_failed_attempts:
