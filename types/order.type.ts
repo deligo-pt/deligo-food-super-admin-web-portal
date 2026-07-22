@@ -14,14 +14,8 @@ export type TOrder = {
 
   // Items
   items: {
-    productId: {
-      name: {
-        en: string;
-        pt: string;
-      };
-      productId: string;
-      _id: string;
-    };
+    productId: string;
+    name: string;
     quantity: number;
     price: number;
     subtotal: number;
