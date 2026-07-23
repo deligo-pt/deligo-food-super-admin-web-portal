@@ -133,6 +133,14 @@ export const getPlatformEarningsReq = async (
   };
 };
 
+export const getDeliveryPartnerAnalytics = async () => {
+  const result = await catchAsync<TSalesAnalytics>(async () => {
+    return await serverRequest.get("/analytics/admin/delivery-partner-analytics");
+  });
+
+  return result;
+};
+
 export const getSalesAnalyticsReq = async () => {
   const result = await catchAsync<TSalesAnalytics>(async () => {
     return await serverRequest.get("/analytics/admin/sales-analytics");

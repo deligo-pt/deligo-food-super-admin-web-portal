@@ -17,7 +17,7 @@ interface IProps {
 }
 
 export function VendorPerformance({ vendorPerformanceData }: IProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -129,11 +129,11 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
               </p>
               <p className="text-[#DC3173] text-sm">
                 {vendorPerformanceData.data?.vendorPerformanceStat
-                  ?.highestRating?.rating?.average || 0}{" "}
-                {t("stars")} (
-                {vendorPerformanceData.data?.vendorPerformanceStat
+                  ?.highestRating?.rating || 0}{" "}
+                {t("stars")}
+                {/* ({vendorPerformanceData.data?.vendorPerformanceStat
                   ?.highestRating?.rating?.totalReviews || 0}{" "}
-                {t("reviews")})
+                {t("reviews")}) */}
               </p>
             </div>
           </div>

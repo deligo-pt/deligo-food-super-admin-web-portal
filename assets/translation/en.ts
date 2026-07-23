@@ -969,6 +969,13 @@ export const en = {
   deliveries_this_range: "deliveries this range",
   revenue: "Revenue",
   payout_history: "Payout History",
+  avg_daily_active_hours: "Avg. Daily Active Hours",
+  partner_retention: "Partner Retention",
+  avg_partner_earnings: "Avg. Partner Earnings",
+  partner_availability: "Partner Availability",
+  workload_vs_available_partners: "Workload vs. Available Partners",
+  completion_time_partner_level: "Completion Time by Partner Level",
+  average_time_in_minutes_from_order: "Average time in minutes from order acceptance to delivery",
 
   // delivery partner wallets
   manage_all_the_rider_wallets: "Manage all the rider wallets",
@@ -1776,6 +1783,20 @@ export const en = {
   target: "Target",
   detailed_info: "Detailed Info",
   timestamp: "Timestamp",
+  no_logs_found: "No logs found",
+  //--> details
+  back_to_logs: "Back to logs",
+  back_to_activity_logs: "Back to Activity Logs",
+  user_information: "User Information",
+  unknown_user: "Unknown User",
+  auth_user_id: "Auth User Id",
+  action_details: "Action Details",
+  action_performed: "Action Performed",
+  target_entity: "Target Entity",
+  log_type: "Log Type",
+  system_timestamps: "System Timestamps",
+  created_at: "Created At",
+  updated_at: "Updated At",
 
   // login-history
   see_recent_sign_ins_failed_attempts:

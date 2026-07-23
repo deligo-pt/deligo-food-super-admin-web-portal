@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/hooks/use-translation";
-import { useStore } from "@/store/store";
 import { TOrder } from "@/types/order.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion, Variants } from "framer-motion";
@@ -13,7 +12,6 @@ interface IProps {
 
 export default function OrderItemsTable({ items }: IProps) {
   const { t } = useTranslation();
-  const { lang } = useStore();
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -68,17 +66,17 @@ export default function OrderItemsTable({ items }: IProps) {
           >
             {items.map((item, index) => (
               <motion.tr
-                key={item.productId._id || index}
+                key={item.productId || index}
                 variants={rowVariants as Variants}
                 className="hover:bg-gray-50/50 transition-colors"
               >
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
                     <span className="font-medium text-gray-900">
-                      {item.productId.name?.[lang]}
+                      {item?.name}
                     </span>
                     <span className="text-xs text-gray-400">
-                      {t("id")}: {item.productId.productId}
+                      {t("id")}: {item.productId}
                     </span>
                   </div>
                 </td>
