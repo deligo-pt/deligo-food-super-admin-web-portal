@@ -22,10 +22,10 @@ export default function FleetManagerPerformanceDetails({
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title={`${performanceData?.fleetPerformance?.name?.firstName} ${performanceData?.fleetPerformance?.name?.lastName} ${t("performance_capital")}`}
+        title={`${performanceData?.fleetPerformance?.name} ${t("performance_capital")}`}
         subtitle={t("fleet_manager_performance_details")}
         onBackClick={() => router.push("/admin/fleet-performance")}
       />

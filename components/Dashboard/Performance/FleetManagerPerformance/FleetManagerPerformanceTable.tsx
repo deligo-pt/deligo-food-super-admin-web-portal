@@ -101,14 +101,13 @@ export default function FleetManagerPerformanceTable({
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={fm.profilePhoto} />
                         <AvatarFallback>
-                          {fm.name?.firstName?.charAt(0)}
-                          {fm.name?.lastName?.charAt(0)}
+                          {fm.name || "N/A"}
                         </AvatarFallback>
                       </Avatar>
                     </div>
                     <div>
                       <h3>
-                        {fm.name?.firstName} {fm.name?.lastName}
+                        {fm.name || "N/A"}
                       </h3>
                       <p className="text-gray-700 text-sm">{fm.email}</p>
                     </div>
