@@ -983,6 +983,13 @@ export const pt = {
   deliveries_this_range: "entregas neste intervalo",
   revenue: "Receita",
   payout_history: "Histórico de pagamentos",
+  avg_daily_active_hours: "Média de Horas Ativas Diárias",
+  partner_retention: "Retenção de Parceiros",
+  avg_partner_earnings: "Média de Ganhos por Parceiro",
+  partner_availability: "Disponibilidade de Parceiros",
+  workload_vs_available_partners: "Carga de Trabalho vs. Parceiros Disponíveis",
+  completion_time_partner_level: "Tempo de Conclusão por Nível de Parceiro",
+  average_time_in_minutes_from_order: "Tempo médio em minutos da aceitação do pedido até a entrega",
 
   // delivery partner wallets
   manage_all_the_rider_wallets: "Gerencie todas as carteiras dos Estafetas",

@@ -969,6 +969,13 @@ export const en = {
   deliveries_this_range: "deliveries this range",
   revenue: "Revenue",
   payout_history: "Payout History",
+  avg_daily_active_hours: "Avg. Daily Active Hours",
+  partner_retention: "Partner Retention",
+  avg_partner_earnings: "Avg. Partner Earnings",
+  partner_availability: "Partner Availability",
+  workload_vs_available_partners: "Workload vs. Available Partners",
+  completion_time_partner_level: "Completion Time by Partner Level",
+  average_time_in_minutes_from_order: "Average time in minutes from order acceptance to delivery",
 
   // delivery partner wallets
   manage_all_the_rider_wallets: "Manage all the rider wallets",
