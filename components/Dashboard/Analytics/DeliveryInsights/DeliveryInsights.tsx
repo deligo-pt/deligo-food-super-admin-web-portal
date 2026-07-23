@@ -85,7 +85,7 @@ export default function DeliveryInsightsPage({ deliveryInsights }: IProps) {
           ))}
           {deliveryInsights.rejectedReasons.length === 0 && (
             <div className="text-center text-gray-500">
-             {t("no_rejected_deliveries")}
+              {t("no_rejected_deliveries")}
             </div>
           )}
         </div>
