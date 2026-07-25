@@ -341,7 +341,9 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               <div>
                 <p className="text-sm text-gray-500">{t("closing_days")}</p>
                 <p className="font-medium">
-                  {vendor?.businessDetails?.closingDays || "N/A"}
+                  {vendor?.businessDetails?.closingDays?.length
+                    ? vendor.businessDetails.closingDays.join(", ")
+                    : "N/A"}
                 </p>
               </div>
             </div>

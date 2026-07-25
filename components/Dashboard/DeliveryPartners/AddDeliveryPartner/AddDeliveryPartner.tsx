@@ -709,7 +709,7 @@ export default function AddDeliveryPartner() {
                           name="nifNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("nif_number")}<span className="text-red-600">*</span></FormLabel>
+                              <FormLabel>{t("nif_number")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -727,7 +727,7 @@ export default function AddDeliveryPartner() {
                           name="passportNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("passport_number")}<span className="text-red-600">*</span></FormLabel>
+                              <FormLabel>{t("passport_number")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -791,7 +791,7 @@ export default function AddDeliveryPartner() {
                           name="bankName"
                           render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("bank_name")}<span className="text-red-600">*</span></FormLabel>
+                              <FormLabel>{t("bank_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Select onValueChange={field.onChange} value={field.value}>
                                   <SelectTrigger
@@ -823,7 +823,7 @@ export default function AddDeliveryPartner() {
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("account_holder_name")}<span className="text-red-600">*</span></FormLabel>
+                              <FormLabel>{t("account_holder_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
@@ -840,7 +840,7 @@ export default function AddDeliveryPartner() {
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("iban")}<span className="text-red-600">*</span></FormLabel>
+                              <FormLabel>{t("iban")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -858,7 +858,7 @@ export default function AddDeliveryPartner() {
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("swift_code")}<span className="text-red-600">*</span></FormLabel>
+                              <FormLabel>{t("swift_code")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -904,7 +904,7 @@ export default function AddDeliveryPartner() {
                         name="residencePermitType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("residence_permit_type")}<span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{t("residence_permit_type")} <span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -950,7 +950,7 @@ export default function AddDeliveryPartner() {
                         name="residencePermitExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("residence_permit_expiry")}<span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_expiry") : t("residence_permit_expiry")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>

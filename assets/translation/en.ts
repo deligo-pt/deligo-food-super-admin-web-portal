@@ -762,6 +762,7 @@ export const en = {
   search_address_here: "Search address here...",
   legal_address: "Legal Status",
   residence_permit_expiry: "Residence Permit Expiry",
+  passport_expiry: "Passport Expiry",
   select_permit_type: "Select a permit type",
   select_vehicle_type: "Select a vehicle type",
   driving_license_expiry: "Driving License Expiry",
