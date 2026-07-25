@@ -97,7 +97,7 @@ export default function FleetManagerDetails({ agentData }: IProps) {
   };
 
   return (
-    <div className="p-4 md;px-6">
+    <div>
       <div className="mb-4">
         <Button
           onClick={() => router.back()}

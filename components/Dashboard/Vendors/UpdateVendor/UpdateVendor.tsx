@@ -353,7 +353,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                       </div>
                     </div>
 
-                    <Label className="mb-2">{t("phone_number")} {vendor.userId && <span className="text-[#DC3173]">*</span>}</Label>
+                    <Label className="mb-2">{t("phone_number")} z</Label>
                     <FormField
                       control={form.control}
                       name="phoneNumber"
