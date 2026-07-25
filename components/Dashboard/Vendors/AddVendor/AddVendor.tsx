@@ -424,7 +424,7 @@ export default function AddVendor({
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")} <span className="text-[#DC3173]">*</span></FormLabel>
+                        <FormLabel>{t("first_name")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -438,7 +438,7 @@ export default function AddVendor({
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")} <span className="text-[#DC3173]">*</span></FormLabel>
+                        <FormLabel>{t("last_name")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -534,7 +534,7 @@ export default function AddVendor({
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")} <span className="text-[#DC3173]">*</span></Label>
+                  <Label className="mb-2">{t("phone_number")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"

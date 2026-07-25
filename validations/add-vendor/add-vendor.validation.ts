@@ -147,7 +147,7 @@ export const addVendorValidation = z
     },
   )
   .superRefine((data, ctx) => {
-    if (data.businessType === "RESTAURANT") {
+    if (data.businessType === "restaurant") {
       if (
         !data.restaurantCuisineType ||
         !Array.isArray(data.restaurantCuisineType) ||

@@ -195,7 +195,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </div>
       </motion.div>
-      <div className="bg-gray-50 p-6 rounded-b-lg">
+      <div className="bg-gray-50 rounded-b-lg">
         <Section title={t("personal_details")} icon={<User />} defaultOpen={true}>
           <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6">
             <div>

@@ -1,7 +1,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadVendorDocuments from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
+import UploadVendorDocuments, { REQUIRED_DOCS } from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,6 @@ import { TBusinessLocation, TVendor } from "@/types/user.type";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-// import parsePhoneNumberFromString from "libphonenumber-js";
 import { Banknote, Briefcase, FileText, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -275,6 +274,12 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
     }
   }, [form]);
 
+  const isDocumentsValid = REQUIRED_DOCS.every(
+    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
+  );
+
+  const isSubmitDisabled = !isDocumentsValid || isSubmitting;
+
   return (
     <>
       <TitleHeader
@@ -313,7 +318,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("first_name")}</FormLabel>
+                          <FormLabel>{t("first_name")} {vendor.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                           <FormControl>
                             <Input placeholder={t("first_name")} {...field} />
                           </FormControl>
@@ -327,7 +332,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("last_name")}</FormLabel>
+                          <FormLabel>{t("last_name")} {vendor.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                           <FormControl>
                             <Input placeholder={t("last_name")} {...field} />
                           </FormControl>
@@ -337,7 +342,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                     />
 
                     <div>
-                      <Label>{t("email")}</Label>
+                      <Label>{t("email")} <span className="text-[#DC3173]">*</span></Label>
                       <div className="flex items-center gap-3 mt-2">
                         <Input
                           type="email"
@@ -348,7 +353,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                       </div>
                     </div>
 
-                    <Label className="mb-2">{t("phone_number")}</Label>
+                    <Label className="mb-2">{t("phone_number")} {vendor.userId && <span className="text-[#DC3173]">*</span>}</Label>
                     <FormField
                       control={form.control}
                       name="phoneNumber"
@@ -425,7 +430,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             name="businessName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t("business_name")}</FormLabel>
+                                <FormLabel>{t("business_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder={t("business_name")}
@@ -442,7 +447,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             name="businessType"
                             render={({ field, fieldState }) => (
                               <FormItem>
-                                <FormLabel>{t("business_type")}</FormLabel>
+                                <FormLabel>{t("business_type")} <span className="text-[#DC3173]">*</span></FormLabel>
                                 <FormControl>
                                   <Select
                                     onValueChange={(value) => field.onChange(value)}
@@ -482,7 +487,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             name="NIF"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t("nif")}</FormLabel>
+                                <FormLabel>{t("nif")} <span className="text-[#DC3173]">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder={t("tax_identification_number")}
@@ -599,7 +604,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             name="branches"
                             render={({ field }) => (
                               <FormItem className="col-span-2">
-                                <FormLabel>{t("total_branches")}</FormLabel>
+                                <FormLabel>{t("total_branches")} <span className="text-[#DC3173]">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     type="number"
@@ -620,7 +625,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                               <FormItem>
                                 <div className="relative">
                                   <FormLabel className="mb-2">
-                                    {t("opening_hours")}
+                                    {t("opening_hours")} <span className="text-[#DC3173]">*</span>
                                   </FormLabel>
                                   <FormControl>
                                     <Input
@@ -642,7 +647,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                               <FormItem>
                                 <div className="relative">
                                   <FormLabel className="mb-2">
-                                    {t("closing_hours")}
+                                    {t("closing_hours")} <span className="text-[#DC3173]">*</span>
                                   </FormLabel>
                                   <FormControl>
                                     <Input
@@ -664,7 +669,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                               <FormItem className="col-span-2">
                                 <div>
                                   <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                    {t("closing_days")}
+                                    {t("closing_days")} <span className="text-[#DC3173]">*</span>
                                   </FormLabel>
                                   <div className="flex flex-wrap gap-2">
                                     {daysOfWeek.map((day) => (
@@ -723,7 +728,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             name="bankName"
                             render={({ field, fieldState }) => (
                               <FormItem>
-                                <FormLabel>{t("bank_name")}</FormLabel>
+                                <FormLabel>{t("bank_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                                 <FormControl>
                                   <Select onValueChange={field.onChange} value={field.value || vendor?.bankDetails?.bankName || "undefined"}>
                                     <SelectTrigger
@@ -756,7 +761,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>
-                                  {t("account_holder_name")}
+                                  {t("account_holder_name")} <span className="text-[#DC3173]">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -774,7 +779,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             name="iban"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t("iban")}</FormLabel>
+                                <FormLabel>{t("iban")} <span className="text-[#DC3173]">*</span></FormLabel>
                                 <FormControl>
                                   <Input placeholder={t("iban")} {...field} />
                                 </FormControl>
@@ -788,7 +793,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             name="swiftCode"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>{t("swift_code")}</FormLabel>
+                                <FormLabel>{t("swift_code")} <span className="text-[#DC3173]">*</span></FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder={t("swift_code")}
@@ -877,7 +882,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
               <Button
                 className="px-8 py-2 text-white"
                 style={{ background: DELIGO }}
-                disabled={isSubmitting}
+                disabled={isSubmitDisabled}
               >
                 {t("submit_vendor")}
               </Button>
