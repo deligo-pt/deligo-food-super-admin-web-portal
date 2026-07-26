@@ -773,6 +773,7 @@ export const pt = {
   search_address_here: "Pesquisar endereço aqui...",
   legal_address: "Status Legal", // Use "Endereço Legal" if the intent was address instead of status
   residence_permit_expiry: "Validade da Autorização de Residência",
+  passport_expiry: "Validade do Passaporte",
   select_permit_type: "Selecione um tipo de licença",
   select_vehicle_type: "Selecione um tipo de veículo",
   driving_license_expiry: "Validade da Carteira de Habilitação",
