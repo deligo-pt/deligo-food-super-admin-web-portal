@@ -32,7 +32,7 @@ export const en = {
   dashboard: "Dashboard",
 
   vendors: "Vendors",
-  all_vendors: "All vendors",
+  all_vendors: "All Vendors",
   pending_approvals: "Pending Approvals",
   active_vendors: "Active Vendors",
   suspended_vendors: "Suspended Vendors",
