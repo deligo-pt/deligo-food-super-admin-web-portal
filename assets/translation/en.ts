@@ -1093,6 +1093,7 @@ export const en = {
   orders_from: "Orders from",
   customer_orders: "Customer Orders",
   manage_customer_orders_here: "Manage customer orders here",
+  payment_status: "Payment Status",
 
   // pending-orders
   all_pending_orders_system: "All pending orders in the system",

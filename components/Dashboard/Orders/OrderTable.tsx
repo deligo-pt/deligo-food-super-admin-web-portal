@@ -1,31 +1,16 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { useTranslation } from "@/hooks/use-translation";
 import { TOrder } from "@/types/order.type";
-import { formatPrice } from "@/utils/formatPrice";
-import { format } from "date-fns";
 import { motion } from "framer-motion";
-import {
-  CalendarIcon,
-  CheckCircleIcon,
-  Cog,
-  EuroIcon,
-  EyeIcon,
-  HashIcon,
-  PackageIcon,
-  UserIcon,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getOrderColumns } from "./OrderColumns";
+import ReusableTable from "@/components/common/ReusableTable";
+import { refundOrderReq } from "@/services/dashboard/order/order.service";
+import { toast } from "sonner";
+import { useState } from "react";
+import RefundModal from "./RefundModal";
 
 interface IProps {
   orders: TOrder[];
@@ -34,6 +19,32 @@ interface IProps {
 export default function OrderTable({ orders }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
+  const [orderId, setOrderId] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRefundOrder = async () => {
+    if (!orderId) return;
+
+    const toastId = toast.loading("Refunding! Please wait....");
+    setIsSubmitting(true);
+    const res = await refundOrderReq(orderId);
+
+    if (res.success) {
+      toast.success(res?.message || "Refunded successfully!", { id: toastId });
+      router.refresh();
+      setIsSubmitting(false);
+      setOrderId("");
+    } else {
+      toast.error(res?.message || "Refunded failed!", { id: toastId });
+      setIsSubmitting(false);
+    }
+  }
+
+  const columns = getOrderColumns({
+    t,
+    router,
+    setOrderId
+  });
 
   return (
     <motion.div
@@ -41,119 +52,19 @@ export default function OrderTable({ orders }: IProps) {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
     >
-      <Table className="max-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <HashIcon className="w-4" />
-                {t("order_id")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <UserIcon className="w-4" />
-                {t("customer")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <PackageIcon className="w-4" />
-                {t("items")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <EuroIcon className="w-4" />
-                {t("amount")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CheckCircleIcon className="w-4" />
-                {t("status")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CalendarIcon className="w-4" />
-                {t("date")}
-              </div>
-            </TableHead>
-            <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-              <Cog className="w-4" />
-              {t("actions")}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders?.length === 0 && (
-            <TableRow>
-              <TableCell
-                className="text-[#DC3173] text-lg text-center"
-                colSpan={7}
-              >
-                {t("no_orders_found")}
-              </TableCell>
-            </TableRow>
-          )}
-          {orders?.map((order) => (
-            <TableRow key={order._id}>
-              <TableCell>{order.orderId}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={order.customerId?.profilePhoto} />
-                    <AvatarFallback>
-                      {order.customerId?.name?.firstName?.charAt(0)}
-                      {order.customerId?.name?.lastName?.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">
-                      {order.customerId?.name?.firstName}{" "}
-                      {order.customerId?.name?.lastName}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      {order.deliveryAddress.street},{" "}
-                      {order.deliveryAddress.city}
-                    </div>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                {order?.items?.map((i, index) => (
-                  <span key={index}>
-                    {i.name} x {i.itemSummary?.quantity}
-                  </span>
-                ))}
-              </TableCell>
-              <TableCell>
-                €{formatPrice(order.payoutSummary?.grandTotal || 0)}
-              </TableCell>
-              <TableCell>
-                {order.orderStatus
-                  ?.split("_")
-                  ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
-                  ?.join(" ")}
-              </TableCell>
-              <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
-              <TableCell>
-                <Button
-                  onClick={() =>
-                    router.push(`/admin/all-orders/${order.orderId}`)
-                  }
-                  size="sm"
-                  className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"
-                >
-                  <EyeIcon />
-                  {t("view")}
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ReusableTable
+        data={orders}
+        columns={columns}
+        getRowKey={(row) => row._id as string}
+        emptyMessage={t("no_orders_found")}
+      />
+
+      <RefundModal
+        open={!!orderId}
+        onOpenChange={() => setOrderId("")}
+        onConfirm={handleRefundOrder}
+        isSubmitting={isSubmitting}
+      />
     </motion.div>
   );
 }

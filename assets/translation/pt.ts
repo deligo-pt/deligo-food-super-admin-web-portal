@@ -1110,6 +1110,7 @@ export const pt = {
   orders_from: "Pedidos de",
   customer_orders: "Pedidos do Cliente",
   manage_customer_orders_here: "Gerencie os pedidos dos clientes aqui",
+  payment_status: "Status do Pagamento",
 
   // pending-orders
   all_pending_orders_system: "Todos os pedidos pendentes no sistema",
