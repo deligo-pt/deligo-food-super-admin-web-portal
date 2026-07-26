@@ -773,6 +773,7 @@ export const pt = {
   search_address_here: "Pesquisar endereço aqui...",
   legal_address: "Status Legal", // Use "Endereço Legal" if the intent was address instead of status
   residence_permit_expiry: "Validade da Autorização de Residência",
+  passport_expiry: "Validade do Passaporte",
   select_permit_type: "Selecione um tipo de licença",
   select_vehicle_type: "Selecione um tipo de veículo",
   driving_license_expiry: "Validade da Carteira de Habilitação",
@@ -1109,6 +1110,7 @@ export const pt = {
   orders_from: "Pedidos de",
   customer_orders: "Pedidos do Cliente",
   manage_customer_orders_here: "Gerencie os pedidos dos clientes aqui",
+  payment_status: "Status do Pagamento",
 
   // pending-orders
   all_pending_orders_system: "Todos os pedidos pendentes no sistema",

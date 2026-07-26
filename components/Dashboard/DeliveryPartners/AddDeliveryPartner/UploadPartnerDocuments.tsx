@@ -204,7 +204,7 @@ export default function UploadPartnerDocuments({
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
-                  <p>{d.label}<span className="text-red-600">*</span></p>
+                  <p>{d.label} <span className="text-red-600">*</span></p>
                   {isSelected && (
                     <div>
                       <button

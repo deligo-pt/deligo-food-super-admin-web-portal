@@ -424,7 +424,7 @@ export default function AddVendor({
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")} <span className="text-[#DC3173]">*</span></FormLabel>
+                        <FormLabel>{t("first_name")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -438,7 +438,7 @@ export default function AddVendor({
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")} <span className="text-[#DC3173]">*</span></FormLabel>
+                        <FormLabel>{t("last_name")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -534,7 +534,7 @@ export default function AddVendor({
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")} <span className="text-[#DC3173]">*</span></Label>
+                  <Label className="mb-2">{t("phone_number")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -852,31 +852,34 @@ export default function AddVendor({
                             <FormItem className="col-span-2">
                               <div>
                                 <FormLabel className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                  {t("closing_days")} <span className="text-[#DC3173]">*</span>
+                                  {t("closing_days")}
                                 </FormLabel>
                                 <div className="flex flex-wrap gap-2">
-                                  {daysOfWeek.map((day) => (
-                                    <motion.button
-                                      key={day}
-                                      type="button"
-                                      onClick={() => {
-                                        field.onChange(
-                                          field.value?.includes(day)
-                                            ? field.value?.filter(
-                                              (d) => d !== day,
-                                            )
-                                            : [...field.value, day],
-                                        );
-                                      }}
-                                      whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
-                                        ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                        : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                        }`}
-                                    >
-                                      {day}
-                                    </motion.button>
-                                  ))}
+                                  {daysOfWeek.map((day) => {
+                                    const isSelected = field.value?.includes(day) ?? false;
+
+                                    return (
+                                      <motion.button
+                                        key={day}
+                                        type="button"
+                                        onClick={() => {
+                                          const current = field.value ?? [];
+                                          field.onChange(
+                                            isSelected
+                                              ? current.filter((d) => d !== day)
+                                              : [...current, day]
+                                          );
+                                        }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${isSelected
+                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                          }`}
+                                      >
+                                        {day}
+                                      </motion.button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                               <FormMessage />

@@ -60,11 +60,7 @@ export const addVendorValidation = z
 
     closingHours: z.string().nonempty("Closing hours is required"),
 
-    closingDays: z
-      .array(z.string())
-      .min(1, "At least one closing day is required")
-      .max(7, "Closing days must be at most 7")
-      .nonempty("Closing days is required"),
+    closingDays: z.array(z.string()).optional(),
 
     street: z
       .string()
@@ -147,7 +143,7 @@ export const addVendorValidation = z
     },
   )
   .superRefine((data, ctx) => {
-    if (data.businessType === "RESTAURANT") {
+    if (data.businessType === "restaurant") {
       if (
         !data.restaurantCuisineType ||
         !Array.isArray(data.restaurantCuisineType) ||

@@ -32,7 +32,7 @@ export const en = {
   dashboard: "Dashboard",
 
   vendors: "Vendors",
-  all_vendors: "All vendors",
+  all_vendors: "All Vendors",
   pending_approvals: "Pending Approvals",
   active_vendors: "Active Vendors",
   suspended_vendors: "Suspended Vendors",
@@ -762,6 +762,7 @@ export const en = {
   search_address_here: "Search address here...",
   legal_address: "Legal Status",
   residence_permit_expiry: "Residence Permit Expiry",
+  passport_expiry: "Passport Expiry",
   select_permit_type: "Select a permit type",
   select_vehicle_type: "Select a vehicle type",
   driving_license_expiry: "Driving License Expiry",
@@ -1092,6 +1093,7 @@ export const en = {
   orders_from: "Orders from",
   customer_orders: "Customer Orders",
   manage_customer_orders_here: "Manage customer orders here",
+  payment_status: "Payment Status",
 
   // pending-orders
   all_pending_orders_system: "All pending orders in the system",

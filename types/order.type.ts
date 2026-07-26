@@ -31,7 +31,7 @@ export type TOrder = {
   discount?: number;
   finalAmount: number;
   paymentMethod: "CARD" | "MOBILE";
-  paymentStatus: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+  paymentStatus: 'PENDING' | 'PROCESSING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
   // Order Lifecycle
   orderStatus: keyof typeof ORDER_STATUS;
