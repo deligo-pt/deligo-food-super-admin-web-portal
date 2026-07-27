@@ -1421,6 +1421,7 @@ export const en = {
   // all offers
   manage_all_offers_here: "Manage all offers here",
   no_offers_found: "No offers found",
+  created_by: "Created By",
   expire_status: "Expire Status",
   activating: "Activating",
   deactivating: "Deactivating",

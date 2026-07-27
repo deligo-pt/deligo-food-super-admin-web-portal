@@ -1,5 +1,6 @@
 "use client";
 
+
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Button } from "@/components/ui/button";
@@ -12,22 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
-import { cn } from "@/lib/utils";
 import {
   deleteProductCategoryReq,
   updateProductCategoryReq,
@@ -37,24 +23,19 @@ import { TMeta } from "@/types";
 import { TProductCategoryResponse } from "@/types/category.type";
 import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
-import {
-  CircleCheckBig,
-  Cog,
-  InfoIcon,
-  ListIcon,
-  MoreVertical,
-} from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { getProductCategoryColumns } from "./productCategoryColumns";
+import ReusableTable from "../common/ReusableTable";
 
 interface IProps {
   categoriesResult: {
     data: TProductCategoryResponse[];
     meta?: TMeta;
   };
-};
+}
+
 const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function CategoryTable({ categoriesResult }: IProps) {
@@ -62,6 +43,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
   const { lang } = useStore();
   const sortOptions = getSortOptions(t, sortFields);
   const router = useRouter();
+
   const [statusInfo, setStatusInfo] = useState<{
     categoryId: string;
     isActive?: boolean;
@@ -88,18 +70,11 @@ export default function CategoryTable({ categoriesResult }: IProps) {
         id: toastId,
       });
       router.refresh();
-      setStatusInfo((prevStatusInfo) => ({
-        ...prevStatusInfo,
-        categoryId: "",
-        field: "",
-      }));
+      setStatusInfo((prev) => ({ ...prev, categoryId: "", field: "" }));
       return;
     }
 
-    toast.error(result.message || "Active Status update failed", {
-      id: toastId,
-    });
-    console.log(result);
+    toast.error(result.message || "Active Status update failed", { id: toastId });
     setButtonDisabled(0);
   };
 
@@ -112,20 +87,20 @@ export default function CategoryTable({ categoriesResult }: IProps) {
     if (result?.success) {
       toast.success("Category deleted successfully!", { id: toastId });
       router.refresh();
-      setStatusInfo((prevStatusInfo) => ({
-        ...prevStatusInfo,
-        categoryId: "",
-        field: "",
-      }));
+      setStatusInfo((prev) => ({ ...prev, categoryId: "", field: "" }));
       return;
     }
 
-    toast.error(result?.message || "Category delete failed", {
-      id: toastId,
-    });
-    console.log(result);
+    toast.error(result?.message || "Category delete failed", { id: toastId });
     setButtonDisabled(0);
   };
+
+  const columns = getProductCategoryColumns({
+    t,
+    lang,
+    router,
+    setStatusInfo,
+  });
 
   return (
     <>
@@ -136,149 +111,15 @@ export default function CategoryTable({ categoriesResult }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
       >
-        <Table className="max-w-full">
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <ListIcon className="w-4" />
-                  {t("name")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <InfoIcon className="w-4" />
-                  {t("business_type")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <InfoIcon className="w-4" />
-                  {t("description")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <CircleCheckBig className="w-4" />
-                  {t("status")}
-                </div>
-              </TableHead>
-              <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-                <Cog className="w-4" />
-                {t("actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categoriesResult?.data?.map((category) => {
-              const name = category.name[lang];
-
-              return (
-                <TableRow key={category._id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      {category.icon && (
-                        <div>
-                          <Image
-                            className="w-8 h-8 rounded-full object-cover"
-                            src={category.icon}
-                            alt={name as string}
-                            width={32}
-                            height={32}
-                          />
-                        </div>
-                      )}
-                      <p>{name}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{category?.businessCategoryId?.name?.[lang]}</TableCell>
-                  <TableCell>{(category?.description && category?.description?.length > 70) ? category?.description.slice(0, 70) + "...." : category?.description || "N/A"}</TableCell>
-                  <TableCell
-                    className={cn(
-                      category.isDeleted
-                        ? "text-red-500"
-                        : category.isActive
-                          ? "text-green-500"
-                          : "text-yellow-500",
-                    )}
-                  >
-                    {category.isDeleted
-                      ? t("deleted")
-                      : category.isActive
-                        ? t("active")
-                        : t("inactive")}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreVertical className="h-4 w-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          className=""
-                          onClick={() =>
-                            router.push(
-                              "/admin/product-categories/" + category._id,
-                            )
-                          }
-                        >
-                          {t("view")}
-                        </DropdownMenuItem>
-                        {category.isDeleted ? (
-                          <DropdownMenuItem className="text-red-500">
-                            {t("deleted")}
-                          </DropdownMenuItem>
-                        ) : (
-                          <>
-                            {!category.isDeleted && (
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  setStatusInfo({
-                                    categoryId: category._id as string,
-                                    isDeleted: true,
-                                    field: "isDeleted",
-                                  })
-                                }
-                              >
-                                {t("delete")}
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem
-                              onClick={() =>
-                                setStatusInfo({
-                                  categoryId: category._id as string,
-                                  isActive: !category.isActive,
-                                  field: "isActive",
-                                })
-                              }
-                            >
-                              {category.isActive
-                                ? t("deactivate")
-                                : t("activate")}
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-            {categoriesResult?.meta?.total === 0 && (
-              <TableRow>
-                <TableCell
-                  className="text-center text-lg text-[#DC3173]"
-                  colSpan={5}
-                >
-                  {t("no_categories_found")}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <ReusableTable
+          data={categoriesResult?.data || []}
+          columns={columns}
+          getRowKey={(row) => row._id}
+          emptyMessage={t("no_categories_found")}
+        />
       </motion.div>
 
-      {!!categoriesResult?.meta?.total && categoriesResult?.meta?.total > 0 && (
+      {!!categoriesResult?.meta?.total && categoriesResult.meta.total > 0 && (
         <div className="px-6 mt-4">
           <PaginationComponent
             totalPages={categoriesResult?.meta?.totalPage || 0}
@@ -286,69 +127,67 @@ export default function CategoryTable({ categoriesResult }: IProps) {
         </div>
       )}
 
-      {
-        <Dialog
-          open={statusInfo?.categoryId?.length > 0}
-          onOpenChange={() =>
-            setStatusInfo((prevStatusInfo) => ({
-              ...prevStatusInfo,
-              categoryId: "",
-              field: "",
-            }))
-          }
-        >
-          <form>
-            <DialogContent className="sm:max-w-106.25">
-              <DialogHeader>
-                <DialogTitle>
-                  {statusInfo.field === "isDeleted"
-                    ? t("delete")
-                    : !statusInfo.isActive
-                      ? t("deactivate")
-                      : t("activate")}{" "}
-                  {t("category_lg")}
-                </DialogTitle>
-                <DialogDescription>
-                  {t("are_you_sure_want_to")}{" "}
-                  {statusInfo.field === "isDeleted"
-                    ? "delete"
-                    : !statusInfo.isActive
-                      ? "deactivate"
-                      : "activate"}{" "}
-                  {t("this_category")}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">{t("cancel")}</Button>
-                </DialogClose>
+      <Dialog
+        open={statusInfo?.categoryId?.length > 0}
+        onOpenChange={() =>
+          setStatusInfo((prev) => ({ ...prev, categoryId: "", field: "" }))
+        }
+      >
+        <form>
+          <DialogContent className="sm:max-w-106.25">
+            <DialogHeader>
+              <DialogTitle>
+                {statusInfo.field === "isDeleted"
+                  ? t("delete")
+                  : !statusInfo.isActive
+                    ? t("deactivate")
+                    : t("activate")}{" "}
+                {t("category_lg")}
+              </DialogTitle>
+              <DialogDescription>
+                {t("are_you_sure_want_to")}{" "}
+                {statusInfo.field === "isDeleted"
+                  ? "delete"
+                  : !statusInfo.isActive
+                    ? "deactivate"
+                    : "activate"}{" "}
+                {t("this_category")}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">{t("cancel")}</Button>
+              </DialogClose>
 
-                {statusInfo.field === "isDeleted" ? (
-                  <Button variant="destructive" disabled={buttonDisabled === 1} onClick={softDeleteCategory}>
-                    {t("delete")}
-                  </Button>
-                ) : !statusInfo.isActive ? (
-                  <Button
-                    onClick={updateActiveStatus}
-                    disabled={buttonDisabled === 2}
-                    className="bg-yellow-600 hover:bg-yellow-500"
-                  >
-                    {t("deactivate")}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={updateActiveStatus}
-                    disabled={buttonDisabled === 2}
-                    className="bg-[#DC3173] hover:bg-[#DC3173]/90"
-                  >
-                    {t("activate")}
-                  </Button>
-                )}
-              </DialogFooter>
-            </DialogContent>
-          </form>
-        </Dialog>
-      }
+              {statusInfo.field === "isDeleted" ? (
+                <Button
+                  variant="destructive"
+                  disabled={buttonDisabled === 1}
+                  onClick={softDeleteCategory}
+                >
+                  {t("delete")}
+                </Button>
+              ) : !statusInfo.isActive ? (
+                <Button
+                  onClick={updateActiveStatus}
+                  disabled={buttonDisabled === 2}
+                  className="bg-yellow-600 hover:bg-yellow-500"
+                >
+                  {t("deactivate")}
+                </Button>
+              ) : (
+                <Button
+                  onClick={updateActiveStatus}
+                  disabled={buttonDisabled === 2}
+                  className="bg-[#DC3173] hover:bg-[#DC3173]/90"
+                >
+                  {t("activate")}
+                </Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </form>
+      </Dialog>
     </>
   );
 }

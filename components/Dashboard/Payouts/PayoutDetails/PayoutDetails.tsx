@@ -279,7 +279,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                 </div>
                 <div>
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                   {t("start_date")}
+                    {t("start_date")}
                   </p>
                   <p className="text-sm font-medium text-gray-900 mt-0.5">
                     {payout.startDate

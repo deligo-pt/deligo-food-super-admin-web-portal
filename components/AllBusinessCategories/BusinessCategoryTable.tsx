@@ -1,5 +1,6 @@
 "use client";
 
+
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Button } from "@/components/ui/button";
@@ -12,22 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
-import { cn } from "@/lib/utils";
 import {
   deleteBusinessCategoryReq,
   updateBusinessCategoryReq,
@@ -37,17 +23,11 @@ import { TMeta } from "@/types";
 import { TBusinessCategoryResponse } from "@/types/category.type";
 import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
-import {
-  CircleCheckBig,
-  Cog,
-  InfoIcon,
-  ListIcon,
-  MoreVertical,
-} from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { getBusinessCategoryColumns } from "./businessCategoriesColumns";
+import ReusableTable from "../common/ReusableTable";
 
 interface IProps {
   categoriesResult: {
@@ -55,6 +35,7 @@ interface IProps {
     meta?: TMeta;
   };
 }
+
 const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function CategoryTable({ categoriesResult }: IProps) {
@@ -62,6 +43,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
   const { lang } = useStore();
   const sortOptions = getSortOptions(t, sortFields);
   const router = useRouter();
+
   const [statusInfo, setStatusInfo] = useState<{
     categoryId: string;
     isActive?: boolean;
@@ -88,18 +70,11 @@ export default function CategoryTable({ categoriesResult }: IProps) {
         id: toastId,
       });
       router.refresh();
-      setStatusInfo((prevStatusInfo) => ({
-        ...prevStatusInfo,
-        categoryId: "",
-        field: "",
-      }));
+      setStatusInfo((prev) => ({ ...prev, categoryId: "", field: "" }));
       return;
     }
 
-    toast.error(result.message || "Active Status update failed", {
-      id: toastId,
-    });
-    console.log(result);
+    toast.error(result.message || "Active Status update failed", { id: toastId });
     setButtonDisabled(0);
   };
 
@@ -113,21 +88,21 @@ export default function CategoryTable({ categoriesResult }: IProps) {
       toast.success(result.message || "Category deleted successfully!", {
         id: toastId,
       });
-      setStatusInfo((prevStatusInfo) => ({
-        ...prevStatusInfo,
-        categoryId: "",
-        field: "",
-      }));
+      setStatusInfo((prev) => ({ ...prev, categoryId: "", field: "" }));
       router.refresh();
       return;
     }
 
-    toast.error(result?.message || "Category delete failed", {
-      id: toastId,
-    });
-    console.log(result);
+    toast.error(result?.message || "Category delete failed", { id: toastId });
     setButtonDisabled(0);
   };
+
+  const columns = getBusinessCategoryColumns({
+    t,
+    lang,
+    router,
+    setStatusInfo,
+  });
 
   return (
     <>
@@ -138,138 +113,15 @@ export default function CategoryTable({ categoriesResult }: IProps) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
       >
-        <Table className="max-w-full">
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <ListIcon className="w-4" />
-                  {t("name")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <InfoIcon className="w-4" />
-                  {t("description")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <CircleCheckBig className="w-4" />
-                  {t("status")}
-                </div>
-              </TableHead>
-              <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-                <Cog className="w-4" />
-                {t("actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categoriesResult?.data?.map((category) => (
-              <TableRow key={category._id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    {category.icon && (
-                      <div>
-                        <Image
-                          className="w-8 h-8 rounded-full object-cover"
-                          src={category.icon}
-                          alt={category.name?.[lang] as string}
-                          width={32}
-                          height={32}
-                        />
-                      </div>
-                    )}
-                    <p>{category.name?.[lang]}</p>
-                  </div>
-                </TableCell>
-                <TableCell>{category.description || "N/A"}</TableCell>
-                <TableCell
-                  className={cn(
-                    category.isDeleted
-                      ? "text-red-500"
-                      : category.isActive
-                        ? "text-green-500"
-                        : "text-yellow-500",
-                  )}
-                >
-                  {category.isDeleted
-                    ? t("deleted")
-                    : category.isActive
-                      ? t("active")
-                      : t("inactive")}
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <MoreVertical className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        className=""
-                        onClick={() =>
-                          router.push(
-                            "/admin/business-categories/" + category._id,
-                          )
-                        }
-                      >
-                        {t("view")}
-                      </DropdownMenuItem>
-                      {category.isDeleted ? (
-                        <DropdownMenuItem className="text-red-500">
-                          {t("deleted")}
-                        </DropdownMenuItem>
-                      ) : (
-                        <>
-                          {!category.isDeleted && (
-                            <DropdownMenuItem
-                              onClick={() =>
-                                setStatusInfo({
-                                  categoryId: category._id as string,
-                                  isDeleted: true,
-                                  field: "isDeleted",
-                                })
-                              }
-                            >
-                              {t("delete")}
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            onClick={() =>
-                              setStatusInfo({
-                                categoryId: category._id as string,
-                                isActive: !category.isActive,
-                                field: "isActive",
-                              })
-                            }
-                          >
-                            {category.isActive
-                              ? t("deactivate")
-                              : t("activate")}
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-            {categoriesResult?.meta?.total === 0 && (
-              <TableRow>
-                <TableCell
-                  className="text-center text-lg text-[#DC3173]"
-                  colSpan={5}
-                >
-                  {t("no_categories_found")}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <ReusableTable
+          data={categoriesResult?.data || []}
+          columns={columns}
+          getRowKey={(row) => row._id}
+          emptyMessage={t("no_categories_found")}
+        />
       </motion.div>
 
-      {!!categoriesResult?.meta?.total && categoriesResult?.meta?.total > 0 && (
+      {!!categoriesResult?.meta?.total && categoriesResult.meta.total > 0 && (
         <div className="px-6 mt-4">
           <PaginationComponent
             totalPages={categoriesResult?.meta?.totalPage || 0}
@@ -280,11 +132,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
       <Dialog
         open={statusInfo?.categoryId?.length > 0}
         onOpenChange={() =>
-          setStatusInfo((prevStatusInfo) => ({
-            ...prevStatusInfo,
-            categoryId: "",
-            field: "",
-          }))
+          setStatusInfo((prev) => ({ ...prev, categoryId: "", field: "" }))
         }
       >
         <form>
@@ -314,7 +162,11 @@ export default function CategoryTable({ categoriesResult }: IProps) {
               </DialogClose>
 
               {statusInfo.field === "isDeleted" ? (
-                <Button variant="destructive" disabled={buttonDisabled === 1} onClick={softDeleteCategory}>
+                <Button
+                  variant="destructive"
+                  disabled={buttonDisabled === 1}
+                  onClick={softDeleteCategory}
+                >
                   {t("delete")}
                 </Button>
               ) : !statusInfo.isActive ? (

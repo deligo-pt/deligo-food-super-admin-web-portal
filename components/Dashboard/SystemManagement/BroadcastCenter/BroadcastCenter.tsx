@@ -33,7 +33,7 @@ type RoleType = keyof Pick<
 
 export default function BroadcastCenter() {
   const { t } = useTranslation();
-  const [notificationCategory, setNotificationCategory] = useState<TNotificationType>();
+  const [notificationCategory, setNotificationCategory] = useState<TNotificationType | undefined>();
   const [commType, setCommType] = useState<"PUSH" | "BOTH" | "EMAIL">("EMAIL");
 
   const [selectedRoles, setSelectedRoles] = useState<RoleType[]>([]);
@@ -54,6 +54,14 @@ export default function BroadcastCenter() {
     DELIVERY_PARTNER: true,
     FLEET_MANAGER: true,
     ADMIN: true,
+  });
+
+  const [searchQueries, setSearchQueries] = useState<Record<RoleType, string>>({
+    VENDOR: '',
+    CUSTOMER: '',
+    DELIVERY_PARTNER: '',
+    FLEET_MANAGER: '',
+    ADMIN: '',
   });
 
   const [title, setTitle] = useState("");
@@ -162,8 +170,16 @@ export default function BroadcastCenter() {
         FLEET_MANAGER: false,
         ADMIN: false,
       });
-      setNotificationCategory(undefined as unknown as TNotificationType);
-    }, 2000);
+      setSearchQueries({
+        VENDOR: "",
+        CUSTOMER: "",
+        DELIVERY_PARTNER: "",
+        FLEET_MANAGER: "",
+        ADMIN: "",
+      });
+      setNotificationCategory(undefined);
+      console.log("hit");
+    }, 1000);
   };
 
   return (
@@ -199,6 +215,8 @@ export default function BroadcastCenter() {
               setSelectedUsers={setSelectedUsers}
               expandedPanels={expandedPanels}
               setExpandedPanels={setExpandedPanels}
+              searchQueries={searchQueries}
+              setSearchQueries={setSearchQueries}
               itemVariants={itemVariants}
             />
 
@@ -217,7 +235,7 @@ export default function BroadcastCenter() {
 
             <NotificationDropdown
               onValueChange={setNotificationCategory}
-              defaultValue={notificationCategory}
+              value={notificationCategory}
               itemVariants={itemVariants}
             />
             {/* Actions Card */}

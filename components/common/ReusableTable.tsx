@@ -57,7 +57,7 @@ function ReusableTable<T>({
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="">
+                                    className="text-[#DC3173] text-lg text-center">
                                     {emptyMessage}
                                 </TableCell>
                             </TableRow>

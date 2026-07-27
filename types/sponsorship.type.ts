@@ -3,6 +3,7 @@ export type TSponsorship = {
   sponsorName: string;
   sponsorType: "Ads" | "Offer" | "Other";
   bannerImage: string;
+  url: string;
 
   isActive: boolean;
   startDate: Date;

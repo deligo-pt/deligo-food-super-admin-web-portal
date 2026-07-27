@@ -47,6 +47,7 @@ export default function SuperAdminLoginPage({
   const [showModal, setShowModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [removeSubmitting, setRemoveSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginValidation),
@@ -56,14 +57,13 @@ export default function SuperAdminLoginPage({
     },
   });
 
-  const { formState: { isSubmitting } } = form;
-
   const login = async (payload: {
     email: string;
     password: string;
     forceLogin?: boolean;
   }) => {
     const toastId = toast.loading("Logging in...");
+    setIsSubmitting(true);
 
     try {
       const deviceDetails = await getDeviceInfo();
@@ -85,27 +85,35 @@ export default function SuperAdminLoginPage({
 
           if (redirect) {
             router.push(redirect);
+            setIsSubmitting(false);
             return;
           }
 
           router.push("/admin/dashboard");
+          setTimeout(() => {
+            setIsSubmitting(false);
+          }, 3000);
           return;
         }
 
         toast.error("You are not a super admin", { id: toastId });
+        setIsSubmitting(false);
         return;
       } else {
         if (result?.err?.statusCode === 403 && result?.err?.errorKey === "LIMIT_EXCEEDED") {
           toast.error("Device limit exceeded. Click remove and continue login or try again later", { id: toastId });
           setShowModal(true);
+          setIsSubmitting(false);
           return;
         }
         toast.error(result?.message, { id: toastId });
+        setIsSubmitting(false);
         return;
       }
     } catch (err: any) {
       console.log("login err :", err);
       toast.error(err.message || err?.response?.message || "Login failed", { id: toastId });
+      setIsSubmitting(false);
     }
   };
 

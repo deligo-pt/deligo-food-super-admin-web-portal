@@ -6,6 +6,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { motion } from "framer-motion";
+import Image from "next/image"; // Import Next.js Image component
 import {
   ArrowLeftCircle,
   CalendarIcon,
@@ -99,6 +100,9 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
     setIsDeleting(false);
   };
 
+  // Adjust URL
+  const targetUrl = sponsorship.url || "#";
+
   return (
     <div className="min-h-screen">
       <motion.div
@@ -118,6 +122,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             <ArrowLeftCircle /> {t("go_back")}
           </Button>
         </div>
+
         {/* Banner Hero */}
         <motion.div
           initial={{
@@ -130,33 +135,35 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           }}
           className="relative rounded-3xl overflow-hidden shadow-2xl mb-8"
         >
-          {/* Banner Image */}
+          {/* Banner Image Container */}
           <div className="relative aspect-21/9 bg-slate-100">
             {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <ImageIcon className="w-16 h-16 text-slate-300 animate-pulse" />
               </div>
             )}
-            <motion.img
-              src={sponsorship.bannerImage}
-              alt={sponsorship.sponsorName}
-              className="w-full h-full object-cover"
-              initial={{
-                opacity: 0,
-                scale: 1.1,
-              }}
-              animate={{
-                opacity: imageLoaded ? 1 : 0,
-                scale: 1,
-              }}
-              transition={{
-                duration: 0.6,
-              }}
-              onLoad={() => setImageLoaded(true)}
-            />
+
+            {/* Anchor tag to handle new tab navigation */}
+            <a
+              href={targetUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full h-full relative cursor-pointer group"
+            >
+              <Image
+                src={sponsorship.bannerImage}
+                alt={sponsorship.sponsorName}
+                fill
+                priority
+                sizes="(max-width: 1200px) 100vw, 1200px"
+                className={`object-cover transition-all duration-500 group-hover:scale-105 ${imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                  }`}
+                onLoad={() => setImageLoaded(true)}
+              />
+            </a>
 
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/50 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/50 to-transparent pointer-events-none" />
 
             {/* Status Badge */}
             <motion.div
@@ -171,10 +178,17 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
               transition={{
                 delay: 0.3,
               }}
-              className="absolute top-6 right-6"
+              className="absolute top-6 right-6 z-10"
             >
               <span
-                className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${isLive && sponsorship.isActive ? "bg-green-500 text-white" : isExpired ? "bg-slate-600 text-slate-300" : isUpcoming ? "bg-blue-500 text-white" : "bg-red-500 text-white"}`}
+                className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${isLive && sponsorship.isActive
+                  ? "bg-green-500 text-white"
+                  : isExpired
+                    ? "bg-slate-600 text-slate-300"
+                    : isUpcoming
+                      ? "bg-blue-500 text-white"
+                      : "bg-red-500 text-white"
+                  }`}
               >
                 {isLive && sponsorship.isActive ? (
                   <>
@@ -192,7 +206,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             </motion.div>
 
             {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-8">
+            <div className="absolute bottom-0 left-0 right-0 p-8 pointer-events-none z-10">
               <motion.div
                 initial={{
                   opacity: 0,
