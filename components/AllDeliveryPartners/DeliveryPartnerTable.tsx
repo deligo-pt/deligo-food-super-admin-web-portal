@@ -1,44 +1,26 @@
 "use client";
 
+
+import { getDeliveryPartnerColumns } from "./deliveryPartnerColumns"; // adjust path
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
-import {
-  CircleCheckBig,
-  Cog,
-  IdCard,
-  Mail,
-  MoreVertical,
-  Phone,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import ReusableTable from "../common/ReusableTable";
 
 interface IProps {
   deliveryPartnersResult: { data: TDeliveryPartner[]; meta?: TMeta };
 }
+
 const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function DeliveryPartnerTable({
@@ -54,6 +36,7 @@ export default function DeliveryPartnerTable({
   const [deleteId, setDeleteId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const sortOptions = getSortOptions(t, sortFields);
+
   const filterOptions = [
     {
       label: t("status"),
@@ -61,33 +44,17 @@ export default function DeliveryPartnerTable({
       placeholder: t("select_status"),
       type: "select",
       items: [
-        {
-          label: t("pending"),
-          value: "PENDING",
-        },
-        {
-          label: t("submitted"),
-          value: "SUBMITTED",
-        },
-        {
-          label: t("approved"),
-          value: "APPROVED",
-        },
-        {
-          label: t("rejected"),
-          value: "REJECTED",
-        },
-        {
-          label: t("blocked"),
-          value: "BLOCKED",
-        },
+        { label: t("pending"), value: "PENDING" },
+        { label: t("submitted"), value: "SUBMITTED" },
+        { label: t("approved"), value: "APPROVED" },
+        { label: t("rejected"), value: "REJECTED" },
+        { label: t("blocked"), value: "BLOCKED" },
       ],
     },
   ];
+
   const closeDeleteModal = (open: boolean) => {
-    if (!open) {
-      setDeleteId("");
-    }
+    if (!open) setDeleteId("");
   };
 
   const deleteDeliveryPartner = async () => {
@@ -101,9 +68,7 @@ export default function DeliveryPartnerTable({
       setDeleteId("");
       toast.success(
         result.message || "Delivery Partner deleted successfully!",
-        {
-          id: toastId,
-        },
+        { id: toastId },
       );
       return;
     }
@@ -114,6 +79,13 @@ export default function DeliveryPartnerTable({
     setIsDeleting(false);
   };
 
+  const columns = getDeliveryPartnerColumns({
+    t,
+    router,
+    setStatusInfo,
+    setDeleteId,
+  });
+
   return (
     <>
       <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
@@ -122,160 +94,14 @@ export default function DeliveryPartnerTable({
         animate={{ opacity: 1, y: 0 }}
         className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
       >
-        <Table className="max-w-full">
-          <TableHeader>
-            <TableRow>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <IdCard className="w-4" />
-                  {t("name")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <Mail className="w-4" />
-                  {t("email")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <Phone className="w-4" />
-                  {t("phone")}
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                  <CircleCheckBig className="w-4" />
-                  {t("status")}
-                </div>
-              </TableHead>
-              <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-                <Cog className="w-4" />
-                {t("actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {deliveryPartnersResult &&
-              deliveryPartnersResult?.data?.length > 0 &&
-              deliveryPartnersResult?.data?.map((deliveryPartner) => (
-                <TableRow key={deliveryPartner?._id}>
-                  <TableCell>
-                    {deliveryPartner?.name?.firstName}{" "}
-                    {deliveryPartner?.name?.lastName}
-                  </TableCell>
-                  <TableCell>{deliveryPartner?.email}</TableCell>
-                  <TableCell>{deliveryPartner?.contactNumber}</TableCell>
-                  <TableCell>
-                    {deliveryPartner?.isDeleted
-                      ? "DELETED"
-                      : deliveryPartner?.status}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {!deliveryPartner?.isDeleted && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <MoreVertical className="h-4 w-4" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem
-                            className=""
-                            onClick={() =>
-                              router.push(
-                                "/admin/all-delivery-partners/" +
-                                deliveryPartner.userId,
-                              )
-                            }
-                          >
-                            {t("view")}
-                          </DropdownMenuItem>
-                          {deliveryPartner.status === "SUBMITTED" && (
-                            <DropdownMenuItem
-                              className=""
-                              onClick={() =>
-                                setStatusInfo({
-                                  deliveryPartnerId:
-                                    deliveryPartner.userId as string,
-                                  deliveryPartnerName: `${deliveryPartner?.name?.firstName} ${deliveryPartner?.name?.lastName}`,
-                                  status: "APPROVED",
-                                })
-                              }
-                            >
-                              {t("approve")}
-                            </DropdownMenuItem>
-                          )}
-                          {deliveryPartner.status === "SUBMITTED" && (
-                            <DropdownMenuItem
-                              className=""
-                              onClick={() =>
-                                setStatusInfo({
-                                  deliveryPartnerId:
-                                    deliveryPartner.userId as string,
-                                  deliveryPartnerName: `${deliveryPartner?.name?.firstName} ${deliveryPartner?.name?.lastName}`,
-                                  status: "REJECTED",
-                                })
-                              }
-                            >
-                              {t("reject")}
-                            </DropdownMenuItem>
-                          )}
-                          {deliveryPartner.status === "APPROVED" && (
-                            <DropdownMenuItem
-                              className=""
-                              onClick={() =>
-                                setStatusInfo({
-                                  deliveryPartnerId:
-                                    deliveryPartner.userId as string,
-                                  deliveryPartnerName: `${deliveryPartner?.name?.firstName} ${deliveryPartner?.name?.lastName}`,
-                                  status: "BLOCKED",
-                                })
-                              }
-                            >
-                              {t("block")}
-                            </DropdownMenuItem>
-                          )}
-                          {deliveryPartner.status === "BLOCKED" && (
-                            <DropdownMenuItem
-                              className=""
-                              onClick={() =>
-                                setStatusInfo({
-                                  deliveryPartnerId:
-                                    deliveryPartner.userId as string,
-                                  deliveryPartnerName: `${deliveryPartner?.name?.firstName} ${deliveryPartner?.name?.lastName}`,
-                                  status: "UNBLOCKED",
-                                })
-                              }
-                            >
-                              {t("unblock")}
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() =>
-                              setDeleteId(deliveryPartner.userId as string)
-                            }
-                          >
-                            {t("delete")}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            {deliveryPartnersResult?.data?.length === 0 && (
-              <TableRow>
-                <TableCell
-                  className="text-[#DC3173] text-lg text-center"
-                  colSpan={5}
-                >
-                  {t("no_delivery_partners_found")}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <ReusableTable
+          data={deliveryPartnersResult?.data || []}
+          columns={columns}
+          getRowKey={(row) => row._id as string}
+          emptyMessage={t("no_delivery_partners_found")}
+        />
       </motion.div>
+
       {!!deliveryPartnersResult?.meta?.totalPage && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
