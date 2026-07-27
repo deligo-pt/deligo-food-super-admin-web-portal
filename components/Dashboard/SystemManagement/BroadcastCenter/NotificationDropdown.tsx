@@ -24,13 +24,13 @@ import { useTranslation } from '@/hooks/use-translation';
 
 interface NotificationDropdownProps {
     onValueChange: (value: TNotificationType) => void;
-    defaultValue?: TNotificationType;
+    value?: TNotificationType;
     itemVariants: any;
 }
 
 const NotificationDropdown = ({
     onValueChange,
-    defaultValue,
+    value,
     itemVariants
 }: NotificationDropdownProps) => {
     const { t } = useTranslation();
@@ -66,7 +66,7 @@ const NotificationDropdown = ({
 
             <Select
                 onValueChange={(val) => onValueChange(val as TNotificationType)}
-                defaultValue={defaultValue}
+                value={value ?? ""}
             >
                 <SelectTrigger className="w-full bg-gray-50 border-slate-200 focus:ring-[#DC3173] focus:border-[#DC3173]">
                     <SelectValue placeholder={t("select_type")} />
