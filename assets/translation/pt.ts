@@ -1440,6 +1440,7 @@ export const pt = {
   // all offers
   manage_all_offers_here: "Gerenciar todas as ofertas aqui",
   no_offers_found: "Nenhuma oferta encontrada",
+  created_by: "Criado por",
   expire_status: "Status de Expiração",
   activating: "Ativando",
   deactivating: "Desativando",

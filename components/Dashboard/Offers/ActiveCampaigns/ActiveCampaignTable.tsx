@@ -1,35 +1,13 @@
 "use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { useTranslation } from "@/hooks/use-translation";
 import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
-import { format } from "date-fns";
 import { motion } from "framer-motion";
-import {
-  CircleCheckBig,
-  Clock,
-  Cog,
-  Hourglass,
-  MoreVertical,
-  PercentIcon,
-  StoreIcon,
-  TagsIcon,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getCampaignColumns } from "./CampaignColumns";
+import ReusableTable from "@/components/common/ReusableTable";
 
 interface IProps {
   offers: TOffer[];
@@ -52,139 +30,27 @@ export default function CampaignTable({
   const { lang } = useStore();
   const router = useRouter();
 
+  const columns = getCampaignColumns({
+    t,
+    lang,
+    router,
+    handleStatusInfo,
+    handleOpenEditModal,
+    handleDeleteId,
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
     >
-      <Table className="max-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <StoreIcon className="w-4" />
-                {t("title")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <TagsIcon className="w-4" />
-                {t("type")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <PercentIcon className="w-4" />
-                {t("discount")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <Clock className="w-4" />
-                {t("duration")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CircleCheckBig className="w-4" />
-                {t("active_status")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <Hourglass className="w-4" />
-                {t("expire_status")}
-              </div>
-            </TableHead>
-            <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-              <Cog className="w-4" />
-              {t("actions")}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {offers?.length === 0 && (
-            <TableRow>
-              <TableCell
-                className="text-[#DC3173] text-lg text-center"
-                colSpan={7}
-              >
-                {t("no_offers_found")}
-              </TableCell>
-            </TableRow>
-          )}
-          {offers?.map((offer) => (
-            <TableRow key={offer._id}>
-              <TableCell>{offer?.title?.[lang]}</TableCell>
-              <TableCell>{offer.offerType}</TableCell>
-              <TableCell>
-                {offer.offerType === "PERCENT"
-                  ? `${offer.discountValue}%`
-                  : offer.offerType === "FLAT"
-                    ? `€${offer.discountValue}`
-                    : "N/A"}
-              </TableCell>
-              <TableCell>
-                {offer.validFrom && offer.expiresAt
-                  ? `${format(offer.validFrom, "yyyy-MM-dd")} to ${format(offer.expiresAt, "yyyy-MM-dd")}`
-                  : "N/A"}
-              </TableCell>
-              <TableCell>{offer?.isActive ? "Active" : "Inactive"}</TableCell>
-              <TableCell>
-                {new Date(offer.expiresAt).getTime() - new Date().getTime() > 0
-                  ? "Live"
-                  : "Expired"}
-              </TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <MoreVertical className="h-4 w-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        router.push("/admin/all-offers/" + offer._id)
-                      }
-                    >
-                      {t("view")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleOpenEditModal(offer)}
-                    >
-                      {t("edit")}
-                    </DropdownMenuItem>
-                    {offer.isActive && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(offer._id, offer.title?.[lang] as string, false)
-                        }
-                      >
-                        {t("deactivate")}
-                      </DropdownMenuItem>
-                    )}
-                    {!offer.isActive && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleStatusInfo(offer._id, offer.title?.[lang] as string, true)
-                        }
-                      >
-                        {t("activate")}
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={() => handleDeleteId(offer._id)}
-                    >
-                      {t("delete")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ReusableTable
+        data={offers}
+        columns={columns}
+        getRowKey={(row) => row._id}
+        emptyMessage={t("no_offers_found")}
+      />
     </motion.div>
   );
 }
