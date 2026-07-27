@@ -51,7 +51,7 @@ export default function ActivityLogsPage({ logsData }: IProps) {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35 }}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
             >
                 <ReusableTable
                     data={logsList}
