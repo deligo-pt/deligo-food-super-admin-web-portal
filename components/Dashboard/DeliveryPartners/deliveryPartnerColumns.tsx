@@ -1,4 +1,6 @@
+"use client";
 
+import { Column } from "@/components/common/ReusableTable";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,82 +12,103 @@ import {
     CircleCheckBig,
     Cog,
     IdCard,
+    ListIcon,
     Mail,
     MoreVertical,
     Phone,
 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { Column } from "../common/ReusableTable";
 
 type TFunction = (key: string) => string;
 
 interface GetDeliveryPartnerColumnsParams {
     t: TFunction;
     router: AppRouterInstance;
-    setStatusInfo: (info: {
-        deliveryPartnerId: string;
-        deliveryPartnerName: string;
-        status: string;
-    }) => void;
-    setDeleteId: (id: string) => void;
+    handleStatusInfo: (
+        partnerId: string,
+        partnerName: string,
+        status: string,
+    ) => void;
+    handleApproveInfo: (
+        partnerId: string,
+        partnerName: string,
+        city: string,
+        status: string,
+    ) => void;
+    handleDeleteId: (id: string) => void;
 }
 
 export function getDeliveryPartnerColumns({
     t,
     router,
-    setStatusInfo,
-    setDeleteId,
+    handleStatusInfo,
+    handleApproveInfo,
+    handleDeleteId,
 }: GetDeliveryPartnerColumnsParams): Column<TDeliveryPartner>[] {
     return [
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                    <IdCard className="w-4" />
-                    {t("name")}
+                    <IdCard className="w-4 h-4" />
+                    <span>{t("name")}</span>
                 </div>
             ),
             accessor: (dp) =>
-                `${dp?.name?.firstName || ""} ${dp?.name?.lastName || ""}`.trim(),
+                `${dp?.name?.firstName || ""} ${dp?.name?.lastName || ""}`.trim() || "N/A",
         },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                    <Mail className="w-4" />
-                    {t("email")}
+                    <ListIcon className="w-4 h-4" />
+                    <span>{t("associated_fleet")}</span>
                 </div>
             ),
-            accessor: "email",
+            accessor: (dp) => {
+                const fleetReg = dp?.registeredBy?.id?.name;
+                const fleetName = `${fleetReg?.firstName || ""} ${fleetReg?.lastName || ""}`.trim();
+                return fleetName || "-";
+            },
         },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                    <Phone className="w-4" />
-                    {t("phone")}
+                    <Mail className="w-4 h-4" />
+                    <span>{t("email")}</span>
                 </div>
             ),
-            accessor: "contactNumber",
+            accessor: (dp) => dp?.email || "-",
         },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                    <CircleCheckBig className="w-4" />
-                    {t("status")}
+                    <Phone className="w-4 h-4" />
+                    <span>{t("phone")}</span>
                 </div>
             ),
-            accessor: (dp) => (dp?.isDeleted ? "DELETED" : dp?.status),
+            accessor: (dp) => dp?.contactNumber || "-",
+        },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                    <CircleCheckBig className="w-4 h-4" />
+                    <span>{t("status")}</span>
+                </div>
+            ),
+            accessor: (dp) => (dp?.isDeleted ? "Deleted" : dp?.status || "-"),
         },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center justify-end">
-                    <Cog className="w-4" />
-                    {t("actions")}
+                    <Cog className="w-4 h-4" />
+                    <span>{t("actions")}</span>
                 </div>
             ),
             className: "text-right",
             accessor: (dp) => {
                 if (dp?.isDeleted) return null;
 
-                const fullName = `${dp?.name?.firstName || ""} ${dp?.name?.lastName || ""}`.trim();
+                const fullName = `${dp?.name?.firstName || ""} ${dp?.name?.lastName || ""
+                    }`.trim();
 
                 return (
                     <DropdownMenu>
@@ -95,9 +118,7 @@ export function getDeliveryPartnerColumns({
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
                                 onClick={() =>
-                                    router.push(
-                                        "/admin/all-delivery-partners/" + dp.userId,
-                                    )
+                                    router.push(`/admin/all-delivery-partners/${dp.userId}`)
                                 }
                             >
                                 {t("view")}
@@ -106,23 +127,32 @@ export function getDeliveryPartnerColumns({
                             {dp.status === "SUBMITTED" && (
                                 <>
                                     <DropdownMenuItem
-                                        onClick={() =>
-                                            setStatusInfo({
-                                                deliveryPartnerId: dp.userId as string,
-                                                deliveryPartnerName: fullName,
-                                                status: "APPROVED",
-                                            })
-                                        }
+                                        onClick={() => {
+                                            if (dp?.registeredBy?.id?.userId) {
+                                                handleStatusInfo(
+                                                    dp.userId as string,
+                                                    fullName,
+                                                    "APPROVED",
+                                                );
+                                            } else {
+                                                handleApproveInfo(
+                                                    dp.userId as string,
+                                                    fullName,
+                                                    dp?.address?.city as string,
+                                                    "APPROVED",
+                                                );
+                                            }
+                                        }}
                                     >
                                         {t("approve")}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() =>
-                                            setStatusInfo({
-                                                deliveryPartnerId: dp.userId as string,
-                                                deliveryPartnerName: fullName,
-                                                status: "REJECTED",
-                                            })
+                                            handleStatusInfo(
+                                                dp.userId as string,
+                                                fullName,
+                                                "REJECTED",
+                                            )
                                         }
                                     >
                                         {t("reject")}
@@ -133,11 +163,11 @@ export function getDeliveryPartnerColumns({
                             {dp.status === "APPROVED" && (
                                 <DropdownMenuItem
                                     onClick={() =>
-                                        setStatusInfo({
-                                            deliveryPartnerId: dp.userId as string,
-                                            deliveryPartnerName: fullName,
-                                            status: "BLOCKED",
-                                        })
+                                        handleStatusInfo(
+                                            dp.userId as string,
+                                            fullName,
+                                            "BLOCKED",
+                                        )
                                     }
                                 >
                                     {t("block")}
@@ -147,11 +177,11 @@ export function getDeliveryPartnerColumns({
                             {dp.status === "BLOCKED" && (
                                 <DropdownMenuItem
                                     onClick={() =>
-                                        setStatusInfo({
-                                            deliveryPartnerId: dp.userId as string,
-                                            deliveryPartnerName: fullName,
-                                            status: "UNBLOCKED",
-                                        })
+                                        handleStatusInfo(
+                                            dp.userId as string,
+                                            fullName,
+                                            "UNBLOCKED",
+                                        )
                                     }
                                 >
                                     {t("unblock")}
@@ -160,7 +190,7 @@ export function getDeliveryPartnerColumns({
 
                             <DropdownMenuItem
                                 className="text-destructive"
-                                onClick={() => setDeleteId(dp.userId as string)}
+                                onClick={() => handleDeleteId(dp.userId as string)}
                             >
                                 {t("delete")}
                             </DropdownMenuItem>
