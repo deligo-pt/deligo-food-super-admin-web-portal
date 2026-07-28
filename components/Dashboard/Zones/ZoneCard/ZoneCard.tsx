@@ -1,6 +1,7 @@
 "use client";
 
 import { USER_ROLE } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { MapIcon, MapPin } from "lucide-react";
 
@@ -19,6 +20,8 @@ export default function ZoneCard({
   isOperational,
   delay = 0,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{
@@ -65,14 +68,14 @@ export default function ZoneCard({
           <span
             className={`px-2 py-0.5 rounded-full text-xs font-bold uppercase ${isOperational ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
           >
-            {isOperational ? "Operational" : "Not Operational"}
+            {isOperational ? t("operational") : t("not_operational")}
           </span>
         </div>
 
         <div className="bg-gray-50 rounded-lg p-3">
           <p className="text-xs text-gray-500 mb-1">
-            {userType === USER_ROLE.FLEET_MANAGER && "Fleet Managers"}
-            {userType === USER_ROLE.VENDOR && "Vendors"}
+            {userType === USER_ROLE.FLEET_MANAGER && t("fleet_managers")}
+            {userType === USER_ROLE.VENDOR && t("vendors")}
           </p>
           <div className="flex items-center gap-1.5">
             <MapIcon size={16} className="text-[#DC3173]" />

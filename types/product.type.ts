@@ -1,7 +1,12 @@
+type LocalizedString = {
+  en: string;
+  pt: string
+};
+
 export type TVariations = {
-  name: string;
+  name: LocalizedString;
   options: {
-    label: string;
+    label: LocalizedString;
     price: number;
     stockQuantity: number;
     sku: string;
@@ -14,16 +19,16 @@ export type TProduct = {
   _id?: string;
   productId: string;
   sku: string;
-  name: string;
+  name: LocalizedString;
   slug: string;
-  description: string;
+  description: LocalizedString;
   isDeleted: boolean;
   isApproved: boolean;
   remarks?: string;
 
   category: {
     _id: string;
-    name: string;
+    name: LocalizedString;
   };
   subCategory?: string;
   brand?: string;
@@ -52,7 +57,10 @@ export type TProduct = {
     _id: string;
     businessDetails: {
       businessName: string;
-      businessType: string;
+      businessType: {
+        name: LocalizedString;
+        slug: string;
+      };
     };
     businessLocation: {
       latitude: number;
@@ -108,11 +116,11 @@ export type TRestrictedItem = {
   reason: string;
 
   category:
-    | "TOBACCO"
-    | "ALCOHOL"
-    | "ADULT_CONTENT"
-    | "DANGEROUS_GOODS"
-    | "OTHER";
+  | "TOBACCO"
+  | "ALCOHOL"
+  | "ADULT_CONTENT"
+  | "DANGEROUS_GOODS"
+  | "OTHER";
 
   createdAt: string;
   updatedAt: string;

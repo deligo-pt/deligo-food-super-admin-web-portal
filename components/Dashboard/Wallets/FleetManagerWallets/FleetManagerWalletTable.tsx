@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TFleetManagerWallet } from "@/types/wallet.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -34,6 +35,7 @@ interface IProps {
 }
 
 export default function FleetManagerWalletTable({ wallets }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -48,30 +50,30 @@ export default function FleetManagerWalletTable({ wallets }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Wallet ID
+                {t("wallet_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <UserIcon className="w-4" />
-                Fleet Manager
+                {t("fleet_manager")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Balance
+                {t("balance")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Last Settlement
+                {t("last_settlement")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -82,7 +84,7 @@ export default function FleetManagerWalletTable({ wallets }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No wallets found
+                {t("no_wallets_found")}
               </TableCell>
             </TableRow>
           )}
@@ -108,7 +110,7 @@ export default function FleetManagerWalletTable({ wallets }: IProps) {
                   </div>
                 </div>
               </TableCell>
-              <TableCell>€{formatPrice(w.totalUnpaidEarnings || 0)}</TableCell>
+              <TableCell>€{formatPrice(w.currentBalance || 0)}</TableCell>
               <TableCell>
                 {w.lastSettlementDate
                   ? format(w.lastSettlementDate, "do MMM yyyy")
@@ -127,7 +129,7 @@ export default function FleetManagerWalletTable({ wallets }: IProps) {
                         )
                       }
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

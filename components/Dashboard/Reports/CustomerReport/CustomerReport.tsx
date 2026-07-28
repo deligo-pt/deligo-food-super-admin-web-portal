@@ -9,6 +9,7 @@ import {
   SelectDateRangeFilter,
 } from "@/components/Filtering/SelectDateRangeFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { ICustomerReportAnalytics } from "@/types/report.type";
 import { generateCustomerReportCSV } from "@/utils/csv/customerReportCSV";
 import { formatPrice } from "@/utils/formatPrice";
@@ -23,6 +24,7 @@ interface IProps {
 }
 
 export function CustomerReport({ customerReportAnalytics }: IProps) {
+  const {t} = useTranslation();
   const searchParams = useSearchParams();
   const currentTimeframe = searchParams.get("timeframe") || "";
   const [isCustomDate, setIsCustomDate] = useState(
@@ -34,13 +36,13 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
       <div>
         {/* Header */}
         <TitleHeader
-          title="Customer Report"
-          subtitle="Overview of all registered customers and their activity"
+          title={t("customer_report")}
+          subtitle={t("overview_of_all_registered_customers_activity")}
           extraComponent={
             <div className="flex items-center gap-3">
               {/* Date Filter */}
               <SelectDateRangeFilter
-                placeholder="Select Date Range"
+                placeholder={t("select_date_range")}
                 onCustomRangeSelect={() => setIsCustomDate(true)}
               />
 
@@ -64,25 +66,25 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatsCard
-            title="Total Customers"
+            title={t("total_customers")}
             value={customerReportAnalytics.stats?.totalCustomers || 0}
             icon={User}
             delay={0}
           />
           <StatsCard
-            title="Active Customers"
+            title={t("active_customers")}
             value={customerReportAnalytics.stats?.activeCustomers || 0}
             icon={Heart}
             delay={0.1}
           />
           <StatsCard
-            title="Total Orders"
+            title={t("total_orders")}
             value={customerReportAnalytics.stats?.totalOrders || 0}
             icon={ShoppingBag}
             delay={0.2}
           />
           <StatsCard
-            title="Total Spent"
+            title={t("total_spent")}
             value={`€${formatPrice(customerReportAnalytics.stats?.totalSpent || 0)}`}
             icon={EuroIcon}
             delay={0.3}
@@ -92,11 +94,11 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
         {/* Charts */}
         <CustomizedCharts
           type="area"
-          title="Customer Growth"
-          description="New customer registrations over time"
+          title={t("customer_growth")}
+          description={t("new_customer_registration_over_time")}
           data={customerReportAnalytics.customerGrowth || []}
-          xLabel="Time"
-          yLabel="No of Customers"
+          xLabel={t("time")}
+          yLabel={t("no_of_customers")}
           delay={0.2}
         />
 
@@ -116,7 +118,7 @@ export function CustomerReport({ customerReportAnalytics }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4">
-            Status Distribution
+            {t("status_distribution")}
           </h3>
           <div className="space-y-3">
             <StatusDistributionCard

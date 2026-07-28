@@ -80,3 +80,12 @@ export const getAllOrders = async () => {
     };
   }
 };
+
+// refund order
+export const refundOrderReq = async (id: string) => {
+  const result = await catchAsync<TOrder>(async () => {
+    return await serverRequest.post(`/payment/reduniq/refund/${id}`);
+  });
+
+  return result;
+};

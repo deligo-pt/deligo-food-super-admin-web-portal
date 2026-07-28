@@ -1,6 +1,7 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { updatedIngredientOrderStatusReq } from "@/services/dashboard/ingredient/ingredient.service";
 import { TIngredientOrder } from "@/types/ingredient.type";
 import { formatPrice } from "@/utils/formatPrice";
@@ -26,6 +27,7 @@ interface IProps {
 }
 
 export default function IngredientOrderDetails({ order }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -104,8 +106,8 @@ export default function IngredientOrderDetails({ order }: IProps) {
     <div className="min-h-screen">
       {/* Header Layout Component handling Badge layout cleanly without literal string errors */}
       <TitleHeader
-        title={`Order #${order.orderId}`}
-        subtitle={`Placed on ${format(new Date(order.createdAt), "do MMM yyyy, hh:mm a")}`}
+        title={`${t("order")} #${order.orderId}`}
+        subtitle={`${"placed_on"} ${format(new Date(order.createdAt), "do MMM yyyy, hh:mm a")}`}
         onBackClick={() => router.back()}
       />
 
@@ -119,7 +121,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
           {/* Items Table */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex flex-row justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-900">Order Items</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t("order_items")}</h2>
               <div className="mt-2 mb-6">
                 {getStatusBadge(order.orderStatus)}
               </div>
@@ -128,10 +130,10 @@ export default function IngredientOrderDetails({ order }: IProps) {
               <table className="w-full">
                 <thead className="bg-gray-50 text-left">
                   <tr>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">Item</th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">Qty</th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Unit Price</th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">Total</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase">{t("item")}</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-center">{t("qty")}</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">{t("unit_price")}</th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase text-right">{t("total")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -139,7 +141,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
                     <tr key={idx}>
                       <td className="px-6 py-4">
                         <div className="font-medium text-gray-900">{item.name || item.ingredientId?.name}</div>
-                        <div className="text-xs text-gray-400 mt-0.5">SKU: {item.sku}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">{("sku")}: {item.sku}</div>
                         {/* Optional Bulk Discount Guard */}
                         {item.ingredientId?.bulkDiscount && item.ingredientId.bulkDiscount.length > 0 && (
                           <div className="mt-1 flex flex-wrap gap-1">
@@ -165,25 +167,25 @@ export default function IngredientOrderDetails({ order }: IProps) {
                 </tbody>
                 <tbody className="bg-gray-50/50 border-t border-gray-100 divide-y divide-gray-100">
                   <tr>
-                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">Product Discount</td>
+                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">{t("product_discount")}</td>
                     <td className="px-6 py-3 text-right text-sm font-medium text-gray-700">
                       -€{formatPrice(order.orderCalculation?.totalProductDiscount || 0)}
                     </td>
                   </tr>
                   <tr>
-                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">Tax amount ({order.orderDetails?.[0]?.taxRate || 0}%)</td>
+                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">{t("tax_amount")} ({order.orderDetails?.[0]?.taxRate || 0}%)</td>
                     <td className="px-6 py-3 text-right text-sm font-medium text-gray-700">
                       €{formatPrice(order.orderCalculation?.totalTaxAmount || 0)}
                     </td>
                   </tr>
                   <tr>
-                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">Delivery Charge</td>
+                    <td colSpan={3} className="px-6 py-3 text-right text-sm text-gray-500">{t("delivery_charge")}</td>
                     <td className="px-6 py-3 text-right text-sm font-medium text-gray-700">
                       €{formatPrice(order.delivery?.charge || 0)}
                     </td>
                   </tr>
                   <tr className="bg-gray-50">
-                    <td colSpan={3} className="px-6 py-4 text-right font-bold text-lg text-gray-900">Total</td>
+                    <td colSpan={3} className="px-6 py-4 text-right font-bold text-lg text-gray-900">{t("total")}</td>
                     <td className="px-6 py-4 text-right font-extrabold text-lg text-[#DC3173]">
                       €{formatPrice(order.grandTotal)}
                     </td>
@@ -195,7 +197,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
 
           {/* Timeline */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Order Timeline</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-6">{t("order_timeline")}</h2>
             <div className="space-y-6">
               {orderTimeline.map((step, index) => (
                 <div key={index} className="flex gap-4">
@@ -235,7 +237,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
         >
           {/* Vendor Info */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Vendor Details</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">{t("vendor_details")}</h2>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-full overflow-hidden shrink-0">
                 {order.vendorId?.profilePhoto ? (
@@ -257,7 +259,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
                   {order.vendorId?.businessDetails?.businessName || "N/A"}
                 </h3>
                 <p className="text-xs text-gray-400">
-                  Manager: {order.vendorId?.name?.firstName} {order.vendorId?.name?.lastName}
+                  {t("manager")}: {order.vendorId?.name?.firstName} {order.vendorId?.name?.lastName}
                 </p>
               </div>
             </div>
@@ -299,7 +301,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
             className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-500 transition-all disabled:opacity-50"
           >
             <TruckIcon size={18} />
-            Mark Shipped
+           {t("mark_shipped")}
           </button>
         )}
         {order.orderStatus === "SHIPPED" && (
@@ -309,7 +311,7 @@ export default function IngredientOrderDetails({ order }: IProps) {
             className="flex items-center gap-2 px-5 py-2.5 bg-[#DC3173] text-white rounded-xl font-medium hover:bg-[#DC3173]/90 transition-all disabled:opacity-50"
           >
             <TruckIcon size={18} />
-            Mark Delivered
+            {t("mark_delivered")}
           </button>
         )}
       </div>

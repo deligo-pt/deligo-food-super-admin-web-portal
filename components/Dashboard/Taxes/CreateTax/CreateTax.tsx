@@ -20,9 +20,12 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TAX_RATE } from "@/consts/tax.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { createTaxReq } from "@/services/dashboard/tax/tax.service";
+import { useStore } from "@/store/store";
 import { TTax } from "@/types/tax.type";
+import { translateObject } from "@/utils/translation/translationObject";
 import { taxValidation } from "@/validations/tax/tax.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -33,16 +36,28 @@ import z from "zod";
 type TaxForm = z.infer<typeof taxValidation>;
 
 export default function CreateTax() {
+  const { t } = useTranslation();
+  const { lang } = useStore();
   const form = useForm<TaxForm>({
     resolver: zodResolver(taxValidation),
-    defaultValues: {
-      taxName: "",
+    values: {
+      taxName: {
+        en: "",
+        pt: ""
+      },
       taxCode: "",
       taxRate: 0,
       countryID: "",
-      description: "",
+      description: {
+        en: "",
+        pt: ""
+      },
       taxExemptionCode: "",
-      taxExemptionReason: "",
+      taxExemptionReason: {
+        en: "",
+        pt: ""
+      },
+      currentLang: lang
     },
   });
 
@@ -51,7 +66,38 @@ export default function CreateTax() {
   const handleCreateTax = async (data: TaxForm) => {
     const toastId = toast.loading("Creating Tax...");
 
-    const result = await createTaxReq(data as Partial<TTax>);
+    const translated = await translateObject(data, lang);
+
+    if (!translated) {
+      toast.error("Translation failed", { id: toastId });
+      return;
+    };
+
+    const payload: Record<string, unknown> = {
+      taxName: translated?.taxName,
+      taxCode: data.taxCode,
+      taxRate: data.taxRate,
+      countryID: data.countryID,
+      description: translated?.description,
+      taxExemptionCode: data.taxExemptionCode,
+    };
+
+    const currentReasonValue = data.taxExemptionReason?.[lang as "en" | "pt"];
+
+    if (currentReasonValue && currentReasonValue.trim() !== "") {
+      const translatedReason = await translateObject(
+        { taxExemptionReason: data.taxExemptionReason },
+        lang
+      );
+
+      payload.taxExemptionReason = {
+        en: translatedReason?.taxExemptionReason?.en || data.taxExemptionReason.en,
+        pt: translatedReason?.taxExemptionReason?.pt || data.taxExemptionReason.pt,
+      };
+    }
+
+    const result = await createTaxReq(payload as Partial<TTax>);
+    console.log("rsult", result);
 
     if (result.success) {
       toast.success(result.message || "Tax created successfully!", {
@@ -74,22 +120,22 @@ export default function CreateTax() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <TitleHeader title="Create Tax" subtitle="Create a new tax rule" />
+        <TitleHeader title={t("create_tax")} subtitle={t("create_a_new_tax_rule")} />
         <Card className="py-0">
           <CardContent className="space-y-6 bg-white shadow-xl p-6 rounded-xl">
-            <h1 className="text-3xl font-extrabold text-[#DC3173]">Tax Form</h1>
+            <h1 className="text-3xl font-extrabold text-[#DC3173]">{t("tax_form")}</h1>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(handleCreateTax)}
                 className="space-y-8"
               >
                 <div className="grid lg:grid-cols-2 gap-6">
-                  <FormField
-                    name="taxName"
+                  {lang === "en" && <FormField
+                    name="taxName.en"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Name</FormLabel>
+                        <FormLabel>{t("tax_name")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -100,13 +146,30 @@ export default function CreateTax() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
+                  {lang === "pt" && <FormField
+                    name="taxName.pt"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("tax_name")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Tax Name"
+                            className="w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
                   <FormField
                     name="taxCode"
                     control={form.control}
                     render={({ field, fieldState }) => (
                       <FormItem>
-                        <FormLabel>Tax Code</FormLabel>
+                        <FormLabel>{t("tax_code")}</FormLabel>
                         <FormControl>
                           <Select
                             value={field.value}
@@ -144,7 +207,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Rate</FormLabel>
+                        <FormLabel>{t("tax_rate")}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -164,7 +227,7 @@ export default function CreateTax() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Country ID</FormLabel>
+                        <FormLabel>{t("country_id")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -176,12 +239,12 @@ export default function CreateTax() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    name="description"
+                  {lang === "en" && <FormField
+                    name="description.en"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem className="lg:col-span-2">
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{t("description")}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
@@ -192,13 +255,30 @@ export default function CreateTax() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
+                  {lang === "pt" && <FormField
+                    name="description.pt"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="lg:col-span-2">
+                        <FormLabel>{t("description")}</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Description"
+                            className="w-full h-20"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
                   <FormField
                     name="taxExemptionCode"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Exemption Code</FormLabel>
+                        <FormLabel>{t("tax_exemption_code")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -210,12 +290,12 @@ export default function CreateTax() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    name="taxExemptionReason"
+                  {lang === "en" && <FormField
+                    name="taxExemptionReason.en"
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tax Exemption Reason</FormLabel>
+                        <FormLabel>{t("tax_exemption_reason")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -226,14 +306,31 @@ export default function CreateTax() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  />}
+                  {lang === "pt" && <FormField
+                    name="taxExemptionReason.pt"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("tax_exemption_reason")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Tax Exemption Reason"
+                            className="w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />}
                 </div>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="bg-[#DC3173] text-white py-2 px-4 rounded-lg w-full"
                 >
-                  Create Tax
+                  {t("create_tax")}
                 </button>
               </form>
             </Form>

@@ -2,6 +2,7 @@
 
 import SOSActions from "@/components/Dashboard/SOS/SOSActions";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { TMeta } from "@/types";
 import { SOSType, TSOS } from "@/types/sos.type";
@@ -76,6 +77,8 @@ export function SOSDetailModal({
   SOSData,
   getSOSes,
 }: IProps) {
+  const { t } = useTranslation();
+
   if (!isOpen || !sectionType) return null;
 
   const getTitle = (type: SOSType) => {
@@ -129,7 +132,7 @@ export function SOSDetailModal({
                       {getTitle(sectionType)}
                     </h2>
                     <p className="text-sm text-gray-500">
-                      {SOSData?.meta?.total} active alerts
+                      {SOSData?.meta?.total} {t("active_alerts")}
                     </p>
                   </div>
                 </div>
@@ -156,10 +159,10 @@ export function SOSDetailModal({
                         className="mb-4 text-green-500 opacity-50"
                       />
                       <p className="text-lg font-medium">
-                        No active emergencies
+                        {t("no_active_emergencies")}
                       </p>
                       <p className="text-sm">
-                        All systems operational in this sector.
+                        {t("all_system_operational_sector")}
                       </p>
                     </div>
                   )}
@@ -185,7 +188,7 @@ export function SOSDetailModal({
                               className={cn(
                                 sos.status === "ACTIVE" && "bg-red-500",
                                 sos.status === "INVESTIGATING" &&
-                                  "bg-indigo-500",
+                                "bg-indigo-500",
                                 sos.status === "RESOLVED" && "bg-[#DC3173]",
                                 sos.status === "FALSE_ALARM" && "bg-yellow-500",
                               )}

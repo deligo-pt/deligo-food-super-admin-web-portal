@@ -16,8 +16,8 @@ export default async function DeliveredOrdersPage({ searchParams }: IProps) {
   return (
     <Orders
       ordersResult={ordersResult}
-      title="Delivered Orders"
-      subtitle="Successfully delivered orders are listed here."
+      title="delivered_orders"
+      subtitle="successfully_delivered_orders_listed"
     />
   );
 }

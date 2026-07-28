@@ -15,12 +15,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
-import { TFleetDocKey } from "@/types/document.type";
-import { TAgent } from "@/types/user.type";
+import { FLEET_REQUIRED_DOCS, TFleetDocKey } from "@/types/document.type";
+import { TAgent, TBusinessLocation } from "@/types/user.type";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -85,6 +88,8 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       city: fleetManager.businessLocation?.city || "",
       postalCode: fleetManager.businessLocation?.postalCode || "",
       country: fleetManager.businessLocation?.country || "",
+      latitude: fleetManager?.businessLocation?.latitude || 0,
+      longitude: fleetManager?.businessLocation?.longitude || 0,
       bankName: fleetManager.bankDetails?.bankName || "",
       accountHolderName: fleetManager.bankDetails?.accountHolderName || "",
       iban: fleetManager.bankDetails?.iban || "",
@@ -165,6 +170,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
         if (approveResult.success) {
           form.reset();
           router.refresh();
+          router.push(`/admin/agent/${fleetManager.userId}`)
           toast.success(
             approveResult.message || "Fleet manager updated successfully!",
             {
@@ -182,6 +188,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       }
 
       form.reset();
+      router.push(`/admin/agent/${fleetManager.userId}`)
       toast.success(
         updatedResult.message || "Fleet manager updated successfully!",
         {
@@ -204,11 +211,17 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
     }
   }, [form]);
 
+  const isDocumentsValid = FLEET_REQUIRED_DOCS.every(
+    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
+  );
+
+  const isSubmitDisabled = isSubmitting || !isDocumentsValid;
+
   return (
     <>
       <TitleHeader
-        title="Edit Fleet Manager Details"
-        subtitle="Update fleet manager details and information"
+        title={t("edit_fleet_manager_details")}
+        subtitle={t("update_fleet_manager_update_and_information")}
         onBackClick={() => router.back()}
       />
       <Form {...form}>
@@ -410,14 +423,29 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                           <FormField
                             control={form.control}
                             name="bankName"
-                            render={({ field }) => (
+                            render={({ field, fieldState }) => (
                               <FormItem>
                                 <FormLabel>{t("bank_name")}</FormLabel>
                                 <FormControl>
-                                  <Input
-                                    placeholder={t("bank_name")}
-                                    {...field}
-                                  />
+                                  <Select onValueChange={field.onChange} value={field.value || fleetManager?.bankDetails?.bankName || "undefined"}>
+                                    <SelectTrigger
+                                      className={cn(
+                                        "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
+                                        fieldState.invalid
+                                          ? "border-red-500"
+                                          : "border-gray-300",
+                                      )}
+                                    >
+                                      <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {bankNames.map((value) => (
+                                        <SelectItem key={value} value={value}>
+                                          {value}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -507,7 +535,9 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
 
                       <BusinessLocationMap
                         form={form}
+                        businessLocation={fleetManager.businessLocation as TBusinessLocation}
                         setLocationCoordinates={setLocationCoordinates}
+                        t={t}
                       />
                     </Card>
                   </motion.div>
@@ -534,6 +564,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                         fleetManagerId={fleetManager.userId}
                         previews={previews}
                         setPreviews={setPreviews}
+                        isSubmitting={isSubmitting}
                       />
                     </Card>
                   </motion.div>
@@ -548,7 +579,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
               <Button
                 className="px-8 py-2 text-white"
                 style={{ background: DELIGO }}
-                disabled={isSubmitting}
+                disabled={isSubmitDisabled}
               >
                 {t("submit_fleetManager")}
               </Button>

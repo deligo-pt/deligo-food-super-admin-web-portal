@@ -73,8 +73,8 @@ export const getAllBusinessCategoriesReq = async (
 
   if (result?.success)
     return {
-      data: result.data.data,
-      meta: result.data.meta,
+      data: result.data,
+      meta: result.meta,
     };
 
   return {

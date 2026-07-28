@@ -1,8 +1,14 @@
 "use client";
 
+import DeleteModal from "@/components/Modals/DeleteModal";
+import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
+import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { motion } from "framer-motion";
+import Image from "next/image"; // Import Next.js Image component
 import {
+  ArrowLeftCircle,
   CalendarIcon,
   CheckCircleIcon,
   ClockIcon,
@@ -13,7 +19,9 @@ import {
   TrashIcon,
   XCircleIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface IProps {
   sponsorship: TSponsorship;
@@ -41,7 +49,11 @@ const sponsorTypeConfig = {
 };
 
 export function SponsorshipDetails({ sponsorship }: IProps) {
+  const { t } = useTranslation();
+  const router = useRouter();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const config = sponsorTypeConfig[sponsorship.sponsorType];
   const IconComponent = config.icon;
@@ -62,6 +74,35 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
     (end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
   );
 
+  const closeDeleteModal = (open: boolean) => {
+    if (!open) {
+      setDeleteId("");
+    }
+  };
+
+  const deleteSponsorship = async () => {
+    const toastId = toast.loading("Deleting Sponsorship...");
+    setIsDeleting(true);
+
+    const result = await deleteSponsorshipReq(deleteId);
+
+    if (result.success) {
+      toast.success(result.message || "Sponsorship deleted successfully!", {
+        id: toastId,
+      });
+      router.refresh();
+      closeDeleteModal(false);
+      return;
+    }
+
+    toast.error(result.message || "Sponsorship delete failed", { id: toastId });
+    console.log(result);
+    setIsDeleting(false);
+  };
+
+  // Adjust URL
+  const targetUrl = sponsorship.url || "#";
+
   return (
     <div className="min-h-screen">
       <motion.div
@@ -72,6 +113,16 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           opacity: 1,
         }}
       >
+        <div className="mb-4">
+          <Button
+            onClick={() => router.back()}
+            variant="link"
+            className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
+          >
+            <ArrowLeftCircle /> {t("go_back")}
+          </Button>
+        </div>
+
         {/* Banner Hero */}
         <motion.div
           initial={{
@@ -84,33 +135,35 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           }}
           className="relative rounded-3xl overflow-hidden shadow-2xl mb-8"
         >
-          {/* Banner Image */}
+          {/* Banner Image Container */}
           <div className="relative aspect-21/9 bg-slate-100">
             {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <ImageIcon className="w-16 h-16 text-slate-300 animate-pulse" />
               </div>
             )}
-            <motion.img
-              src={sponsorship.bannerImage}
-              alt={sponsorship.sponsorName}
-              className="w-full h-full object-cover"
-              initial={{
-                opacity: 0,
-                scale: 1.1,
-              }}
-              animate={{
-                opacity: imageLoaded ? 1 : 0,
-                scale: 1,
-              }}
-              transition={{
-                duration: 0.6,
-              }}
-              onLoad={() => setImageLoaded(true)}
-            />
+
+            {/* Anchor tag to handle new tab navigation */}
+            <a
+              href={targetUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full h-full relative cursor-pointer group"
+            >
+              <Image
+                src={sponsorship.bannerImage}
+                alt={sponsorship.sponsorName}
+                fill
+                priority
+                sizes="(max-width: 1200px) 100vw, 1200px"
+                className={`object-cover transition-all duration-500 group-hover:scale-105 ${imageLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                  }`}
+                onLoad={() => setImageLoaded(true)}
+              />
+            </a>
 
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/50 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/50 to-transparent pointer-events-none" />
 
             {/* Status Badge */}
             <motion.div
@@ -125,10 +178,17 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
               transition={{
                 delay: 0.3,
               }}
-              className="absolute top-6 right-6"
+              className="absolute top-6 right-6 z-10"
             >
               <span
-                className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${isLive && sponsorship.isActive ? "bg-green-500 text-white" : isExpired ? "bg-slate-600 text-slate-300" : isUpcoming ? "bg-blue-500 text-white" : "bg-red-500 text-white"}`}
+                className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${isLive && sponsorship.isActive
+                  ? "bg-green-500 text-white"
+                  : isExpired
+                    ? "bg-slate-600 text-slate-300"
+                    : isUpcoming
+                      ? "bg-blue-500 text-white"
+                      : "bg-red-500 text-white"
+                  }`}
               >
                 {isLive && sponsorship.isActive ? (
                   <>
@@ -146,7 +206,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             </motion.div>
 
             {/* Content Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-8">
+            <div className="absolute bottom-0 left-0 right-0 p-8 pointer-events-none z-10">
               <motion.div
                 initial={{
                   opacity: 0,
@@ -199,11 +259,11 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             whileTap={{
               scale: 0.98,
             }}
-            // onClick={() => setShowDeleteConfirm(true)}
+            onClick={() => setDeleteId(sponsorship?._id)}
             className="bg-red-500 hover:bg-red-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors"
           >
             <TrashIcon className="w-4 h-4" />
-            Delete
+            {t("delete")}
           </motion.button>
         </motion.div>
 
@@ -226,7 +286,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-900 text-sm font-medium uppercase tracking-wider">
-                Status
+                {t("status")}
               </h3>
               {sponsorship.isActive ? (
                 <CheckCircleIcon className="w-5 h-5 text-[#DC3173]" />
@@ -239,10 +299,10 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             </p>
             <p className="text-slate-700 text-sm mt-1">
               {isLive
-                ? "Currently running"
+                ? t("currently_running")
                 : isExpired
-                  ? "Campaign ended"
-                  : "Scheduled to start"}
+                  ? t("campaign_ended")
+                  : t("scheduled_to_start")}
             </p>
           </motion.div>
 
@@ -263,17 +323,17 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-900 text-sm font-medium uppercase tracking-wider">
-                Duration
+                {t("duration")}
               </h3>
               <ClockIcon className="w-5 h-5 text-[#DC3173]" />
             </div>
-            <p className="text-2xl font-bold">{totalDays} Days</p>
+            <p className="text-2xl font-bold">{totalDays} {t("days")}</p>
             <p className="text-slate-700 text-sm mt-1">
               {isExpired
-                ? "Campaign completed"
+                ? t("campaign_completed")
                 : isUpcoming
-                  ? `Starts in ${Math.abs(daysElapsed)} days`
-                  : `${daysRemaining} days remaining`}
+                  ? `${t("starts_in")} ${Math.abs(daysElapsed)} ${t("days_sm")}`
+                  : `${daysRemaining} ${t("days_remaining")}`}
             </p>
           </motion.div>
 
@@ -294,12 +354,12 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-900 text-sm font-medium uppercase tracking-wider">
-                Type
+                {t("type")}
               </h3>
               <IconComponent className={`w-5 h-5 ${config.text}`} />
             </div>
             <p className="text-2xl font-bold">{sponsorship.sponsorType}</p>
-            <p className="text-slate-700 text-sm mt-1">Sponsorship category</p>
+            <p className="text-slate-700 text-sm mt-1">{t("sponsorship_category")}</p>
           </motion.div>
         </div>
 
@@ -320,7 +380,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
         >
           <h3 className="text-white font-semibold mb-8 flex items-center gap-2">
             <CalendarIcon className="w-5 h-5 text-[#DC3173]" />
-            Campaign Timeline
+            {t("campaign_timeline")}
           </h3>
 
           <div className="relative">
@@ -350,7 +410,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
               <div className="text-left">
                 <div className="w-4 h-4 rounded-full bg-[#DC3173] mb-3 shadow-lg shadow-[#DC3173]/50" />
                 <p className="text-slate-800 text-xs uppercase tracking-wider mb-1">
-                  Start
+                  {t("start")}
                 </p>
                 <p className="font-semibold">
                   {start.toLocaleDateString("en-US", {
@@ -374,9 +434,9 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
                     className="w-4 h-4 rounded-full bg-green-500 mb-3 mx-auto shadow-lg shadow-green-500/50"
                   />
                   <p className="text-slate-800 text-xs uppercase tracking-wider mb-1">
-                    Now
+                    {t("now")}
                   </p>
-                  <p className="text-green-400 font-semibold">Live</p>
+                  <p className="text-green-400 font-semibold">{t("live")}</p>
                 </div>
               )}
 
@@ -385,7 +445,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
                   className={`w-4 h-4 rounded-full mb-3 ml-auto ${isExpired ? "bg-slate-800" : "bg-slate-600"}`}
                 />
                 <p className="text-slate-800 text-xs uppercase tracking-wider mb-1">
-                  End
+                  {t("end")}
                 </p>
                 <p className="font-semibold">
                   {end.toLocaleDateString("en-US", {
@@ -413,7 +473,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           className="flex flex-wrap gap-6 text-sm text-slate-700"
         >
           <div>
-            <span className="text-slate-900">Created:</span>{" "}
+            <span className="text-slate-900">{t("created")}:</span>{" "}
             {new Date(sponsorship.createdAt).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
@@ -421,7 +481,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
             })}
           </div>
           <div>
-            <span className="text-slate-900">Last Updated:</span>{" "}
+            <span className="text-slate-900">{t("last_updated")}:</span>{" "}
             {new Date(sponsorship.updatedAt).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
@@ -430,6 +490,14 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Delete Modal */}
+      <DeleteModal
+        open={!!deleteId}
+        onOpenChange={closeDeleteModal}
+        onConfirm={deleteSponsorship}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

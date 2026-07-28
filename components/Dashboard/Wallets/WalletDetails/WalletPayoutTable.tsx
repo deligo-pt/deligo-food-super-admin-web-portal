@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TPayout } from "@/types/payout.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -20,6 +21,8 @@ interface IProps {
 }
 
 export default function WalletPayoutTable({ payouts }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -32,24 +35,24 @@ export default function WalletPayoutTable({ payouts }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Date
+                {t("date")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ShapesIcon className="w-4" />
-                IBAN
+                {t("iban")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Earnings Amount
+               {t("earnings_amount")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -60,7 +63,7 @@ export default function WalletPayoutTable({ payouts }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={4}
               >
-                No payouts found
+                {t("no_payouts_found")}
               </TableCell>
             </TableRow>
           )}
@@ -78,7 +81,7 @@ export default function WalletPayoutTable({ payouts }: IProps) {
                   className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"
                 >
                   <EyeIcon />
-                  Orders
+                  {t("orders_capital")}
                 </Button>
               </TableCell>
             </TableRow>

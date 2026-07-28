@@ -17,6 +17,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { TCuisine } from "@/types/cuisine.type";
+import { useStore } from "@/store/store";
 
 interface IProps {
     cuisine: TCuisine;
@@ -24,6 +25,7 @@ interface IProps {
 
 const CuisineDetails = ({ cuisine }: IProps) => {
     const { t } = useTranslation();
+    const { lang } = useStore();
     const router = useRouter();
 
     // Formatting timestamps cleanly for layout timelines
@@ -64,7 +66,7 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                             {t("id")}: {cuisine._id}
                         </span>
                         <h1 className="text-3xl font-bold mt-2 uppercase tracking-wide">
-                            {cuisine.name}
+                            {cuisine?.name?.[lang]}
                         </h1>
                         <p className="text-pink-100 mt-1 text-sm font-mono">
                             {t("slug")}: {cuisine.slug}
@@ -102,7 +104,7 @@ const CuisineDetails = ({ cuisine }: IProps) => {
                             {cuisine.imageUrl ? (
                                 <Image
                                     src={cuisine.imageUrl}
-                                    alt={cuisine.name}
+                                    alt={cuisine?.name?.[lang]}
                                     fill
                                     className="object-cover transition-transform duration-300 hover:scale-105"
                                     sizes="(max-w-768s) 100vw, 33vw"

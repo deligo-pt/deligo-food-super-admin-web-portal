@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -19,6 +21,8 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function ProductAlertCard({ product }: { product: TProduct }) {
+  const { t } = useTranslation();
+  const { lang } = useStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getProductAlertLevel = (
@@ -50,14 +54,14 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
     if (level === "Critical") {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">
-          <AlertCircle size={12} /> Critical (0 Stock)
+          <AlertCircle size={12} /> {t("critical")} (0 {t("stock")})
         </span>
       );
     }
     if (level === "Low") {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
-          <AlertTriangle size={12} /> Low Stock (≤10)
+          <AlertTriangle size={12} /> {t("low_stock")} (≤10)
         </span>
       );
     }
@@ -87,7 +91,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
           {product.images && product.images.length > 0 ? (
             <Image
               src={product.images?.[0]}
-              alt={product.name}
+              alt={product.name?.[lang]}
               className="w-full h-full object-cover"
               width={64}
               height={64}
@@ -103,14 +107,14 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
             <h3 className="text-lg font-bold text-gray-900 truncate">
-              {product.name}
+              {product.name?.[lang]}
             </h3>
             {alertBadge(getProductAlertLevel(product))}
           </div>
 
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded">
-              {product.category.name}
+              {product.category.name?.[lang]}
             </span>
             <span className="text-xs text-gray-600 flex items-center gap-1">
               <Store size={12} />{" "}
@@ -122,7 +126,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
           {(product?.stock && !product.stock.hasVariations) && (
             <div className="mt-4">
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-gray-500 font-medium">Current Stock</span>
+                <span className="text-gray-500 font-medium">{t("current_stock")}</span>
                 <span
                   className={`font-bold ${product.stock.quantity === 0 ? "text-red-600" : "text-amber-600"}`}
                 >
@@ -147,7 +151,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
               className="mt-2 flex items-center gap-1.5 text-sm font-medium text-[#DC3173] hover:text-[#DC3173]/80 transition-colors"
             >
               <Layers size={16} />
-              View Variation Stock
+              {t("view_variation_stock")}
               {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
           )}
@@ -179,7 +183,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
                   className="bg-white rounded-xl border border-gray-200 p-4"
                 >
                   <h4 className="text-sm font-bold text-gray-900 mb-3">
-                    {variation.name}
+                    {variation.name?.[lang]}
                   </h4>
                   <div className="space-y-2">
                     {variation.options.map((option, oIdx) => {
@@ -194,7 +198,7 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
                         >
                           <div className="flex items-center gap-3">
                             <span className="font-medium text-gray-700">
-                              {option.label}
+                              {option.label?.[lang]}
                             </span>
                             <span className="text-xs font-mono text-gray-400">
                               {option.sku}
@@ -204,11 +208,11 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
                             <span
                               className={`font-bold ${isCritical ? "text-red-600" : isLow ? "text-amber-600" : "text-green-600"}`}
                             >
-                              {option.stockQuantity} in stock
+                              {option.stockQuantity} {t("in_stock")}
                             </span>
                             {isCritical && (
                               <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">
-                                Out of Stock
+                                {t("out_of_stock")}
                               </span>
                             )}
                           </div>

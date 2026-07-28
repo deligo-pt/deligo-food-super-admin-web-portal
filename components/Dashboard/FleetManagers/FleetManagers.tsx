@@ -6,9 +6,11 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TMeta } from "@/types";
 import { TAgent } from "@/types/user.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,12 +23,7 @@ interface IProps {
   subtitle?: string;
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 const filterOptions = [
   {
@@ -65,7 +62,9 @@ export default function FleetManagers({
   title,
   subtitle,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = getSortOptions(t, sortFields);
   const [statusInfo, setStatusInfo] = useState({
     agentId: "",
     agentName: "",
@@ -114,10 +113,10 @@ export default function FleetManagers({
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title={title}
-        subtitle={subtitle}
+        title={t(`${title}`)}
+        subtitle={t(`${subtitle}`)}
         buttonInfo={{
-          text: "Add Fleet Manager",
+          text: t("add_fleet_manager"),
           onClick: () => router.push("/admin/add-fleet-manager"),
         }}
       />

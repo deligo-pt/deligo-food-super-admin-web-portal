@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import { MapPin, PackageIcon } from "lucide-react";
 
@@ -14,6 +15,8 @@ export default function OrderReportZoneCard({
   orders,
   delay = 0,
 }: IProps) {
+  const {t} = useTranslation();
+
   return (
     <motion.div
       initial={{
@@ -54,7 +57,7 @@ export default function OrderReportZoneCard({
         </div>
 
         <div className="bg-gray-50 rounded-lg p-3">
-          <p className="text-xs text-gray-500 mb-1">Orders</p>
+          <p className="text-xs text-gray-500 mb-1">{t("orders_lg")}</p>
           <div className="flex items-center gap-1.5">
             <PackageIcon size={16} className="text-[#DC3173]" />
             <p className="font-semibold text-gray-800">{orders}</p>

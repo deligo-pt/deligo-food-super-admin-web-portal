@@ -21,7 +21,7 @@ export const getAllPayoutsReq = async <T>(
   const page = Number(queries.page || 1);
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
-  const status = queries.status || "PAID";
+  const status = queries.status || "";
   const userId = queries.userId;
   const userModel = (queries.userModel || "Vendor") as
     | "Vendor"

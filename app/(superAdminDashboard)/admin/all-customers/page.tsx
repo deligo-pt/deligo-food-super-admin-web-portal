@@ -13,8 +13,8 @@ export default async function AllCustomersPage({ searchParams }: IProps) {
     <Customers
       customersResult={customersResult}
       showFilters={true}
-      title="All Customers"
-      subtitle="Manage all registered customers"
+      title="all_customers"
+      subtitle="manage_all_registered_customers"
     />
   );
 }

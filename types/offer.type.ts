@@ -1,9 +1,17 @@
+import { TVendor } from "./user.type";
+
 type TOfferType = "PERCENT" | "FLAT" | "FREE_DELIVERY" | "BOGO";
 
 export type TOffer = {
   _id: string;
-  title: string;
-  description?: string;
+  title: {
+    en?: string;
+    pt?: string;
+  };
+  description?: {
+    en?: string;
+    pt?: string;
+  };
   // Offer type
   offerType: TOfferType;
   // Discount values
@@ -22,7 +30,7 @@ export type TOffer = {
   expiresAt: Date;
 
   // Eligibility
-  vendorId?: string | null; // null = global offer
+  vendorId?: Partial<TVendor>;
   minOrderAmount?: number;
 
   // Auto apply or manual code (optional)

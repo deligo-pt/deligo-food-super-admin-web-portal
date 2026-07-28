@@ -30,7 +30,7 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
-import { TFleetDocKey } from "@/types/document.type";
+import { FLEET_REQUIRED_DOCS, TFleetDocKey } from "@/types/document.type";
 import { TAgent } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
@@ -45,7 +45,6 @@ import {
   EyeOff,
   FileText,
   Mail,
-  UserIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -55,6 +54,7 @@ import { toast } from "sonner";
 import z from "zod";
 import { cn } from "@/lib/utils";
 import { USER_ROLE } from "@/consts/user.const";
+import { bankNames } from "@/consts/bankNames.const";
 
 const DELIGO = "#DC3173";
 
@@ -112,6 +112,8 @@ export default function AddFleetManager() {
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
       bankName: "",
       accountHolderName: "",
       iban: "",
@@ -260,6 +262,8 @@ export default function AddFleetManager() {
             id: toastId,
           },
         );
+        setEmail("");
+        setPassword("");
         return;
       }
 
@@ -283,12 +287,11 @@ export default function AddFleetManager() {
     }
   }, [timer]);
 
-  useEffect(() => {
-    const currentPhone = form.getValues("phoneNumber");
-    if (!currentPhone) {
-      form.setValue("phoneNumber", "+351", { shouldValidate: true });
-    }
-  }, [form]);
+  const isDocumentsValid = FLEET_REQUIRED_DOCS.every(
+    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
+  );
+
+  const isSubmitDisabled = isSubmitting || !isDocumentsValid;
 
   return (
     <Form {...form}>
@@ -298,7 +301,7 @@ export default function AddFleetManager() {
       >
         <TitleHeader
           title={t("add_new_fleet_manager")}
-          subtitle="Add a new fleet manager here"
+          subtitle={t("add_a_new_fleet_manager_here")}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -327,7 +330,7 @@ export default function AddFleetManager() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -341,7 +344,7 @@ export default function AddFleetManager() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -351,7 +354,7 @@ export default function AddFleetManager() {
                   />
 
                   <div>
-                    <Label>{t("email")}</Label>
+                    <Label>{t("email")} <span className="text-red-600">*</span></Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
@@ -389,41 +392,6 @@ export default function AddFleetManager() {
                     </div>
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field, fieldState }) => (
-                      <FormItem className="content-start">
-                        <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
-                          <div className="flex items-center">
-                            <UserIcon className="w-5 h-5 text-[#DC3173]" />
-                            <span className="ml-2">{t("gender")}</span>
-                          </div>
-                        </FormLabel>
-                        <FormControl>
-                          <Select onValueChange={field.onChange} value={field.value}>
-                            <SelectTrigger
-                              className={cn(
-                                "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
-                                fieldState.invalid
-                                  ? "border-red-500"
-                                  : "border-gray-300",
-                              )}
-                            >
-                              <SelectValue placeholder="Select Gender" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="MALE">{t("male")}</SelectItem>
-                              <SelectItem value="FEMALE">{t("female")}</SelectItem>
-                              <SelectItem value="OTHER">{t("other")}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   {otpSent && !emailVerified && (
                     <div>
                       <Label className="mb-2">{t("otp")}</Label>
@@ -432,10 +400,11 @@ export default function AddFleetManager() {
                           placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
+                          maxLength={4}
                         />
                         <Button
                           type="button"
-                          disabled={buttonDisabled === 3}
+                          disabled={buttonDisabled === 3 || otp.length < 4}
                           style={{ background: DELIGO }}
                           onClick={verifyOtp}
                           className="w-32"
@@ -448,7 +417,7 @@ export default function AddFleetManager() {
                   )}
 
                   <div>
-                    <Label className="mb-2">{t("password")}</Label>
+                    <Label className="mb-2">{t("password")} <span className="text-red-600">*</span></Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
@@ -472,7 +441,7 @@ export default function AddFleetManager() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
+                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -549,7 +518,7 @@ export default function AddFleetManager() {
                           name="businessName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("business_name")}</FormLabel>
+                              <FormLabel>{t("business_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("business_name")}
@@ -567,7 +536,7 @@ export default function AddFleetManager() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                {t("business_license_number")}
+                                {t("business_license_number")} <span className="text-red-600">*</span>
                               </FormLabel>
                               <FormControl>
                                 <Input
@@ -605,14 +574,29 @@ export default function AddFleetManager() {
                         <FormField
                           control={form.control}
                           name="bankName"
-                          render={({ field }) => (
+                          render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("bank_name")}</FormLabel>
+                              <FormLabel>{t("bank_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder={t("bank_name")}
-                                  {...field}
-                                />
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <SelectTrigger
+                                    className={cn(
+                                      "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
+                                      fieldState.invalid
+                                        ? "border-red-500"
+                                        : "border-gray-300",
+                                    )}
+                                  >
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {bankNames.map((value) => (
+                                      <SelectItem key={value} value={value}>
+                                        {value}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -624,7 +608,7 @@ export default function AddFleetManager() {
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("account_holder_name")}</FormLabel>
+                              <FormLabel>{t("account_holder_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
@@ -641,7 +625,7 @@ export default function AddFleetManager() {
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("iban")}</FormLabel>
+                              <FormLabel>{t("iban")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input placeholder={t("iban")} {...field} />
                               </FormControl>
@@ -655,7 +639,7 @@ export default function AddFleetManager() {
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("swift_code")}</FormLabel>
+                              <FormLabel>{t("swift_code")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("swift_code")}
@@ -701,6 +685,7 @@ export default function AddFleetManager() {
                     <BusinessLocationMap
                       form={form}
                       setLocationCoordinates={setLocationCoordinates}
+                      t={t}
                     />
                   </Card>
                 </motion.div>
@@ -727,6 +712,7 @@ export default function AddFleetManager() {
                       fleetManagerId={fleetManagerId}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>
@@ -741,7 +727,7 @@ export default function AddFleetManager() {
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
-              disabled={isSubmitting}
+              disabled={isSubmitDisabled}
             >
               {t("submit_fleetManager")}
             </Button>

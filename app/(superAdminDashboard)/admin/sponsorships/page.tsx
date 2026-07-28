@@ -12,8 +12,8 @@ export default async function SponsorshipPage({ searchParams }: IProps) {
   return (
     <Sponsorships
       sponsorshipsResult={sponsorshipsResult}
-      title="All Sponsorships"
-      subtitle=" Manage all sponsorships here"
+      title="all_sponsorships"
+      subtitle="manage_all_sponsorships_here"
     />
   );
 }

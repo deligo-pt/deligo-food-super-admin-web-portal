@@ -16,7 +16,7 @@ import {
   UploadCloud,
 } from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 type DocKey =
@@ -34,67 +34,70 @@ export default function UploadPartnerDocuments({
   partnerId,
   previews,
   setPreviews,
+  isSubmitting
 }: {
   partnerId: string;
   previews: Record<TPartnerDocKey, TFilePreview | null>;
   setPreviews: React.Dispatch<
     React.SetStateAction<Record<TPartnerDocKey, TFilePreview | null>>
   >;
+  isSubmitting: boolean;
 }) {
   const { t } = useTranslation();
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const [processing, setProcessing] = useState(false);
 
   const DOCUMENTS: {
     key: DocKey;
     label: string;
     prefersImagePreview: boolean;
   }[] = [
-    {
-      key: "idProofFront",
-      label: t("id_proof_front"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "idProofBack",
-      label: t("id_proof_back"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "drivingLicenseFront",
-      label: "Driving License Front",
-      prefersImagePreview: true,
-    },
-    {
-      key: "drivingLicenseBack",
-      label: "Driving License Back",
-      prefersImagePreview: true,
-    },
-    {
-      key: "vehicleRegistration",
-      label: t("vehicle_registration"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "criminalRecordCertificate",
-      label: t("criminal_record_certification"),
-      prefersImagePreview: true,
-    },
-    {
-      key: "activity",
-      label: "Activity",
-      prefersImagePreview: false,
-    },
-    {
-      key: "insurancePolicy",
-      label: "Insurance Policy",
-      prefersImagePreview: true,
-    },
-    {
-      key: "myPhoto",
-      label: "My Photo",
-      prefersImagePreview: true,
-    },
-  ];
+      {
+        key: "idProofFront",
+        label: t("id_proof_front"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "idProofBack",
+        label: t("id_proof_back"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "drivingLicenseFront",
+        label: t("driving_license_front"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "drivingLicenseBack",
+        label: t("driving_license_back"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "vehicleRegistration",
+        label: t("vehicle_registration"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "criminalRecordCertificate",
+        label: t("criminal_record_certification"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "activity",
+        label: t("activity"),
+        prefersImagePreview: false,
+      },
+      {
+        key: "insurancePolicy",
+        label: t("insurance_policy"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "myPhoto",
+        label: t("my_photo"),
+        prefersImagePreview: true,
+      },
+    ];
 
   const openPicker = (key: DocKey) => {
     const el = inputsRef.current[key];
@@ -105,9 +108,11 @@ export default function UploadPartnerDocuments({
     if (!f) return;
 
     const toastId = toast.loading("Uploading...");
+    setProcessing(true);
 
     if (f.size > 5 * 1024 * 1024) {
       toast.error("File size should be less than 5MB", { id: toastId });
+      setProcessing(false);
       return;
     }
 
@@ -146,12 +151,13 @@ export default function UploadPartnerDocuments({
           isImage,
         },
       }));
-
+      setProcessing(false);
       return;
     }
 
     toast.error(uploadResult.message || "File upload failed", { id: toastId });
     console.log(uploadResult);
+    setProcessing(false);
   };
 
   function getActualFileName(url: string): string {
@@ -177,18 +183,16 @@ export default function UploadPartnerDocuments({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.06 }}
-            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${
-              isSelected
-                ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
-                : "bg-white"
-            }`}
+            className={`flex items-center justify-between p-4 border rounded-xl shadow-sm hover:shadow-md transition-all ${isSelected
+              ? "border-[#DC3173]/30 bg-[#FFF7FB] w-full"
+              : "bg-white"
+              }`}
           >
             <div className="flex items-center gap-4 w-full">
               {!isSelected && (
                 <div
-                  className={`w-14 h-14 rounded-lg flex items-center justify-center ${
-                    isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
-                  }`}
+                  className={`w-14 h-14 rounded-lg flex items-center justify-center ${isSelected ? "bg-[#DC3173]/10" : "bg-gray-50"
+                    }`}
                 >
                   {d.prefersImagePreview ? (
                     <ImageIcon className="w-6 h-6 text-[#DC3173]" />
@@ -200,7 +204,7 @@ export default function UploadPartnerDocuments({
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
-                  {d.label}
+                  <p>{d.label} <span className="text-red-600">*</span></p>
                   {isSelected && (
                     <div>
                       <button
@@ -216,10 +220,11 @@ export default function UploadPartnerDocuments({
                       </button>
                       <button
                         type="button"
+                        disabled={isSubmitting || processing}
                         onClick={() => openPicker(d.key)}
                         className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
                       >
-                        <RefreshCcw className="w-3 h-3 text-[#DC3173]" /> Change
+                        <RefreshCcw className="w-3 h-3 text-[#DC3173]" /> {t("change")}
                       </button>
                     </div>
                   )}
@@ -271,9 +276,10 @@ export default function UploadPartnerDocuments({
             </div>
 
             {!isSelected && (
-              <div className="flex items-center justify-end gap-3 w-[170px]!">
+              <div className="flex items-center justify-end gap-3 w-42.5!">
                 <button
                   type="button"
+                  disabled={isSubmitting || processing}
                   onClick={() => openPicker(d.key)}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#DC3173] border border-[#DC3173]/20 hover:bg-[#DC3173]/5 transition"
                 >

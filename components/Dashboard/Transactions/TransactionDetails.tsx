@@ -1,6 +1,8 @@
 "use client";
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TTransaction } from "@/types/transaction.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -11,16 +13,19 @@ import {
   ArrowUpRightIcon,
   CheckCircle2Icon,
   CircleXIcon,
+  GiftIcon,
   InfoIcon,
+  PercentCircleIcon,
   ShoppingBagIcon,
   TagIcon,
   UserIcon,
+  WalletIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const typeConfig: Record<
-  string,
+  TTransaction['type'],
   {
     label: string;
     bg: string;
@@ -28,23 +33,86 @@ const typeConfig: Record<
     icon: React.ReactNode;
   }
 > = {
-  earning: {
-    label: "Earning",
+  // --- Payments & Earnings (Green) ---
+  ORDER_PAYMENT: {
+    label: "Order Payment",
+    bg: "bg-emerald-100",
+    text: "text-emerald-700",
+    icon: <ArrowUpRightIcon className="w-4 h-4" />,
+  },
+  VENDOR_EARNING: {
+    label: "Vendor Earning",
     bg: "bg-green-100",
     text: "text-green-700",
     icon: <ArrowUpRightIcon className="w-4 h-4" />,
   },
-  payout: {
-    label: "Payout",
-    bg: "bg-blue-100",
-    text: "text-blue-700",
+  FLEET_EARNING: {
+    label: "Fleet Earning",
+    bg: "bg-green-100",
+    text: "text-green-700",
     icon: <ArrowUpRightIcon className="w-4 h-4" />,
   },
-  fee: {
-    label: "Fee",
-    bg: "bg-red-100",
-    text: "text-red-700",
-    icon: <ArrowDownLeftIcon className="w-4 h-4" />,
+  DELIVERY_PARTNER_EARNING: {
+    label: "Delivery Partner Earning",
+    bg: "bg-green-100",
+    text: "text-green-700",
+    icon: <ArrowUpRightIcon className="w-4 h-4" />,
+  },
+
+  // --- Settlements & Payouts (Blue) ---
+  VENDOR_SETTLEMENT: {
+    label: "Vendor Settlement",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    icon: <WalletIcon className="w-4 h-4" />,
+  },
+  FLEET_SETTLEMENT: {
+    label: "Fleet Settlement",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    icon: <WalletIcon className="w-4 h-4" />,
+  },
+  DELIVERY_PARTNER_SETTLEMENT: {
+    label: "Delivery Settlement",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    icon: <WalletIcon className="w-4 h-4" />,
+  },
+
+  // --- Commissions & Charges (Purple/Indigo) ---
+  PLATFORM_COMMISSION: {
+    label: "Platform Commission",
+    bg: "bg-purple-100",
+    text: "text-purple-700",
+    icon: <PercentCircleIcon className="w-4 h-4" />,
+  },
+  PLATFORM_SERVICE_CHARGE: {
+    label: "Service Charge",
+    bg: "bg-indigo-100",
+    text: "text-indigo-700",
+    icon: <PercentCircleIcon className="w-4 h-4" />,
+  },
+  PLATFORM_TAX_COLLECTION: {
+    label: "Tax Collection",
+    bg: "bg-slate-100",
+    text: "text-slate-700",
+    icon: <PercentCircleIcon className="w-4 h-4" />,
+  },
+
+  // --- Expenses & Purchases (Red/Rose) ---
+  INGREDIENT_PURCHASE: {
+    label: "Ingredient Purchase",
+    bg: "bg-rose-100",
+    text: "text-rose-700",
+    icon: <ShoppingBagIcon className="w-4 h-4" />,
+  },
+
+  // --- Rewards & Bonuses (Amber/Orange) ---
+  REFERRAL_BONUS: {
+    label: "Referral Bonus",
+    bg: "bg-amber-100",
+    text: "text-amber-700",
+    icon: <GiftIcon className="w-4 h-4" />,
   },
 };
 
@@ -53,11 +121,11 @@ export default function TransactionDetails({
 }: {
   transaction: TTransaction;
 }) {
+  const { t } = useTranslation();
+  const { lang } = useStore();
   const router = useRouter();
 
-  console.log(transaction);
-
-  const config = typeConfig[transaction.type] || typeConfig.earning;
+  const config = typeConfig[transaction.type];
 
   const containerVariants = {
     hidden: {
@@ -87,9 +155,11 @@ export default function TransactionDetails({
     },
   } as Variants;
 
+  const isSettlmentTrx = transaction.type === 'VENDOR_SETTLEMENT' || transaction.type === 'FLEET_SETTLEMENT' || transaction.type === 'DELIVERY_PARTNER_SETTLEMENT';
+
   return (
     <motion.div
-      className="min-h-screen p-6 space-y-6"
+      className="min-h-screen space-y-6"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -101,14 +171,14 @@ export default function TransactionDetails({
           className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium"
         >
           <ArrowLeftIcon className="w-4 h-4" />
-          Back to Transactions
+          {t("back_to_transactions")}
         </button>
       </motion.div>
 
       {/* Header */}
       <TitleHeader
-        title="Transaction Details"
-        subtitle="Full details of the transaction"
+        title={t("transactions_details")}
+        subtitle={t("full_details_of_the_transaction")}
       />
 
       {/* Hero */}
@@ -135,7 +205,7 @@ export default function TransactionDetails({
                   {config.label}
                 </span>
                 <span className="text-gray-400 text-xs font-mono">
-                  ID: {transaction.transactionId}
+                  {t("id")}: {transaction.transactionId}
                 </span>
               </div>
               <p className="text-xl font-bold text-gray-900">
@@ -170,8 +240,45 @@ export default function TransactionDetails({
         </div>
       </motion.div>
 
+      {/* settlement details */}
+      {isSettlmentTrx && <motion.div
+        variants={itemVariants}
+        className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+      >
+        <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <ShoppingBagIcon className="w-4 h-4 text-[#DC3173]" />
+          {t("settlement_details")}
+        </h3>
+        <div className="space-y-3">
+          {[
+            {
+              label: t("type"),
+              value: transaction.type,
+            },
+            {
+              label: t("payment_method"),
+              value: transaction.paymentMethod,
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="flex justify-between items-start py-2 border-b border-gray-50 last:border-0 gap-4"
+            >
+              <span className="text-xs text-gray-400 uppercase tracking-wide font-semibold shrink-0">
+                {item.label}
+              </span>
+              <span
+                className={`text-sm text-gray-900 font-medium text-right`}
+              >
+                {item.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </motion.div>}
+
       {/* Two-column */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {!isSettlmentTrx && <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Order Details */}
         <motion.div
           variants={itemVariants}
@@ -179,25 +286,25 @@ export default function TransactionDetails({
         >
           <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
             <ShoppingBagIcon className="w-4 h-4 text-[#DC3173]" />
-            Order Details
+            {t("order_details")}
           </h3>
           <div className="space-y-3">
             {[
               {
-                label: "Order ID",
+                label: t("order_id"),
                 value: `#${transaction.orderId}`,
                 mono: true,
               },
               {
-                label: "Order Total",
+                label: t("order_total"),
                 value: `€${formatPrice(transaction.items?.reduce((acc, item) => acc + item.price * item.qty, 0) || 0)}`,
               },
               {
-                label: "Payment Method",
+                label: t("payment_method"),
                 value: transaction.paymentMethod,
               },
               {
-                label: "Delivery Address",
+                label: t("delivery_address"),
                 value: transaction.deliveryAddress,
               },
             ].map((item) => (
@@ -225,7 +332,7 @@ export default function TransactionDetails({
         >
           <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
             <UserIcon className="w-4 h-4 text-[#DC3173]" />
-            Customer
+            {t("customer")}
           </h3>
           <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl mb-4">
             <div className="w-12 h-12 bg-[#DC3173]/10 rounded-full flex items-center justify-center">
@@ -233,8 +340,8 @@ export default function TransactionDetails({
             </div>
             <div>
               <p className="font-bold text-gray-900">
-                {transaction.customer?.name?.firstName}{" "}
-                {transaction.customer?.name?.lastName}
+                {transaction.customer?.name?.firstName || "N/"}{" "}
+                {transaction.customer?.name?.lastName || "A"}
               </p>
               <p className="text-sm text-gray-400">
                 {transaction.customer?.contactNumber || "-"}
@@ -244,11 +351,11 @@ export default function TransactionDetails({
           <div className="space-y-3">
             {[
               {
-                label: "Payment",
+                label: t("payment"),
                 value: transaction.paymentMethod,
               },
               {
-                label: "Status",
+                label: t("status"),
                 value: "Verified Customer",
               },
             ].map((item) => (
@@ -266,16 +373,16 @@ export default function TransactionDetails({
             ))}
           </div>
         </motion.div>
-      </div>
+      </div>}
 
       {/* Items Ordered */}
-      <motion.div
+      {(transaction?.items && transaction?.items?.length > 0) && <motion.div
         variants={itemVariants}
         className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
       >
         <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
           <TagIcon className="w-4 h-4 text-[#DC3173]" />
-          Items Ordered
+          {t("items_ordered")}
         </h3>
         <div className="space-y-2 mb-4">
           {transaction.items?.map((item, i) => (
@@ -288,7 +395,7 @@ export default function TransactionDetails({
                   x{item.qty}
                 </span>
                 <span className="text-sm font-medium text-gray-900">
-                  {item.name}
+                  {item.name?.[lang]}
                 </span>
               </div>
               <span className="text-sm font-bold text-gray-900">
@@ -318,7 +425,7 @@ export default function TransactionDetails({
             </span>
           </div>
         </div> */}
-      </motion.div>
+      </motion.div>}
     </motion.div>
   );
 }

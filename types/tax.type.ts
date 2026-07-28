@@ -1,14 +1,23 @@
 export type TTax = {
   _id: string;
-  taxName: string;
+  taxName: {
+    en: string;
+    pt: string;
+  };
   taxCode: "NOR" | "INT" | "RED" | "ISE";
   taxRate: 6 | 13 | 23 | 0;
   countryID: string;
   TaxRegionID?: string;
   taxGroupID: string;
-  description: string;
+  description: {
+    en: string;
+    pt: string;
+  };
   taxExemptionCode?: string;
-  taxExemptionReason?: string;
+  taxExemptionReason?: {
+    en: string;
+    pt: string;
+  };
   isActive: boolean;
   isDeleted: boolean;
 };

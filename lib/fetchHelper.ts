@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
@@ -7,17 +7,16 @@ const backendUrl =
   "http://localhost:5000/api/v1";
 
 async function createHeaders(
+  lang: string,
   headers?: HeadersInit
 ) {
   const cookieStore = await cookies();
-
   const accessToken = cookieStore.get("accessToken")?.value || "";
-
   const cookieStr = cookieStore.toString();
 
   return {
     ...headers,
-
+    "Accept-Language": lang,
     ...(accessToken && {
       Authorization: `Bearer ${accessToken}`,
     }),
@@ -32,6 +31,28 @@ async function serverFetchHelper(
   endPoint: string,
   options: RequestInit = {},
 ): Promise<Response> {
+  let activeLang: string = "en";
+
+  try {
+    const targetUrlParams = new URLSearchParams(endPoint.split("?")[1]);
+    if (targetUrlParams.has("lang")) {
+      activeLang = targetUrlParams.get("lang") || "en";
+    } else {
+      const headersList = await headers();
+      const referer = headersList.get("referer");
+
+      if (referer) {
+        const refererUrl = new URL(referer);
+        const langQuery = refererUrl.searchParams.get("lang");
+        if (langQuery === "en" || langQuery === "pt") {
+          activeLang = langQuery;
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Failed to parse language query inside serverFetch, defaulting to 'en'", e);
+  }
+
   try {
     const { headers, ...rest } = options;
 
@@ -40,7 +61,7 @@ async function serverFetchHelper(
       {
         ...rest,
         credentials: "include",
-        headers: await createHeaders(headers),
+        headers: await createHeaders(activeLang, headers),
       }
     );
 

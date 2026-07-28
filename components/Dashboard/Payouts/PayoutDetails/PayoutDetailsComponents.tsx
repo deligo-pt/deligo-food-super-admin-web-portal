@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TPayout } from "@/types/payout.type";
 import { TAgent, TVendor } from "@/types/user.type";
@@ -115,6 +116,7 @@ export const InfoRow = ({
 );
 
 export const RecipientCard = ({ payout }: { payout: TPayout }) => {
+  const { t } = useTranslation();
   if (payout.userModel === "Vendor") {
     const v = payout.userId as unknown as TVendor;
     // const fullAddress = v.businessLocation
@@ -127,7 +129,7 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
           <div className="p-2 bg-[#DC3173]/10 rounded-xl text-[#DC3173]">
             <Store size={20} />
           </div>
-          <h2 className="text-lg font-bold text-gray-900">Vendor</h2>
+          <h2 className="text-lg font-bold text-gray-900">{t("vendor")}</h2>
         </div>
         <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
           <div className="w-12 h-12 rounded-full bg-[#DC3173]/10 flex items-center justify-center text-[#DC3173] font-extrabold text-lg">
@@ -140,22 +142,22 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
               {!v.name?.firstName && !v.name?.lastName && "Unknown"}
               {v.name?.firstName} {v.name?.lastName}
             </h3>
-            <p className="text-xs text-gray-500 font-mono">ID: {v.userId}</p>
+            <p className="text-xs text-gray-500 font-mono">{t("id")}: {v.userId}</p>
           </div>
         </div>
         <div className="space-y-4">
-          <InfoRow icon={<Mail size={16} />} label="Email" value={v.email} />
+          <InfoRow icon={<Mail size={16} />} label={t("email")} value={v.email} />
           {v.contactNumber && (
             <InfoRow
               icon={<Phone size={16} />}
-              label="Phone"
+              label={t("phone")}
               value={v.contactNumber}
             />
           )}
-          {v.businessDetails?.businessLicenseNumber && (
+           {v.businessDetails?.businessLicenseNumber && (
             <InfoRow
               icon={<Hash size={16} />}
-              label="License No."
+              label={t("license_no")}
               value={v.businessDetails.businessLicenseNumber}
             />
           )}
@@ -193,7 +195,7 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
           <div className="p-2 bg-blue-50 rounded-xl text-blue-600">
             <Truck size={20} />
           </div>
-          <h2 className="text-lg font-bold text-gray-900">Delivery Partner</h2>
+          <h2 className="text-lg font-bold text-gray-900">{t("delivery_partner")}</h2>
         </div>
         <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
           <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-extrabold text-lg">
@@ -201,22 +203,22 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
           </div>
           <div>
             <h3 className="font-bold text-gray-900">{fullName}</h3>
-            <p className="text-xs text-gray-500 font-mono">ID: {d.userId}</p>
+            <p className="text-xs text-gray-500 font-mono">{t("id")}: {d.userId}</p>
           </div>
         </div>
         <div className="space-y-4">
-          <InfoRow icon={<Mail size={16} />} label="Email" value={d.email} />
+          <InfoRow icon={<Mail size={16} />} label={t("email")} value={d.email} />
           {d.contactNumber && (
             <InfoRow
               icon={<Phone size={16} />}
-              label="Phone"
+              label={t("phone")}
               value={d.contactNumber}
             />
           )}
           {d.vehicleInfo?.vehicleType && (
             <InfoRow
               icon={<Truck size={16} />}
-              label="Vehicle"
+              label={t("vehicle")}
               value={d.vehicleInfo.vehicleType}
             />
           )}
@@ -254,7 +256,7 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
           <div className="p-2 bg-purple-50 rounded-xl text-purple-600">
             <User size={20} />
           </div>
-          <h2 className="text-lg font-bold text-gray-900">Fleet Manager</h2>
+          <h2 className="text-lg font-bold text-gray-900">{t("fleet_manager")}</h2>
         </div>
         <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
           <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 font-extrabold text-lg">
@@ -262,15 +264,15 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
           </div>
           <div>
             <h3 className="font-bold text-gray-900">{fullName}</h3>
-            <p className="text-xs text-gray-500 font-mono">ID: {f.userId}</p>
+            <p className="text-xs text-gray-500 font-mono">{t("id")}: {f.userId}</p>
           </div>
         </div>
         <div className="space-y-4">
-          <InfoRow icon={<Mail size={16} />} label="Email" value={f.email} />
+          <InfoRow icon={<Mail size={16} />} label={t("email")} value={f.email} />
           {f.contactNumber && (
             <InfoRow
               icon={<Phone size={16} />}
-              label="Phone"
+              label={t("phone")}
               value={f.contactNumber}
             />
           )}
@@ -289,6 +291,7 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
 };
 
 export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
+  const { t } = useTranslation();
   const steps = [
     {
       key: "PENDING",
@@ -311,7 +314,7 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-6">Payout Status</h2>
+      <h2 className="text-lg font-bold text-gray-900 mb-6">{t("payout_status")}</h2>
       <div className="space-y-0">
         {steps.map((step, index) => {
           const isDone = status === "PAID" || index < currentIndex;

@@ -183,6 +183,7 @@ export type TVendor = {
   businessDetails?: {
     businessName: string;
     businessType: string;
+    businessTypeSlug?: string;
     restaurantCuisineType?: string[];
     businessLicenseNumber?: string;
     NIF?: string;
@@ -379,3 +380,14 @@ export type TUserQueryParams = {
   searchTerm?: string;
   sortBy?: string;
 };
+
+export type TBusinessLocation = {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  geoAccuracy: number;
+}

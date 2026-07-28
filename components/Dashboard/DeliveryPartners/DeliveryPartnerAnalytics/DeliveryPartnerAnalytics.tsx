@@ -3,6 +3,7 @@
 import AnalyticsChart from "@/components/Dashboard/Performance/AnalyticsChart/AnalyticsChart";
 import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryPartnerAnalyticsData } from "@/types/analytics/delivery-partner-analytics.type";
 import { formatPrice } from "@/utils/formatPrice";
 import {
@@ -10,7 +11,6 @@ import {
   BarChart3,
   Clock,
   Euro,
-  Map,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -29,36 +29,36 @@ interface IProps {
 }
 
 export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
+  const { t } = useTranslation();
   const {
     summary,
     statusDistribution,
     workloadTrends,
     efficiencyByLevel,
-    zonePerformance,
   } = analyticsData;
 
   return (
-    <div className="min-h-screen bg-[#FBFBFE] p-6 space-y-8">
+    <div className="min-h-screen bg-[#FBFBFE] space-y-8">
       {/* Header */}
       <TitleHeader
-        title="Delivery Partner Analytics"
-        subtitle="Analyze partner availability, performance tiers, and regional distribution"
+        title={t("rider_analytics")}
+        subtitle={t("analyze_rider_availability_performance")}
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatsCard
-          title="Avg. Daily Active Hours"
+          title={t("avg_daily_active_hours")}
           value={`${summary.avgActiveHours}h`}
           icon={Clock}
         />
         <StatsCard
-          title="Partner Retention"
+          title={t("partner_retention")}
           value={`${summary.retentionRate}%`}
           icon={UserCheck}
         />
         <StatsCard
-          title="Avg. Partner Earnings"
+          title={t("avg_partner_earnings")}
           value={`€${formatPrice(summary.avgEarningsPerPartner)}`}
           icon={Euro}
         />
@@ -70,7 +70,7 @@ export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
         <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm flex flex-col">
           <h3 className="font-bold text-slate-800 text-sm mb-6 flex items-center gap-2">
             <Users size={18} className="text-blue-500" />
-            Partner Availability
+            {t("partner_availability")}
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -118,7 +118,7 @@ export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
         <div className="lg:col-span-2 bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
           <h3 className="font-bold text-slate-800 text-sm mb-6 flex items-center gap-2">
             <BarChart3 size={18} className="text-[#DC3173]" />
-            Workload vs. Available Partners
+            {t("workload_vs_available_partners")}
           </h3>
           <AnalyticsChart
             data={workloadTrends}
@@ -131,12 +131,12 @@ export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
       </div>
 
       {/* Performance Tiers & Zones */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* Efficiency by Experience Tier */}
         <div className="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
           <h3 className="font-bold text-slate-800 text-sm mb-6 flex items-center gap-2">
             <Award size={18} className="text-amber-500" />
-            Completion Time by Partner Level
+            {t("completion_time_partner_level")}
           </h3>
           <AnalyticsChart
             data={efficiencyByLevel}
@@ -146,12 +146,12 @@ export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
             height={250}
           />
           <p className="text-[11px] text-slate-400 mt-4 italic text-center">
-            * Average time in minutes from order acceptance to delivery
+            * {t("average_time_in_minutes_from_order")}
           </p>
         </div>
 
         {/* Regional Distribution Grid */}
-        <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm space-y-4">
+        {/* <div className="bg-white p-6 rounded-xl border border-slate-100 shadow-sm space-y-4">
           <h3 className="font-bold text-slate-800 text-sm ml-2 flex items-center gap-2">
             <Map size={18} className="text-indigo-500" />
             Partner Zone Saturation
@@ -194,7 +194,7 @@ export default function DeliveryPartnerAnalytics({ analyticsData }: IProps) {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

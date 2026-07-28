@@ -17,17 +17,14 @@ const axiosInstance = axios.create({
 const createHeaders = async (
   options?: AxiosRequestConfig
 ) => {
-
   const cookieStore = await cookies();
-
-  const accessToken =
-    cookieStore.get("accessToken")?.value || "";
-
+  const accessToken = cookieStore.get("accessToken")?.value || "";
+  const activeLang = cookieStore.get("lang")?.value === "pt" ? "pt" : "en";
   const cookieStr = cookieStore.toString();
 
   return {
     ...(options?.headers || {}),
-
+    "Accept-Language": activeLang,
     ...(accessToken && {
       authorization: `Bearer ${accessToken}`,
     }),

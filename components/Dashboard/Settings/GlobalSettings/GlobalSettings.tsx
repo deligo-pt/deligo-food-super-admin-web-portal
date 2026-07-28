@@ -2,7 +2,6 @@
 
 import SettingsCard from "@/components/Dashboard/Settings/GlobalSettings/SettingsCard";
 import SettingsInput from "@/components/Dashboard/Settings/GlobalSettings/SettingsInput";
-import SettingsToggle from "@/components/Dashboard/Settings/GlobalSettings/SettingsToggle";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import {
   Form,
@@ -19,9 +18,8 @@ import {
 import { TGlobalSettings } from "@/types/global-settings.type";
 import { globalSettingsSchema } from "@/validations/settings/global-settings/global-settings.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  Activity,
   CheckCircle2,
   Clock,
   EuroIcon,
@@ -29,10 +27,9 @@ import {
   Package,
   Percent,
   Save,
-  Shield,
 } from "lucide-react";
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -54,56 +51,22 @@ export default function GlobalSettings({
       // delivery
       deliveryChargePerKm: settings?.delivery?.chargePerKm || 0,
       baseDeliveryCharge: settings?.delivery?.baseCharge || 0,
-      minDeliveryCharge: settings?.delivery?.minCharge || 0,
-      maxDeliveryCharge: settings?.delivery?.maxCharge || 0,
-      freeDeliveryAbove: settings?.delivery?.freeAbove || 0,
-      maxDeliveryDistanceKm: settings?.delivery?.maxDistanceKm || 0,
       deliveryVatRate: settings?.delivery?.vatRate || 0,
 
       // commission
       platformCommissionPercent: settings?.commission?.platformPercent || 0,
       platformVatRate: settings?.commission?.platformVatRate || 0,
-      deliveryPartnerCommissionPercent:
-        settings?.commission?.deliveryPartnerPercent || 0,
-      fleetManagerCommissionPercent:
-        settings?.commission?.fleetManagerPercent || 0,
-      vendorVatPercent: settings?.commission?.vendorVatPercent || 0,
+      fleetManagerCommissionPercent: settings?.commission?.fleetManagerPercent || 0,
       serviceCharge: settings?.commission?.serviceCharge || 0,
 
       // order
-      minOrderAmount: settings?.order?.minAmount || 0,
-      maxOrderAmount: settings?.order?.maxAmount || 0,
-      maxItemsPerOrder: settings?.order?.maxItemsPerOrder || 1,
-      customerNearestVendorRadiusKm:
-        settings?.order?.nearestVendorRadiusKm || 0,
+      customerNearestVendorRadiusKm: settings?.order?.nearestVendorRadiusKm || 0,
       cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
-      autoCancelUnacceptedOrderMinutes:
-        settings?.order?.autoCancelUnacceptedMinutes || 0,
-      autoMarkDeliveredAfterMinutes:
-        settings?.order?.autoMarkDeliveredMinutes || 0,
-
-      // system - otp
-      orderOtpEnabled: settings?.system?.otp?.enabled || false,
-      otpLength: settings?.system?.otp?.length || 0,
-      otpExpiryMinutes: settings?.system?.otp?.expiryMinutes || 0,
-
-      // system - others
-      isOfferEnabled: settings?.system?.isOfferEnabled || false,
-      isPlatformLive: settings?.system?.isPlatformLive || false,
-      maintenanceMessage: settings?.system?.maintenanceMessage || "",
-      refundProcessingDays: settings?.system?.refundProcessingDays || 0,
-      maxDiscountPercent: settings?.system?.maxDiscountPercent || 0,
 
       // ingredients and delivery charges
       deliveryChargeInsideLisbon: settings?.ingredientsOrder?.deliveryChargeInsideLisbon || 20,
       deliveryChargeOutsideLisbon: settings?.ingredientsOrder?.deliveryChargeOutsideLisbon || 30,
-      vatRate: settings?.ingredientsOrder?.vatRate || 23,
     },
-  });
-
-  const [watchIsPlatformLive] = useWatch({
-    control: form.control,
-    name: ["isPlatformLive"],
   });
 
   const onSubmit = async (data: TGlobalSettingsForm) => {
@@ -114,45 +77,21 @@ export default function GlobalSettings({
       delivery: {
         chargePerKm: data.deliveryChargePerKm,
         baseCharge: data.baseDeliveryCharge,
-        minCharge: data.minDeliveryCharge,
-        maxCharge: data.maxDeliveryCharge,
-        freeAbove: data.freeDeliveryAbove,
-        maxDistanceKm: data.maxDeliveryDistanceKm,
         vatRate: data.deliveryVatRate,
       },
       commission: {
         platformPercent: data.platformCommissionPercent,
         platformVatRate: data.platformVatRate,
-        deliveryPartnerPercent: data.deliveryPartnerCommissionPercent,
         fleetManagerPercent: data.fleetManagerCommissionPercent,
-        vendorVatPercent: data.vendorVatPercent,
         serviceCharge: data.serviceCharge,
       },
       order: {
-        minAmount: data.minOrderAmount,
-        maxAmount: data.maxOrderAmount,
-        maxItemsPerOrder: data.maxItemsPerOrder,
         nearestVendorRadiusKm: data.customerNearestVendorRadiusKm,
         cancelTimeLimitMinutes: data.cancelTimeLimitMinutes,
-        autoCancelUnacceptedMinutes: data.autoCancelUnacceptedOrderMinutes,
-        autoMarkDeliveredMinutes: data.autoMarkDeliveredAfterMinutes,
-      },
-      system: {
-        otp: {
-          enabled: data.orderOtpEnabled,
-          length: data.otpLength,
-          expiryMinutes: data.otpExpiryMinutes,
-        },
-        isOfferEnabled: data.isOfferEnabled,
-        isPlatformLive: data.isPlatformLive,
-        maintenanceMessage: data.maintenanceMessage,
-        refundProcessingDays: data.refundProcessingDays,
-        maxDiscountPercent: data.maxDiscountPercent,
       },
       ingredientsOrder: {
         deliveryChargeInsideLisbon: data.deliveryChargeInsideLisbon,
         deliveryChargeOutsideLisbon: data.deliveryChargeOutsideLisbon,
-        vatRate: data.vatRate
       }
     } as Partial<TGlobalSettings>;
 
@@ -232,130 +171,6 @@ export default function GlobalSettings({
 
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Platform Status */}
-            <div className="lg:col-span-2">
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  duration: 0.5,
-                }}
-                className={`
-                relative overflow-hidden rounded-2xl border transition-all duration-300
-                ${watchIsPlatformLive
-                    ? "bg-white border-gray-200 shadow-sm"
-                    : "bg-gray-900 border-gray-800 shadow-xl"
-                  }
-              `}
-              >
-                <div className="absolute top-0 right-0 p-32 bg-[#DC3173]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-
-                <div className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                  <div className="flex items-center gap-5">
-                    <div
-                      className={`
-                    p-4 rounded-2xl transition-colors duration-300
-                    ${watchIsPlatformLive
-                          ? "bg-green-100 text-green-600"
-                          : "bg-gray-800 text-gray-400"
-                        }
-                  `}
-                    >
-                      <Activity size={32} strokeWidth={2.5} />
-                    </div>
-                    <div>
-                      <h2
-                        className={`text-2xl font-bold ${watchIsPlatformLive ? "text-gray-900" : "text-white"
-                          }`}
-                      >
-                        {t("platform_status")}
-                      </h2>
-                      <p
-                        className={`mt-1 font-medium ${watchIsPlatformLive
-                          ? "text-gray-500"
-                          : "text-gray-400"
-                          }`}
-                      >
-                        {watchIsPlatformLive
-                          ? t("your_platform_currently_live")
-                          : t("platform_maintenance_mode")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <span
-                      className={`text-sm font-bold uppercase tracking-wider ${watchIsPlatformLive ? "text-green-600" : "text-gray-400"
-                        }`}
-                    >
-                      {watchIsPlatformLive ? t("live") : t("maintenance")}
-                    </span>
-                    <FormField
-                      control={form.control}
-                      name="isPlatformLive"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <SettingsToggle
-                              label=""
-                              checked={field.value}
-                              onChange={(val) => field.onChange(val)}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-
-                <AnimatePresence>
-                  {!watchIsPlatformLive && (
-                    <motion.div
-                      initial={{
-                        height: 0,
-                        opacity: 0,
-                      }}
-                      animate={{
-                        height: "auto",
-                        opacity: 1,
-                      }}
-                      exit={{
-                        height: 0,
-                        opacity: 0,
-                      }}
-                      className="border-t border-gray-800 bg-gray-900/50 px-8 py-6"
-                    >
-                      <FormField
-                        control={form.control}
-                        name="maintenanceMessage"
-                        render={({ field, fieldState }) => (
-                          <FormItem>
-                            <FormControl>
-                              <SettingsInput
-                                fieldState={fieldState}
-                                label={t("maintenance_message")}
-                                type="text"
-                                value={field.value}
-                                onChange={(e) => field.onChange(e.target.value)}
-                                placeholder={t("enter_message_shown_to_users")}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </div>
 
             {/* Delivery Pricing */}
             <SettingsCard
@@ -409,7 +224,7 @@ export default function GlobalSettings({
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="minDeliveryCharge"
                   render={({ field, fieldState }) => (
@@ -496,7 +311,7 @@ export default function GlobalSettings({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={form.control}
                   name="deliveryVatRate"
@@ -505,7 +320,7 @@ export default function GlobalSettings({
                       <FormControl>
                         <SettingsInput
                           fieldState={fieldState}
-                          label="Delivery VAT Rate"
+                          label={t("delivery_vat_rate")}
                           type="number"
                           value={field.value}
                           onChange={(e) =>
@@ -566,7 +381,7 @@ export default function GlobalSettings({
                         <FormControl>
                           <SettingsInput
                             fieldState={fieldState}
-                            label="Platform VAT"
+                            label={t("platform_vat")}
                             type="number"
                             value={field.value}
                             onChange={(e) =>
@@ -591,7 +406,7 @@ export default function GlobalSettings({
                         <FormControl>
                           <SettingsInput
                             fieldState={fieldState}
-                            label="Fleet Manager Commission"
+                            label={t("fleet_manager_commission")}
                             type="number"
                             value={field.value}
                             onChange={(e) =>
@@ -607,7 +422,7 @@ export default function GlobalSettings({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="deliveryPartnerCommissionPercent"
                     render={({ field, fieldState }) => (
@@ -630,7 +445,7 @@ export default function GlobalSettings({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
@@ -655,7 +470,7 @@ export default function GlobalSettings({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="vendorVatPercent"
                     render={({ field, fieldState }) => (
@@ -678,7 +493,7 @@ export default function GlobalSettings({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                 </div>
               </div>
             </SettingsCard>
@@ -691,73 +506,6 @@ export default function GlobalSettings({
               delay={0.3}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="minOrderAmount"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("min_order_amount")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="€"
-                          min={0}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="maxOrderAmount"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("max_order_amount")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="€"
-                          min={0}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="maxItemsPerOrder"
-                  render={({ field, fieldState }) => (
-                    <FormItem className="col-span-2">
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("max_items_per_order")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value))
-                          }
-                          suffix="items"
-                          description="Maximum number of items allowed per order"
-                          min={0}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={form.control}
                   name="customerNearestVendorRadiusKm"
@@ -815,7 +563,7 @@ export default function GlobalSettings({
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="autoCancelUnacceptedOrderMinutes"
                   render={({ field, fieldState }) => (
@@ -860,185 +608,7 @@ export default function GlobalSettings({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-              </div>
-            </SettingsCard>
-
-            {/* OTP & Security */}
-            <SettingsCard
-              title={t("otp_security")}
-              description={t("configure_order_verification_settings")}
-              icon={Shield}
-              delay={0.45}
-            >
-              <div className="space-y-6">
-                <div className="p-4 bg-[#DC3173]/5 rounded-xl border border-[#DC3173]/10">
-                  <FormField
-                    control={form.control}
-                    name="orderOtpEnabled"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <SettingsToggle
-                            label={t("enable_order_otp")}
-                            description={t(
-                              "require_otp_verification_order_delivery",
-                            )}
-                            checked={field.value}
-                            onChange={(val) => field.onChange(val)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <AnimatePresence>
-                  {/* {watchOrderOtpEnabled && ( */}
-                  <motion.div
-                    initial={{
-                      height: 0,
-                      opacity: 0,
-                    }}
-                    animate={{
-                      height: "auto",
-                      opacity: 1,
-                    }}
-                    exit={{
-                      height: 0,
-                      opacity: 0,
-                    }}
-                    className="space-y-4"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="otpLength"
-                      render={({ field, fieldState }) => (
-                        <FormItem>
-                          <FormControl>
-                            <SettingsInput
-                              fieldState={fieldState}
-                              label={t("otp_length")}
-                              type="number"
-                              value={field.value}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
-                              suffix="digits"
-                              description={t("number_of_digits_otp_code")}
-                              min={0}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="otpExpiryMinutes"
-                      render={({ field, fieldState }) => (
-                        <FormItem>
-                          <FormControl>
-                            <SettingsInput
-                              fieldState={fieldState}
-                              label={t("otp_expiry_time")}
-                              type="number"
-                              value={field.value}
-                              onChange={(e) =>
-                                field.onChange(parseFloat(e.target.value))
-                              }
-                              suffix="min"
-                              description={t("time_before_otp_expires")}
-                              min={0}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </motion.div>
-                  {/* )} */}
-                </AnimatePresence>
-              </div>
-            </SettingsCard>
-
-            {/* Offers & Refunds */}
-            <SettingsCard
-              title={t("offers_refunds")}
-              description={t("control_global_discount_settings")}
-              icon={Gift}
-              delay={0.5}
-            >
-              <div className="space-y-6">
-                <div className="p-4 bg-[#DC3173]/5 rounded-xl border border-[#DC3173]/10">
-                  <FormField
-                    control={form.control}
-                    name="isOfferEnabled"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <SettingsToggle
-                            label="Enable Offers"
-                            description={t("activate_sitewide_promotional")}
-                            checked={field.value}
-                            onChange={(val) => field.onChange(val)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="maxDiscountPercent"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("max_discount_percentage")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="%"
-                          description={t("safety_cap_generated_discounts")}
-                          min={0}
-                          max={100}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="refundProcessingDays"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <SettingsInput
-                          fieldState={fieldState}
-                          label={t("refund_processing_days")}
-                          type="number"
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                          suffix="days"
-                          description="Number of days to process refunds"
-                          min={0}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                /> */}
               </div>
             </SettingsCard>
 
@@ -1095,8 +665,7 @@ export default function GlobalSettings({
                     </FormItem>
                   )}
                 />
-
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="vatRate"
                   render={({ field, fieldState }) => (
@@ -1118,8 +687,7 @@ export default function GlobalSettings({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-
+                /> */}
               </div>
             </SettingsCard>
           </div>

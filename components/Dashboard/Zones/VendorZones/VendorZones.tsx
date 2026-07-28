@@ -4,6 +4,7 @@ import StatsCard from "@/components/Dashboard/Performance/StatsCard/StatsCard";
 import ZoneCard from "@/components/Dashboard/Zones/ZoneCard/ZoneCard";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { USER_ROLE } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TZone } from "@/types/zone.type";
 import { CircleCheckBig, CircleOff, MapPin } from "lucide-react";
@@ -13,6 +14,7 @@ interface IProps {
 }
 
 export default function VendorZones({ zonesData }: IProps) {
+  const { t } = useTranslation();
   const operationalZones = zonesData.data?.filter(
     (z) => z.isOperational,
   ).length;
@@ -22,29 +24,29 @@ export default function VendorZones({ zonesData }: IProps) {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title="Vendor Zones & Coverage"
-        subtitle="Manage service areas for vendor operations"
+        title={t("vendor_zones_coverage")}
+        subtitle={t("manage_service_areas_vendor_operations")}
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <StatsCard
-          title="Total Zones"
+          title={t("total_zones")}
           value={zonesData.data?.length}
           icon={MapPin}
           delay={0}
         />
         <StatsCard
-          title="Operational Zones"
+          title={t("operational_zones")}
           value={operationalZones}
           icon={CircleCheckBig}
           delay={0.1}
         />
         <StatsCard
-          title="Not Operational Zones"
+          title={t("not_operational_zones")}
           value={notOperationalZones}
           icon={CircleOff}
           delay={0.2}
@@ -65,7 +67,7 @@ export default function VendorZones({ zonesData }: IProps) {
         ))}
       </div>
       {zonesData.data?.length === 0 && (
-        <div className="text-center text-gray-500">No zones found</div>
+        <div className="text-center text-gray-500">{t("no_zones_found")}</div>
       )}
     </div>
   );

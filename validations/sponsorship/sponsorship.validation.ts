@@ -41,7 +41,7 @@ export const sponsorshipValidation = z
       .default(true)
       .optional(),
 
-    url: z.string().url("Invalid URL format").max(255).or(z.literal("")),
+    url: z.string().url("Invalid URL format").max(255).or(z.literal("")).optional(),
 
     sponsorBanner: z.object(
       {
@@ -57,7 +57,7 @@ export const sponsorshipValidation = z
   })
   .superRefine(async (data, ctx) => {
     if (data.sponsorBanner.file instanceof File) {
-      const isCorrectRatio = await checkImageRatio(data.sponsorBanner.file, 2); // 2 for 2:1 ratio
+      const isCorrectRatio = await checkImageRatio(data.sponsorBanner.file, 2);
 
       if (!isCorrectRatio) {
         ctx.addIssue({

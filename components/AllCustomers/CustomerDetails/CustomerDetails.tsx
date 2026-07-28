@@ -225,14 +225,14 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
             </div>
           </div>
         </Section>
-        <Section title="Orders" icon={<Package />}>
+        <Section title={t("orders_lg")} icon={<Package />}>
           <CustomerOrdersSection orders={orders} />
           <div className="text-center my-3">
             <Link
               className="text-[#DC3173] hover:underline text-sm cursor-pointer font-semibold"
               href={`/admin/all-orders/customer/${customer.userId}`}
             >
-              Show All
+              {t("show_all")}
             </Link>
           </div>
         </Section>

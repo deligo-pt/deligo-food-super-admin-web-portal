@@ -7,7 +7,9 @@ import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
 import { USER_STATUS } from "@/consts/user.const";
+import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
+import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TAgent } from "@/types/user.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -28,13 +30,24 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import FleetRidersTable from "./FleetRiders";
+import { TMeta } from "@/types";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 
 interface IProps {
-  agent: TAgent;
+  agentData: {
+    meta: TMeta;
+    data: {
+      existingFleetManager: TAgent;
+      deliveryPartners: Partial<TDeliveryPartner>[];
+    };
+  }
 }
 
-export default function FleetManagerDetails({ agent }: IProps) {
+export default function FleetManagerDetails({ agentData }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
+  const { meta, data } = agentData;
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -55,7 +68,7 @@ export default function FleetManagerDetails({ agent }: IProps) {
     const toastId = toast.loading("Deleting Fleet Manager...");
     setIsDeleting(true);
 
-    const result = await userSoftDeleteReq(agent.userId as string);
+    const result = await userSoftDeleteReq(data?.existingFleetManager?.userId as string);
 
     if (result?.success) {
       setShowDeleteModal(false);
@@ -84,14 +97,14 @@ export default function FleetManagerDetails({ agent }: IProps) {
   };
 
   return (
-    <div className="p-4 md;px-6">
+    <div>
       <div className="mb-4">
         <Button
           onClick={() => router.back()}
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle /> Go Back
+          <ArrowLeftCircle /> {t("go_back")}
         </Button>
       </div>
       <motion.div
@@ -126,17 +139,17 @@ export default function FleetManagerDetails({ agent }: IProps) {
           >
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                agent?.status,
+                data?.existingFleetManager?.status,
               )}`}
             >
-              {agent?.status}
+              {data?.existingFleetManager?.status}
             </span>
           </motion.div>
           <div className="flex items-center gap-4">
-            {agent?.profilePhoto ? (
+            {data?.existingFleetManager?.profilePhoto ? (
               <Image
-                src={agent?.profilePhoto}
-                alt={`${agent?.name?.firstName || "Fleet Manager"}`}
+                src={data?.existingFleetManager?.profilePhoto}
+                alt={`${data?.existingFleetManager?.name?.firstName || "Fleet Manager"}`}
                 className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
                 width={500}
                 height={500}
@@ -148,11 +161,11 @@ export default function FleetManagerDetails({ agent }: IProps) {
             )}
             <div>
               <h1 className="text-2xl font-bold">
-                {agent?.name?.firstName} {agent?.name?.lastName}
+                {data?.existingFleetManager?.name?.firstName} {data?.existingFleetManager?.name?.lastName}
               </h1>
-              <p className="opacity-90">{agent?.email}</p>
-              {agent?.contactNumber && (
-                <p className="opacity-90">{agent?.contactNumber}</p>
+              <p className="opacity-90">{data?.existingFleetManager?.email}</p>
+              {data?.existingFleetManager?.contactNumber && (
+                <p className="opacity-90">{data?.existingFleetManager?.contactNumber}</p>
               )}
             </div>
           </div>
@@ -162,47 +175,47 @@ export default function FleetManagerDetails({ agent }: IProps) {
           <div className="mb-6 border-gray-200">
             <div className="flex flex-wrap justify-end gap-4">
               <ActionButton
-                onClick={() => router.push("/admin/agent/edit/" + agent.userId)}
-                label="Edit"
+                onClick={() => router.push("/admin/agent/edit/" + data?.existingFleetManager.userId)}
+                label={t("edit")}
                 icon={<EditIcon size={18} />}
                 variant="primary"
               />
-              {agent?.status === "SUBMITTED" && (
+              {data?.existingFleetManager?.status === "SUBMITTED" && (
                 <>
                   <ActionButton
                     onClick={() => setApproveStatus("APPROVED")}
-                    label="Approve"
+                    label={t("approve")}
                     icon={<CheckIcon size={18} />}
                     variant="success"
                   />
                   <ActionButton
                     onClick={() => setApproveStatus("REJECTED")}
-                    label="Reject"
+                    label={t("reject")}
                     icon={<XIcon size={18} />}
                     variant="danger"
                   />
                 </>
               )}
-              {agent?.status === "APPROVED" && (
+              {data?.existingFleetManager?.status === "APPROVED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("BLOCKED")}
-                  label="Block"
+                  label={t("block")}
                   icon={<BanIcon size={18} />}
                   variant="warning"
                 />
               )}
-              {agent?.status === "BLOCKED" && (
+              {data?.existingFleetManager?.status === "BLOCKED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("UNBLOCKED")}
-                  label="Unblock"
+                  label={t("unblock")}
                   icon={<CheckIcon size={18} />}
                   variant="primary"
                 />
               )}
-              {!agent?.isDeleted && (
+              {!data?.existingFleetManager?.isDeleted && (
                 <ActionButton
                   onClick={() => setShowDeleteModal(true)}
-                  label="Delete"
+                  label={t("delete")}
                   icon={<TrashIcon size={18} />}
                   variant="danger"
                 />
@@ -210,189 +223,204 @@ export default function FleetManagerDetails({ agent }: IProps) {
             </div>
           </div>
           <Section
-            title="Personal Details"
+            title={t("personal_details")}
             icon={<UserIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Full Name</p>
+                <p className="text-sm text-gray-500">{t("full_name")}</p>
                 <p className="font-medium">
-                  {agent?.name?.firstName || "N/A"}{" "}
-                  {agent?.name?.lastName || ""}
+                  {data?.existingFleetManager?.name?.firstName || "N/A"}{" "}
+                  {data?.existingFleetManager?.name?.lastName || ""}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{agent?.email}</p>
+                <p className="text-sm text-gray-500">{t("email")}</p>
+                <p className="font-medium">{data?.existingFleetManager?.email}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Contact Number</p>
-                <p className="font-medium">{agent?.contactNumber || "N/A"}</p>
+                <p className="text-sm text-gray-500">{t("contact_number")}</p>
+                <p className="font-medium">{data?.existingFleetManager?.contactNumber || "N/A"}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email Verified</p>
+                <p className="text-sm text-gray-500">{t("email_verified")}</p>
                 <p className="font-medium">
-                  {agent?.isEmailVerified ? "Yes" : "No"}
+                  {data?.existingFleetManager?.email ? "Yes" : "No"}
                 </p>
               </div>
             </div>
           </Section>
           <Section
-            title="Business Details"
+            title={t("business_details")}
             icon={<BuildingIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Business Name</p>
+                <p className="text-sm text-gray-500">{t("business_name")}</p>
                 <p className="font-medium">
-                  {agent?.businessDetails?.businessName || "N/A"}
+                  {data?.existingFleetManager?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">License Number</p>
+                <p className="text-sm text-gray-500">{t("license_number")}</p>
                 <p className="font-medium">
-                  {agent?.businessDetails?.businessLicenseNumber || "N/A"}
+                  {data?.existingFleetManager?.businessDetails?.businessLicenseNumber || "N/A"}
                 </p>
               </div>
             </div>
           </Section>
           <Section
-            title="Business Location"
+            title={t("business_location")}
             icon={<MapPinIcon size={20} />}
             defaultOpen={true}
           >
-            {agent?.businessLocation ? (
+            {data?.existingFleetManager?.businessLocation ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Street Address</p>
+                  <p className="text-sm text-gray-500">{t("street_address")}</p>
                   <p className="font-medium">
-                    {agent?.businessLocation.street || "N/A"}
+                    {data?.existingFleetManager?.businessLocation.street || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Postal Code</p>
+                  <p className="text-sm text-gray-500">{t("postal_code")}</p>
                   <p className="font-medium">
-                    {agent?.businessLocation.postalCode || "N/A"}
+                    {data?.existingFleetManager?.businessLocation.postalCode || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">City</p>
+                  <p className="text-sm text-gray-500">{t("city")}</p>
                   <p className="font-medium">
-                    {agent?.businessLocation.city || "N/A"}
+                    {data?.existingFleetManager?.businessLocation.city || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">State</p>
+                  <p className="text-sm text-gray-500">{t("state")}</p>
                   <p className="font-medium">
-                    {agent?.businessLocation.state || "N/A"}
+                    {data?.existingFleetManager?.businessLocation.state || "N/A"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Country</p>
+                  <p className="text-sm text-gray-500">{t("country")}</p>
                   <p className="font-medium">
-                    {agent?.businessLocation.country || "N/A"}
+                    {data?.existingFleetManager?.businessLocation.country || "N/A"}
                   </p>
                 </div>
               </div>
             ) : (
               <p className="text-gray-500 italic">
-                No business location provided
+                {t("no_business_location_provided")}
               </p>
             )}
           </Section>
           <Section
-            title="Bank Details"
+            title={t("bank_details")}
             icon={<BriefcaseIcon size={20} />}
             defaultOpen={true}
           >
-            {agent?.bankDetails ? (
+            {data?.existingFleetManager?.bankDetails ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Bank Name</p>
-                  <p className="font-medium">{agent?.bankDetails.bankName}</p>
+                  <p className="text-sm text-gray-500">{t("bank_name")}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.bankName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Account Holder</p>
+                  <p className="text-sm text-gray-500">{t("account_holder")}</p>
                   <p className="font-medium">
-                    {agent?.bankDetails.accountHolderName}
+                    {data?.existingFleetManager?.bankDetails.accountHolderName}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">IBAN</p>
-                  <p className="font-medium">{agent?.bankDetails.iban}</p>
+                  <p className="text-sm text-gray-500">{t("iban")}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.iban}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">SWIFT Code</p>
-                  <p className="font-medium">{agent?.bankDetails.swiftCode}</p>
+                  <p className="text-sm text-gray-500">{t("swift_code")}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.swiftCode}</p>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 italic">No bank details provided</p>
+              <p className="text-gray-500 italic">{t("no_bank_details_provided")}</p>
             )}
           </Section>
           <Section
-            title="Activity Logs"
+            title={t("activity_logs")}
             icon={<BriefcaseIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Registered On</p>
+                <p className="text-sm text-gray-500">{t("registered_on")}</p>
                 <p className="font-medium">
-                  {format(agent?.createdAt, "do MMM yyyy")}
+                  {format(data?.existingFleetManager?.createdAt, "do MMM yyyy")}
                 </p>
               </div>
-              {agent?.submittedForApprovalAt && (
+              {data?.existingFleetManager?.submittedForApprovalAt && (
                 <div>
-                  <p className="text-sm text-gray-500">Submitted On</p>
+                  <p className="text-sm text-gray-500">{t("submitted_on")}</p>
                   <p className="font-medium">
-                    {format(agent?.submittedForApprovalAt, "do MMM yyyy")}
+                    {format(data?.existingFleetManager?.submittedForApprovalAt, "do MMM yyyy")}
                   </p>
                 </div>
               )}
-              {(agent?.status === "APPROVED" ||
-                agent?.status === "REJECTED" ||
-                agent?.status === "BLOCKED") &&
-                agent?.approvedOrRejectedOrBlockedAt && (
+              {(data?.existingFleetManager?.status === "APPROVED" ||
+                data?.existingFleetManager?.status === "REJECTED" ||
+                data?.existingFleetManager?.status === "BLOCKED") &&
+                data?.existingFleetManager?.approvedOrRejectedOrBlockedAt && (
                   <div>
                     <p className="text-sm text-gray-500">
-                      {agent?.status.charAt(0).toUpperCase() +
-                        agent?.status.slice(1)}{" "}
+                      {data?.existingFleetManager?.status.charAt(0).toUpperCase() +
+                        data?.existingFleetManager?.status.slice(1)}{" "}
                       On
                     </p>
                     <p className="font-medium">
                       {format(
-                        agent?.approvedOrRejectedOrBlockedAt,
+                        data?.existingFleetManager?.approvedOrRejectedOrBlockedAt,
                         "do MMM yyyy",
                       )}
                     </p>
                   </div>
                 )}
-              {agent?.lastLoginAt && (
+              {data?.existingFleetManager?.lastLoginAt && (
                 <div>
-                  <p className="text-sm text-gray-500">Last logged On</p>
+                  <p className="text-sm text-gray-500">{t("last_logged_on")}</p>
                   <p className="font-medium">
-                    {format(agent?.lastLoginAt, "do MMM yyyy")}
+                    {format(data?.existingFleetManager?.lastLoginAt, "do MMM yyyy")}
                   </p>
                 </div>
               )}
             </div>
           </Section>
           <Section
-            title="Documents"
+            title={t("documents")}
             icon={<FileTextIcon size={20} />}
             defaultOpen={true}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-6">
-              <FleetManagerDetailsDoc documents={agent?.documents as IFleetDocs} />
+              <FleetManagerDetailsDoc documents={data?.existingFleetManager?.documents as IFleetDocs} />
             </div>
+          </Section>
+          {/* riders table */}
+          <Section
+            title={t("all_registered_riders")}
+            icon={<BriefcaseIcon size={20} />}
+            defaultOpen={true}
+          >
+            <FleetRidersTable riders={data?.deliveryPartners || []} />
+            {!!meta?.total && meta?.total > 0 && (
+              <div className="px-6 mt-4">
+                <PaginationComponent
+                  totalPages={meta?.totalPage || 0}
+                />
+              </div>
+            )}
           </Section>
           <div className="mt-8 border-t pt-6 border-gray-200">
             <ActionButton
-              onClick={() => router.push("/admin/all-agents")}
-              label="Go Back"
+              onClick={() => router.push("/admin/all-fleet-managers")}
+              label={t("go_back")}
               icon={<ArrowLeftCircle />}
               variant="primary"
             />
@@ -403,8 +431,8 @@ export default function FleetManagerDetails({ agent }: IProps) {
         open={!!approveStatus}
         onOpenChange={closeApproveOrRejectModal}
         status={approveStatus as "APPROVED" | "REJECTED"}
-        userId={agent?.userId}
-        userName={`${agent?.name?.firstName} ${agent?.name?.lastName}`}
+        userId={data?.existingFleetManager?.userId}
+        userName={`${data?.existingFleetManager?.name?.firstName} ${data?.existingFleetManager?.name?.lastName}`}
       />
       <DeleteModal
         open={showDeleteModal}

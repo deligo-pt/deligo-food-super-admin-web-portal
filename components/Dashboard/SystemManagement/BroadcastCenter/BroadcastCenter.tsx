@@ -13,6 +13,7 @@ import { TNotificationType } from "@/types/notification.type";
 import PreviewCard from "./PreviewCard";
 import RoleSelector from "./RoleSelector";
 import { broadcastNotificationReq } from "@/services/dashboard/notifications/notifications.service";
+import { useTranslation } from "@/hooks/use-translation";
 
 export type TUser = {
   _id: string;
@@ -31,7 +32,8 @@ type RoleType = keyof Pick<
 >;
 
 export default function BroadcastCenter() {
-  const [notificationCategory, setNotificationCategory] = useState<TNotificationType>();
+  const { t } = useTranslation();
+  const [notificationCategory, setNotificationCategory] = useState<TNotificationType | undefined>();
   const [commType, setCommType] = useState<"PUSH" | "BOTH" | "EMAIL">("EMAIL");
 
   const [selectedRoles, setSelectedRoles] = useState<RoleType[]>([]);
@@ -52,6 +54,14 @@ export default function BroadcastCenter() {
     DELIVERY_PARTNER: true,
     FLEET_MANAGER: true,
     ADMIN: true,
+  });
+
+  const [searchQueries, setSearchQueries] = useState<Record<RoleType, string>>({
+    VENDOR: '',
+    CUSTOMER: '',
+    DELIVERY_PARTNER: '',
+    FLEET_MANAGER: '',
+    ADMIN: '',
   });
 
   const [title, setTitle] = useState("");
@@ -160,8 +170,16 @@ export default function BroadcastCenter() {
         FLEET_MANAGER: false,
         ADMIN: false,
       });
-      setNotificationCategory(undefined as unknown as TNotificationType);
-    }, 2000);
+      setSearchQueries({
+        VENDOR: "",
+        CUSTOMER: "",
+        DELIVERY_PARTNER: "",
+        FLEET_MANAGER: "",
+        ADMIN: "",
+      });
+      setNotificationCategory(undefined);
+      console.log("hit");
+    }, 1000);
   };
 
   return (
@@ -174,8 +192,8 @@ export default function BroadcastCenter() {
       >
         {/* Header */}
         <TitleHeader
-          title="Email & Notification Settings"
-          subtitle="Send announcements, alerts, or promotional messages to specific user groups across the platform."
+          title={t("email_and_notification_settings")}
+          subtitle={t("send_announcements_alerts_promotional_emails")}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -197,6 +215,8 @@ export default function BroadcastCenter() {
               setSelectedUsers={setSelectedUsers}
               expandedPanels={expandedPanels}
               setExpandedPanels={setExpandedPanels}
+              searchQueries={searchQueries}
+              setSearchQueries={setSearchQueries}
               itemVariants={itemVariants}
             />
 
@@ -215,7 +235,7 @@ export default function BroadcastCenter() {
 
             <NotificationDropdown
               onValueChange={setNotificationCategory}
-              defaultValue={notificationCategory}
+              value={notificationCategory}
               itemVariants={itemVariants}
             />
             {/* Actions Card */}
@@ -224,7 +244,7 @@ export default function BroadcastCenter() {
               className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sticky top-6"
             >
               <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-                Actions
+                {t("actions")}
               </h2>
 
               <div className="space-y-3">
@@ -233,7 +253,7 @@ export default function BroadcastCenter() {
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors border-2 ${showPreview ? "bg-gray-100 border-gray-100 text-gray-900" : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"}`}
                 >
                   <EyeIcon className="w-4 h-4" />
-                  {showPreview ? "Hide Preview" : "Show Preview"}
+                  {showPreview ? t("hide_preview") : t("show_preview")}
                 </button>
 
                 <button
@@ -242,20 +262,20 @@ export default function BroadcastCenter() {
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm bg-[#DC3173] text-white hover:bg-[#c42a65] transition-colors shadow-sm shadow-[#DC3173]/20"
                 >
                   <SendIcon className="w-4 h-4" />
-                  Send Broadcast
+                  {t("send_broadcast")}
                 </button>
               </div>
 
               <div className="mt-6 p-4 bg-amber-50 rounded-xl border border-amber-100">
                 <h4 className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">
-                  Best Practices
+                  {t("best_practices")}
                 </h4>
                 <ul className="text-xs text-amber-700 space-y-2 list-disc pl-4">
-                  <li>Keep subjects short & clear.</li>
-                  <li>Always check preview before broadcasting.</li>
-                  <li>Do not spam users frequently.</li>
+                  <li>{t("keep_subjects_short_and_clear")}</li>
+                  <li>{t("always_check_preview_before_broadcasting")}</li>
+                  <li>{t("do_not_spam_users_frequently")}</li>
                   <li>
-                    Use personalization tags like {"{name}"} if supported.
+                    {t("use_personalization_tags")} {"{name}"} {t("if_supported")}
                   </li>
                 </ul>
               </div>

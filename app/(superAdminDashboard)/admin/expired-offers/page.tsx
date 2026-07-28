@@ -15,8 +15,8 @@ export default async function ExpiredOffersPage({ searchParams }: IProps) {
   return (
     <ActiveCampaigns
       offersResult={offersResult}
-      title="Expired Offers"
-      subtitle="List of all expired offers"
+      title="expired_offers"
+      subtitle="list_of_all_expired_offers"
     />
   );
 }

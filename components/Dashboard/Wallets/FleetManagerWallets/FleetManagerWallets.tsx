@@ -4,26 +4,28 @@ import FleetManagerWalletTable from "@/components/Dashboard/Wallets/FleetManager
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TFleetManagerWallet } from "@/types/wallet.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 
 interface IProps {
   walletsResult: { data: TFleetManagerWallet[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function FleetManagerWallets({ walletsResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
+
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-full">
+    <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title="Fleet Manager Wallets"
-        subtitle="Manage all the fleet manager wallets"
+        title={t("fleet_manager_wallets")}
+        subtitle={t("manage_all_fleet_manager_wallets")}
       />
 
       {/* Filters */}

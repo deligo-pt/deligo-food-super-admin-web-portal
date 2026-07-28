@@ -5,6 +5,7 @@ import DeliveryPartnerPerformanceTable from "@/components/Dashboard/Performance/
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TPartnerPerformanceData } from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
@@ -18,12 +19,16 @@ interface IProps {
 export default function DeliveryPartnerPerformance({
   partnerPerformanceData,
 }: IProps) {
+  const { t } = useTranslation();
+
+  const { earningsPerformance, partnerPerformance, topCards, topPerformers } = partnerPerformanceData.data;
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title="Delivery Partner Performance Analytics"
-        subtitle="Comprehensive insights into delivery partner performance"
+        title={t("rider_performance_analytics")}
+        subtitle={t("comprehensive_insights_into_rider")}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -45,49 +50,28 @@ export default function DeliveryPartnerPerformance({
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <TrendingUp size={20} />
             </div>
-            <span className="font-medium">Most Orders</span>
+            <span className="font-medium">{t("most_orders")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
-                  src={
-                    partnerPerformanceData?.data?.topCards?.mostOrders
-                      ?.partnerPhoto
-                  }
-                  alt={`${
-                    partnerPerformanceData?.data?.topCards?.mostOrders
-                      ?.partnerName?.firstName
-                  } ${
-                    partnerPerformanceData?.data?.topCards?.mostOrders
-                      ?.partnerName?.lastName
-                  }`}
+                  src={topCards?.mostOrders?.partnerPhoto}
+                  alt={topCards?.mostOrders?.partnerName}
                 />
                 <AvatarFallback>
-                  {partnerPerformanceData?.data?.topCards?.mostOrders?.partnerName?.firstName?.charAt(
-                    0,
-                  )}
-                  {partnerPerformanceData?.data?.topCards?.mostOrders?.partnerName?.lastName?.charAt(
-                    0,
-                  )}
+                  {topCards?.mostOrders?.partnerName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
               <p className="text-gray-800 font-semibold">
-                {
-                  partnerPerformanceData?.data?.topCards?.mostOrders
-                    ?.partnerName?.firstName
-                }{" "}
-                {
-                  partnerPerformanceData?.data?.topCards?.mostOrders
-                    ?.partnerName?.lastName
-                }
+                {topCards?.mostOrders?.partnerName || "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {partnerPerformanceData?.data?.topCards?.mostOrders?.ordersCount?.toLocaleString() ||
+                {topCards?.mostOrders?.ordersCount?.toLocaleString() ||
                   0}{" "}
-                orders this month
+                {t("orders_this_month")}
               </p>
             </div>
           </div>
@@ -110,52 +94,31 @@ export default function DeliveryPartnerPerformance({
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <Star size={20} />
             </div>
-            <span className="font-medium">Highest Rated</span>
+            <span className="font-medium">{t("highest_rated")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
-                  src={
-                    partnerPerformanceData?.data?.topCards?.highestRated
-                      ?.partnerPhoto
-                  }
-                  alt={`${
-                    partnerPerformanceData?.data?.topCards?.highestRated
-                      ?.partnerName?.firstName
-                  } ${
-                    partnerPerformanceData?.data?.topCards?.highestRated
-                      ?.partnerName?.lastName
-                  }`}
+                  src={topCards?.highestRated.partnerPhoto}
+                  alt={topCards?.highestRated?.partnerName || "N/A"}
                 />
                 <AvatarFallback>
-                  {partnerPerformanceData?.data?.topCards?.highestRated?.partnerName?.firstName?.charAt(
-                    0,
-                  )}
-                  {partnerPerformanceData?.data?.topCards?.highestRated?.partnerName?.lastName?.charAt(
-                    0,
-                  )}
+                  {topCards?.highestRated?.partnerName?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {
-                  partnerPerformanceData?.data?.topCards?.highestRated
-                    ?.partnerName?.firstName
-                }{" "}
-                {
-                  partnerPerformanceData?.data?.topCards?.highestRated
-                    ?.partnerName?.lastName
-                }
+                {topCards?.highestRated?.partnerName || "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {partnerPerformanceData?.data?.topCards?.highestRated?.rating
+                {topCards?.highestRated?.rating
                   ?.average || 0}{" "}
-                stars (
-                {partnerPerformanceData?.data?.topCards?.highestRated?.rating
+                {t("stars")} (
+                {topCards?.highestRated?.rating
                   ?.totalRatings || 0}{" "}
-                reviews)
+                {t("reviews")})
               </p>
             </div>
           </div>
@@ -178,51 +141,27 @@ export default function DeliveryPartnerPerformance({
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <EuroIcon size={20} />
             </div>
-            <span className="font-medium">Highest Earnings</span>
+            <span className="font-medium">{t("highest_earnings")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
-                  src={
-                    partnerPerformanceData?.data?.topCards?.highestEarnings
-                      ?.partnerPhoto
-                  }
-                  alt={`${
-                    partnerPerformanceData?.data?.topCards?.highestEarnings
-                      ?.partnerName?.firstName
-                  } ${
-                    partnerPerformanceData?.data?.topCards?.highestEarnings
-                      ?.partnerName?.lastName
-                  }`}
+                  src={topCards?.highestEarnings?.partnerPhoto}
+                  alt={topCards?.highestEarnings?.partnerName}
                 />
                 <AvatarFallback>
-                  {partnerPerformanceData?.data?.topCards?.highestEarnings?.partnerName?.firstName?.charAt(
-                    0,
-                  )}
-                  {partnerPerformanceData?.data?.topCards?.highestEarnings?.partnerName?.lastName?.charAt(
-                    0,
-                  )}
+                  {topCards?.highestEarnings?.partnerName.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {
-                  partnerPerformanceData?.data?.topCards?.highestEarnings
-                    ?.partnerName?.firstName
-                }{" "}
-                {
-                  partnerPerformanceData?.data?.topCards?.highestEarnings
-                    ?.partnerName?.lastName
-                }
+                {topCards?.highestEarnings?.partnerName || "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
                 €
-                {formatPrice(
-                  partnerPerformanceData?.data?.topCards?.highestEarnings
-                    ?.earnings || 0,
-                )}
+                {formatPrice(topCards?.highestEarnings?.earnings || 0)}
               </p>
             </div>
           </div>
@@ -233,12 +172,12 @@ export default function DeliveryPartnerPerformance({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <CustomizedCharts
-            title="Orders Performance"
-            description="Monthly performance over the last 6 months"
-            data={partnerPerformanceData?.data?.earningsPerformance || []}
-            xLabel="Month"
+            title={t("orders_performance")}
+            description={t("monthly_performance_over_the_last_6_months")}
+            data={earningsPerformance || []}
+            xLabel={t("month")}
             xKey="month"
-            yLabel="No of Orders"
+            yLabel={t("no_of_orders")}
             yKey="totalOrders"
             delay={0.2}
             isBGNeed={false}
@@ -262,10 +201,10 @@ export default function DeliveryPartnerPerformance({
         >
           <div className="flex items-center gap-2 mb-6">
             <Award className="text-[#DC3173]" size={20} />
-            <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
+            <h3 className="text-lg font-bold text-gray-900">{t("top_performers")}</h3>
           </div>
           <div className="space-y-4">
-            {partnerPerformanceData?.data?.topPerformers?.map((dp, index) => (
+            {topPerformers?.map((dp, index) => (
               <div
                 key={index}
                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
@@ -279,17 +218,17 @@ export default function DeliveryPartnerPerformance({
                   <Avatar className="w-8 h-8">
                     <AvatarImage
                       src={dp.profilePhoto}
-                      alt={`${dp?.name?.firstName} ${dp?.name?.lastName}`}
+                      alt={`${dp?.name}`}
                     />
                     <AvatarFallback>{dp?.initials}</AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 truncate">
-                    {dp?.name?.firstName} {dp?.name?.lastName}
+                    {dp?.name}
                   </p>
                   <p className="text-xs text-gray-500">
-                    €{formatPrice(dp?.totalEarnings || 0)} earnings
+                    €{formatPrice(dp?.totalEarnings || 0)} {t("earnings")}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 text-sm">
@@ -304,7 +243,7 @@ export default function DeliveryPartnerPerformance({
 
       {/* partner Performance Table */}
       <DeliveryPartnerPerformanceTable
-        partners={partnerPerformanceData?.data?.partnerPerformance}
+        partners={partnerPerformance}
       />
 
       {/* Pagination */}

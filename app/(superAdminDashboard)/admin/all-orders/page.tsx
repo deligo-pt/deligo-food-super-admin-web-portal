@@ -12,8 +12,8 @@ export default async function AllOrdersPage({ searchParams }: IProps) {
   return (
     <Orders
       ordersResult={ordersResult}
-      title="All Orders"
-      subtitle="Manage all orders here"
+      title="all_orders"
+      subtitle="manage_all_customer_orders_realtime"
     />
   );
 }

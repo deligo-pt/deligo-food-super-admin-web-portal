@@ -26,15 +26,6 @@ import {
 } from "@vis.gl/react-google-maps";
 import { UseFormReturn } from "react-hook-form";
 
-const formFields = [
-  { label: "Street Address", name: "street" },
-  { label: "City", name: "city" },
-  { label: "Postal Code", name: "postalCode" },
-  { label: "Country", name: "country" },
-  { label: "Latitude", name: "latitude" },
-  { label: "Longitude", name: "longitude" },
-];
-
 type LocationFormType = {
   street: string;
   city: string;
@@ -51,12 +42,13 @@ interface IProps {
     city: string;
     postalCode: string;
     country: string;
-    latitude?: number;
-    longitude?: number;
+    latitude: number;
+    longitude: number;
   };
   setLocationCoordinates: Dispatch<
     SetStateAction<{ latitude: number; longitude: number }>
   >;
+  t: (key: string) => string;
 }
 
 const defaultLocation = { lat: 38.7223, lng: -9.1393 };
@@ -65,16 +57,31 @@ const BusinessLocationMap = ({
   form,
   businessLocation,
   setLocationCoordinates,
+  t,
 }: IProps) => {
+  const formFields = [
+    { label: t("street_address"), name: "street" },
+    { label: t("city"), name: "city" },
+    { label: t("postal_code"), name: "postalCode" },
+    { label: t("country"), name: "country" },
+    { label: t("latitude"), name: "latitude" },
+    { label: t("longitude"), name: "longitude" },
+  ];
+
   const map = useMap();
   const places = useMapsLibrary("places");
-
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [position, setPosition] = useState({
     lat: businessLocation?.latitude ?? defaultLocation.lat,
     lng: businessLocation?.longitude ?? defaultLocation.lng,
   });
+
+  // Controls whether address fields are editable
+  // Starts true only if an existing businessLocation is provided
+  const [isLocationSelected, setIsLocationSelected] = useState(
+    !!businessLocation
+  );
 
   const fillAddressFields = useCallback(
     (components: any[]) => {
@@ -88,24 +95,27 @@ const BusinessLocationMap = ({
       });
 
       Object.entries(address).forEach(([key, value]) =>
-        form.setValue(key as keyof LocationFormType, (value || "") as string),
+        form.setValue(key as keyof LocationFormType, (value || "") as string)
       );
     },
-    [form],
+    [form]
   );
 
-  // Reverse geocode (for map drag/select)
-  const reverseGeocode = useCallback((lat: number, lng: number) => {
-    if (!window.google) return;
+  // Reverse geocode (for map click)
+  const reverseGeocode = useCallback(
+    (lat: number, lng: number) => {
+      if (!window.google) return;
 
-    const geocoder = new google.maps.Geocoder();
+      const geocoder = new google.maps.Geocoder();
 
-    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-      if (status === "OK" && results?.[0]) {
-        fillAddressFields(results[0].address_components);
-      }
-    });
-  }, [fillAddressFields]);
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === "OK" && results?.[0]) {
+          fillAddressFields(results[0].address_components);
+        }
+      });
+    },
+    [fillAddressFields]
+  );
 
   // SEARCH + INIT AUTOCOMPLETE
   useEffect(() => {
@@ -136,23 +146,24 @@ const BusinessLocationMap = ({
 
       fillAddressFields(place.address_components || []);
 
+      // Enable address fields after selection
+      setIsLocationSelected(true);
+
       if (inputRef.current) {
         inputRef.current.value = "";
       }
     });
   }, [places, map, fillAddressFields, setLocationCoordinates, form]);
 
-
   return (
     <div className="space-y-6">
-
       {/* SEARCH */}
       <div className="relative">
         <Search className="absolute left-3 top-3.5 text-gray-500 w-5 h-5" />
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search address here..."
+          placeholder={t("search_address_here")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -186,36 +197,48 @@ const BusinessLocationMap = ({
             form.setValue("longitude", lng);
 
             reverseGeocode(lat, lng);
+
+            // Enable address fields after selection
+            setIsLocationSelected(true);
           }}
         >
           <Marker position={position} />
         </Map>
       </div>
 
-      {/* FORM (READ ONLY) */}
+      {/* FORM FIELDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {formFields.map((field) => (
-          <FormField
-            key={field.name}
-            control={form.control}
-            name={field.name as keyof LocationFormType}
-            render={({ field: formField }) => (
-              <FormItem>
-                <FormLabel>{field.label}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...formField}
-                    readOnly={
-                      field.name === "latitude" ||
-                      field.name === "longitude"
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ))}
+        {formFields.map((field) => {
+          const isLatOrLng =
+            field.name === "latitude" || field.name === "longitude";
+
+          // Address fields are disabled until a location is selected
+          // Lat / Lng are always disabled
+          const isDisabled = isLatOrLng || !isLocationSelected;
+
+          return (
+            <FormField
+              key={field.name}
+              control={form.control}
+              name={field.name as keyof LocationFormType}
+              render={({ field: formField }) => (
+                <FormItem>
+                  <FormLabel>
+                    {field.label} <span className="text-red-600">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...formField}
+                      disabled={isDisabled}
+                      readOnly={isLatOrLng} // extra safety for lat/lng
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          );
+        })}
       </div>
     </div>
   );

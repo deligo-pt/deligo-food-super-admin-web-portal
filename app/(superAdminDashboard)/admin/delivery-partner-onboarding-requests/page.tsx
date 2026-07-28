@@ -17,8 +17,8 @@ export default async function SubmittedDeliveryPartnersPage({
   return (
     <DeliveryPartners
       partnersResult={partnersResult}
-      title="Delivery Partner Onboarding Requests"
-      subtitle="All Requested Delivery Partners for Onboarding"
+      title="rider_onboarding_requests"
+      subtitle="all_requested_riders_onboarding"
     />
   );
 }

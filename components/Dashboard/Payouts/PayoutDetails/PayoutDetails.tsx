@@ -7,6 +7,7 @@ import {
   StatusTimeline,
 } from "@/components/Dashboard/Payouts/PayoutDetails/PayoutDetailsComponents";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TPayout } from "@/types/payout.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -25,10 +26,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function PayoutDetails({ payout }: { payout: TPayout }) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       {/* Back Button */}
       <div className="mb-4">
         <span
@@ -36,14 +38,14 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
           className="inline-flex items-center gap-2 text-[#DC3173] hover:underline mb-4 transition-colors"
         >
           <ArrowLeft size={18} />
-          Back to Payouts
+          {t("back_to_payouts")}
         </span>
       </div>
 
       {/* Header */}
       <TitleHeader
-        title="Payout Details"
-        subtitle="View the details of a payout"
+        title={t("payout_details")}
+        subtitle={t("view_the_details_of_a_payout")}
       />
 
       {/* Payout Info */}
@@ -56,7 +58,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
             <StatusBadge status={payout.status} />
           </div>
           <p className="text-gray-500">
-            Created {format(payout.createdAt, "do MMM yyyy")} · Last updated{" "}
+            {t("created")} {format(payout.createdAt, "do MMM yyyy")} · {t("last_updated")}{" "}
             {format(payout.updatedAt, "do MMM yyyy")}
           </p>
         </div>
@@ -79,7 +81,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div>
                 <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">
-                  Payout Amount
+                  {t("payout_amount")}
                 </p>
                 <p className="text-5xl font-extrabold text-gray-900">
                   €{formatPrice(payout.amount)}
@@ -96,7 +98,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
             {payout.remarks && (
               <div className="mt-6 pt-6 border-t border-gray-100">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Remarks
+                  {t("remarks")}
                 </p>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   {payout.remarks}
@@ -124,13 +126,13 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               <div className="p-2 bg-[#DC3173]/10 rounded-xl text-[#DC3173]">
                 <Landmark size={20} />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Bank Details</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t("bank_details")}</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Bank Name
+                  {t("bank_name")}
                 </p>
                 <p className="font-semibold text-gray-900">
                   {payout.userId?.bankDetails?.bankName}
@@ -138,7 +140,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Account Holder
+                  {t("account_holder")}
                 </p>
                 <p className="font-semibold text-gray-900">
                   {payout.userId?.bankDetails?.accountHolderName || "-"}
@@ -146,15 +148,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Account Number
-                </p>
-                <p className="font-semibold text-gray-900">
-                  {payout.userId?.bankDetails?.accountNumber || "-"}
-                </p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  IBAN
+                  {t("iban")}
                 </p>
                 <p className="font-mono font-semibold text-gray-900 tracking-wider">
                   {payout.userId?.bankDetails?.iban || "-"}
@@ -162,7 +156,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  SWIFT / BIC
+                  {t("swift_code")}
                 </p>
                 <p className="font-mono font-semibold text-gray-900">
                   {payout.userId?.bankDetails?.swiftCode || "-"}
@@ -170,7 +164,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               </div>
               <div className="p-4 bg-gray-50 rounded-xl">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
-                  Bank Reference ID
+                  {t("bank_reference_id")}
                 </p>
                 <p className="font-mono font-semibold text-gray-900">
                   {payout.bankReferenceId || "-"}
@@ -201,7 +195,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                     <ImageIcon size={20} />
                   </div>
                   <h2 className="text-lg font-bold text-gray-900">
-                    Payout Proof
+                    {t("payout_proof")}
                   </h2>
                 </div>
                 <a
@@ -211,7 +205,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                   className="flex items-center gap-1.5 text-sm text-[#DC3173] font-medium hover:underline"
                 >
                   <ExternalLink size={14} />
-                  Open Full Size
+                  {t("open_full_size")}
                 </a>
               </div>
               <div className="rounded-xl overflow-hidden border border-gray-100">
@@ -277,7 +271,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
             }}
             className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
           >
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Timestamps</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">{t("timestamps")}</h2>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-gray-50 rounded-lg text-gray-500 shrink-0">
@@ -285,7 +279,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                 </div>
                 <div>
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Start Date
+                    {t("start_date")}
                   </p>
                   <p className="text-sm font-medium text-gray-900 mt-0.5">
                     {payout.startDate
@@ -300,7 +294,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                 </div>
                 <div>
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    End Date
+                    {t("end_date")}
                   </p>
                   <p className="text-sm font-medium text-gray-900 mt-0.5">
                     {payout.endDate
@@ -315,7 +309,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                 </div>
                 <div>
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Payment Date
+                    {t("payment_date")}
                   </p>
                   <p className="text-sm font-medium text-gray-900 mt-0.5">
                     {payout.paymentDate

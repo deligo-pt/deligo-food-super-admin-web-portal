@@ -13,7 +13,15 @@ export type TDeliveryPartner = {
   // -------------------------------------------------
   _id?: string;
   userId: string;
-  registeredBy?: string;
+  registeredBy?: {
+    id: {
+      name: {
+        firstName: string;
+        lastName: string;
+      },
+      userId: string;
+    }
+  };
   role: "DELIVERY_PARTNER";
   email: string;
   status: keyof typeof USER_STATUS;

@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TTransaction } from "@/types/transaction.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -29,6 +30,7 @@ interface IProps {
 }
 
 export default function TransactionTable({ transactions }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -43,36 +45,36 @@ export default function TransactionTable({ transactions }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Transaction ID
+                {t("transaction_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <InfoIcon className="w-4" />
-                Description
+                {t("description")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ShapesIcon className="w-4" />
-                Type
+                {t("type")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Amount
+                {t("amount")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Date
+                {t("date")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -83,7 +85,7 @@ export default function TransactionTable({ transactions }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={6}
               >
-                No transactions found
+                {t("no_transactions_found")}
               </TableCell>
             </TableRow>
           )}
@@ -103,7 +105,7 @@ export default function TransactionTable({ transactions }: IProps) {
                   className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"
                 >
                   <EyeIcon />
-                  View
+                  {t("view")}
                 </Button>
               </TableCell>
             </TableRow>

@@ -5,6 +5,7 @@ import VendorPerformanceTable from "@/components/Dashboard/Performance/VendorPer
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TVendorPerformanceData } from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
@@ -16,12 +17,14 @@ interface IProps {
 }
 
 export function VendorPerformance({ vendorPerformanceData }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title="Vendor Performance Analytics"
-        subtitle="Comprehensive insights into restaurant performance and trends"
+        title={t("vendor_performance_analytics")}
+        subtitle={t("comprehensive_insights_into_restaurant_performance_and_trends")}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -43,7 +46,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <TrendingUp size={20} />
             </div>
-            <span className="font-medium">Most Orders</span>
+            <span className="font-medium">{t("most_orders")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
@@ -72,7 +75,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
               <p className="text-[#DC3173] text-sm">
                 {vendorPerformanceData.data?.vendorPerformanceStat?.mostOrders?.ordersCount?.toLocaleString() ||
                   0}{" "}
-                orders this month
+                {t("orders_this_month")}
               </p>
             </div>
           </div>
@@ -95,7 +98,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <Star size={20} />
             </div>
-            <span className="font-medium">Highest Rated</span>
+            <span className="font-medium">{t("highest_rated")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
@@ -126,11 +129,11 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
               </p>
               <p className="text-[#DC3173] text-sm">
                 {vendorPerformanceData.data?.vendorPerformanceStat
-                  ?.highestRating?.rating?.average || 0}{" "}
-                stars (
-                {vendorPerformanceData.data?.vendorPerformanceStat
+                  ?.highestRating?.rating || 0}{" "}
+                {t("stars")}
+                {/* ({vendorPerformanceData.data?.vendorPerformanceStat
                   ?.highestRating?.rating?.totalReviews || 0}{" "}
-                reviews)
+                {t("reviews")}) */}
               </p>
             </div>
           </div>
@@ -153,7 +156,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <EuroIcon size={20} />
             </div>
-            <span className="font-medium">Highest Revenue</span>
+            <span className="font-medium">{t("highest_revenue")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
@@ -199,12 +202,12 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
         <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <CustomizedCharts
             type="line"
-            title="Orders Performance"
-            description="Monthly performance over the last 12 months"
+            title={t("orders_performance")}
+            description={t("monthly_performance_over")}
             data={vendorPerformanceData.data?.vendorMonthlyPerformance || []}
-            xLabel="Month"
+            xLabel={t("month")}
             xKey="month"
-            yLabel="No of Orders"
+            yLabel={t("no_of_orders")}
             yKey="totalOrders"
             delay={0.2}
             isBGNeed={false}
@@ -228,7 +231,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
         >
           <div className="flex items-center gap-2 mb-6">
             <Award className="text-[#DC3173]" size={20} />
-            <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
+            <h3 className="text-lg font-bold text-gray-900">{t("top_performers")}</h3>
           </div>
           <div className="space-y-4">
             {vendorPerformanceData.data?.topVendorPerformers
@@ -259,7 +262,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
                       {vendor.vendorName}
                     </p>
                     <p className="text-xs text-gray-500">
-                      €{formatPrice(vendor.totalRevenue || 0)} revenue
+                      €{formatPrice(vendor.totalRevenue || 0)} {t("revenue")}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-sm">

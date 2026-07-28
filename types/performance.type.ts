@@ -31,10 +31,11 @@ export type TVendorPerformanceStat = {
   highestRating: {
     vendorName: string;
     vendorPhoto: string;
-    rating: {
-      average: number;
-      totalReviews: number;
-    };
+    rating: number;
+    // rating: {
+    //   average: number;
+    //   totalReviews: number;
+    // };
   };
   highestRevenue: {
     vendorName: string;
@@ -76,10 +77,10 @@ export type TFleetManagerPerformance = Pick<
   | "userId"
   | "email"
   | "status"
-  | "name"
   | "address"
   | "operationalData"
 > & {
+  name: string;
   totalDeliveries: number;
   totalDrivers: number;
   totalEarnings: number;
@@ -91,26 +92,17 @@ export type TFleetManagerPerformance = Pick<
 
 export type TFleetPerformanceStat = {
   mostOrders: {
-    fleetName: {
-      firstName: string;
-      lastName: string;
-    };
+    fleetName: string;
     fleetPhoto: string;
     ordersCount: number;
   };
   highestRating: {
-    fleetName: {
-      firstName: string;
-      lastName: string;
-    };
+    fleetName: string;
     fleetPhoto: string;
     rating: number;
   };
   highestEarnings: {
-    fleetName: {
-      firstName: string;
-      lastName: string;
-    };
+    fleetName: string;
     fleetPhoto: string;
     earnings: number;
   };
@@ -124,10 +116,7 @@ export type TFleetWeeklyPerformance = {
 
 export type TTopFleetPerformers = {
   _id: string;
-  fleetName: {
-    firstName: string;
-    lastName: string;
-  };
+  fleetName: string;
   fleetPhoto: string;
   rating: number;
   totalEarnings: number;
@@ -166,18 +155,12 @@ export type TDeliveryPartnerPerformance = Pick<
 
 export type TPartnerPerformanceStat = {
   mostOrders: {
-    partnerName: {
-      firstName: string;
-      lastName: string;
-    };
+    partnerName: string;
     partnerPhoto: string;
     ordersCount: number;
   };
   highestRated: {
-    partnerName: {
-      firstName: string;
-      lastName: string;
-    };
+    partnerName: string;
     partnerPhoto: string;
     rating: {
       average: number;
@@ -185,10 +168,7 @@ export type TPartnerPerformanceStat = {
     };
   };
   highestEarnings: {
-    partnerName: {
-      firstName: string;
-      lastName: string;
-    };
+    partnerName: string;
     partnerPhoto: string;
     earnings: number;
   };
@@ -202,10 +182,7 @@ export type TPartnerMonthlyPerformance = {
 export type TTopPartnerPerformers = {
   totalEarnings: number;
   initials: string;
-  name: {
-    firstName: string;
-    lastName: string;
-  };
+  name: string;
   rating: number;
   profilePhoto: string;
 };

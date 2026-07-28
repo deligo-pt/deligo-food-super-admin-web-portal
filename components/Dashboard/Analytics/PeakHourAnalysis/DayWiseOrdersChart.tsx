@@ -14,8 +14,10 @@ import {
 } from "recharts";
 export default function DayWiseOrdersChart({
   dayWiseOrders,
+  title
 }: {
   dayWiseOrders: TPeakHoursAnalysis["dayWiseOrders"];
+  title: string;
 }) {
   return (
     <motion.div
@@ -24,7 +26,7 @@ export default function DayWiseOrdersChart({
       transition={{ delay: 0.1 }}
       className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
     >
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Day-wise Orders</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-4">{title}</h3>
 
       <motion.div
         initial={{

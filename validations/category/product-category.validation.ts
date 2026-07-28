@@ -1,11 +1,10 @@
 import z from "zod";
 
 export const productCategoryValidation = z.object({
-  name: z
-    .string()
-    .min(2, "Category name must be at least 2 characters long")
-    .max(50, "Category name must be at most 50 characters long")
-    .nonempty("Category name is required"),
+  name: z.object({
+    en: z.string().trim().max(50, "Max 50 characters allowed").optional(),
+    pt: z.string().trim().max(50, "Max 50 characters allowed").optional(),
+  }),
 
   description: z.string().optional(),
 
@@ -18,13 +17,27 @@ export const productCategoryValidation = z.object({
     },
     "Image is required",
   ),
-});
+  currentLang: z.enum(["en", "pt"]),
+})
+  .superRefine((data, ctx) => {
+    const currentLanguage = data.currentLang;
+    const targetNameValue = data.name[currentLanguage];
+
+    if (!targetNameValue || targetNameValue.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Category name is required",
+        path: ["name", currentLanguage],
+      });
+    }
+  });
 
 export const updateProductCategoryValidation = z.object({
   name: z
-    .string()
-    .min(2, "Category name must be at least 2 characters long")
-    .max(50, "Category name must be at most 50 characters long")
+    .object({
+      en: z.string().trim().max(50).optional(),
+      pt: z.string().trim().max(50).optional(),
+    })
     .optional(),
 
   description: z.string().optional(),
@@ -35,6 +48,4 @@ export const updateProductCategoryValidation = z.object({
       url: z.string(),
     })
     .optional(),
-
-  businessCategoryId: z.string().optional(),
 });

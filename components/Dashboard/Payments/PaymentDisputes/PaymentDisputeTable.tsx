@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -37,6 +38,8 @@ interface IProps {
 }
 
 export default function PaymentDisputeTable({ disputes }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -49,43 +52,43 @@ export default function PaymentDisputeTable({ disputes }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Dispute ID
+                {t("dispute_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <FileTextIcon className="w-4" />
-                Description
+                {t("description")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <StoreIcon className="w-4" />
-                Vendor
+                {t("vendor")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <UserIcon className="w-4" />
-                Customer
+                {t("customer")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Amount
+                {t("amount")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Status
+                {t("status")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CalendarIcon className="w-4" />
-                Date
+                {t("date")}
               </div>
             </TableHead>
           </TableRow>
@@ -97,7 +100,7 @@ export default function PaymentDisputeTable({ disputes }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={7}
               >
-                No disputes found
+                {t("no_disputes_found")}
               </TableCell>
             </TableRow>
           )}

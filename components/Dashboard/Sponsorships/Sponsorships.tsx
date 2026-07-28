@@ -6,9 +6,11 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteSponsorshipReq } from "@/services/dashboard/sponsorship/sponsorship.service";
 import { TMeta } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,14 +23,11 @@ interface IProps {
   subtitle?: string;
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 const filterOptions = [
   {
-    label: "Active Status",
+    label: "active_status",
     key: "status",
     placeholder: "Select Status",
     type: "select",
@@ -50,7 +49,9 @@ export default function Sponsorships({
   title,
   subtitle,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = getSortOptions(t, sortFields);
 
   const [deleteId, setDeleteId] = useState("");
   const [selectedSponsorship, setSelectedSponsorship] =
@@ -92,10 +93,10 @@ export default function Sponsorships({
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title={title}
-        subtitle={subtitle}
+        title={t(`${title}`)}
+        subtitle={t(`${subtitle}`)}
         buttonInfo={{
-          text: "Add Sponsorship",
+          text: t("add_sponsorship"),
           onClick: () => router.push("/admin/add-sponsorship"),
         }}
       />

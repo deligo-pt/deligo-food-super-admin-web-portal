@@ -11,6 +11,7 @@ const VALID_PERMISSION_ACTIONS = [
     'CAN_MANAGE_PERMISSIONS',
     'CAN_MANAGE_COUPONS',
     'CAN_VIEW_ANALYTICS',
+    'CAN_MANAGE_ACTIVITY_LOGS',
     'CAN_MANAGE_SYSTEM_SETTINGS',
     'CAN_MANAGE_AGREEMENTS',
 ] as const;
@@ -57,6 +58,10 @@ export const permissionActions = [
         value: "CAN_VIEW_ANALYTICS"
     },
     {
+        label: "Manage Activity Logs",
+        value: "CAN_MANAGE_ACTIVITY_LOGS"
+    },
+    {
         label: "Manage System Settings",
         value: "CAN_MANAGE_SYSTEM_SETTINGS"
     },
@@ -72,6 +77,7 @@ export const MODULE_GROUPS = [
     "Vendor Management",
     "Fleet Management",
     "Order Management",
+    "Admin Management",
     "Marketing",
     "Analytics",
     "System Settings",

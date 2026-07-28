@@ -42,12 +42,6 @@ export const addVendorValidation = z
 
     restaurantCuisineType: z.array(z.string()).optional(),
 
-    businessLicenseNumber: z
-      .string()
-      .min(2, "Business license number must be at least 2 characters long")
-      .max(50, "Business license number must be at most 50 characters long")
-      .nonempty("Business license number is required"),
-
     NIF: z
       .string()
       .min(2, "NIF must be at least 2 characters long")
@@ -66,11 +60,7 @@ export const addVendorValidation = z
 
     closingHours: z.string().nonempty("Closing hours is required"),
 
-    closingDays: z
-      .array(z.string())
-      .min(1, "At least one closing day is required")
-      .max(7, "Closing days must be at most 7")
-      .nonempty("Closing days is required"),
+    closingDays: z.array(z.string()).optional(),
 
     street: z
       .string()
@@ -96,8 +86,9 @@ export const addVendorValidation = z
       .min(2, "Country must be at least 2 characters")
       .max(50, "Country must be at most 50 characters"),
 
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
+    latitude: z.number({ error: "Latitude is required" }),
+
+    longitude: z.number({ error: "Logitude is required" }),
 
     bankName: z
       .string()
@@ -152,7 +143,7 @@ export const addVendorValidation = z
     },
   )
   .superRefine((data, ctx) => {
-    if (data.businessType === "RESTAURANT") {
+    if (data.businessType === "restaurant") {
       if (
         !data.restaurantCuisineType ||
         !Array.isArray(data.restaurantCuisineType) ||

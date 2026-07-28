@@ -17,22 +17,25 @@ import {
   UploadCloud,
 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function UploadFleetManagerDocuments({
   fleetManagerId,
   previews,
   setPreviews,
+  isSubmitting
 }: {
   fleetManagerId: string;
   previews: Record<TFleetDocKey, string[] | null>;
   setPreviews: React.Dispatch<
     React.SetStateAction<Record<TFleetDocKey, string[] | null>>
   >;
+  isSubmitting: boolean;
 }) {
   const { t } = useTranslation();
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const [processing, setProcessing] = useState(false);
 
   const DOCUMENTS: {
     key: TFleetDocKey;
@@ -84,6 +87,7 @@ export default function UploadFleetManagerDocuments({
     }
 
     const toastId = toast.loading("Uploading...");
+    setProcessing(true);
 
     const currentFiles = previews[key] || [];
 
@@ -96,7 +100,7 @@ export default function UploadFleetManagerDocuments({
           : `You can only upload a maximum of ${limit} documents`,
         { id: toastId }
       );
-
+      setProcessing(false);
       return;
     }
 
@@ -106,6 +110,7 @@ export default function UploadFleetManagerDocuments({
       toast.error(uploadResult.message || "File upload failed", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -115,6 +120,7 @@ export default function UploadFleetManagerDocuments({
       toast.error("Upload failed: no file URL returned", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -135,6 +141,7 @@ export default function UploadFleetManagerDocuments({
       toast.error(updateResult.message || "File upload failed", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -144,6 +151,7 @@ export default function UploadFleetManagerDocuments({
       ...p,
       [key]: [...(p[key] || []), newUrl],
     }));
+    setProcessing(false);
   };
 
   const removeFile = async (key: TFleetDocKey, index: number) => {
@@ -154,6 +162,7 @@ export default function UploadFleetManagerDocuments({
     const url = currentFiles[index];
 
     const toastId = toast.loading("Deleting...");
+    setProcessing(true);
 
     const endpoint = `/fleet-managers/${fleetManagerId}/docImage`;
     const result = await deleteDocumentReq(endpoint, {
@@ -165,6 +174,7 @@ export default function UploadFleetManagerDocuments({
       toast.error(result.message || "File deletion failed", {
         id: toastId,
       });
+      setProcessing(false);
       return;
     }
 
@@ -178,6 +188,7 @@ export default function UploadFleetManagerDocuments({
     if (inputsRef.current[key]) {
       inputsRef.current[key]!.value = "";
     }
+    setProcessing(false);
   };
 
   useEffect(() => {
@@ -234,14 +245,15 @@ export default function UploadFleetManagerDocuments({
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
-                  {d.label}
+                  <p>{d.label} <span className="text-red-600">*</span></p>
                   {isSelected && (
                     <button
                       type="button"
+                      disabled={isSubmitting || processing}
                       onClick={() => openPicker(d.key)}
                       className="inline-flex items-center gap-2 p-0 text-sm font-medium text-[#DC3173]  hover:underline"
                     >
-                      <Plus className="w-3 h-3 text-[#DC3173]" /> Add More
+                      <Plus className="w-3 h-3 text-[#DC3173]" /> {t("add_more")}
                     </button>
                   )}
 
@@ -302,6 +314,7 @@ export default function UploadFleetManagerDocuments({
 
                         <button
                           type="button"
+                          disabled={isSubmitting || processing}
                           onClick={() => removeFile(d.key, i)}
                           className="px-2 py-1 rounded-md text-xs"
                         >
@@ -319,6 +332,7 @@ export default function UploadFleetManagerDocuments({
               <div className="flex items-center justify-end gap-3 w-42.5!">
                 <button
                   type="button"
+                  disabled={isSubmitting || processing}
                   onClick={() => openPicker(d.key)}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[#DC3173] border border-[#DC3173]/20 hover:bg-[#DC3173]/5 transition"
                 >

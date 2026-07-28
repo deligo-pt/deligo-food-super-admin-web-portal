@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
@@ -22,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { bankNames } from "@/consts/bankNames.const";
 import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -32,8 +34,8 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
-import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
-import { formatTime } from "@/utils/formatTime";
+import { PARTNER_REQUIRED_DOCS, TFilePreview, TPartnerDocKey } from "@/types/document.type";
+import { formatTime, getTodayDateString } from "@/utils/formatTime";
 import { deliveryPartnerValidation } from "@/validations/delivery-partner/delivery-partner.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -50,6 +52,8 @@ import {
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import "react-international-phone/style.css";
 import { toast } from "sonner";
 import z from "zod";
@@ -59,11 +63,10 @@ const DELIGO = "#DC3173";
 type TDeliveryPartnerForm = z.infer<typeof deliveryPartnerValidation>;
 
 const permitTypes = [
-  "D2 Visa",
-  "D4 Student Visa",
   "Temporary Residence",
   "Permanent Residence",
   "EU Citizen",
+  "Passport",
   "Other",
 ];
 
@@ -140,6 +143,8 @@ export default function AddDeliveryPartner() {
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
       vehicleType: "SCOOTER",
       brand: "",
       model: "",
@@ -168,9 +173,11 @@ export default function AddDeliveryPartner() {
     },
   });
 
-  const [watchZones] = useWatch({
+  const { formState: { isSubmitting } } = form;
+
+  const [watchZones, vehicleType, haveCriminalRecordCertificate, residencePermitType] = useWatch({
     control: form.control,
-    name: ["preferredZones"],
+    name: ["preferredZones", "vehicleType", "haveCriminalRecordCertificate", "residencePermitType"],
   });
 
   const addZone = () => {
@@ -243,7 +250,6 @@ export default function AddDeliveryPartner() {
         return;
       }
       toast.error(result.message, { id: toastId });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "OTP resend failed", {
         id: toastId,
@@ -285,6 +291,36 @@ export default function AddDeliveryPartner() {
     const toastId = toast.loading("Adding partner...");
     setButtonDisabled(4);
 
+    const isMotorVehicle = (
+      type: typeof data.vehicleType
+    ): type is "CAR" | "SCOOTER" | "MOTORBIKE" =>
+      type === "CAR" || type === "SCOOTER" || type === "MOTORBIKE";
+
+    const vehicleInfo = isMotorVehicle(data.vehicleType)
+      ? {
+        vehicleType: data.vehicleType,
+        brand: data.brand,
+        model: data.model,
+        licensePlate: (data as any).licensePlate
+          ? (data as any).licensePlate.toUpperCase()
+          : undefined,
+        drivingLicenseNumber: (data as any).drivingLicenseNumber
+          ? (data as any).drivingLicenseNumber.toUpperCase()
+          : undefined,
+        drivingLicenseExpiry: (data as any).drivingLicenseExpiry,
+        insurancePolicyNumber: (data as any).insurancePolicyNumber
+          ? (data as any).insurancePolicyNumber.toUpperCase()
+          : undefined,
+        insuranceExpiry: (data as any).insuranceExpiry
+          ? new Date((data as any).insuranceExpiry)
+          : undefined,
+      }
+      : {
+        vehicleType: data.vehicleType,
+        brand: data.brand,
+        model: data.model,
+      };
+
     const partnerData = {
       name: {
         firstName: data.firstName,
@@ -317,16 +353,9 @@ export default function AddDeliveryPartner() {
         iban: data.iban?.toUpperCase(),
         swiftCode: data.swiftCode?.toUpperCase(),
       },
-      vehicleInfo: {
-        vehicleType: data.vehicleType,
-        brand: data.brand,
-        model: data.model,
-        licensePlate: data.licensePlate?.toUpperCase(),
-        drivingLicenseNumber: data.drivingLicenseNumber?.toUpperCase(),
-        drivingLicenseExpiry: data.drivingLicenseExpiry,
-        insurancePolicyNumber: data.insurancePolicyNumber?.toUpperCase(),
-        insuranceExpiry: new Date(data.insuranceExpiry),
-      },
+
+      vehicleInfo,
+
       criminalRecord: {
         certificate: data.haveCriminalRecordCertificate,
         issueDate: new Date(data.issueDate as string),
@@ -364,6 +393,8 @@ export default function AddDeliveryPartner() {
             id: toastId,
           },
         );
+        setEmail("");
+        setPassword("");
         return;
       }
 
@@ -388,12 +419,10 @@ export default function AddDeliveryPartner() {
     }
   }, [timer]);
 
-  useEffect(() => {
-    const currentPhone = form.getValues("phoneNumber");
-    if (!currentPhone) {
-      form.setValue("phoneNumber", "+351", { shouldValidate: true });
-    }
-  }, [form]);
+  const isDocumentsValid = PARTNER_REQUIRED_DOCS.every(
+    (key) => previews[key] !== null);
+
+  const isSubmitDisabled = isSubmitting || !isDocumentsValid
 
   return (
     <Form {...form}>
@@ -402,8 +431,8 @@ export default function AddDeliveryPartner() {
         className="min-h-screen bg-slate-50"
       >
         <TitleHeader
-          title="Add New Delivery Partner"
-          subtitle="Create a new delivery partner with the form below"
+          title={t("add_new_rider")}
+          subtitle={t("create_new_rider_form")}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -431,7 +460,7 @@ export default function AddDeliveryPartner() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -445,7 +474,7 @@ export default function AddDeliveryPartner() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -455,7 +484,7 @@ export default function AddDeliveryPartner() {
                   />
 
                   <div>
-                    <Label>{t("email")}</Label>
+                    <Label>{t("email")} <span className="text-red-600">*</span></Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
@@ -495,17 +524,18 @@ export default function AddDeliveryPartner() {
 
                   {otpSent && !emailVerified && (
                     <div>
-                      <Label className="mb-2">{t("otp")}</Label>
+                      <Label className="mb-2">{t("otp")} <span className="text-red-600">*</span></Label>
                       <div className="flex items-center gap-3">
                         <Input
                           placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
+                          maxLength={4}
                         />
                         <Button
                           type="button"
                           style={{ background: DELIGO }}
-                          disabled={buttonDisabled === 3}
+                          disabled={buttonDisabled === 3 || otp.length < 4}
                           onClick={verifyOtp}
                           className="w-32"
                         >
@@ -517,7 +547,7 @@ export default function AddDeliveryPartner() {
                   )}
 
                   <div>
-                    <Label className="mb-2">{t("password")}</Label>
+                    <Label className="mb-2">{t("password")} <span className="text-red-600">*</span></Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
@@ -541,7 +571,7 @@ export default function AddDeliveryPartner() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
+                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -610,7 +640,7 @@ export default function AddDeliveryPartner() {
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4">
-                        2. Personal Information
+                        2. {t("personal_information")}
                       </h2>
 
                       <div className="space-y-4 items-start">
@@ -619,9 +649,9 @@ export default function AddDeliveryPartner() {
                           name="dateOfBirth"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Date Of Birth</FormLabel>
+                              <FormLabel>{t("date_of_birth")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
-                                <Input type="date" {...field} />
+                                <Input type="date" {...field} max={getTodayDateString()} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -633,21 +663,21 @@ export default function AddDeliveryPartner() {
                           name="gender"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Gender</FormLabel>
+                              <FormLabel>{t("gender")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Select
                                   onValueChange={field.onChange}
                                   defaultValue={field.value}
                                 >
                                   <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select a Gender" />
+                                    <SelectValue placeholder={t("select_a_gender")} />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="MALE">Male</SelectItem>
+                                    <SelectItem value="MALE">{t("male")}</SelectItem>
                                     <SelectItem value="FEMALE">
-                                      Female
+                                      {t("female")}
                                     </SelectItem>
-                                    <SelectItem value="OTHER">Other</SelectItem>
+                                    <SelectItem value="OTHER">{t("other")}</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -661,9 +691,9 @@ export default function AddDeliveryPartner() {
                           name="nationality"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Nationality</FormLabel>
+                              <FormLabel>{t("nationality")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
-                                <Input placeholder="Nationality" {...field} />
+                                <Input placeholder={t("nationality")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -675,11 +705,11 @@ export default function AddDeliveryPartner() {
                           name="nifNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>NIF Number</FormLabel>
+                              <FormLabel>{t("nif_number")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
-                                  placeholder="NIF Number"
+                                  placeholder={t("nif_number")}
                                   {...field}
                                 />
                               </FormControl>
@@ -693,11 +723,11 @@ export default function AddDeliveryPartner() {
                           name="passportNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Passport Number</FormLabel>
+                              <FormLabel>{t("passport_number")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
-                                  placeholder="Passport Number"
+                                  placeholder={t("passport_number")}
                                   {...field}
                                 />
                               </FormControl>
@@ -723,12 +753,13 @@ export default function AddDeliveryPartner() {
                       style={{ borderColor: DELIGO }}
                     >
                       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        3. Address
+                        3. {t("address")}
                       </h2>
 
                       <BusinessLocationMap
                         form={form}
                         setLocationCoordinates={setLocationCoordinates}
+                        t={t}
                       />
                     </Card>
                   </motion.div>
@@ -754,14 +785,29 @@ export default function AddDeliveryPartner() {
                         <FormField
                           control={form.control}
                           name="bankName"
-                          render={({ field }) => (
+                          render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("bank_name")}</FormLabel>
+                              <FormLabel>{t("bank_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder={t("bank_name")}
-                                  {...field}
-                                />
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <SelectTrigger
+                                    className={cn(
+                                      "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
+                                      fieldState.invalid
+                                        ? "border-red-500"
+                                        : "border-gray-300",
+                                    )}
+                                  >
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {bankNames.map((value) => (
+                                      <SelectItem key={value} value={value}>
+                                        {value}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -773,7 +819,7 @@ export default function AddDeliveryPartner() {
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("account_holder_name")}</FormLabel>
+                              <FormLabel>{t("account_holder_name")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
@@ -790,7 +836,7 @@ export default function AddDeliveryPartner() {
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("iban")}</FormLabel>
+                              <FormLabel>{t("iban")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -808,7 +854,7 @@ export default function AddDeliveryPartner() {
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("swift_code")}</FormLabel>
+                              <FormLabel>{t("swift_code")} <span className="text-red-600">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   className="uppercase placeholder:capitalize"
@@ -845,7 +891,7 @@ export default function AddDeliveryPartner() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      5. Legal Status
+                      5. {t("legal_address")}
                     </h2>
 
                     <div className="space-y-4 items-start">
@@ -854,14 +900,14 @@ export default function AddDeliveryPartner() {
                         name="residencePermitType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Type</FormLabel>
+                            <FormLabel>{t("residence_permit_type")} <span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Select a permit type" />
+                                  <SelectValue placeholder={t("select_permit_type")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {permitTypes.map((type) => (
@@ -882,11 +928,11 @@ export default function AddDeliveryPartner() {
                         name="residencePermitNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Number</FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder="Residence Permit Number"
+                                placeholder={residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}
                                 {...field}
                               />
                             </FormControl>
@@ -900,9 +946,9 @@ export default function AddDeliveryPartner() {
                         name="residencePermitExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Residence Permit Expiry</FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_expiry") : t("residence_permit_expiry")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -925,7 +971,7 @@ export default function AddDeliveryPartner() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      6. Vehicle Information
+                      6. {t("vehicle_information")}
                     </h2>
 
                     <div className="space-y-4 items-start">
@@ -934,14 +980,14 @@ export default function AddDeliveryPartner() {
                         name="vehicleType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Vehicle Type</FormLabel>
+                            <FormLabel>{t("vehicle_type")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Select a vehicle type" />
+                                  <SelectValue placeholder={t("select_vehicle_type")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {[
@@ -972,9 +1018,9 @@ export default function AddDeliveryPartner() {
                         name="brand"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Brand</FormLabel>
+                            <FormLabel>{t("brand")}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Brand" {...field} />
+                              <Input placeholder={t("brand")} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -986,96 +1032,96 @@ export default function AddDeliveryPartner() {
                         name="model"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Model</FormLabel>
+                            <FormLabel>{t("model")}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Model" {...field} />
+                              <Input placeholder={t("model")} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="licensePlate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>License Plate</FormLabel>
+                            <FormLabel>{t("license_plate")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder="License Plate"
+                                placeholder={t("license_plate")}
                                 {...field}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="drivingLicenseNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Driving License Number</FormLabel>
+                            <FormLabel>{t("driving_license_number")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder="Driving License Number"
+                                placeholder={t("driving_license_number")}
                                 {...field}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="drivingLicenseExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Driving License Expiry</FormLabel>
+                            <FormLabel>{t("driving_license_expiry")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="insurancePolicyNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Insurance Policy Number</FormLabel>
+                            <FormLabel>{t("insurance_policy_number")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
-                                placeholder="Insurance Policy Number"
+                                placeholder={t("insurance_policy_number")}
                                 {...field}
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {(!(vehicleType === "BICYCLE" || vehicleType === "E-BIKE")) && <FormField
                         control={form.control}
                         name="insuranceExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Insurance Expiry</FormLabel>
+                            <FormLabel>{t("insurance_expiry")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
                     </div>
                   </Card>
                 </motion.div>
@@ -1093,7 +1139,7 @@ export default function AddDeliveryPartner() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      7. Criminal Record Status
+                      7. {t("criminal_record_status")}
                     </h2>
 
                     <div className="space-y-4 items-start">
@@ -1103,7 +1149,7 @@ export default function AddDeliveryPartner() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Have Criminal Record Certificate?
+                              {t("have_criminal_record_certificate")}
                             </FormLabel>
                             <FormControl>
                               <FormLabel
@@ -1117,7 +1163,7 @@ export default function AddDeliveryPartner() {
                                   onChange={field.onChange}
                                   className="h-4 w-4"
                                 />
-                                Yes
+                                {t("yes")}
                               </FormLabel>
                             </FormControl>
                             <FormMessage />
@@ -1125,33 +1171,33 @@ export default function AddDeliveryPartner() {
                         )}
                       />
 
-                      <FormField
+                      {haveCriminalRecordCertificate && <FormField
                         control={form.control}
                         name="issueDate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Issue Date</FormLabel>
+                            <FormLabel>{t("issue_date")}</FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} max={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
 
-                      <FormField
+                      {haveCriminalRecordCertificate && <FormField
                         control={form.control}
                         name="expiryDate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Expiry Date</FormLabel>
+                            <FormLabel>{t("expiry_date")}</FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      />}
                     </div>
                   </Card>
                 </motion.div>
@@ -1169,12 +1215,12 @@ export default function AddDeliveryPartner() {
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4">
-                      8. Work Preferences and Equipments
+                      8. {t("work_preferences_equipments")}
                     </h2>
 
                     <div className="space-y-4 items-start">
                       <div className="space-y-2">
-                        <Label className="">Preferred Working Zones</Label>
+                        <Label className="">{t("preferred_working_zones")}<span className="text-red-600">*</span></Label>
                         {watchZones?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-1">
                             {watchZones?.map((zone) => (
@@ -1211,7 +1257,7 @@ export default function AddDeliveryPartner() {
                                     type="text"
                                     value={zone}
                                     onChange={(e) => setZone(e.target.value)}
-                                    placeholder="Add a zone"
+                                    placeholder={t("add_a_zone")}
                                     onKeyUp={(e) => {
                                       if (e.key === "Enter") {
                                         e.preventDefault();
@@ -1239,7 +1285,7 @@ export default function AddDeliveryPartner() {
                         name="preferredHours"
                         render={({ field, fieldState }) => (
                           <FormItem>
-                            <FormLabel>Preferred Working Hours</FormLabel>
+                            <FormLabel>{t("preferred_working_hours")}<span className="text-red-600">*</span></FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={(value) =>
@@ -1255,26 +1301,26 @@ export default function AddDeliveryPartner() {
                                       : "border-gray-300",
                                   )}
                                 >
-                                  <SelectValue placeholder="Select Preferred Hours" />
+                                  <SelectValue placeholder={t("select_preferred_hours")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="morning">
-                                    Morning (8AM-12PM)
+                                    {t("morning")} (8AM-12PM)
                                   </SelectItem>
                                   <SelectItem value="afternoon">
-                                    Afternoon (12PM-6PM)
+                                    {t("afternoon")} (12PM-6PM)
                                   </SelectItem>
                                   <SelectItem value="evening">
-                                    Evening (6PM-10PM)
+                                    {t("evening")} (6PM-10PM)
                                   </SelectItem>
                                   <SelectItem value="night">
-                                    Night (10PM-12AM)
+                                    {t("night")} (10PM-12AM)
                                   </SelectItem>
                                   <SelectItem value="fullday">
-                                    Full Day
+                                    {t("full_day")}
                                   </SelectItem>
                                   <SelectItem value="flexible">
-                                    Flexible
+                                    {t("flexible")}
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
@@ -1285,7 +1331,7 @@ export default function AddDeliveryPartner() {
                       />
 
                       <div className="space-y-4 items-start">
-                        <Label className="">Delivery equipments</Label>
+                        <Label className="">{t("delivery_equipments")}</Label>
                         <div className="grid grid-cols-2 gap-3">
                           {equipment.map((item) => (
                             <FormField
@@ -1327,7 +1373,7 @@ export default function AddDeliveryPartner() {
                         name="workedWithOtherPlatform"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Worked With Other Platforms</FormLabel>
+                            <FormLabel>{t("worked_with_other_platform")}</FormLabel>
                             <FormControl>
                               <FormLabel
                                 htmlFor="workedWithOtherPlatform"
@@ -1340,7 +1386,7 @@ export default function AddDeliveryPartner() {
                                   onChange={field.onChange}
                                   className="h-4 w-4"
                                 />
-                                Yes
+                                {t("yes")}
                               </FormLabel>
                             </FormControl>
                             <FormMessage />
@@ -1354,7 +1400,7 @@ export default function AddDeliveryPartner() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Other Platform Name (If Applicable)
+                              {t("other_platform_name_if_applicable")}
                             </FormLabel>
                             <FormControl>
                               <Input
@@ -1383,14 +1429,33 @@ export default function AddDeliveryPartner() {
                     className="p-6 shadow-md border-t-4"
                     style={{ borderColor: DELIGO }}
                   >
-                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <h2 className="text-xl font-semibold flex items-center gap-2">
                       9. {t("documents_nd_verification")}
                     </h2>
+                    <motion.div
+                      initial={{
+                        opacity: 0,
+                        y: 20,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        duration: 0.5,
+                      }}
+                      className="bg-[#DC3173]/10 p-5 rounded-lg w-full text-[#DC3173] italic"
+                    >
+                      <h2 className="text-lg font-semibold">{t("note")} : </h2>
+                      <p className="text-sm">- {t("vehicle_type_bicycle")}</p>
+                      <p className="text-sm">- {t("vehicle_type_not_bicycle")}</p>
+                    </motion.div>
 
                     <UploadPartnerDocuments
                       partnerId={partnerId}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>
@@ -1405,9 +1470,9 @@ export default function AddDeliveryPartner() {
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
-              disabled={buttonDisabled === 4}
+              disabled={buttonDisabled === 4 || isSubmitDisabled}
             >
-              Add Delivery Partner
+              {t("add_rider")}
             </Button>
           </div>
         )}

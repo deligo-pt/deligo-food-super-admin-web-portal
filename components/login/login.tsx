@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import ClearSessionModal from "@/components/login/ClearSessionModal";
@@ -46,6 +47,7 @@ export default function SuperAdminLoginPage({
   const [showModal, setShowModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [removeSubmitting, setRemoveSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginValidation),
@@ -55,49 +57,63 @@ export default function SuperAdminLoginPage({
     },
   });
 
-  const { formState: { isSubmitting } } = form;
-
   const login = async (payload: {
     email: string;
     password: string;
     forceLogin?: boolean;
   }) => {
     const toastId = toast.loading("Logging in...");
+    setIsSubmitting(true);
 
-    const deviceDetails = await getDeviceInfo();
+    try {
+      const deviceDetails = await getDeviceInfo();
 
-    const result = await loginReq({ ...payload, deviceDetails });
+      const result = await loginReq({ ...payload, deviceDetails });
 
-    if (result?.success) {
-      const decoded = jwtDecode(result.data.accessToken) as { role: string };
+      if (result?.success) {
+        const decoded = jwtDecode(result.data.accessToken) as { role: string };
 
-      if (decoded.role === "SUPER_ADMIN" || decoded.role === "ADMIN") {
-        setCookie("accessToken", result.data.accessToken, 7);
-        setCookie("refreshToken", result.data.refreshToken, 365);
-        toast.success("Login successful!", { id: toastId });
+        if (decoded.role === "SUPER_ADMIN" || decoded.role === "ADMIN") {
+          setCookie("accessToken", result.data.accessToken, 7);
+          setCookie("refreshToken", result.data.refreshToken, 365);
+          toast.success("Login successful!", { id: toastId });
 
-        // get and save fcm token
-        setTimeout(() => {
-          getAndSaveFcmToken(result.data.accessToken);
-        }, 1000);
+          // get and save fcm token
+          setTimeout(() => {
+            getAndSaveFcmToken(result.data.accessToken);
+          }, 1000);
 
-        if (redirect) {
-          router.push(redirect);
+          if (redirect) {
+            router.push(redirect);
+            setIsSubmitting(false);
+            return;
+          }
+
+          router.push("/admin/dashboard");
+          setTimeout(() => {
+            setIsSubmitting(false);
+          }, 3000);
           return;
         }
 
-        router.push("/admin/dashboard");
+        toast.error("You are not a super admin", { id: toastId });
+        setIsSubmitting(false);
+        return;
+      } else {
+        if (result?.err?.statusCode === 403 && result?.err?.errorKey === "LIMIT_EXCEEDED") {
+          toast.error("Device limit exceeded. Click remove and continue login or try again later", { id: toastId });
+          setShowModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+        toast.error(result?.message, { id: toastId });
+        setIsSubmitting(false);
         return;
       }
-
-      toast.error("You are not a super admin", { id: toastId });
-      return;
-    }
-
-    toast.error(result.message, { id: toastId });
-
-    if (result.message === "LIMIT_EXCEEDED") {
-      setShowModal(true);
+    } catch (err: any) {
+      console.log("login err :", err);
+      toast.error(err.message || err?.response?.message || "Login failed", { id: toastId });
+      setIsSubmitting(false);
     }
   };
 

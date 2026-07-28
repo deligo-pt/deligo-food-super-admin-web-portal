@@ -6,7 +6,12 @@ import { catchAsync } from "@/utils/catchAsync";
 
 
 export const createCuisine = async (
-    data: { name: string },
+    data: {
+        name: {
+            en: string,
+            pt: string,
+        }
+    },
     image?: File | null,
 ) => {
     return catchAsync(async () => {
@@ -24,9 +29,28 @@ export const createCuisine = async (
     });
 };
 
-export const getAllCuisine = async () => {
+export const getAllCuisine = async (queryString?: string) => {
+    let cleanQueryString = "";
+    let activeLang = "en";
+
+    if (queryString) {
+        const params = new URLSearchParams(queryString);
+
+        if (params.has("lang")) {
+            activeLang = params.get("lang") || "en";
+            params.delete("lang");
+        }
+
+        cleanQueryString = params.toString();
+    }
+
     const result = await catchAsync(async () => {
-        const res = await serverFetch.get("/categories/cuisine", {
+        const url = `/categories/cuisine${cleanQueryString ? `?${cleanQueryString}` : ""}`;
+
+        const res = await serverFetch.get(url, {
+            headers: {
+                "Accept-Language": activeLang,
+            },
             next: {
                 tags: ["cuisine-list"],
             },
@@ -40,9 +64,13 @@ export const getAllCuisine = async () => {
 };
 
 // Get Single Cuisine by ID
-export const getSingleCuisine = async (id: string) => {
+export const getSingleCuisine = async (id: string, lang: "en" | "pt") => {
     return catchAsync(async () => {
-        const res = await serverFetch.get(`/categories/cuisine/${id}`);
+        const res = await serverFetch.get(`/categories/cuisine/${id}`, {
+            headers: {
+                "Accept-Language": lang
+            }
+        });
         return await res.json();
     });
 };

@@ -15,8 +15,8 @@ export default async function SubmittedVendorsPage({ searchParams }: IProps) {
   return (
     <Vendors
       vendorsResult={vendorsResult}
-      title="Pending Approvals"
-      subtitle="All submitted requests for vendor approval"
+      title="pending_approvals"
+      subtitle="review_newly_registered_vendors"
     />
   );
 }

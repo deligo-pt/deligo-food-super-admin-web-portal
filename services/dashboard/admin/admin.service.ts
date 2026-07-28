@@ -57,3 +57,20 @@ export const getAllAdmin = async () => {
 
   return null;
 };
+
+export const getSingleAdmin = async (id: string) => {
+  const url = `/admins/${id}`;
+
+  const result = await catchAsync<TAdmin>(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["admin-list"],
+      },
+    });
+    return await res.json();
+  });
+
+  if (result?.success) return result;
+
+  return null;
+};

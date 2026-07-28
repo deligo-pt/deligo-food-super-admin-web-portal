@@ -32,6 +32,8 @@ import { uploadImagesReq } from "@/services/upload/upload.service";
 import { TIngredient } from "@/types/ingredient.type";
 import { ingredientSchema } from "@/validations/Ingredients/Ingredients.validation";
 import { TTax } from "@/types/tax.type";
+import { useStore } from "@/store/store";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface EditIngredientModalProps {
   isOpen: boolean;
@@ -50,6 +52,8 @@ export default function EditIngredientModal({
   taxes,
   onSuccess,
 }: EditIngredientModalProps) {
+  const { t } = useTranslation();
+  const { lang } = useStore();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [previewImage, setPreviewImage] = useState(ingredientData.image || "");
@@ -160,10 +164,10 @@ export default function EditIngredientModal({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 bg-white">
         <DialogHeader>
           <DialogTitle className="text-2xl font-extrabold text-gray-900">
-            Edit Ingredient Specifications
+            {t("edit_ingredient_specifications")}
           </DialogTitle>
           <DialogDescription>
-            Modify catalog parameters and wholesale matrix definitions for SKU:{" "}
+            {t("modify_catalog_parameters_wholesale_matrix")}:{" "}
             <span className="font-mono text-gray-700">{ingredientData.sku}</span>
           </DialogDescription>
         </DialogHeader>
@@ -180,7 +184,7 @@ export default function EditIngredientModal({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{t("name")}</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. Premium Extra Virgin Olive Oil" {...field} />
                     </FormControl>
@@ -195,7 +199,7 @@ export default function EditIngredientModal({
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t("category_lg")}</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. Oils & Vinegars" {...field} />
                     </FormControl>
@@ -210,7 +214,7 @@ export default function EditIngredientModal({
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price per Unit (€)</FormLabel>
+                    <FormLabel>{t("price_per_unit")}(€)</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g. 12.50"
@@ -233,7 +237,7 @@ export default function EditIngredientModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tax rate</FormLabel>
+                    <FormLabel>{t("tax_rate")}</FormLabel>
                     {/* Fallback to undefined if value is empty so the placeholder shows instead of a broken empty selection */}
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl>
@@ -244,7 +248,7 @@ export default function EditIngredientModal({
                       <SelectContent>
                         {taxes?.map((tax) => (
                           <SelectItem key={tax._id} value={tax._id}>
-                            {tax.taxName} ({tax.taxRate}%)
+                            {tax.taxName?.[lang]} ({tax.taxRate}%)
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -260,7 +264,7 @@ export default function EditIngredientModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Measurement Unit</FormLabel>
+                    <FormLabel>{t("measurement_unit")}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger className="w-full h-10!">
@@ -286,7 +290,7 @@ export default function EditIngredientModal({
                 name="stock"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Stock</FormLabel>
+                    <FormLabel>{t("stock")}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g. 150"
@@ -308,7 +312,7 @@ export default function EditIngredientModal({
                 name="lowStockAlert"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Low Stock Alert Level</FormLabel>
+                    <FormLabel>{t("low_stock_alert_level")}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g. 15"
@@ -330,7 +334,7 @@ export default function EditIngredientModal({
                 name="minOrder"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum Order</FormLabel>
+                    <FormLabel>{t("minimum_order")}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g. 2"
@@ -353,7 +357,7 @@ export default function EditIngredientModal({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Catalog Description</FormLabel>
+                  <FormLabel>{t("catalog_description")}</FormLabel>
                   <FormControl>
                     <Textarea rows={3} {...field} />
                   </FormControl>
@@ -371,7 +375,7 @@ export default function EditIngredientModal({
                   <FormItem>
                     <FormControl>
                       <ImageUpload
-                        label="Replace Thumbnail Asset Image"
+                        label={t("replace_thumbnail_asset_image")}
                         value={previewImage}
                         onChange={(file) => (file ? handleImageUpload(file) : removeFile())}
                         isInvalid={fieldState.invalid}
@@ -390,7 +394,7 @@ export default function EditIngredientModal({
                 name="lowStockAlert"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Low Stock Warning Limit ({ingredientData.unit})</FormLabel>
+                    <FormLabel>{t("low_stock_warning_limit")} ({ingredientData.unit})</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -409,7 +413,7 @@ export default function EditIngredientModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
-                      <Calendar size={14} /> Shelf Life Safeguard (Days)
+                      <Calendar size={14} /> {t("shelf_life_safeguard")}
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -431,22 +435,22 @@ export default function EditIngredientModal({
             <div className="border-t border-gray-100 pt-4">
               <div className="flex justify-between items-center mb-3">
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900">Dynamic Discount Matrix</h4>
-                  <p className="text-xs text-gray-400">Map localized pricing offsets against bulk volume thresholds</p>
+                  <h4 className="text-sm font-bold text-gray-900">{t("dynamic_discount_matrix")}</h4>
+                  <p className="text-xs text-gray-400">{t("map_localized_pricing_offsets")}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => append({ minQty: 1, discountPrice: 0 })}
                   className="flex items-center gap-1 text-xs font-bold bg-gray-100 hover:bg-[#DC3173] hover:text-white transition-all px-3 py-1.5 rounded-lg text-gray-700"
                 >
-                  <Plus size={14} /> Add Tier
+                  <Plus size={14} /> {t("add_tier")}
                 </button>
               </div>
 
               <div className="space-y-2 max-h-45 overflow-y-auto pr-1">
                 {fields.length === 0 && (
                   <p className="text-xs text-gray-400 bg-gray-50 p-3 text-center rounded-lg italic">
-                    No active discount tiers mapped to this object profile.
+                   {t("no_active_discount_tiers_mapped_object_profile")}
                   </p>
                 )}
                 {fields.map((item, index) => (
@@ -456,7 +460,7 @@ export default function EditIngredientModal({
                       name={`bulkDiscount.${index}.minQty`}
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel className="text-[11px] text-gray-500">Min Volume ({ingredientData.unit})</FormLabel>
+                          <FormLabel className="text-[11px] text-gray-500">{t("min_volume")} ({ingredientData.unit})</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -474,7 +478,7 @@ export default function EditIngredientModal({
                       name={`bulkDiscount.${index}.discountPrice`}
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel className="text-[11px] text-gray-500">Promo Rate (€)</FormLabel>
+                          <FormLabel className="text-[11px] text-gray-500">{t("promo_rate")} (€)</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -508,7 +512,7 @@ export default function EditIngredientModal({
                 className="flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all text-sm"
                 disabled={isSaving}
               >
-                <X size={16} /> Cancel
+                <X size={16} /> {t("cancel")}
               </button>
               <button
                 type="submit"
@@ -516,7 +520,7 @@ export default function EditIngredientModal({
                 disabled={isSaving || isUploadingImage}
               >
                 <Save size={16} />
-                {isSaving ? "Saving..." : "Save Changes"}
+                {isSaving ? "Saving..." : t("save_changes")}
               </button>
             </div>
           </form>

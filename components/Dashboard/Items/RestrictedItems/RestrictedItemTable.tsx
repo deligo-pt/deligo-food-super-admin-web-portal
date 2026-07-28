@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TRestrictedItem } from "@/types/product.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -37,6 +38,8 @@ export default function RestrictedItemTable({
   onEdit,
   onDelete,
 }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -49,30 +52,30 @@ export default function RestrictedItemTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <PackageX className="w-4" />
-                Name
+                {t("name")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Layers className="w-4" />
-                Category
+                {t("category_lg")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <MessageSquareWarning className="w-4" />
-                Reason
+                {t("reason")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Calendar className="w-4" />
-                Date
+                {t("date")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -83,7 +86,7 @@ export default function RestrictedItemTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No restricted items found
+                {t("no_restricted_items_found")}
               </TableCell>
             </TableRow>
           )}
@@ -102,13 +105,13 @@ export default function RestrictedItemTable({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => onEdit(restrictedItem)}>
-                      Edit
+                      {t("edit")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => onDelete(restrictedItem._id)}
                     >
-                      Delete
+                      {t("delete")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

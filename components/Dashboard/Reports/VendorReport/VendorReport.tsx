@@ -9,6 +9,7 @@ import {
   SelectDateRangeFilter,
 } from "@/components/Filtering/SelectDateRangeFilter";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { IVendorReportAnalytics } from "@/types/report.type";
 import { generateVendorReportCSV } from "@/utils/csv/vendorReportCSV";
 import { generateVendorReportPDF } from "@/utils/pdf/vendorReportPdf";
@@ -22,6 +23,7 @@ interface IProps {
 }
 
 export default function VendorReport({ vendorReportAnalytics }: IProps) {
+  const {t} = useTranslation();
   const searchParams = useSearchParams();
   const currentTimeframe = searchParams.get("timeframe") || "";
   const [isCustomDate, setIsCustomDate] = useState(
@@ -33,13 +35,13 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
       <div>
         {/* Header */}
         <TitleHeader
-          title="Vendor Report"
-          subtitle="Overview of all registered vendors and their status"
+          title={t("vendor_report")}
+          subtitle={t("overview_of_all_registered_vendors_status")}
           extraComponent={
             <div className="flex items-center gap-3">
               {/* Date Filter */}
               <SelectDateRangeFilter
-                placeholder="Select Date Range"
+                placeholder={t("select_date_range")}
                 onCustomRangeSelect={() => setIsCustomDate(true)}
               />
 
@@ -63,25 +65,25 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8 print:mb-4">
           <StatsCard
-            title="Total Vendors"
+            title={t("total_vendors")}
             value={vendorReportAnalytics.stats?.totalVendors || 0}
             icon={Store}
             delay={0}
           />
           <StatsCard
-            title="Approved Vendors"
+            title={t("approved_vendors")}
             value={vendorReportAnalytics.stats?.approvedVendors || 0}
             icon={CheckCircle}
             delay={0.1}
           />
           <StatsCard
-            title="Pending Vendors"
+            title={t("pending_vendors")}
             value={vendorReportAnalytics.stats?.pendingVendors || 0}
             icon={Clock}
             delay={0.2}
           />
           <StatsCard
-            title="Blocked/Rejected Vendors"
+            title={t("blocked_rejected_vendors")}
             value={vendorReportAnalytics.stats?.blockedVendors || 0}
             icon={XCircle}
             delay={0.3}
@@ -91,11 +93,11 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
         {/* Charts */}
         <CustomizedCharts
           type="area"
-          title="Vendor Growth"
-          description="New vendor registrations over time"
+          title={t("vendor_growth")}
+          description={t("new_vendor_registration_over_time")}
           data={vendorReportAnalytics.vendorGrowths || []}
-          xLabel="Time"
-          yLabel="No of Vendors"
+          xLabel={t("time")}
+          yLabel={t("no_of_vendors")}
           xKey="time"
           yKey="vendors"
           delay={0.2}
@@ -117,7 +119,7 @@ export default function VendorReport({ vendorReportAnalytics }: IProps) {
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 my-8"
         >
           <h3 className="text-lg font-bold text-gray-900 mb-4">
-            Status Distribution
+            {t("status_distribution")}
           </h3>
           <div className="space-y-3">
             <StatusDistributionCard

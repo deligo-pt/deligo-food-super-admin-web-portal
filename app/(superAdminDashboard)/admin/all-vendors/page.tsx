@@ -13,8 +13,8 @@ export default async function AllVendorsPage({ searchParams }: IProps) {
     <Vendors
       vendorsResult={vendorsResult}
       showFilters={true}
-      title="All Vendors"
-      subtitle="Manage all registered vendors"
+      title="all_vendors"
+      subtitle="manage_all_registered_vendors"
     />
   );
 }

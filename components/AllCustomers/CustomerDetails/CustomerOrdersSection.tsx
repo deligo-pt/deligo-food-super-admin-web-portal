@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TOrder } from "@/types/order.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -18,6 +19,8 @@ interface IProps {
 }
 
 export default function CustomerOrdersSection({ orders }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -25,7 +28,7 @@ export default function CustomerOrdersSection({ orders }: IProps) {
       className="overflow-x-auto"
     >
       {orders?.length === 0 ? (
-        <div className="text-gray-500 text-sm text-center">No orders found</div>
+        <div className="text-gray-500 text-sm text-center">{t("no_orders_found")}</div>
       ) : (
         <Table className="max-w-full">
           <TableHeader>
@@ -33,25 +36,25 @@ export default function CustomerOrdersSection({ orders }: IProps) {
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <HashIcon className="w-4" />
-                  Order ID
+                  {t("order_id")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <PackageIcon className="w-4" />
-                  Items
+                  {t("items")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <EuroIcon className="w-4" />
-                  Amount
+                  {t("amount")}
                 </div>
               </TableHead>
               <TableHead>
                 <div className="text-[#DC3173] flex gap-2 items-center">
                   <CalendarIcon className="w-4" />
-                  Date
+                  {t("date")}
                 </div>
               </TableHead>
             </TableRow>
@@ -63,7 +66,7 @@ export default function CustomerOrdersSection({ orders }: IProps) {
                 <TableCell>
                   {order.items?.map((i, index) => (
                     <span key={index}>
-                      {i.productId?.name} x {i.quantity}
+                      {i.name} x {i.quantity}
                     </span>
                   ))}
                 </TableCell>

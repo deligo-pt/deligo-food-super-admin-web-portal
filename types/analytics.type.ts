@@ -2,7 +2,10 @@ import { ORDER_STATUS } from "@/consts/order.const";
 
 export type TPopularCategory = {
   _id: string;
-  name: string;
+  name: {
+    en: string;
+    pt: string;
+  };
   percentage: number;
 };
 
@@ -32,7 +35,10 @@ export type TTopRatedDeliveryPartner = {
 
 export type TTopRatedItems = {
   _id: string;
-  name: string;
+  name: {
+    en: string;
+    pt: string;
+  };
   rating: {
     average: number;
   };
@@ -53,7 +59,7 @@ export type TAnalytics = {
     total: number;
     pending: number;
     completed: number;
-    cancelled: number;
+    canceled: number;
   };
 
   popularCategories: TPopularCategory[];

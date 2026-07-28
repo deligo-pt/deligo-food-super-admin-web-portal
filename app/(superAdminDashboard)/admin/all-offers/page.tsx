@@ -13,8 +13,8 @@ export default async function AllOffersPage({ searchParams }: IProps) {
     <ActiveCampaigns
       offersResult={offersResult}
       showFilters={true}
-      title="All Offers"
-      subtitle="Manage all offers here"
+      title="all_offers"
+      subtitle="manage_all_offers_here"
     />
   );
 }

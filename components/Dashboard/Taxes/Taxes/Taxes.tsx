@@ -6,12 +6,15 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   deleteTaxReq,
+  permanentDeleteTax,
   updateTaxReq,
 } from "@/services/dashboard/tax/tax.service";
 import { TMeta } from "@/types";
 import { TTax } from "@/types/tax.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,16 +24,14 @@ interface IProps {
   taxesResult: { data: TTax[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "taxName" },
-  { label: "Name (Z-A)", value: "-taxName" },
-];
+const sortFields = ["newest", "oldest", "taxNameAZ", "taxNameZA"] as SortOptionKey[];
 
 export default function Taxes({ taxesResult }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
   const [editTax, setEditTax] = useState<TTax | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [permanentDeleteId, setPermanentDeleteId] = useState<string | null>(null);
   const [buttonDisabled, setButtonDisabled] = useState(0);
   const router = useRouter();
 
@@ -85,13 +86,36 @@ export default function Taxes({ taxesResult }: IProps) {
     setButtonDisabled(0);
   };
 
+  const handlePermanentDeleteTax = async () => {
+    const toastId = toast.loading("Deleting Tax...");
+    setButtonDisabled(2);
+
+    const result = await permanentDeleteTax(permanentDeleteId as string);
+
+    if (result.success) {
+      router.push("/admin/all-taxes");
+      toast.success(result.message || "Tax deleted successfully!", {
+        id: toastId,
+      });
+      setPermanentDeleteId(null);
+      setButtonDisabled(0);
+      return;
+    }
+
+    toast.error(result.message || "Failed to delete tax", {
+      id: toastId,
+    });
+    console.log(result);
+    setButtonDisabled(0);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <TitleHeader
-        title="All Taxes"
-        subtitle="Manage all the taxes in the system"
+        title={t("all_taxes")}
+        subtitle={t("manage_all_the_taxes_in_system")}
         buttonInfo={{
-          text: "Create",
+          text: t("create"),
           icon: PlusCircle,
           onClick: () => router.push("/admin/create-tax"),
         }}
@@ -105,6 +129,7 @@ export default function Taxes({ taxesResult }: IProps) {
         onEditClick={(tax: TTax) => setEditTax(tax)}
         onStatusChange={handleUpdateStatus}
         onDeleteClick={(id: string) => setDeleteId(id)}
+        onPermanentDelete={(id: string) => setPermanentDeleteId(id)}
       />
 
       {!!taxesResult?.meta?.total && taxesResult?.meta?.total > 0 && (
@@ -126,6 +151,14 @@ export default function Taxes({ taxesResult }: IProps) {
         onOpenChange={(open) => !open && setDeleteId(null)}
         onConfirm={handleDeleteTax}
         isDeleting={buttonDisabled === 1 ? true : false}
+      />
+
+      {/* Permanent Delete Tax Modal */}
+      <DeleteModal
+        open={!!permanentDeleteId}
+        onOpenChange={(open) => !open && setPermanentDeleteId(null)}
+        onConfirm={handlePermanentDeleteTax}
+        isDeleting={buttonDisabled === 2 ? true : false}
       />
     </div>
   );

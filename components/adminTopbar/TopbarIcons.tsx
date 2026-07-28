@@ -16,7 +16,7 @@ import {
   UserIcon,
 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { setLanguageCookie } from "@/utils/language";
 
 const PRIMARY = "#DC3173";
 
@@ -37,7 +38,29 @@ export default function TopbarIcons({ admin }: IProps) {
   const { lang, setLang } = useStore();
   const [langOpen, setLangOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const urlLang = searchParams.get("lang");
+    if (urlLang === "en" || urlLang === "pt") {
+      setLang(urlLang);
+    }
+  }, [searchParams, setLang]);
+
+  const handleLangChange = (value: "en" | "pt") => {
+    setLang(value);
+
+    // Save cookie
+    setLanguageCookie(value);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("lang", value);
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
 
   const logOut = async () => {
@@ -92,22 +115,13 @@ export default function TopbarIcons({ admin }: IProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const LANGS = [
-    { code: "en", label: "English" },
-    { code: "pt", label: "Português" },
-    { code: "es", label: "Español" },
-  ];
-
   return (
     <>
       {/* Language */}
-
-      <div className="relative hidden sm:block z-1002">
+      <div className="relative z-1002">
         <Select
           value={lang}
-          onValueChange={(value: "en" | "pt") => {
-            setLang(value);
-          }}
+          onValueChange={(value: "en" | "pt") => handleLangChange(value)}
         >
           <SelectTrigger className="w-17.5 hover:border hover:border-[#DC3173]">
             <SelectValue placeholder="Language" />

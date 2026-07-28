@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryInsights } from "@/types/analytics/delivery-insights.type";
 import { motion } from "framer-motion";
 import { Bike, CheckCircle2, Clock, XCircle } from "lucide-react";
@@ -9,6 +10,7 @@ interface IProps {
 }
 
 export default function RiderPerformance({ riderPerformance }: IProps) {
+  const { t } = useTranslation();
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -31,10 +33,10 @@ export default function RiderPerformance({ riderPerformance }: IProps) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Rider Performance
+           {t("rider_performance")}
           </h3>
           <p className="text-sm text-gray-500">
-            Deliveries handled by each rider
+            {t("deliveries_handled_by_each_rider")}
           </p>
         </div>
         <div className="bg-slate-50 p-2 rounded-lg">
@@ -46,7 +48,7 @@ export default function RiderPerformance({ riderPerformance }: IProps) {
         variants={container}
         initial="hidden"
         animate="show"
-        className="max-h-[400px] overflow-y-auto space-y-4 pr-2 custom-scrollbar grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="max-h-100 overflow-y-auto space-y-4 pr-2 custom-scrollbar grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       >
         {riderPerformance.map((rider) => {
           const successRate = Math.round(
@@ -65,14 +67,14 @@ export default function RiderPerformance({ riderPerformance }: IProps) {
                     {rider.riderName}
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
-                    {rider.totalDeliveries} Total Deliveries
+                    {rider.totalDeliveries} {t("total_deliveries")}
                   </p>
                 </div>
 
                 <div className="flex-1">
                   <div className="flex justify-between mb-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase">
-                      Success Rate
+                      {t("success_rate")}
                     </span>
                     <span className="text-[10px] font-bold text-[#DC3173]">
                       {successRate}%
@@ -96,7 +98,7 @@ export default function RiderPerformance({ riderPerformance }: IProps) {
                       </span>
                     </div>
                     <span className="text-[10px] text-slate-400 text-center">
-                      Successfull Deliveries
+                     {t("successfull_deliveries")}
                     </span>
                   </div>
 
@@ -108,7 +110,7 @@ export default function RiderPerformance({ riderPerformance }: IProps) {
                       </span>
                     </div>
                     <span className="text-[10px] text-slate-400 text-center">
-                      Failed Deliveries
+                      {t("failed_deliveries")}
                     </span>
                   </div>
 
@@ -118,7 +120,7 @@ export default function RiderPerformance({ riderPerformance }: IProps) {
                       <span className="text-sm">{rider.averageTime}m</span>
                     </div>
                     <span className="text-[10px] text-slate-400 uppercase text-center">
-                      Avg Time
+                      {t("avg_time")}
                     </span>
                   </div>
                 </div>

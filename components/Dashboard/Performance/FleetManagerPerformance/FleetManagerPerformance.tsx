@@ -5,6 +5,7 @@ import FleetManagerPerformanceTable from "@/components/Dashboard/Performance/Fle
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TFleetPerformanceData } from "@/types/performance.type";
 import { formatPrice } from "@/utils/formatPrice";
@@ -18,12 +19,15 @@ interface IProps {
 export default function FleetManagerPerformance({
   fleetPerformanceData,
 }: IProps) {
+  const { t } = useTranslation();
+  console.log("fleet performance", fleetPerformanceData);
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title="Fleet Manager Performance Analytics"
-        subtitle="Comprehensive insights into fleet manager performance"
+        title={t("fleet_manager_performance_analytics")}
+        subtitle={t("comprehensive_insights_fleet_manager_performance")}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -45,48 +49,31 @@ export default function FleetManagerPerformance({
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <TrendingUp size={20} />
             </div>
-            <span className="font-medium">Most Orders</span>
+            <span className="font-medium">{t("most_orders")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
-                      ?.fleetPhoto
+                    fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetPhoto
                   }
-                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.firstName} ${fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.lastName}`}
+                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.charAt(0)}`}
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.firstName?.charAt(
-                    0,
-                  )}
-                  {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.lastName?.charAt(
-                    0,
-                  )}
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
               <p className="text-gray-800 font-semibold">
                 {
-                  fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
-                    ?.fleetName?.firstName
-                }{" "}
-                {
-                  fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
-                    ?.fleetName?.lastName
-                }
-                {!fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
-                  ?.fleetName?.firstName &&
-                  !fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders
-                    ?.fleetName?.lastName &&
-                  "N/A"}
+                  fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.fleetName || "N/A"}{" "}
               </p>
               <p className="text-[#DC3173] text-sm">
                 {fleetPerformanceData?.data?.fleetPerformanceStat?.mostOrders?.ordersCount?.toLocaleString() ||
                   0}{" "}
-                orders
+                {t("orders")}
               </p>
             </div>
           </div>
@@ -109,48 +96,29 @@ export default function FleetManagerPerformance({
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <Star size={20} />
             </div>
-            <span className="font-medium">Highest Rated</span>
+            <span className="font-medium">{t("highest_rated")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.fleetPerformanceStat
-                      ?.highestRating?.fleetPhoto
+                    fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetPhoto
                   }
-                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.firstName} ${fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.lastName}`}
+                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.charAt(0)}`}
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.firstName?.charAt(
-                    0,
-                  )}
-                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.lastName?.charAt(
-                    0,
-                  )}
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
               <p className="text-gray-800 font-bold">
-                {
-                  fleetPerformanceData?.data?.fleetPerformanceStat
-                    ?.highestRating?.fleetName?.firstName
-                }{" "}
-                {
-                  fleetPerformanceData?.data?.fleetPerformanceStat
-                    ?.highestRating?.fleetName?.lastName
-                }
-                {!fleetPerformanceData?.data?.fleetPerformanceStat
-                  ?.highestRating?.fleetName?.firstName &&
-                  !fleetPerformanceData?.data?.fleetPerformanceStat
-                    ?.highestRating?.fleetName?.lastName &&
-                  "N/A"}
+                {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.fleetName || "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
-                {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating
-                  ?.rating || 0}{" "}
-                stars
+                {fleetPerformanceData?.data?.fleetPerformanceStat?.highestRating?.rating || 0}{" "}
+                {t("stars")}
               </p>
             </div>
           </div>
@@ -173,49 +141,32 @@ export default function FleetManagerPerformance({
             <div className="p-2 bg-[#DC3173]/20 text-[#DC3173] rounded-lg">
               <EuroIcon size={20} />
             </div>
-            <span className="font-medium">Highest Earnings</span>
+            <span className="font-medium">{t("highest_earnings")}</span>
           </div>
           <div className="flex items-center gap-3">
             <div>
               <Avatar className="w-8 h-8">
                 <AvatarImage
                   src={
-                    fleetPerformanceData?.data?.fleetPerformanceStat
-                      ?.highestEarnings?.fleetPhoto
+                    fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetPhoto
                   }
-                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.firstName} ${fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.lastName}`}
+                  alt={`${fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.charAt(0)}`}
                 />
                 <AvatarFallback>
-                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.firstName?.charAt(
-                    0,
-                  )}
-                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.lastName?.charAt(
-                    0,
-                  )}
+                  {fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
             </div>
             <div>
               <p className="text-gray-800 font-bold">
                 {
-                  fleetPerformanceData?.data?.fleetPerformanceStat
-                    ?.highestEarnings?.fleetName?.firstName
-                }{" "}
-                {
-                  fleetPerformanceData?.data?.fleetPerformanceStat
-                    ?.highestEarnings?.fleetName?.lastName
+                  fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.fleetName || "N/A"
                 }
-                {!fleetPerformanceData?.data?.fleetPerformanceStat
-                  ?.highestEarnings?.fleetName?.firstName &&
-                  !fleetPerformanceData?.data?.fleetPerformanceStat
-                    ?.highestEarnings?.fleetName?.lastName &&
-                  "N/A"}
               </p>
               <p className="text-[#DC3173] text-sm">
                 €
                 {formatPrice(
-                  fleetPerformanceData?.data?.fleetPerformanceStat
-                    ?.highestEarnings?.earnings || 0,
+                  fleetPerformanceData?.data?.fleetPerformanceStat?.highestEarnings?.earnings || 0,
                 )}
               </p>
             </div>
@@ -228,12 +179,12 @@ export default function FleetManagerPerformance({
         <div className="lg:col-span-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <CustomizedCharts
             type="area"
-            title="Orders Performance"
-            description="Daily performance over the last 7 days"
+            title={t("orders_performance")}
+            description={t("daily_performance_over_7_days")}
             data={fleetPerformanceData?.data?.fleetWeeklyPerformance || []}
-            xLabel="Days"
+            xLabel={t("days")}
             xKey="day"
-            yLabel="No of Orders"
+            yLabel={t("no_of_orders")}
             yKey="totalOrders"
             delay={0.2}
             isBGNeed={false}
@@ -242,8 +193,8 @@ export default function FleetManagerPerformance({
 
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <CustomizedCharts
-            title="Earnings Performance"
-            description="Daily performance over the last 7 days"
+            title={t("earnings_performance")}
+            description={t("daily_performance_over_7_days")}
             data={fleetPerformanceData?.data?.fleetWeeklyPerformance || []}
             xLabel="Days"
             xKey="day"
@@ -273,7 +224,7 @@ export default function FleetManagerPerformance({
         >
           <div className="flex items-center gap-2 mb-6">
             <Award className="text-[#DC3173]" size={20} />
-            <h3 className="text-lg font-bold text-gray-900">Top Performers</h3>
+            <h3 className="text-lg font-bold text-gray-900">{t("top_performers")}</h3>
           </div>
           <div className="space-y-4">
             {fleetPerformanceData?.data?.topFleetPerformers?.map(
@@ -291,24 +242,19 @@ export default function FleetManagerPerformance({
                     <Avatar className="w-8 h-8">
                       <AvatarImage
                         src={fleetManager.fleetPhoto}
-                        alt={`${fleetManager?.fleetName?.firstName} ${fleetManager?.fleetName?.lastName}`}
+                        alt={`${fleetManager?.fleetName}`}
                       />
                       <AvatarFallback>
-                        {fleetManager?.fleetName?.firstName?.charAt(0)}
-                        {fleetManager?.fleetName?.lastName?.charAt(0)}
+                        {fleetManager?.fleetName?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-gray-900 truncate">
-                      {fleetManager?.fleetName?.firstName}{" "}
-                      {fleetManager?.fleetName?.lastName}
-                      {!fleetManager?.fleetName?.firstName &&
-                        !fleetManager?.fleetName?.lastName &&
-                        "N/A"}
+                      {fleetManager?.fleetName || "N/A"}
                     </p>
                     <p className="text-xs text-gray-500">
-                      €{formatPrice(fleetManager.totalEarnings || 0)} earnings
+                      €{formatPrice(fleetManager.totalEarnings || 0)} {t("earnings")}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-sm">

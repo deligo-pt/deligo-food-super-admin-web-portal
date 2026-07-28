@@ -1,5 +1,6 @@
 import { Mail, Bell, Send } from "lucide-react";
 import { motion, Variants } from 'framer-motion';
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
     itemVariants: Variants;
@@ -14,6 +15,7 @@ const OPTIONS = [
 ];
 
 export default function CommunicationType({ itemVariants, commType, setCommType }: IProps) {
+    const {t} = useTranslation();
 
     return (
         <motion.div
@@ -21,7 +23,7 @@ export default function CommunicationType({ itemVariants, commType, setCommType 
             className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
         >
             <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">
-                Communication Type
+                {t("communication_type")}
             </h2>
             <div className="flex p-1 bg-gray-100 rounded-xl">
                 {OPTIONS.map((type) => (

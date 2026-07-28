@@ -19,19 +19,20 @@ import {
   softDeleteIngredient,
   permanentDeleteIngredient
 } from "@/services/dashboard/ingredient/ingredient.service";
+import { useTranslation } from "@/hooks/use-translation";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 
 interface IProps {
   ingredientsData: { data: TIngredient[]; meta?: TMeta };
   taxes: TTax[];
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function Ingredients({ ingredientsData, taxes }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = getSortOptions(t, sortFields);
 
   // Track both the ID and deletion strategy type together
   const [deleteConfig, setDeleteConfig] = useState<{
@@ -77,10 +78,10 @@ export default function Ingredients({ ingredientsData, taxes }: IProps) {
     <div className="min-h-screen">
       {/* Header */}
       <TitleHeader
-        title="All Ingredients"
-        subtitle="Inventory management for packaging and supplies"
+        title={t("all_ingredients")}
+        subtitle={t("inventory_management_packaging_supplies")}
         buttonInfo={{
-          text: "Add Ingredient",
+          text: t("add_ingredient"),
           onClick: () => router.push("/admin/add-ingredient"),
         }}
       />
@@ -131,8 +132,8 @@ export default function Ingredients({ ingredientsData, taxes }: IProps) {
         title={deleteConfig?.type === "permanent" ? "Permanent Deletion Alert" : "Soft Delete Confirmation"}
         description={
           deleteConfig?.type === "permanent"
-            ? "Are you absolutely sure? This action is irreversible and completely wipes the asset record from the cluster database."
-            : "Are you sure you want to flag this item? This operation moves the ingredient item to archive contexts safely."
+            ? t("are_you_absolutely_sure_this_action_irreversible")
+            : t("are_you_sure")
         }
       />
     </div>

@@ -14,11 +14,8 @@ export type TOrder = {
 
   // Items
   items: {
-    productId: {
-      name: string;
-      productId: string;
-      _id: string;
-    };
+    productId: string;
+    name: string;
     quantity: number;
     price: number;
     subtotal: number;
@@ -34,7 +31,7 @@ export type TOrder = {
   discount?: number;
   finalAmount: number;
   paymentMethod: "CARD" | "MOBILE";
-  paymentStatus: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+  paymentStatus: 'PENDING' | 'PROCESSING' | 'PAID' | 'FAILED' | 'REFUNDED';
 
   // Order Lifecycle
   orderStatus: keyof typeof ORDER_STATUS;

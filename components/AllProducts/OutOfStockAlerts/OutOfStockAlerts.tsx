@@ -3,8 +3,10 @@
 import ProductAlertCard from "@/components/AllProducts/OutOfStockAlerts/ProductAlertCard";
 import AllFilters from "@/components/Filtering/AllFilters";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TProduct } from "@/types/product.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { AnimatePresence } from "framer-motion";
 import { PackageX } from "lucide-react";
 
@@ -12,18 +14,18 @@ interface IProps {
   productsData: { data: TProduct[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 export default function OutOfStockAlerts({ productsData }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
+
   return (
     <div className="min-h-screen">
       {/* Header */}
       <TitleHeader
-        title="Out of Stock Alerts"
-        subtitle="Monitor products and variations that require immediate restocking"
+        title={t("out_of_stock_alerts")}
+        subtitle={t("monitor_products_variations_require_immediate")}
       />
 
       {/* Filters */}
@@ -43,10 +45,10 @@ export default function OutOfStockAlerts({ productsData }: IProps) {
               <PackageX size={32} />
             </div>
             <h3 className="text-lg font-medium text-gray-900">
-              All caught up!
+              {t("all_caught_up")}
             </h3>
             <p className="text-gray-500">
-              No out of stock items match your current filters.
+              {t("no_out_of_stock_items_match_current_filters")}
             </p>
           </div>
         )}

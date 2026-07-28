@@ -47,6 +47,10 @@ export const addAdminValidation = z
       .nonempty("Country is required")
       .min(2, "Country must be at least 2 characters")
       .max(50, "Country must be at most 50 characters"),
+
+    latitude: z.number({ error: "Latitude is required" }),
+
+    longitude: z.number({ error: "Logitude is required" }),
   })
   .refine(
     (data) => {

@@ -14,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
+import { useStore } from "@/store/store";
 import { TTax } from "@/types/tax.type";
 import { motion } from "framer-motion";
 import {
@@ -34,6 +36,7 @@ interface IProps {
   onEditClick: (tax: TTax) => void;
   onStatusChange: (id: string, status: boolean) => void;
   onDeleteClick: (id: string) => void;
+  onPermanentDelete: (id: string) => void;
 }
 
 export default function TaxTable({
@@ -41,8 +44,11 @@ export default function TaxTable({
   onEditClick,
   onStatusChange,
   onDeleteClick,
+  onPermanentDelete
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
+  const { lang } = useStore();
 
   return (
     <motion.div
@@ -56,36 +62,36 @@ export default function TaxTable({
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <BookText className="w-4" />
-                Name
+                {t("name")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Barcode className="w-4" />
-                Tax Code
+                {t("tax_code")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <Percent className="w-4" />
-                Rate
+                {t("rate")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Country ID
+              {t("country_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <CircleCheckBig className="w-4" />
-                Active
+                {t("active")}
               </div>
             </TableHead>
             <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
               <Cog className="w-4" />
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -96,25 +102,25 @@ export default function TaxTable({
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={6}
               >
-                No tax found
+                {t("no_tax_found")}
               </TableCell>
             </TableRow>
           )}
           {taxes?.map((tax) => (
             <TableRow key={tax._id}>
-              <TableCell>{tax.taxName}</TableCell>
-              <TableCell>{tax.taxCode}</TableCell>
-              <TableCell>{tax.taxRate}</TableCell>
-              <TableCell>{tax.countryID}</TableCell>
+              <TableCell>{tax?.taxName?.[lang]}</TableCell>
+              <TableCell>{tax?.taxCode}</TableCell>
+              <TableCell>{tax?.taxRate}</TableCell>
+              <TableCell>{tax?.countryID}</TableCell>
               <TableCell>
-                {tax.isActive ? (
+                {tax?.isActive ? (
                   <div className="flex gap-1 items-center text-green-500">
-                    <CheckCircle size={16} /> Yes
+                    <CheckCircle size={16} /> {t("yes")}
                   </div>
                 ) : (
                   <div className="flex gap-1 items-center text-destructive">
                     <XCircle size={16} />
-                    No
+                    {t("no")}
                   </div>
                 )}
               </TableCell>
@@ -126,38 +132,44 @@ export default function TaxTable({
                   <DropdownMenuContent>
                     <DropdownMenuItem
                       className=""
-                      onClick={() => router.push(`/admin/all-taxes/${tax._id}`)}
+                      onClick={() => router.push(`/admin/all-taxes/${tax?._id}`)}
                     >
-                      View
+                      {t("view")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-[#DC3173]"
                       onClick={() => onEditClick(tax)}
                     >
-                      Edit
+                      {t("edit")}
                     </DropdownMenuItem>
                     {tax.isActive && (
                       <DropdownMenuItem
                         className="text-yellow-600"
-                        onClick={() => onStatusChange(tax._id, false)}
+                        onClick={() => onStatusChange(tax?._id, false)}
                       >
-                        Deactivate
+                        {t("deactivate")}
                       </DropdownMenuItem>
                     )}
                     {!tax.isActive && (
                       <>
                         <DropdownMenuItem
                           className="text-green-600"
-                          onClick={() => onStatusChange(tax._id, true)}
+                          onClick={() => onStatusChange(tax?._id, true)}
                         >
-                          Activate
+                          {t("activate")}
                         </DropdownMenuItem>
-                        <DropdownMenuItem
+                        {tax?.isDeleted === false ? <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => onDeleteClick(tax._id)}
+                          onClick={() => onDeleteClick(tax?._id)}
                         >
-                          Delete
-                        </DropdownMenuItem>
+                          {t("delete")}
+                        </DropdownMenuItem> :
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => onPermanentDelete(tax?._id)}
+                          >
+                            {t("permanent_delete")}
+                          </DropdownMenuItem>}
                       </>
                     )}
                   </DropdownMenuContent>

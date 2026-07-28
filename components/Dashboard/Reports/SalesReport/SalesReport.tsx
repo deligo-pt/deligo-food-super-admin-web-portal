@@ -40,7 +40,7 @@ const SalesReport = ({ salesReportAnalytics }: IProps) => {
             <div className="flex items-center gap-3">
               {/* Date Filter */}
               <SelectDateRangeFilter
-                placeholder="Select Date Range"
+                placeholder={t("select_date_range")}
                 onCustomRangeSelect={() => setIsCustomDate(true)}
               />
 

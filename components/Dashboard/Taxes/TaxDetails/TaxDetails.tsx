@@ -2,14 +2,17 @@
 
 import EditTaxModal from "@/components/Dashboard/Taxes/Taxes/EditTaxModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   deleteTaxReq,
+  permanentDeleteTax,
   updateTaxReq,
 } from "@/services/dashboard/tax/tax.service";
+import { useStore } from "@/store/store";
 import { TTax } from "@/types/tax.type";
 import { motion } from "framer-motion";
 import {
@@ -33,8 +36,10 @@ interface IProps {
 }
 
 export default function TaxDetails({ tax }: IProps) {
+  const { lang } = useStore();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [permanentDeleteModalOpen, setPermanentDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
@@ -86,20 +91,48 @@ export default function TaxDetails({ tax }: IProps) {
     setIsDeleting(false);
   };
 
+  const handlePermanentDeleteTax = async () => {
+    const toastId = toast.loading("Deleting Tax...");
+    setIsDeleting(true);
+
+    const result = await permanentDeleteTax(tax?._id as string);
+
+    if (result.success) {
+      router.refresh();
+      toast.success(result.message || "Tax deleted successfully!", {
+        id: toastId,
+      });
+      setPermanentDeleteModalOpen(false);
+      setIsDeleting(false);
+      return;
+    }
+
+    toast.error(result.message || "Failed to delete tax", {
+      id: toastId,
+    });
+    setIsDeleting(false);
+    console.log(result);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
+      <TitleHeader
+        title={tax?.taxName?.[lang]}
+        subtitle={tax?.description?.[lang]}
+        onBackClick={() => router.back()}
+      />
       <Card className="rounded-2xl shadow-md border-muted">
+
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <div className="space-y-1">
             <CardTitle className="text-xl font-semibold flex items-center gap-2">
               <Utensils className="h-5 w-5 text-[#DC3173]" />
-              {tax.taxName}
+             Tax Details
             </CardTitle>
-            <p className="text-sm text-muted-foreground">{tax.description}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -107,9 +140,9 @@ export default function TaxDetails({ tax }: IProps) {
               variant="outline"
               className="border-[#DC3173] text-[#DC3173]"
             >
-              {tax.taxCode}
+              {tax?.taxCode}
             </Badge>
-            {tax.isActive ? (
+            {tax?.isActive ? (
               <ShieldCheck className="h-4 w-4 text-green-600" />
             ) : (
               <ShieldOff className="h-4 w-4 text-destructive" />
@@ -124,46 +157,46 @@ export default function TaxDetails({ tax }: IProps) {
             <div className="flex items-center gap-2">
               <Percent className="h-4 w-4 text-[#DC3173]" />
               <span className="text-muted-foreground">Tax Rate</span>
-              <span className="font-medium">{tax.taxRate}%</span>
+              <span className="font-medium">{tax?.taxRate}%</span>
             </div>
 
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-[#DC3173]" />
               <span className="text-muted-foreground">Country</span>
-              <span className="font-medium">{tax.countryID}</span>
+              <span className="font-medium">{tax?.countryID}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <Hash className="h-4 w-4 text-[#DC3173]" />
               <span className="text-muted-foreground">Tax Group</span>
-              <span className="font-medium">{tax.taxGroupID}</span>
+              <span className="font-medium">{tax?.taxGroupID}</span>
             </div>
 
-            {tax.TaxRegionID && (
+            {tax?.TaxRegionID && (
               <div className="flex items-center gap-2">
                 <Globe className="h-4 w-4 text-[#DC3173]" />
                 <span className="text-muted-foreground">Region</span>
-                <span className="font-medium">{tax.TaxRegionID}</span>
+                <span className="font-medium">{tax?.TaxRegionID}</span>
               </div>
             )}
           </div>
 
-          {(tax.taxExemptionCode || tax.taxExemptionReason) && (
+          {(tax?.taxExemptionCode || tax?.taxExemptionReason) && (
             <div className="rounded-xl bg-muted p-3 text-sm space-y-1">
               <div className="flex items-center gap-2 font-medium">
                 <ShieldOff className="h-4 w-4 text-[#DC3173]" />
                 Tax Exemption
               </div>
-              {tax.taxExemptionCode && (
+              {tax?.taxExemptionCode && (
                 <p>
                   <span className="text-muted-foreground">Code:</span>{" "}
                   {tax.taxExemptionCode}
                 </p>
               )}
-              {tax.taxExemptionReason && (
+              {tax?.taxExemptionReason && (
                 <p>
                   <span className="text-muted-foreground">Reason:</span>{" "}
-                  {tax.taxExemptionReason}
+                  {tax?.taxExemptionReason?.[lang]}
                 </p>
               )}
             </div>
@@ -174,7 +207,7 @@ export default function TaxDetails({ tax }: IProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Active</span>
-              {tax.isActive ? (
+              {tax?.isActive ? (
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
               ) : (
                 <XCircle className="h-4 w-4 text-destructive" />
@@ -191,7 +224,7 @@ export default function TaxDetails({ tax }: IProps) {
                 <Pencil className="h-4 w-4 mr-1" />
                 Edit
               </Button>
-              {tax.isActive && (
+              {tax?.isActive && (
                 <Button
                   size="sm"
                   className="bg-yellow-500 hover:bg-yellow-500/90"
@@ -201,7 +234,7 @@ export default function TaxDetails({ tax }: IProps) {
                   Deactivate
                 </Button>
               )}
-              {!tax.isActive && (
+              {!tax?.isActive && (
                 <>
                   <Button
                     size="sm"
@@ -211,14 +244,22 @@ export default function TaxDetails({ tax }: IProps) {
                     <ShieldCheck className="h-4 w-4 mr-1" />
                     Activate
                   </Button>
-                  <Button
+                  {tax?.isDeleted === false ? <Button
                     size="sm"
                     variant="destructive"
                     onClick={() => setDeleteModalOpen(true)}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
                     Delete
-                  </Button>
+                  </Button> :
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setPermanentDeleteModalOpen(true)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Permanent Delete
+                    </Button>}
                 </>
               )}
             </div>
@@ -238,6 +279,14 @@ export default function TaxDetails({ tax }: IProps) {
         open={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
         onConfirm={handleDeleteTax}
+        isDeleting={isDeleting}
+      />
+
+      {/* Permanent Delete Modal */}
+      <DeleteModal
+        open={permanentDeleteModalOpen}
+        onOpenChange={setPermanentDeleteModalOpen}
+        onConfirm={handlePermanentDeleteTax}
         isDeleting={isDeleting}
       />
     </motion.div>

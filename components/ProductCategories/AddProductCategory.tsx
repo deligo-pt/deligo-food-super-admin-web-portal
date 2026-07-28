@@ -20,7 +20,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "@/hooks/use-translation";
 import { addProductCategoryReq } from "@/services/dashboard/category/product-category.service";
-import { TBusinessCategory } from "@/types/category.type";
+import { useStore } from "@/store/store";
+import { TBusinessCategoryResponse } from "@/types/category.type";
+import { translateObject } from "@/utils/translation/translationObject";
 import { productCategoryValidation } from "@/validations/category/product-category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -42,16 +44,21 @@ type FormData = z.infer<typeof productCategoryValidation>;
 export default function AddProductCategory({
   businessCategories,
 }: {
-  businessCategories: TBusinessCategory[];
+  businessCategories: TBusinessCategoryResponse[];
 }) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const form = useForm<FormData>({
     resolver: zodResolver(productCategoryValidation),
     defaultValues: {
-      name: "",
+      name: {
+        en: "",
+        pt: ""
+      },
       description: "",
       image: { file: null, url: "" },
       businessCategoryId: "",
+      currentLang: lang
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,13 +76,17 @@ export default function AddProductCategory({
     const toastId = toast.loading("Adding category...");
     setIsSubmitting(true);
 
-    const categoryData = {
-      name: data.name,
-      description: data.description,
-      businessCategoryId: data.businessCategoryId,
-    };
+    const { image, ...rest } = data;
 
-    const result = await addProductCategoryReq(categoryData, data.image?.file);
+    const translated = await translateObject(rest, lang);
+
+    const categoryData = {
+      name: translated.name,
+      description: translated.description,
+      businessCategoryId: translated.businessCategoryId,
+    }
+
+    const result = await addProductCategoryReq(categoryData, image?.file);
 
     if (result?.success) {
       toast.success(result.message || "Category added successfully!", {
@@ -91,6 +102,7 @@ export default function AddProductCategory({
     });
     setIsSubmitting(false);
     console.log(result);
+    toast.dismiss()
   };
 
   return (
@@ -150,9 +162,10 @@ export default function AddProductCategory({
           }}
         >
           <div className="space-y-4">
-            <FormField
+
+            {lang === 'en' && <FormField
               control={form.control}
-              name="name"
+              name="name.en"
               render={({ field }) => (
                 <FormItem className="content-start">
                   <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
@@ -171,7 +184,30 @@ export default function AddProductCategory({
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            />}
+
+            {lang === 'pt' && <FormField
+              control={form.control}
+              name="name.pt"
+              render={({ field }) => (
+                <FormItem className="content-start">
+                  <FormLabel className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="flex items-center">
+                      <FileTextIcon className="w-5 h-5 text-[#DC3173]" />
+                      <span className="ml-2">{t("category_name")}</span>
+                    </div>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder={t("eg_pizza")}
+                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />}
 
             <FormField
               control={form.control}
@@ -245,7 +281,7 @@ export default function AddProductCategory({
                             key={businessCategory._id}
                             value={businessCategory._id}
                           >
-                            {businessCategory.name}
+                            {businessCategory.name?.[lang]}
                           </SelectItem>
                         ))}
                       </SelectContent>

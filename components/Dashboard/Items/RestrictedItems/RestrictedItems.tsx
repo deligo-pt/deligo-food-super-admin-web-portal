@@ -7,9 +7,11 @@ import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { deleteRestrictedItemReq } from "@/services/dashboard/product/restricted-item.service";
 import { TMeta } from "@/types";
 import { TRestrictedItem } from "@/types/product.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,15 +21,12 @@ interface IProps {
   restrictedItemsData: { data: TRestrictedItem[]; meta?: TMeta };
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-  { label: "Name (A-Z)", value: "name.firstName" },
-  { label: "Name (Z-A)", value: "-name.lastName" },
-];
+const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
 export default function RestrictedItems({ restrictedItemsData }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
+  const sortOptions = getSortOptions(t, sortFields);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<TRestrictedItem | null>(null);
   const [deleteId, setDeleteId] = useState("");
@@ -59,10 +58,10 @@ export default function RestrictedItems({ restrictedItemsData }: IProps) {
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
-        title="Restricted Items"
-        subtitle="Manage items vendors are not allowed to sell on Deligo"
+        title={t("restricted_items")}
+        subtitle={t("manage_items_vendors_allowed_sell")}
         buttonInfo={{
-          text: "Add Item",
+          text: t("add_item"),
           onClick: () => setIsAddModalOpen(true),
         }}
       />

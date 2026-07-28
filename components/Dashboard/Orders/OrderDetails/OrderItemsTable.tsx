@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { TOrder } from "@/types/order.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion, Variants } from "framer-motion";
@@ -10,6 +11,7 @@ interface IProps {
 }
 
 export default function OrderItemsTable({ items }: IProps) {
+  const { t } = useTranslation();
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -41,9 +43,9 @@ export default function OrderItemsTable({ items }: IProps) {
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center gap-2">
         <ShoppingBagIcon className="w-5 h-5 text-[#DC3173]" />
-        <h3 className="font-semibold text-gray-900">Order Items</h3>
+        <h3 className="font-semibold text-gray-900">{t("order_items")}</h3>
         <span className="ml-auto text-sm text-gray-500">
-          {items.length} items
+          {items.length} {t("items")}
         </span>
       </div>
 
@@ -51,9 +53,9 @@ export default function OrderItemsTable({ items }: IProps) {
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
             <tr>
-              <th className="px-6 py-3">Product Details</th>
-              <th className="px-6 py-3 text-center">Qty</th>
-              <th className="px-6 py-3 text-right">Subtotal</th>
+              <th className="px-6 py-3">{t("product_details")}</th>
+              <th className="px-6 py-3 text-center">{t("qty")}</th>
+              <th className="px-6 py-3 text-right">{t("subtotal")}</th>
             </tr>
           </thead>
           <motion.tbody
@@ -64,17 +66,17 @@ export default function OrderItemsTable({ items }: IProps) {
           >
             {items.map((item, index) => (
               <motion.tr
-                key={item.productId._id || index}
+                key={item.productId || index}
                 variants={rowVariants as Variants}
                 className="hover:bg-gray-50/50 transition-colors"
               >
                 <td className="px-6 py-4">
                   <div className="flex flex-col">
                     <span className="font-medium text-gray-900">
-                      {item.productId.name}
+                      {item?.name}
                     </span>
                     <span className="text-xs text-gray-400">
-                      ID: {item.productId.productId}
+                      {t("id")}: {item.productId}
                     </span>
                   </div>
                 </td>

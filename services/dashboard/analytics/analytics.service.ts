@@ -45,9 +45,7 @@ export const getPerformanceAnalyticsReq = async <T>(
     });
   });
 
-  if (result.success) return { data: result.data, meta: result.meta };
-
-  return { data: {}, meta: {} };
+  return { data: result.data, meta: result.meta };
 };
 
 export const getSinglePerformanceReq = async <T>(endPoint: string) => {
@@ -130,9 +128,17 @@ export const getPlatformEarningsReq = async (
   );
 
   return {
-    data: result.data.data || [],
-    meta: result.data.meta,
+    data: result.data || [],
+    meta: result.meta,
   };
+};
+
+export const getDeliveryPartnerAnalytics = async () => {
+  const result = await catchAsync<TSalesAnalytics>(async () => {
+    return await serverRequest.get("/analytics/admin/delivery-partner-analytics");
+  });
+
+  return result;
 };
 
 export const getSalesAnalyticsReq = async () => {

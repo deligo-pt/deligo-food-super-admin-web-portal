@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -99,6 +100,7 @@ export function SelectCustomDateFilter({
   toDateLabel?: string;
   onClear?: () => void;
 }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -191,14 +193,14 @@ export function SelectCustomDateFilter({
           disabled={isPending}
           onClick={onApply}
         >
-          Apply
+          {t("apply")}
         </button>
         <button
           className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isPending}
           onClick={onFilterClear}
         >
-          Clear
+          {t("clear")}
         </button>
       </div>
       {error && <p className="text-destructive text-sm mt-2">{error}</p>}

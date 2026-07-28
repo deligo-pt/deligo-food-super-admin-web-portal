@@ -89,7 +89,7 @@ export default function EditRestrictedItemModal({
       <form>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Restricted Item</DialogTitle>
+            <DialogTitle>{t("edit_restricted_item")}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -102,7 +102,7 @@ export default function EditRestrictedItemModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Item Name</FormLabel>
+                    <FormLabel>{t("item_name")}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="e.g. Cuban Cigars"
@@ -120,7 +120,7 @@ export default function EditRestrictedItemModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t("category_lg")}</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
@@ -147,7 +147,7 @@ export default function EditRestrictedItemModal({
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Reason</FormLabel>
+                    <FormLabel>{t("reason")}</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={3}
@@ -173,7 +173,7 @@ export default function EditRestrictedItemModal({
               disabled={isSubmitting}
               className="bg-[#DC3173] hover:bg-[#DC3173]/90"
             >
-              Update
+              {t("update")}
             </Button>
           </DialogFooter>
         </DialogContent>

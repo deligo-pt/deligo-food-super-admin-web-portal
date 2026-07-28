@@ -4,11 +4,14 @@ import { getSingleCuisine } from "@/services/dashboard/category/cuisine.service"
 
 interface IProps {
     params: Promise<{ id: string }>;
+    searchParams: Promise<{ lang?: string }>;
 }
 
-const CuisineDetailsPage = async ({ params }: IProps) => {
+const CuisineDetailsPage = async ({ params, searchParams }: IProps) => {
     const { id } = await params;
-    const cuisineDetails = await getSingleCuisine(id);
+    const { lang } = await searchParams;
+
+    const cuisineDetails = await getSingleCuisine(id, lang as "en" | "pt");
 
     return (
         <div>

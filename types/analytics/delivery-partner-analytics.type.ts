@@ -30,5 +30,5 @@ export type TDeliveryPartnerAnalyticsData = {
   statusDistribution: TPartnerStatusDistribution[];
   workloadTrends: TWorkloadTrend[];
   efficiencyByLevel: TPartnerEfficiencyByLevel[];
-  zonePerformance: TPartnerZonePerformance[];
+  // zonePerformance: TPartnerZonePerformance[];
 };

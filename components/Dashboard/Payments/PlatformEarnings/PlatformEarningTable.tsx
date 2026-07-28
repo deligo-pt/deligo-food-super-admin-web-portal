@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useTranslation } from "@/hooks/use-translation";
 import { TPlaformEarningsData } from "@/types/payment.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { motion } from "framer-motion";
@@ -24,6 +25,8 @@ interface IProps {
 }
 
 export default function PlatformEarningsTable({ commissions }: IProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,31 +39,31 @@ export default function PlatformEarningsTable({ commissions }: IProps) {
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <HashIcon className="w-4" />
-                Transaction ID
+                {t("transaction_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <UserIcon className="w-4" />
-                Customer
+                {t("customer")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <ShoppingBagIcon className="w-4" />
-                Order ID
+                {t("order_id")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <EuroIcon className="w-4" />
-                Amount
+                {t("amount")}
               </div>
             </TableHead>
             <TableHead>
               <div className="text-[#DC3173] flex gap-2 items-center">
                 <PercentIcon className="w-4" />
-                Platform Fee
+                {t("platform_fee")}
               </div>
             </TableHead>
           </TableRow>
@@ -72,7 +75,7 @@ export default function PlatformEarningsTable({ commissions }: IProps) {
                 className="text-[#DC3173] text-lg text-center"
                 colSpan={5}
               >
-                No commissions found
+                {t("no_commissions_found")}
               </TableCell>
             </TableRow>
           )}
@@ -80,7 +83,7 @@ export default function PlatformEarningsTable({ commissions }: IProps) {
             <TableRow key={c._id}>
               <TableCell>{c.transactionId}</TableCell>
               <TableCell>
-                {c.customer?.name?.firstName} {c.customer?.name?.lastName}
+                {c.customer?.name?.firstName || "N/A"} {c.customer?.name?.lastName}
               </TableCell>
               <TableCell>{c.orderId}</TableCell>
               <TableCell>€{formatPrice(c.amount || 0)}</TableCell>

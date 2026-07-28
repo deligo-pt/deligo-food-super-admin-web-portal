@@ -4,8 +4,10 @@ import PayoutTable from "@/components/Dashboard/Payouts/Payouts/PayoutTable";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TPayout } from "@/types/payout.type";
+import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 
 interface IProps {
@@ -15,18 +17,19 @@ interface IProps {
   userRole: "VENDOR" | "FLEET_MANAGER" | "DELIVERY_PARTNER";
 }
 
-const sortOptions = [
-  { label: "Newest First", value: "-createdAt" },
-  { label: "Oldest First", value: "createdAt" },
-];
+const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
 const extraSelectFilter = {
   key: "status",
   placeholder: "Select Payment Status",
   type: "select",
   isAllNeeded: false,
-  defaultValue: "PAID",
+  defaultValue: "All",
   options: [
+    {
+      label: "All",
+      value: "All",
+    },
     {
       label: "Pending",
       value: "PENDING",
@@ -44,10 +47,13 @@ export default function Payouts({
   subtitle,
   userRole,
 }: IProps) {
+  const { t } = useTranslation();
+  const sortOptions = getSortOptions(t, sortFields);
+
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
-      <TitleHeader title={title} subtitle={subtitle} />
+      <TitleHeader title={t(`${title}`)} subtitle={t(`${subtitle}`)} />
 
       {/* Filters */}
       <AllFilters

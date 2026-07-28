@@ -2,7 +2,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadVendorDocuments from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
+import UploadVendorDocuments, { REQUIRED_DOCS } from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { bankNames } from "@/consts/bankNames.const";
 import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -34,12 +35,14 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { getSingleVendorReq } from "@/services/dashboard/vendor/vendor.service";
+import { useStore } from "@/store/store";
 import { TResponse } from "@/types";
-import { TBusinessCategory } from "@/types/category.type";
+import { TBusinessCategoryResponse } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
+import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -87,15 +90,17 @@ const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
   menuUpload: null,
   agoserisHaccpCertificate: null,
 };
+const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "storePhoto", "menuUpload"];
 
 export default function AddVendor({
   businessCategories,
   cuisines,
 }: {
-  businessCategories: TBusinessCategory[];
+  businessCategories: TBusinessCategoryResponse[];
   cuisines: TCuisine[]
 }) {
   const { t } = useTranslation();
+  const { lang } = useStore();
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -123,7 +128,6 @@ export default function AddVendor({
       businessName: "",
       businessType: "",
       restaurantCuisineType: [],
-      businessLicenseNumber: "",
       NIF: "",
       branches: "",
       openingHours: "",
@@ -133,6 +137,8 @@ export default function AddVendor({
       city: "",
       postalCode: "",
       country: "",
+      latitude: 0,
+      longitude: 0,
       bankName: "",
       accountHolderName: "",
       iban: "",
@@ -237,13 +243,11 @@ export default function AddVendor({
         // 1. Decode the JWT to get the userId
         const decoded = jwtDecode(result.data.accessToken) as { userId: string };
         const currentUserId = decoded.userId;
-        console.log("currentuserId", currentUserId);
         setEmailVerified(true);
 
         // 2. Fetch the single vendor details using the userId
         try {
           const vendorResult = await getSingleVendorReq(currentUserId);
-          console.log("vendorResult", vendorResult);
           if (vendorResult) {
             setVendorDetails(vendorResult); // Store vendor details in state
           } else {
@@ -278,6 +282,26 @@ export default function AddVendor({
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Adding vendor...");
 
+    if (!vendorDetails) {
+      return;
+    };
+
+    try {
+      // Fill in defaults for any optional doc the user skipped
+      for (const key of OPTIONAL_DEFAULTS) {
+        if (!previews[key] || previews[key]!.length === 0) {
+          await uploadDefaultDocument(key, vendorDetails?.userId);
+        }
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to set default documents",
+        { id: toastId }
+      );
+      console.log(err);
+      return;
+    }
+
     const vendorData = {
       name: {
         firstName: data.firstName,
@@ -287,11 +311,10 @@ export default function AddVendor({
       businessDetails: {
         businessName: data.businessName,
         businessType: data.businessType,
-        ...(data?.businessType === "RESTAURANT" && {
+        ...(data?.businessType === "restaurant" && {
           restaurantCuisineType: data.restaurantCuisineType
         }),
         NIF: data.NIF?.toUpperCase(),
-        businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
         totalBranches: Number(data.branches),
         openingHours: data.openingHours,
         closingHours: data.closingHours,
@@ -329,6 +352,10 @@ export default function AddVendor({
         toast.success(approveResult.message || "Vendor added successfully!", {
           id: toastId,
         });
+        setOtpSent(false);
+        setEmailVerified(false);
+        setEmail("");
+        setPassword("");
         return;
       }
 
@@ -357,6 +384,12 @@ export default function AddVendor({
     }
   }, [form]);
 
+  const isDocumentsValid = REQUIRED_DOCS.every(
+    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
+  );
+
+  const isSubmitDisabled = !isDocumentsValid || isSubmitting;
+
   return (
     <Form {...form}>
       <form
@@ -364,8 +397,8 @@ export default function AddVendor({
         className="min-h-screen bg-slate-50"
       >
         <TitleHeader
-          title={t("add_new_vendor")}
-          subtitle="Add a new vendor here"
+          title={t("add_vendor")}
+          subtitle={t("add_new_vendor_here")}
         />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -393,7 +426,7 @@ export default function AddVendor({
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")}</FormLabel>
+                        <FormLabel>{t("first_name")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -407,7 +440,7 @@ export default function AddVendor({
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")}</FormLabel>
+                        <FormLabel>{t("last_name")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -417,13 +450,14 @@ export default function AddVendor({
                   />
 
                   <div>
-                    <Label>{t("email")}</Label>
+                    <Label>{t("email")} <span className="text-[#DC3173]">*</span></Label>
                     <div className="flex items-center gap-3 mt-2">
                       <Input
                         type="email"
                         placeholder={t("vendor_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={!!vendorDetails?.userId}
                       />
                       {!otpSent && !emailVerified && (
                         <Button
@@ -457,16 +491,17 @@ export default function AddVendor({
 
                   {otpSent && !emailVerified && (
                     <div>
-                      <Label className="mb-2">{t("otp")}</Label>
+                      <Label className="mb-2">{t("otp")} <span className="text-[#DC3173]">*</span></Label>
                       <div className="flex items-center gap-3">
                         <Input
                           placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
+                          maxLength={4}
                         />
                         <Button
                           type="button"
-                          disabled={buttonDisabled === 3}
+                          disabled={buttonDisabled === 3 || otp.length < 4}
                           style={{ background: DELIGO }}
                           onClick={verifyOtp}
                           className="w-32"
@@ -479,13 +514,14 @@ export default function AddVendor({
                   )}
 
                   <div>
-                    <Label className="mb-2">{t("password")}</Label>
+                    <Label className="mb-2">{t("password")} <span className="text-[#DC3173]">*</span></Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
                         placeholder={t("password")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={!!vendorDetails?.userId}
                       />
                       {showPass ? (
                         <EyeOff
@@ -503,7 +539,7 @@ export default function AddVendor({
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")}</Label>
+                  <Label className="mb-2">{t("phone_number")} {vendorDetails?.userId && <span className="text-[#DC3173]">*</span>}</Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -581,7 +617,7 @@ export default function AddVendor({
                           name="businessName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("business_name")}</FormLabel>
+                              <FormLabel>{t("business_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("business_name")}
@@ -598,7 +634,7 @@ export default function AddVendor({
                           name="businessType"
                           render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("business_type")}</FormLabel>
+                              <FormLabel>{t("business_type")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Select
                                   onValueChange={field.onChange}
@@ -620,9 +656,9 @@ export default function AddVendor({
                                     {businessCategories?.map((category) => (
                                       <SelectItem
                                         key={category._id}
-                                        value={category.name}
+                                        value={category.slug}
                                       >
-                                        {category.name}
+                                        {category?.name?.[lang]}
                                       </SelectItem>
                                     ))}
                                   </SelectContent>
@@ -635,29 +671,10 @@ export default function AddVendor({
 
                         <FormField
                           control={form.control}
-                          name="businessLicenseNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>
-                                {t("business_license_number")}
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("license_number")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
                           name="NIF"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("nif")}</FormLabel>
+                              <FormLabel>{t("nif")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("tax_identification_number")}
@@ -671,12 +688,13 @@ export default function AddVendor({
 
 
                         {/* if business type is restaurant */}
-                        {businessType === "RESTAURANT" && (
+                        {businessType === "restaurant" && (
                           <FormField
                             control={form.control}
                             name="restaurantCuisineType"
                             render={({ field, fieldState }) => {
                               const selectedCuisines = Array.isArray(field.value) ? field.value : [];
+                              const getCuisineName = (slug: string) => cuisines?.find((c) => c.slug === slug)?.name?.[lang] ?? slug;
 
                               // remove cuisine
                               const handleRemoveCuisine = (cuisineToRemove: string) => {
@@ -702,16 +720,16 @@ export default function AddVendor({
                                   {/* 4. Display Selected Badges ABOVE the Select Dropdown */}
                                   {selectedCuisines.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mb-3 p-2 border border-dashed rounded-lg bg-gray-50/50">
-                                      {selectedCuisines.map((cuisine) => (
+                                      {selectedCuisines.map((slug) => (
                                         <Badge
-                                          key={cuisine}
+                                          key={slug}
                                           variant="secondary"
                                           className="flex items-center gap-1 bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 transition-all capitalize px-3 py-1 text-sm font-medium"
                                         >
-                                          {cuisine}
+                                          {getCuisineName(slug)}
                                           <button
                                             type="button"
-                                            onClick={() => handleRemoveCuisine(cuisine)}
+                                            onClick={() => handleRemoveCuisine(slug)}
                                             className="rounded-full outline-none hover:bg-[#DC3173]/20 p-0.5"
                                           >
                                             <X className="h-3 w-3" />
@@ -735,7 +753,7 @@ export default function AddVendor({
                                           )}
                                           style={{ height: "3rem" }}
                                         >
-                                          <SelectValue placeholder="Select Multiple Cuisine" />
+                                          <SelectValue placeholder={t("select_multiple_cuisine")} />
                                         </SelectTrigger>
 
                                         <SelectContent>
@@ -745,15 +763,15 @@ export default function AddVendor({
                                             </div>
                                           ) : (
                                             cuisines?.map((type, idx) => {
-                                              const isAlreadySelected = selectedCuisines.includes(type?.name);
+                                              const isAlreadySelected = selectedCuisines.includes(type?.slug);
                                               return (
                                                 <SelectItem
                                                   key={idx}
-                                                  value={type?.name}
+                                                  value={type?.slug}
                                                   className="capitalize"
                                                   disabled={isAlreadySelected}
                                                 >
-                                                  {type?.name} {isAlreadySelected && "✓"}
+                                                  {type?.name?.[lang]} {isAlreadySelected && "✓"}
                                                 </SelectItem>
                                               );
                                             })
@@ -774,7 +792,7 @@ export default function AddVendor({
                           name="branches"
                           render={({ field }) => (
                             <FormItem className="col-span-2">
-                              <FormLabel>{t("total_branches")}</FormLabel>
+                              <FormLabel>{t("total_branches")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
@@ -795,7 +813,7 @@ export default function AddVendor({
                             <FormItem>
                               <div className="relative">
                                 <FormLabel className="mb-2">
-                                  {t("opening_hours")}
+                                  {t("opening_hours")} <span className="text-[#DC3173]">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -817,7 +835,7 @@ export default function AddVendor({
                             <FormItem>
                               <div className="relative">
                                 <FormLabel className="mb-2">
-                                  {t("closing_hours")}
+                                  {t("closing_hours")} <span className="text-[#DC3173]">*</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input
@@ -842,28 +860,31 @@ export default function AddVendor({
                                   {t("closing_days")}
                                 </FormLabel>
                                 <div className="flex flex-wrap gap-2">
-                                  {daysOfWeek.map((day) => (
-                                    <motion.button
-                                      key={day}
-                                      type="button"
-                                      onClick={() => {
-                                        field.onChange(
-                                          field.value?.includes(day)
-                                            ? field.value?.filter(
-                                              (d) => d !== day,
-                                            )
-                                            : [...field.value, day],
-                                        );
-                                      }}
-                                      whileTap={{ scale: 0.95 }}
-                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
-                                        ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                        : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                        }`}
-                                    >
-                                      {day}
-                                    </motion.button>
-                                  ))}
+                                  {daysOfWeek.map((day) => {
+                                    const isSelected = field.value?.includes(day) ?? false;
+
+                                    return (
+                                      <motion.button
+                                        key={day}
+                                        type="button"
+                                        onClick={() => {
+                                          const current = field.value ?? [];
+                                          field.onChange(
+                                            isSelected
+                                              ? current.filter((d) => d !== day)
+                                              : [...current, day]
+                                          );
+                                        }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${isSelected
+                                          ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                          : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                          }`}
+                                      >
+                                        {day}
+                                      </motion.button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                               <FormMessage />
@@ -896,14 +917,29 @@ export default function AddVendor({
                         <FormField
                           control={form.control}
                           name="bankName"
-                          render={({ field }) => (
+                          render={({ field, fieldState }) => (
                             <FormItem>
-                              <FormLabel>{t("bank_name")}</FormLabel>
+                              <FormLabel>{t("bank_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder={t("bank_name")}
-                                  {...field}
-                                />
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <SelectTrigger
+                                    className={cn(
+                                      "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
+                                      fieldState.invalid
+                                        ? "border-red-500"
+                                        : "border-gray-300",
+                                    )}
+                                  >
+                                    <SelectValue placeholder="Select" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {bankNames.map((value) => (
+                                      <SelectItem key={value} value={value}>
+                                        {value}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -915,7 +951,7 @@ export default function AddVendor({
                           name="accountHolderName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("account_holder_name")}</FormLabel>
+                              <FormLabel>{t("account_holder_name")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("account_holder_name")}
@@ -932,7 +968,7 @@ export default function AddVendor({
                           name="iban"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("iban")}</FormLabel>
+                              <FormLabel>{t("iban")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input placeholder={t("iban")} {...field} />
                               </FormControl>
@@ -946,7 +982,7 @@ export default function AddVendor({
                           name="swiftCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t("swift_code")}</FormLabel>
+                              <FormLabel>{t("swift_code")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder={t("swift_code")}
@@ -990,6 +1026,7 @@ export default function AddVendor({
                     <BusinessLocationMap
                       form={form}
                       setLocationCoordinates={setLocationCoordinates}
+                      t={t}
                     />
                   </Card>
                 </motion.div>
@@ -1014,8 +1051,10 @@ export default function AddVendor({
 
                     <UploadVendorDocuments
                       vendor={vendorDetails}
+                      businessType={businessType}
                       previews={previews}
                       setPreviews={setPreviews}
+                      isSubmitting={isSubmitting}
                     />
                   </Card>
                 </motion.div>
@@ -1030,7 +1069,7 @@ export default function AddVendor({
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
-              disabled={isSubmitting}
+              disabled={isSubmitDisabled}
             >
               {t("submit_vendor")}
             </Button>
