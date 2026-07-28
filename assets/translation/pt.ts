@@ -1203,6 +1203,8 @@ export const pt = {
   balance: "Saldo",
   no_transactions_match_filters: "Nenhuma transação corresponde aos seus filtros.",
   no_transactions_found: "Nenhuma transação encontrada",
+  // --> details
+  settlement_details: "Detalhes da Liquidação",
 
   // payment-disputes
   track_and_resolve_payment_disputes: "Rastreie e resolva disputas de pagamento em toda a plataforma",

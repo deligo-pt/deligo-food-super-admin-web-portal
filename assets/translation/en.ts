@@ -1186,6 +1186,8 @@ export const en = {
   balance: "Balance",
   no_transactions_match_filters: "No transactions match your filters.",
   no_transactions_found: "No transactions found",
+  // --> details
+  settlement_details: "Settlement Details",
 
   // payment-disputes
   track_and_resolve_payment_disputes: "Track and resolve payment disputes across the platform",

@@ -13,16 +13,19 @@ import {
   ArrowUpRightIcon,
   CheckCircle2Icon,
   CircleXIcon,
+  GiftIcon,
   InfoIcon,
+  PercentCircleIcon,
   ShoppingBagIcon,
   TagIcon,
   UserIcon,
+  WalletIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const typeConfig: Record<
-  string,
+  TTransaction['type'],
   {
     label: string;
     bg: string;
@@ -30,23 +33,86 @@ const typeConfig: Record<
     icon: React.ReactNode;
   }
 > = {
-  earning: {
-    label: "Earning",
+  // --- Payments & Earnings (Green) ---
+  ORDER_PAYMENT: {
+    label: "Order Payment",
+    bg: "bg-emerald-100",
+    text: "text-emerald-700",
+    icon: <ArrowUpRightIcon className="w-4 h-4" />,
+  },
+  VENDOR_EARNING: {
+    label: "Vendor Earning",
     bg: "bg-green-100",
     text: "text-green-700",
     icon: <ArrowUpRightIcon className="w-4 h-4" />,
   },
-  payout: {
-    label: "Payout",
-    bg: "bg-blue-100",
-    text: "text-blue-700",
+  FLEET_EARNING: {
+    label: "Fleet Earning",
+    bg: "bg-green-100",
+    text: "text-green-700",
     icon: <ArrowUpRightIcon className="w-4 h-4" />,
   },
-  fee: {
-    label: "Fee",
-    bg: "bg-red-100",
-    text: "text-red-700",
-    icon: <ArrowDownLeftIcon className="w-4 h-4" />,
+  DELIVERY_PARTNER_EARNING: {
+    label: "Delivery Partner Earning",
+    bg: "bg-green-100",
+    text: "text-green-700",
+    icon: <ArrowUpRightIcon className="w-4 h-4" />,
+  },
+
+  // --- Settlements & Payouts (Blue) ---
+  VENDOR_SETTLEMENT: {
+    label: "Vendor Settlement",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    icon: <WalletIcon className="w-4 h-4" />,
+  },
+  FLEET_SETTLEMENT: {
+    label: "Fleet Settlement",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    icon: <WalletIcon className="w-4 h-4" />,
+  },
+  DELIVERY_PARTNER_SETTLEMENT: {
+    label: "Delivery Settlement",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    icon: <WalletIcon className="w-4 h-4" />,
+  },
+
+  // --- Commissions & Charges (Purple/Indigo) ---
+  PLATFORM_COMMISSION: {
+    label: "Platform Commission",
+    bg: "bg-purple-100",
+    text: "text-purple-700",
+    icon: <PercentCircleIcon className="w-4 h-4" />,
+  },
+  PLATFORM_SERVICE_CHARGE: {
+    label: "Service Charge",
+    bg: "bg-indigo-100",
+    text: "text-indigo-700",
+    icon: <PercentCircleIcon className="w-4 h-4" />,
+  },
+  PLATFORM_TAX_COLLECTION: {
+    label: "Tax Collection",
+    bg: "bg-slate-100",
+    text: "text-slate-700",
+    icon: <PercentCircleIcon className="w-4 h-4" />,
+  },
+
+  // --- Expenses & Purchases (Red/Rose) ---
+  INGREDIENT_PURCHASE: {
+    label: "Ingredient Purchase",
+    bg: "bg-rose-100",
+    text: "text-rose-700",
+    icon: <ShoppingBagIcon className="w-4 h-4" />,
+  },
+
+  // --- Rewards & Bonuses (Amber/Orange) ---
+  REFERRAL_BONUS: {
+    label: "Referral Bonus",
+    bg: "bg-amber-100",
+    text: "text-amber-700",
+    icon: <GiftIcon className="w-4 h-4" />,
   },
 };
 
@@ -59,7 +125,7 @@ export default function TransactionDetails({
   const { lang } = useStore();
   const router = useRouter();
 
-  const config = typeConfig[transaction.type] || typeConfig.earning;
+  const config = typeConfig[transaction.type];
 
   const containerVariants = {
     hidden: {
@@ -88,6 +154,8 @@ export default function TransactionDetails({
       },
     },
   } as Variants;
+
+  const isSettlmentTrx = transaction.type === 'VENDOR_SETTLEMENT' || transaction.type === 'FLEET_SETTLEMENT' || transaction.type === 'DELIVERY_PARTNER_SETTLEMENT';
 
   return (
     <motion.div
@@ -172,8 +240,45 @@ export default function TransactionDetails({
         </div>
       </motion.div>
 
+      {/* settlement details */}
+      {isSettlmentTrx && <motion.div
+        variants={itemVariants}
+        className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
+      >
+        <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <ShoppingBagIcon className="w-4 h-4 text-[#DC3173]" />
+          {t("settlement_details")}
+        </h3>
+        <div className="space-y-3">
+          {[
+            {
+              label: t("type"),
+              value: transaction.type,
+            },
+            {
+              label: t("payment_method"),
+              value: transaction.paymentMethod,
+            },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="flex justify-between items-start py-2 border-b border-gray-50 last:border-0 gap-4"
+            >
+              <span className="text-xs text-gray-400 uppercase tracking-wide font-semibold shrink-0">
+                {item.label}
+              </span>
+              <span
+                className={`text-sm text-gray-900 font-medium text-right`}
+              >
+                {item.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </motion.div>}
+
       {/* Two-column */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {!isSettlmentTrx && <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Order Details */}
         <motion.div
           variants={itemVariants}
@@ -268,10 +373,10 @@ export default function TransactionDetails({
             ))}
           </div>
         </motion.div>
-      </div>
+      </div>}
 
       {/* Items Ordered */}
-      <motion.div
+      {(transaction?.items && transaction?.items?.length > 0) && <motion.div
         variants={itemVariants}
         className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6"
       >
@@ -320,7 +425,7 @@ export default function TransactionDetails({
             </span>
           </div>
         </div> */}
-      </motion.div>
+      </motion.div>}
     </motion.div>
   );
 }
