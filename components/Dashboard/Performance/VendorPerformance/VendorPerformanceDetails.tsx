@@ -16,14 +16,14 @@ interface IProps {
 }
 
 export function VendorPerformanceDetails({ performanceData }: IProps) {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gray-50/50">
       {/* Header */}
       <TitleHeader
-        title={t("fry_express_performance")}
+        title={`${performanceData?.vendorPerformance?.businessDetails?.businessName} ${t('performance')}`}
         subtitle={t("vendor_performance_details")}
         onBackClick={() => router.push("/admin/vendor-performance")}
       />

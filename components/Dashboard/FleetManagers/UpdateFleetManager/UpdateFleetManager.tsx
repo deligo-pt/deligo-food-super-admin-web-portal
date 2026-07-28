@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
 import { FLEET_REQUIRED_DOCS, TFleetDocKey } from "@/types/document.type";
-import { TAgent } from "@/types/user.type";
+import { TAgent, TBusinessLocation } from "@/types/user.type";
 import { addFleetManagerValidation } from "@/validations/add-fleet-manager/add-fleet-manager.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -535,6 +535,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
 
                       <BusinessLocationMap
                         form={form}
+                        businessLocation={fleetManager.businessLocation as TBusinessLocation}
                         setLocationCoordinates={setLocationCoordinates}
                         t={t}
                       />

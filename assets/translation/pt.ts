@@ -420,6 +420,7 @@ export const pt = {
   orders_capital: "Pedidos",
   // --> details
   fry_express_performance: "Desempenho do Fry Express",
+  performance: "Desempenho",
   vendor_performance_details: "Detalhes de Desempenho do Vendedor",
   avg_rating: "Avaliação Média",
   total_products: "Total de Produtos",

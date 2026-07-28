@@ -412,6 +412,7 @@ export const en = {
   orders_capital: "Orders",
   // --> details
   fry_express_performance: "Fry Express Performance",
+  performance: "Performance",
   vendor_performance_details: "Vendor Performance Details",
   avg_rating: "Avg Rating",
   total_products: "Total Products",
