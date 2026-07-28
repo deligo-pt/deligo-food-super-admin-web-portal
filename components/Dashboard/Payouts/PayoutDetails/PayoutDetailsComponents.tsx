@@ -7,7 +7,6 @@ import { TAgent, TVendor } from "@/types/user.type";
 import {
   CheckCircle,
   Clock,
-  Hash,
   Loader2,
   Mail,
   Phone,
@@ -152,13 +151,6 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
               icon={<Phone size={16} />}
               label={t("phone")}
               value={v.contactNumber}
-            />
-          )}
-          {v.businessDetails?.businessLicenseNumber && (
-            <InfoRow
-              icon={<Hash size={16} />}
-              label={t("license_no")}
-              value={v.businessDetails.businessLicenseNumber}
             />
           )}
           {/* {fullAddress && (
