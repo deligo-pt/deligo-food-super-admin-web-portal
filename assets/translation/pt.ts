@@ -886,6 +886,7 @@ export const pt = {
 
   // delivery partner performance
   rider_performance_analytics: "Análise de Desempenho do Estafeta",
+  rider_performance_details: "Detalhes do Desempenho do Entregador",
   comprehensive_insights_into_rider: "Informações detalhadas sobre o desempenho dos Estafetas",
   monthly_performance_over_the_last_6_months: "Desempenho mensal nos últimos 6 meses",
   view_riders_performance_analytics: "Ver análises de desempenho dos Estafetas",

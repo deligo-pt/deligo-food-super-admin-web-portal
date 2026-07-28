@@ -586,7 +586,7 @@ export const en = {
   custom: "Custom",
   all_managers: "All Managers",
   total_deliveries: "Total Deliveries",
-  earnings: "earnings",
+  earnings: "Earnings",
   avg_delivery_time: "Avg Delivery Time",
   min: "min",
   on_time: "On-time",
@@ -873,6 +873,7 @@ export const en = {
 
   // delivery partner performance
   rider_performance_analytics: "Rider Performance Analytics",
+  rider_performance_details: "Rider Performance Details",
   comprehensive_insights_into_rider: "Comprehensive insights into rider performance",
   monthly_performance_over_the_last_6_months: "Monthly performance over the last 6 months",
   view_riders_performance_analytics: "View riders performance analytics",
