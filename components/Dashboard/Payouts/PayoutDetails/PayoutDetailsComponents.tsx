@@ -154,7 +154,7 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
               value={v.contactNumber}
             />
           )}
-          {v.businessDetails?.businessLicenseNumber && (
+           {v.businessDetails?.businessLicenseNumber && (
             <InfoRow
               icon={<Hash size={16} />}
               label={t("license_no")}

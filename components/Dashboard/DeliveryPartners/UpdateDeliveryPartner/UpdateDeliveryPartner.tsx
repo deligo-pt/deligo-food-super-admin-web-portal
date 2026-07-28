@@ -31,6 +31,7 @@ import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
+import { TBusinessLocation } from "@/types/user.type";
 import { getTodayDateString } from "@/utils/formatTime";
 import { deliveryPartnerValidation } from "@/validations/delivery-partner/delivery-partner.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -597,6 +598,7 @@ export default function UpdateDeliveryPartner({
 
                       <BusinessLocationMap
                         form={form}
+                        businessLocation={partner?.address as TBusinessLocation}
                         setLocationCoordinates={setLocationCoordinates}
                         t={t}
                       />

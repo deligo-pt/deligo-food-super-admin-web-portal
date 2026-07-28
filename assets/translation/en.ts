@@ -412,6 +412,7 @@ export const en = {
   orders_capital: "Orders",
   // --> details
   fry_express_performance: "Fry Express Performance",
+  performance: "Performance",
   vendor_performance_details: "Vendor Performance Details",
   avg_rating: "Avg Rating",
   total_products: "Total Products",
@@ -585,7 +586,7 @@ export const en = {
   custom: "Custom",
   all_managers: "All Managers",
   total_deliveries: "Total Deliveries",
-  earnings: "earnings",
+  earnings: "Earnings",
   avg_delivery_time: "Avg Delivery Time",
   min: "min",
   on_time: "On-time",
@@ -872,6 +873,7 @@ export const en = {
 
   // delivery partner performance
   rider_performance_analytics: "Rider Performance Analytics",
+  rider_performance_details: "Rider Performance Details",
   comprehensive_insights_into_rider: "Comprehensive insights into rider performance",
   monthly_performance_over_the_last_6_months: "Monthly performance over the last 6 months",
   view_riders_performance_analytics: "View riders performance analytics",
@@ -1184,6 +1186,8 @@ export const en = {
   balance: "Balance",
   no_transactions_match_filters: "No transactions match your filters.",
   no_transactions_found: "No transactions found",
+  // --> details
+  settlement_details: "Settlement Details",
 
   // payment-disputes
   track_and_resolve_payment_disputes: "Track and resolve payment disputes across the platform",

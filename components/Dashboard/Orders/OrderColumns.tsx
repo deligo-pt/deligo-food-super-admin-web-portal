@@ -64,11 +64,11 @@ export function getOrderColumns({
                     </Avatar>
                     <div>
                         <div className="font-medium">
-                            {order.customerId?.name?.firstName}{" "}
+                            {order.customerId?.name?.firstName || "N/A"}{" "}
                             {order.customerId?.name?.lastName}
                         </div>
                         <div className="text-xs text-slate-500">
-                            {order.deliveryAddress.street}, {order.deliveryAddress.city}
+                            {order.deliveryAddress.street || "-"}, {order.deliveryAddress.city || "-"}
                         </div>
                     </div>
                 </div>

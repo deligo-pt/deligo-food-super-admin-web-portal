@@ -104,10 +104,8 @@ export default function AddIngredients({ taxes }: { taxes: TTax[] }) {
   const removeFile = async () => {
     if (!previewImage) return;
 
-    // Clear states directly (No updateDocumentReq or deleteDocumentReq needed here)
     setPreviewImage("");
     form.setValue("image", "");
-    toast.success("File removed successfully!");
   };
 
   const onSubmit = async (data: TIngredientForm) => {

@@ -42,7 +42,7 @@ export default function DeliveryPartnerWalletTable({ wallets }: IProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white shadow-md rounded-2xl mb-2 overflow-x-auto"
+      className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
     >
       <Table className="max-w-full">
         <TableHeader>

@@ -246,7 +246,7 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
                 <p className="font-medium">
-                  {data?.existingFleetManager?.isEmailVerified ? "Yes" : "No"}
+                  {data?.existingFleetManager?.email ? "Yes" : "No"}
                 </p>
               </div>
             </div>

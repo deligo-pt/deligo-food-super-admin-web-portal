@@ -420,6 +420,7 @@ export const pt = {
   orders_capital: "Pedidos",
   // --> details
   fry_express_performance: "Desempenho do Fry Express",
+  performance: "Desempenho",
   vendor_performance_details: "Detalhes de Desempenho do Vendedor",
   avg_rating: "Avaliação Média",
   total_products: "Total de Produtos",
@@ -885,6 +886,7 @@ export const pt = {
 
   // delivery partner performance
   rider_performance_analytics: "Análise de Desempenho do Estafeta",
+  rider_performance_details: "Detalhes do Desempenho do Entregador",
   comprehensive_insights_into_rider: "Informações detalhadas sobre o desempenho dos Estafetas",
   monthly_performance_over_the_last_6_months: "Desempenho mensal nos últimos 6 meses",
   view_riders_performance_analytics: "Ver análises de desempenho dos Estafetas",
@@ -1201,6 +1203,8 @@ export const pt = {
   balance: "Saldo",
   no_transactions_match_filters: "Nenhuma transação corresponde aos seus filtros.",
   no_transactions_found: "Nenhuma transação encontrada",
+  // --> details
+  settlement_details: "Detalhes da Liquidação",
 
   // payment-disputes
   track_and_resolve_payment_disputes: "Rastreie e resolva disputas de pagamento em toda a plataforma",

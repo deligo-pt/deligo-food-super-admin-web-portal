@@ -83,7 +83,7 @@ export default function PlatformEarningsTable({ commissions }: IProps) {
             <TableRow key={c._id}>
               <TableCell>{c.transactionId}</TableCell>
               <TableCell>
-                {c.customer?.name?.firstName} {c.customer?.name?.lastName}
+                {c.customer?.name?.firstName || "N/A"} {c.customer?.name?.lastName}
               </TableCell>
               <TableCell>{c.orderId}</TableCell>
               <TableCell>€{formatPrice(c.amount || 0)}</TableCell>
