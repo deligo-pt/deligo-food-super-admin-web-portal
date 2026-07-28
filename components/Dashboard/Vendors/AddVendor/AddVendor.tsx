@@ -354,6 +354,8 @@ export default function AddVendor({
         });
         setOtpSent(false);
         setEmailVerified(false);
+        setEmail("");
+        setPassword("");
         return;
       }
 
@@ -455,6 +457,7 @@ export default function AddVendor({
                         placeholder={t("vendor_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        disabled={!!vendorDetails?.userId}
                       />
                       {!otpSent && !emailVerified && (
                         <Button
@@ -494,10 +497,11 @@ export default function AddVendor({
                           placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
+                          maxLength={4}
                         />
                         <Button
                           type="button"
-                          disabled={buttonDisabled === 3}
+                          disabled={buttonDisabled === 3 || otp.length < 4}
                           style={{ background: DELIGO }}
                           onClick={verifyOtp}
                           className="w-32"
@@ -517,6 +521,7 @@ export default function AddVendor({
                         placeholder={t("password")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled={!!vendorDetails?.userId}
                       />
                       {showPass ? (
                         <EyeOff

@@ -135,7 +135,7 @@ const Dashboard = ({ analyticsData }: { analyticsData: TAnalytics }) => {
         />
         <StatusCard
           title={t("cancelled_orders")}
-          value={analyticsData?.orders?.cancelled?.toLocaleString() || "0"}
+          value={analyticsData?.orders?.canceled?.toLocaleString() || "0"}
           icon={<XCircleIcon />}
           color="#DC3173"
         />

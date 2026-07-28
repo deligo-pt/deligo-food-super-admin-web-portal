@@ -59,7 +59,7 @@ export type TAnalytics = {
     total: number;
     pending: number;
     completed: number;
-    cancelled: number;
+    canceled: number;
   };
 
   popularCategories: TPopularCategory[];

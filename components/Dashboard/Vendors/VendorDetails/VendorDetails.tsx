@@ -54,7 +54,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
       setApproveStatus("");
     }
   };
-
+  console.log("vendor details", vendor);
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
       setShowDeleteModal(false);
@@ -243,7 +243,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
                 <p className="font-medium">
-                  {vendor?.isEmailVerified ? "Yes" : "No"}
+                  {vendor?.email ? "Yes" : "No"}
                 </p>
               </div>
             </div>
@@ -260,12 +260,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
-              <div>
+              {/* <div>
                 <p className="text-sm text-gray-500">{t("license_number")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.businessLicenseNumber || "N/A"}
                 </p>
-              </div>
+              </div> */}
               <div>
                 <p className="text-sm text-gray-500">{t("nif")}</p>
                 <p className="font-medium">
