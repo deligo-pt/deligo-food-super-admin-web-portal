@@ -262,6 +262,8 @@ export default function AddFleetManager() {
             id: toastId,
           },
         );
+        setEmail("");
+        setPassword("");
         return;
       }
 
@@ -284,13 +286,6 @@ export default function AddFleetManager() {
       return () => clearInterval(interval);
     }
   }, [timer]);
-
-  useEffect(() => {
-    const currentPhone = form.getValues("phoneNumber");
-    if (!currentPhone) {
-      form.setValue("phoneNumber", "+351", { shouldValidate: true });
-    }
-  }, [form]);
 
   const isDocumentsValid = FLEET_REQUIRED_DOCS.every(
     (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
@@ -405,10 +400,11 @@ export default function AddFleetManager() {
                           placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
+                          maxLength={4}
                         />
                         <Button
                           type="button"
-                          disabled={buttonDisabled === 3}
+                          disabled={buttonDisabled === 3 || otp.length < 4}
                           style={{ background: DELIGO }}
                           onClick={verifyOtp}
                           className="w-32"

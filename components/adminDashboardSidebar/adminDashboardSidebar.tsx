@@ -218,7 +218,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("payments_and_earnings"),
       icon: <BadgeEuro size={18} />,
       items: [
-        { name: t("payment_disputes"), path: "/admin/payment-disputes" },
+        // { name: t("payment_disputes"), path: "/admin/payment-disputes" },
         { name: t("platform_earnings"), path: "/admin/platform-earnings" },
         { name: t("transaction_history"), path: "/admin/transaction-history" },
         {

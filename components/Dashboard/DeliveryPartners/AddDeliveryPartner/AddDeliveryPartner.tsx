@@ -393,6 +393,8 @@ export default function AddDeliveryPartner() {
             id: toastId,
           },
         );
+        setEmail("");
+        setPassword("");
         return;
       }
 
@@ -416,13 +418,6 @@ export default function AddDeliveryPartner() {
       return () => clearInterval(interval);
     }
   }, [timer]);
-
-  useEffect(() => {
-    const currentPhone = form.getValues("phoneNumber");
-    if (!currentPhone) {
-      form.setValue("phoneNumber", "+351", { shouldValidate: true });
-    }
-  }, [form]);
 
   const isDocumentsValid = PARTNER_REQUIRED_DOCS.every(
     (key) => previews[key] !== null);
@@ -535,11 +530,12 @@ export default function AddDeliveryPartner() {
                           placeholder={t("enter_otp")}
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
+                          maxLength={4}
                         />
                         <Button
                           type="button"
                           style={{ background: DELIGO }}
-                          disabled={buttonDisabled === 3}
+                          disabled={buttonDisabled === 3 || otp.length < 4}
                           onClick={verifyOtp}
                           className="w-32"
                         >

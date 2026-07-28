@@ -19,6 +19,10 @@ export const createPermissionReq = async (payload: Record<string, unknown>) => {
             throw new Error(result?.message || "Failed to create permission");
         }
 
+        if (result?.success) {
+            revalidateTag("permissions-list", "tags")
+        }
+
         return result;
     });
 };
