@@ -2,7 +2,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadPartnerDocuments from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
+import UploadPartnerDocuments, { BASE_REQUIRED_DOCS, DocKey } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -34,7 +34,7 @@ import {
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
-import { PARTNER_REQUIRED_DOCS, TFilePreview, TPartnerDocKey } from "@/types/document.type";
+import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
 import { formatTime, getTodayDateString } from "@/utils/formatTime";
 import { deliveryPartnerValidation } from "@/validations/delivery-partner/delivery-partner.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -358,8 +358,10 @@ export default function AddDeliveryPartner() {
 
       criminalRecord: {
         certificate: data.haveCriminalRecordCertificate,
-        issueDate: new Date(data.issueDate as string),
-        expiryDate: new Date(data.expiryDate as string),
+        ...(data.haveCriminalRecordCertificate && {
+          issueDate: new Date(data.issueDate as string),
+          expiryDate: new Date(data.expiryDate as string),
+        }),
       },
       workPreferences: {
         preferredZones: data.preferredZones,
@@ -419,7 +421,30 @@ export default function AddDeliveryPartner() {
     }
   }, [timer]);
 
-  const isDocumentsValid = PARTNER_REQUIRED_DOCS.every(
+  // Dynamically build required docs based on vehicle type
+  const getRequiredDocs = (): DocKey[] => {
+    const base = [...BASE_REQUIRED_DOCS];
+
+    if (vehicleType === "MOTORBIKE" || vehicleType === "CAR") {
+      return [
+        ...base,
+        "drivingLicenseFront",
+        "drivingLicenseBack",
+        "vehicleRegistration",
+      ];
+    }
+
+    if (vehicleType === "SCOOTER") {
+      return [...base, "vehicleRegistration"];
+    }
+
+    // BICYCLE | E-BIKE | undefined → only base required docs
+    return base;
+  };
+
+  const REQUIRED_DOCS = getRequiredDocs();
+
+  const isDocumentsValid = REQUIRED_DOCS.every(
     (key) => previews[key] !== null);
 
   const isSubmitDisabled = isSubmitting || !isDocumentsValid
@@ -1220,7 +1245,7 @@ export default function AddDeliveryPartner() {
 
                     <div className="space-y-4 items-start">
                       <div className="space-y-2">
-                        <Label className="">{t("preferred_working_zones")}<span className="text-red-600">*</span></Label>
+                        <Label className="">{t("preferred_working_zones")}</Label>
                         {watchZones?.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-1">
                             {watchZones?.map((zone) => (
@@ -1285,7 +1310,7 @@ export default function AddDeliveryPartner() {
                         name="preferredHours"
                         render={({ field, fieldState }) => (
                           <FormItem>
-                            <FormLabel>{t("preferred_working_hours")}<span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{t("preferred_working_hours")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={(value) =>
@@ -1453,6 +1478,7 @@ export default function AddDeliveryPartner() {
 
                     <UploadPartnerDocuments
                       partnerId={partnerId}
+                      vehicleType={vehicleType}
                       previews={previews}
                       setPreviews={setPreviews}
                       isSubmitting={isSubmitting}

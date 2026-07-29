@@ -94,6 +94,8 @@ export const pt = {
   on_the_way_orders: "Encomendas a Caminho",
   delivered_orders: "Encomendas Entregues",
   cancelled_orders: "Encomendas Canceladas",
+  rejected_orders: "Encomendas Rejeitados",
+  refunded_orders: "Encomendas Reembolsados",
   refund_requests: "Pedidos de Reembolso",
 
   payments_and_earnings: "Pagamentos e Ganhos",
@@ -1149,6 +1151,12 @@ export const pt = {
   cancelled_orders_desc: "Encomendas canceladas — monitorize motivos e parceiros para reduzir churn.",
   cancelled_at: "Cancelada em",
 
+  // refunded-orders
+  refunded_orders_desc: "Pedidos reembolsados — Pedidos que foram cancelados ou devolvidos e tiveram o pagamento devolvido ao cliente.",
+
+  // rejected-orders
+  rejected_orders_desc: "Pedidos rejeitados — Pedidos que foram recusados pela loja, pelo sistema ou pelo entregador antes do atendimento.",
+
   // refund-requests
   manage_all_customer_refund_requests:
     "Gerir eficientemente todos os pedidos de reembolso dos clientes.",
@@ -1328,6 +1336,7 @@ export const pt = {
   view_variation_stock: "Ver Estoque da Variação",
   all_caught_up: "Tudo atualizado!",
   no_out_of_stock_items_match_current_filters: "Nenhum item esgotado corresponde aos filtros atuais.",
+  notify_vendor: "Notificar Fornecedor",
 
   // restricted-items
   manage_items_vendors_allowed_sell:

@@ -34,6 +34,7 @@ import { TBusinessCategoryResponse } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
 import { TVendorDocKey } from "@/types/document.type";
 import { TBusinessLocation, TVendor } from "@/types/user.type";
+import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -91,7 +92,13 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
     agoserisHaccpCertificate: Array.isArray(vendorState?.documents?.agoserisHaccpCertificate)
       ? vendorState?.documents?.agoserisHaccpCertificate
       : null,
+    ibanProof: Array.isArray(vendorState?.documents?.ibanProof)
+      ? vendorState?.documents?.ibanProof
+      : null,
   });
+
+  const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "storePhoto", "menuUpload"];
+
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -183,6 +190,22 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
   const onSubmit = async (data: TVendorForm) => {
     const toastId = toast.loading("Updating vendor data...");
+
+    try {
+      // Fill in defaults for any optional doc the user skipped
+      for (const key of OPTIONAL_DEFAULTS) {
+        if (!previews[key] || previews[key]!.length === 0) {
+          await uploadDefaultDocument(key, vendor?.userId);
+        }
+      }
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to set default documents",
+        { id: toastId }
+      );
+      console.log(err);
+      return;
+    }
 
     const vendorData = {
       name: {

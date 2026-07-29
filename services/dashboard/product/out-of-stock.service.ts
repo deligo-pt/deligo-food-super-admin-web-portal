@@ -1,5 +1,6 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TProduct } from "@/types/product.type";
 import { catchAsync } from "@/utils/catchAsync";
@@ -34,4 +35,18 @@ export const getAllOutOfStocksReq = async (
   return {
     data: [],
   };
+};
+
+export const notifyVendorReq = async (productId: string) => {
+  return await catchAsync(async () => {
+    const response = await serverFetch.post(`/products/notify-vendor/${productId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    return result;
+  });
 };

@@ -8,6 +8,7 @@ export interface IFleetDocs {
   activityDocument?: string[];
   myPhoto?: string[];
   proofOfAddress?: string[];
+  ibanProof?: string[];
 }
 
 interface IProps {
@@ -34,6 +35,7 @@ export default function FleetManagerDetailsDoc({ documents }: IProps) {
               {doc === "activityDocument" && t("activity_document")}
               {doc === "myPhoto" && t("my_photo")}
               {doc === "proofOfAddress" && t("proof_of_address")}
+              {doc === "ibanProof" && t("iban_proof")}
             </p>
 
             <div className="grid grid-cols-2 gap-3">
