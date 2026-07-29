@@ -358,8 +358,10 @@ export default function AddDeliveryPartner() {
 
       criminalRecord: {
         certificate: data.haveCriminalRecordCertificate,
-        issueDate: new Date(data.issueDate as string),
-        expiryDate: new Date(data.expiryDate as string),
+        ...(data.haveCriminalRecordCertificate && {
+          issueDate: new Date(data.issueDate as string),
+          expiryDate: new Date(data.expiryDate as string),
+        }),
       },
       workPreferences: {
         preferredZones: data.preferredZones,
