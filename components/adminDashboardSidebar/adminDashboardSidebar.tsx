@@ -207,6 +207,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       items: [
         { name: t("all_orders"), path: "/admin/all-orders" },
         { name: t("cancelled_orders"), path: "/admin/cancelled-orders" },
+        { name: t("rejected_orders"), path: "/admin/rejected-orders" },
+        { name: t("refunded_orders"), path: "/admin/refunded-orders" },
         { name: t("delivered_orders"), path: "/admin/delivered-orders" },
         { name: t("pending_orders"), path: "/admin/pending-orders" },
         { name: t("preparing_orders"), path: "/admin/preparing-orders" },

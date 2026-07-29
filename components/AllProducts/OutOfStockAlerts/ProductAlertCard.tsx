@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
+import { notifyVendorReq } from "@/services/dashboard/product/out-of-stock.service";
 import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
 import { format } from "date-fns";
@@ -19,11 +20,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ProductAlertCard({ product }: { product: TProduct }) {
   const { t } = useTranslation();
   const { lang } = useStore();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getProductAlertLevel = (
     product: TProduct,
@@ -67,6 +70,22 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
     }
     return null;
   };
+
+  const handleNotifyVendor = async () => {
+    const toastId = toast.loading("Sending request...");
+    setIsSubmitting(true);
+
+    const res = await notifyVendorReq(product?._id as string);
+    if (res.success) {
+      toast.success(res?.message || "Request send to vendor", { id: toastId });
+      setIsSubmitting(false);
+      return;
+    } else {
+      toast.error(res?.message || "Notify sent request failed", { id: toastId });
+      setIsSubmitting(false);
+      return;
+    }
+  }
 
   return (
     <motion.div
@@ -229,12 +248,12 @@ export default function ProductAlertCard({ product }: { product: TProduct }) {
 
       <div className="border-t border-gray-100 p-4 bg-gray-50/30 flex items-center justify-between">
         <span className="text-xs text-gray-400 flex items-center gap-1">
-          <RefreshCw size={12} /> Last updated:{" "}
+          <RefreshCw size={12} /> {t("last_updated")}:{" "}
           {format(product.updatedAt, "do MMM yyyy")}
         </span>
         <div>
-          <Button className="bg-[#DC3173] text-white hover:bg-[#DC3173]/90 transition-colors shadow-sm shadow-[#DC3173]/20 flex items-center gap-2">
-            <BellRing size={14} /> Notify Vendor
+          <Button disabled={isSubmitting} onClick={handleNotifyVendor} className="bg-[#DC3173] text-white hover:bg-[#DC3173]/90 transition-colors shadow-sm shadow-[#DC3173]/20 flex items-center gap-2">
+            <BellRing size={14} /> {t("notify_vendor")}
           </Button>
         </div>
       </div>

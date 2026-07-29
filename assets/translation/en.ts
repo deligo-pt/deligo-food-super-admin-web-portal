@@ -91,6 +91,8 @@ export const en = {
   on_the_way_orders: "On the Way Orders",
   delivered_orders: "Delivered Orders",
   cancelled_orders: "Cancelled Orders",
+  rejected_orders: "Rejected Orders",
+  refunded_orders: "Refunded Orders",
   refund_requests: "Refund Requests",
 
   payments_and_earnings: "Payments & Earnings",
@@ -362,6 +364,7 @@ export const en = {
   store_photo: "Store Photo",
   menu_brochure: "Menu / Brochure",
   agoserisHaccpCertificate: "AGOSERIS HACCP Certificate",
+  iban_proof: "IBAN Proof",
   no_file_selected: "No file selected",
   remove: "Remove",
   add_more: "Add More",
@@ -1132,6 +1135,12 @@ export const en = {
   cancelled_orders_desc: "Cancelled orders — monitor reasons and partners to reduce churn.",
   cancelled_at: "Cancelled At",
 
+  // refunded-orders
+  refunded_orders_desc: "Refunded orders — Orders that were canceled or returned and had their payment returned to the customer.",
+
+  // rejected-orders
+  rejected_orders_desc: "Rejected orders — Orders that were declined by the store, system, or driver before fulfillment.",
+
   // refund-requests
   manage_all_customer_refund_requests:
     "Manage all customer refund requests efficiently.",
@@ -1309,6 +1318,7 @@ export const en = {
   view_variation_stock: "View Variation Stock",
   all_caught_up: "All caught up!",
   no_out_of_stock_items_match_current_filters: "No out of stock items match your current filters.",
+  notify_vendor: "Notify Vendor",
 
   // restricted-items
   manage_items_vendors_allowed_sell:

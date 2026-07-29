@@ -6,7 +6,8 @@ export type TVendorDocKey =
   | "idProofBack"
   | "storePhoto"
   | "menuUpload"
-  | "agoserisHaccpCertificate";
+  | "agoserisHaccpCertificate"
+  | "ibanProof";
 
 export type TFleetDocKey =
   | "myPhoto"
@@ -14,7 +15,8 @@ export type TFleetDocKey =
   | "idProofFront"
   | "idProofBack"
   | "proofOfAddress"
-  | "activityDocument";
+  | "activityDocument"
+  | "ibanProof";
 
 export type TPartnerDocKey =
   | "idProofFront"

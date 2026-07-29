@@ -19,7 +19,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-type DocKey =
+export type DocKey =
   | "idProofFront"
   | "idProofBack"
   | "drivingLicenseFront"
@@ -30,13 +30,22 @@ type DocKey =
   | "insurancePolicy"
   | "myPhoto";
 
+export const BASE_REQUIRED_DOCS: DocKey[] = [
+  "myPhoto",
+  "idProofFront",
+  "idProofBack",
+  "criminalRecordCertificate",
+];
+
 export default function UploadPartnerDocuments({
   partnerId,
+  vehicleType,
   previews,
   setPreviews,
-  isSubmitting
+  isSubmitting,
 }: {
   partnerId: string;
+  vehicleType: string;
   previews: Record<TPartnerDocKey, TFilePreview | null>;
   setPreviews: React.Dispatch<
     React.SetStateAction<Record<TPartnerDocKey, TFilePreview | null>>
@@ -46,6 +55,29 @@ export default function UploadPartnerDocuments({
   const { t } = useTranslation();
   const inputsRef = useRef<Record<string, HTMLInputElement | null>>({});
   const [processing, setProcessing] = useState(false);
+
+  // Dynamically build required docs based on vehicle type
+  const getRequiredDocs = (): DocKey[] => {
+    const base = [...BASE_REQUIRED_DOCS];
+
+    if (vehicleType === "MOTORBIKE" || vehicleType === "CAR") {
+      return [
+        ...base,
+        "drivingLicenseFront",
+        "drivingLicenseBack",
+        "vehicleRegistration",
+      ];
+    }
+
+    if (vehicleType === "SCOOTER") {
+      return [...base, "vehicleRegistration"];
+    }
+
+    // BICYCLE | E-BIKE | undefined → only base required docs
+    return base;
+  };
+
+  const REQUIRED_DOCS = getRequiredDocs();
 
   const DOCUMENTS: {
     key: DocKey;
@@ -177,6 +209,8 @@ export default function UploadPartnerDocuments({
       {DOCUMENTS.map((d, idx) => {
         const previewFile = previews[d.key];
         const isSelected = !!previewFile?.url;
+        const isRequired = REQUIRED_DOCS.includes(d.key);
+
         return (
           <motion.div
             key={d.key}
@@ -204,7 +238,13 @@ export default function UploadPartnerDocuments({
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
-                  <p>{d.label} <span className="text-red-600">*</span></p>
+                  <p>
+                    {d.label}
+                    {isRequired && (
+                      <span className="ml-1 text-red-600">*</span>
+                    )}
+                  </p>
+
                   {isSelected && (
                     <div>
                       <button
@@ -224,7 +264,8 @@ export default function UploadPartnerDocuments({
                         onClick={() => openPicker(d.key)}
                         className="inline-flex items-center gap-2 px-2 py-1 rounded-md text-xs cursor-pointer"
                       >
-                        <RefreshCcw className="w-3 h-3 text-[#DC3173]" /> {t("change")}
+                        <RefreshCcw className="w-3 h-3 text-[#DC3173]" />{" "}
+                        {t("change")}
                       </button>
                     </div>
                   )}
@@ -244,6 +285,7 @@ export default function UploadPartnerDocuments({
                     }
                   />
                 </div>
+
                 <div className="text-xs text-gray-500 mt-1 space-y-1">
                   {isSelected ? (
                     previewFile?.isImage && previewFile?.url ? (

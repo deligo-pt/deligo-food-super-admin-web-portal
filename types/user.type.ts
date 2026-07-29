@@ -88,6 +88,7 @@ export type TAgent = {
     myPhoto?: string;
     proofOfAddress?: string;
     activityDocument?: string;
+    ibanProof?: string;
   };
 
   // ---------------------------------------------
@@ -230,6 +231,7 @@ export type TVendor = {
     storePhoto?: string[];
     menuUpload?: string[];
     agoserisHaccpCertificate?: string[];
+    ibanProof?: string[];
   };
 
   // --------------------------------------------------------

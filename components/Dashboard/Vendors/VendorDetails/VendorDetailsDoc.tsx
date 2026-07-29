@@ -2,12 +2,15 @@ import { useTranslation } from "@/hooks/use-translation";
 import Image from "next/image";
 
 export interface IVendorDocs {
+  myPhoto?: string[];
   businessLicenseDoc?: string[];
   taxDoc?: string[];
   idProofFront?: string[];
   idProofBack?: string[];
   storePhoto?: string[];
   menuUpload?: string[];
+  agoserisHaccpCertificate?: string[];
+  ibanProof?: string[];
 }
 
 interface IProps {
@@ -15,6 +18,7 @@ interface IProps {
 }
 
 export default function VendorDetailsDoc({ documents }: IProps) {
+  console.log("docs", documents);
   const { t } = useTranslation();
   const docsArr = Object.keys(documents || {}) as (keyof IVendorDocs)[];
 
@@ -28,12 +32,15 @@ export default function VendorDetailsDoc({ documents }: IProps) {
         return (
           <div key={doc} className="mb-6">
             <p className="text-sm text-gray-500 mb-2">
+              {doc === "myPhoto" && t("vendor_photo")}
               {doc === "idProofFront" && t("id_proof_front")}
               {doc === "idProofBack" && t("id_proof_back")}
               {doc === "businessLicenseDoc" && t("business_license")}
               {doc === "taxDoc" && t("tax_document")}
               {doc === "storePhoto" && t("store_photo")}
               {doc === "menuUpload" && t("menu_brochure")}
+              {doc === "agoserisHaccpCertificate" && t("agoserisHaccpCertificate")}
+              {doc === "ibanProof" && t("iban_proof")}
             </p>
 
             <div className="grid grid-cols-2 gap-3">

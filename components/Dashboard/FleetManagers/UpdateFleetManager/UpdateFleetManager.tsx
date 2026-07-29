@@ -73,6 +73,9 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
     activityDocument: Array.isArray(fleetManager?.documents?.activityDocument)
       ? fleetManager?.documents?.activityDocument
       : null,
+    ibanProof: Array.isArray(fleetManager?.documents?.ibanProof)
+      ? fleetManager?.documents?.ibanProof
+      : null,
   });
 
   const form = useForm<TFleetManagerForm>({
