@@ -89,6 +89,7 @@ const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
   storePhoto: null,
   menuUpload: null,
   agoserisHaccpCertificate: null,
+  ibanProof: null
 };
 const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "storePhoto", "menuUpload"];
 

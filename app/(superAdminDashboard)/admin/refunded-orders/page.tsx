@@ -1,5 +1,4 @@
 import Orders from "@/components/Dashboard/Orders/Orders";
-import { ORDER_STATUS } from "@/consts/order.const";
 import { getAllOrdersReq } from "@/services/dashboard/order/order.service";
 
 type IProps = {
@@ -10,7 +9,7 @@ export default async function RefundedOrdersPage({ searchParams }: IProps) {
     const queries = (await searchParams) || {};
     const ordersResult = await getAllOrdersReq({
         ...queries,
-        orderStatus: ORDER_STATUS.REFUNDED,
+        paymentStatus: "REFUNDED",
     });
 
     return (

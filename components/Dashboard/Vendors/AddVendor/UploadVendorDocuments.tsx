@@ -28,6 +28,7 @@ export const REQUIRED_DOCS: TVendorDocKey[] = [
   "taxDoc",
   "idProofFront",
   "idProofBack",
+  "ibanProof"
 ];
 
 export const OPTIONAL_DOCS: TVendorDocKey[] = [
@@ -43,6 +44,7 @@ const DOCUMENT_LIMITS: Partial<Record<TVendorDocKey, number>> = {
   idProofFront: 1,
   idProofBack: 1,
   agoserisHaccpCertificate: 1,
+  ibanProof: 1,
 
   businessLicenseDoc: 3,
   taxDoc: 3,
@@ -83,6 +85,7 @@ export default function UploadVendorDocuments({
       { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },
       { key: "menuUpload", label: t("menu_brochure"), prefersImagePreview: true },
       { key: "agoserisHaccpCertificate", label: t("agoserisHaccpCertificate"), prefersImagePreview: true },
+      { key: "ibanProof", label: t("iban_proof"), prefersImagePreview: true },
     ];
 
   const visibleDocuments = DOCUMENTS.filter((doc) => {
@@ -290,7 +293,7 @@ export default function UploadVendorDocuments({
                       onClick={() => openPicker(d.key)}
                       className="inline-flex items-center gap-2 p-0 text-sm font-medium text-[#DC3173]  hover:underline"
                     >
-                      <Plus className="w-3 h-3 text-[#DC3173]" /> Add More
+                      <Plus className="w-3 h-3 text-[#DC3173]" /> {t("add_more")}
                     </button>
                   )}
 
