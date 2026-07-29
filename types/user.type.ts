@@ -88,6 +88,7 @@ export type TAgent = {
     myPhoto?: string;
     proofOfAddress?: string;
     activityDocument?: string;
+    ibanProof?: string;
   };
 
   // ---------------------------------------------

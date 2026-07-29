@@ -2,7 +2,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadPartnerDocuments from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
+import UploadPartnerDocuments, { BASE_REQUIRED_DOCS, DocKey } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -338,6 +338,34 @@ export default function UpdateDeliveryPartner({
       form.setValue("phoneNumber", "+351", { shouldValidate: true });
     }
   }, [form]);
+
+  // Dynamically build required docs based on vehicle type
+  const getRequiredDocs = (): DocKey[] => {
+    const base = [...BASE_REQUIRED_DOCS];
+
+    if (vehicleType === "MOTORBIKE" || vehicleType === "CAR") {
+      return [
+        ...base,
+        "drivingLicenseFront",
+        "drivingLicenseBack",
+        "vehicleRegistration",
+      ];
+    }
+
+    if (vehicleType === "SCOOTER") {
+      return [...base, "vehicleRegistration"];
+    }
+
+    // BICYCLE | E-BIKE | undefined → only base required docs
+    return base;
+  };
+
+  const REQUIRED_DOCS = getRequiredDocs();
+
+  const isDocumentsValid = REQUIRED_DOCS.every(
+    (key) => previews[key] !== null);
+
+  const isSubmitDisabled = isSubmitting || !isDocumentsValid
 
   return (
     <Form {...form}>
@@ -1276,6 +1304,7 @@ export default function UpdateDeliveryPartner({
 
                     <UploadPartnerDocuments
                       partnerId={partner.userId}
+                      vehicleType={vehicleType}
                       previews={previews}
                       setPreviews={setPreviews}
                       isSubmitting={isSubmitting}
@@ -1293,7 +1322,7 @@ export default function UpdateDeliveryPartner({
             <Button
               className="px-8 py-2 text-white"
               style={{ background: DELIGO }}
-              disabled={isSubmitting}
+              disabled={isSubmitDisabled}
             >
               {t("update_delivery_partner")}
             </Button>
