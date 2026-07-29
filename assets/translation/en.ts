@@ -91,6 +91,8 @@ export const en = {
   on_the_way_orders: "On the Way Orders",
   delivered_orders: "Delivered Orders",
   cancelled_orders: "Cancelled Orders",
+  rejected_orders: "Rejected Orders",
+  refunded_orders: "Refunded Orders",
   refund_requests: "Refund Requests",
 
   payments_and_earnings: "Payments & Earnings",
@@ -1131,6 +1133,12 @@ export const en = {
   // cancelled-orders
   cancelled_orders_desc: "Cancelled orders — monitor reasons and partners to reduce churn.",
   cancelled_at: "Cancelled At",
+
+  // refunded-orders
+  refunded_orders_desc: "Refunded orders — Orders that were canceled or returned and had their payment returned to the customer.",
+
+  // rejected-orders
+  rejected_orders_desc: "Rejected orders — Orders that were declined by the store, system, or driver before fulfillment.",
 
   // refund-requests
   manage_all_customer_refund_requests:
