@@ -230,6 +230,7 @@ export type TVendor = {
     storePhoto?: string[];
     menuUpload?: string[];
     agoserisHaccpCertificate?: string[];
+    ibanProof?: string[];
   };
 
   // --------------------------------------------------------

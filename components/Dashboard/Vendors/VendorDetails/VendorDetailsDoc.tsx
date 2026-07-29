@@ -18,6 +18,7 @@ interface IProps {
 }
 
 export default function VendorDetailsDoc({ documents }: IProps) {
+  console.log("docs", documents);
   const { t } = useTranslation();
   const docsArr = Object.keys(documents || {}) as (keyof IVendorDocs)[];
 

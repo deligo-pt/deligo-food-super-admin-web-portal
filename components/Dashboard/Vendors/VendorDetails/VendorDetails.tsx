@@ -54,7 +54,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
       setApproveStatus("");
     }
   };
-  console.log("vendor details", vendor);
+
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
       setShowDeleteModal(false);
