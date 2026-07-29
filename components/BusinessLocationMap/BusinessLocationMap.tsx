@@ -80,7 +80,7 @@ const BusinessLocationMap = ({
   // Controls whether address fields are editable
   // Starts true only if an existing businessLocation is provided
   const [isLocationSelected, setIsLocationSelected] = useState(
-    !!businessLocation
+    false
   );
 
   const fillAddressFields = useCallback(
