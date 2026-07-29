@@ -78,6 +78,7 @@ const defaultDocuments: Record<TFleetDocKey, string[] | null> = {
   idProofBack: null,
   proofOfAddress: null,
   activityDocument: null,
+  ibanProof: null
 };
 
 export default function AddFleetManager() {
