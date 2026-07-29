@@ -1318,6 +1318,7 @@ export const en = {
   view_variation_stock: "View Variation Stock",
   all_caught_up: "All caught up!",
   no_out_of_stock_items_match_current_filters: "No out of stock items match your current filters.",
+  notify_vendor: "Notify Vendor",
 
   // restricted-items
   manage_items_vendors_allowed_sell:

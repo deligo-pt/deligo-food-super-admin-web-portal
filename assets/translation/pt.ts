@@ -1336,6 +1336,7 @@ export const pt = {
   view_variation_stock: "Ver Estoque da Variação",
   all_caught_up: "Tudo atualizado!",
   no_out_of_stock_items_match_current_filters: "Nenhum item esgotado corresponde aos filtros atuais.",
+  notify_vendor: "Notificar Fornecedor",
 
   // restricted-items
   manage_items_vendors_allowed_sell:
