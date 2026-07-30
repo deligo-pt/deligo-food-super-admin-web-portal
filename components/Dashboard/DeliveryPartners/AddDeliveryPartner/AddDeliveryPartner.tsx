@@ -27,10 +27,10 @@ import { bankNames } from "@/consts/bankNames.const";
 import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/otp.service";
 import {
   registerUserAndSendOtpReq,
+  submitForApproval,
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
@@ -386,15 +386,16 @@ export default function AddDeliveryPartner() {
     );
 
     if (updatedResult.success) {
-      const approveResult = await approveOrRejectReq(partnerId, {
-        status: "APPROVED",
-      });
+      const approveResult = await submitForApproval(partnerId);
+      // const approveResult = await approveOrRejectReq(partnerId, {
+      //   status: "APPROVED",
+      // });
 
       if (approveResult.success) {
         form.reset();
         setPreviews(defaultDocuments);
         toast.success(
-          approveResult.message || "Delivery partner added successfully!",
+          approveResult.message || "Delivery partner submitted successfully!",
           {
             id: toastId,
           },

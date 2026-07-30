@@ -859,7 +859,7 @@ export const en = {
   // active delivery partners
   all_active_riders_system: "All active riders in the system",
   all_active_riders: "All Active riders",
-  total: "total",
+  total: "Total",
   no_partners_found: "No partners found.",
 
   // delivery partner onboarding request

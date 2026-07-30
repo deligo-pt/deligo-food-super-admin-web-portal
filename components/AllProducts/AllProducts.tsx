@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import AllFilters from "../Filtering/AllFilters";
 import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 
-const sortFields = ["newest", "oldest", "nameAZ", "nameZA", "priceHL", "priceLH", "highestRated", "lowestRated"] as SortOptionKey[];
+const sortFields = ["newest", "oldest", "priceHL", "priceLH", "highestRated", "lowestRated"] as SortOptionKey[];
 
 export default function Products({
   initialData,
@@ -38,20 +38,20 @@ export default function Products({
     {
       label: "availability_status",
       key: "status",
-      placeholder: "Select Status",
+      placeholder: t("select_status"),
       type: "select",
       items: [
         {
-          label: t("in_stock"),
-          value: "In Stock",
+          label: t("active"),
+          value: "ACTIVE",
         },
         {
-          label: t("out_of_stock"),
-          value: "Out of Stock",
+          label: t("inactive"),
+          value: "INACTIVE",
         },
         {
-          label: t("limited"),
-          value: "Limited",
+          label: t("deleted"),
+          value: "DELETED",
         },
       ],
     },
