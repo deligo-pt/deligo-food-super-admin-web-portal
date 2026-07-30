@@ -67,6 +67,14 @@ export const deleteDocumentReq = async (
   });
 };
 
+export const submitForApproval = async (id: string) => {
+  const result = await catchAsync(async () => {
+    return await serverRequest.patch(`/auth/${id}/submitForApproval`);
+  });
+
+  return result;
+};
+
 // export const uploadUserDocumentsReq = async (
 //   id: string,
 //   key: string,

@@ -227,12 +227,12 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("email_verified")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${partner.isEmailVerified
+                    className={`px-2 py-0.5 rounded text-xs ${partner.email
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                       }`}
                   >
-                    {partner.isEmailVerified ? t("yes") : t("no")}
+                    {partner.email ? t("yes") : t("no")}
                   </span>
                 }
               />

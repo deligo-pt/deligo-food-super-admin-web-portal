@@ -130,16 +130,20 @@ export default function AddFleetManager() {
 
     const toastId = toast.loading("Sending OTP...");
 
-    if (!isValidEmail(email))
+    if (!isValidEmail(email)) {
+      setButtonDisabled(0);
       return toast.error("Invalid email address", { id: toastId });
+    }
 
-    if (!isValidPassword(password))
+    if (!isValidPassword(password)) {
+      setButtonDisabled(0);
       return toast.error(
         "Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
         {
           id: toastId,
         },
       );
+    }
 
     const result = await registerUserAndSendOtpReq(
       {

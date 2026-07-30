@@ -871,7 +871,7 @@ export const pt = {
   // active delivery partners
   all_active_riders_system: "Todos os Estafetas ativos no sistema",
   all_active_riders: "Todos os Estafetas ativos",
-  total: "total",
+  total: "Total",
   no_partners_found: "Nenhum parceiro encontrado.",
 
   // delivery partner onboarding request

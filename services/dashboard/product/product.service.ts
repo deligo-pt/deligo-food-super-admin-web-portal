@@ -34,7 +34,8 @@ export const getAllProductsReq = async (
     page,
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
-    ...(status ? { "stock.availabilityStatus": status } : {}),
+    ...(status ? { "meta.status": status } : {}),
+    // ...(status ? { "stock.availabilityStatus": status } : {}),
   };
 
   const result = await catchAsync<TProduct[]>(async () => {
