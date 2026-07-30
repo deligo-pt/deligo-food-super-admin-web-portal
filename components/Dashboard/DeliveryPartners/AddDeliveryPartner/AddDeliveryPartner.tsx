@@ -201,16 +201,20 @@ export default function AddDeliveryPartner() {
 
     const toastId = toast.loading("Sending OTP...");
 
-    if (!isValidEmail(email))
+    if (!isValidEmail(email)) {
+      setButtonDisabled(0);
       return toast.error("Invalid email address", { id: toastId });
+    }
 
-    if (!isValidPassword(password))
+    if (!isValidPassword(password)) {
+      setButtonDisabled(0);
       return toast.error(
         "Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
         {
           id: toastId,
         },
       );
+    }
 
     const result = await registerUserAndSendOtpReq(
       {
@@ -485,7 +489,7 @@ export default function AddDeliveryPartner() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
+                        <FormLabel>{t("first_name")} {partnerId && <span className="text-red-600">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -499,7 +503,7 @@ export default function AddDeliveryPartner() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
+                        <FormLabel>{t("last_name")} {partnerId && <span className="text-red-600">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -596,7 +600,7 @@ export default function AddDeliveryPartner() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
+                  <Label className="mb-2">{t("phone_number")} {partnerId && <span className="text-red-600">*</span>}</Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
