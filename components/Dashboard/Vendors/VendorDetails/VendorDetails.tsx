@@ -260,12 +260,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
-              <div>
+              {/* <div>
                 <p className="text-sm text-gray-500">{t("license_number")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.businessLicenseNumber || "N/A"}
                 </p>
-              </div>
+              </div> */}
               <div>
                 <p className="text-sm text-gray-500">{t("nif")}</p>
                 <p className="font-medium">
