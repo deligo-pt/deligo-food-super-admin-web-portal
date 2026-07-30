@@ -27,8 +27,7 @@ import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
-import { updateUserDataReq } from "@/services/auth/register-user.service";
+import { submitForApproval, updateUserDataReq } from "@/services/auth/register-user.service";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TFilePreview, TPartnerDocKey } from "@/types/document.type";
 import { TBusinessLocation } from "@/types/user.type";
@@ -295,19 +294,19 @@ export default function UpdateDeliveryPartner({
     );
 
     if (updatedResult.success) {
-      if (partner.status !== USER_STATUS.APPROVED) {
-        const approveResult = await approveOrRejectReq(partner.userId, {
-          status: "APPROVED",
-        });
+      if (partner.status !== USER_STATUS.SUBMITTED) {
+        const approveResult = await submitForApproval(partner.userId);
 
         if (approveResult.success) {
           form.reset();
           toast.success(
-            approveResult.message || "Delivery partner added successfully!",
+            approveResult.message || "Delivery partner submitted successfully!",
             {
               id: toastId,
             },
           );
+          router.refresh();
+          router.back();
           return;
         }
 
@@ -325,6 +324,8 @@ export default function UpdateDeliveryPartner({
           id: toastId,
         },
       );
+      router.refresh();
+      router.back();
       return;
     }
 

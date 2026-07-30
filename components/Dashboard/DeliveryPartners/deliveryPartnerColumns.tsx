@@ -176,13 +176,22 @@ export function getDeliveryPartnerColumns({
 
                             {dp.status === "BLOCKED" && (
                                 <DropdownMenuItem
-                                    onClick={() =>
-                                        handleStatusInfo(
-                                            dp.userId as string,
-                                            fullName,
-                                            "UNBLOCKED",
-                                        )
-                                    }
+                                    onClick={() => {
+                                        if (dp?.registeredBy?.id?.userId) {
+                                            handleStatusInfo(
+                                                dp.userId as string,
+                                                fullName,
+                                                "UNBLOCKED",
+                                            );
+                                        } else {
+                                            handleApproveInfo(
+                                                dp.userId as string,
+                                                fullName,
+                                                dp?.address?.city as string,
+                                                "UNBLOCKED",
+                                            );
+                                        }
+                                    }}
                                 >
                                     {t("unblock")}
                                 </DropdownMenuItem>
