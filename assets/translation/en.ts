@@ -1857,6 +1857,14 @@ export const en = {
   send: "Send",
   no_tickets_found: "No tickets found",
   try_adjusting_your_search_or_filters: "Try adjusting your search or filters",
+  close_conversation: "Close Conversation",
+  this_conversation_has_been_closed: "This conversation has been closed",
+  no_further_messages_can_be_sent: "No further messages can be sent",
+  conversation_is_closed: "Conversation is closed",
+  type_your_reply: "Type your reply",
+  close_this_conversation: "Close this conversation?",
+  the_user_will_no_longer_be_able_to_send_messages: "The user will no longer be able to send messages. You can still view the history",
+  closing: "Closing",
 
   // chat-with-vendors
   active_conversations: "Active conversations",
