@@ -110,7 +110,7 @@ export default function ApproveRiderModal({
                         {t("approve_rider")} — {partnerName}
                     </DialogTitle>
                     <DialogDescription>
-                        {t("rider_city")}: <span className="font-semibold text-gray-900 capitalize">{city || "N/A"}</span>.
+                        {t("rider_city")}: <span className="font-semibold text-gray-900 capitalize mx-1">{city || "N/A"}</span>.
                         {t("showing_available_fleet_managers")}
                     </DialogDescription>
                 </DialogHeader>

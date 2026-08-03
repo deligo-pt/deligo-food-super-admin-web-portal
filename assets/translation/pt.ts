@@ -703,6 +703,9 @@ export const pt = {
   // -> approve_reject modal
   let_them_know_why_you_are: "Informe o motivo pelo qual está a",
   remarks: "Observações",
+  blocking: "bloquear",
+  unblocking: "desbloquear",
+  rejecting: "rejeitar",
 
   // customer-details
   no_name_provided: "Nome não fornecido",
@@ -1115,6 +1118,7 @@ export const pt = {
   customer_orders: "Pedidos do Cliente",
   manage_customer_orders_here: "Gerencie os pedidos dos clientes aqui",
   payment_status: "Status do Pagamento",
+  refund_status: "Status do Reembolso",
 
   // pending-orders
   all_pending_orders_system: "Todos os pedidos pendentes no sistema",
@@ -1881,6 +1885,14 @@ export const pt = {
   send: "Enviar",
   no_tickets_found: "Nenhum tíquete encontrado",
   try_adjusting_your_search_or_filters: "Tente ajustar sua busca ou filtros",
+  close_conversation: "Fechar Conversa",
+  this_conversation_has_been_closed: "Esta conversa foi fechada",
+  no_further_messages_can_be_sent: "Nenhuma outra mensagem pode ser enviada",
+  conversation_is_closed: "A conversa está fechada",
+  type_your_reply: "Digite sua resposta",
+  close_this_conversation: "Fechar esta conversa?",
+  the_user_will_no_longer_be_able_to_send_messages: "O usuário não poderá mais enviar mensagens. Você ainda poderá ver o histórico",
+  closing: "Fechando",
 
   // chat-with-vendors
   active_conversations: "Conversas ativas",

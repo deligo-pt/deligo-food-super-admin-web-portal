@@ -29,7 +29,7 @@ export default function WalletDetails({ wallet, payoutsData }: IProps) {
   const { t } = useTranslation();
   const brandColor = "#DC3173";
   const router = useRouter();
-  console.log("wallet", wallet);
+
   return (
     <div className="min-h-screen">
       {/* Back Button */}

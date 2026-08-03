@@ -29,6 +29,7 @@ import { translateObject } from "@/utils/translation/translationObject";
 import { taxValidation } from "@/validations/tax/tax.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -38,6 +39,7 @@ type TaxForm = z.infer<typeof taxValidation>;
 export default function CreateTax() {
   const { t } = useTranslation();
   const { lang } = useStore();
+  const router = useRouter();
   const form = useForm<TaxForm>({
     resolver: zodResolver(taxValidation),
     values: {
@@ -97,13 +99,13 @@ export default function CreateTax() {
     }
 
     const result = await createTaxReq(payload as Partial<TTax>);
-    console.log("rsult", result);
 
     if (result.success) {
       toast.success(result.message || "Tax created successfully!", {
         id: toastId,
       });
       form.reset();
+      router.push('/admin/all-taxes');
       return;
     }
 
