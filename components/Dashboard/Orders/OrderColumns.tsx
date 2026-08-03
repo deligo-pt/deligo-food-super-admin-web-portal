@@ -8,6 +8,7 @@ import {
     CalendarIcon,
     CheckCheckIcon,
     CheckCircleIcon,
+    CheckLine,
     Cog,
     EuroIcon,
     HashIcon,
@@ -22,6 +23,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { REFUND_STATUS } from "@/consts/order.const";
 
 type TFunction = (key: string) => string;
 
@@ -45,6 +47,15 @@ export function getOrderColumns({
                 </div>
             ),
             accessor: "orderId",
+        },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                    <CalendarIcon className="w-4" />
+                    {t("date")}
+                </div>
+            ),
+            accessor: (order) => format(order.createdAt, "do MMM yyyy"),
         },
         {
             header: (
@@ -77,31 +88,6 @@ export function getOrderColumns({
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                    <PackageIcon className="w-4" />
-                    {t("items")}
-                </div>
-            ),
-            accessor: (order) =>
-                order?.items?.map((i, index) => (
-                    <span key={index}>
-                        {i.name} x {i.itemSummary?.quantity}
-                        {index < (order.items?.length ?? 0) - 1 ? ", " : ""}
-                    </span>
-                )),
-        },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <EuroIcon className="w-4" />
-                    {t("amount")}
-                </div>
-            ),
-            accessor: (order) =>
-                `€${formatPrice(order.payoutSummary?.grandTotal || 0)}`,
-        },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
                     <CheckCircleIcon className="w-4" />
                     {t("order_status")}
                 </div>
@@ -128,11 +114,40 @@ export function getOrderColumns({
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                    <CalendarIcon className="w-4" />
-                    {t("date")}
+                    <CheckLine className="w-4" />
+                    {t("refund_status")}
                 </div>
             ),
-            accessor: (order) => format(order.createdAt, "do MMM yyyy"),
+            accessor: (order) =>
+                order.refundStatus
+                    ?.split("_")
+                    ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
+                    ?.join(" "),
+        },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                    <EuroIcon className="w-4" />
+                    {t("amount")}
+                </div>
+            ),
+            accessor: (order) =>
+                `€${formatPrice(order.payoutSummary?.grandTotal || 0)}`,
+        },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                    <PackageIcon className="w-4" />
+                    {t("items")}
+                </div>
+            ),
+            accessor: (order) =>
+                order?.items?.map((i, index) => (
+                    <span key={index}>
+                        {i.name} x {i.itemSummary?.quantity}
+                        {index < (order.items?.length ?? 0) - 1 ? ", " : ""}
+                    </span>
+                )),
         },
         {
             header: (
@@ -154,14 +169,15 @@ export function getOrderColumns({
                             >
                                 {t("view")}
                             </DropdownMenuItem>
-                            {(order?.isPaid || order?.paymentStatus === "PAID") &&
-                                (order?.orderStatus === "REJECTED" || order?.orderStatus === "CANCELED") && (
+                            {
+                                order?.refundStatus === REFUND_STATUS.PENDING && (
                                     <DropdownMenuItem
                                         onClick={() => setOrderId(order?.orderId)}
                                     >
                                         {t("refund")}
                                     </DropdownMenuItem>
-                                )}
+                                )
+                            }
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )

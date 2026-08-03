@@ -1102,6 +1102,7 @@ export const en = {
   customer_orders: "Customer Orders",
   manage_customer_orders_here: "Manage customer orders here",
   payment_status: "Payment Status",
+  refund_status: "Refund Status",
 
   // pending-orders
   all_pending_orders_system: "All pending orders in the system",

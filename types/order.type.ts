@@ -1,4 +1,4 @@
-import { ORDER_STATUS } from "@/consts/order.const";
+import { ORDER_STATUS, PAYMENT_STATUS, REFUND_STATUS } from "@/consts/order.const";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TCustomer, TVendor } from "@/types/user.type";
 
@@ -31,7 +31,8 @@ export type TOrder = {
   discount?: number;
   finalAmount: number;
   paymentMethod: "CARD" | "MOBILE";
-  paymentStatus: 'PENDING' | 'PROCESSING' | 'PAID' | 'FAILED' | 'REFUNDED';
+  paymentStatus: keyof typeof PAYMENT_STATUS;
+  refundStatus: keyof typeof REFUND_STATUS;
 
   // Order Lifecycle
   orderStatus: keyof typeof ORDER_STATUS;
