@@ -693,6 +693,9 @@ export const en = {
   // -> approve_reject modal
   let_them_know_why_you_are: "Let them know why you are",
   remarks: "Remarks",
+  blocking: "blocking",
+  unblocking: "unblocking",
+  rejecting: "rejecting",
 
   // customer-details
   no_name_provided: "No Name Provided",

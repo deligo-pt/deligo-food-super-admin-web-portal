@@ -98,18 +98,18 @@ export default function ApproveOrRejectModal({
         <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>
-              {status === "APPROVED" && "Approve"}
-              {status === "REJECTED" && "Reject"}
-              {status === "BLOCKED" && "Block"}
-              {status === "UNBLOCKED" && "Unblock"} {userName}
+              {status === "APPROVED" && t("approve")}
+              {status === "REJECTED" && t("reject")}
+              {status === "BLOCKED" && t("block")}
+              {status === "UNBLOCKED" && t("unblock")} - {userName}
             </DialogTitle>
             <DialogDescription>
               {status === "APPROVED"
                 ? t("are_you_sure_want_approve")
                 : t("let_them_know_why_you_are") + " "}
-              {status === "REJECTED" && "rejecting"}
-              {status === "BLOCKED" && "blocking"}
-              {status === "UNBLOCKED" && "unblocking"}
+              {status === "REJECTED" && t("rejecting")}
+              {status === "BLOCKED" && t("blocking")}
+              {status === "UNBLOCKED" && t("unblocking")}
             </DialogDescription>
           </DialogHeader>
           <form

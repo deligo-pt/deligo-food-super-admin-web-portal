@@ -703,6 +703,9 @@ export const pt = {
   // -> approve_reject modal
   let_them_know_why_you_are: "Informe o motivo pelo qual está a",
   remarks: "Observações",
+  blocking: "bloquear",
+  unblocking: "desbloquear",
+  rejecting: "rejeitar",
 
   // customer-details
   no_name_provided: "Nome não fornecido",
