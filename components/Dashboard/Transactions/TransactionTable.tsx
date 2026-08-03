@@ -1,29 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
 import { TTransaction } from "@/types/transaction.type";
-import { formatPrice } from "@/utils/formatPrice";
-import { format } from "date-fns";
 import { motion } from "framer-motion";
-import {
-  CalendarIcon,
-  Cog,
-  EuroIcon,
-  EyeIcon,
-  HashIcon,
-  InfoIcon,
-  ShapesIcon,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getTransactionColumns } from "./TransactionColumns";
+import ReusableTable from "@/components/common/ReusableTable";
 
 interface IProps {
   transactions: TTransaction[];
@@ -33,85 +15,23 @@ export default function TransactionTable({ transactions }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
+  const columns = getTransactionColumns({
+    t,
+    router,
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
     >
-      <Table className="max-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <HashIcon className="w-4" />
-                {t("transaction_id")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <InfoIcon className="w-4" />
-                {t("description")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <ShapesIcon className="w-4" />
-                {t("type")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <EuroIcon className="w-4" />
-                {t("amount")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CalendarIcon className="w-4" />
-                {t("date")}
-              </div>
-            </TableHead>
-            <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-              <Cog className="w-4" />
-              {t("actions")}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions?.length === 0 && (
-            <TableRow>
-              <TableCell
-                className="text-[#DC3173] text-lg text-center"
-                colSpan={6}
-              >
-                {t("no_transactions_found")}
-              </TableCell>
-            </TableRow>
-          )}
-          {transactions?.map((p) => (
-            <TableRow key={p._id}>
-              <TableCell>{p.transactionId}</TableCell>
-              <TableCell>{p.description}</TableCell>
-              <TableCell className="capitalize">{p.type}</TableCell>
-              <TableCell>€{formatPrice(p.amount || 0)}</TableCell>
-              <TableCell>{format(p.createdAt, "do MMM yyyy")}</TableCell>
-              <TableCell className="text-right">
-                <Button
-                  onClick={() =>
-                    router.push(`/admin/transaction-history/${p.transactionId}`)
-                  }
-                  size="sm"
-                  className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"
-                >
-                  <EyeIcon />
-                  {t("view")}
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ReusableTable
+        data={transactions}
+        columns={columns}
+        getRowKey={(row) => row._id}
+        emptyMessage={t("no_transactions_found")}
+      />
     </motion.div>
   );
 }

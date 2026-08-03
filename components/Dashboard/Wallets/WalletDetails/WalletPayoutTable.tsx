@@ -1,20 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
 import { TPayout } from "@/types/payout.type";
-import { formatPrice } from "@/utils/formatPrice";
-import { format } from "date-fns";
 import { motion } from "framer-motion";
-import { CalendarIcon, Cog, EuroIcon, EyeIcon, ShapesIcon } from "lucide-react";
+import { getWalletPayoutColumns } from "./WalletPayoutColumns";
+import ReusableTable from "@/components/common/ReusableTable";
 
 interface IProps {
   payouts: TPayout[];
@@ -23,71 +13,22 @@ interface IProps {
 export default function WalletPayoutTable({ payouts }: IProps) {
   const { t } = useTranslation();
 
+  const columns = getWalletPayoutColumns({
+    t,
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="mb-2 overflow-x-auto"
     >
-      <Table className="max-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CalendarIcon className="w-4" />
-                {t("date")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <ShapesIcon className="w-4" />
-                {t("iban")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <EuroIcon className="w-4" />
-               {t("earnings_amount")}
-              </div>
-            </TableHead>
-            <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-              <Cog className="w-4" />
-              {t("actions")}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {payouts?.length === 0 && (
-            <TableRow>
-              <TableCell
-                className="text-[#DC3173] text-lg text-center"
-                colSpan={4}
-              >
-                {t("no_payouts_found")}
-              </TableCell>
-            </TableRow>
-          )}
-          {payouts?.map((p) => (
-            <TableRow key={p._id}>
-              <TableCell>
-                {p.paymentDate ? format(p.paymentDate, "do MMM yyyy") : "-"}
-              </TableCell>
-              <TableCell>{p.userId?.bankDetails?.iban || "-"}</TableCell>
-              <TableCell>€{formatPrice(p.amount || 0)}</TableCell>
-              <TableCell className="text-right">
-                <Button
-                  //   onClick={() => {}}
-                  size="sm"
-                  className="bg-[#DC3173] flex items-center gap-2 hover:bg-[#DC3173]/90 ml-auto"
-                >
-                  <EyeIcon />
-                  {t("orders_capital")}
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ReusableTable
+        data={payouts}
+        columns={columns}
+        getRowKey={(row) => row._id}
+        emptyMessage={t("no_payouts_found")}
+      />
     </motion.div>
   );
 }

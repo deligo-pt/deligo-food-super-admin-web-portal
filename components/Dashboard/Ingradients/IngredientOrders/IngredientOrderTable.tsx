@@ -1,41 +1,13 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useTranslation } from "@/hooks/use-translation";
 import { updatedIngredientOrderStatusReq } from "@/services/dashboard/ingredient/ingredient.service";
 import { TIngredientOrder } from "@/types/ingredient.type";
-import { formatPrice } from "@/utils/formatPrice";
-import { format } from "date-fns";
 import { motion } from "framer-motion";
-import {
-  CalendarIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  Cog,
-  EuroIcon,
-  HashIcon,
-  MoreVertical,
-  PackageIcon,
-  StoreIcon,
-  TruckIcon,
-  Warehouse,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { getIngredientOrderColumns } from "./IngredientOrdersColumns";
+import ReusableTable from "@/components/common/ReusableTable";
 
 interface IProps {
   orders: TIngredientOrder[];
@@ -76,34 +48,12 @@ export default function IngredientOrderTable({ orders }: IProps) {
     );
   };
 
-  const getStatusBadge = (status: TIngredientOrder["orderStatus"]) => {
-    switch (status) {
-      case "DELIVERED":
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#DC3173]/10 text-[#DC3173]">
-            <CheckCircleIcon size={12} /> Delivered
-          </span>
-        );
-      case "SHIPPED":
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
-            <TruckIcon size={12} /> Shipped
-          </span>
-        );
-      case "CONFIRMED":
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
-            <PackageIcon size={12} /> Confirmed
-          </span>
-        );
-      case "PENDING":
-        return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
-            <ClockIcon size={12} /> Pending
-          </span>
-        );
-    }
-  };
+  const columns = getIngredientOrderColumns({
+    t,
+    router,
+    updateStatus,
+  });
+
 
   return (
     <motion.div
@@ -111,137 +61,12 @@ export default function IngredientOrderTable({ orders }: IProps) {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
     >
-      <Table className="max-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <HashIcon className="w-4" />
-               {t("order_id")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <StoreIcon className="w-4" />
-                {t("vendor")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <Warehouse className="w-4" />
-                {t("items")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <EuroIcon className="w-4" />
-                {t("total")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CheckCircleIcon className="w-4" />
-                {t("status")}
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="text-[#DC3173] flex gap-2 items-center">
-                <CalendarIcon className="w-4" />
-                {t("date")}
-              </div>
-            </TableHead>
-            <TableHead className="text-right text-[#DC3173] flex gap-2 items-center justify-end">
-              <Cog className="w-4" />
-              {t("actions")}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders?.length === 0 && (
-            <TableRow>
-              <TableCell
-                className="text-[#DC3173] text-lg text-center"
-                colSpan={7}
-              >
-                {t("no_orders_found")}
-              </TableCell>
-            </TableRow>
-          )}
-          {orders?.map((order) => (
-            <TableRow key={order._id}>
-              <TableCell>{order.orderId}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={order.vendorId?.profilePhoto} />
-                    <AvatarFallback>
-                      {order.vendorId?.businessDetails?.businessName
-                        ?.split(" ")
-                        ?.map((n) => n[0])
-                        ?.join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium">
-                      {order.vendorId?.businessDetails?.businessName}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      {order.vendorId?.email}
-                    </div>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                {order.orderDetails?.map((detail) =>
-                  `${detail.ingredientId?.name} (x${detail.quantity})`,
-                ).join(", ")}
-              </TableCell>
-              <TableCell>€{formatPrice(order.grandTotal)}</TableCell>
-              <TableCell>{getStatusBadge(order.orderStatus)}</TableCell>
-              <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
-              <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <MoreVertical className="h-4 w-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      className=""
-                      onClick={() =>
-                        router.push("/admin/ingredient-orders/" + order.orderId)
-                      }
-                    >
-                      {t("view")}
-                    </DropdownMenuItem>
-                    {order.orderStatus === "CONFIRMED" && (
-                      <DropdownMenuItem
-                        className=""
-                        onClick={() => updateStatus(order.orderId, "SHIPPED")}
-                      >
-                      {t("update_to_shipped")}
-                      </DropdownMenuItem>
-                    )}
-                    {order.orderStatus === "SHIPPED" && (
-                      <DropdownMenuItem
-                        className=""
-                        onClick={() => updateStatus(order.orderId, "DELIVERED")}
-                      >
-                        {t("update_to_delivered")}
-                      </DropdownMenuItem>
-                    )}
-                    {/* <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={() => onDeleteClick(order._id)}
-                    >
-                      Delete
-                    </DropdownMenuItem> */}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <ReusableTable
+        data={orders}
+        columns={columns}
+        getRowKey={(row) => row._id}
+        emptyMessage={t("no_orders_found")}
+      />
     </motion.div>
   );
 }

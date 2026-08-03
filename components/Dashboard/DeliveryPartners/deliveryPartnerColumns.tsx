@@ -18,6 +18,7 @@ import {
     Phone,
 } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import Link from "next/link";
 
 type TFunction = (key: string) => string;
 
@@ -66,7 +67,20 @@ export function getDeliveryPartnerColumns({
             accessor: (dp) => {
                 const fleetReg = dp?.registeredBy?.id?.name;
                 const fleetName = `${fleetReg?.firstName || ""} ${fleetReg?.lastName || ""}`.trim();
-                return fleetName || "-";
+                const userId = dp?.registeredBy?.id?.userId;
+
+                if (!fleetName) return "N/A";
+
+                return userId ? (
+                    <Link
+                        href={`/admin/agent/${userId}`}
+                        className="hover:underline text-blue-600 font-medium"
+                    >
+                        {fleetName}
+                    </Link>
+                ) : (
+                    fleetName
+                );
             },
         },
         {

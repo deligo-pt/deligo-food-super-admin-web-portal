@@ -106,7 +106,7 @@ export const softDeleteIngredient = async (id: string) => {
 
 export const permanentDeleteIngredient = async (id: string) => {
   return await catchAsync<null>(async () => {
-    const response = await serverFetch.delete(`/ingredients/parmanent-delete/${id}`, {
+    const response = await serverFetch.delete(`/ingredients/permanent-delete/${id}`, {
       headers: {
         "Content-Type": "application/json",
       },
