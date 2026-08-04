@@ -32,6 +32,14 @@ export const pt = {
   confirm_password: "Confirmar Palavra-passe",
   confirm_new_password: "Confirmar nova palavra-passe",
 
+  // verify otp modal
+  verifyOTP: "Verificar OTP",
+  otp4DigitCode: "Digite o código de 4 dígitos enviado para o seu e-mail",
+  remaining: "Restante",
+  resendOTP: "Reenviar OTP",
+  verify: "Verificar",
+  verify_email: "Verificar E-mail",
+
   // sidebar
   dashboard: "Painel",
   vendors: "Vendedores",

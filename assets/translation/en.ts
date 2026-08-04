@@ -28,6 +28,14 @@ export const en = {
   confirm_password: "ConfirmPassword",
   confirm_new_password: "Confirm new password",
 
+  // verify otp modal
+  verifyOTP: "Verify OTP",
+  otp4DigitCode: "Enter the 4-digit code sent to your email",
+  remaining: "Remaining",
+  resendOTP: "Resend OTP",
+  verify: "Verify",
+  verify_email: "Verify Email",
+
   // sidebar
   dashboard: "Dashboard",
 
