@@ -7,12 +7,14 @@ type TProps = {
   label: string;
   icon: React.ReactNode;
   variant: "primary" | "danger" | "warning" | "success";
+  disabled?: boolean;
 };
 export default function ActionButton({
   onClick,
   label,
   icon,
   variant,
+  disabled,
 }: TProps) {
   const baseClasses =
     "flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all duration-300 hover:scale-105";
@@ -26,6 +28,7 @@ export default function ActionButton({
     <motion.button
       className={`${baseClasses} ${variantClasses[variant]}`}
       onClick={onClick}
+      disabled={disabled}
       whileHover={{
         scale: 1.05,
       }}

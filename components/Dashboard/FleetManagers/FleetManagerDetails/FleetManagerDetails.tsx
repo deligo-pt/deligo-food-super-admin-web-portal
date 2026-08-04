@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
@@ -6,7 +7,7 @@ import FleetManagerDetailsDoc, { IFleetDocs } from "@/components/Dashboard/Fleet
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
-import { USER_STATUS } from "@/consts/user.const";
+import { USER_ROLE, USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
@@ -18,6 +19,7 @@ import {
   BanIcon,
   BriefcaseIcon,
   BuildingIcon,
+  Check,
   CheckIcon,
   EditIcon,
   FileTextIcon,
@@ -33,6 +35,8 @@ import { toast } from "sonner";
 import FleetRidersTable from "./FleetRiders";
 import { TMeta } from "@/types";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import { resendOtpReq } from "@/services/auth/otp.service";
+import VerifyOtpModal from "@/components/Modals/VerifyOtpModal";
 
 interface IProps {
   agentData: {
@@ -51,6 +55,8 @@ export default function FleetManagerDetails({ agentData }: IProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -93,6 +99,33 @@ export default function FleetManagerDetails({ agentData }: IProps) {
         return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const resendOtp = async () => {
+    const toastId = toast.loading("Resending OTP...");
+    setIsSubmitting(true);
+
+    try {
+      const result = (await resendOtpReq({
+        email: data?.existingFleetManager?.email,
+        role: USER_ROLE.FLEET_MANAGER,
+      }));
+
+      if (result.success) {
+        toast.success("OTP resent successfully!", { id: toastId });
+        setOpen(true);
+        setIsSubmitting(false);
+        return;
+      }
+      toast.error(result.message, { id: toastId });
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "OTP resend failed", {
+        id: toastId,
+      });
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -174,12 +207,21 @@ export default function FleetManagerDetails({ agentData }: IProps) {
         <div className="p-6">
           <div className="mb-6 border-gray-200">
             <div className="flex flex-wrap justify-end gap-4">
-              <ActionButton
-                onClick={() => router.push("/admin/agent/edit/" + data?.existingFleetManager.userId)}
-                label={t("edit")}
-                icon={<EditIcon size={18} />}
-                variant="primary"
-              />
+              {!data?.existingFleetManager?.isEmailVerified ? (
+                <ActionButton
+                  onClick={resendOtp}
+                  disabled={isSubmitting}
+                  label={t("verify_email")}
+                  icon={<Check size={18} />}
+                  variant="primary"
+                />
+              ) :
+                <ActionButton
+                  onClick={() => router.push("/admin/agent/edit/" + data?.existingFleetManager.userId)}
+                  label={t("edit")}
+                  icon={<EditIcon size={18} />}
+                  variant="primary"
+                />}
               {data?.existingFleetManager?.status === "SUBMITTED" && (
                 <>
                   <ActionButton
@@ -246,7 +288,7 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
                 <p className="font-medium">
-                  {data?.existingFleetManager?.email ? "Yes" : "No"}
+                  {data?.existingFleetManager?.isEmailVerified ? "Yes" : "No"}
                 </p>
               </div>
             </div>
@@ -427,6 +469,16 @@ export default function FleetManagerDetails({ agentData }: IProps) {
           </div>
         </div>
       </motion.div>
+
+      {/* Verify unverified fleet manager */}
+      <VerifyOtpModal
+        email={data?.existingFleetManager?.email}
+        role={USER_ROLE.FLEET_MANAGER}
+        userId={data?.existingFleetManager?.userId}
+        open={open}
+        onOpenChange={setOpen}
+      />
+
       <ApproveOrRejectModal
         open={!!approveStatus}
         onOpenChange={closeApproveOrRejectModal}
