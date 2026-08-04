@@ -104,10 +104,10 @@ const deliveryPartnerBaseValidation = z.object({
     .min(9, "NIF number must be at least 9 characters")
     .nonempty("NIF number is required"),
 
-  passportNumber: z
-    .string()
-    .min(5, "Passport number must be at least 5 characters")
-    .optional(),
+  // passportNumber: z
+  //   .string()
+  //   .min(5, "Passport number must be at least 5 characters")
+  //   .optional(),
 
   street: z
     .string()
@@ -176,26 +176,13 @@ const deliveryPartnerBaseValidation = z.object({
   otherPlatformName: z.string().optional(),
 
   residencePermitType: z
-    .string()
-    .min(2, "Residence permit type must be at least 2 characters")
-    .max(50, "Residence permit type must be at most 50 characters")
-    .nonempty("Residence permit type is required"),
+    .string().optional(),
 
   residencePermitNumber: z
-    .string()
-    .min(2, "ARC / título de residência number must be at least 2 characters")
-    .max(
-      50,
-      "ARC / título de residência number must be at most 50 characters",
-    )
-    .nonempty("ARC / título de residência number is required"),
+    .string().optional(),
 
   residencePermitExpiry: z
-    .string()
-    .refine((value) => {
-      return Date.parse(value);
-    }, "Invalid date format")
-    .nonempty("Date of birth is required"),
+    .string().optional(),
 
   haveCriminalRecordCertificate: z.boolean(
     "Criminal record certificate is required",
