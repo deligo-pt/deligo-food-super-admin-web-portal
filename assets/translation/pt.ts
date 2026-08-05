@@ -376,6 +376,7 @@ export const pt = {
   proof_of_address: "Comprovante de Morada",
   activity_document: "Documento de Atividade",
   tax_document: "Documento fiscal",
+  address_proof: "Comprovante de Endereço",
   id_proof: "Documento de identificação",
   store_photo: "Foto da loja",
   menu_brochure: "Menu / Brochura",

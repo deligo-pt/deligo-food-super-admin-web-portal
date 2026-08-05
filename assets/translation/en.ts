@@ -369,6 +369,7 @@ export const en = {
   proof_of_address: "Proof of Address",
   activity_document: "Activity Document",
   tax_document: "Tax Document",
+  address_proof: "Address Proof",
   store_photo: "Store Photo",
   menu_brochure: "Menu / Brochure",
   agoserisHaccpCertificate: "AGOSERIS HACCP Certificate",
