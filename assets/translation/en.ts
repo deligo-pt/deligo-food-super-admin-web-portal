@@ -28,6 +28,14 @@ export const en = {
   confirm_password: "ConfirmPassword",
   confirm_new_password: "Confirm new password",
 
+  // verify otp modal
+  verifyOTP: "Verify OTP",
+  otp4DigitCode: "Enter the 4-digit code sent to your email",
+  remaining: "Remaining",
+  resendOTP: "Resend OTP",
+  verify: "Verify",
+  verify_email: "Verify Email",
+
   // sidebar
   dashboard: "Dashboard",
 
@@ -361,6 +369,7 @@ export const en = {
   proof_of_address: "Proof of Address",
   activity_document: "Activity Document",
   tax_document: "Tax Document",
+  address_proof: "Address Proof",
   store_photo: "Store Photo",
   menu_brochure: "Menu / Brochure",
   agoserisHaccpCertificate: "AGOSERIS HACCP Certificate",
@@ -1425,6 +1434,7 @@ export const en = {
   flat_amount_off: "Flat Amount OFF",
   buy_1_get_1: "Buy 1 Get 1",
   discount_eg_20: "Discount % (e.g., 20)",
+  max_discount_amount: "Max discount Amount",
   flat_discount: "Flat Discount (€)",
   choose_an_item: "Choose an Item",
   validity: "Validity",
@@ -1432,6 +1442,10 @@ export const en = {
   maximum_usage_count: "Maximum Usage Count",
   users_usage_limit: "Users Usage Limit",
   will_auto_apply: "Will Auto Apply?",
+  applicable_products: "Applicable Products",
+  all_products: "All Products",
+  selected_products: "Selected Products",
+  select_products: "Select Products",
   promo_code: "Promo Code",
   enter_promo_code: "Enter promo code",
   create_offer: "Create Offer",

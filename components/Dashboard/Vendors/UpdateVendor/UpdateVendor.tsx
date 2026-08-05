@@ -97,7 +97,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       : null,
   });
 
-  const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "storePhoto", "menuUpload"];
+  const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "menuUpload"];
 
   const daysOfWeek = [
     "Sunday",

@@ -1,6 +1,7 @@
+import { TAdmin } from "./admin.type";
 import { TVendor } from "./user.type";
 
-type TOfferType = "PERCENT" | "FLAT" | "FREE_DELIVERY" | "BOGO";
+type TOfferType = "PERCENT" | "FLAT" | "BOGO";
 
 export type TOffer = {
   _id: string;
@@ -31,11 +32,14 @@ export type TOffer = {
 
   // Eligibility
   vendorId?: Partial<TVendor>;
+  adminId?: Partial<TAdmin>;
   minOrderAmount?: number;
 
   // Auto apply or manual code (optional)
   isAutoApply: boolean;
   code?: string; // if offer requires a code (optional)
+
+  applicableProducts?: unknown[];
 
   // Usage control
   maxUsageCount?: number;

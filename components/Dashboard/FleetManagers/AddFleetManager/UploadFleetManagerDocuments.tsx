@@ -6,7 +6,7 @@ import {
   updateDocumentsReq,
 } from "@/services/auth/register-user.service";
 import { uploadImagesReq } from "@/services/upload/upload.service";
-import { TFleetDocKey } from "@/types/document.type";
+import { FLEET_REQUIRED_DOCS, TFleetDocKey } from "@/types/document.type";
 import { motion } from "framer-motion";
 import {
   Eye,
@@ -251,7 +251,9 @@ export default function UploadFleetManagerDocuments({
 
               <div className="min-w-0 w-full">
                 <div className="text-sm font-semibold text-gray-800 flex w-full gap-2 justify-between">
-                  <p>{d.label} <span className="text-red-600">*</span></p>
+                  <p>{d.label} {FLEET_REQUIRED_DOCS.includes(d.key) && (
+                    <span className="text-[#DC3173]">*</span>
+                  )}</p>
                   {isSelected && (
                     <button
                       type="button"

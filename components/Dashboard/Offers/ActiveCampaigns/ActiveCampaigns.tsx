@@ -82,7 +82,6 @@ export default function ActiveCampaigns({
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
-  console.log("all offers", offersResult.data);
 
   const handleStatusInfo = (
     offerId: string,

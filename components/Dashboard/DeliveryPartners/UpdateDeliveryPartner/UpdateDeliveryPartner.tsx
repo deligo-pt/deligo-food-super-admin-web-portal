@@ -130,7 +130,7 @@ export default function UpdateDeliveryPartner({
       gender: partner.personalInfo?.gender || "MALE",
       nationality: partner.personalInfo?.nationality || "",
       nifNumber: partner.personalInfo?.NIF || "",
-      passportNumber: partner.personalInfo?.passportNumber || "",
+      // passportNumber: partner.personalInfo?.passportNumber || "",
       street: partner.address?.street || "",
       city: partner.address?.city || "",
       postalCode: partner.address?.postalCode || "",
@@ -252,12 +252,14 @@ export default function UpdateDeliveryPartner({
         gender: data.gender,
         nationality: data.nationality,
         NIF: data.nifNumber?.toUpperCase(),
-        passportNumber: data.passportNumber?.toUpperCase(),
+        // passportNumber: data.passportNumber?.toUpperCase(),
       },
       legalStatus: {
         residencePermitType: data.residencePermitType,
         residencePermitNumber: data.residencePermitNumber?.toUpperCase(),
-        residencePermitExpiry: new Date(data.residencePermitExpiry),
+        residencePermitExpiry: data.residencePermitExpiry
+          ? new Date(data.residencePermitExpiry).toISOString()
+          : undefined,
       },
       bankDetails: {
         bankName: data.bankName,
@@ -522,7 +524,7 @@ export default function UpdateDeliveryPartner({
                             <FormItem>
                               <FormLabel>{t("date_of_birth")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
-                                <Input type="date" {...field} />
+                                <Input type="date" {...field} max={getTodayDateString()} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -589,7 +591,7 @@ export default function UpdateDeliveryPartner({
                           )}
                         />
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="passportNumber"
                           render={({ field }) => (
@@ -605,7 +607,7 @@ export default function UpdateDeliveryPartner({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </Card>
                   </motion.div>
@@ -772,7 +774,7 @@ export default function UpdateDeliveryPartner({
                         name="residencePermitType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("residence_permit_type")} <span className="text-[#DC3173]">*</span></FormLabel>
+                            <FormLabel>{t("residence_permit_type")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -800,7 +802,7 @@ export default function UpdateDeliveryPartner({
                         name="residencePermitNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}<span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}</FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
@@ -818,9 +820,9 @@ export default function UpdateDeliveryPartner({
                         name="residencePermitExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{residencePermitType === "Passport" ? t("passport_expiry") : t("residence_permit_expiry")}<span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_expiry") : t("residence_permit_expiry")}</FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

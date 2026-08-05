@@ -91,7 +91,7 @@ const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
   agoserisHaccpCertificate: null,
   ibanProof: null
 };
-const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "storePhoto", "menuUpload"];
+const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "menuUpload"];
 
 export default function AddVendor({
   businessCategories,

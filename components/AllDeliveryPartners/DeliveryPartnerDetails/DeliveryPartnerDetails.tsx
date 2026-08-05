@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import ImagePreview from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/ImagePreview";
@@ -7,9 +8,12 @@ import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import ApproveRiderModal from "@/components/Modals/ApproveRiderModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import VerifyOtpModal from "@/components/Modals/VerifyOtpModal";
 import { Button } from "@/components/ui/button";
+import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
+import { resendOtpReq } from "@/services/auth/otp.service";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -50,11 +54,13 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
   const [approveStatus, setApproveStatus] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [approveModal, setApproveModal] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const fullName =
     `${partner.name?.firstName || ""} ${partner.name?.lastName || ""}`.trim() ||
     t("no_name_provided");
-  console.log("delivery details", partner);
+
   const getVehicleIcon = () => {
     switch (partner.vehicleInfo?.vehicleType) {
       case "BICYCLE":
@@ -91,6 +97,33 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
       id: toastId,
     });
     setIsDeleting(false);
+  };
+
+  const resendOtp = async () => {
+    const toastId = toast.loading("Resending OTP...");
+    setIsSubmitting(true);
+
+    try {
+      const result = (await resendOtpReq({
+        email: partner?.email,
+        role: USER_ROLE.DELIVERY_PARTNER,
+      }));
+
+      if (result.success) {
+        toast.success("OTP resent successfully!", { id: toastId });
+        setOpen(true);
+        setIsSubmitting(false);
+        return;
+      }
+      toast.error(result.message, { id: toastId });
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "OTP resend failed", {
+        id: toastId,
+      });
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -227,12 +260,12 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
                 label={t("email_verified")}
                 value={
                   <span
-                    className={`px-2 py-0.5 rounded text-xs ${partner.email
+                    className={`px-2 py-0.5 rounded text-xs ${partner.isEmailVerified
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                       }`}
                   >
-                    {partner.email ? t("yes") : t("no")}
+                    {partner.isEmailVerified ? t("yes") : t("no")}
                   </span>
                 }
               />
@@ -686,21 +719,39 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <div className="mt-8 flex flex-wrap justify-end gap-3">
-          <motion.button
-            onClick={() =>
-              router.push(`/admin/all-delivery-partners/edit/${partner.userId}`)
-            }
-            whileHover={{
-              scale: 1.05,
-            }}
-            whileTap={{
-              scale: 0.95,
-            }}
-            className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
-          >
-            <Edit className="w-4 h-4" />
-            <span>Edit</span>
-          </motion.button>
+          {
+            !partner?.isEmailVerified ? (
+              <motion.button
+                onClick={resendOtp}
+                disabled={isSubmitting}
+                whileHover={{
+                  scale: 1.05,
+                }}
+                whileTap={{
+                  scale: 0.95,
+                }}
+                className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+              >
+                <Check className="w-4 h-4" />
+                <span>{t("verify_email")}</span>
+              </motion.button>
+            ) :
+              <motion.button
+                onClick={() =>
+                  router.push(`/admin/all-delivery-partners/edit/${partner.userId}`)
+                }
+                whileHover={{
+                  scale: 1.05,
+                }}
+                whileTap={{
+                  scale: 0.95,
+                }}
+                className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+              >
+                <Edit className="w-4 h-4" />
+                <span>{t("edit")}</span>
+              </motion.button>
+          }
           {partner.status === "SUBMITTED" && (
             <>
               <motion.button
@@ -785,6 +836,16 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         </div>
       </div>
 
+      {/* Verify unverified rider */}
+      <VerifyOtpModal
+        email={partner?.email}
+        role={USER_ROLE.DELIVERY_PARTNER}
+        userId={partner?.userId}
+        open={open}
+        onOpenChange={setOpen}
+      />
+
+      {/* delete rider */}
       <DeleteModal
         open={showDeleteModal}
         onOpenChange={setShowDeleteModal}
