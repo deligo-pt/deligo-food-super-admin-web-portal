@@ -138,7 +138,7 @@ export default function AddDeliveryPartner() {
       gender: "MALE",
       nationality: "",
       nifNumber: "",
-      passportNumber: "",
+      // passportNumber: "",
       street: "",
       city: "",
       postalCode: "",
@@ -344,12 +344,14 @@ export default function AddDeliveryPartner() {
         gender: data.gender,
         nationality: data.nationality,
         NIF: data.nifNumber?.toUpperCase(),
-        passportNumber: data.passportNumber?.toUpperCase(),
+        // passportNumber: data.passportNumber?.toUpperCase(),
       },
       legalStatus: {
         residencePermitType: data.residencePermitType,
         residencePermitNumber: data.residencePermitNumber?.toUpperCase(),
-        residencePermitExpiry: new Date(data.residencePermitExpiry),
+        residencePermitExpiry: data.residencePermitExpiry
+          ? new Date(data.residencePermitExpiry).toISOString()
+          : undefined,
       },
       bankDetails: {
         bankName: data.bankName,
@@ -748,7 +750,7 @@ export default function AddDeliveryPartner() {
                           )}
                         />
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="passportNumber"
                           render={({ field }) => (
@@ -764,7 +766,7 @@ export default function AddDeliveryPartner() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </Card>
                   </motion.div>
@@ -930,7 +932,7 @@ export default function AddDeliveryPartner() {
                         name="residencePermitType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t("residence_permit_type")} <span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{t("residence_permit_type")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -958,7 +960,7 @@ export default function AddDeliveryPartner() {
                         name="residencePermitNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}<span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_number") : t("residence_permit_number")}</FormLabel>
                             <FormControl>
                               <Input
                                 className="uppercase placeholder:capitalize"
@@ -976,7 +978,7 @@ export default function AddDeliveryPartner() {
                         name="residencePermitExpiry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{residencePermitType === "Passport" ? t("passport_expiry") : t("residence_permit_expiry")}<span className="text-red-600">*</span></FormLabel>
+                            <FormLabel>{residencePermitType === "Passport" ? t("passport_expiry") : t("residence_permit_expiry")}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>

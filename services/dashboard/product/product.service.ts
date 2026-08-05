@@ -44,13 +44,15 @@ export const getAllProductsReq = async (
     });
   });
 
-  if (result?.success)
-    return {
-      data: result.data,
-      meta: result.meta,
-    };
+  return result;
 
-  return {
-    data: [],
-  };
+  // if (result?.success)
+  //   return {
+  //     data: result.data,
+  //     meta: result.meta,
+  //   };
+
+  // return {
+  //   data: [],
+  // };
 };

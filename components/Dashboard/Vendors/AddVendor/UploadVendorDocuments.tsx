@@ -26,14 +26,14 @@ import { TVendor } from "@/types/user.type";
 export const REQUIRED_DOCS: TVendorDocKey[] = [
   "businessLicenseDoc",
   "taxDoc",
-  "idProofFront",
-  "idProofBack",
+  "storePhoto",
   "ibanProof"
 ];
 
 export const OPTIONAL_DOCS: TVendorDocKey[] = [
   "myPhoto",
-  "storePhoto",
+  "idProofFront",
+  "idProofBack",
   "menuUpload",
   "agoserisHaccpCertificate",
 ];
@@ -79,7 +79,7 @@ export default function UploadVendorDocuments({
   }[] = [
       { key: "myPhoto", label: t("vendor_photo"), prefersImagePreview: true },
       { key: "businessLicenseDoc", label: t("business_license"), prefersImagePreview: false },
-      { key: "taxDoc", label: t("tax_document"), prefersImagePreview: false },
+      { key: "taxDoc", label: t("address_proof"), prefersImagePreview: false },
       { key: "idProofFront", label: t("id_proof_front"), prefersImagePreview: true },
       { key: "idProofBack", label: t("id_proof_back"), prefersImagePreview: true },
       { key: "storePhoto", label: t("store_photo"), prefersImagePreview: true },

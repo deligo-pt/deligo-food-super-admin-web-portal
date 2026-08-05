@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
@@ -7,10 +8,12 @@ import VendorDetailsDoc, {
 } from "@/components/Dashboard/Vendors/VendorDetails/VendorDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
+import VerifyOtpModal from "@/components/Modals/VerifyOtpModal";
 import { Button } from "@/components/ui/button";
-import { USER_STATUS } from "@/consts/user.const";
+import { USER_ROLE, USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
+import { resendOtpReq } from "@/services/auth/otp.service";
 import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
@@ -21,6 +24,7 @@ import {
   BanIcon,
   BriefcaseIcon,
   BuildingIcon,
+  Check,
   CheckIcon,
   EditIcon,
   FileTextIcon,
@@ -48,6 +52,8 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -90,6 +96,33 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
         return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const resendOtp = async () => {
+    const toastId = toast.loading("Resending OTP...");
+    setIsSubmitting(true);
+
+    try {
+      const result = (await resendOtpReq({
+        email: vendor?.email,
+        role: USER_ROLE.VENDOR,
+      }));
+
+      if (result.success) {
+        toast.success("OTP resent successfully!", { id: toastId });
+        setOpen(true);
+        setIsSubmitting(false);
+        return;
+      }
+      toast.error(result.message, { id: toastId });
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "OTP resend failed", {
+        id: toastId,
+      });
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -171,14 +204,21 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
         <div className="p-6">
           <div className="mb-6 border-gray-200">
             <div className="flex flex-wrap justify-end gap-4">
-              <ActionButton
-                onClick={() =>
-                  router.push("/admin/vendor/edit/" + vendor.userId)
-                }
-                label={t("edit")}
-                icon={<EditIcon size={18} />}
+              {!vendor?.isEmailVerified ? <ActionButton
+                onClick={resendOtp}
+                disabled={isSubmitting}
+                label={t("verify_email")}
+                icon={<Check size={18} />}
                 variant="primary"
-              />
+              /> :
+                <ActionButton
+                  onClick={() =>
+                    router.push("/admin/vendor/edit/" + vendor.userId)
+                  }
+                  label={t("edit")}
+                  icon={<EditIcon size={18} />}
+                  variant="primary"
+                />}
               {vendor.status === "SUBMITTED" && (
                 <ActionButton
                   onClick={() => setApproveStatus("APPROVED")}
@@ -243,7 +283,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
                 <p className="font-medium">
-                  {vendor?.email ? "Yes" : "No"}
+                  {vendor?.isEmailVerified ? "Yes" : "No"}
                 </p>
               </div>
             </div>
@@ -533,6 +573,16 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
           </AgentOrVendorSection>
         </div>
       </motion.div>
+
+      {/* Verify unverified rider */}
+      <VerifyOtpModal
+        email={vendor?.email}
+        role={USER_ROLE.VENDOR}
+        userId={vendor?.userId}
+        open={open}
+        onOpenChange={setOpen}
+      />
+
       <ApproveOrRejectModal
         open={!!approveStatus}
         onOpenChange={closeApproveOrRejectModal}

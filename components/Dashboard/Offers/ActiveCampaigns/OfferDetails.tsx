@@ -11,7 +11,9 @@ import {
 } from "@/services/dashboard/offer/offer.service";
 import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
+import { getCookie } from "@/utils/cookies";
 import { motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
 import {
   ArrowLeftCircle,
   BanIcon,
@@ -29,7 +31,6 @@ import {
   TargetIcon,
   TrashIcon,
   TrendingUpIcon,
-  TruckIcon,
   UsersIcon,
   ZapIcon,
 } from "lucide-react";
@@ -52,11 +53,6 @@ const offerTypeConfig = {
     label: "Flat Discount",
     textColor: "text-emerald-700",
   },
-  FREE_DELIVERY: {
-    icon: TruckIcon,
-    label: "Free Delivery",
-    textColor: "text-blue-700",
-  },
   BOGO: {
     icon: GiftIcon,
     label: "Buy One Get One",
@@ -75,6 +71,9 @@ export default function OfferDetails({ offer }: IProps) {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
+  const accessToken = getCookie("accessToken");
+
+  const { role } = jwtDecode(accessToken as string) as { role: string };
 
   const config = offerTypeConfig[offer.offerType];
   const IconComponent = config.icon;
@@ -93,8 +92,6 @@ export default function OfferDetails({ offer }: IProps) {
         return `${offer.discountValue}%`;
       case "FLAT":
         return `€${offer.discountValue}`;
-      case "FREE_DELIVERY":
-        return "FREE";
       case "BOGO":
         return `${offer.bogo?.buyQty}+${offer.bogo?.getQty}`;
       default:
@@ -317,7 +314,7 @@ export default function OfferDetails({ offer }: IProps) {
           }}
           className="flex justify-end gap-3 mb-6"
         >
-          <motion.button
+          {(role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && <motion.button
             whileHover={{
               scale: 1.02,
             }}
@@ -329,36 +326,40 @@ export default function OfferDetails({ offer }: IProps) {
           >
             <EditIcon className="w-4 h-4" />
             {t("edit")}
-          </motion.button>
+          </motion.button>}
           {offer.isActive && (
-            <motion.button
-              whileHover={{
-                scale: 1.02,
-              }}
-              whileTap={{
-                scale: 0.98,
-              }}
-              onClick={() => setOpenStatusUpdateModal(true)}
-              className="bg-yellow-500 hover:bg-yellow-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
-            >
-              <BanIcon className="w-4 h-4" />
-              {t("deactivate")}
-            </motion.button>
+            (role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
+              <motion.button
+                whileHover={{
+                  scale: 1.02,
+                }}
+                whileTap={{
+                  scale: 0.98,
+                }}
+                onClick={() => setOpenStatusUpdateModal(true)}
+                className="bg-yellow-500 hover:bg-yellow-500/90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
+              >
+                <BanIcon className="w-4 h-4" />
+                {t("deactivate")}
+              </motion.button>
+            )
           )}
           {!offer.isActive && (
-            <motion.button
-              whileHover={{
-                scale: 1.02,
-              }}
-              whileTap={{
-                scale: 0.98,
-              }}
-              onClick={() => setOpenStatusUpdateModal(true)}
-              className="bg-[#DC3173] hover:bg-[#DC3173]/-90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
-            >
-              <ShieldIcon className="w-4 h-4" />
-              {t("activate")}
-            </motion.button>
+            (role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
+              <motion.button
+                whileHover={{
+                  scale: 1.02,
+                }}
+                whileTap={{
+                  scale: 0.98,
+                }}
+                onClick={() => setOpenStatusUpdateModal(true)}
+                className="bg-[#DC3173] hover:bg-[#DC3173]/-90 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium transition-colors shadow-lg"
+              >
+                <ShieldIcon className="w-4 h-4" />
+                {t("activate")}
+              </motion.button>
+            )
           )}
           <motion.button
             whileHover={{

@@ -32,6 +32,14 @@ export const pt = {
   confirm_password: "Confirmar Palavra-passe",
   confirm_new_password: "Confirmar nova palavra-passe",
 
+  // verify otp modal
+  verifyOTP: "Verificar OTP",
+  otp4DigitCode: "Digite o código de 4 dígitos enviado para o seu e-mail",
+  remaining: "Restante",
+  resendOTP: "Reenviar OTP",
+  verify: "Verificar",
+  verify_email: "Verificar E-mail",
+
   // sidebar
   dashboard: "Painel",
   vendors: "Vendedores",
@@ -368,6 +376,7 @@ export const pt = {
   proof_of_address: "Comprovante de Morada",
   activity_document: "Documento de Atividade",
   tax_document: "Documento fiscal",
+  address_proof: "Comprovante de Endereço",
   id_proof: "Documento de identificação",
   store_photo: "Foto da loja",
   menu_brochure: "Menu / Brochura",
@@ -1443,6 +1452,7 @@ export const pt = {
   flat_amount_off: "Desconto de valor fixo",
   buy_1_get_1: "Leve 1, receba 1",
   discount_eg_20: "Desconto % (ex.: 20)",
+  max_discount_amount: "Valor Máximo de Desconto",
   flat_discount: "Desconto fixo (€)",
   choose_an_item: "Escolher um item",
   validity: "Validade",
@@ -1450,6 +1460,10 @@ export const pt = {
   maximum_usage_count: "Limite Máximo de Uso",
   users_usage_limit: "Limite de Uso por Usuário",
   will_auto_apply: "Aplicar automaticamente?",
+  applicable_products: "Produtos Aplicáveis",
+  all_products: "Todos os Produtos",
+  selected_products: "Produtos Selecionados",
+  select_products: "Selecionar Produtos",
   promo_code: "Código promocional",
   enter_promo_code: "Introduzir código promocional",
   create_offer: "Criar oferta",

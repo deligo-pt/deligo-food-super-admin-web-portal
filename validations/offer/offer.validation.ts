@@ -16,8 +16,8 @@ export const offerValidation = z
     }),
 
     offerType: z.enum(
-      ["PERCENT", "FLAT", "FREE_DELIVERY"],
-      "Offer type must be one of the following: PERCENT, FLAT, FREE_DELIVERY",
+      ["PERCENT", "FLAT"],
+      "Offer type must be one of the following: PERCENT, FLAT",
     ),
 
     discountValue: z
@@ -28,7 +28,7 @@ export const offerValidation = z
     maxDiscountAmount: z
       .number("Max discount amount must be a number")
       .min(0, "Max discount amount must be at least 0")
-      .max(100, "Max discount amount must be at most 100")
+      .max(1000, "Max discount amount must be at most 1000")
       .optional(),
 
     validFrom: z.date("Start date must be a valid date"),
@@ -45,6 +45,8 @@ export const offerValidation = z
     maxUsageCount: z.string().optional(),
 
     userUsageLimit: z.string().optional(),
+
+    applicableProducts: z.array(z.string("Product is required")).optional(),
 
     currentLang: z.enum(["en", "pt"]).optional(),
   })
@@ -64,14 +66,6 @@ export const offerValidation = z
       "Description is required"
     );
   })
-  .refine(
-    (data) =>
-      data.offerType === "FREE_DELIVERY" || (data?.discountValue && data?.discountValue > 0),
-    {
-      message: "Discount value must be at least 1",
-      path: ["discountValue"],
-    }
-  )
   .refine(
     (data) => {
       if (data.offerType === "PERCENT" && data.discountValue && data.discountValue > 100) {
