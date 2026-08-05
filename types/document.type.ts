@@ -48,10 +48,15 @@ export const PARTNER_REQUIRED_DOCS: TPartnerDocKey[] = [
 ];
 
 export const FLEET_REQUIRED_DOCS: TFleetDocKey[] = [
-  "myPhoto",
   "businessLicense",
-  "idProofFront",
-  "idProofBack",
   "proofOfAddress",
   "activityDocument",
+  "ibanProof"
 ];
+
+
+const FLEET_OPTIONAL_DOCS: TFleetDocKey[] = [
+  "myPhoto",
+  "idProofFront",
+  "idProofBack",
+]
