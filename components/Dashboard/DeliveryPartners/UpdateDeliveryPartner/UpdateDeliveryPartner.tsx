@@ -524,7 +524,7 @@ export default function UpdateDeliveryPartner({
                             <FormItem>
                               <FormLabel>{t("date_of_birth")} <span className="text-[#DC3173]">*</span></FormLabel>
                               <FormControl>
-                                <Input type="date" {...field} />
+                                <Input type="date" {...field} max={getTodayDateString()} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -822,7 +822,7 @@ export default function UpdateDeliveryPartner({
                           <FormItem>
                             <FormLabel>{residencePermitType === "Passport" ? t("passport_expiry") : t("residence_permit_expiry")}</FormLabel>
                             <FormControl>
-                              <Input type="date" {...field} />
+                              <Input type="date" {...field} min={getTodayDateString()} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
