@@ -69,7 +69,7 @@ export default function EditOfferModal({
         pt: prevValues?.description?.pt || "",
       },
       offerType:
-        (prevValues.offerType as "PERCENT" | "FLAT" | "FREE_DELIVERY") ||
+        (prevValues.offerType as "PERCENT" | "FLAT") ||
         "PERCENT",
       discountValue: prevValues.discountValue || 0,
       maxDiscountAmount: prevValues.maxDiscountAmount || 0,

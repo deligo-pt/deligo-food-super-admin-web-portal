@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getCampaignColumns } from "./CampaignColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { getCookie } from "@/utils/cookies";
+import { jwtDecode } from "jwt-decode";
 
 interface IProps {
   offers: TOffer[];
@@ -29,10 +31,14 @@ export default function CampaignTable({
   const { t } = useTranslation();
   const { lang } = useStore();
   const router = useRouter();
+  const accessToken = getCookie("accessToken");
+
+  const { role } = jwtDecode(accessToken as string) as { role: string };
 
   const columns = getCampaignColumns({
     t,
     lang,
+    role,
     router,
     handleStatusInfo,
     handleOpenEditModal,

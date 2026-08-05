@@ -26,6 +26,7 @@ type TFunction = (key: string) => string;
 interface GetCampaignColumnsParams {
     t: TFunction;
     lang: string;
+    role: string;
     router: AppRouterInstance;
     handleStatusInfo: (
         offerId: string,
@@ -39,6 +40,7 @@ interface GetCampaignColumnsParams {
 export function getCampaignColumns({
     t,
     lang,
+    role,
     router,
     handleStatusInfo,
     handleOpenEditModal,
@@ -151,36 +153,42 @@ export function getCampaignColumns({
                             {t("view")}
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={() => handleOpenEditModal(offer)}>
-                            {t("edit")}
-                        </DropdownMenuItem>
-
-                        {offer.isActive && (
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    handleStatusInfo(
-                                        offer._id,
-                                        offer.title?.[lang as 'en' | 'pt'] as string,
-                                        false,
-                                    )
-                                }
-                            >
-                                {t("deactivate")}
+                        {(role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
+                            <DropdownMenuItem onClick={() => handleOpenEditModal(offer)}>
+                                {t("edit")}
                             </DropdownMenuItem>
                         )}
 
+                        {offer.isActive && (
+                            (role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        handleStatusInfo(
+                                            offer._id,
+                                            offer.title?.[lang as 'en' | 'pt'] as string,
+                                            false,
+                                        )
+                                    }
+                                >
+                                    {t("deactivate")}
+                                </DropdownMenuItem>
+                            )
+                        )}
+
                         {!offer.isActive && (
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    handleStatusInfo(
-                                        offer._id,
-                                        offer.title?.[lang as 'en' | 'pt'] as string,
-                                        true,
-                                    )
-                                }
-                            >
-                                {t("activate")}
-                            </DropdownMenuItem>
+                            (role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        handleStatusInfo(
+                                            offer._id,
+                                            offer.title?.[lang as 'en' | 'pt'] as string,
+                                            true,
+                                        )
+                                    }
+                                >
+                                    {t("activate")}
+                                </DropdownMenuItem>
+                            )
                         )}
 
                         <DropdownMenuItem

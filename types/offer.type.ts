@@ -1,6 +1,6 @@
 import { TVendor } from "./user.type";
 
-type TOfferType = "PERCENT" | "FLAT" | "FREE_DELIVERY" | "BOGO";
+type TOfferType = "PERCENT" | "FLAT" | "BOGO";
 
 export type TOffer = {
   _id: string;

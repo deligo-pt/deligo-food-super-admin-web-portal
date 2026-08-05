@@ -16,8 +16,8 @@ export const offerValidation = z
     }),
 
     offerType: z.enum(
-      ["PERCENT", "FLAT", "FREE_DELIVERY"],
-      "Offer type must be one of the following: PERCENT, FLAT, FREE_DELIVERY",
+      ["PERCENT", "FLAT"],
+      "Offer type must be one of the following: PERCENT, FLAT",
     ),
 
     discountValue: z
@@ -64,14 +64,6 @@ export const offerValidation = z
       "Description is required"
     );
   })
-  .refine(
-    (data) =>
-      data.offerType === "FREE_DELIVERY" || (data?.discountValue && data?.discountValue > 0),
-    {
-      message: "Discount value must be at least 1",
-      path: ["discountValue"],
-    }
-  )
   .refine(
     (data) => {
       if (data.offerType === "PERCENT" && data.discountValue && data.discountValue > 100) {
