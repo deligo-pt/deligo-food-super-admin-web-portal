@@ -27,24 +27,33 @@ import { cn } from "@/lib/utils";
 import { createOfferReq } from "@/services/dashboard/offer/offer.service";
 import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
+import { TProduct } from "@/types/product.type";
 import { translateObject } from "@/utils/translation/translationObject";
 import { offerValidation } from "@/validations/offer/offer.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { Label } from "../ui/label";
+import { XIcon } from "lucide-react";
 
 const PRIMARY = "#DC3173";
 const BG = "#FFF1F7";
 
 type TOfferForm = z.infer<typeof offerValidation>;
 
-export default function CreateNewOffer() {
+export default function CreateNewOffer({ products }: { products: TProduct[] }) {
   const { lang } = useStore();
   const { t } = useTranslation();
   const router = useRouter();
+  const [isSelectedAllProducts, setIsSelectedAllProducts] = useState(true);
+  const [filteredItems, setFilteredItems] = useState<TProduct[]>(
+    products || [],
+  );
+
   const form = useForm<TOfferForm>({
     resolver: zodResolver(offerValidation),
     defaultValues: {
@@ -66,14 +75,15 @@ export default function CreateNewOffer() {
       isAutoApply: false,
       maxUsageCount: "",
       userUsageLimit: "",
+      applicableProducts: [],
       currentLang: lang
     },
   });
   const { formState: { isSubmitting } } = form;
 
-  const [watchOfferType, isAutoApply] = useWatch({
+  const [watchOfferType, isAutoApply, watchApplicableProducts] = useWatch({
     control: form.control,
-    name: ["offerType", "isAutoApply"],
+    name: ["offerType", "isAutoApply", "applicableProducts"],
   });
 
   const onSubmit = async (data: TOfferForm) => {
@@ -96,6 +106,11 @@ export default function CreateNewOffer() {
         ...restData,
         title: translated.title,
         description: translated.description,
+        applicableProducts: data.applicableProducts,
+        ...(data.discountValue && { discountValue: data.discountValue }),
+        ...(data.maxDiscountAmount && { maxDiscountAmount: data.maxDiscountAmount }),
+        ...(data.code && { code: data.code }),
+        ...(isAutoApply && { isAutoApply: isAutoApply }),
         ...(maxUsageCount && {
           maxUsageCount: Number(maxUsageCount),
         }),
@@ -103,6 +118,18 @@ export default function CreateNewOffer() {
           userUsageLimit: Number(userUsageLimit),
         }),
       } as Partial<TOffer>;
+
+      if (isSelectedAllProducts) {
+        delete payload.applicableProducts;
+      }
+
+      if (data.maxUsageCount === "") {
+        delete payload.maxUsageCount;
+      }
+
+      if (data.userUsageLimit === "") {
+        delete payload.userUsageLimit;
+      }
 
       const result = await createOfferReq(payload);
 
@@ -547,6 +574,126 @@ export default function CreateNewOffer() {
                     )}
                   />
                 </div>}
+
+                {/* APPLICABLE PRODUCTS */}
+                <div className="space-y-4">
+                  <h2 className="font-bold text-lg">{t("applicable_products")}</h2>
+                  <Separator />
+
+                  <div className="flex items-center w-full gap-4">
+                    <Label className="font-medium text-sm text-gray-700">
+                      <Input
+                        className="w-4 h-4"
+                        name="products"
+                        type="radio"
+                        checked={isSelectedAllProducts}
+                        onChange={() => {
+                          setIsSelectedAllProducts(true);
+                        }}
+                      />
+                      <span>{t("all_products")}</span>
+                    </Label>
+                    <Label className="font-medium text-sm text-gray-700">
+                      <Input
+                        className="w-4 h-4"
+                        name="products"
+                        type="radio"
+                        checked={!isSelectedAllProducts}
+                        onChange={() => {
+                          setIsSelectedAllProducts(false);
+                        }}
+                      />
+                      <span>{t("selected_products")}</span>
+                    </Label>
+                  </div>
+
+                  {!isSelectedAllProducts &&
+                    watchApplicableProducts &&
+                    watchApplicableProducts?.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-1">
+                        {watchApplicableProducts?.map((itemId) => (
+                          <div
+                            key={itemId}
+                            className="flex items-center bg-[#DC3173] bg-opacity-10 text-white px-3 py-1 rounded-full"
+                          >
+                            <span>
+                              {products?.find((i) => i._id === itemId)
+                                ?.name?.[lang] || "-"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setFilteredItems((prev) => {
+                                  const removedItem = products?.find(
+                                    (i) => i._id === itemId,
+                                  );
+                                  if (removedItem) {
+                                    return [...prev, removedItem];
+                                  }
+                                  return prev;
+                                });
+                                form.setValue(
+                                  "applicableProducts",
+                                  watchApplicableProducts.filter(
+                                    (i) => i !== itemId,
+                                  ),
+                                );
+                              }}
+                              className="ml-2 text-white hover:text-[#CCC]"
+                            >
+                              <XIcon className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                  {!isSelectedAllProducts && (
+                    <FormField
+                      control={form.control}
+                      name="applicableProducts"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="space-y-2">
+                              <Select
+                                onValueChange={(value) => {
+                                  const newValue = [
+                                    ...(field.value || []),
+                                    value,
+                                  ];
+                                  field.onChange(newValue);
+                                  setFilteredItems((prev) =>
+                                    prev.filter((item) => item._id !== value),
+                                  );
+                                }}
+                                value="select_products"
+                              >
+                                <SelectTrigger className="w-full h-12!">
+                                  <SelectValue placeholder={t("select_products")} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="select_products">
+                                    {t("select_products")}
+                                  </SelectItem>
+                                  {filteredItems?.map((item: TProduct) => (
+                                    <SelectItem
+                                      key={item._id}
+                                      value={item._id as string}
+                                    >
+                                      {item.name?.[lang]}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
 
                 {/* ACTION */}
                 <div className="pt-4 flex justify-end gap-4">

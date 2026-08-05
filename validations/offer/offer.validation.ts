@@ -28,7 +28,7 @@ export const offerValidation = z
     maxDiscountAmount: z
       .number("Max discount amount must be a number")
       .min(0, "Max discount amount must be at least 0")
-      .max(100, "Max discount amount must be at most 100")
+      .max(1000, "Max discount amount must be at most 1000")
       .optional(),
 
     validFrom: z.date("Start date must be a valid date"),
@@ -45,6 +45,8 @@ export const offerValidation = z
     maxUsageCount: z.string().optional(),
 
     userUsageLimit: z.string().optional(),
+
+    applicableProducts: z.array(z.string("Product is required")).optional(),
 
     currentLang: z.enum(["en", "pt"]).optional(),
   })

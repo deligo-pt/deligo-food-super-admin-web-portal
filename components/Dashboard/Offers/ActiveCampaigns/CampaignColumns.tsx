@@ -66,11 +66,11 @@ export function getCampaignColumns({
             accessor: (offer) => (
                 <div>
                     <div className="font-medium">
-                        {offer.vendorId?.name?.firstName || "N/A"}{" "}
-                        {offer.vendorId?.name?.lastName}
+                        {offer.vendorId?.name?.firstName || offer?.adminId?.name?.firstName || "N/A"}{" "}
+                        {offer.vendorId?.name?.lastName || offer?.adminId?.name?.lastName}
                     </div>
                     <div className="text-xs text-slate-500">
-                        {offer?.vendorId?.userId}
+                        {offer?.vendorId?.userId || offer?.adminId?.userId || "N/A"}
                     </div>
                 </div>
             ),
