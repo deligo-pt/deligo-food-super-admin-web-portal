@@ -28,6 +28,7 @@ export type TDeliveryPartner = {
   isEmailVerified: boolean;
   isDeleted: boolean;
   isUpdateLocked: boolean;
+  currentFleetManagerId?: string;
 
   // FCM tokens
   fcmTokens?: string[];

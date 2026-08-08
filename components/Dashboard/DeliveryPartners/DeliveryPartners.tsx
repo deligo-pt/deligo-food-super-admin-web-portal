@@ -170,6 +170,9 @@ export default function DeliveryPartners({
         partnerId={approveInfo.partnerId}
         partnerName={approveInfo.partnerName}
         city={approveInfo.city}
+        status={
+          approveInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
       />
 
       {/* Approve or Reject or Block Modal */}
