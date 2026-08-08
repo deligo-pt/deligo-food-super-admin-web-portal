@@ -860,6 +860,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         partnerId={partner.userId}
         partnerName={`${partner?.name?.firstName} ${partner?.name?.lastName}`}
         city={partner?.address?.city as string}
+        status={
+          partner.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
       />
 
       <ApproveOrRejectModal
