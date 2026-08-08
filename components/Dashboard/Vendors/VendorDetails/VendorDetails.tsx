@@ -441,21 +441,21 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">{t("bank_name")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.bankName}</p>
+                  <p className="font-medium">{vendor.bankDetails?.bankName || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("account_holder")}</p>
                   <p className="font-medium">
-                    {vendor.bankDetails?.accountHolderName}
+                    {vendor.bankDetails?.accountHolderName || "N/A"}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("iban")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.iban}</p>
+                  <p className="font-medium">{vendor.bankDetails?.iban || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("swift_code")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.swiftCode}</p>
+                  <p className="font-medium">{vendor.bankDetails?.swiftCode || "N/A"}</p>
                 </div>
               </div>
             ) : (

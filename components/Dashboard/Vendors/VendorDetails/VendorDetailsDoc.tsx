@@ -18,9 +18,14 @@ interface IProps {
 }
 
 export default function VendorDetailsDoc({ documents }: IProps) {
-  console.log("docs", documents);
   const { t } = useTranslation();
-  const docsArr = Object.keys(documents || {}) as (keyof IVendorDocs)[];
+
+  const docsArr = (
+    Object.keys(documents || {}) as (keyof IVendorDocs)[]
+  ).filter((doc) => {
+    const files = documents?.[doc];
+    return files && files.length > 0;
+  });
 
   return (
     <>

@@ -335,7 +335,7 @@ export default function AddFleetManager() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
+                        <FormLabel>{t("first_name")} {fleetManagerId && <span className="text-red-600">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -349,7 +349,7 @@ export default function AddFleetManager() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
+                        <FormLabel>{t("last_name")} {fleetManagerId && <span className="text-red-600">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -366,6 +366,8 @@ export default function AddFleetManager() {
                         placeholder={t("fleet_manager_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        readOnly={!!fleetManagerId || timer > 0}
+                        disabled={!!fleetManagerId}
                       />
                       {!otpSent && !emailVerified && (
                         <Button
@@ -446,7 +448,7 @@ export default function AddFleetManager() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
+                  <Label className="mb-2">{t("phone_number")} {fleetManagerId && <span className="text-red-600">*</span>}</Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"

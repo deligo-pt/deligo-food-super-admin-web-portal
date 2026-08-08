@@ -62,14 +62,14 @@ export default function ApproveOrRejectModal({
       setRemarks("");
       onOpenChange(false);
       toast.success(
-        result.message ||
+        result.message ? result?.message :
           status === "APPROVED"
-          ? "Approved successfully!"
-          : status === "REJECTED"
-            ? "Rejected successfully!"
-            : status === "BLOCKED"
-              ? "Blocked successfully!"
-              : "Unblocked successfully!",
+            ? "Approved successfully!"
+            : status === "REJECTED"
+              ? "Rejected successfully!"
+              : status === "BLOCKED"
+                ? "Blocked successfully!"
+                : "Unblocked successfully!",
         { id: toastId },
       );
       router.refresh();
