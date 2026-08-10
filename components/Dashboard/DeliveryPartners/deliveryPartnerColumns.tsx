@@ -65,21 +65,20 @@ export function getDeliveryPartnerColumns({
                 </div>
             ),
             accessor: (dp) => {
-                const fleetReg = dp?.registeredBy?.id?.name;
-                const fleetName = `${fleetReg?.firstName || ""} ${fleetReg?.lastName || ""}`.trim();
-                const userId = dp?.registeredBy?.id?.userId;
+                const fleetBName = dp?.currentFleetManagerId?.businessDetails?.businessName;
+                const userId = dp?.currentFleetManagerId?.userId;
 
-                if (!fleetName) return "N/A";
+                if (!fleetBName) return "N/A";
 
                 return userId ? (
                     <Link
                         href={`/admin/agent/${userId}`}
                         className="hover:underline text-blue-600 font-medium"
                     >
-                        {fleetName}
+                        {fleetBName}
                     </Link>
                 ) : (
-                    fleetName
+                    fleetBName
                 );
             },
         },
