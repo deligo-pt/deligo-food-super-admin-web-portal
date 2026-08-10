@@ -58,11 +58,20 @@ export function getVendorColumns({
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
+                    <Mail className="w-4" />
+                    {t("type")}
+                </div>
+            ),
+            accessor: (row) => row.businessDetails?.businessTypeSlug === 'store' ? "Store" : row.businessDetails?.businessTypeSlug === 'restaurant' ? "Restaurant" : "N/A",
+        },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
                     <Phone className="w-4" />
                     {t("phone")}
                 </div>
             ),
-            accessor: "contactNumber",
+            accessor: (row) => row.contactNumber || "N/A",
         },
         {
             header: (
