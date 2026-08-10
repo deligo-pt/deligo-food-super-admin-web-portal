@@ -296,7 +296,7 @@ export default function UpdateDeliveryPartner({
     );
 
     if (updatedResult.success) {
-      if (partner.status !== USER_STATUS.SUBMITTED) {
+      if (partner.status === USER_STATUS.PENDING) {
         const approveResult = await submitForApproval(partner.userId);
 
         if (approveResult.success) {

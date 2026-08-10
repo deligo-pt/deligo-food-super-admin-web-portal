@@ -48,7 +48,7 @@ export function getFleetRidersColumns({
                     )}
 
                     <p>
-                        {rider.name?.firstName} {rider.name?.lastName}
+                        {rider.name?.firstName || "N/A"} {rider.name?.lastName}
                     </p>
                 </div>
             ),
