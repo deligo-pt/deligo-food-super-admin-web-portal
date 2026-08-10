@@ -294,7 +294,7 @@ export default function UpdateDeliveryPartner({
       `/delivery-partners/${partner.userId}`,
       partnerData,
     );
-
+    console.log("update result", updatedResult);
     if (updatedResult.success) {
       if (partner.status === USER_STATUS.PENDING) {
         const approveResult = await submitForApproval(partner.userId);
