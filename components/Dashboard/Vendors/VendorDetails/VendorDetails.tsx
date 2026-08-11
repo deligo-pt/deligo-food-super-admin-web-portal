@@ -282,8 +282,11 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
-                <p className="font-medium">
-                  {vendor?.isEmailVerified ? "Yes" : "No"}
+                <p className={`px-2 py-0.5 w-9 rounded text-sm font-medium ${vendor?.isEmailVerified
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+                  }`}>
+                  {vendor?.isEmailVerified ? t("yes") : t("no")}
                 </p>
               </div>
             </div>

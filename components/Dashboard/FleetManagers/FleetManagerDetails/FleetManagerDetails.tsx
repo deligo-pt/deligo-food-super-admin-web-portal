@@ -287,8 +287,11 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
-                <p className="font-medium">
-                  {data?.existingFleetManager?.isEmailVerified ? "Yes" : "No"}
+                <p className={`px-2 py-0.5 w-9 rounded text-sm font-medium ${data?.existingFleetManager?.isEmailVerified
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+                  }`}>
+                  {data?.existingFleetManager?.isEmailVerified ? t("yes") : t("no")}
                 </p>
               </div>
             </div>
