@@ -203,7 +203,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
 
         <div className="p-6">
           <div className="mb-6 border-gray-200">
-            <div className="flex flex-wrap justify-end gap-4">
+            <div className="flex justify-end gap-4">
               {!vendor?.isEmailVerified ? <ActionButton
                 onClick={resendOtp}
                 disabled={isSubmitting}
@@ -219,44 +219,6 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   icon={<EditIcon size={18} />}
                   variant="primary"
                 />}
-              {vendor.status === "SUBMITTED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("APPROVED")}
-                  label={t("approve")}
-                  icon={<CheckIcon size={18} />}
-                  variant="success"
-                />
-              )}
-              {vendor.status === "SUBMITTED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("REJECTED")}
-                  label={t("reject")}
-                  icon={<XIcon size={18} />}
-                  variant="warning"
-                />
-              )}
-              {vendor.status === "APPROVED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("BLOCKED")}
-                  label={t("block")}
-                  icon={<BanIcon size={18} />}
-                  variant="warning"
-                />
-              )}
-              {vendor.status === "BLOCKED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("UNBLOCKED")}
-                  label={t("unblock")}
-                  icon={<CheckIcon size={18} />}
-                  variant="primary"
-                />
-              )}
-              <ActionButton
-                onClick={() => setShowDeleteModal(true)}
-                label={t("delete")}
-                icon={<TrashIcon size={18} />}
-                variant="danger"
-              />
             </div>
           </div>
           <AgentOrVendorSection
@@ -574,6 +536,49 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               </div>
             )}
           </AgentOrVendorSection>
+        </div>
+
+        <div className="mb-6 mx-6">
+          <div className="flex flex-wrap justify-end gap-4">
+            {vendor.status === "SUBMITTED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("APPROVED")}
+                label={t("approve")}
+                icon={<CheckIcon size={18} />}
+                variant="success"
+              />
+            )}
+            {vendor.status === "SUBMITTED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("REJECTED")}
+                label={t("reject")}
+                icon={<XIcon size={18} />}
+                variant="warning"
+              />
+            )}
+            {vendor.status === "APPROVED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("BLOCKED")}
+                label={t("block")}
+                icon={<BanIcon size={18} />}
+                variant="warning"
+              />
+            )}
+            {vendor.status === "BLOCKED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("UNBLOCKED")}
+                label={t("unblock")}
+                icon={<CheckIcon size={18} />}
+                variant="primary"
+              />
+            )}
+            <ActionButton
+              onClick={() => setShowDeleteModal(true)}
+              label={t("delete")}
+              icon={<TrashIcon size={18} />}
+              variant="danger"
+            />
+          </div>
         </div>
       </motion.div>
 

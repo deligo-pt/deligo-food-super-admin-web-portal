@@ -128,7 +128,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
 
   return (
     <div>
-      <div className="mb-4">
+      <div className="mb-4 flex flex-row justify-between items-center">
         <Button
           onClick={() => router.back()}
           variant="link"
@@ -136,6 +136,39 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         >
           <ArrowLeftCircle /> {t("go_back")}
         </Button>
+        {
+          !partner?.isEmailVerified ? (
+            <motion.button
+              onClick={resendOtp}
+              disabled={isSubmitting}
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+            >
+              <Check className="w-4 h-4" />
+              <span>{t("verify_email")}</span>
+            </motion.button>
+          ) :
+            <motion.button
+              onClick={() =>
+                router.push(`/admin/all-delivery-partners/edit/${partner.userId}`)
+              }
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+            >
+              <Edit className="w-4 h-4" />
+              <span>{t("edit")}</span>
+            </motion.button>
+        }
       </div>
       <motion.div
         initial={{
@@ -146,7 +179,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           opacity: 1,
           y: 0,
         }}
-        className="bg-[#DC3173] text-white p-6 rounded-t-lg"
+        className="bg-[#DC3173] text-white p-3 md:p-6 rounded-t-lg"
       >
         <div className="flex items-center space-x-4">
           <motion.div
@@ -719,39 +752,6 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <div className="mt-8 flex flex-wrap justify-end gap-3">
-          {
-            !partner?.isEmailVerified ? (
-              <motion.button
-                onClick={resendOtp}
-                disabled={isSubmitting}
-                whileHover={{
-                  scale: 1.05,
-                }}
-                whileTap={{
-                  scale: 0.95,
-                }}
-                className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
-              >
-                <Check className="w-4 h-4" />
-                <span>{t("verify_email")}</span>
-              </motion.button>
-            ) :
-              <motion.button
-                onClick={() =>
-                  router.push(`/admin/all-delivery-partners/edit/${partner.userId}`)
-                }
-                whileHover={{
-                  scale: 1.05,
-                }}
-                whileTap={{
-                  scale: 0.95,
-                }}
-                className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
-              >
-                <Edit className="w-4 h-4" />
-                <span>{t("edit")}</span>
-              </motion.button>
-          }
           {partner.status === "SUBMITTED" && (
             <>
               <motion.button

@@ -222,46 +222,6 @@ export default function FleetManagerDetails({ agentData }: IProps) {
                   icon={<EditIcon size={18} />}
                   variant="primary"
                 />}
-              {data?.existingFleetManager?.status === "SUBMITTED" && (
-                <>
-                  <ActionButton
-                    onClick={() => setApproveStatus("APPROVED")}
-                    label={t("approve")}
-                    icon={<CheckIcon size={18} />}
-                    variant="success"
-                  />
-                  <ActionButton
-                    onClick={() => setApproveStatus("REJECTED")}
-                    label={t("reject")}
-                    icon={<XIcon size={18} />}
-                    variant="danger"
-                  />
-                </>
-              )}
-              {data?.existingFleetManager?.status === "APPROVED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("BLOCKED")}
-                  label={t("block")}
-                  icon={<BanIcon size={18} />}
-                  variant="warning"
-                />
-              )}
-              {data?.existingFleetManager?.status === "BLOCKED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("UNBLOCKED")}
-                  label={t("unblock")}
-                  icon={<CheckIcon size={18} />}
-                  variant="primary"
-                />
-              )}
-              {!data?.existingFleetManager?.isDeleted && (
-                <ActionButton
-                  onClick={() => setShowDeleteModal(true)}
-                  label={t("delete")}
-                  icon={<TrashIcon size={18} />}
-                  variant="danger"
-                />
-              )}
             </div>
           </div>
           <Section
@@ -469,6 +429,50 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               icon={<ArrowLeftCircle />}
               variant="primary"
             />
+          </div>
+        </div>
+        <div className="mb-6 mx-6">
+          <div className="flex flex-wrap justify-end gap-4">
+            {data?.existingFleetManager?.status === "SUBMITTED" && (
+              <>
+                <ActionButton
+                  onClick={() => setApproveStatus("APPROVED")}
+                  label={t("approve")}
+                  icon={<CheckIcon size={18} />}
+                  variant="success"
+                />
+                <ActionButton
+                  onClick={() => setApproveStatus("REJECTED")}
+                  label={t("reject")}
+                  icon={<XIcon size={18} />}
+                  variant="danger"
+                />
+              </>
+            )}
+            {data?.existingFleetManager?.status === "APPROVED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("BLOCKED")}
+                label={t("block")}
+                icon={<BanIcon size={18} />}
+                variant="warning"
+              />
+            )}
+            {data?.existingFleetManager?.status === "BLOCKED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("UNBLOCKED")}
+                label={t("unblock")}
+                icon={<CheckIcon size={18} />}
+                variant="primary"
+              />
+            )}
+            {!data?.existingFleetManager?.isDeleted && (
+              <ActionButton
+                onClick={() => setShowDeleteModal(true)}
+                label={t("delete")}
+                icon={<TrashIcon size={18} />}
+                variant="danger"
+              />
+            )}
           </div>
         </div>
       </motion.div>
