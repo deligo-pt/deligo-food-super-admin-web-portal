@@ -124,7 +124,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
               <p className="text-gray-800 font-bold">
                 {
                   vendorPerformanceData.data?.vendorPerformanceStat
-                    ?.highestRating?.vendorName
+                    ?.highestRating?.vendorName || "N/A"
                 }
               </p>
               <p className="text-[#DC3173] text-sm">

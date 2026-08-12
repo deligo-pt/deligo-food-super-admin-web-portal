@@ -168,7 +168,7 @@ export default function UpdateDeliveryPartner({
         ? format(partner.legalStatus?.residencePermitExpiry, "yyyy-MM-dd")
         : "",
       haveCriminalRecordCertificate:
-        partner.criminalRecord?.certificate || true,
+        partner.criminalRecord?.certificate ?? true,
       issueDate: partner.criminalRecord?.issueDate
         ? format(partner.criminalRecord?.issueDate, "yyyy-MM-dd")
         : "",
@@ -177,7 +177,8 @@ export default function UpdateDeliveryPartner({
         : "",
     },
   });
-
+  console.log("partner", partner);
+  console.log("cert", partner.criminalRecord?.certificate);
   const { formState: { isSubmitting } } = form;
 
   const [watchZones, vehicleType, haveCriminalRecordCertificate, residencePermitType] = useWatch({
