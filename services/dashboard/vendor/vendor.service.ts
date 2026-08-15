@@ -13,6 +13,7 @@ export const getAllVendorsReq = async (
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
   const status = queries.status || "";
+  const businessType = queries.businessType || "";
 
   const params = {
     limit,
@@ -20,6 +21,7 @@ export const getAllVendorsReq = async (
     sortBy,
     ...(searchTerm ? { searchTerm: searchTerm } : {}),
     ...(status ? { status: status } : {}),
+    ...(businessType ? { businessType: businessType } : {}),
     isDeleted: false,
   };
 

@@ -1930,6 +1930,7 @@ export const en = {
   top_earning_day: "Top Earning Day",
   show_cancelled: "Show Cancelled",
   restaurant: "Restaurant",
+  store: "Store",
   earnings_by_day: "Earnings by Day",
 
   // order report

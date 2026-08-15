@@ -138,7 +138,7 @@ export default function AllFilters({
             />
           </div>
           {extraSelectFilter && (
-            <div className="w-full lg:w-48">
+            <div className="w-full lg:w-32">
               <SelectFilter
                 paramName={extraSelectFilter.key}
                 options={extraSelectFilter.options}

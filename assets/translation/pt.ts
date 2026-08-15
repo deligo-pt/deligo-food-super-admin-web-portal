@@ -1955,6 +1955,7 @@ export const pt = {
   top_earning_day: "Dia com maior faturação",
   show_cancelled: "Mostrar canceladas",
   restaurant: "Restaurante",
+  store: "Loja",
   earnings_by_day: "Ganhos por dia",
 
   // order report
