@@ -328,10 +328,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("global_settings"), path: "/admin/global-settings" },
         { name: t("rewards_settings"), path: "/admin/rewards-settings" },
         { name: t("payouts_settings"), path: "/admin/payout-settings" },
-        {
-          name: t("notification_preferences"),
-          path: "/admin/notification-preferences",
-        },
       ],
     },
     {
