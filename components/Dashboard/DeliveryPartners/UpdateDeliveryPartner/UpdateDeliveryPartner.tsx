@@ -177,8 +177,7 @@ export default function UpdateDeliveryPartner({
         : "",
     },
   });
-  console.log("partner", partner);
-  console.log("cert", partner.criminalRecord?.certificate);
+
   const { formState: { isSubmitting } } = form;
 
   const [watchZones, vehicleType, haveCriminalRecordCertificate, residencePermitType] = useWatch({

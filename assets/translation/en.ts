@@ -36,6 +36,17 @@ export const en = {
   verify: "Verify",
   verify_email: "Verify Email",
 
+  // error page
+  something_went_wrong: "Something Went Wrong",
+  looks_like_our_app_ran_into: "Looks like our app ran into an unexpected issue",
+  we_are_working_hard_to_get_things: "We’re working hard to get things working again!",
+  retry: "Retry",
+  back_to_home: "Back to Home",
+
+  // not found
+  page_not_found: "Page Not Found",
+  oops_it_looks_like_your_are_stumbled_upon: "Oops! It looks like you&lsquo;ve stumbled upon a dead end 🗺️. The page you&lsquo;re searching for seems to have been misplaced or moved to a different location.",
+
   // sidebar
   dashboard: "Dashboard",
 
@@ -1930,6 +1941,7 @@ export const en = {
   top_earning_day: "Top Earning Day",
   show_cancelled: "Show Cancelled",
   restaurant: "Restaurant",
+  store: "Store",
   earnings_by_day: "Earnings by Day",
 
   // order report

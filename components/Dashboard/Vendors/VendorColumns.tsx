@@ -62,7 +62,7 @@ export function getVendorColumns({
                     {t("type")}
                 </div>
             ),
-            accessor: (row) => row.businessDetails?.businessTypeSlug === 'store' ? "Store" : row.businessDetails?.businessTypeSlug === 'restaurant' ? "Restaurant" : "N/A",
+            accessor: (row) => row.businessDetails?.businessTypeSlug === 'store' ? t("store") : row.businessDetails?.businessTypeSlug === 'restaurant' ? t("restaurant") : "N/A",
         },
         {
             header: (

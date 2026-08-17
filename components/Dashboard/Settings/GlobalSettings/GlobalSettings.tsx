@@ -8,14 +8,17 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "@/hooks/use-translation";
 import {
   createGlobalSettingsReq,
   updateGlobalSettingsReq,
 } from "@/services/dashboard/global-settings/global-settings.service";
 import { TGlobalSettings } from "@/types/global-settings.type";
+import { TTax } from "@/types/tax.type";
 import { globalSettingsSchema } from "@/validations/settings/global-settings/global-settings.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -37,8 +40,10 @@ type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
 export default function GlobalSettings({
   settingsResult: settings,
+  taxRates
 }: {
   settingsResult: TGlobalSettings;
+  taxRates: TTax[];
 }) {
   const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
@@ -68,7 +73,7 @@ export default function GlobalSettings({
       deliveryChargeOutsideLisbon: settings?.ingredientsOrder?.deliveryChargeOutsideLisbon || 30,
     },
   });
-
+  console.log("taxes", taxRates);
   const onSubmit = async (data: TGlobalSettingsForm) => {
     setIsSaving(true);
     const toastId = toast.loading("Saving global settings...");
@@ -315,6 +320,36 @@ export default function GlobalSettings({
                 <FormField
                   control={form.control}
                   name="deliveryVatRate"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2 w-full">
+                      <FormLabel>{t("delivery_vat_rate")}</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value?.toString() ?? ""}
+                          onValueChange={(value) => field.onChange(parseFloat(value))}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder={t("delivery_vat_rate")} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {taxRates.map((tax) => (
+                              <SelectItem
+                                key={tax?.taxRate}
+                                value={tax?.taxRate.toString()}
+                              >
+                                {tax?.taxRate}%
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* <FormField
+                  control={form.control}
+                  name="deliveryVatRate"
                   render={({ field, fieldState }) => (
                     <FormItem className="col-span-2">
                       <FormControl>
@@ -334,7 +369,7 @@ export default function GlobalSettings({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
             </SettingsCard>
 
@@ -376,21 +411,28 @@ export default function GlobalSettings({
                   <FormField
                     control={form.control}
                     name="platformVatRate"
-                    render={({ field, fieldState }) => (
-                      <FormItem>
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>{t("platform_vat")}</FormLabel>
                         <FormControl>
-                          <SettingsInput
-                            fieldState={fieldState}
-                            label={t("platform_vat")}
-                            type="number"
-                            value={field.value}
-                            onChange={(e) =>
-                              field.onChange(parseFloat(e.target.value))
-                            }
-                            suffix="%"
-                            min={0}
-                            max={100}
-                          />
+                          <Select
+                            value={field.value?.toString() ?? ""}
+                            onValueChange={(value) => field.onChange(parseFloat(value))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder={t("platform_vat")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {taxRates.map((tax) => (
+                                <SelectItem
+                                  key={tax?.taxRate}
+                                  value={tax?.taxRate.toString()}
+                                >
+                                  {tax?.taxRate}%
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

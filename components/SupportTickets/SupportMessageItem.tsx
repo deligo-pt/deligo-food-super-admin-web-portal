@@ -40,18 +40,23 @@ const SupportMessageItem = React.memo(
           {!isAdmin && userInfo?.name?.lastName}
         </p>
         <div
-          className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm ${isAdmin ? "bg-[#DC3173] text-white rounded-tr-sm" : "bg-white border border-gray-100 text-gray-800 rounded-tl-sm shadow-sm"}`}
+          className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm text-justify wrap-break-word overflow-hidden ${isAdmin
+              ? "bg-[#DC3173] text-white rounded-tr-sm"
+              : "bg-white border border-gray-100 text-gray-800 rounded-tl-sm shadow-sm"
+            }`}
         >
           {msg.message}
+
           <div className="flex justify-between items-center mt-1 gap-2">
             <span
               className={cn(
                 "text-xs block text-right",
-                isAdmin ? "text-gray-300" : "text-gray-400",
+                isAdmin ? "text-gray-300" : "text-gray-400"
               )}
             >
-              {formatDistanceToNow(msg.createdAt, { addSuffix: true })}
+              {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}
             </span>
+
             {isAdmin &&
               (isOptimistic ? (
                 <CheckIcon size={16} className="text-gray-400 animate-pulse" />

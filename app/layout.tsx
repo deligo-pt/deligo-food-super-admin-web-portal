@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     type: "website",
   },
   metadataBase: new URL("https://deligo.pt"),
+  other: {
+    google: "notranslate",
+  },
 };
 
 export default function RootLayout({
@@ -37,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" translate="no">
+    <html lang="en" translate="no" className="notranslate">
       <body className={`antialiased`} suppressHydrationWarning>
         <GoogleMapsProvider>
           {children}

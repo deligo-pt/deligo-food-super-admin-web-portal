@@ -25,37 +25,6 @@ interface IProps {
 
 const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
-
 export default function Vendors({
   vendorsResult,
   showFilters = false,
@@ -109,6 +78,59 @@ export default function Vendors({
     setIsDeleting(false);
   };
 
+  const filterOptions = [
+    {
+      label: t("status"),
+      key: "status",
+      placeholder: t("select_status"),
+      type: "select",
+      items: [
+        {
+          label: "Pending",
+          value: "PENDING",
+        },
+        {
+          label: "Submitted",
+          value: "SUBMITTED",
+        },
+        {
+          label: "Approved",
+          value: "APPROVED",
+        },
+        {
+          label: "Rejected",
+          value: "REJECTED",
+        },
+        {
+          label: "Blocked",
+          value: "BLOCKED",
+        },
+      ],
+    },
+  ];
+
+  const extraSelectFilter = {
+    key: "businessType",
+    placeholder: t("select_type"),
+    type: "select",
+    isAllNeeded: false,
+    // defaultValue: "All",
+    options: [
+      {
+        label: t("all"),
+        value: "All",
+      },
+      {
+        label: t("store"),
+        value: "STORE",
+      },
+      {
+        label: t("restaurant"),
+        value: "RESTAURANT",
+      },
+    ],
+  };
+
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
@@ -125,6 +147,7 @@ export default function Vendors({
       <AllFilters
         sortOptions={sortOptions}
         {...(showFilters && { filterOptions })}
+        extraSelectFilter={extraSelectFilter}
       />
 
       {/* Vendor Table */}
