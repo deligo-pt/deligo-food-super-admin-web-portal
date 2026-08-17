@@ -40,5 +40,5 @@ export default function VendorDetailsDoc({ documents }: IProps) {
     files: documents?.[key] || [],
   }));
 
-  return <DocumentViewer sections={sections} emptyMessageKey="no_documents_uploaded" />;;
+  return <DocumentViewer sections={sections} emptyMessageKey="no_documents_uploaded" />;
 }
