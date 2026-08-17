@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import ImagePreview from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/ImagePreview";
 import InfoRow from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/InfoRow";
 import Section from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/Section";
 import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/StatusBadge";
@@ -27,7 +26,6 @@ import {
   Check,
   CreditCard,
   Edit,
-  FileText,
   Gavel,
   Mail,
   MapPin,
@@ -43,6 +41,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PartnerDetailsDoc } from "./PartnerDetailsDoc";
 
 interface IProps {
   partner: TDeliveryPartner;
@@ -461,123 +460,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             </div>
           </div>
         </Section>
-        <Section title={t("documents")} icon={<FileText />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6">
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("id_proof_front")}
-              </div>
-              {partner.documents?.idProofFront ? (
-                <ImagePreview
-                  url={partner.documents.idProofFront}
-                  alt="ID Proof Front"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
+        {/* documents */}
+        <PartnerDetailsDoc partner={partner} />
 
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("id_proof_back")}
-              </div>
-              {partner.documents?.idProofBack ? (
-                <ImagePreview
-                  url={partner.documents.idProofBack}
-                  alt="ID Proof Back"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("driving_license_front")}
-              </div>
-              {partner.documents?.drivingLicenseFront ? (
-                <ImagePreview
-                  url={partner.documents.drivingLicenseFront}
-                  alt="Driving License Front"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("driving_license_back")}
-              </div>
-              {partner.documents?.drivingLicenseBack ? (
-                <ImagePreview
-                  url={partner.documents.drivingLicenseBack}
-                  alt="Driving License Back"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("vehicle_registration")}
-              </div>
-              {partner.documents?.vehicleRegistration ? (
-                <ImagePreview
-                  url={partner.documents.vehicleRegistration}
-                  alt="Vehicle Registration"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("criminal_record_certificate")}
-              </div>
-              {partner.documents?.criminalRecordCertificate ? (
-                <ImagePreview
-                  url={partner.documents.criminalRecordCertificate}
-                  alt="Criminal Record"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">{t('activity')}</div>
-              {partner.documents?.activity ? (
-                <ImagePreview url={partner.documents.activity} alt="Activity" />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">{t("insurance_policy")}</div>
-              {partner.documents?.insurancePolicy ? (
-                <ImagePreview
-                  url={partner.documents.insurancePolicy}
-                  alt="Insurance Policy"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">{t("my_photo")}</div>
-              {partner.documents?.myPhoto ? (
-                <ImagePreview url={partner.documents.myPhoto} alt="My Photo" />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-          </div>
-        </Section>
         <Section title={t("operational_date")} icon={<Package />}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">

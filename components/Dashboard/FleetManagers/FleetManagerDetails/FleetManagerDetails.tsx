@@ -403,7 +403,7 @@ export default function FleetManagerDetails({ agentData }: IProps) {
             icon={<FileTextIcon size={20} />}
             defaultOpen={true}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-6">
+            <div className="w-full">
               <FleetManagerDetailsDoc documents={data?.existingFleetManager?.documents as IFleetDocs} />
             </div>
           </Section>
