@@ -8,25 +8,33 @@ import { cleanupFirebaseDatabases } from "./firebaseDBCleanup";
 let isCleaning = false;
 
 export async function getFcmToken(): Promise<string | null> {
-  if (!messaging || !("serviceWorker" in navigator)) return null;
+  // Early exit if not supported
+  if (typeof window === "undefined" || !messaging || !("serviceWorker" in navigator)) {
+    return null;
+  }
 
   try {
-    const permission = await Notification.requestPermission();
+    // Don't hang on permission prompt
+    const permission = Notification.permission;
+
+    if (permission === "denied") return null;
+
     if (permission !== "granted") {
-      console.log("Notification permission not granted");
-      return null;
+      // Request with timeout
+      const permResult = await Promise.race([
+        Notification.requestPermission(),
+        new Promise<"denied">((resolve) => setTimeout(() => resolve("denied"), 4000)),
+      ]);
+      if (permResult !== "granted") return null;
     }
 
-    // Add timeout to prevent infinite hang
-    const tokenPromise = getToken(messaging, {
-      vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
-    });
-
     const token = await Promise.race([
-      tokenPromise,
+      getToken(messaging, {
+        vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,
+      }),
       new Promise<null>((_, reject) =>
-        setTimeout(() => reject(new Error("getToken timeout")), 6000)
-      )
+        setTimeout(() => reject(new Error("getToken timeout")), 7000)
+      ),
     ]);
 
     return token || null;
