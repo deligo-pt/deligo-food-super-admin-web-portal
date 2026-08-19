@@ -14,16 +14,22 @@ import {
     Clock,
     Calendar,
     Database,
-    Hash
+    Hash,
+    Layers,
+    FileText,
 } from "lucide-react";
 
 import { useTranslation } from "@/hooks/use-translation";
-import { IActivityLog, ActivityLogType } from "@/types/activity-logs.type";
+import {
+    IActivityLog,
+    ActivityLogType,
+} from "@/types/activity-logs.type";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { getActivityActionLabel, getActivityEntityLabel } from "@/consts/activity-logs.const";
 
 interface IProps {
     log: IActivityLog;
@@ -33,8 +39,10 @@ export default function ActivityLogDetails({ log }: IProps) {
     const { t } = useTranslation();
 
     // Helper for rendering Type Badges
-    const renderTypeBadge = (type: ActivityLogType) => {
-        switch (type?.toUpperCase()) {
+    const renderTypeBadge = (type?: ActivityLogType) => {
+        if (!type) return <Badge variant="outline">—</Badge>;
+
+        switch (type.toUpperCase()) {
             case "INFO":
                 return (
                     <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200">
@@ -63,7 +71,10 @@ export default function ActivityLogDetails({ log }: IProps) {
     // Helper to format ISO dates cleanly
     const formatDate = (isoString?: string) => {
         if (!isoString) return "—";
-        return new Date(isoString).toLocaleString(undefined, {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return isoString;
+
+        return date.toLocaleString(undefined, {
             dateStyle: "full",
             timeStyle: "medium",
         });
@@ -89,9 +100,14 @@ export default function ActivityLogDetails({ log }: IProps) {
         );
     }
 
+    const hasMetaData =
+        log.metadata &&
+        typeof log.metadata === "object" &&
+        Object.keys(log.metadata).length > 0;
+
     return (
         <div className="min-h-screen space-y-6">
-            {/* NAVIGATION / TOP BAR */}
+            {/* TOP NAVIGATION */}
             <div className="flex items-center justify-between">
                 <Link href="/admin/activity-logs">
                     <Button
@@ -118,7 +134,9 @@ export default function ActivityLogDetails({ log }: IProps) {
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
                                 <CardTitle className="text-xl font-bold text-gray-900">
-                                    {log.action}
+                                    {log.action
+                                        ? getActivityActionLabel(log.action)
+                                        : t("unspecified_action")}
                                 </CardTitle>
                                 <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
                                     <Clock size={14} className="text-gray-400" />
@@ -126,9 +144,11 @@ export default function ActivityLogDetails({ log }: IProps) {
                                 </p>
                             </div>
 
-                            <div className="text-xs text-gray-400 font-mono bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100 flex items-center gap-1">
+                            <div className="text-xs text-gray-400 font-mono bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100 flex items-center gap-1 self-start md:self-auto">
                                 <Hash size={12} />
-                                <span>{t("id")}: {log._id}</span>
+                                <span>
+                                    {t("id")}: {log._id}
+                                </span>
                             </div>
                         </div>
                     </CardHeader>
@@ -159,7 +179,10 @@ export default function ActivityLogDetails({ log }: IProps) {
                                     <h3 className="font-semibold text-gray-900 text-lg">
                                         {log.userName || t("unknown_user")}
                                     </h3>
-                                    <Badge variant="outline" className="mt-1 capitalize text-xs font-semibold bg-gray-50 text-gray-700">
+                                    <Badge
+                                        variant="outline"
+                                        className="mt-1 capitalize text-xs font-semibold bg-gray-50 text-gray-700"
+                                    >
                                         {log.role || "N/A"}
                                     </Badge>
                                 </div>
@@ -173,7 +196,9 @@ export default function ActivityLogDetails({ log }: IProps) {
                                         <Mail size={16} className="text-gray-400" />
                                         {t("email")}
                                     </span>
-                                    <span className="font-medium text-gray-800">{log.email || "—"}</span>
+                                    <span className="font-medium text-gray-800">
+                                        {log.email || "—"}
+                                    </span>
                                 </div>
 
                                 <div className="flex items-center justify-between text-sm">
@@ -205,26 +230,56 @@ export default function ActivityLogDetails({ log }: IProps) {
                         </CardHeader>
                         <CardContent className="pt-4 space-y-4">
                             <div className="space-y-3">
+                                {/* Action */}
                                 <div className="flex flex-col space-y-1">
                                     <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
                                         <Activity size={14} />
                                         {t("action_performed")}
                                     </span>
-                                    <p className="text-base font-medium text-gray-900 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                        {log.action}
+                                    <p className="text-sm font-medium text-gray-900 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                                        {log.action
+                                            ? getActivityActionLabel(log.action)
+                                            : "—"}
                                     </p>
                                 </div>
 
+                                {/* Target Entity */}
                                 <div className="flex flex-col space-y-1">
                                     <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
                                         <Target size={14} />
-                                        {t("target_entity")}
+                                        {t("target")}
                                     </span>
-                                    <p className="text-base font-medium text-gray-900 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <p className="text-sm font-medium text-gray-900 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
                                         {log.target || "—"}
                                     </p>
                                 </div>
 
+                                {/* Entity Type & Entity ID */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100 space-y-1">
+                                        <span className="text-xs text-gray-400 font-semibold flex items-center gap-1">
+                                            <Layers size={13} />
+                                            {t("entity_type")}
+                                        </span>
+                                        <p className="text-sm font-medium text-gray-800">
+                                            {log.entityType
+                                                ? getActivityEntityLabel(log.entityType)
+                                                : "—"}
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100 space-y-1">
+                                        <span className="text-xs text-gray-400 font-semibold flex items-center gap-1">
+                                            <Hash size={13} />
+                                            {t("entity_id")}
+                                        </span>
+                                        <p className="text-xs font-mono text-gray-800 truncate" title={log.entityId}>
+                                            {log.entityId || "—"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Type Badge */}
                                 <div className="flex items-center justify-between text-sm pt-2">
                                     <span className="text-gray-500 flex items-center gap-2">
                                         <Info size={16} className="text-gray-400" />
@@ -238,7 +293,55 @@ export default function ActivityLogDetails({ log }: IProps) {
                 </motion.div>
             </div>
 
-            {/* SYSTEM METADATA CARD */}
+            {/* METADATA SECTION */}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.12 }}
+            >
+                <Card className="border-gray-100 shadow-sm">
+                    <CardHeader className="border-b border-gray-50 pb-3">
+                        <CardTitle className="text-base font-semibold text-gray-700 flex items-center gap-2">
+                            <FileText size={18} />
+                            {t("meta_data")}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                        {hasMetaData ? (
+                            <div className="space-y-4">
+                                {/* Formatted Key-Value Grid */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {Object.entries(log?.metadata ?? {}).map(([key, value]) => (
+                                        <div
+                                            key={key}
+                                            className="bg-gray-50 p-3 rounded-lg border border-gray-100 space-y-1"
+                                        >
+                                            <span className="text-xs text-gray-400 font-mono capitalize">
+                                                {key.replace(/([A-Z])/g, " $1")}
+                                            </span>
+                                            <p className="text-sm font-medium text-gray-800 wrap-break-word">
+                                                {Array.isArray(value)
+                                                    ? value.join(", ")
+                                                    : typeof value === "boolean"
+                                                        ? value
+                                                            ? "True"
+                                                            : "False"
+                                                        : String(value ?? "—")}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-gray-400 italic">
+                                {t("no_metadata_available")}
+                            </p>
+                        )}
+                    </CardContent>
+                </Card>
+            </motion.div>
+
+            {/* SYSTEM TIMESTAMPS CARD */}
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
