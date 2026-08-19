@@ -54,7 +54,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  console.log("vendor", vendor);
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
       setApproveStatus("");
@@ -283,7 +283,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessType || "N/A"}
                 </p>
               </div>
-              {vendor?.businessDetails?.businessType === "RESTAURANT" && (
+              {vendor?.businessDetails?.businessTypeSlug === "restaurant" && (
                 <div>
                   <p className="text-sm text-gray-500">{t("restaurant_cuisine_type")}</p>
                   <p className="font-medium">

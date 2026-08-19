@@ -527,6 +527,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setMobileOpen(false)}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 md:hidden flex"
           >
             <motion.div
@@ -534,6 +535,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: "spring", damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
               className="bg-white w-72 h-full p-4 shadow-xl overflow-y-auto no-scrollbar"
             >
               <div className="flex items-center justify-between mb-4">
