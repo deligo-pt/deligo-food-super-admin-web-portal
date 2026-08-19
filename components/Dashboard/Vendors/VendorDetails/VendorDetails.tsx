@@ -54,7 +54,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  console.log("vendor", vendor);
+
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
       setApproveStatus("");
