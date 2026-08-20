@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { bankNames } from "@/consts/bankNames.const";
 import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -153,10 +152,10 @@ export default function AddDeliveryPartner() {
       drivingLicenseExpiry: "",
       insurancePolicyNumber: "",
       insuranceExpiry: "",
-      bankName: "",
+      // bankName: "",
       accountHolderName: "",
       iban: "",
-      swiftCode: "",
+      // swiftCode: "",
       preferredZones: [],
       preferredHours: [],
       isothermalBag: false,
@@ -354,10 +353,10 @@ export default function AddDeliveryPartner() {
           : undefined,
       },
       bankDetails: {
-        bankName: data.bankName,
+        // bankName: data.bankName,
         accountHolderName: data.accountHolderName,
         iban: data.iban?.toUpperCase(),
-        swiftCode: data.swiftCode?.toUpperCase(),
+        // swiftCode: data.swiftCode?.toUpperCase(),
       },
 
       vehicleInfo,
@@ -814,7 +813,7 @@ export default function AddDeliveryPartner() {
                       </h2>
 
                       <div className="space-y-4">
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="bankName"
                           render={({ field, fieldState }) => (
@@ -844,7 +843,7 @@ export default function AddDeliveryPartner() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
 
                         <FormField
                           control={form.control}
@@ -881,7 +880,7 @@ export default function AddDeliveryPartner() {
                           )}
                         />
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="swiftCode"
                           render={({ field }) => (
@@ -897,7 +896,7 @@ export default function AddDeliveryPartner() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </Card>
                   </motion.div>

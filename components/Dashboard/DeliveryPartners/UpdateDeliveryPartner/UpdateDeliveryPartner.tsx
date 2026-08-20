@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -91,8 +90,8 @@ export default function UpdateDeliveryPartner({
   const router = useRouter();
   const [zone, setZone] = useState("");
   const [locationCoordinates, setLocationCoordinates] = useState({
-    latitude: 0,
-    longitude: 0,
+    latitude: partner?.address?.latitude || 0,
+    longitude: partner?.address?.longitude || 0,
   });
 
   const [previews, setPreviews] = useState<
@@ -149,10 +148,10 @@ export default function UpdateDeliveryPartner({
       insuranceExpiry: partner.vehicleInfo?.insuranceExpiry
         ? format(partner.vehicleInfo?.insuranceExpiry, "yyyy-MM-dd")
         : "",
-      bankName: partner.bankDetails?.bankName || "",
+      // bankName: partner.bankDetails?.bankName || "",
       accountHolderName: partner.bankDetails?.accountHolderName || "",
       iban: partner.bankDetails?.iban || "",
-      swiftCode: partner.bankDetails?.swiftCode || "",
+      // swiftCode: partner.bankDetails?.swiftCode || "",
       preferredZones: partner.workPreferences?.preferredZones || [],
       preferredHours: partner.workPreferences?.preferredHours || [],
       isothermalBag:
@@ -203,81 +202,276 @@ export default function UpdateDeliveryPartner({
   const onSubmit = async (data: TDeliveryPartnerForm) => {
     const toastId = toast.loading("Updating partner...");
 
+    // Helper to check if a value really changed
+    const hasChanged = (current: any, original: any) => {
+      if (Array.isArray(current) || Array.isArray(original)) {
+        return JSON.stringify(current || []) !== JSON.stringify(original || []);
+      }
+      // Handle Date comparison
+      if (current instanceof Date || original instanceof Date) {
+        const curr =
+          current instanceof Date
+            ? current.getTime()
+            : new Date(current || 0).getTime();
+        const orig =
+          original instanceof Date
+            ? original.getTime()
+            : new Date(original || 0).getTime();
+        return curr !== orig;
+      }
+      return current !== original;
+    };
+
     const isMotorVehicle = (
       type: typeof data.vehicleType
     ): type is "CAR" | "SCOOTER" | "MOTORBIKE" =>
       type === "CAR" || type === "SCOOTER" || type === "MOTORBIKE";
 
-    const vehicleInfo = isMotorVehicle(data.vehicleType)
-      ? {
-        vehicleType: data.vehicleType,
-        brand: data.brand,
-        model: data.model,
-        licensePlate: (data as any).licensePlate
-          ? (data as any).licensePlate.toUpperCase()
-          : undefined,
-        drivingLicenseNumber: (data as any).drivingLicenseNumber
-          ? (data as any).drivingLicenseNumber.toUpperCase()
-          : undefined,
-        drivingLicenseExpiry: (data as any).drivingLicenseExpiry,
-        insurancePolicyNumber: (data as any).insurancePolicyNumber
-          ? (data as any).insurancePolicyNumber.toUpperCase()
-          : undefined,
-        insuranceExpiry: (data as any).insuranceExpiry
-          ? new Date((data as any).insuranceExpiry)
-          : undefined,
-      }
-      : {
-        vehicleType: data.vehicleType,
-        brand: data.brand,
-        model: data.model,
-      };
+    const partnerData: Record<string, any> = {};
 
-    const partnerData = {
-      name: {
+    // name
+    const originalFirstName = partner?.name?.firstName || "";
+    const originalLastName = partner?.name?.lastName || "";
+
+    if (
+      hasChanged(data.firstName, originalFirstName) ||
+      hasChanged(data.lastName, originalLastName)
+    ) {
+      // Send FULL object
+      partnerData.name = {
         firstName: data.firstName,
         lastName: data.lastName,
-      },
-      contactNumber: data.phoneNumber,
-      address: {
+      };
+    }
+
+    // contactNumber
+    if (hasChanged(data.phoneNumber, partner?.contactNumber || "")) {
+      partnerData.contactNumber = data.phoneNumber;
+    }
+
+    // address
+    const currentLat =
+      locationCoordinates.latitude || partner?.address?.latitude || 0;
+    const currentLng =
+      locationCoordinates.longitude || partner?.address?.longitude || 0;
+
+    const originalStreet = partner?.address?.street || "";
+    const originalCity = partner?.address?.city || "";
+    const originalPostalCode = partner?.address?.postalCode || "";
+    const originalCountry = partner?.address?.country || "";
+    const originalLat = partner?.address?.latitude ?? 0;
+    const originalLng = partner?.address?.longitude ?? 0;
+
+    const addressChanged =
+      hasChanged(data.street, originalStreet) ||
+      hasChanged(data.city, originalCity) ||
+      hasChanged(data.postalCode, originalPostalCode) ||
+      hasChanged(data.country, originalCountry) ||
+      hasChanged(currentLat, originalLat) ||
+      hasChanged(currentLng, originalLng);
+
+    if (addressChanged) {
+      // Send FULL object
+      partnerData.address = {
         street: data.street,
         city: data.city,
         postalCode: data.postalCode,
         country: data.country,
-        latitude: locationCoordinates.latitude,
-        longitude: locationCoordinates.longitude,
-      },
-      personalInfo: {
+        latitude: currentLat,
+        longitude: currentLng,
+      };
+    }
+
+    // personalInfo
+    const originalDob = partner?.personalInfo?.dateOfBirth;
+    const originalGender = partner?.personalInfo?.gender || "";
+    const originalNationality = partner?.personalInfo?.nationality || "";
+    const originalNIF = partner?.personalInfo?.NIF || "";
+
+    const personalInfoChanged =
+      hasChanged(new Date(data.dateOfBirth), originalDob) ||
+      hasChanged(data.gender, originalGender) ||
+      hasChanged(data.nationality, originalNationality) ||
+      hasChanged(data.nifNumber?.toUpperCase(), originalNIF);
+
+    if (personalInfoChanged) {
+      // Send FULL object
+      partnerData.personalInfo = {
         dateOfBirth: new Date(data.dateOfBirth),
         gender: data.gender,
         nationality: data.nationality,
         NIF: data.nifNumber?.toUpperCase(),
-        // passportNumber: data.passportNumber?.toUpperCase(),
-      },
-      legalStatus: {
+      };
+    }
+
+    // legalStatus
+    const originalPermitType = partner?.legalStatus?.residencePermitType || "";
+    const originalPermitNumber =
+      partner?.legalStatus?.residencePermitNumber || "";
+    const originalPermitExpiry = partner?.legalStatus?.residencePermitExpiry;
+
+    const legalStatusChanged =
+      hasChanged(data.residencePermitType, originalPermitType) ||
+      hasChanged(
+        data.residencePermitNumber?.toUpperCase(),
+        originalPermitNumber
+      ) ||
+      hasChanged(
+        data.residencePermitExpiry
+          ? new Date(data.residencePermitExpiry).toISOString()
+          : undefined,
+        originalPermitExpiry
+      );
+
+    if (legalStatusChanged) {
+      // Send FULL object
+      partnerData.legalStatus = {
         residencePermitType: data.residencePermitType,
         residencePermitNumber: data.residencePermitNumber?.toUpperCase(),
         residencePermitExpiry: data.residencePermitExpiry
           ? new Date(data.residencePermitExpiry).toISOString()
           : undefined,
-      },
-      bankDetails: {
-        bankName: data.bankName,
+      };
+    }
+
+    // bankDetails
+    const originalAccountHolder =
+      partner?.bankDetails?.accountHolderName || "";
+    const originalIban = partner?.bankDetails?.iban || "";
+
+    if (
+      hasChanged(data.accountHolderName, originalAccountHolder) ||
+      hasChanged(data.iban?.toUpperCase(), originalIban)
+    ) {
+      // Already correct – full object
+      partnerData.bankDetails = {
         accountHolderName: data.accountHolderName,
         iban: data.iban?.toUpperCase(),
-        swiftCode: data.swiftCode?.toUpperCase(),
-      },
+      };
+    }
 
-      vehicleInfo,
+    // vehicleInfo
+    const originalVehicleType = partner?.vehicleInfo?.vehicleType || "";
+    const originalBrand = partner?.vehicleInfo?.brand || "";
+    const originalModel = partner?.vehicleInfo?.model || "";
+    const originalLicensePlate = partner?.vehicleInfo?.licensePlate || "";
+    const originalDrivingLicenseNumber =
+      partner?.vehicleInfo?.drivingLicenseNumber || "";
+    const originalDrivingLicenseExpiry =
+      partner?.vehicleInfo?.drivingLicenseExpiry;
+    const originalInsurancePolicyNumber =
+      partner?.vehicleInfo?.insurancePolicyNumber || "";
+    const originalInsuranceExpiry = partner?.vehicleInfo?.insuranceExpiry;
 
-      criminalRecord: {
+    const vehicleChanged =
+      hasChanged(data.vehicleType, originalVehicleType) ||
+      hasChanged(data.brand, originalBrand) ||
+      hasChanged(data.model, originalModel) ||
+      (isMotorVehicle(data.vehicleType) &&
+        (hasChanged(
+          (data as any).licensePlate?.toUpperCase(),
+          originalLicensePlate
+        ) ||
+          hasChanged(
+            (data as any).drivingLicenseNumber?.toUpperCase(),
+            originalDrivingLicenseNumber
+          ) ||
+          hasChanged(
+            (data as any).drivingLicenseExpiry,
+            originalDrivingLicenseExpiry
+          ) ||
+          hasChanged(
+            (data as any).insurancePolicyNumber?.toUpperCase(),
+            originalInsurancePolicyNumber
+          ) ||
+          hasChanged(
+            (data as any).insuranceExpiry
+              ? new Date((data as any).insuranceExpiry)
+              : undefined,
+            originalInsuranceExpiry
+          )));
+
+    if (vehicleChanged) {
+      // Always send FULL vehicleInfo
+      if (isMotorVehicle(data.vehicleType)) {
+        partnerData.vehicleInfo = {
+          vehicleType: data.vehicleType,
+          brand: data.brand,
+          model: data.model,
+          licensePlate: (data as any).licensePlate
+            ? (data as any).licensePlate.toUpperCase()
+            : undefined,
+          drivingLicenseNumber: (data as any).drivingLicenseNumber
+            ? (data as any).drivingLicenseNumber.toUpperCase()
+            : undefined,
+          drivingLicenseExpiry: (data as any).drivingLicenseExpiry,
+          insurancePolicyNumber: (data as any).insurancePolicyNumber
+            ? (data as any).insurancePolicyNumber.toUpperCase()
+            : undefined,
+          insuranceExpiry: (data as any).insuranceExpiry
+            ? new Date((data as any).insuranceExpiry)
+            : undefined,
+        };
+      } else {
+        partnerData.vehicleInfo = {
+          vehicleType: data.vehicleType,
+          brand: data.brand,
+          model: data.model,
+        };
+      }
+    }
+
+    // criminalRecord
+    const originalCertificate =
+      partner?.criminalRecord?.certificate ?? false;
+    const originalIssueDate = partner?.criminalRecord?.issueDate;
+    const originalExpiryDate = partner?.criminalRecord?.expiryDate;
+
+    const criminalRecordChanged =
+      hasChanged(data.haveCriminalRecordCertificate, originalCertificate) ||
+      (data.haveCriminalRecordCertificate &&
+        (hasChanged(new Date(data.issueDate as string), originalIssueDate) ||
+          hasChanged(new Date(data.expiryDate as string), originalExpiryDate)));
+
+    if (criminalRecordChanged) {
+      // Send FULL object
+      partnerData.criminalRecord = {
         certificate: data.haveCriminalRecordCertificate,
         ...(data.haveCriminalRecordCertificate && {
           issueDate: new Date(data.issueDate as string),
           expiryDate: new Date(data.expiryDate as string),
         }),
-      },
-      workPreferences: {
+      };
+    }
+
+    // workPreferences
+    const originalPreferredZones =
+      partner?.workPreferences?.preferredZones || [];
+    const originalPreferredHours =
+      partner?.workPreferences?.preferredHours || [];
+    const originalIsothermalBag =
+      partner?.workPreferences?.hasEquipment?.isothermalBag ?? false;
+    const originalHelmet =
+      partner?.workPreferences?.hasEquipment?.helmet ?? false;
+    const originalPowerBank =
+      partner?.workPreferences?.hasEquipment?.powerBank ?? false;
+    const originalWorkedWithOther =
+      partner?.workPreferences?.workedWithOtherPlatform ?? false;
+    const originalOtherPlatformName =
+      partner?.workPreferences?.otherPlatformName || "";
+
+    const workPreferencesChanged =
+      hasChanged(data.preferredZones, originalPreferredZones) ||
+      hasChanged(data.preferredHours, originalPreferredHours) ||
+      hasChanged(data.isothermalBag, originalIsothermalBag) ||
+      hasChanged(data.helmet, originalHelmet) ||
+      hasChanged(data.powerBank, originalPowerBank) ||
+      hasChanged(data.workedWithOtherPlatform, originalWorkedWithOther) ||
+      hasChanged(data.otherPlatformName, originalOtherPlatformName);
+
+    if (workPreferencesChanged) {
+      // Send FULL object
+      partnerData.workPreferences = {
         preferredZones: data.preferredZones,
         preferredHours: data.preferredHours,
         hasEquipment: {
@@ -287,12 +481,20 @@ export default function UpdateDeliveryPartner({
         },
         workedWithOtherPlatform: data.workedWithOtherPlatform,
         otherPlatformName: data.otherPlatformName,
-      },
-    };
+      };
+    }
+
+    // final check
+    const hasAnyChange = Object.keys(partnerData).length > 0;
+
+    if (!hasAnyChange) {
+      toast.info("No changes detected", { id: toastId });
+      return;
+    }
 
     const updatedResult = await updateUserDataReq(
       `/delivery-partners/${partner.userId}`,
-      partnerData,
+      partnerData
     );
 
     if (updatedResult.success) {
@@ -302,17 +504,16 @@ export default function UpdateDeliveryPartner({
         if (approveResult.success) {
           form.reset();
           toast.success(
-            approveResult.message || "Delivery partner submitted successfully!",
-            {
-              id: toastId,
-            },
+            approveResult.message ||
+            "Delivery partner submitted successfully!",
+            { id: toastId }
           );
           router.refresh();
           router.back();
           return;
         }
 
-        toast.error(approveResult.message || "Delivery partner add failed", {
+        toast.error(approveResult.message || "Delivery partner update failed", {
           id: toastId,
         });
         console.log(approveResult);
@@ -322,16 +523,14 @@ export default function UpdateDeliveryPartner({
       form.reset();
       toast.success(
         updatedResult.message || "Delivery partner updated successfully!",
-        {
-          id: toastId,
-        },
+        { id: toastId }
       );
       router.refresh();
       router.back();
       return;
     }
 
-    toast.error(updatedResult.message || "Delivery partner add failed", {
+    toast.error(updatedResult.message || "Delivery partner update failed", {
       id: toastId,
     });
     console.log(updatedResult);
@@ -656,7 +855,7 @@ export default function UpdateDeliveryPartner({
                         </h2>
 
                         <div className="space-y-4">
-                          <FormField
+                          {/* <FormField
                             control={form.control}
                             name="bankName"
                             render={({ field, fieldState }) => (
@@ -686,7 +885,7 @@ export default function UpdateDeliveryPartner({
                                 <FormMessage />
                               </FormItem>
                             )}
-                          />
+                          /> */}
 
                           <FormField
                             control={form.control}
@@ -723,7 +922,7 @@ export default function UpdateDeliveryPartner({
                             )}
                           />
 
-                          <FormField
+                          {/* <FormField
                             control={form.control}
                             name="swiftCode"
                             render={({ field }) => (
@@ -739,7 +938,7 @@ export default function UpdateDeliveryPartner({
                                 <FormMessage />
                               </FormItem>
                             )}
-                          />
+                          /> */}
                         </div>
                       </Card>
                     </motion.div>
