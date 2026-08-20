@@ -329,21 +329,21 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">{t("bank_name")}</p>
-                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.bankName}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.bankName || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("account_holder")}</p>
                   <p className="font-medium">
-                    {data?.existingFleetManager?.bankDetails.accountHolderName}
+                    {data?.existingFleetManager?.bankDetails.accountHolderName || "N/A"}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("iban")}</p>
-                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.iban}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.iban || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("swift_code")}</p>
-                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.swiftCode}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.swiftCode || "N/A"}</p>
                 </div>
               </div>
             ) : (
