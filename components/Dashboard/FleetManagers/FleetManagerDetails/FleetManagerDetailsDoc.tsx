@@ -1,5 +1,5 @@
+import { DocumentViewer, IDocSection } from "@/components/common/DocumentViewer";
 import { useTranslation } from "@/hooks/use-translation";
-import Image from "next/image";
 
 export interface IFleetDocs {
   businessLicense?: string[];
@@ -15,69 +15,26 @@ interface IProps {
   documents: IFleetDocs | undefined;
 }
 
+const DOC_TRANSLATION_MAP: Record<keyof IFleetDocs, string> = {
+  idProofFront: "id_proof_front",
+  idProofBack: "id_proof_back",
+  businessLicense: "business_license",
+  activityDocument: "activity_document",
+  myPhoto: "my_photo",
+  proofOfAddress: "proof_of_address",
+  ibanProof: "iban_proof",
+};
+
 export default function FleetManagerDetailsDoc({ documents }: IProps) {
   const { t } = useTranslation();
-  const docsArr = Object.keys(documents || {}) as (keyof IFleetDocs)[];
 
-  return (
-    <>
-      {docsArr.map((doc) => {
-        const files = documents?.[doc];
+  const sections: IDocSection[] = (
+    Object.keys(DOC_TRANSLATION_MAP) as (keyof IFleetDocs)[]
+  ).map((key) => ({
+    key,
+    label: t(DOC_TRANSLATION_MAP[key]),
+    files: documents?.[key] || [],
+  }));
 
-        if (!files || files.length === 0) return null;
-
-        return (
-          <div key={doc} className="mb-6">
-            <p className="text-sm text-gray-500 mb-2">
-              {doc === "idProofFront" && t("id_proof_front")}
-              {doc === "idProofBack" && t("id_proof_back")}
-              {doc === "businessLicense" && t("business_license")}
-              {doc === "activityDocument" && t("activity_document")}
-              {doc === "myPhoto" && t("my_photo")}
-              {doc === "proofOfAddress" && t("proof_of_address")}
-              {doc === "ibanProof" && t("iban_proof")}
-            </p>
-
-            <div className="grid grid-cols-2 gap-3">
-              {files.map((file, index) => {
-                const isPdf = file.toLowerCase().endsWith(".pdf");
-
-                return (
-                  <div key={index}>
-                    {isPdf ? (
-                      <iframe
-                        src={file}
-                        className="w-full h-40 rounded-lg border border-gray-200"
-                      />
-                    ) : (
-                      <Image
-                        src={file}
-                        alt={`${doc}-${index}`}
-                        width={500}
-                        height={500}
-                        className="w-full h-40 object-cover rounded-lg border border-gray-200"
-                      />
-                    )}
-
-                    <a
-                      href={file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 text-sm text-[#DC3173] hover:underline inline-block"
-                    >
-                      {t("view_full_file")}
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-
-      {docsArr.length === 0 && (
-        <p className="text-gray-500 italic">{t("no_document_uploaded")}</p>
-      )}
-    </>
-  );
+  return <DocumentViewer sections={sections} emptyMessageKey="no_document_uploaded" />;
 }

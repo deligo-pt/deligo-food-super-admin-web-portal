@@ -26,36 +26,6 @@ interface IProps {
 
 const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
 
 export default function DeliveryPartners({
   partnersResult,
@@ -131,7 +101,7 @@ export default function DeliveryPartners({
       {/* Filters */}
       <AllFilters
         sortOptions={sortOptions}
-        {...(showFilters && { filterOptions })}
+      // {...(showFilters && { filterOptions })}
       />
 
       {/* Partner Table */}

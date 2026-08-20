@@ -13,13 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
@@ -52,9 +45,7 @@ import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { toast } from "sonner";
 import z from "zod";
-import { cn } from "@/lib/utils";
 import { USER_ROLE } from "@/consts/user.const";
-import { bankNames } from "@/consts/bankNames.const";
 
 const DELIGO = "#DC3173";
 
@@ -115,10 +106,10 @@ export default function AddFleetManager() {
       country: "",
       latitude: 0,
       longitude: 0,
-      bankName: "",
+      // bankName: "",
       accountHolderName: "",
       iban: "",
-      swiftCode: "",
+      // swiftCode: "",
     },
   });
 
@@ -241,10 +232,10 @@ export default function AddFleetManager() {
         longitude: locationCoordinates.longitude,
       },
       bankDetails: {
-        bankName: data.bankName,
+        // bankName: data.bankName,
         accountHolderName: data.accountHolderName,
         iban: data.iban,
-        swiftCode: data.swiftCode,
+        // swiftCode: data.swiftCode,
       },
     } as Partial<TAgent>;
 
@@ -578,7 +569,7 @@ export default function AddFleetManager() {
                       </h2>
 
                       <div className="space-y-4">
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="bankName"
                           render={({ field, fieldState }) => (
@@ -608,7 +599,7 @@ export default function AddFleetManager() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
 
                         <FormField
                           control={form.control}
@@ -641,7 +632,7 @@ export default function AddFleetManager() {
                           )}
                         />
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="swiftCode"
                           render={({ field }) => (
@@ -656,7 +647,7 @@ export default function AddFleetManager() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </Card>
                   </motion.div>

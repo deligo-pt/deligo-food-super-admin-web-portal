@@ -107,35 +107,27 @@ export default function AllFilters({
       className="mb-1"
     >
       <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
-        {/* Search + Clear button */}
-        <div className="relative w-full lg:w-auto flex-1 max-w-xs">
-          <SearchFilter
-            paramName="searchTerm"
-            placeholder={
-              searchPlaceholder ? t(`${searchPlaceholder}`) : t("search")
-            }
-          />
-
-          {/* Cross button – only visible when there is a search term */}
-          {searchTerm.length > 0 && (
-            <button
-              type="button"
-              onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors z-10"
-              aria-label="Clear search"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-          <div className="w-full lg:w-48">
-            <SelectFilter
-              paramName="sortBy"
-              options={sortOptions}
-              placeholder={t("sort_by")}
+        <div className="flex flex-col lg:flex-row gap-0 lg:gap-2">
+          {/* Search + Clear button */}
+          <div className="relative w-full lg:w-auto flex-1 max-w-xs">
+            <SearchFilter
+              paramName="searchTerm"
+              placeholder={
+                searchPlaceholder ? t(`${searchPlaceholder}`) : t("search")
+              }
             />
+
+            {/* Cross button – only visible when there is a search term */}
+            {searchTerm.length > 0 && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors z-10"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
           {extraSelectFilter && (
             <div className="w-full lg:w-32">
@@ -148,7 +140,9 @@ export default function AllFilters({
               />
             </div>
           )}
+        </div>
 
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           {filterOptions && (
             <Button
               variant="outline"
@@ -168,6 +162,13 @@ export default function AllFilters({
               )?.length || ""}
             </Button>
           )}
+          <div className="w-full lg:w-40">
+            <SelectFilter
+              paramName="sortBy"
+              options={sortOptions}
+              placeholder={t("sort_by")}
+            />
+          </div>
         </div>
       </div>
 

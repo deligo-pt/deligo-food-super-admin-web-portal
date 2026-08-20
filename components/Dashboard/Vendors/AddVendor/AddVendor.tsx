@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { bankNames } from "@/consts/bankNames.const";
 import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -124,7 +123,6 @@ export default function AddVendor({
     defaultValues: {
       firstName: "",
       lastName: "",
-      // prefixPhoneNumber: "",
       phoneNumber: "",
       businessName: "",
       businessType: "",
@@ -140,10 +138,10 @@ export default function AddVendor({
       country: "",
       latitude: 0,
       longitude: 0,
-      bankName: "",
+      // bankName: "",
       accountHolderName: "",
       iban: "",
-      swiftCode: "",
+      // swiftCode: "",
     },
   });
 
@@ -334,10 +332,10 @@ export default function AddVendor({
         longitude: locationCoordinates.longitude,
       },
       bankDetails: {
-        bankName: data.bankName,
+        // bankName: data.bankName,
         accountHolderName: data.accountHolderName,
         iban: data.iban,
-        swiftCode: data.swiftCode,
+        // swiftCode: data.swiftCode,
       },
     } as Partial<TVendor>;
 
@@ -919,7 +917,7 @@ export default function AddVendor({
                       </h2>
 
                       <div className="space-y-4">
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="bankName"
                           render={({ field, fieldState }) => (
@@ -949,7 +947,7 @@ export default function AddVendor({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
 
                         <FormField
                           control={form.control}
@@ -982,7 +980,7 @@ export default function AddVendor({
                           )}
                         />
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="swiftCode"
                           render={({ field }) => (
@@ -997,7 +995,7 @@ export default function AddVendor({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </Card>
                   </motion.div>

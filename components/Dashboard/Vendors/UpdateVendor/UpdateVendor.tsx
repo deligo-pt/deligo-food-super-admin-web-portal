@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
@@ -23,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -129,10 +129,10 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       country: "",
       latitude: 0,
       longitude: 0,
-      bankName: "",
+      // bankName: "",
       accountHolderName: "",
       iban: "",
-      swiftCode: "",
+      // swiftCode: "",
     },
   });
 
@@ -180,11 +180,11 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       country: vendor?.businessLocation?.country || "",
       latitude: vendor?.businessLocation?.latitude ?? 0,
       longitude: vendor?.businessLocation?.longitude ?? 0,
-      bankName: vendor?.bankDetails?.bankName || "",
+      // bankName: vendor?.bankDetails?.bankName || "",
       accountHolderName:
         vendor?.bankDetails?.accountHolderName || "",
       iban: vendor?.bankDetails?.iban || "",
-      swiftCode: vendor?.bankDetails?.swiftCode || "",
+      // swiftCode: vendor?.bankDetails?.swiftCode || "",
     });
   }, [vendor, form, cuisines, lang]);
 
@@ -207,47 +207,181 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       return;
     }
 
-    const vendorData = {
-      name: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-      },
-      contactNumber: data.phoneNumber,
-      businessDetails: {
-        businessName: data.businessName,
-        businessType: data.businessType,
-        ...(data?.businessType === "restaurant" && {
-          restaurantCuisineType: data.restaurantCuisineType
-        }),
-        NIF: data.NIF?.toUpperCase(),
-        totalBranches: Number(data.branches),
-        openingHours: data.openingHours,
-        closingHours: data.closingHours,
-        closingDays: data.closingDays,
-      },
-      businessLocation: {
-        street: data.street,
-        city: data.city,
-        postalCode: data.postalCode,
-        country: data.country,
-        latitude: locationCoordinates.latitude,
-        longitude: locationCoordinates.longitude,
-      },
-      bankDetails: {
-        bankName: data.bankName,
-        accountHolderName: data.accountHolderName,
-        iban: data.iban,
-        swiftCode: data.swiftCode,
-      },
-    } as Partial<TVendor>;
+    // Helper to check if a value really changed
+    const hasChanged = (current: any, original: any) => {
+      if (Array.isArray(current) || Array.isArray(original)) {
+        return JSON.stringify(current || []) !== JSON.stringify(original || []);
+      }
+      return current !== original;
+    };
+
+    const vendorData: Record<string, any> = {};
+
+    // name
+    const originalFirstName = vendor?.name?.firstName || "";
+    const originalLastName = vendor?.name?.lastName || "";
+
+    if (
+      hasChanged(data.firstName, originalFirstName) ||
+      hasChanged(data.lastName, originalLastName)
+    ) {
+      vendorData.name = {};
+      if (hasChanged(data.firstName, originalFirstName)) {
+        vendorData.name.firstName = data.firstName;
+      }
+      if (hasChanged(data.lastName, originalLastName)) {
+        vendorData.name.lastName = data.lastName;
+      }
+    }
+
+    // contactNumber
+    if (hasChanged(data.phoneNumber, vendor?.contactNumber || "")) {
+      vendorData.contactNumber = data.phoneNumber;
+    }
+
+    // businessDetails
+    const originalBusinessName = vendor?.businessDetails?.businessName || "";
+    const originalBusinessType = vendor?.businessDetails?.businessTypeSlug || ""; // ← use slug
+    const originalNIF = vendor?.businessDetails?.NIF || "";
+    const originalBranches = vendor?.businessDetails?.totalBranches ?? 0;
+    const originalOpeningHours = vendor?.businessDetails?.openingHours || "";
+    const originalClosingHours = vendor?.businessDetails?.closingHours || "";
+    const originalClosingDays = vendor?.businessDetails?.closingDays || [];
+
+    // Normalize original cuisine the same way the form does (to slugs)
+    const rawCuisineData = vendor?.businessDetails?.restaurantCuisineType;
+    let originalCuisineSlugs: string[] = [];
+
+    if (rawCuisineData) {
+      const normalized = Array.isArray(rawCuisineData)
+        ? rawCuisineData
+        : [rawCuisineData];
+
+      originalCuisineSlugs = normalized
+        .map((storedName) => {
+          const cuisine = cuisines?.find((c) => c.name?.[lang] === storedName);
+          return cuisine?.slug;
+        })
+        .filter(Boolean) as string[];
+    }
+
+    const businessDetailsChanged =
+      hasChanged(data.businessName, originalBusinessName) ||
+      hasChanged(data.businessType, originalBusinessType) ||
+      hasChanged(data.restaurantCuisineType, originalCuisineSlugs) || // ← now both are slug arrays
+      hasChanged(data.NIF?.toUpperCase(), originalNIF) ||
+      hasChanged(Number(data.branches), originalBranches) ||
+      hasChanged(data.openingHours, originalOpeningHours) ||
+      hasChanged(data.closingHours, originalClosingHours) ||
+      hasChanged(data.closingDays, originalClosingDays);
+
+    if (businessDetailsChanged) {
+      vendorData.businessDetails = {};
+
+      if (hasChanged(data.businessName, originalBusinessName)) {
+        vendorData.businessDetails.businessName = data.businessName;
+      }
+      if (hasChanged(data.businessType, originalBusinessType)) {
+        vendorData.businessDetails.businessType = data.businessType;
+      }
+      if (
+        data.businessType === "restaurant" &&
+        hasChanged(data.restaurantCuisineType, originalCuisineSlugs)
+      ) {
+        vendorData.businessDetails.restaurantCuisineType =
+          data.restaurantCuisineType;
+      }
+      if (hasChanged(data.NIF?.toUpperCase(), originalNIF)) {
+        vendorData.businessDetails.NIF = data.NIF?.toUpperCase();
+      }
+      if (hasChanged(Number(data.branches), originalBranches)) {
+        vendorData.businessDetails.totalBranches = Number(data.branches);
+      }
+      if (hasChanged(data.openingHours, originalOpeningHours)) {
+        vendorData.businessDetails.openingHours = data.openingHours;
+      }
+      if (hasChanged(data.closingHours, originalClosingHours)) {
+        vendorData.businessDetails.closingHours = data.closingHours;
+      }
+      if (hasChanged(data.closingDays, originalClosingDays)) {
+        vendorData.businessDetails.closingDays = data.closingDays;
+      }
+    }
+
+    // businessLocation
+    const originalStreet = vendor?.businessLocation?.street || "";
+    const originalCity = vendor?.businessLocation?.city || "";
+    const originalPostalCode = vendor?.businessLocation?.postalCode || "";
+    const originalCountry = vendor?.businessLocation?.country || "";
+    const originalLat = vendor?.businessLocation?.latitude;
+    const originalLng = vendor?.businessLocation?.longitude;
+
+    const locationChanged =
+      hasChanged(data.street, originalStreet) ||
+      hasChanged(data.city, originalCity) ||
+      hasChanged(data.postalCode, originalPostalCode) ||
+      hasChanged(data.country, originalCountry) ||
+      hasChanged(locationCoordinates.latitude, originalLat) ||
+      hasChanged(locationCoordinates.longitude, originalLng);
+
+    if (locationChanged) {
+      vendorData.businessLocation = {};
+
+      if (hasChanged(data.street, originalStreet)) {
+        vendorData.businessLocation.street = data.street;
+      }
+      if (hasChanged(data.city, originalCity)) {
+        vendorData.businessLocation.city = data.city;
+      }
+      if (hasChanged(data.postalCode, originalPostalCode)) {
+        vendorData.businessLocation.postalCode = data.postalCode;
+      }
+      if (hasChanged(data.country, originalCountry)) {
+        vendorData.businessLocation.country = data.country;
+      }
+      if (hasChanged(locationCoordinates.latitude, originalLat)) {
+        vendorData.businessLocation.latitude = locationCoordinates.latitude;
+      }
+      if (hasChanged(locationCoordinates.longitude, originalLng)) {
+        vendorData.businessLocation.longitude = locationCoordinates.longitude;
+      }
+    }
+
+    // bankDetails
+    const originalAccountHolder =
+      vendor?.bankDetails?.accountHolderName || "";
+    const originalIban = vendor?.bankDetails?.iban || "";
+
+    if (
+      hasChanged(data.accountHolderName, originalAccountHolder) ||
+      hasChanged(data.iban, originalIban)
+    ) {
+      vendorData.bankDetails = {};
+
+      if (hasChanged(data.accountHolderName, originalAccountHolder)) {
+        vendorData.bankDetails.accountHolderName = data.accountHolderName;
+      }
+      if (hasChanged(data.iban, originalIban)) {
+        vendorData.bankDetails.iban = data.iban;
+      }
+    }
+
+    // final check
+    const hasAnyChange = Object.keys(vendorData).length > 0;
+    console.log("has changed", vendorData);
+
+    if (!hasAnyChange) {
+      toast.info("No changes detected", { id: toastId });
+      return;
+    }
 
     const updatedResult = await updateUserDataReq(
       `/vendors/${vendor.userId}`,
-      vendorData,
+      vendorData
     );
 
     if (updatedResult.success) {
-      router.back()
+      router.back();
       setVendorState((prev) => ({
         ...prev,
         ...vendorData,
@@ -263,14 +397,12 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
           router.refresh();
           toast.success(
             approveResult.message || "Vendor updated successfully!",
-            {
-              id: toastId,
-            },
+            { id: toastId }
           );
           return;
         }
 
-        toast.error(approveResult.message || "Vendor updated failed", {
+        toast.error(approveResult.message || "Vendor update failed", {
           id: toastId,
         });
         console.log(approveResult);
@@ -285,7 +417,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       return;
     }
 
-    toast.error(updatedResult.message || "Vendor updated failed", {
+    toast.error(updatedResult.message || "Vendor update failed", {
       id: toastId,
     });
   };
@@ -749,7 +881,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                         </h2>
 
                         <div className="space-y-4">
-                          <FormField
+                          {/* <FormField
                             control={form.control}
                             name="bankName"
                             render={({ field, fieldState }) => (
@@ -779,7 +911,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                 <FormMessage />
                               </FormItem>
                             )}
-                          />
+                          /> */}
 
                           <FormField
                             control={form.control}
@@ -814,7 +946,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                             )}
                           />
 
-                          <FormField
+                          {/* <FormField
                             control={form.control}
                             name="swiftCode"
                             render={({ field }) => (
@@ -829,7 +961,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                 <FormMessage />
                               </FormItem>
                             )}
-                          />
+                          /> */}
                         </div>
                       </Card>
                     </motion.div>

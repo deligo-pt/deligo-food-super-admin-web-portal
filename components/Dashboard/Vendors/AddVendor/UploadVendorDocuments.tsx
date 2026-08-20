@@ -92,7 +92,7 @@ export default function UploadVendorDocuments({
     if (doc.key !== "agoserisHaccpCertificate") return true;
 
     const effectiveBusinessType =
-      businessType ?? vendor?.businessDetails?.businessType;
+      businessType ?? vendor?.businessDetails?.businessTypeSlug;
 
     return effectiveBusinessType === "restaurant";
   });

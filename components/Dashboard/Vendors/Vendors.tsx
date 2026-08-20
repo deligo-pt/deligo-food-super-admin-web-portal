@@ -78,37 +78,6 @@ export default function Vendors({
     setIsDeleting(false);
   };
 
-  const filterOptions = [
-    {
-      label: t("status"),
-      key: "status",
-      placeholder: t("select_status"),
-      type: "select",
-      items: [
-        {
-          label: "Pending",
-          value: "PENDING",
-        },
-        {
-          label: "Submitted",
-          value: "SUBMITTED",
-        },
-        {
-          label: "Approved",
-          value: "APPROVED",
-        },
-        {
-          label: "Rejected",
-          value: "REJECTED",
-        },
-        {
-          label: "Blocked",
-          value: "BLOCKED",
-        },
-      ],
-    },
-  ];
-
   const extraSelectFilter = {
     key: "businessType",
     placeholder: t("select_type"),
@@ -146,7 +115,7 @@ export default function Vendors({
       {/* Filters */}
       <AllFilters
         sortOptions={sortOptions}
-        {...(showFilters && { filterOptions })}
+        // {...(showFilters && { filterOptions })}
         extraSelectFilter={extraSelectFilter}
       />
 
