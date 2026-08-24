@@ -371,8 +371,12 @@ export default function AddFleetManager() {
                         placeholder={t("fleet_manager_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        readOnly={!!fleetManagerId || timer > 0}
-                        disabled={!!fleetManagerId}
+                        readOnly={!!fleetManagerId}
+                        className={
+                          !!fleetManagerId
+                            ? "bg-gray-100 cursor-not-allowed"
+                            : ""
+                        }
                       />
                       {!otpSent && !emailVerified && (
                         <Button
