@@ -513,9 +513,16 @@ export default function UpdateDeliveryPartner({
           return;
         }
 
-        toast.error(approveResult.message || "Delivery partner update failed", {
-          id: toastId,
-        });
+        if (approveResult?.data?.errorSources) {
+          approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+            toast.error(err?.message, { id: toastId })
+          ));
+          return;
+        } else {
+          toast.error(approveResult.message || "Delivery partner update failed", {
+            id: toastId,
+          });
+        }
         console.log(approveResult);
         return;
       }
@@ -530,9 +537,16 @@ export default function UpdateDeliveryPartner({
       return;
     }
 
-    toast.error(updatedResult.message || "Delivery partner update failed", {
-      id: toastId,
-    });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(updatedResult.message || "Delivery partner update failed", {
+        id: toastId,
+      });
+    }
     console.log(updatedResult);
   };
 

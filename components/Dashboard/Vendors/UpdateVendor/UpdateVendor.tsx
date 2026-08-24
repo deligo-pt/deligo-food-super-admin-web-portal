@@ -368,7 +368,6 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
     // final check
     const hasAnyChange = Object.keys(vendorData).length > 0;
-    console.log("has changed", vendorData);
 
     if (!hasAnyChange) {
       toast.info("No changes detected", { id: toastId });
@@ -402,9 +401,16 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
           return;
         }
 
-        toast.error(approveResult.message || "Vendor update failed", {
-          id: toastId,
-        });
+        if (approveResult?.data?.errorSources) {
+          approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+            toast.error(err?.message, { id: toastId })
+          ));
+          return;
+        } else {
+          toast.error(approveResult.message || "Vendor status update failed", {
+            id: toastId,
+          });
+        }
         console.log(approveResult);
         return;
       }
@@ -417,9 +423,17 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       return;
     }
 
-    toast.error(updatedResult.message || "Vendor update failed", {
-      id: toastId,
-    });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(updatedResult.message || "Vendor update failed", {
+        id: toastId,
+      });
+    }
+    console.log(updatedResult);
   };
 
   useEffect(() => {
