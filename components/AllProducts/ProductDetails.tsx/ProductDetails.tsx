@@ -293,6 +293,18 @@ export default function ProductDetails({ product }: IProps) {
                 <p className="mt-1 text-gray-900">{product.brand}</p>
               </div>
             )}
+            <div>
+              <h3 className="text-sm font-semibold text-gray-500">{t("additional_categories")}</h3>
+              {(product.additionalCategories?.length ?? 0) > 0 ? (
+                product.additionalCategories?.map((c) => (
+                  <p key={c?._id} className="mt-1 text-gray-900">
+                    {c?.name?.[lang]}
+                  </p>
+                ))
+              ) : (
+                <p className="mt-1 text-gray-900">N/A</p>
+              )}
+            </div>
           </motion.div>
           {/* Variations */}
           {product.variations?.length > 0 && (

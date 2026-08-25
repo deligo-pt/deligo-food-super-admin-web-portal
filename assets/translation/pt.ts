@@ -1340,6 +1340,7 @@ export const pt = {
   stock_information: "Informação de stock",
   available: "disponível",
   sub: "Sub",
+  additional_categories: "Additional Categories",
   vendor_information: "Informações do vendedor",
   delivery_information: "Informações de entrega",
   delivery_type: "Tipo de entrega",

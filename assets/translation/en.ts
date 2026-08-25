@@ -1322,6 +1322,7 @@ export const en = {
   stock_information: "Stock Information",
   available: "available",
   sub: "Sub",
+  additional_categories: "Additional Categories",
   vendor_information: "Vendor Information",
   delivery_information: "Delivery Information",
   delivery_type: "Delivery Type",
