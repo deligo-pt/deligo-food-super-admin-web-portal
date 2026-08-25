@@ -265,6 +265,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
+              {vendor?.role === "SUB_VENDOR" && <div>
+                <p className="text-sm text-gray-500">{t("branch_name")}</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.branchName || "N/A"}
+                </p>
+              </div>}
               {/* <div>
                 <p className="text-sm text-gray-500">{t("license_number")}</p>
                 <p className="font-medium">
@@ -299,12 +305,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   </p>
                 </div>
               )}
-              <div>
+              {vendor?.role === "VENDOR" && <div>
                 <p className="text-sm text-gray-500">{t("total_branches")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.totalBranches || "N/A"}
                 </p>
-              </div>
+              </div>}
               {vendor?.businessDetails?.openingHours && (
                 <div>
                   <p className="text-sm text-gray-500">{t("opening_hours")}</p>
@@ -557,7 +563,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                 variant="warning"
               />
             )}
-            {vendor.status === "APPROVED" && (
+            {(vendor.status === "APPROVED" && vendor?.role === "VENDOR") && (
               <ActionButton
                 onClick={() => router.push(`/admin/vendor-branch/add/${vendor?.userId}`)}
                 label={t("add_branch")}

@@ -397,6 +397,8 @@ export const en = {
   add_new_branch_here: "Add new branch here",
   branch_name: "Branch Name",
   submit_branch: "Submit Branch",
+  add_branch: "Add Branch",
+  manage_all_registered_vendor_branches: "Manage all registered vendor branches",
 
   // vendor-payouts
   manage_all_vendor_payouts_here: "Manage all vendor payouts here",

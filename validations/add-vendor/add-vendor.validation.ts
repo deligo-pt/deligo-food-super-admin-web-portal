@@ -1,7 +1,7 @@
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { z } from "zod";
 
-export const addVendorValidation = z
+export const addVendorValidation = (isSubVendor = false) => z
   .object({
     firstName: z
       .string()
@@ -47,6 +47,14 @@ export const addVendorValidation = z
       .min(2, "NIF must be at least 2 characters long")
       .max(50, "NIF must be at most 50 characters long")
       .nonempty("NIF is required"),
+
+    branchName: isSubVendor
+      ? z
+        .string()
+        .min(2, "Branch name must be at least 2 characters long")
+        .max(50, "Branch name must be at most 50 characters long")
+        .nonempty("Branch name is required")
+      : z.string().optional(),
 
     branches: z
       .string()

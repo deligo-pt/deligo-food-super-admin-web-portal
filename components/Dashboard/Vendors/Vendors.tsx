@@ -19,6 +19,7 @@ import { toast } from "sonner";
 interface IProps {
   vendorsResult: { data: TVendor[]; meta?: TMeta };
   showFilters?: boolean;
+  showButton?: boolean;
   title: string;
   subtitle?: string;
 }
@@ -28,6 +29,7 @@ const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 export default function Vendors({
   vendorsResult,
   showFilters = false,
+  showButton = true,
   title,
   subtitle,
 }: IProps) {
@@ -106,10 +108,14 @@ export default function Vendors({
       <TitleHeader
         title={t(`${title}`)}
         subtitle={t(`${subtitle}`)}
-        buttonInfo={{
-          text: t("add_vendor"),
-          onClick: () => router.push("/admin/add-vendor"),
-        }}
+        buttonInfo={
+          showButton
+            ? {
+              text: t("add_vendor"),
+              onClick: () => router.push("/admin/add-vendor"),
+            }
+            : undefined
+        }
       />
 
       {/* Filters */}

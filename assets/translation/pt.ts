@@ -58,6 +58,7 @@ export const pt = {
   pending_approvals: "Aprovações Pendentes",
   active_vendors: "Vendedores Ativos",
   suspended_vendors: "Vendedores Suspensos",
+  vendor_branches: "Filiais de Fornecedores",
   add_vendor: "Adicionar Vendedor",
   vendor_payouts: "Pagamentos aos Vendedores",
   vendor_performance_analytics: "Análise de Desempenho do Vendedor",
@@ -403,6 +404,8 @@ export const pt = {
   add_new_branch_here: "Adicionar nova filial aqui",
   branch_name: "Nome da Filial",
   submit_branch: "Submeter Filial",
+  add_branch: "Adicionar Filial",
+  manage_all_registered_vendor_branches: "Gerir todas as filiais de fornecedores registadas",
 
   // vendor-payouts
   manage_all_vendor_payouts_here: "Gerencie todos os pagamentos dos vendedores aqui",
