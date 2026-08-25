@@ -398,6 +398,12 @@ export const pt = {
   select_file: "Selecionar ficheiro",
   submit_vendor: "Submeter vendedor",
 
+  // vendor branches
+  add_vendor_branch: "Adicionar Filial do Fornecedor",
+  add_new_branch_here: "Adicionar nova filial aqui",
+  branch_name: "Nome da Filial",
+  submit_branch: "Submeter Filial",
+
   // vendor-payouts
   manage_all_vendor_payouts_here: "Gerencie todos os pagamentos dos vendedores aqui",
   search_vendor_city_payout:

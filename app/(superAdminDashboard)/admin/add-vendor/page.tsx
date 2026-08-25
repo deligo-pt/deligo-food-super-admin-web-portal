@@ -1,26 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import AddVendor from "@/components/Dashboard/Vendors/AddVendor/AddVendor";
-import { serverRequest } from "@/lib/serverFetch";
+import { getAllBusinessCategoriesReq } from "@/services/dashboard/category/business-category.service";
 import { getAllCuisine } from "@/services/dashboard/category/cuisine.service";
-import { TResponse } from "@/types";
-import { TBusinessCategoryResponse } from "@/types/category.type";
 
 export default async function AddVendorPage() {
-  let businessCategories: TBusinessCategoryResponse[] = [];
   const result = await getAllCuisine();
+  const businessCategoriesRes = await getAllBusinessCategoriesReq();
 
-  try {
-    const result = (await serverRequest.get(
-      "/categories/businessCategory",
-    )) as unknown as TResponse<TBusinessCategoryResponse[]>;
 
-    if (result?.success) {
-      businessCategories = result?.data;
-    }
-  } catch (err) {
-    console.log("Server fetch error:", err);
-  }
-
-  return <AddVendor businessCategories={businessCategories} cuisines={result?.data} />;
+  return <AddVendor businessCategories={businessCategoriesRes?.data} cuisines={result?.data} />;
 }

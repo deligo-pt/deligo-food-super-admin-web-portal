@@ -55,6 +55,7 @@ export const en = {
   pending_approvals: "Pending Approvals",
   active_vendors: "Active Vendors",
   suspended_vendors: "Suspended Vendors",
+  vendor_branches: "Vendor Branches",
   add_vendor: "Add Vendor",
   vendor_payouts: "Vendor Payouts",
   vendor_performance_analytics: "Vendor Performance Analytics",
@@ -390,6 +391,12 @@ export const en = {
   add_more: "Add More",
   select_file: "Select file",
   submit_vendor: "Submit Vendor",
+
+  // vendor branches
+  add_vendor_branch: "Add Vendor Branch",
+  add_new_branch_here: "Add new branch here",
+  branch_name: "Branch Name",
+  submit_branch: "Submit Branch",
 
   // vendor-payouts
   manage_all_vendor_payouts_here: "Manage all vendor payouts here",

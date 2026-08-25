@@ -297,10 +297,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       if (hasChanged(Number(data.branches), originalBranches)) {
         vendorData.businessDetails.totalBranches = Number(data.branches);
       }
-      if (hasChanged(data.openingHours, originalOpeningHours)) {
+      if (hasChanged(data.openingHours, originalOpeningHours) || hasChanged(data.closingHours, originalClosingHours)) {
         vendorData.businessDetails.openingHours = data.openingHours;
-      }
-      if (hasChanged(data.closingHours, originalClosingHours)) {
         vendorData.businessDetails.closingHours = data.closingHours;
       }
       if (hasChanged(data.closingDays, originalClosingDays)) {

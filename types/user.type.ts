@@ -135,7 +135,7 @@ export type TVendor = {
   // --------------------------------------------------------
   _id: string;
   userId: string;
-  role: "VENDOR";
+  role: "VENDOR" | "SUB_VENDOR";
   email: string;
 
   status: keyof typeof USER_STATUS;
@@ -183,12 +183,13 @@ export type TVendor = {
   // --------------------------------------------------------
   businessDetails?: {
     businessName: string;
+    branchName?: string;
     businessType: string;
     businessTypeSlug?: string;
     restaurantCuisineType?: string[];
     businessLicenseNumber?: string;
     NIF?: string;
-    totalBranches: number;
+    totalBranches?: number;
 
     openingHours?: string; // "09:00 AM"
     closingHours?: string; // "11:00 PM"

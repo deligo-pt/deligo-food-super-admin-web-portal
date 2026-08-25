@@ -64,6 +64,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("active_vendors"), path: "/admin/active-vendors" },
         { name: t("pending_approvals"), path: "/admin/pending-approvals" },
         { name: t("suspended_vendors"), path: "/admin/suspended-vendors" },
+        { name: t("vendor_branches"), path: "/admin/vendor-branch/all" },
         { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
         {
           name: t("vendor_performance_analytics"),

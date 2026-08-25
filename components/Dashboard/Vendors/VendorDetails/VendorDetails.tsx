@@ -538,6 +538,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
           </AgentOrVendorSection>
         </div>
 
+        {/* buttons */}
         <div className="mb-6 mx-6">
           <div className="flex flex-wrap justify-end gap-4">
             {vendor.status === "SUBMITTED" && (
@@ -554,6 +555,14 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                 label={t("reject")}
                 icon={<XIcon size={18} />}
                 variant="warning"
+              />
+            )}
+            {vendor.status === "APPROVED" && (
+              <ActionButton
+                onClick={() => router.push(`/admin/vendor-branch/add/${vendor?.userId}`)}
+                label={t("add_branch")}
+                icon={<EditIcon size={18} />}
+                variant="primary"
               />
             )}
             {vendor.status === "APPROVED" && (
