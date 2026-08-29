@@ -1,7 +1,7 @@
 import parsePhoneNumberFromString from "libphonenumber-js";
 import { z } from "zod";
 
-export const addVendorValidation = z
+export const addVendorValidation = (isSubVendor = false) => z
   .object({
     firstName: z
       .string()
@@ -48,6 +48,14 @@ export const addVendorValidation = z
       .max(50, "NIF must be at most 50 characters long")
       .nonempty("NIF is required"),
 
+    branchName: isSubVendor
+      ? z
+        .string()
+        .min(2, "Branch name must be at least 2 characters long")
+        .max(50, "Branch name must be at most 50 characters long")
+        .nonempty("Branch name is required")
+      : z.string().optional(),
+
     branches: z
       .string()
       .nonempty("Number of branches is required")
@@ -90,11 +98,11 @@ export const addVendorValidation = z
 
     longitude: z.number({ error: "Logitude is required" }),
 
-    bankName: z
-      .string()
-      .min(2, "Bank name must be at least 2 characters")
-      .max(50, "Bank name must be at most 50 characters")
-      .nonempty("Bank name is required"),
+    // bankName: z
+    //   .string()
+    //   .min(2, "Bank name must be at least 2 characters")
+    //   .max(50, "Bank name must be at most 50 characters")
+    //   .nonempty("Bank name is required"),
 
     accountHolderName: z
       .string()
@@ -107,10 +115,10 @@ export const addVendorValidation = z
       .min(15, "IBAN must be at least 15 characters")
       .max(34, "IBAN must be at most 34 characters"),
 
-    swiftCode: z
-      .string()
-      .min(8, "SWIFT code must be at least 8 characters")
-      .max(11, "SWIFT code must be at most 11 characters"),
+    // swiftCode: z
+    //   .string()
+    //   .min(8, "SWIFT code must be at least 8 characters")
+    //   .max(11, "SWIFT code must be at most 11 characters"),
   })
   // .refine(
   //   (data) => {

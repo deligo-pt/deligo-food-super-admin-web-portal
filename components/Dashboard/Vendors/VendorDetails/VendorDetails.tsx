@@ -203,7 +203,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
 
         <div className="p-6">
           <div className="mb-6 border-gray-200">
-            <div className="flex flex-wrap justify-end gap-4">
+            <div className="flex justify-end gap-4">
               {!vendor?.isEmailVerified ? <ActionButton
                 onClick={resendOtp}
                 disabled={isSubmitting}
@@ -219,44 +219,6 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   icon={<EditIcon size={18} />}
                   variant="primary"
                 />}
-              {vendor.status === "SUBMITTED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("APPROVED")}
-                  label={t("approve")}
-                  icon={<CheckIcon size={18} />}
-                  variant="success"
-                />
-              )}
-              {vendor.status === "SUBMITTED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("REJECTED")}
-                  label={t("reject")}
-                  icon={<XIcon size={18} />}
-                  variant="warning"
-                />
-              )}
-              {vendor.status === "APPROVED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("BLOCKED")}
-                  label={t("block")}
-                  icon={<BanIcon size={18} />}
-                  variant="warning"
-                />
-              )}
-              {vendor.status === "BLOCKED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("UNBLOCKED")}
-                  label={t("unblock")}
-                  icon={<CheckIcon size={18} />}
-                  variant="primary"
-                />
-              )}
-              <ActionButton
-                onClick={() => setShowDeleteModal(true)}
-                label={t("delete")}
-                icon={<TrashIcon size={18} />}
-                variant="danger"
-              />
             </div>
           </div>
           <AgentOrVendorSection
@@ -282,8 +244,11 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
-                <p className="font-medium">
-                  {vendor?.isEmailVerified ? "Yes" : "No"}
+                <p className={`px-2 py-0.5 w-9 rounded text-sm font-medium ${vendor?.isEmailVerified
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+                  }`}>
+                  {vendor?.isEmailVerified ? t("yes") : t("no")}
                 </p>
               </div>
             </div>
@@ -300,6 +265,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
+              {vendor?.role === "SUB_VENDOR" && <div>
+                <p className="text-sm text-gray-500">{t("branch_name")}</p>
+                <p className="font-medium">
+                  {vendor?.businessDetails?.branchName || "N/A"}
+                </p>
+              </div>}
               {/* <div>
                 <p className="text-sm text-gray-500">{t("license_number")}</p>
                 <p className="font-medium">
@@ -318,7 +289,7 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessType || "N/A"}
                 </p>
               </div>
-              {vendor?.businessDetails?.businessType === "RESTAURANT" && (
+              {vendor?.businessDetails?.businessTypeSlug === "restaurant" && (
                 <div>
                   <p className="text-sm text-gray-500">{t("restaurant_cuisine_type")}</p>
                   <p className="font-medium">
@@ -334,12 +305,12 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   </p>
                 </div>
               )}
-              <div>
+              {vendor?.role === "VENDOR" && <div>
                 <p className="text-sm text-gray-500">{t("total_branches")}</p>
                 <p className="font-medium">
                   {vendor?.businessDetails?.totalBranches || "N/A"}
                 </p>
-              </div>
+              </div>}
               {vendor?.businessDetails?.openingHours && (
                 <div>
                   <p className="text-sm text-gray-500">{t("opening_hours")}</p>
@@ -441,21 +412,21 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">{t("bank_name")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.bankName}</p>
+                  <p className="font-medium">{vendor.bankDetails?.bankName || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("account_holder")}</p>
                   <p className="font-medium">
-                    {vendor.bankDetails?.accountHolderName}
+                    {vendor.bankDetails?.accountHolderName || "N/A"}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("iban")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.iban}</p>
+                  <p className="font-medium">{vendor.bankDetails?.iban || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("swift_code")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.swiftCode}</p>
+                  <p className="font-medium">{vendor.bankDetails?.swiftCode || "N/A"}</p>
                 </div>
               </div>
             ) : (
@@ -571,6 +542,58 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               </div>
             )}
           </AgentOrVendorSection>
+        </div>
+
+        {/* buttons */}
+        <div className="mb-6 mx-6">
+          <div className="flex flex-wrap justify-end gap-4">
+            {vendor.status === "SUBMITTED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("APPROVED")}
+                label={t("approve")}
+                icon={<CheckIcon size={18} />}
+                variant="success"
+              />
+            )}
+            {vendor.status === "SUBMITTED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("REJECTED")}
+                label={t("reject")}
+                icon={<XIcon size={18} />}
+                variant="warning"
+              />
+            )}
+            {(vendor.status === "APPROVED" && vendor?.role === "VENDOR") && (
+              <ActionButton
+                onClick={() => router.push(`/admin/vendor-branch/add/${vendor?.userId}`)}
+                label={t("add_branch")}
+                icon={<EditIcon size={18} />}
+                variant="primary"
+              />
+            )}
+            {vendor.status === "APPROVED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("BLOCKED")}
+                label={t("block")}
+                icon={<BanIcon size={18} />}
+                variant="warning"
+              />
+            )}
+            {vendor.status === "BLOCKED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("UNBLOCKED")}
+                label={t("unblock")}
+                icon={<CheckIcon size={18} />}
+                variant="primary"
+              />
+            )}
+            <ActionButton
+              onClick={() => setShowDeleteModal(true)}
+              label={t("delete")}
+              icon={<TrashIcon size={18} />}
+              variant="danger"
+            />
+          </div>
         </div>
       </motion.div>
 

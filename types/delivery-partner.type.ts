@@ -28,6 +28,14 @@ export type TDeliveryPartner = {
   isEmailVerified: boolean;
   isDeleted: boolean;
   isUpdateLocked: boolean;
+  currentFleetManagerId?: {
+    businessDetails: {
+      businessName: string;
+    },
+    role: string;
+    userId: string;
+    _id: string;
+  };
 
   // FCM tokens
   fcmTokens?: string[];
@@ -166,6 +174,7 @@ export type TDeliveryPartner = {
     activity?: string;
     insurancePolicy?: string;
     myPhoto?: string;
+    ibanProof?: string;
   };
 
   // -------------------------------------------------

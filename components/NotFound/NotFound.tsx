@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
 import {
   Bike,
@@ -13,6 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 export function NotFound() {
   const router = useRouter();
+  const { t } = useTranslation();
   const floatingIcons = [
     {
       Icon: Pizza,
@@ -61,7 +63,7 @@ export function NotFound() {
       {/* Background Decorative Blobs */}
       {/* Soft Background Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] left-[10%] w-[40%] h-[40%] bg-[#DC3173]/20 blur-3xl rounded-full" />
+        <div className="absolute top-[-20%] left-[10%] w-[40%] h-[40%] bg-[#DC3173]/20 blur-3xl rounded-full" />
         <div className="absolute bottom-[0%] right-[10%] w-[50%] h-[50%] bg-[#DC3173]/15 blur-3xl rounded-full" />
       </div>
 
@@ -188,12 +190,10 @@ export function NotFound() {
           className="space-y-6"
         >
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900">
-            Page Not Found
+            {t("page_not_found")}
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-lg mx-auto leading-relaxed">
-            Oops! It looks like you&lsquo;ve stumbled upon a dead end 🗺️. The
-            page you&lsquo;re searching for seems to have been misplaced or
-            moved to a different location.
+            {t("oops_it_looks_like_your_are_stumbled_upon")}
           </p>
 
           {/* Action Buttons */}
@@ -221,7 +221,7 @@ export function NotFound() {
             >
               <span className="relative z-10 flex items-center gap-2">
                 <Home size={20} />
-                Back to Home
+                {t("back_to_home")}
               </span>
               <motion.div
                 className="absolute inset-0 bg-[#DC3173] rounded-full"

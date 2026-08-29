@@ -34,6 +34,7 @@ interface IProps {
     partnerId: string;
     partnerName: string;
     city: string;
+    status: "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED";
 }
 
 export default function ApproveRiderModal({
@@ -42,6 +43,7 @@ export default function ApproveRiderModal({
     partnerId,
     partnerName,
     city,
+    status
 }: IProps) {
     const { t } = useTranslation();
     const router = useRouter();
@@ -50,6 +52,7 @@ export default function ApproveRiderModal({
     const [isLoadingFleets, setIsLoadingFleets] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedFleetId, setSelectedFleetId] = useState<string>("");
+    const [remarks, setRemarks] = useState("");
 
     useEffect(() => {
         if (open && city) {
@@ -98,6 +101,60 @@ export default function ApproveRiderModal({
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleApproveOrReject = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const toastId = toast.loading(
+            status === "APPROVED"
+                ? "Approving..."
+                : status === "REJECTED"
+                    ? "Rejecting..."
+                    : status === "BLOCKED"
+                        ? "Blocking..."
+                        : "Unblocking...",
+        );
+        setIsSubmitting(true);
+
+        const updateStatus = {
+            status: status === "UNBLOCKED" ? "APPROVED" : status,
+            remarks,
+        };
+
+        const result = await approveOrRejectReq(partnerId, updateStatus);
+
+        if (result?.success) {
+            setRemarks("");
+            onOpenChange(false);
+            toast.success(
+                result.message ||
+                    status === "APPROVED"
+                    ? "Approved successfully!"
+                    : status === "REJECTED"
+                        ? "Rejected successfully!"
+                        : status === "BLOCKED"
+                            ? "Blocked successfully!"
+                            : "Unblocked successfully!",
+                { id: toastId },
+            );
+            router.refresh();
+            setIsSubmitting(false);
+            return;
+        }
+
+        toast.error(
+            result.message ||
+            (status === "APPROVED"
+                ? "Approving failed"
+                : status === "REJECTED"
+                    ? "Rejecting failed"
+                    : status === "BLOCKED"
+                        ? "Blocking failed"
+                        : "Unblocking failed"),
+            { id: toastId },
+        );
+        console.log(result);
+        setIsSubmitting(false);
     };
 
     return (
@@ -213,6 +270,17 @@ export default function ApproveRiderModal({
                         onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                     >
                         {t("assign_and_approve")}
+                    </Button>
+                    <Button
+                        onClick={handleApproveOrReject}
+                        disabled={isSubmitting || isLoadingFleets}
+                        size="sm"
+                        className="text-white font-medium"
+                        style={{ backgroundColor: "#DC3173" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
+                        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                    >
+                        Approve without Assign
                     </Button>
                 </DialogFooter>
 

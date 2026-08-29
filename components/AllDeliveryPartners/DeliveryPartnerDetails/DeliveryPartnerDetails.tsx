@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import ImagePreview from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/ImagePreview";
 import InfoRow from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/InfoRow";
 import Section from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/Section";
 import StatusBadge from "@/components/AllDeliveryPartners/DeliveryPartnerDetails/StatusBadge";
@@ -27,7 +26,6 @@ import {
   Check,
   CreditCard,
   Edit,
-  FileText,
   Gavel,
   Mail,
   MapPin,
@@ -43,6 +41,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PartnerDetailsDoc } from "./PartnerDetailsDoc";
 
 interface IProps {
   partner: TDeliveryPartner;
@@ -128,7 +127,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
 
   return (
     <div>
-      <div className="mb-4">
+      <div className="mb-4 flex flex-row justify-between items-center">
         <Button
           onClick={() => router.back()}
           variant="link"
@@ -136,6 +135,39 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         >
           <ArrowLeftCircle /> {t("go_back")}
         </Button>
+        {
+          !partner?.isEmailVerified ? (
+            <motion.button
+              onClick={resendOtp}
+              disabled={isSubmitting}
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+            >
+              <Check className="w-4 h-4" />
+              <span>{t("verify_email")}</span>
+            </motion.button>
+          ) :
+            <motion.button
+              onClick={() =>
+                router.push(`/admin/all-delivery-partners/edit/${partner.userId}`)
+              }
+              whileHover={{
+                scale: 1.05,
+              }}
+              whileTap={{
+                scale: 0.95,
+              }}
+              className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
+            >
+              <Edit className="w-4 h-4" />
+              <span>{t("edit")}</span>
+            </motion.button>
+        }
       </div>
       <motion.div
         initial={{
@@ -146,7 +178,7 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           opacity: 1,
           y: 0,
         }}
-        className="bg-[#DC3173] text-white p-6 rounded-t-lg"
+        className="bg-[#DC3173] text-white p-3 md:p-6 rounded-t-lg"
       >
         <div className="flex items-center space-x-4">
           <motion.div
@@ -428,123 +460,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             </div>
           </div>
         </Section>
-        <Section title={t("documents")} icon={<FileText />}>
-          <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6">
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("id_proof_front")}
-              </div>
-              {partner.documents?.idProofFront ? (
-                <ImagePreview
-                  url={partner.documents.idProofFront}
-                  alt="ID Proof Front"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
+        {/* documents */}
+        <PartnerDetailsDoc partner={partner} />
 
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("id_proof_back")}
-              </div>
-              {partner.documents?.idProofBack ? (
-                <ImagePreview
-                  url={partner.documents.idProofBack}
-                  alt="ID Proof Back"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("driving_license_front")}
-              </div>
-              {partner.documents?.drivingLicenseFront ? (
-                <ImagePreview
-                  url={partner.documents.drivingLicenseFront}
-                  alt="Driving License Front"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("driving_license_back")}
-              </div>
-              {partner.documents?.drivingLicenseBack ? (
-                <ImagePreview
-                  url={partner.documents.drivingLicenseBack}
-                  alt="Driving License Back"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("vehicle_registration")}
-              </div>
-              {partner.documents?.vehicleRegistration ? (
-                <ImagePreview
-                  url={partner.documents.vehicleRegistration}
-                  alt="Vehicle Registration"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">
-                {t("criminal_record_certificate")}
-              </div>
-              {partner.documents?.criminalRecordCertificate ? (
-                <ImagePreview
-                  url={partner.documents.criminalRecordCertificate}
-                  alt="Criminal Record"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">{t('activity')}</div>
-              {partner.documents?.activity ? (
-                <ImagePreview url={partner.documents.activity} alt="Activity" />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">{t("insurance_policy")}</div>
-              {partner.documents?.insurancePolicy ? (
-                <ImagePreview
-                  url={partner.documents.insurancePolicy}
-                  alt="Insurance Policy"
-                />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-
-            <div>
-              <div className="mb-2 text-gray-500 text-sm">{t("my_photo")}</div>
-              {partner.documents?.myPhoto ? (
-                <ImagePreview url={partner.documents.myPhoto} alt="My Photo" />
-              ) : (
-                <p className="text-gray-700">N/A</p>
-              )}
-            </div>
-          </div>
-        </Section>
         <Section title={t("operational_date")} icon={<Package />}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">
@@ -719,39 +637,6 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
           </div>
         </Section>
         <div className="mt-8 flex flex-wrap justify-end gap-3">
-          {
-            !partner?.isEmailVerified ? (
-              <motion.button
-                onClick={resendOtp}
-                disabled={isSubmitting}
-                whileHover={{
-                  scale: 1.05,
-                }}
-                whileTap={{
-                  scale: 0.95,
-                }}
-                className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
-              >
-                <Check className="w-4 h-4" />
-                <span>{t("verify_email")}</span>
-              </motion.button>
-            ) :
-              <motion.button
-                onClick={() =>
-                  router.push(`/admin/all-delivery-partners/edit/${partner.userId}`)
-                }
-                whileHover={{
-                  scale: 1.05,
-                }}
-                whileTap={{
-                  scale: 0.95,
-                }}
-                className="flex items-center space-x-1 px-4 py-2 bg-[#DC3173] text-white rounded-lg shadow-sm hover:bg-[#DC3173]/90"
-              >
-                <Edit className="w-4 h-4" />
-                <span>{t("edit")}</span>
-              </motion.button>
-          }
           {partner.status === "SUBMITTED" && (
             <>
               <motion.button
@@ -860,6 +745,9 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
         partnerId={partner.userId}
         partnerName={`${partner?.name?.firstName} ${partner?.name?.lastName}`}
         city={partner?.address?.city as string}
+        status={
+          partner.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
       />
 
       <ApproveOrRejectModal

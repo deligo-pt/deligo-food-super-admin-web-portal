@@ -30,6 +30,10 @@ export type TProduct = {
     _id: string;
     name: LocalizedString;
   };
+  additionalCategories?: {
+    _id: string;
+    name: LocalizedString;
+  }[];
   subCategory?: string;
   brand?: string;
 

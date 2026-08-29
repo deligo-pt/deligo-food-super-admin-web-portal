@@ -78,9 +78,9 @@ export function getOrderColumns({
                             {order.customerId?.name?.firstName || "N/A"}{" "}
                             {order.customerId?.name?.lastName}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        {order.deliveryAddress && <div className="text-xs text-slate-500">
                             {order.deliveryAddress.street || "-"}, {order.deliveryAddress.city || "-"}
-                        </div>
+                        </div>}
                     </div>
                 </div>
             ),

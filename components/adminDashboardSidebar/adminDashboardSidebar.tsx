@@ -64,6 +64,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("active_vendors"), path: "/admin/active-vendors" },
         { name: t("pending_approvals"), path: "/admin/pending-approvals" },
         { name: t("suspended_vendors"), path: "/admin/suspended-vendors" },
+        { name: t("vendor_branches"), path: "/admin/vendor-branch/all" },
         { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
         {
           name: t("vendor_performance_analytics"),
@@ -185,21 +186,21 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         },
       ]
     },
-    {
-      id: "product-categories",
-      title: t("product_categories"),
-      icon: <SquareChartGantt size={18} />,
-      items: [
-        {
-          name: t("add_product_categories"),
-          path: "/admin/product-categories/add",
-        },
-        {
-          name: t("all_product_categories"),
-          path: "/admin/product-categories",
-        },
-      ],
-    },
+    // {
+    //   id: "product-categories",
+    //   title: t("product_categories"),
+    //   icon: <SquareChartGantt size={18} />,
+    //   items: [
+    //     {
+    //       name: t("add_product_categories"),
+    //       path: "/admin/product-categories/add",
+    //     },
+    //     {
+    //       name: t("all_product_categories"),
+    //       path: "/admin/product-categories",
+    //     },
+    //   ],
+    // },
     {
       id: "orders",
       title: t("orders_management"),
@@ -328,10 +329,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("global_settings"), path: "/admin/global-settings" },
         { name: t("rewards_settings"), path: "/admin/rewards-settings" },
         { name: t("payouts_settings"), path: "/admin/payout-settings" },
-        {
-          name: t("notification_preferences"),
-          path: "/admin/notification-preferences",
-        },
       ],
     },
     {
@@ -531,6 +528,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setMobileOpen(false)}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 md:hidden flex"
           >
             <motion.div
@@ -538,6 +536,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: "spring", damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
               className="bg-white w-72 h-full p-4 shadow-xl overflow-y-auto no-scrollbar"
             >
               <div className="flex items-center justify-between mb-4">

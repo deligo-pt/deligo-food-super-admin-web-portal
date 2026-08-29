@@ -27,7 +27,8 @@ export type TPartnerDocKey =
   | "criminalRecordCertificate"
   | "activity"
   | "insurancePolicy"
-  | "myPhoto";
+  | "myPhoto"
+  | "ibanProof";
 
 export type TFilePreview = {
   file: File | null;
@@ -45,6 +46,7 @@ export const PARTNER_REQUIRED_DOCS: TPartnerDocKey[] = [
   "criminalRecordCertificate",
   "activity",
   "insurancePolicy",
+  "ibanProof",
 ];
 
 export const FLEET_REQUIRED_DOCS: TFleetDocKey[] = [

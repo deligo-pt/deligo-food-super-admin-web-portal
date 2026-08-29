@@ -40,6 +40,17 @@ export const pt = {
   verify: "Verificar",
   verify_email: "Verificar E-mail",
 
+  // error page
+  something_went_wrong: "Algo Deu Errado",
+  looks_like_our_app_ran_into: "Parece que nosso aplicativo encontrou um problema inesperado",
+  we_are_working_hard_to_get_things: "Estamos trabalhando duro para colocar tudo para funcionar novamente!",
+  retry: "Tentar Novamente",
+  back_to_home: "Voltar para o Início",
+
+  // not found
+  page_not_found: "Página Não Encontrada",
+  oops_it_looks_like_your_are_stumbled_upon: "Ops! Parece que você caiu em um beco sem saída 🗺️. A página que você está procurando parece ter sido perdida ou movida para um local diferente.",
+
   // sidebar
   dashboard: "Painel",
   vendors: "Vendedores",
@@ -47,6 +58,7 @@ export const pt = {
   pending_approvals: "Aprovações Pendentes",
   active_vendors: "Vendedores Ativos",
   suspended_vendors: "Vendedores Suspensos",
+  vendor_branches: "Filiais de Fornecedores",
   add_vendor: "Adicionar Vendedor",
   vendor_payouts: "Pagamentos aos Vendedores",
   vendor_performance_analytics: "Análise de Desempenho do Vendedor",
@@ -381,11 +393,20 @@ export const pt = {
   store_photo: "Foto da loja",
   menu_brochure: "Menu / Brochura",
   agoserisHaccpCertificate: "Certificado HACCP Agoseris",
+  iban_proof: "Comprovativo de IBAN",
   no_file_selected: "Nenhum ficheiro selecionado",
   remove: "Remover",
   add_more: "Adicionar Mais",
   select_file: "Selecionar ficheiro",
   submit_vendor: "Submeter vendedor",
+
+  // vendor branches
+  add_vendor_branch: "Adicionar Filial do Fornecedor",
+  add_new_branch_here: "Adicionar nova filial aqui",
+  branch_name: "Nome da Filial",
+  submit_branch: "Submeter Filial",
+  add_branch: "Adicionar Filial",
+  manage_all_registered_vendor_branches: "Gerir todas as filiais de fornecedores registadas",
 
   // vendor-payouts
   manage_all_vendor_payouts_here: "Gerencie todos os pagamentos dos vendedores aqui",
@@ -879,6 +900,7 @@ export const pt = {
   select: "Selecionar",
   no_fleet_managers_found_in: "Nenhum gerente de frota encontrado em",
   assign_and_approve: "Atribuir e Aprovar",
+  approve_without_assign: "Aprovar sem Atribuir",
 
   // active delivery partners
   all_active_riders_system: "Todos os Estafetas ativos no sistema",
@@ -1319,6 +1341,7 @@ export const pt = {
   stock_information: "Informação de stock",
   available: "disponível",
   sub: "Sub",
+  additional_categories: "Additional Categories",
   vendor_information: "Informações do vendedor",
   delivery_information: "Informações de entrega",
   delivery_type: "Tipo de entrega",
@@ -1846,13 +1869,18 @@ export const pt = {
   //--> details
   back_to_logs: "Voltar para os registros",
   back_to_activity_logs: "Voltar para o Histórico de Atividades",
+  unspecified_action: "Ação não especificada",
   user_information: "Informações do Usuário",
   unknown_user: "Usuário Desconhecido",
   auth_user_id: "ID de Autenticação do Usuário",
   action_details: "Detalhes da Ação",
   action_performed: "Ação Realizada",
+  entity_type: "Tipo de Entidade",
+  entity_id: "ID da Entidade",
   target_entity: "Entidade de Destino",
   log_type: "Tipo de Registro",
+  meta_data: "Metadados",
+  no_metadata_available: "Nenhum metadado disponível",
   system_timestamps: "Carimbos de Data/Hora do Sistema",
   created_at: "Criado em",
   updated_at: "Atualizado em",
@@ -1954,6 +1982,7 @@ export const pt = {
   top_earning_day: "Dia com maior faturação",
   show_cancelled: "Mostrar canceladas",
   restaurant: "Restaurante",
+  store: "Loja",
   earnings_by_day: "Ganhos por dia",
 
   // order report

@@ -19,46 +19,17 @@ import { toast } from "sonner";
 interface IProps {
   vendorsResult: { data: TVendor[]; meta?: TMeta };
   showFilters?: boolean;
+  showButton?: boolean;
   title: string;
   subtitle?: string;
 }
 
 const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
-
 export default function Vendors({
   vendorsResult,
   showFilters = false,
+  showButton = true,
   title,
   subtitle,
 }: IProps) {
@@ -99,6 +70,7 @@ export default function Vendors({
       toast.success(result.message || "Vendor deleted successfully!", {
         id: toastId,
       });
+      setIsDeleting(false);
       return;
     }
 
@@ -109,22 +81,49 @@ export default function Vendors({
     setIsDeleting(false);
   };
 
+  const extraSelectFilter = {
+    key: "businessType",
+    placeholder: t("select_type"),
+    type: "select",
+    isAllNeeded: false,
+    // defaultValue: "All",
+    options: [
+      {
+        label: t("all"),
+        value: "All",
+      },
+      {
+        label: t("store"),
+        value: "STORE",
+      },
+      {
+        label: t("restaurant"),
+        value: "RESTAURANT",
+      },
+    ],
+  };
+
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}
       <TitleHeader
         title={t(`${title}`)}
         subtitle={t(`${subtitle}`)}
-        buttonInfo={{
-          text: t("add_vendor"),
-          onClick: () => router.push("/admin/add-vendor"),
-        }}
+        buttonInfo={
+          showButton
+            ? {
+              text: t("add_vendor"),
+              onClick: () => router.push("/admin/add-vendor"),
+            }
+            : undefined
+        }
       />
 
       {/* Filters */}
       <AllFilters
         sortOptions={sortOptions}
-        {...(showFilters && { filterOptions })}
+        // {...(showFilters && { filterOptions })}
+        extraSelectFilter={extraSelectFilter}
       />
 
       {/* Vendor Table */}

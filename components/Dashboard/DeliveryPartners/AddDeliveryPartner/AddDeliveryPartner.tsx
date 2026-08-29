@@ -2,7 +2,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadPartnerDocuments, { BASE_REQUIRED_DOCS, DocKey } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
+import UploadPartnerDocuments, { BASE_REQUIRED_DOCS } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { bankNames } from "@/consts/bankNames.const";
 import { USER_ROLE } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
@@ -106,6 +105,7 @@ const defaultDocuments: Record<TPartnerDocKey, TFilePreview | null> = {
   activity: null,
   insurancePolicy: null,
   myPhoto: null,
+  ibanProof: null,
 };
 
 export default function AddDeliveryPartner() {
@@ -153,10 +153,10 @@ export default function AddDeliveryPartner() {
       drivingLicenseExpiry: "",
       insurancePolicyNumber: "",
       insuranceExpiry: "",
-      bankName: "",
+      // bankName: "",
       accountHolderName: "",
       iban: "",
-      swiftCode: "",
+      // swiftCode: "",
       preferredZones: [],
       preferredHours: [],
       isothermalBag: false,
@@ -354,10 +354,10 @@ export default function AddDeliveryPartner() {
           : undefined,
       },
       bankDetails: {
-        bankName: data.bankName,
+        // bankName: data.bankName,
         accountHolderName: data.accountHolderName,
         iban: data.iban?.toUpperCase(),
-        swiftCode: data.swiftCode?.toUpperCase(),
+        // swiftCode: data.swiftCode?.toUpperCase(),
       },
 
       vehicleInfo,
@@ -407,16 +407,31 @@ export default function AddDeliveryPartner() {
         return;
       }
 
-      toast.error(approveResult.message || "Delivery partner add failed", {
-        id: toastId,
-      });
+      if (approveResult?.data?.errorSources) {
+        approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+          toast.error(err?.message, { id: toastId })
+        ));
+        return;
+      } else {
+        toast.error(approveResult.message || "Delivery partner add failed", {
+          id: toastId,
+        });
+      }
       console.log(approveResult);
       return;
     }
 
-    toast.error(updatedResult.message || "Delivery partner add failed", {
-      id: toastId,
-    });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      setButtonDisabled(0);
+      return;
+    } else {
+      toast.error(updatedResult.message || "Delivery partner add failed", {
+        id: toastId,
+      });
+    }
     console.log(updatedResult);
     setButtonDisabled(0);
   };
@@ -429,7 +444,7 @@ export default function AddDeliveryPartner() {
   }, [timer]);
 
   // Dynamically build required docs based on vehicle type
-  const getRequiredDocs = (): DocKey[] => {
+  const getRequiredDocs = (): TPartnerDocKey[] => {
     const base = [...BASE_REQUIRED_DOCS];
 
     if (vehicleType === "MOTORBIKE" || vehicleType === "CAR") {
@@ -814,7 +829,7 @@ export default function AddDeliveryPartner() {
                       </h2>
 
                       <div className="space-y-4">
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="bankName"
                           render={({ field, fieldState }) => (
@@ -844,7 +859,7 @@ export default function AddDeliveryPartner() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
 
                         <FormField
                           control={form.control}
@@ -881,7 +896,7 @@ export default function AddDeliveryPartner() {
                           )}
                         />
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="swiftCode"
                           render={({ field }) => (
@@ -897,7 +912,7 @@ export default function AddDeliveryPartner() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </Card>
                   </motion.div>

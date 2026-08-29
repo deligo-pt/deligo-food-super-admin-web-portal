@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
@@ -15,11 +16,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { bankNames } from "@/consts/bankNames.const";
 import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
-import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { updateUserDataReq } from "@/services/auth/register-user.service";
 import { FLEET_REQUIRED_DOCS, TFleetDocKey } from "@/types/document.type";
@@ -49,8 +47,8 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const [locationCoordinates, setLocationCoordinates] = useState({
-    latitude: 0,
-    longitude: 0,
+    latitude: fleetManager?.businessLocation?.latitude || 0,
+    longitude: fleetManager?.businessLocation?.longitude || 0,
   });
   const [previews, setPreviews] = useState<
     Record<TFleetDocKey, string[] | null>
@@ -93,10 +91,10 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       country: fleetManager.businessLocation?.country || "",
       latitude: fleetManager?.businessLocation?.latitude || 0,
       longitude: fleetManager?.businessLocation?.longitude || 0,
-      bankName: fleetManager.bankDetails?.bankName || "",
+      // bankName: fleetManager.bankDetails?.bankName || "",
       accountHolderName: fleetManager.bankDetails?.accountHolderName || "",
       iban: fleetManager.bankDetails?.iban || "",
-      swiftCode: fleetManager.bankDetails?.swiftCode || "",
+      // swiftCode: fleetManager.bankDetails?.swiftCode || "",
     },
   });
 
@@ -116,50 +114,122 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
       postalCode:
         fleetManagerState.businessLocation?.postalCode || "",
       country: fleetManagerState.businessLocation?.country || "",
-      bankName: fleetManagerState.bankDetails?.bankName || "",
-      accountHolderName:
-        fleetManagerState.bankDetails?.accountHolderName || "",
+      // bankName: fleetManagerState.bankDetails?.bankName || "",
+      accountHolderName: fleetManagerState.bankDetails?.accountHolderName || "",
       iban: fleetManagerState.bankDetails?.iban || "",
-      swiftCode: fleetManagerState.bankDetails?.swiftCode || "",
+      // swiftCode: fleetManagerState.bankDetails?.swiftCode || "",
     });
   }, [fleetManagerState, form]);
 
   const onSubmit = async (data: TFleetManagerForm) => {
-    const toastId = toast.loading("Adding fleet manager...");
+    const toastId = toast.loading("Updating fleet manager...");
 
-    const fleetManagerData = {
-      name: {
+    // Helper to check if a value really changed
+    const hasChanged = (current: any, original: any) => {
+      if (Array.isArray(current) || Array.isArray(original)) {
+        return JSON.stringify(current || []) !== JSON.stringify(original || []);
+      }
+      return current !== original;
+    };
+
+    const fleetManagerData: Record<string, any> = {};
+
+    // name
+    const originalFirstName = fleetManager?.name?.firstName || "";
+    const originalLastName = fleetManager?.name?.lastName || "";
+
+    if (
+      hasChanged(data.firstName, originalFirstName) ||
+      hasChanged(data.lastName, originalLastName)
+    ) {
+      fleetManagerData.name = {
         firstName: data.firstName,
         lastName: data.lastName,
-      },
-      contactNumber: data.phoneNumber,
-      businessDetails: {
+      };
+    }
+
+    // contactNumber
+    if (hasChanged(data.phoneNumber, fleetManager?.contactNumber || "")) {
+      fleetManagerData.contactNumber = data.phoneNumber;
+    }
+
+    // businessDetails
+    const originalBusinessName = fleetManager?.businessDetails?.businessName || "";
+    const originalLicense = fleetManager?.businessDetails?.businessLicenseNumber || "";
+
+    if (
+      hasChanged(data.businessName, originalBusinessName) ||
+      hasChanged(data.businessLicenseNumber?.toUpperCase(), originalLicense)
+    ) {
+      // Send full object so backend doesn't wipe other fields
+      fleetManagerData.businessDetails = {
         businessName: data.businessName,
         businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
-      },
-      businessLocation: {
+      };
+    }
+
+    // businessLocation
+    // Use the real coordinates (prefer state, fallback to original)
+    const currentLat = locationCoordinates.latitude || fleetManager?.businessLocation?.latitude || 0;
+    const currentLng = locationCoordinates.longitude || fleetManager?.businessLocation?.longitude || 0;
+
+    const originalStreet = fleetManager?.businessLocation?.street || "";
+    const originalCity = fleetManager?.businessLocation?.city || "";
+    const originalPostalCode = fleetManager?.businessLocation?.postalCode || "";
+    const originalCountry = fleetManager?.businessLocation?.country || "";
+    const originalLat = fleetManager?.businessLocation?.latitude ?? 0;
+    const originalLng = fleetManager?.businessLocation?.longitude ?? 0;
+
+    const locationChanged =
+      hasChanged(data.street, originalStreet) ||
+      hasChanged(data.city, originalCity) ||
+      hasChanged(data.postalCode, originalPostalCode) ||
+      hasChanged(data.country, originalCountry) ||
+      hasChanged(currentLat, originalLat) ||
+      hasChanged(currentLng, originalLng);
+
+    if (locationChanged) {
+      // Send FULL location object so nothing is wiped
+      fleetManagerData.businessLocation = {
         street: data.street,
         city: data.city,
         postalCode: data.postalCode,
         country: data.country,
-        latitude: locationCoordinates.latitude,
-        longitude: locationCoordinates.longitude,
-      },
-      bankDetails: {
-        bankName: data.bankName,
+        latitude: currentLat,
+        longitude: currentLng,
+      };
+    }
+
+    // bankDetails
+    const originalAccountHolder =
+      fleetManager?.bankDetails?.accountHolderName || "";
+    const originalIban = fleetManager?.bankDetails?.iban || "";
+
+    if (
+      hasChanged(data.accountHolderName, originalAccountHolder) ||
+      hasChanged(data.iban, originalIban)
+    ) {
+      // CRITICAL: send full bankDetails so IBAN is never deleted
+      fleetManagerData.bankDetails = {
         accountHolderName: data.accountHolderName,
         iban: data.iban,
-        swiftCode: data.swiftCode,
-      },
-    } as Partial<TAgent>;
+      };
+    }
+
+    // final check
+    const hasAnyChange = Object.keys(fleetManagerData).length > 0;
+
+    if (!hasAnyChange) {
+      toast.info("No changes detected", { id: toastId });
+      return;
+    }
 
     const updatedResult = await updateUserDataReq(
       `/fleet-managers/${fleetManager.userId}`,
-      fleetManagerData,
+      fleetManagerData
     );
 
     if (updatedResult.success) {
-
       setFleetManagerState((prev) => ({
         ...prev,
         ...fleetManagerData,
@@ -173,37 +243,47 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
         if (approveResult.success) {
           form.reset();
           router.refresh();
-          router.push(`/admin/agent/${fleetManager.userId}`)
+          router.push(`/admin/agent/${fleetManager.userId}`);
           toast.success(
             approveResult.message || "Fleet manager updated successfully!",
-            {
-              id: toastId,
-            },
+            { id: toastId }
           );
           return;
         }
 
-        toast.error(approveResult.message || "Fleet manager update failed", {
-          id: toastId,
-        });
+        if (approveResult?.data?.errorSources) {
+          approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+            toast.error(err?.message, { id: toastId })
+          ));
+          return;
+        } else {
+          toast.error(approveResult.message || "Fleet manager update failed", {
+            id: toastId,
+          });
+        }
         console.log(approveResult);
         return;
       }
 
       form.reset();
-      router.push(`/admin/agent/${fleetManager.userId}`)
+      router.push(`/admin/agent/${fleetManager.userId}`);
       toast.success(
         updatedResult.message || "Fleet manager updated successfully!",
-        {
-          id: toastId,
-        },
+        { id: toastId }
       );
       return;
     }
 
-    toast.error(updatedResult.message || "Fleet manager add failed", {
-      id: toastId,
-    });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(updatedResult.message || "Fleet manager update failed", {
+        id: toastId,
+      });
+    }
     console.log(updatedResult);
   };
 
@@ -423,7 +503,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                         </h2>
 
                         <div className="space-y-4">
-                          <FormField
+                          {/* <FormField
                             control={form.control}
                             name="bankName"
                             render={({ field, fieldState }) => (
@@ -453,7 +533,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                                 <FormMessage />
                               </FormItem>
                             )}
-                          />
+                          /> */}
 
                           <FormField
                             control={form.control}
@@ -488,7 +568,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                             )}
                           />
 
-                          <FormField
+                          {/* <FormField
                             control={form.control}
                             name="swiftCode"
                             render={({ field }) => (
@@ -503,7 +583,7 @@ export default function UpdateFleetManager({ fleetManager }: IProps) {
                                 <FormMessage />
                               </FormItem>
                             )}
-                          />
+                          /> */}
                         </div>
                       </Card>
                     </motion.div>

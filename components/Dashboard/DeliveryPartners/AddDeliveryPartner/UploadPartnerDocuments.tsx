@@ -19,22 +19,12 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-export type DocKey =
-  | "idProofFront"
-  | "idProofBack"
-  | "drivingLicenseFront"
-  | "drivingLicenseBack"
-  | "vehicleRegistration"
-  | "criminalRecordCertificate"
-  | "activity"
-  | "insurancePolicy"
-  | "myPhoto";
 
-export const BASE_REQUIRED_DOCS: DocKey[] = [
+export const BASE_REQUIRED_DOCS: TPartnerDocKey[] = [
   "myPhoto",
   "idProofFront",
   "idProofBack",
-  "criminalRecordCertificate",
+  "ibanProof",
 ];
 
 export default function UploadPartnerDocuments({
@@ -57,7 +47,7 @@ export default function UploadPartnerDocuments({
   const [processing, setProcessing] = useState(false);
 
   // Dynamically build required docs based on vehicle type
-  const getRequiredDocs = (): DocKey[] => {
+  const getRequiredDocs = (): TPartnerDocKey[] => {
     const base = [...BASE_REQUIRED_DOCS];
 
     if (vehicleType === "MOTORBIKE" || vehicleType === "CAR") {
@@ -80,7 +70,7 @@ export default function UploadPartnerDocuments({
   const REQUIRED_DOCS = getRequiredDocs();
 
   const DOCUMENTS: {
-    key: DocKey;
+    key: TPartnerDocKey;
     label: string;
     prefersImagePreview: boolean;
   }[] = [
@@ -92,6 +82,11 @@ export default function UploadPartnerDocuments({
       {
         key: "idProofBack",
         label: t("id_proof_back"),
+        prefersImagePreview: true,
+      },
+      {
+        key: "ibanProof",
+        label: t("iban_proof"),
         prefersImagePreview: true,
       },
       {
@@ -131,7 +126,7 @@ export default function UploadPartnerDocuments({
       },
     ];
 
-  const openPicker = (key: DocKey) => {
+  const openPicker = (key: TPartnerDocKey) => {
     const el = inputsRef.current[key];
     el?.click();
   };
@@ -187,9 +182,18 @@ export default function UploadPartnerDocuments({
       return;
     }
 
-    toast.error(uploadResult.message || "File upload failed", { id: toastId });
+    if (uploadResult?.data?.errorSources) {
+      uploadResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(uploadResult.message || "File upload failed", { id: toastId });
+    }
+
     console.log(uploadResult);
     setProcessing(false);
+    return;
   };
 
   function getActualFileName(url: string): string {

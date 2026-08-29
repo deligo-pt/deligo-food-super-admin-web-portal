@@ -222,46 +222,6 @@ export default function FleetManagerDetails({ agentData }: IProps) {
                   icon={<EditIcon size={18} />}
                   variant="primary"
                 />}
-              {data?.existingFleetManager?.status === "SUBMITTED" && (
-                <>
-                  <ActionButton
-                    onClick={() => setApproveStatus("APPROVED")}
-                    label={t("approve")}
-                    icon={<CheckIcon size={18} />}
-                    variant="success"
-                  />
-                  <ActionButton
-                    onClick={() => setApproveStatus("REJECTED")}
-                    label={t("reject")}
-                    icon={<XIcon size={18} />}
-                    variant="danger"
-                  />
-                </>
-              )}
-              {data?.existingFleetManager?.status === "APPROVED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("BLOCKED")}
-                  label={t("block")}
-                  icon={<BanIcon size={18} />}
-                  variant="warning"
-                />
-              )}
-              {data?.existingFleetManager?.status === "BLOCKED" && (
-                <ActionButton
-                  onClick={() => setApproveStatus("UNBLOCKED")}
-                  label={t("unblock")}
-                  icon={<CheckIcon size={18} />}
-                  variant="primary"
-                />
-              )}
-              {!data?.existingFleetManager?.isDeleted && (
-                <ActionButton
-                  onClick={() => setShowDeleteModal(true)}
-                  label={t("delete")}
-                  icon={<TrashIcon size={18} />}
-                  variant="danger"
-                />
-              )}
             </div>
           </div>
           <Section
@@ -287,8 +247,11 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
-                <p className="font-medium">
-                  {data?.existingFleetManager?.isEmailVerified ? "Yes" : "No"}
+                <p className={`px-2 py-0.5 w-9 rounded text-sm font-medium ${data?.existingFleetManager?.isEmailVerified
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+                  }`}>
+                  {data?.existingFleetManager?.isEmailVerified ? t("yes") : t("no")}
                 </p>
               </div>
             </div>
@@ -366,21 +329,21 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">{t("bank_name")}</p>
-                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.bankName}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.bankName || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("account_holder")}</p>
                   <p className="font-medium">
-                    {data?.existingFleetManager?.bankDetails.accountHolderName}
+                    {data?.existingFleetManager?.bankDetails.accountHolderName || "N/A"}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("iban")}</p>
-                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.iban}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.iban || "N/A"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("swift_code")}</p>
-                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.swiftCode}</p>
+                  <p className="font-medium">{data?.existingFleetManager?.bankDetails.swiftCode || "N/A"}</p>
                 </div>
               </div>
             ) : (
@@ -440,7 +403,7 @@ export default function FleetManagerDetails({ agentData }: IProps) {
             icon={<FileTextIcon size={20} />}
             defaultOpen={true}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-6">
+            <div className="w-full">
               <FleetManagerDetailsDoc documents={data?.existingFleetManager?.documents as IFleetDocs} />
             </div>
           </Section>
@@ -466,6 +429,50 @@ export default function FleetManagerDetails({ agentData }: IProps) {
               icon={<ArrowLeftCircle />}
               variant="primary"
             />
+          </div>
+        </div>
+        <div className="mb-6 mx-6">
+          <div className="flex flex-wrap justify-end gap-4">
+            {data?.existingFleetManager?.status === "SUBMITTED" && (
+              <>
+                <ActionButton
+                  onClick={() => setApproveStatus("APPROVED")}
+                  label={t("approve")}
+                  icon={<CheckIcon size={18} />}
+                  variant="success"
+                />
+                <ActionButton
+                  onClick={() => setApproveStatus("REJECTED")}
+                  label={t("reject")}
+                  icon={<XIcon size={18} />}
+                  variant="danger"
+                />
+              </>
+            )}
+            {data?.existingFleetManager?.status === "APPROVED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("BLOCKED")}
+                label={t("block")}
+                icon={<BanIcon size={18} />}
+                variant="warning"
+              />
+            )}
+            {data?.existingFleetManager?.status === "BLOCKED" && (
+              <ActionButton
+                onClick={() => setApproveStatus("UNBLOCKED")}
+                label={t("unblock")}
+                icon={<CheckIcon size={18} />}
+                variant="primary"
+              />
+            )}
+            {!data?.existingFleetManager?.isDeleted && (
+              <ActionButton
+                onClick={() => setShowDeleteModal(true)}
+                label={t("delete")}
+                icon={<TrashIcon size={18} />}
+                variant="danger"
+              />
+            )}
           </div>
         </div>
       </motion.div>

@@ -26,36 +26,6 @@ interface IProps {
 
 const sortFields = ["newest", "oldest", "nameAZ", "nameZA"] as SortOptionKey[];
 
-const filterOptions = [
-  {
-    label: "Status",
-    key: "status",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Pending",
-        value: "PENDING",
-      },
-      {
-        label: "Submitted",
-        value: "SUBMITTED",
-      },
-      {
-        label: "Approved",
-        value: "APPROVED",
-      },
-      {
-        label: "Rejected",
-        value: "REJECTED",
-      },
-      {
-        label: "Blocked",
-        value: "BLOCKED",
-      },
-    ],
-  },
-];
 
 export default function DeliveryPartners({
   partnersResult,
@@ -114,6 +84,7 @@ export default function DeliveryPartners({
       toast.success(result.message || "Partner deleted successfully!", {
         id: toastId,
       });
+      setIsDeleting(false);
       return;
     }
 
@@ -131,7 +102,7 @@ export default function DeliveryPartners({
       {/* Filters */}
       <AllFilters
         sortOptions={sortOptions}
-        {...(showFilters && { filterOptions })}
+      // {...(showFilters && { filterOptions })}
       />
 
       {/* Partner Table */}
@@ -170,6 +141,9 @@ export default function DeliveryPartners({
         partnerId={approveInfo.partnerId}
         partnerName={approveInfo.partnerName}
         city={approveInfo.city}
+        status={
+          approveInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+        }
       />
 
       {/* Approve or Reject or Block Modal */}

@@ -99,6 +99,7 @@ export default function Admins({
       toast.success(result.message || "Admin deleted successfully!", {
         id: toastId,
       });
+      setIsDeleting(false);
       return;
     }
 

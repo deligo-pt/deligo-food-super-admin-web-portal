@@ -13,13 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
@@ -52,9 +45,7 @@ import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { toast } from "sonner";
 import z from "zod";
-import { cn } from "@/lib/utils";
 import { USER_ROLE } from "@/consts/user.const";
-import { bankNames } from "@/consts/bankNames.const";
 
 const DELIGO = "#DC3173";
 
@@ -115,10 +106,10 @@ export default function AddFleetManager() {
       country: "",
       latitude: 0,
       longitude: 0,
-      bankName: "",
+      // bankName: "",
       accountHolderName: "",
       iban: "",
-      swiftCode: "",
+      // swiftCode: "",
     },
   });
 
@@ -241,10 +232,10 @@ export default function AddFleetManager() {
         longitude: locationCoordinates.longitude,
       },
       bankDetails: {
-        bankName: data.bankName,
+        // bankName: data.bankName,
         accountHolderName: data.accountHolderName,
         iban: data.iban,
-        swiftCode: data.swiftCode,
+        // swiftCode: data.swiftCode,
       },
     } as Partial<TAgent>;
 
@@ -272,16 +263,30 @@ export default function AddFleetManager() {
         return;
       }
 
-      toast.error(approveResult.message || "Fleet manager add failed", {
-        id: toastId,
-      });
+      if (approveResult?.data?.errorSources) {
+        approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+          toast.error(err?.message, { id: toastId })
+        ));
+        return;
+      } else {
+        toast.error(approveResult.message || "Fleet manager add failed", {
+          id: toastId,
+        });
+      }
       console.log(approveResult);
       return;
     }
 
-    toast.error(updatedResult.message || "Fleet manager add failed", {
-      id: toastId,
-    });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(updatedResult.message || "Fleet manager add failed", {
+        id: toastId,
+      });
+    }
     console.log(updatedResult);
   };
 
@@ -335,7 +340,7 @@ export default function AddFleetManager() {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("first_name")} <span className="text-red-600">*</span></FormLabel>
+                        <FormLabel>{t("first_name")} {fleetManagerId && <span className="text-red-600">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("first_name")} {...field} />
                         </FormControl>
@@ -349,7 +354,7 @@ export default function AddFleetManager() {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("last_name")} <span className="text-red-600">*</span></FormLabel>
+                        <FormLabel>{t("last_name")} {fleetManagerId && <span className="text-red-600">*</span>}</FormLabel>
                         <FormControl>
                           <Input placeholder={t("last_name")} {...field} />
                         </FormControl>
@@ -366,6 +371,12 @@ export default function AddFleetManager() {
                         placeholder={t("fleet_manager_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        readOnly={!!fleetManagerId}
+                        className={
+                          !!fleetManagerId
+                            ? "bg-gray-100 cursor-not-allowed"
+                            : ""
+                        }
                       />
                       {!otpSent && !emailVerified && (
                         <Button
@@ -446,7 +457,7 @@ export default function AddFleetManager() {
                     </div>
                   </div>
 
-                  <Label className="mb-2">{t("phone_number")} <span className="text-red-600">*</span></Label>
+                  <Label className="mb-2">{t("phone_number")} {fleetManagerId && <span className="text-red-600">*</span>}</Label>
                   <FormField
                     control={form.control}
                     name="phoneNumber"
@@ -576,7 +587,7 @@ export default function AddFleetManager() {
                       </h2>
 
                       <div className="space-y-4">
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="bankName"
                           render={({ field, fieldState }) => (
@@ -606,7 +617,7 @@ export default function AddFleetManager() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
 
                         <FormField
                           control={form.control}
@@ -639,7 +650,7 @@ export default function AddFleetManager() {
                           )}
                         />
 
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="swiftCode"
                           render={({ field }) => (
@@ -654,7 +665,7 @@ export default function AddFleetManager() {
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </Card>
                   </motion.div>

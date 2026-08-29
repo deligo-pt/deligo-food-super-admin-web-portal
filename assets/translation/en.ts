@@ -36,6 +36,17 @@ export const en = {
   verify: "Verify",
   verify_email: "Verify Email",
 
+  // error page
+  something_went_wrong: "Something Went Wrong",
+  looks_like_our_app_ran_into: "Looks like our app ran into an unexpected issue",
+  we_are_working_hard_to_get_things: "We’re working hard to get things working again!",
+  retry: "Retry",
+  back_to_home: "Back to Home",
+
+  // not found
+  page_not_found: "Page Not Found",
+  oops_it_looks_like_your_are_stumbled_upon: "Oops! It looks like you&lsquo;ve stumbled upon a dead end 🗺️. The page you&lsquo;re searching for seems to have been misplaced or moved to a different location.",
+
   // sidebar
   dashboard: "Dashboard",
 
@@ -44,6 +55,7 @@ export const en = {
   pending_approvals: "Pending Approvals",
   active_vendors: "Active Vendors",
   suspended_vendors: "Suspended Vendors",
+  vendor_branches: "Vendor Branches",
   add_vendor: "Add Vendor",
   vendor_payouts: "Vendor Payouts",
   vendor_performance_analytics: "Vendor Performance Analytics",
@@ -379,6 +391,14 @@ export const en = {
   add_more: "Add More",
   select_file: "Select file",
   submit_vendor: "Submit Vendor",
+
+  // vendor branches
+  add_vendor_branch: "Add Vendor Branch",
+  add_new_branch_here: "Add new branch here",
+  branch_name: "Branch Name",
+  submit_branch: "Submit Branch",
+  add_branch: "Add Branch",
+  manage_all_registered_vendor_branches: "Manage all registered vendor branches",
 
   // vendor-payouts
   manage_all_vendor_payouts_here: "Manage all vendor payouts here",
@@ -867,6 +887,7 @@ export const en = {
   select: "Select",
   no_fleet_managers_found_in: "No fleet managers found in",
   assign_and_approve: "Assign & Approve",
+  approve_without_assign: "Approve without Assign",
 
   // active delivery partners
   all_active_riders_system: "All active riders in the system",
@@ -1301,6 +1322,7 @@ export const en = {
   stock_information: "Stock Information",
   available: "available",
   sub: "Sub",
+  additional_categories: "Additional Categories",
   vendor_information: "Vendor Information",
   delivery_information: "Delivery Information",
   delivery_type: "Delivery Type",
@@ -1822,13 +1844,18 @@ export const en = {
   //--> details
   back_to_logs: "Back to logs",
   back_to_activity_logs: "Back to Activity Logs",
+  unspecified_action: "Unspecified action",
   user_information: "User Information",
   unknown_user: "Unknown User",
   auth_user_id: "Auth User Id",
   action_details: "Action Details",
   action_performed: "Action Performed",
+  entity_type: "Entity Type",
+  entity_id: "Entity ID",
   target_entity: "Target Entity",
   log_type: "Log Type",
+  meta_data: "MetaData",
+  no_metadata_available: "No MetaData available",
   system_timestamps: "System Timestamps",
   created_at: "Created At",
   updated_at: "Updated At",
@@ -1929,6 +1956,7 @@ export const en = {
   top_earning_day: "Top Earning Day",
   show_cancelled: "Show Cancelled",
   restaurant: "Restaurant",
+  store: "Store",
   earnings_by_day: "Earnings by Day",
 
   // order report

@@ -20,7 +20,6 @@ export default function FleetManagerPerformance({
   fleetPerformanceData,
 }: IProps) {
   const { t } = useTranslation();
-  console.log("fleet performance", fleetPerformanceData);
 
   return (
     <div className="min-h-screen bg-gray-50/50">
