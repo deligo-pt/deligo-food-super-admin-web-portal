@@ -393,6 +393,7 @@ export const pt = {
   store_photo: "Foto da loja",
   menu_brochure: "Menu / Brochura",
   agoserisHaccpCertificate: "Certificado HACCP Agoseris",
+  iban_proof: "Comprovativo de IBAN",
   no_file_selected: "Nenhum ficheiro selecionado",
   remove: "Remover",
   add_more: "Adicionar Mais",
