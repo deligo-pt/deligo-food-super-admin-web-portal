@@ -70,6 +70,7 @@ export default function Vendors({
       toast.success(result.message || "Vendor deleted successfully!", {
         id: toastId,
       });
+      setIsDeleting(false);
       return;
     }
 

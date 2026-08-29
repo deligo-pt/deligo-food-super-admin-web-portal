@@ -87,6 +87,7 @@ export default function Customers({
       toast.success(result.message || "Customer deleted successfully!", {
         id: toastId,
       });
+      setIsDeleting(false);
       return;
     }
 

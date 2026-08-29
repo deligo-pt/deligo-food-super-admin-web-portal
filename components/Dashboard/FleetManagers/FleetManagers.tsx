@@ -99,6 +99,7 @@ export default function FleetManagers({
       toast.success(result.message || "Fleet manager deleted successfully!", {
         id: toastId,
       });
+      setIsDeleting(false);
       return;
     }
 
