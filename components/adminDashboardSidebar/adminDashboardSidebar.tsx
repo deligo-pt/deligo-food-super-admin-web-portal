@@ -186,21 +186,21 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         },
       ]
     },
-    {
-      id: "product-categories",
-      title: t("product_categories"),
-      icon: <SquareChartGantt size={18} />,
-      items: [
-        {
-          name: t("add_product_categories"),
-          path: "/admin/product-categories/add",
-        },
-        {
-          name: t("all_product_categories"),
-          path: "/admin/product-categories",
-        },
-      ],
-    },
+    // {
+    //   id: "product-categories",
+    //   title: t("product_categories"),
+    //   icon: <SquareChartGantt size={18} />,
+    //   items: [
+    //     {
+    //       name: t("add_product_categories"),
+    //       path: "/admin/product-categories/add",
+    //     },
+    //     {
+    //       name: t("all_product_categories"),
+    //       path: "/admin/product-categories",
+    //     },
+    //   ],
+    // },
     {
       id: "orders",
       title: t("orders_management"),

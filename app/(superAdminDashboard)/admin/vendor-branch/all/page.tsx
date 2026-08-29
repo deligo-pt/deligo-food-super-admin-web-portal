@@ -9,7 +9,7 @@ type IProps = {
 const AllVendorBranches = async ({ searchParams }: IProps) => {
     const queries = (await searchParams) || {};
     const vendorsResult = await getAllVendorsReq(queries, USER_ROLE.SUB_VENDOR);
-
+    console.log("vendor", vendorsResult);
     return (
         <Vendors
             vendorsResult={vendorsResult}

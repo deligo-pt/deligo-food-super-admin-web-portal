@@ -257,6 +257,13 @@ export type TVendor = {
   approvedBy?: string;
   rejectedBy?: string;
   blockedBy?: string;
+  parentVendorId?: {
+    name: {
+      firstName: string;
+      lastName: string;
+    },
+    userId: string;
+  };
 
   submittedForApprovalAt?: Date;
   approvedOrRejectedOrBlockedAt?: Date;

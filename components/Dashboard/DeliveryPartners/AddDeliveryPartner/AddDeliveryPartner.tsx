@@ -2,7 +2,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadPartnerDocuments, { BASE_REQUIRED_DOCS, DocKey } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
+import UploadPartnerDocuments, { BASE_REQUIRED_DOCS } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -105,6 +105,7 @@ const defaultDocuments: Record<TPartnerDocKey, TFilePreview | null> = {
   activity: null,
   insurancePolicy: null,
   myPhoto: null,
+  ibanProof: null,
 };
 
 export default function AddDeliveryPartner() {
@@ -443,7 +444,7 @@ export default function AddDeliveryPartner() {
   }, [timer]);
 
   // Dynamically build required docs based on vehicle type
-  const getRequiredDocs = (): DocKey[] => {
+  const getRequiredDocs = (): TPartnerDocKey[] => {
     const base = [...BASE_REQUIRED_DOCS];
 
     if (vehicleType === "MOTORBIKE" || vehicleType === "CAR") {
