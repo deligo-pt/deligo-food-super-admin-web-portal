@@ -40,11 +40,13 @@ import {
   Save,
   Truck,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import { cn } from "@/lib/utils";
+import { uploadImagesReq } from "@/services/upload/upload.service";
+import { FileUploadZone } from "./FileUploadZone";
 
 type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
@@ -101,6 +103,14 @@ export default function GlobalSettings({
     "idle",
   );
   const [activeTab, setActiveTab] = useState<TabId>("delivery");
+  const signatureFileRef = useRef<HTMLInputElement | null>(null);
+  const stampFileRef = useRef<HTMLInputElement | null>(null);
+  const [uploadedSignatureUrl, setUploadedSignatureUrl] = useState<string | null>(
+    null
+  );
+  const [partyStamp, setPartyStamp] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingStamp, setIsUploadingStamp] = useState(false);
 
   const form = useForm<TGlobalSettingsForm>({
     resolver: zodResolver(globalSettingsSchema),
@@ -137,6 +147,59 @@ export default function GlobalSettings({
     },
   });
 
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "signature" | "stamp"
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (PNG, JPG, etc.)");
+      return;
+    }
+
+    const toastId = toast.loading(
+      type === "signature" ? "Uploading signature..." : "Uploading stamp..."
+    );
+
+    if (type === "signature") setIsUploading(true);
+    else setIsUploadingStamp(true);
+
+    try {
+      const uploadResult = await uploadImagesReq([file]);
+
+      if (uploadResult.success && uploadResult.data?.[0]) {
+        if (type === "signature") {
+          setUploadedSignatureUrl(uploadResult.data[0]);
+        } else {
+          setPartyStamp(uploadResult.data[0]);
+        }
+        toast.success(
+          type === "signature"
+            ? "Signature uploaded successfully!"
+            : "Stamp uploaded successfully!",
+          { id: toastId }
+        );
+      } else {
+        toast.error(uploadResult.message || "Upload failed", { id: toastId });
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(error?.message || "Failed to upload", { id: toastId });
+    } finally {
+      if (type === "signature") setIsUploading(false);
+      else setIsUploadingStamp(false);
+    }
+  };
+
+  const clearStamp = () => {
+    setPartyStamp(null);
+    if (stampFileRef.current) {
+      stampFileRef.current.value = "";
+    }
+  };
+
   const onSubmit = async (data: TGlobalSettingsForm) => {
     setIsSaving(true);
     const toastId = toast.loading("Saving global settings...");
@@ -154,10 +217,10 @@ export default function GlobalSettings({
         serviceCharge: data.serviceCharge,
       },
       agreement: {
-        deligoSignatureUrl: data.deligoSignatureUrl,
+        deligoSignatureUrl: uploadedSignatureUrl,
         deligoSignatoryName: data.deligoSignatoryName,
         deligoSignatoryRole: data.deligoSignatoryRole,
-        deligoCompanyStampUrl: data.deligoCompanyStampUrl,
+        deligoCompanyStampUrl: partyStamp,
       },
       activityLogRetention: {
         archiveAfterMonths: data.archiveAfterMonths,
@@ -587,7 +650,29 @@ export default function GlobalSettings({
                             )}
                           />
                         </div>
-                        <FormField
+                        <FileUploadZone
+                          inputRef={signatureFileRef}
+                          onChange={(e) => handleFileUpload(e, "signature")}
+                          isLoading={isUploading}
+                          previewUrl={uploadedSignatureUrl}
+                          onClear={() => {
+                            setUploadedSignatureUrl(null);
+                            if (signatureFileRef.current) {
+                              signatureFileRef.current.value = "";
+                            }
+                          }}
+                          label={t("deligo_signature_url")}
+                        />
+                        <FileUploadZone
+                          inputRef={stampFileRef}
+                          onChange={(e) => handleFileUpload(e, "stamp")}
+                          isLoading={isUploadingStamp}
+                          previewUrl={partyStamp}
+                          onClear={clearStamp}
+                          label={t("deligo_company_stamp_url")}
+                          optional
+                        />
+                        {/* <FormField
                           control={form.control}
                           name="deligoSignatureUrl"
                           render={({ field, fieldState }) => (
@@ -622,7 +707,7 @@ export default function GlobalSettings({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </SettingsCard>
                   )}
