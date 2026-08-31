@@ -33,6 +33,23 @@ export type TGlobalSettings = {
     cancelTimeLimitMinutes: number;
   };
 
+  // Agreements
+  agreement?: {
+    deligoSignatureUrl?: string | null;
+    deligoSignatoryName?: string | null;
+    deligoSignatoryRole?: string | null;
+    deligoCompanyStampUrl?: string | null;
+  };
+
+  activityLogRetention: {
+    /** Months after which an ActivityLog document is moved to ActivityLogArchive. */
+    archiveAfterMonths: number;
+    /** Months after which an archived record is permanently deleted. */
+    deleteAfterMonths: number;
+    /** Max documents the retention job processes per batch. */
+    batchSize: number;
+  };
+
   // Loyalty & Rewards
   rewards: {
     customerPointsPerEuro: number;

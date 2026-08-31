@@ -32,7 +32,9 @@ import {
   CheckCircle2,
   Clock,
   EuroIcon,
+  FormInput,
   Gift,
+  LogsIcon,
   Package,
   Percent,
   Save,
@@ -58,9 +60,19 @@ const TABS = [
     icon: Percent,
   },
   {
+    id: "agreements",
+    labelKey: "agreements",
+    icon: FormInput,
+  },
+  {
     id: "order",
     labelKey: "order_rules",
     icon: Package,
+  },
+  {
+    id: "activity-logs",
+    labelKey: "activity_logs_retention",
+    icon: LogsIcon,
   },
   {
     id: "cancellation",
@@ -104,9 +116,20 @@ export default function GlobalSettings({
       fleetManagerCommissionPercent: settings?.commission?.fleetManagerPercent || 0,
       serviceCharge: settings?.commission?.serviceCharge || 0,
 
+      // agreements
+      deligoSignatureUrl: settings?.agreement?.deligoSignatureUrl || undefined,
+      deligoSignatoryName: settings?.agreement?.deligoSignatoryName || undefined,
+      deligoSignatoryRole: settings?.agreement?.deligoSignatoryRole || undefined,
+      deligoCompanyStampUrl: settings?.agreement?.deligoSignatureUrl || undefined,
+
       // order
       customerNearestVendorRadiusKm: settings?.order?.nearestVendorRadiusKm || 0,
       cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
+
+      // activity logs retention
+      archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 0,
+      deleteAfterMonths: settings?.activityLogRetention?.deleteAfterMonths || 0,
+      batchSize: settings?.activityLogRetention?.batchSize || 0,
 
       // ingredients and delivery charges
       deliveryChargeInsideLisbon: settings?.ingredientsOrder?.deliveryChargeInsideLisbon || 20,
@@ -129,6 +152,17 @@ export default function GlobalSettings({
         platformVatRate: data.platformVatRate,
         fleetManagerPercent: data.fleetManagerCommissionPercent,
         serviceCharge: data.serviceCharge,
+      },
+      agreement: {
+        deligoSignatureUrl: data.deligoSignatureUrl,
+        deligoSignatoryName: data.deligoSignatoryName,
+        deligoSignatoryRole: data.deligoSignatoryRole,
+        deligoCompanyStampUrl: data.deligoCompanyStampUrl,
+      },
+      activityLogRetention: {
+        archiveAfterMonths: data.archiveAfterMonths,
+        deleteAfterMonths: data.deleteAfterMonths,
+        batchSize: data.batchSize,
       },
       order: {
         nearestVendorRadiusKm: data.customerNearestVendorRadiusKm,
@@ -503,6 +537,96 @@ export default function GlobalSettings({
                     </SettingsCard>
                   )}
 
+                  {/* Agreements */}
+                  {activeTab === "agreements" && (
+                    <SettingsCard
+                      title={t("agreements")}
+                      description={t("set_agreements_related_urls_nd_infos")}
+                      icon={Percent}
+                      delay={0}
+                    >
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="deligoSignatoryName"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deligo_signatory_name")}
+                                    type="text"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                    description={t("deligo_signatory_name_for_agreement")}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="deligoSignatoryRole"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deligo_signatory_role")}
+                                    type="text"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                    description={t("deligo_signatory_role_in_agreement")}
+                                  />
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <FormField
+                          control={form.control}
+                          name="deligoSignatureUrl"
+                          render={({ field, fieldState }) => (
+                            <FormItem>
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("deligo_signature_url")}
+                                  type="url"
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="deligoCompanyStampUrl"
+                          render={({ field, fieldState }) => (
+                            <FormItem>
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("deligo_company_stamp_url")}
+                                  type="url"
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </SettingsCard>
+                  )}
+
                   {/* Order Rules */}
                   {activeTab === "order" && (
                     <SettingsCard
@@ -528,6 +652,87 @@ export default function GlobalSettings({
                                   }
                                   suffix="km"
                                   description="Maximum distance between customer and nearest vendor"
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </SettingsCard>
+                  )}
+
+                  {/* activity log retention */}
+                  {activeTab === "activity-logs" && (
+                    <SettingsCard
+                      title={t("activity_log_retention")}
+                      description={t("control_activity_logs_nd_customize")}
+                      icon={Package}
+                      delay={0}
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="archiveAfterMonths"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="col-span-2">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("archive_after_months")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="month/s"
+                                  description={t("months_after_which_an_activityLogArchive")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="deleteAfterMonths"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="col-span-2">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("permanently_delete_after_month")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="month/s"
+                                  description={t("months_after_which_archived")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="batchSize"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="col-span-2">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("maximum_documents_per_batch")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  description={t("max_documents_the_retention_job")}
                                   min={0}
                                 />
                               </FormControl>
