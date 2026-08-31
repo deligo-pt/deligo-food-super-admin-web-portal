@@ -557,13 +557,9 @@ export default function GlobalSettings({
                                     fieldState={fieldState}
                                     label={t("deligo_signatory_name")}
                                     type="text"
-                                    value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
                                     description={t("deligo_signatory_name_for_agreement")}
-                                    min={0}
-                                    max={100}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -580,15 +576,12 @@ export default function GlobalSettings({
                                     fieldState={fieldState}
                                     label={t("deligo_signatory_role")}
                                     type="text"
-                                    value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
                                     description={t("deligo_signatory_role_in_agreement")}
-                                    min={0}
-                                    max={100}
                                   />
                                 </FormControl>
+
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -604,10 +597,8 @@ export default function GlobalSettings({
                                   fieldState={fieldState}
                                   label={t("deligo_signature_url")}
                                   type="url"
-                                  value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -624,10 +615,8 @@ export default function GlobalSettings({
                                   fieldState={fieldState}
                                   label={t("deligo_company_stamp_url")}
                                   type="url"
-                                  value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value)}
                                 />
                               </FormControl>
                               <FormMessage />
