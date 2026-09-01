@@ -102,7 +102,7 @@ export function DocumentViewer({
 
             {/* Lightbox Modal */}
             <Dialog open={!!selectedFile} onOpenChange={(open) => !open && setSelectedFile(null)}>
-                <DialogContent className="max-w-4xl w-[90vw] h-[85vh] p-0 overflow-hidden flex flex-col bg-background">
+                <DialogContent className="max-w-4xl w-[90vw] h-[95vh] p-0 overflow-hidden flex flex-col bg-background">
                     <DialogTitle className="sr-only">Document Preview</DialogTitle>
 
                     <div className="absolute right-4 top-4 z-50">

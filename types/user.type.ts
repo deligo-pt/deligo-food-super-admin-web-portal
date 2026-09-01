@@ -183,6 +183,7 @@ export type TVendor = {
   // --------------------------------------------------------
   businessDetails?: {
     businessName: string;
+    companyLegalName?: string;
     branchName?: string;
     businessType: string;
     businessTypeSlug?: string;
@@ -233,6 +234,13 @@ export type TVendor = {
     menuUpload?: string[];
     agoserisHaccpCertificate?: string[];
     ibanProof?: string[];
+  };
+
+  // Agreement section
+  agreement?: {
+    agreementId: string;
+    status: "UNSIGNED" | "PARTY_SIGNED" | "SIGNED";
+    pdfPath: string;
   };
 
   // --------------------------------------------------------

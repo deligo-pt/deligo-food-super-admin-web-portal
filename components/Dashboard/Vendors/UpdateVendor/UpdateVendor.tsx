@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -117,6 +118,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       lastName: "",
       phoneNumber: "",
       businessName: "",
+      companyLegalName: "",
       branchName: "",
       businessType: "",
       restaurantCuisineType: [],
@@ -168,6 +170,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       lastName: vendor.name?.lastName || "",
       phoneNumber: vendor?.contactNumber || "",
       businessName: vendor.businessDetails?.businessName || "",
+      companyLegalName: vendor.businessDetails?.companyLegalName || "",
       branchName: vendor.businessDetails?.branchName || "",
       businessType: vendor?.businessDetails?.businessTypeSlug || "",
       restaurantCuisineType: cuisineSlugs,
@@ -244,6 +247,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
     // businessDetails
     const originalBusinessName = vendor?.businessDetails?.businessName || "";
+    const originalLegalName = vendor?.businessDetails?.companyLegalName || "";
     const originalBranchName = vendor?.businessDetails?.branchName || "";
     const originalBusinessType = vendor?.businessDetails?.businessTypeSlug || ""; // ← use slug
     const originalNIF = vendor?.businessDetails?.NIF || "";
@@ -271,6 +275,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
     const businessDetailsChanged =
       hasChanged(data.businessName, originalBusinessName) ||
+      hasChanged(data.companyLegalName, originalLegalName) ||
       hasChanged(data.branchName, originalBranchName) ||
       hasChanged(data.businessType, originalBusinessType) ||
       hasChanged(data.restaurantCuisineType, originalCuisineSlugs) ||
@@ -285,6 +290,9 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
       if (hasChanged(data.businessName, originalBusinessName)) {
         vendorData.businessDetails.businessName = data.businessName;
+      }
+      if (hasChanged(data.companyLegalName, originalLegalName)) {
+        vendorData.businessDetails.companyLegalName = data.companyLegalName;
       }
       if (hasChanged(data.branchName, originalBranchName)) {
         vendorData.businessDetails.branchName = data.branchName;
@@ -629,6 +637,27 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                     disabled={isSubVendor}
                                   />
                                 </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="companyLegalName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("company_legal_name")} <span className="text-[#DC3173]">*</span></FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("company_legal_name")}
+                                    {...field}
+                                    disabled={isSubVendor}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  {t("company_legal_name_description")}
+                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
