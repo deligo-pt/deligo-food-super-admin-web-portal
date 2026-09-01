@@ -1,7 +1,8 @@
+import { DocumentViewer } from "@/components/common/DocumentViewer";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
-import { Upload, X } from "lucide-react";
+import { Upload, X, RefreshCw } from "lucide-react";
 
 export const FileUploadZone = ({
     inputRef,
@@ -33,40 +34,72 @@ export const FileUploadZone = ({
                 )}
             </Label>
 
+            {/* Hidden Input rendered once to work seamlessly in both states */}
+            <input
+                ref={inputRef}
+                type="file"
+                accept="image/*,.pdf"
+                onChange={onChange}
+                disabled={isLoading}
+                className="hidden"
+            />
+
             {previewUrl ? (
                 <div className="relative border border-slate-200 rounded-lg p-3 bg-slate-50 flex items-center gap-4">
-                    <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="h-16 w-auto max-w-[140px] object-contain rounded border bg-white"
-                    />
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm text-green-600 font-medium truncate">
-                            {t("uploaded_successfully")}
-                        </p>
-                        <p className="text-xs text-slate-400 truncate">{previewUrl}</p>
+                        <DocumentViewer
+                            sections={[
+                                {
+                                    key: "agreement",
+                                    label: t("agreement_preview") || "Agreement Preview",
+                                    files: previewUrl,
+                                },
+                            ]}
+                        />
                     </div>
-                    {onClear && (
+
+                    <div className="flex items-center gap-1 shrink-0">
+                        {/* Replace / Change Button */}
                         <Button
                             type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={onClear}
-                            className="shrink-0 text-slate-400 hover:text-red-500"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => inputRef.current?.click()}
+                            disabled={isLoading}
+                            className="text-xs flex items-center gap-1.5 h-8 px-2.5 text-slate-600 hover:text-[#DC3173] hover:border-[#DC3173]"
                         >
-                            <X className="h-4 w-4" />
+                            {isLoading ? (
+                                <div className="w-3.5 h-3.5 border-2 border-[#DC3173] border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <RefreshCw className="h-3.5 w-3.5" />
+                            )}
+                            {t("replace") || "Replace"}
                         </Button>
-                    )}
+
+                        {/* Remove / Clear Button */}
+                        {/* {onClear && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={onClear}
+                                disabled={isLoading}
+                                className="h-8 w-8 text-slate-400 hover:text-red-500"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )} */}
+                    </div>
                 </div>
             ) : (
                 <div
                     className={`
-            relative border-2 border-dashed rounded-lg p-6
-            flex flex-col items-center justify-center gap-2
-            transition-colors cursor-pointer
-            ${isLoading ? "opacity-60 pointer-events-none" : "hover:border-[#DC3173] hover:bg-pink-50/40"}
-            border-slate-300 bg-slate-50
-          `}
+                        relative border-2 border-dashed rounded-lg p-6
+                        flex flex-col items-center justify-center gap-2
+                        transition-colors cursor-pointer
+                        ${isLoading ? "opacity-60 pointer-events-none" : "hover:border-[#DC3173] hover:bg-pink-50/40"}
+                        border-slate-300 bg-slate-50
+                    `}
                     onClick={() => inputRef.current?.click()}
                 >
                     <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center">
@@ -84,16 +117,8 @@ export const FileUploadZone = ({
                             PNG, JPG or WebP (max. 5MB)
                         </p>
                     </div>
-                    <input
-                        ref={inputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={onChange}
-                        disabled={isLoading}
-                        className="hidden"
-                    />
                 </div>
             )}
         </div>
-    )
+    );
 };

@@ -3,6 +3,7 @@
 
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
 import AgentOrVendorSection from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
+import { DocumentViewer } from "@/components/common/DocumentViewer";
 import VendorDetailsDoc, {
   IVendorDocs,
 } from "@/components/Dashboard/Vendors/VendorDetails/VendorDetailsDoc";
@@ -26,6 +27,7 @@ import {
   BuildingIcon,
   Check,
   CheckIcon,
+  DownloadIcon,
   EditIcon,
   FileTextIcon,
   MapPinIcon,
@@ -265,6 +267,14 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
                   {vendor?.businessDetails?.businessName || "N/A"}
                 </p>
               </div>
+              {vendor?.businessDetails?.companyLegalName && (
+                <div>
+                  <p className="text-sm text-gray-500">{t("company_legal_name")}</p>
+                  <p className="font-medium">
+                    {vendor?.businessDetails?.companyLegalName || "N/A"}
+                  </p>
+                </div>
+              )}
               {vendor?.role === "SUB_VENDOR" && <div>
                 <p className="text-sm text-gray-500">{t("branch_name")}</p>
                 <p className="font-medium">
@@ -497,6 +507,65 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             <VendorDetailsDoc documents={vendor?.documents as IVendorDocs} />
           </AgentOrVendorSection>
           <AgentOrVendorSection
+            title={t("agreement_document") || "Agreement Document"}
+            icon={<FileTextIcon size={20} />}
+            defaultOpen={true}
+          >
+            {vendor?.agreement?.pdfPath ? (
+              <div className="space-y-4">
+                {/* Agreement Status Header */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-gray-200 rounded-lg p-4 bg-gray-50/50">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-900 text-sm font-mono">
+                        ID: {vendor?.agreement?.agreementId}
+                      </span>
+                      <span
+                        className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${vendor?.agreement?.status === "SIGNED"
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          : vendor?.agreement?.status === "PARTY_SIGNED"
+                            ? "bg-amber-100 text-amber-800 border border-amber-200"
+                            : "bg-gray-100 text-gray-700 border border-gray-200"
+                          }`}
+                      >
+                        {vendor?.agreement?.status.replace("_", " ")}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {t("signed_agreement_description") ||
+                        "Official signed partnership agreement PDF."}
+                    </p>
+                  </div>
+
+                  {/* Download Button */}
+                  <a
+                    href={vendor?.agreement?.pdfPath}
+                    download
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium text-white bg-[#DC3173] hover:bg-[#c22762] transition-colors shadow-xs"
+                  >
+                    <DownloadIcon size={14} />
+                    {t("download") || "Download"}
+                  </a>
+                </div>
+
+                {/* Embedded Document Viewer with Modal */}
+                <DocumentViewer
+                  sections={[
+                    {
+                      key: "agreement",
+                      label: t("agreement_preview") || "Agreement Preview",
+                      files: vendor.agreement.pdfPath,
+                    },
+                  ]}
+                />
+              </div>
+            ) : (
+              <p className="text-gray-500 italic text-sm">
+                {t("no_agreement_found") || "No agreement document available."}
+              </p>
+            )}
+          </AgentOrVendorSection>
+          <AgentOrVendorSection
             title={t("created_offers")}
             icon={<TicketIcon size={20} />}
             defaultOpen={true}
@@ -595,10 +664,10 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
             />
           </div>
         </div>
-      </motion.div>
+      </motion.div >
 
       {/* Verify unverified rider */}
-      <VerifyOtpModal
+      < VerifyOtpModal
         email={vendor?.email}
         role={USER_ROLE.VENDOR}
         userId={vendor?.userId}
@@ -621,6 +690,6 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
         onConfirm={deleteVendor}
         isDeleting={isDeleting}
       />
-    </div>
+    </div >
   );
 }

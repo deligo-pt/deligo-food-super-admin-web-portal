@@ -106,9 +106,9 @@ export default function GlobalSettings({
   const signatureFileRef = useRef<HTMLInputElement | null>(null);
   const stampFileRef = useRef<HTMLInputElement | null>(null);
   const [uploadedSignatureUrl, setUploadedSignatureUrl] = useState<string | null>(
-    null
+    settings?.agreement?.deligoSignatureUrl || null
   );
-  const [partyStamp, setPartyStamp] = useState<string | null>(null);
+  const [partyStamp, setPartyStamp] = useState<string | null>(settings?.agreement?.deligoCompanyStampUrl || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingStamp, setIsUploadingStamp] = useState(false);
 
