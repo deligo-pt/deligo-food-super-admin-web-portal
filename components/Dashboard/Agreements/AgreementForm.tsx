@@ -14,23 +14,12 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox"
-import { Plus, Trash2, Eye } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import RichTextEditor from "./RichTextEditor";
 import { useTranslation } from "@/hooks/use-translation";
+import { AgreementPart, Clause, IAgreementVersion } from "@/types/agreement.type";
 
-export type Clause = {
-    clauseNumber: number;
-    clauseTitle: string;
-    bodyHtml: string;
-    forcePageBreakBefore?: boolean;
-    showPosPaymentWidget?: boolean;
-};
-
-export type AgreementPart = {
-    partTitle?: string;
-    clauses: Clause[];
-};
 
 export type AgreementFormValues = {
     agreementType: "INITIAL_VENDOR_AGREEMENT" | "INITIAL_FLEET_MANAGER_AGREEMENT";
@@ -39,7 +28,7 @@ export type AgreementFormValues = {
 };
 
 interface AgreementFormProps {
-    defaultValues?: Partial<AgreementFormValues>;
+    defaultValues?: IAgreementVersion;
     onSubmit: (data: AgreementFormValues) => void;
     isSubmitting?: boolean;
     submitLabel?: string;
@@ -61,13 +50,11 @@ const AgreementForm = ({
 }: AgreementFormProps) => {
     const { t } = useTranslation();
     const [form, setForm] = useState<AgreementFormValues>({
-        agreementType: "INITIAL_VENDOR_AGREEMENT",
-        documentTitle: "",
-        parts: [{ clauses: [emptyClause(1)] }],
+        agreementType: defaultValues?.agreementType || "INITIAL_VENDOR_AGREEMENT",
+        documentTitle: defaultValues?.documentTitle || "",
+        parts: defaultValues?.parts && defaultValues.parts.length > 0 ? defaultValues.parts : [{ clauses: [emptyClause(1)] }],
         ...defaultValues,
     });
-
-    // const [previewOpen, setPreviewOpen] = useState(false);
 
     useEffect(() => {
         if (defaultValues) {
@@ -234,6 +221,7 @@ const AgreementForm = ({
                             <Select
                                 value={form.agreementType}
                                 onValueChange={(v) => updateTopField("agreementType", v)}
+                                disabled={isSubmitting || defaultValues?.agreementType === "INITIAL_FLEET_MANAGER_AGREEMENT" || defaultValues?.agreementType === "INITIAL_VENDOR_AGREEMENT"}
                             >
                                 <SelectTrigger>
                                     <SelectValue />
@@ -385,7 +373,7 @@ const AgreementForm = ({
                                                     }
                                                 />
                                                 <Label htmlFor={`force-${partIndex}-${clauseIndex}`}>
-                                                   {t("force_page_break_before")}
+                                                    {t("force_page_break_before")}
                                                 </Label>
                                             </div>
 

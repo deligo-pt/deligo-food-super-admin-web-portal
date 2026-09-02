@@ -288,6 +288,27 @@ export const en = {
   force_page_break_before: " Force Page Break Before",
   show_pos_payment_widget: "Show POS Payment Widget",
   add_clause: "Add Clause",
+  // all agreements versions
+  all_agreements_versions: "All Agreements Versions",
+  manage_all_agreements_versions: "Manage all agreements versions",
+  date_created: "Date Created",
+  // details
+  agreement_overview: "Agreement Overview",
+  is_current: "Is Current",
+  version_number: "Version Number",
+  lifecycle_details: "Lifecycle Details",
+  published_at: "Published At",
+  archived_at: "Archived At",
+  audit_info: "Audit Info",
+  published_by: "Published By",
+  publish_agreement: "Publish Agreement",
+  select_effective_date_description: "Select when this agreement version should take effect.",
+  publishing: "Publishing...",
+  confirm_and_publish: "Confirm and Publish",
+
+  // edit draft agreement
+  edit_draft_agreement: "Edit Draft Agreement",
+  edit_draft_agreement_subtitle: "Edit the existing draft agreement for vendors or fleet managers. Update the required details and submit the form to save changes to the draft agreement document.",
 
   // add-vendor
   add_new_vendor: "Add New Vendor",
