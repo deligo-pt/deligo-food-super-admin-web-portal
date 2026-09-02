@@ -1,4 +1,7 @@
+
+import AllAgreementVersions from '@/components/Dashboard/Agreements/AllAgreementVersions';
 import { getAllAgreements } from '@/services/dashboard/agreement/agreement.service';
+import { IAgreementVersionResponse } from '@/types/agreement.type';
 import { queryStringFormatter } from '@/utils/formatter';
 
 interface IProps {
@@ -13,7 +16,7 @@ const AllAgreementsVersionPage = async ({ searchParams }: IProps) => {
 
     return (
         <div>
-            All the agreements with versions here
+            <AllAgreementVersions agreeVersionsData={agreements as IAgreementVersionResponse} />
         </div>
     );
 };

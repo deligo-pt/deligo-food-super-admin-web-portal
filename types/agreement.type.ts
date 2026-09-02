@@ -1,3 +1,5 @@
+import { TMeta } from ".";
+
 export interface IAgreement {
     _id: string;
     establishmentName: string;
@@ -17,4 +19,29 @@ export interface IAgreement {
     createdAt: string;
     updatedAt: string;
     __v: number;
+}
+
+export interface IAgreementVersion {
+    _id: string;
+    agreementType: string;
+    versionNumber: number | null;
+    status: "DRAFT" | "PUBLISHED" | "ARCHIVED" | string;
+    isCurrent: boolean;
+    parts: {
+        partTitle: string;
+        clauses: Record<string, string>[];
+    }[];
+    documentTitle: string;
+    effectiveFrom: string | null;
+    createdBy: string;
+    publishedBy: string | null;
+    publishedAt: string | null;
+    archivedAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export interface IAgreementVersionResponse {
+    data: IAgreementVersion[];
+    meta: TMeta;
 }
