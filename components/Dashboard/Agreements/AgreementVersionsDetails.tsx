@@ -144,6 +144,8 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
             setIsPublishing(false);
         }
     };
+
+    // previe handler
     const handlePreview = async () => {
         try {
             setIsPreviewing(true);
@@ -172,6 +174,7 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
             setIsPreviewing(false);
         }
     };
+
     return (
         <div className="space-y-6 pb-12">
             {/* Back Navigation Button */}
@@ -257,10 +260,10 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
                         <p className="text-sm font-semibold text-gray-900">
                             {agreeVersion.isCurrent ? (
                                 <span className="text-emerald-600 flex items-center gap-1">
-                                    <CheckCircle2 className="w-4 h-4" /> Yes
+                                    <CheckCircle2 className="w-4 h-4" /> {t("yes")}
                                 </span>
                             ) : (
-                                <span className="text-gray-500">No</span>
+                                <span className="text-gray-500">{t("no")}</span>
                             )}
                         </p>
                     </div>

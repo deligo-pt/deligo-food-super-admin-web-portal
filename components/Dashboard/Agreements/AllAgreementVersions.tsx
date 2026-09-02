@@ -19,6 +19,27 @@ const AllAgreementVersions = ({ agreeVersionsData }: IProps) => {
     const { t } = useTranslation();
     const sortOptions = getSortOptions(t, sortFields);
 
+    const extraSelectFilter = {
+        key: "agreementType",
+        placeholder: t("agreement_type"),
+        type: "select",
+        isAllNeeded: false,
+        options: [
+            {
+                label: t("all"),
+                value: "All",
+            },
+            {
+                label: t("initial_fleet_agreement"),
+                value: "INITIAL_FLEET_MANAGER_AGREEMENT",
+            },
+            {
+                label: t("initial_vendor_agreement"),
+                value: "INITIAL_VENDOR_AGREEMENT",
+            },
+        ],
+    };
+
     return (
         <div className="space-y-6 max-w-full">
             {/* Page Title */}
@@ -30,7 +51,7 @@ const AllAgreementVersions = ({ agreeVersionsData }: IProps) => {
             {/* Filters */}
             <AllFilters
                 sortOptions={sortOptions}
-            // {...(showFilters && { filterOptions })}
+                extraSelectFilter={extraSelectFilter}
             />
 
             {/* Agreement Versions Table */}

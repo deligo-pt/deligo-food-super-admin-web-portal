@@ -49,7 +49,7 @@ export function getAgreementVersionColumns({
             accessor: (row) => (
                 <Badge
                     variant={row.status === "DRAFT" ? "secondary" : "default"}
-                    className="font-normal"
+                    className={`font-normal ${row.status === "DRAFT" ? "bg-[#FDE8F0] text-[#DC3173]" : "bg-[#DC3173] text-white"}`}
                 >
                     {row.status}
                 </Badge>

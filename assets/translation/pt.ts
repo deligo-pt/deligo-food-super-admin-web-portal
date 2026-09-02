@@ -298,6 +298,27 @@ export const pt = {
   force_page_break_before: "Forçar Quebra de Página Antes",
   show_pos_payment_widget: "Mostrar Widget de Pagamento POS",
   add_clause: "Adicionar Cláusula",
+  // all agreements versions
+  all_agreements_versions: "Todas as Versões dos Acordos",
+  manage_all_agreements_versions: "Gerir todas as versões dos acordos",
+  date_created: "Data de Criação",
+  // details
+  agreement_overview: "Visão Geral do Acordo",
+  is_current: "É Atual",
+  version_number: "Número da Versão",
+  lifecycle_details: "Detalhes do Ciclo de Vida",
+  published_at: "Publicado Em",
+  archived_at: "Arquivado Em",
+  audit_info: "Informações de Auditoria",
+  published_by: "Publicado Por",
+  publish_agreement: "Publicar Acordo",
+  select_effective_date_description: "Selecione quando esta versão do acordo deve entrar em vigor.",
+  publishing: "A publicar...",
+  confirm_and_publish: "Confirmar e Publicar",
+
+  // edit draft agreement
+  edit_draft_agreement: "Editar Rascunho de Acordo",
+  edit_draft_agreement_subtitle: "Edite o rascunho de acordo existente para fornecedores ou gestores de frota. Atualize os detalhes necessários e submeta o formulário para guardar as alterações ao rascunho do documento de acordo.",
 
   // add vendor
   add_new_vendor: "Adicionar Novo Vendedor",

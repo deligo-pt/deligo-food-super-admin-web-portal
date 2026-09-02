@@ -56,8 +56,6 @@ const AgreementForm = ({
         ...defaultValues,
     });
 
-    // const [previewOpen, setPreviewOpen] = useState(false);
-
     useEffect(() => {
         if (defaultValues) {
             setForm((prev) => ({
