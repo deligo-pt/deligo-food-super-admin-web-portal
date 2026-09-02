@@ -1,6 +1,16 @@
-import React from 'react';
+import { getAllAgreements } from '@/services/dashboard/agreement/agreement.service';
+import { queryStringFormatter } from '@/utils/formatter';
 
-const AllAgreementsVersionPage = () => {
+interface IProps {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+const AllAgreementsVersionPage = async ({ searchParams }: IProps) => {
+    const searchParamsObj = await searchParams;
+    const queryString = queryStringFormatter(searchParamsObj);
+    const agreements = await getAllAgreements(queryString);
+
+
     return (
         <div>
             All the agreements with versions here
