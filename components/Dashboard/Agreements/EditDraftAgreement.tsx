@@ -4,11 +4,13 @@
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import AgreementForm, { AgreementFormValues } from "./AgreementForm";
 import { useTranslation } from "@/hooks/use-translation";
-import {  updateDraftAgreement } from "@/services/dashboard/agreement/agreement.service";
+import { updateDraftAgreement } from "@/services/dashboard/agreement/agreement.service";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IAgreementVersion } from "@/types/agreement.type";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const EditDraftAgreement = ({ agreement }: { agreement: IAgreementVersion }) => {
     const { t } = useTranslation();
@@ -19,7 +21,7 @@ const EditDraftAgreement = ({ agreement }: { agreement: IAgreementVersion }) => 
         const toastId = toast.loading("Updating draft agreement...");
         setIsSubmitting(true);
 
-        if(data.agreementType){
+        if (data.agreementType) {
             delete data.agreementType;
         };
 
@@ -38,6 +40,17 @@ const EditDraftAgreement = ({ agreement }: { agreement: IAgreementVersion }) => 
 
     return (
         <div>
+            <>
+                <Button
+                    variant="link"
+                    size="sm"
+                    onClick={() => router.back()}
+                    className="flex items-center gap-1.5 text-sm text-[#DC3173] p-0 hover:bg-transparent"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    {t("go_back")}
+                </Button>
+            </>
             <TitleHeader
                 title={t("edit_draft_agreement")}
                 subtitle={t("edit_draft_agreement_subtitle")}

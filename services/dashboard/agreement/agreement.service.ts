@@ -162,3 +162,41 @@ export const updateDraftAgreement = async (data: Partial<AgreementFormValues>, v
 
     return result;
 };
+
+// publish draft agreement
+export const publishDraftAgreement = async (data: { effectiveFrom: Date | string }, versionId: string): Promise<any> => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/agreement-versions/${versionId}/publish`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreement-versions", {});
+        revalidatePath(`/admin/agreements/${versionId}`);
+    };
+
+    return result;
+};
+
+// preview agreement
+export const previewAgreementVersion = async (versionId: string) => {
+    const res = await serverFetch.get(`/agreement-versions/${versionId}/preview`, {
+        next: {
+            tags: ["agreement-versions"],
+        },
+    });
+
+    // Extract raw binary data
+    const buffer = await res.arrayBuffer();
+
+    return {
+        success: res.ok,
+        contentType: res.headers.get("content-type") || "application/pdf",
+        data: Buffer.from(buffer).toString("base64"),
+    };
+};

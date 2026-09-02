@@ -2,10 +2,31 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
 import { useTranslation } from "@/hooks/use-translation";
 import { IAgreementVersion } from "@/types/agreement.type";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import {
     ArrowLeft,
     Edit,
@@ -15,18 +36,54 @@ import {
     Calendar,
     User,
     CheckCircle2,
+    Loader2,
 } from "lucide-react";
+import { previewAgreementVersion, publishDraftAgreement } from "@/services/dashboard/agreement/agreement.service";
+import { toast } from "sonner";
 
 interface IProps {
     agreeVersion: IAgreementVersion;
 }
 
+// Zod Schema requiring a valid future date
+const publishSchema = z.object({
+    effectiveFrom: z.string().refine(
+        (val) => {
+            if (!val) return false;
+            const selectedDate = new Date(val);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return selectedDate >= today;
+        },
+        { message: "Effective date must be today or in the future" }
+    ),
+});
+
+type TPublishForm = z.infer<typeof publishSchema>;
+
 export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
     const { t } = useTranslation();
     const router = useRouter();
 
+    const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
     const [isPreviewing, setIsPreviewing] = useState(false);
+
+    // Minimum date boundary helper for HTML5 date picker
+    const getTodayDateString = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
+    const form = useForm<TPublishForm>({
+        resolver: zodResolver(publishSchema),
+        defaultValues: {
+            effectiveFrom: "",
+        },
+    });
 
     // Formatting helpers
     const formatDate = (dateString?: string | null) => {
@@ -45,32 +102,76 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
         return type.replace(/_/g, " ");
     };
 
-    // API Call Handlers
-    const handlePublish = async () => {
+    // Submit handler called from Modal
+    const handlePublish = async (values: TPublishForm) => {
+        const toastId = toast.loading("Publishing agreement version...");
         try {
             setIsPublishing(true);
-            // TODO: Call publish API endpoint
-            // await publishAgreementVersion(agreeVersion._id);
-            console.log("Publishing agreement version:", agreeVersion._id);
+
+            const payload = {
+                effectiveFrom: new Date(values.effectiveFrom).toISOString(),
+            };
+
+            const res = await publishDraftAgreement(payload, agreeVersion._id);
+
+            if (res?.success) {
+                toast.success(res?.message || "Agreement version published successfully!", { id: toastId });
+                router.refresh();
+                form.reset();
+                setIsPublishOpen(false);
+                return;
+            }
+
+            if (res?.data?.errorSources) {
+                res.data.errorSources.map(
+                    (err: { path: string; message: string }) =>
+                        toast.error(err?.message, { id: toastId })
+                );
+                setIsPublishOpen(false);
+                return;
+            }
+            toast.error(res.message || "Agreement version publish failed", {
+                id: toastId,
+            });
+            setIsPublishOpen(false);
+            return;
+
         } catch (error) {
             console.error("Failed to publish agreement version:", error);
+
         } finally {
+            form.reset();
             setIsPublishing(false);
         }
     };
-
     const handlePreview = async () => {
         try {
             setIsPreviewing(true);
-            // TODO: Handle modal open or navigation for preview
-            console.log("Previewing agreement version:", agreeVersion._id);
+
+            const res = await previewAgreementVersion(agreeVersion._id);
+
+            if (res?.success && res?.data) {
+                const byteCharacters = atob(res.data);
+                const byteNumbers = new Array(byteCharacters.length);
+
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: res.contentType });
+
+                // Create a blob URL and open in new tab
+                const blobUrl = URL.createObjectURL(blob);
+                window.open(blobUrl, "_blank");
+                return;
+            }
         } catch (error) {
             console.error("Failed to load preview:", error);
         } finally {
             setIsPreviewing(false);
         }
     };
-
     return (
         <div className="space-y-6 pb-12">
             {/* Back Navigation Button */}
@@ -117,15 +218,17 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
             </div>
 
             {/* Top Action Row: Edit Button below Header */}
-            <div className="flex justify-end">
-                <Button
-                    onClick={() => router.push(`/admin/agreements/edit/${agreeVersion._id}`)}
-                    className="bg-[#DC3173] hover:bg-[#c22863] text-white gap-2 px-5 py-2 shadow-xs"
-                >
-                    <Edit className="w-4 h-4" />
-                    {t("edit")}
-                </Button>
-            </div>
+            {agreeVersion?.status === "DRAFT" && (
+                <div className="flex justify-end">
+                    <Button
+                        onClick={() => router.push(`/admin/agreements/edit/${agreeVersion?._id}`)}
+                        className="bg-[#DC3173] hover:bg-[#c22863] text-white gap-2 px-5 py-2 shadow-xs"
+                    >
+                        <Edit className="w-4 h-4" />
+                        {t("edit")}
+                    </Button>
+                </div>
+            )}
 
             {/* Basic Metadata Details Card */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-xs space-y-4">
@@ -220,14 +323,18 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
                     <div>
                         <p className="text-xs text-gray-500 font-medium mb-1">{t("created_by")}</p>
                         <p className="text-sm font-semibold text-gray-900">
-                            {agreeVersion.createdBy?.email ? agreeVersion?.createdBy?.name?.firstName + "" + agreeVersion?.createdBy?.name?.lastName : "N/A"}
+                            {agreeVersion.createdBy?.email
+                                ? `${agreeVersion.createdBy.name?.firstName || ""} ${agreeVersion.createdBy.name?.lastName || ""}`.trim()
+                                : "N/A"}
                         </p>
                     </div>
 
                     <div>
                         <p className="text-xs text-gray-500 font-medium mb-1">{t("published_by")}</p>
                         <p className="text-sm font-semibold text-gray-900">
-                            {agreeVersion.publishedBy?.email ? agreeVersion?.publishedBy?.name?.firstName + "" + agreeVersion?.publishedBy?.name?.lastName : "N/A"}
+                            {agreeVersion.publishedBy?.email
+                                ? `${agreeVersion.publishedBy.name?.firstName || ""} ${agreeVersion.publishedBy.name?.lastName || ""}`.trim()
+                                : "N/A"}
                         </p>
                     </div>
                 </div>
@@ -249,15 +356,76 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
                 {agreeVersion.status !== "PUBLISHED" && (
                     <Button
                         type="button"
-                        onClick={handlePublish}
-                        disabled={isPublishing}
+                        onClick={() => setIsPublishOpen(true)}
                         className="bg-[#DC3173] hover:bg-[#c22863] text-white gap-2 px-6 py-2 rounded-xl shadow-xs"
                     >
                         <Send className="w-4 h-4" />
-                        {isPublishing ? t("publishing") : t("publish")}
+                        {t("publish")}
                     </Button>
                 )}
             </div>
+
+            {/* Publish Agreement Dialog Modal */}
+            <Dialog open={isPublishOpen} onOpenChange={setIsPublishOpen}>
+                <DialogContent className="sm:max-w-106.25">
+                    <DialogHeader>
+                        <DialogTitle>{t("publish_agreement")}</DialogTitle>
+                        <DialogDescription>
+                            {t("select_effective_date_description") ||
+                                "Select when this agreement version should take effect."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(handlePublish)} className="space-y-4 py-2">
+                            <FormField
+                                control={form.control}
+                                name="effectiveFrom"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {t("effective_from")} <span className="text-red-600">*</span>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="date"
+                                                {...field}
+                                                min={getTodayDateString()}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <DialogFooter className="pt-4">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setIsPublishOpen(false)}
+                                    disabled={isPublishing}
+                                >
+                                    {t("cancel")}
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={isPublishing}
+                                    className="bg-[#DC3173] hover:bg-[#c22863] text-white"
+                                >
+                                    {isPublishing ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                            {t("publishing")}
+                                        </>
+                                    ) : (
+                                        t("confirm_and_publish")
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
