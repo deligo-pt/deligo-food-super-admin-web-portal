@@ -2,7 +2,7 @@
 'use server';
 import { serverFetch } from "@/lib/fetchHelper";
 import { catchAsync } from "@/utils/catchAsync";
-import { TUserAgreementForm } from "@/validations/agreements/agreement.validation";
+// import { TUserAgreementForm } from "@/validations/agreements/agreement.validation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
@@ -68,26 +68,26 @@ export const getSingleAgreement = async (agreementId: string) => {
 };
 
 // create agreement
-export const createAgreement = async (id: string, data: Partial<TUserAgreementForm>) => {
-    const result = await catchAsync(async () => {
-        const res = await serverFetch.post(`/agreements/party/${id}`, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
+// export const createAgreement = async (id: string, data: Partial<TUserAgreementForm>) => {
+//     const result = await catchAsync(async () => {
+//         const res = await serverFetch.post(`/agreements/party/${id}`, {
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify(data),
+//         });
 
-        return await res.json();
-    });
+//         return await res.json();
+//     });
 
-    if (result.success) {
-        revalidateTag("agreements", {});
-        revalidatePath("/become-vendor/agreement-sign");
-    };
+//     if (result.success) {
+//         revalidateTag("agreements", {});
+//         revalidatePath("/become-vendor/agreement-sign");
+//     };
 
 
-    return result;
-};
+//     return result;
+// };
 
 
 /**
@@ -113,3 +113,19 @@ export const createDraftAgreement = async (data: any) => {
 
     return result;
 };
+
+
+// get all agreements
+export const getAllAgreements = async (query?: string) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.get(`/agreement-versions${query ? `?${query}` : ''}`, {
+            next: {
+                tags: ["agreement-versions"],
+            }
+        });
+        return await res.json();
+    });
+
+    return result;
+};
+
