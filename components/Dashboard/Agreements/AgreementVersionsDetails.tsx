@@ -119,7 +119,7 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
             {/* Top Action Row: Edit Button below Header */}
             <div className="flex justify-end">
                 <Button
-                    onClick={() => router.push(`/admin/agreements/edit/${agreeVersion._id}/edit`)}
+                    onClick={() => router.push(`/admin/agreements/edit/${agreeVersion._id}`)}
                     className="bg-[#DC3173] hover:bg-[#c22863] text-white gap-2 px-5 py-2 shadow-xs"
                 >
                     <Edit className="w-4 h-4" />

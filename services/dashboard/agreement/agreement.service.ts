@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
+import { AgreementFormValues } from "@/components/Dashboard/Agreements/AgreementForm";
 import { serverFetch } from "@/lib/fetchHelper";
 import { catchAsync } from "@/utils/catchAsync";
 // import { TUserAgreementForm } from "@/validations/agreements/agreement.validation";
@@ -95,7 +96,7 @@ export const getSingleAgreement = async (agreementId: string) => {
  */
 
 // create draft agreement
-export const createDraftAgreement = async (data: any) => {
+export const createDraftAgreement = async (data: AgreementFormValues) => {
     const result = await catchAsync(async () => {
         const res = await serverFetch.post(`/agreement-versions`, {
             headers: {
@@ -113,7 +114,6 @@ export const createDraftAgreement = async (data: any) => {
 
     return result;
 };
-
 
 // get all agreements
 export const getAllAgreements = async (query?: string) => {
@@ -143,3 +143,22 @@ export const getSingleAgreementVersion = async (versionId: string) => {
     return result;
 };
 
+// update draft agreement
+export const updateDraftAgreement = async (data: Partial<AgreementFormValues>, versionId: string) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.patch(`/agreement-versions/${versionId}`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreement-versions", {});
+        revalidatePath(`/admin/agreements/${versionId}`);
+    };
+
+    return result;
+};
