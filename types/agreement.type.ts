@@ -33,8 +33,22 @@ export interface IAgreementVersion {
     }[];
     documentTitle: string;
     effectiveFrom: string | null;
-    createdBy: string;
-    publishedBy: string | null;
+    createdBy: {
+        email: string;
+        name: {
+            firstName: string;
+            lastName: string;
+        },
+        _id: string;
+    };
+    publishedBy: {
+        email: string;
+        name: {
+            firstName: string;
+            lastName: string;
+        },
+        _id: string;
+    } | null;
     publishedAt: string | null;
     archivedAt: string | null;
     createdAt: string;

@@ -129,3 +129,17 @@ export const getAllAgreements = async (query?: string) => {
     return result;
 };
 
+// get all agreements
+export const getSingleAgreementVersion = async (versionId: string) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.get(`/agreement-versions/${versionId}`, {
+            next: {
+                tags: ["agreement-versions"],
+            }
+        });
+        return await res.json();
+    });
+
+    return result;
+};
+
