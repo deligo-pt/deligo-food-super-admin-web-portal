@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+'use server';
 import { serverFetch } from "@/lib/fetchHelper";
+import { catchAsync } from "@/utils/catchAsync";
+import { TUserAgreementForm } from "@/validations/agreements/agreement.validation";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 
@@ -62,4 +65,51 @@ export const getSingleAgreement = async (agreementId: string) => {
         console.error("Get Single Agreement Error:", error);
         throw error;
     }
+};
+
+// create agreement
+export const createAgreement = async (id: string, data: Partial<TUserAgreementForm>) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/agreements/party/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreements", {});
+        revalidatePath("/become-vendor/agreement-sign");
+    };
+
+
+    return result;
+};
+
+
+/**
+ * draft agreement
+ */
+
+// create draft agreement
+export const createDraftAgreement = async (data: any) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/agreement-versions`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreement-versions", {});
+        revalidatePath("/admin/agreements/all");
+    };
+
+    return result;
 };
