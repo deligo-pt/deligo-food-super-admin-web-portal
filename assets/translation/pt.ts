@@ -53,6 +53,11 @@ export const pt = {
 
   // sidebar
   dashboard: "Painel",
+
+  create_draft_agreement: "Criar Rascunho de Acordo",
+  all_agreements: "Todos os Acordos",
+
+
   vendors: "Vendedores",
   all_vendors: "Todos os vendedores",
   pending_approvals: "Aprovações Pendentes",
@@ -272,6 +277,27 @@ export const pt = {
   top_rated_items: "Itens mais bem avaliados",
   no_top_rated_items_found: "Nenhum item bem avaliado encontrado",
   orders: "encomendas",
+
+  // create draft agreement
+  create_draft_agreement_subtitle: "Crie um novo rascunho de acordo para fornecedores ou gestores de frota. Preencha os detalhes necessários e submeta o formulário para gerar um rascunho do documento de acordo.",
+  agreement_info: "Informação do Acordo",
+  agreement_type: "Tipo de Acordo",
+  initial_vendor_agreement: "Acordo Inicial de Fornecedor",
+  initial_fleet_agreement: "Acordo Inicial de Gestor de Frota",
+  document_title: "Título do Documento",
+  document_title_ph: "ex.: Contrato de Comerciante",
+  parts: "Partes",
+  clauses: "Cláusulas",
+  add_part: "Adicionar Parte",
+  part_title: "Título da Parte",
+  part_title_ph: "ex.: Termos Gerais",
+  clause: "Cláusula",
+  clause_number: "Número da Cláusula",
+  clause_title: "Título da Cláusula",
+  body_content: "Conteúdo do Corpo",
+  force_page_break_before: "Forçar Quebra de Página Antes",
+  show_pos_payment_widget: "Mostrar Widget de Pagamento POS",
+  add_clause: "Adicionar Cláusula",
 
   // add vendor
   add_new_vendor: "Adicionar Novo Vendedor",

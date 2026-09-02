@@ -50,6 +50,9 @@ export const en = {
   // sidebar
   dashboard: "Dashboard",
 
+  create_draft_agreement: "Create Draft Agreement",
+  all_agreements: "All Agreements",
+
   vendors: "Vendors",
   all_vendors: "All Vendors",
   pending_approvals: "Pending Approvals",
@@ -264,6 +267,27 @@ export const en = {
   top_rated_items: "Top rated Items",
   no_top_rated_items_found: "No top rated items found",
   orders: "orders",
+
+  // create draft agreement
+  create_draft_agreement_subtitle: "Create a new draft agreement for vendors or fleet managers. Fill in the required details and submit the form to generate a draft agreement document.",
+  agreement_info: "Agreement Info",
+  agreement_type: "Agreement Type",
+  initial_vendor_agreement: "Initial Vendor Agreement",
+  initial_fleet_agreement: "Initial Fleet Manager Agreement",
+  document_title: "Document Title",
+  document_title_ph: "e.g. Contrato de Comerciante",
+  parts: "Parts",
+  clauses: "Clauses",
+  add_part: "Add Part",
+  part_title: "Part Title",
+  part_title_ph: "e.g. General Terms",
+  clause: "Clause",
+  clause_number: "Clause Number",
+  clause_title: "Clause Title",
+  body_content: "Body Content",
+  force_page_break_before: " Force Page Break Before",
+  show_pos_payment_widget: "Show POS Payment Widget",
+  add_clause: "Add Clause",
 
   // add-vendor
   add_new_vendor: "Add New Vendor",

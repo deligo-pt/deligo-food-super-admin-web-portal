@@ -17,7 +17,6 @@ import {
   Settings,
   ShieldUser,
   ShoppingBag,
-  SquareChartGantt,
   Ticket,
   ToolCase,
   Users,
@@ -53,6 +52,15 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("dashboard"),
       icon: <LayoutDashboard size={18} />,
       path: "/admin/dashboard",
+    },
+    {
+      id: "agreements",
+      title: t("agreements"),
+      icon: <LayoutDashboard size={18} />,
+      items: [
+        { name: t("create_draft_agreement"), path: "/admin/agreements/create-draft" },
+        { name: t("all_agreements"), path: "/admin/agreements/all" },
+      ],
     },
     {
       id: "vendors",
@@ -114,7 +122,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       ],
     },
     {
-      id: "driverss",
+      id: "drivers",
       title: t("riders"),
       icon: <Bike size={18} />,
       items: [
