@@ -17,7 +17,6 @@ import {
   Settings,
   ShieldUser,
   ShoppingBag,
-  SquareChartGantt,
   Ticket,
   ToolCase,
   Users,
@@ -55,6 +54,15 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       path: "/admin/dashboard",
     },
     {
+      id: "agreements",
+      title: t("agreements"),
+      icon: <LayoutDashboard size={18} />,
+      items: [
+        { name: t("create_draft_agreement"), path: "/admin/agreements/create-draft" },
+        { name: t("all_agreements"), path: "/admin/agreements/all" },
+      ],
+    },
+    {
       id: "vendors",
       title: t("vendors"),
       icon: <Utensils size={18} />,
@@ -64,6 +72,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("active_vendors"), path: "/admin/active-vendors" },
         { name: t("pending_approvals"), path: "/admin/pending-approvals" },
         { name: t("suspended_vendors"), path: "/admin/suspended-vendors" },
+        { name: t("vendor_branches"), path: "/admin/vendor-branch/all" },
         { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
         {
           name: t("vendor_performance_analytics"),
@@ -113,7 +122,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       ],
     },
     {
-      id: "driverss",
+      id: "drivers",
       title: t("riders"),
       icon: <Bike size={18} />,
       items: [
@@ -185,21 +194,21 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         },
       ]
     },
-    {
-      id: "product-categories",
-      title: t("product_categories"),
-      icon: <SquareChartGantt size={18} />,
-      items: [
-        {
-          name: t("add_product_categories"),
-          path: "/admin/product-categories/add",
-        },
-        {
-          name: t("all_product_categories"),
-          path: "/admin/product-categories",
-        },
-      ],
-    },
+    // {
+    //   id: "product-categories",
+    //   title: t("product_categories"),
+    //   icon: <SquareChartGantt size={18} />,
+    //   items: [
+    //     {
+    //       name: t("add_product_categories"),
+    //       path: "/admin/product-categories/add",
+    //     },
+    //     {
+    //       name: t("all_product_categories"),
+    //       path: "/admin/product-categories",
+    //     },
+    //   ],
+    // },
     {
       id: "orders",
       title: t("orders_management"),

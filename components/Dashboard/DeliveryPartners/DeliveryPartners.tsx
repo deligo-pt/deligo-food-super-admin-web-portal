@@ -84,6 +84,7 @@ export default function DeliveryPartners({
       toast.success(result.message || "Partner deleted successfully!", {
         id: toastId,
       });
+      setIsDeleting(false);
       return;
     }
 

@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+'use server';
+import { AgreementFormValues } from "@/components/Dashboard/Agreements/AgreementForm";
 import { serverFetch } from "@/lib/fetchHelper";
+import { catchAsync } from "@/utils/catchAsync";
+import { TUserAgreementForm } from "@/validations/agreements/agreement.validation";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 
@@ -62,4 +66,137 @@ export const getSingleAgreement = async (agreementId: string) => {
         console.error("Get Single Agreement Error:", error);
         throw error;
     }
+};
+
+// create agreement
+export const createAgreement = async (id: string, data: Partial<TUserAgreementForm>) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/agreements/party/${id}`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreements", {});
+        revalidatePath("/become-vendor/agreement-sign");
+    };
+
+
+    return result;
+};
+
+
+/**
+ * draft agreement
+ */
+
+// create draft agreement
+export const createDraftAgreement = async (data: AgreementFormValues) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/agreement-versions`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreement-versions", {});
+        revalidatePath("/admin/agreements/all");
+    };
+
+    return result;
+};
+
+// get all agreements
+export const getAllAgreements = async (query?: string) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.get(`/agreement-versions${query ? `?${query}` : ''}`, {
+            next: {
+                tags: ["agreement-versions"],
+            }
+        });
+        return await res.json();
+    });
+
+    return result;
+};
+
+// get all agreements
+export const getSingleAgreementVersion = async (versionId: string) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.get(`/agreement-versions/${versionId}`, {
+            next: {
+                tags: ["agreement-versions"],
+            }
+        });
+        return await res.json();
+    });
+
+    return result;
+};
+
+// update draft agreement
+export const updateDraftAgreement = async (data: Partial<AgreementFormValues>, versionId: string) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.patch(`/agreement-versions/${versionId}`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreement-versions", {});
+        revalidatePath(`/admin/agreements/${versionId}`);
+    };
+
+    return result;
+};
+
+// publish draft agreement
+export const publishDraftAgreement = async (data: { effectiveFrom: Date | string }, versionId: string): Promise<any> => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/agreement-versions/${versionId}/publish`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreement-versions", {});
+        revalidatePath(`/admin/agreements/${versionId}`);
+    };
+
+    return result;
+};
+
+// preview agreement
+export const previewAgreementVersion = async (versionId: string) => {
+    const res = await serverFetch.get(`/agreement-versions/${versionId}/preview`, {
+        next: {
+            tags: ["agreement-versions"],
+        },
+    });
+
+    // Extract raw binary data
+    const buffer = await res.arrayBuffer();
+
+    return {
+        success: res.ok,
+        contentType: res.headers.get("content-type") || "application/pdf",
+        data: Buffer.from(buffer).toString("base64"),
+    };
 };

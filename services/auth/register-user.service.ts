@@ -25,6 +25,7 @@ export const onboardUserAndSendOtpReq = async (
     email: string;
     password: string;
     role: string;
+    parentVendorId?: string;
   },
 ) => {
   return catchAsync<null>(async () => {

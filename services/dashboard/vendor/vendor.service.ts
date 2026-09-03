@@ -1,5 +1,6 @@
 "use server";
 
+import { USER_ROLE } from "@/consts/user.const";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
@@ -7,6 +8,7 @@ import { catchAsync } from "@/utils/catchAsync";
 
 export const getAllVendorsReq = async (
   queries: Record<string, string | undefined>,
+  role?: string
 ): Promise<{ data: TVendor[]; meta?: TMeta }> => {
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);
@@ -23,6 +25,7 @@ export const getAllVendorsReq = async (
     ...(status ? { status: status } : {}),
     ...(businessType ? { businessType: businessType } : {}),
     isDeleted: false,
+    role: role ? role : USER_ROLE.VENDOR,
   };
 
   const result = await catchAsync<TVendor[]>(async () => {

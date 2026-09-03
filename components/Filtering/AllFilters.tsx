@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AnimatePresence, motion } from "framer-motion";
-import { RefreshCcw, SlidersHorizontal, X } from "lucide-react";
+import { Loader2, LoaderIcon, RefreshCcw, SlidersHorizontal, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import SearchFilter from "./SearchFilter";
 import SelectFilter from "./SelectFilter";
 import { useTranslation } from "@/hooks/use-translation";
@@ -34,17 +34,26 @@ interface IProps {
     defaultValue?: string;
     isAllNeeded?: boolean;
   };
+  refreshButton?: boolean;
 }
 
 export default function AllFilters({
   sortOptions,
   filterOptions,
   searchPlaceholder,
-  extraSelectFilter
+  extraSelectFilter,
+  refreshButton = false
 }: IProps) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const handleRefresh = () => {
+    startTransition(() => {
+      router.refresh();
+    });
+  };
 
   const oldFilters =
     filterOptions?.reduce((acc, option) => {
@@ -107,9 +116,9 @@ export default function AllFilters({
       className="mb-1"
     >
       <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
-        <div className="flex flex-col lg:flex-row gap-0 lg:gap-2">
+        <div className="flex flex-col lg:flex-row gap-2 w-full">
           {/* Search + Clear button */}
-          <div className="relative w-full lg:w-auto flex-1 max-w-xs">
+          <div className="relative w-full lg:w-auto flex-1 lg:max-w-xs">
             <SearchFilter
               paramName="searchTerm"
               placeholder={
@@ -140,6 +149,18 @@ export default function AllFilters({
               />
             </div>
           )}
+          <Button
+            className={`bg-[#DC3173] text-white`}
+            variant="outline"
+            disabled={isPending}
+            onClick={handleRefresh}
+          >
+            {isPending ? <LoaderIcon className="w-5 h-5 mr-2 animate-spin" /> : (
+              <>
+                <Loader2 /> <span>Refresh</span>
+              </>
+            )}
+          </Button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">

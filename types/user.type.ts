@@ -135,7 +135,7 @@ export type TVendor = {
   // --------------------------------------------------------
   _id: string;
   userId: string;
-  role: "VENDOR";
+  role: "VENDOR" | "SUB_VENDOR";
   email: string;
 
   status: keyof typeof USER_STATUS;
@@ -183,12 +183,14 @@ export type TVendor = {
   // --------------------------------------------------------
   businessDetails?: {
     businessName: string;
+    companyLegalName?: string;
+    branchName?: string;
     businessType: string;
     businessTypeSlug?: string;
     restaurantCuisineType?: string[];
     businessLicenseNumber?: string;
     NIF?: string;
-    totalBranches: number;
+    totalBranches?: number;
 
     openingHours?: string; // "09:00 AM"
     closingHours?: string; // "11:00 PM"
@@ -234,6 +236,13 @@ export type TVendor = {
     ibanProof?: string[];
   };
 
+  // Agreement section
+  agreement?: {
+    agreementId: string;
+    status: "UNSIGNED" | "PARTY_SIGNED" | "SIGNED";
+    pdfPath: string;
+  };
+
   // --------------------------------------------------------
   // Security & Access
   // --------------------------------------------------------
@@ -256,6 +265,13 @@ export type TVendor = {
   approvedBy?: string;
   rejectedBy?: string;
   blockedBy?: string;
+  parentVendorId?: {
+    name: {
+      firstName: string;
+      lastName: string;
+    },
+    userId: string;
+  };
 
   submittedForApprovalAt?: Date;
   approvedOrRejectedOrBlockedAt?: Date;

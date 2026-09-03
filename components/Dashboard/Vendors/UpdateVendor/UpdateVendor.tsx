@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -54,7 +55,7 @@ interface IProps {
   cuisines: TCuisine[]
 }
 
-type TVendorForm = z.infer<typeof addVendorValidation>;
+type TVendorForm = z.infer<ReturnType<typeof addVendorValidation>>;
 
 export default function UpdateVendor({ businessCategories, vendor, cuisines }: IProps) {
   const [vendorState, setVendorState] = useState(vendor);
@@ -98,6 +99,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
   });
 
   const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "menuUpload"];
+  const isSubVendor = vendor?.role === "SUB_VENDOR";
 
   const daysOfWeek = [
     "Sunday",
@@ -110,12 +112,14 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
   ];
 
   const form = useForm<TVendorForm>({
-    resolver: zodResolver(addVendorValidation),
+    resolver: zodResolver(addVendorValidation(isSubVendor)),
     defaultValues: {
       firstName: "",
       lastName: "",
       phoneNumber: "",
       businessName: "",
+      companyLegalName: "",
+      branchName: "",
       businessType: "",
       restaurantCuisineType: [],
       NIF: "",
@@ -166,6 +170,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       lastName: vendor.name?.lastName || "",
       phoneNumber: vendor?.contactNumber || "",
       businessName: vendor.businessDetails?.businessName || "",
+      companyLegalName: vendor.businessDetails?.companyLegalName || "",
+      branchName: vendor.businessDetails?.branchName || "",
       businessType: vendor?.businessDetails?.businessTypeSlug || "",
       restaurantCuisineType: cuisineSlugs,
       NIF: vendor?.businessDetails?.NIF || "",
@@ -241,6 +247,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
     // businessDetails
     const originalBusinessName = vendor?.businessDetails?.businessName || "";
+    const originalLegalName = vendor?.businessDetails?.companyLegalName || "";
+    const originalBranchName = vendor?.businessDetails?.branchName || "";
     const originalBusinessType = vendor?.businessDetails?.businessTypeSlug || ""; // ← use slug
     const originalNIF = vendor?.businessDetails?.NIF || "";
     const originalBranches = vendor?.businessDetails?.totalBranches ?? 0;
@@ -267,8 +275,10 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
     const businessDetailsChanged =
       hasChanged(data.businessName, originalBusinessName) ||
+      hasChanged(data.companyLegalName, originalLegalName) ||
+      hasChanged(data.branchName, originalBranchName) ||
       hasChanged(data.businessType, originalBusinessType) ||
-      hasChanged(data.restaurantCuisineType, originalCuisineSlugs) || // ← now both are slug arrays
+      hasChanged(data.restaurantCuisineType, originalCuisineSlugs) ||
       hasChanged(data.NIF?.toUpperCase(), originalNIF) ||
       hasChanged(Number(data.branches), originalBranches) ||
       hasChanged(data.openingHours, originalOpeningHours) ||
@@ -280,6 +290,12 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
       if (hasChanged(data.businessName, originalBusinessName)) {
         vendorData.businessDetails.businessName = data.businessName;
+      }
+      if (hasChanged(data.companyLegalName, originalLegalName)) {
+        vendorData.businessDetails.companyLegalName = data.companyLegalName;
+      }
+      if (hasChanged(data.branchName, originalBranchName)) {
+        vendorData.businessDetails.branchName = data.branchName;
       }
       if (hasChanged(data.businessType, originalBusinessType)) {
         vendorData.businessDetails.businessType = data.businessType;
@@ -297,10 +313,8 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       if (hasChanged(Number(data.branches), originalBranches)) {
         vendorData.businessDetails.totalBranches = Number(data.branches);
       }
-      if (hasChanged(data.openingHours, originalOpeningHours)) {
+      if (hasChanged(data.openingHours, originalOpeningHours) || hasChanged(data.closingHours, originalClosingHours)) {
         vendorData.businessDetails.openingHours = data.openingHours;
-      }
-      if (hasChanged(data.closingHours, originalClosingHours)) {
         vendorData.businessDetails.closingHours = data.closingHours;
       }
       if (hasChanged(data.closingDays, originalClosingDays)) {
@@ -368,7 +382,6 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
 
     // final check
     const hasAnyChange = Object.keys(vendorData).length > 0;
-    console.log("has changed", vendorData);
 
     if (!hasAnyChange) {
       toast.info("No changes detected", { id: toastId });
@@ -402,9 +415,16 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
           return;
         }
 
-        toast.error(approveResult.message || "Vendor update failed", {
-          id: toastId,
-        });
+        if (approveResult?.data?.errorSources) {
+          approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+            toast.error(err?.message, { id: toastId })
+          ));
+          return;
+        } else {
+          toast.error(approveResult.message || "Vendor status update failed", {
+            id: toastId,
+          });
+        }
         console.log(approveResult);
         return;
       }
@@ -417,9 +437,17 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
       return;
     }
 
-    toast.error(updatedResult.message || "Vendor update failed", {
-      id: toastId,
-    });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(updatedResult.message || "Vendor update failed", {
+        id: toastId,
+      });
+    }
+    console.log(updatedResult);
   };
 
   useEffect(() => {
@@ -580,6 +608,22 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                          {isSubVendor && <FormField
+                            control={form.control}
+                            name="branchName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("branch_name")} <span className="text-[#DC3173]">*</span></FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("branch_name")}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />}
                           <FormField
                             control={form.control}
                             name="businessName"
@@ -590,8 +634,30 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                   <Input
                                     placeholder={t("business_name")}
                                     {...field}
+                                    disabled={isSubVendor}
                                   />
                                 </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="companyLegalName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t("company_legal_name")} <span className="text-[#DC3173]">*</span></FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("company_legal_name")}
+                                    {...field}
+                                    disabled={isSubVendor}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  {t("company_legal_name_description")}
+                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -615,6 +681,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                           ? "border-red-500"
                                           : "",
                                       )}
+                                      disabled={isSubVendor}
                                     >
                                       <SelectValue
                                         placeholder={t("select_business_type")}
@@ -647,6 +714,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                   <Input
                                     placeholder={t("tax_identification_number")}
                                     {...field}
+                                    disabled={isSubVendor}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -698,6 +766,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                               type="button"
                                               onClick={() => handleRemoveCuisine(slug)}
                                               className="rounded-full outline-none hover:bg-[#DC3173]/20 p-0.5"
+                                              disabled={isSubVendor}
                                             >
                                               <X className="h-3 w-3" />
                                             </button>
@@ -719,6 +788,7 @@ export default function UpdateVendor({ businessCategories, vendor, cuisines }: I
                                               fieldState.invalid ? "border-destructive focus-visible:ring-destructive/20" : "border-gray-300"
                                             )}
                                             style={{ height: "3rem" }}
+                                            disabled={isSubVendor}
                                           >
                                             <SelectValue placeholder="Select Multiple Cuisine" />
                                           </SelectTrigger>

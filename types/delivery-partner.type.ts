@@ -174,6 +174,7 @@ export type TDeliveryPartner = {
     activity?: string;
     insurancePolicy?: string;
     myPhoto?: string;
+    ibanProof?: string;
   };
 
   // -------------------------------------------------

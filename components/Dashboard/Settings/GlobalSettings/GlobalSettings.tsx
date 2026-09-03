@@ -32,17 +32,21 @@ import {
   CheckCircle2,
   Clock,
   EuroIcon,
+  FormInput,
   Gift,
+  LogsIcon,
   Package,
   Percent,
   Save,
   Truck,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import { cn } from "@/lib/utils";
+import { uploadImagesReq } from "@/services/upload/upload.service";
+import { FileUploadZone } from "./FileUploadZone";
 
 type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
@@ -58,9 +62,19 @@ const TABS = [
     icon: Percent,
   },
   {
+    id: "agreements",
+    labelKey: "agreements",
+    icon: FormInput,
+  },
+  {
     id: "order",
     labelKey: "order_rules",
     icon: Package,
+  },
+  {
+    id: "activity-logs",
+    labelKey: "activity_logs_retention",
+    icon: LogsIcon,
   },
   {
     id: "cancellation",
@@ -89,6 +103,14 @@ export default function GlobalSettings({
     "idle",
   );
   const [activeTab, setActiveTab] = useState<TabId>("delivery");
+  const signatureFileRef = useRef<HTMLInputElement | null>(null);
+  const stampFileRef = useRef<HTMLInputElement | null>(null);
+  const [uploadedSignatureUrl, setUploadedSignatureUrl] = useState<string | null>(
+    settings?.agreement?.deligoSignatureUrl || null
+  );
+  const [partyStamp, setPartyStamp] = useState<string | null>(settings?.agreement?.deligoCompanyStampUrl || null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingStamp, setIsUploadingStamp] = useState(false);
 
   const form = useForm<TGlobalSettingsForm>({
     resolver: zodResolver(globalSettingsSchema),
@@ -104,15 +126,79 @@ export default function GlobalSettings({
       fleetManagerCommissionPercent: settings?.commission?.fleetManagerPercent || 0,
       serviceCharge: settings?.commission?.serviceCharge || 0,
 
+      // agreements
+      deligoSignatureUrl: settings?.agreement?.deligoSignatureUrl || undefined,
+      deligoSignatoryName: settings?.agreement?.deligoSignatoryName || undefined,
+      deligoSignatoryRole: settings?.agreement?.deligoSignatoryRole || undefined,
+      deligoCompanyStampUrl: settings?.agreement?.deligoSignatureUrl || undefined,
+
       // order
       customerNearestVendorRadiusKm: settings?.order?.nearestVendorRadiusKm || 0,
       cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
+
+      // activity logs retention
+      archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 0,
+      deleteAfterMonths: settings?.activityLogRetention?.deleteAfterMonths || 0,
+      batchSize: settings?.activityLogRetention?.batchSize || 0,
 
       // ingredients and delivery charges
       deliveryChargeInsideLisbon: settings?.ingredientsOrder?.deliveryChargeInsideLisbon || 20,
       deliveryChargeOutsideLisbon: settings?.ingredientsOrder?.deliveryChargeOutsideLisbon || 30,
     },
   });
+
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "signature" | "stamp"
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (PNG, JPG, etc.)");
+      return;
+    }
+
+    const toastId = toast.loading(
+      type === "signature" ? "Uploading signature..." : "Uploading stamp..."
+    );
+
+    if (type === "signature") setIsUploading(true);
+    else setIsUploadingStamp(true);
+
+    try {
+      const uploadResult = await uploadImagesReq([file]);
+
+      if (uploadResult.success && uploadResult.data?.[0]) {
+        if (type === "signature") {
+          setUploadedSignatureUrl(uploadResult.data[0]);
+        } else {
+          setPartyStamp(uploadResult.data[0]);
+        }
+        toast.success(
+          type === "signature"
+            ? "Signature uploaded successfully!"
+            : "Stamp uploaded successfully!",
+          { id: toastId }
+        );
+      } else {
+        toast.error(uploadResult.message || "Upload failed", { id: toastId });
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(error?.message || "Failed to upload", { id: toastId });
+    } finally {
+      if (type === "signature") setIsUploading(false);
+      else setIsUploadingStamp(false);
+    }
+  };
+
+  const clearStamp = () => {
+    setPartyStamp(null);
+    if (stampFileRef.current) {
+      stampFileRef.current.value = "";
+    }
+  };
 
   const onSubmit = async (data: TGlobalSettingsForm) => {
     setIsSaving(true);
@@ -129,6 +215,17 @@ export default function GlobalSettings({
         platformVatRate: data.platformVatRate,
         fleetManagerPercent: data.fleetManagerCommissionPercent,
         serviceCharge: data.serviceCharge,
+      },
+      agreement: {
+        deligoSignatureUrl: uploadedSignatureUrl,
+        deligoSignatoryName: data.deligoSignatoryName,
+        deligoSignatoryRole: data.deligoSignatoryRole,
+        deligoCompanyStampUrl: partyStamp,
+      },
+      activityLogRetention: {
+        archiveAfterMonths: data.archiveAfterMonths,
+        deleteAfterMonths: data.deleteAfterMonths,
+        batchSize: data.batchSize,
       },
       order: {
         nearestVendorRadiusKm: data.customerNearestVendorRadiusKm,
@@ -503,6 +600,118 @@ export default function GlobalSettings({
                     </SettingsCard>
                   )}
 
+                  {/* Agreements */}
+                  {activeTab === "agreements" && (
+                    <SettingsCard
+                      title={t("agreements")}
+                      description={t("set_agreements_related_urls_nd_infos")}
+                      icon={Percent}
+                      delay={0}
+                    >
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="deligoSignatoryName"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deligo_signatory_name")}
+                                    type="text"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                    description={t("deligo_signatory_name_for_agreement")}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="deligoSignatoryRole"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deligo_signatory_role")}
+                                    type="text"
+                                    value={field.value ?? ""}
+                                    onChange={(e) => field.onChange(e.target.value)}
+                                    description={t("deligo_signatory_role_in_agreement")}
+                                  />
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <FileUploadZone
+                          inputRef={signatureFileRef}
+                          onChange={(e) => handleFileUpload(e, "signature")}
+                          isLoading={isUploading}
+                          previewUrl={uploadedSignatureUrl}
+                          onClear={() => {
+                            setUploadedSignatureUrl(null);
+                            if (signatureFileRef.current) {
+                              signatureFileRef.current.value = "";
+                            }
+                          }}
+                          label={t("deligo_signature_url")}
+                        />
+                        <FileUploadZone
+                          inputRef={stampFileRef}
+                          onChange={(e) => handleFileUpload(e, "stamp")}
+                          isLoading={isUploadingStamp}
+                          previewUrl={partyStamp}
+                          onClear={clearStamp}
+                          label={t("deligo_company_stamp_url")}
+                          optional
+                        />
+                        {/* <FormField
+                          control={form.control}
+                          name="deligoSignatureUrl"
+                          render={({ field, fieldState }) => (
+                            <FormItem>
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("deligo_signature_url")}
+                                  type="url"
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="deligoCompanyStampUrl"
+                          render={({ field, fieldState }) => (
+                            <FormItem>
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("deligo_company_stamp_url")}
+                                  type="url"
+                                  value={field.value ?? ""}
+                                  onChange={(e) => field.onChange(e.target.value)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        /> */}
+                      </div>
+                    </SettingsCard>
+                  )}
+
                   {/* Order Rules */}
                   {activeTab === "order" && (
                     <SettingsCard
@@ -528,6 +737,87 @@ export default function GlobalSettings({
                                   }
                                   suffix="km"
                                   description="Maximum distance between customer and nearest vendor"
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </SettingsCard>
+                  )}
+
+                  {/* activity log retention */}
+                  {activeTab === "activity-logs" && (
+                    <SettingsCard
+                      title={t("activity_log_retention")}
+                      description={t("control_activity_logs_nd_customize")}
+                      icon={Package}
+                      delay={0}
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="archiveAfterMonths"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="col-span-2">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("archive_after_months")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="month/s"
+                                  description={t("months_after_which_an_activityLogArchive")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="deleteAfterMonths"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="col-span-2">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("permanently_delete_after_month")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="month/s"
+                                  description={t("months_after_which_archived")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="batchSize"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="col-span-2">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("maximum_documents_per_batch")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  description={t("max_documents_the_retention_job")}
                                   min={0}
                                 />
                               </FormControl>

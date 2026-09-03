@@ -2,7 +2,7 @@
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
-import UploadPartnerDocuments, { BASE_REQUIRED_DOCS, DocKey } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
+import UploadPartnerDocuments, { BASE_REQUIRED_DOCS } from "@/components/Dashboard/DeliveryPartners/AddDeliveryPartner/UploadPartnerDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -115,6 +115,7 @@ export default function UpdateDeliveryPartner({
     ),
     activity: generateFilePreview(partner?.documents?.activity),
     insurancePolicy: generateFilePreview(partner?.documents?.insurancePolicy),
+    ibanProof: generateFilePreview(partner?.documents?.ibanProof),
   });
 
   const form = useForm<TDeliveryPartnerForm>({
@@ -513,9 +514,16 @@ export default function UpdateDeliveryPartner({
           return;
         }
 
-        toast.error(approveResult.message || "Delivery partner update failed", {
-          id: toastId,
-        });
+        if (approveResult?.data?.errorSources) {
+          approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+            toast.error(err?.message, { id: toastId })
+          ));
+          return;
+        } else {
+          toast.error(approveResult.message || "Delivery partner update failed", {
+            id: toastId,
+          });
+        }
         console.log(approveResult);
         return;
       }
@@ -530,9 +538,16 @@ export default function UpdateDeliveryPartner({
       return;
     }
 
-    toast.error(updatedResult.message || "Delivery partner update failed", {
-      id: toastId,
-    });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(updatedResult.message || "Delivery partner update failed", {
+        id: toastId,
+      });
+    }
     console.log(updatedResult);
   };
 
@@ -544,7 +559,7 @@ export default function UpdateDeliveryPartner({
   }, [form]);
 
   // Dynamically build required docs based on vehicle type
-  const getRequiredDocs = (): DocKey[] => {
+  const getRequiredDocs = (): TPartnerDocKey[] => {
     const base = [...BASE_REQUIRED_DOCS];
 
     if (vehicleType === "MOTORBIKE" || vehicleType === "CAR") {

@@ -66,7 +66,7 @@ import z from "zod";
 
 const DELIGO = "#DC3173";
 
-type TVendorForm = z.infer<typeof addVendorValidation>;
+type TVendorForm = z.infer<ReturnType<typeof addVendorValidation>>;
 
 function isValidEmail(email: string) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -117,9 +117,10 @@ export default function AddVendor({
     useState<Record<TVendorDocKey, string[] | null>>(defaultDocuments);
 
   const [buttonDisabled, setButtonDisabled] = useState(0);
+  const isSubVendor = vendorDetails?.role === "SUB_VENDOR";
 
   const form = useForm<TVendorForm>({
-    resolver: zodResolver(addVendorValidation),
+    resolver: zodResolver(addVendorValidation(isSubVendor)),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -362,14 +363,30 @@ export default function AddVendor({
         return;
       }
 
-      toast.error(approveResult.message || "Vendor add failed", {
-        id: toastId,
-      });
+      if (approveResult?.data?.errorSources) {
+        approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+          toast.error(err?.message, { id: toastId })
+        ));
+        return;
+      } else {
+        toast.error(approveResult.message || "Vendor status update failed", {
+          id: toastId,
+        });
+      }
       console.log(approveResult);
       return;
     }
 
-    toast.error(updatedResult.message || "Vendor add failed", { id: toastId });
+    if (updatedResult?.data?.errorSources) {
+      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
+    } else {
+      toast.error(updatedResult.message || "Vendor add failed", {
+        id: toastId,
+      });
+    }
     console.log(updatedResult);
   };
 
