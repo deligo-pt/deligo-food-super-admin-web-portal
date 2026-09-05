@@ -142,44 +142,53 @@ export default function BroadcastCenter() {
     };
 
     const res = await broadcastNotificationReq(payload);
+
     if (res.success) {
       toast.success(res?.message, { id: toastId })
       setIsSubmitting(false);
+      setTimeout(() => {
+        setTitle("");
+        setBody("");
+        setSelectedRoles([]);
+        setShowPreview(false);
+        setSelectedUsers({
+          VENDOR: new Set(),
+          CUSTOMER: new Set(),
+          DELIVERY_PARTNER: new Set(),
+          FLEET_MANAGER: new Set(),
+          ADMIN: new Set(),
+        });
+        setExpandedPanels({
+          VENDOR: false,
+          CUSTOMER: false,
+          DELIVERY_PARTNER: false,
+          FLEET_MANAGER: false,
+          ADMIN: false,
+        });
+        setSearchQueries({
+          VENDOR: "",
+          CUSTOMER: "",
+          DELIVERY_PARTNER: "",
+          FLEET_MANAGER: "",
+          ADMIN: "",
+        });
+        setNotificationCategory(undefined);
+      }, 1000);
+      return;
+    };
+
+
+    if (res?.data?.errorSources) {
+      res?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      return;
     } else {
       toast.error(res?.message || "Notification sent failed", { id: toastId })
       setIsSubmitting(false);
-      return;
     }
-
-    setTimeout(() => {
-      setTitle("");
-      setBody("");
-      setSelectedRoles([]);
-      setShowPreview(false);
-      setSelectedUsers({
-        VENDOR: new Set(),
-        CUSTOMER: new Set(),
-        DELIVERY_PARTNER: new Set(),
-        FLEET_MANAGER: new Set(),
-        ADMIN: new Set(),
-      });
-      setExpandedPanels({
-        VENDOR: false,
-        CUSTOMER: false,
-        DELIVERY_PARTNER: false,
-        FLEET_MANAGER: false,
-        ADMIN: false,
-      });
-      setSearchQueries({
-        VENDOR: "",
-        CUSTOMER: "",
-        DELIVERY_PARTNER: "",
-        FLEET_MANAGER: "",
-        ADMIN: "",
-      });
-      setNotificationCategory(undefined);
-      console.log("hit");
-    }, 1000);
+    console.log(res);
+    return;
   };
 
   return (
