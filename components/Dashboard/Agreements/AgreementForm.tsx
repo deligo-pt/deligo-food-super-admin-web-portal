@@ -19,19 +19,22 @@ import { toast } from "sonner";
 import RichTextEditor from "./RichTextEditor";
 import { useTranslation } from "@/hooks/use-translation";
 import { AgreementPart, Clause, IAgreementVersion } from "@/types/agreement.type";
+import { FLEET_MANAGER_AGREEMENT_TEMPLATE, VENDOR_AGREEMENT_TEMPLATE } from "@/consts/agreement-templates";
 
 
 export type AgreementFormValues = {
     agreementType: "INITIAL_VENDOR_AGREEMENT" | "INITIAL_FLEET_MANAGER_AGREEMENT";
     documentTitle: string;
+    effectiveFrom?: string | null;
     parts: AgreementPart[];
 };
 
 interface AgreementFormProps {
-    defaultValues?: IAgreementVersion;
+    defaultValues?: AgreementFormValues | IAgreementVersion;
     onSubmit: (data: AgreementFormValues) => void;
     isSubmitting?: boolean;
     submitLabel?: string;
+    setSelectedType?: React.Dispatch<React.SetStateAction<"INITIAL_VENDOR_AGREEMENT" | "INITIAL_FLEET_MANAGER_AGREEMENT">>;
 }
 
 const emptyClause = (number = 1): Clause => ({
@@ -47,6 +50,7 @@ const AgreementForm = ({
     onSubmit,
     isSubmitting = false,
     submitLabel = "Create Draft Agreement",
+    setSelectedType,
 }: AgreementFormProps) => {
     const { t } = useTranslation();
     const [form, setForm] = useState<AgreementFormValues>({
@@ -69,20 +73,17 @@ const AgreementForm = ({
     const isFleet = form.agreementType === "INITIAL_FLEET_MANAGER_AGREEMENT";
 
     // Helpers
-    const updateTopField = (field: "agreementType" | "documentTitle", value: string) => {
+    const updateTopField = (field: "agreementType" | "documentTitle", value: AgreementFormValues["agreementType"] | AgreementFormValues["documentTitle"]) => {
         setForm((prev) => {
             if (field === "agreementType") {
-                if (value === "INITIAL_VENDOR_AGREEMENT") {
-                    return {
-                        ...prev,
-                        agreementType: value as any,
-                        parts: [{ clauses: [emptyClause(1)] }],
-                    };
-                }
+                const template =
+                    value === "INITIAL_VENDOR_AGREEMENT"
+                        ? VENDOR_AGREEMENT_TEMPLATE
+                        : FLEET_MANAGER_AGREEMENT_TEMPLATE;
+
                 return {
-                    ...prev,
-                    agreementType: value as any,
-                    parts: [{ partTitle: "", clauses: [emptyClause(1)] }],
+                    ...template,
+                    agreementType: value as AgreementFormValues["agreementType"],
                 };
             }
             return { ...prev, [field]: value };
@@ -147,7 +148,7 @@ const AgreementForm = ({
         partIndex: number,
         clauseIndex: number,
         field: keyof Clause,
-        value: any
+        value: Clause[keyof Clause]
     ) => {
         setForm((prev) => {
             const newParts = [...prev.parts];
@@ -220,8 +221,11 @@ const AgreementForm = ({
                             <Label>{t("agreement_type")}</Label>
                             <Select
                                 value={form.agreementType}
-                                onValueChange={(v) => updateTopField("agreementType", v)}
-                                disabled={isSubmitting || defaultValues?.agreementType === "INITIAL_FLEET_MANAGER_AGREEMENT" || defaultValues?.agreementType === "INITIAL_VENDOR_AGREEMENT"}
+                                onValueChange={(v) => {
+                                    updateTopField("agreementType", v as AgreementFormValues["agreementType"]);
+                                    if (setSelectedType) setSelectedType(v as AgreementFormValues["agreementType"]);
+                                }}
+                                disabled={isSubmitting}
                             >
                                 <SelectTrigger>
                                     <SelectValue />
@@ -241,7 +245,7 @@ const AgreementForm = ({
                             <Label>{t("document_title")}</Label>
                             <Input
                                 value={form.documentTitle}
-                                onChange={(e) => updateTopField("documentTitle", e.target.value)}
+                                onChange={(e) => updateTopField("documentTitle", e.target.value as AgreementFormValues["documentTitle"])}
                                 placeholder={t("document_title_ph")}
                             />
                         </div>

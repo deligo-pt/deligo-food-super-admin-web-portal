@@ -955,6 +955,8 @@ export const pt = {
   no_fleet_managers_found_in: "Nenhum gerente de frota encontrado em",
   assign_and_approve: "Atribuir e Aprovar",
   approve_without_assign: "Aprovar sem Atribuir",
+  assign_fleet_manager: "Atribuir Gestor de Frota",
+  assign_to_fleet_manager: "Atribuir ao Gestor de Frota",
 
   // active delivery partners
   all_active_riders_system: "Todos os Estafetas ativos no sistema",

@@ -8,11 +8,20 @@ import { createDraftAgreement } from "@/services/dashboard/agreement/agreement.s
 import { toast } from "sonner";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { FLEET_MANAGER_AGREEMENT_TEMPLATE, VENDOR_AGREEMENT_TEMPLATE } from "@/consts/agreement-templates";
 
 const CreateDraftAgreement = () => {
     const { t } = useTranslation();
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedType, setSelectedType] = useState<
+        "INITIAL_VENDOR_AGREEMENT" | "INITIAL_FLEET_MANAGER_AGREEMENT"
+    >("INITIAL_VENDOR_AGREEMENT");
+
+    const template =
+        selectedType === "INITIAL_VENDOR_AGREEMENT"
+            ? VENDOR_AGREEMENT_TEMPLATE
+            : FLEET_MANAGER_AGREEMENT_TEMPLATE;
 
     const handleSubmit = async (data: any) => {
         const toastId = toast.loading("Creating draft agreement...");
@@ -43,6 +52,9 @@ const CreateDraftAgreement = () => {
                 onSubmit={handleSubmit}
                 submitLabel={t("create_draft_agreement")}
                 isSubmitting={isSubmitting}
+                setSelectedType={setSelectedType}
+                key={selectedType}
+                defaultValues={template}
             />
         </div>
     );

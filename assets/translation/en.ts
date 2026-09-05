@@ -940,6 +940,8 @@ export const en = {
   no_fleet_managers_found_in: "No fleet managers found in",
   assign_and_approve: "Assign & Approve",
   approve_without_assign: "Approve without Assign",
+  assign_fleet_manager: "Assign Fleet Manager",
+  assign_to_fleet_manager: "Assign to Fleet Manager",
 
   // active delivery partners
   all_active_riders_system: "All active riders in the system",
