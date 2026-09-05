@@ -301,6 +301,7 @@ export default function AddAdmin() {
                         placeholder={t("admin_email")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        readOnly={!!adminId}
                       />
                       {!otpSent && !emailVerified && (
                         <Button
