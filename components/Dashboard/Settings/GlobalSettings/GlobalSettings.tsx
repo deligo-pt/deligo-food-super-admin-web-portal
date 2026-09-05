@@ -137,9 +137,9 @@ export default function GlobalSettings({
       cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
 
       // activity logs retention
-      archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 0,
-      deleteAfterMonths: settings?.activityLogRetention?.deleteAfterMonths || 0,
-      batchSize: settings?.activityLogRetention?.batchSize || 0,
+      archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 12,
+      deleteAfterMonths: settings?.activityLogRetention?.deleteAfterMonths || 18,
+      batchSize: settings?.activityLogRetention?.batchSize || 500,
 
       // ingredients and delivery charges
       deliveryChargeInsideLisbon: settings?.ingredientsOrder?.deliveryChargeInsideLisbon || 20,
@@ -236,17 +236,20 @@ export default function GlobalSettings({
         deliveryChargeOutsideLisbon: data.deliveryChargeOutsideLisbon,
       },
     } as Partial<TGlobalSettings>;
-    console.log("payload", payload);
+
     const result = settings._id
       ? await updateGlobalSettingsReq(payload)
       : await createGlobalSettingsReq(payload);
+
 
     if (result.success) {
       toast.success(result.message || "Global settings saved successfully!", {
         id: toastId,
       });
+      setIsSaving(false);
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 3000);
+      return;
     }
 
     if (result?.data?.errorSources) {
