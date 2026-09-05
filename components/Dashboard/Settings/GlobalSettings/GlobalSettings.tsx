@@ -220,7 +220,7 @@ export default function GlobalSettings({
         deligoSignatureUrl: uploadedSignatureUrl,
         deligoSignatoryName: data.deligoSignatoryName,
         deligoSignatoryRole: data.deligoSignatoryRole,
-        deligoCompanyStampUrl: partyStamp,
+        ...(partyStamp && { deligoCompanyStampUrl: partyStamp }),
       },
       activityLogRetention: {
         archiveAfterMonths: data.archiveAfterMonths,
@@ -236,7 +236,7 @@ export default function GlobalSettings({
         deliveryChargeOutsideLisbon: data.deliveryChargeOutsideLisbon,
       },
     } as Partial<TGlobalSettings>;
-
+    console.log("payload", payload);
     const result = settings._id
       ? await updateGlobalSettingsReq(payload)
       : await createGlobalSettingsReq(payload);
@@ -247,14 +247,27 @@ export default function GlobalSettings({
       });
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 3000);
+    }
+
+    if (result?.data?.errorSources) {
+      result?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      setIsSaving(false);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+      return;
     } else {
       toast.error(result.message || "Global settings save failed", {
         id: toastId,
       });
-      setSaveStatus("error");
-      setTimeout(() => setSaveStatus("idle"), 3000);
     }
+    console.log(result);
     setIsSaving(false);
+    setSaveStatus("error");
+    setTimeout(() => setSaveStatus("idle"), 3000);
+    return;
+
   };
 
   return (

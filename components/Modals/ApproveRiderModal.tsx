@@ -34,7 +34,7 @@ interface IProps {
     partnerId: string;
     partnerName: string;
     city: string;
-    status: "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED";
+    status: "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED" | "ASSIGN";
 }
 
 export default function ApproveRiderModal({
@@ -73,6 +73,45 @@ export default function ApproveRiderModal({
         }
     }, [open, city]);
 
+    const handleAssignToFleet = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedFleetId) return;
+
+        const toastId = toast.loading("Assigning to fleet manager...");
+        setIsSubmitting(true);
+
+        try {
+            const result = await assignFleetAndApproveRiderReq({ fleetManagerId: selectedFleetId }, partnerId);
+
+            if (result?.success) {
+                setSelectedFleetId("");
+                toast.success("Rider assigned successfully", { id: toastId });
+                onOpenChange(false);
+                router.refresh();
+                return;
+            };
+
+            if (result?.data?.errorSources) {
+                result?.data?.errorSources?.map((err: { path: string, message: string }) => (
+                    toast.error(err?.message, { id: toastId })
+                ));
+                return;
+            } else {
+                toast.error(result.message || "Rider assigned failed", {
+                    id: toastId,
+                });
+            }
+            console.log(result);
+            return;
+
+        } catch (error) {
+            console.log("error", error);
+            toast.error("An unexpected error occurred", { id: toastId });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const handleAssignAndApprove = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedFleetId) return;
@@ -92,9 +131,18 @@ export default function ApproveRiderModal({
                     onOpenChange(false);
                     router.refresh();
                 }
+            }
+            if (result?.data?.errorSources) {
+                result?.data?.errorSources?.map((err: { path: string, message: string }) => (
+                    toast.error(err?.message, { id: toastId })
+                ));
+                return;
             } else {
                 toast.error(result?.message || "Operation failed", { id: toastId });
             }
+            console.log(result);
+            return;
+
         } catch (error) {
             console.log("error", error);
             toast.error("An unexpected error occurred", { id: toastId });
@@ -117,7 +165,7 @@ export default function ApproveRiderModal({
         setIsSubmitting(true);
 
         const updateStatus = {
-            status: status === "UNBLOCKED" ? "APPROVED" : status,
+            status: status === "UNBLOCKED" || status === "ASSIGN" ? "APPROVED" : status,
             remarks,
         };
 
@@ -142,19 +190,28 @@ export default function ApproveRiderModal({
             return;
         }
 
-        toast.error(
-            result.message ||
-            (status === "APPROVED"
-                ? "Approving failed"
-                : status === "REJECTED"
-                    ? "Rejecting failed"
-                    : status === "BLOCKED"
-                        ? "Blocking failed"
-                        : "Unblocking failed"),
-            { id: toastId },
-        );
+        if (result?.data?.errorSources) {
+            result?.data?.errorSources?.map((err: { path: string, message: string }) => (
+                toast.error(err?.message, { id: toastId })
+            ));
+            setIsSubmitting(false);
+            return;
+        } else {
+            toast.error(
+                result.message ||
+                (status === "APPROVED"
+                    ? "Approving failed"
+                    : status === "REJECTED"
+                        ? "Rejecting failed"
+                        : status === "BLOCKED"
+                            ? "Blocking failed"
+                            : "Unblocking failed"),
+                { id: toastId },
+            );
+        }
         console.log(result);
         setIsSubmitting(false);
+        return;
     };
 
     return (
@@ -260,8 +317,8 @@ export default function ApproveRiderModal({
                     <DialogClose asChild>
                         <Button variant="outline" size="sm">{t("cancel")}</Button>
                     </DialogClose>
-                    <Button
-                        onClick={handleAssignAndApprove}
+                    {status === "ASSIGN" ? <Button
+                        onClick={handleAssignToFleet}
                         disabled={isSubmitting || !selectedFleetId || isLoadingFleets}
                         size="sm"
                         className="text-white font-medium"
@@ -269,19 +326,33 @@ export default function ApproveRiderModal({
                         onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
                         onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                     >
-                        {t("assign_and_approve")}
-                    </Button>
-                    <Button
-                        onClick={handleApproveOrReject}
-                        disabled={isSubmitting || isLoadingFleets}
-                        size="sm"
-                        className="text-white font-medium"
-                        style={{ backgroundColor: "#DC3173" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
-                        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-                    >
-                        Approve without Assign
-                    </Button>
+                        {t("assign_to_fleet_manager")}
+                    </Button> : (
+                        <>
+                            <Button
+                                onClick={handleAssignAndApprove}
+                                disabled={isSubmitting || !selectedFleetId || isLoadingFleets}
+                                size="sm"
+                                className="text-white font-medium"
+                                style={{ backgroundColor: "#DC3173" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
+                                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                            >
+                                {t("assign_and_approve")}
+                            </Button>
+                            <Button
+                                onClick={handleApproveOrReject}
+                                disabled={isSubmitting || isLoadingFleets}
+                                size="sm"
+                                className="text-white font-medium"
+                                style={{ backgroundColor: "#DC3173" }}
+                                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.9")}
+                                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+                            >
+                                {t("approve_without_assign")}
+                            </Button>
+                        </>
+                    )}
                 </DialogFooter>
 
             </DialogContent>
