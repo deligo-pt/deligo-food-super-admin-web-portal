@@ -44,8 +44,6 @@ interface CreateUserAgreementProps {
     user: { userId: string;[key: string]: any };
     role: AgreementRole;
     onSuccess?: (agreement: any) => void;
-
-    successRedirectPath?: (agreementId: string) => string;
     showBackButton?: boolean;
     title?: string;
     subtitle?: string;
@@ -56,7 +54,6 @@ export default function CreateUserAgreement({
     user,
     role,
     onSuccess,
-    successRedirectPath,
     showBackButton = true,
     title,
     subtitle,
@@ -105,7 +102,6 @@ export default function CreateUserAgreement({
         const userId = user?.userId;
         const result = await createAgreement(userId, payload);
         console.log("result", result);
-
         if (result?.success) {
             toast.success(result?.message || "Agreement created successfully!", {
                 id: toastId,
@@ -115,14 +111,6 @@ export default function CreateUserAgreement({
                 onSuccess(result.data);
                 return;
             }
-
-            const agreementId = result?.data?._id;
-            const path = successRedirectPath
-                ? successRedirectPath(agreementId)
-                : `/become-vendor/agreement-sign?agreementId=${encodeURIComponent(agreementId)}`;
-
-            router.push(path);
-            return;
         }
 
         if (result?.data?.errorSources) {
