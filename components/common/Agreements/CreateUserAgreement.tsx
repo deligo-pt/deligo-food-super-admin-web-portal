@@ -101,7 +101,7 @@ export default function CreateUserAgreement({
 
         const userId = user?.userId;
         const result = await createAgreement(userId, payload);
-        console.log("result", result);
+
         if (result?.success) {
             toast.success(result?.message || "Agreement created successfully!", {
                 id: toastId,

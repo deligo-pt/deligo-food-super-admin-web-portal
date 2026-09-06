@@ -209,7 +209,7 @@ const AgreementForm = ({
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="space-y-4">
             {/* Agreement Info */}
             <Card>
                 <CardHeader>
@@ -418,12 +418,12 @@ const AgreementForm = ({
             </div>
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3">
                 {/* <Button type="button" variant="outline" className="gap-2">
                     <Eye className="h-4 w-4" />
                     {t("preview")}
                 </Button> */}
-                <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
+                <Button type="button" className="bg-[#DC3173] text-white" variant="outline" onClick={handleSubmit} disabled={isSubmitting}>
                     {isSubmitting ? t("saving") : submitLabel}
                 </Button>
             </div>

@@ -53,9 +53,9 @@ const publishSchema = z.object({
             const selectedDate = new Date(val);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            return selectedDate >= today;
+            return selectedDate > today;
         },
-        { message: "Effective date must be today or in the future" }
+        { message: "Effective date must be in the future" }
     ),
 });
 
@@ -135,9 +135,6 @@ export default function AgreementVersionsDetails({ agreeVersion }: IProps) {
             });
             setIsPublishOpen(false);
             return;
-
-        } catch (error) {
-            console.error("Failed to publish agreement version:", error);
 
         } finally {
             form.reset();
