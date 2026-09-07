@@ -136,7 +136,7 @@ export default function DeliveryPartners({
 
       {/* Approve rider*/}
       <ApproveRiderModal
-        open={approveInfo.partnerId.length > 0 && (approveInfo.status === "APPROVED" || approveInfo.status === "UNBLOCKED")}
+        open={approveInfo.partnerId.length > 0 && (approveInfo.status === "APPROVED" || approveInfo.status === "UNBLOCKED" || approveInfo.status === "ASSIGN")}
         onOpenChange={() => setApproveInfo({ partnerId: "", partnerName: "", city: "", status: "" })}
         partnerId={approveInfo.partnerId}
         partnerName={approveInfo.partnerName}

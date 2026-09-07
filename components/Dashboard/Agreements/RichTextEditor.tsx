@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Bold,
@@ -11,6 +11,9 @@ import {
     Table,
     Plus,
     Minus,
+    Heading2,
+    Rows,
+    Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -35,92 +38,293 @@ const RichTextEditor = ({
     className,
 }: RichTextEditorProps) => {
     const editorRef = useRef<HTMLDivElement>(null);
+    const isInternalChange = useRef(false); // prevents cursor jump
+
     const [activeFormats, setActiveFormats] = useState({
         bold: false,
         underline: false,
         unorderedList: false,
         orderedList: false,
+        subheading: false,
     });
 
-    // Table size controls
     const [tableRows, setTableRows] = useState(3);
     const [tableCols, setTableCols] = useState(2);
     const [tableOpen, setTableOpen] = useState(false);
 
-    // Sync external value → editor
+    // ========== Save / Restore Cursor ==========
+    const saveSelection = () => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0 || !editorRef.current) return null;
+
+        const range = selection.getRangeAt(0);
+        const preSelectionRange = range.cloneRange();
+        preSelectionRange.selectNodeContents(editorRef.current);
+        preSelectionRange.setEnd(range.startContainer, range.startOffset);
+        const start = preSelectionRange.toString().length;
+
+        return {
+            start,
+            end: start + range.toString().length,
+        };
+    };
+
+    const restoreSelection = (saved: { start: number; end: number } | null) => {
+        if (!saved || !editorRef.current) return;
+
+        const selection = window.getSelection();
+        if (!selection) return;
+
+        let charIndex = 0;
+        const range = document.createRange();
+        range.setStart(editorRef.current, 0);
+        range.collapse(true);
+
+        const nodeStack: Node[] = [editorRef.current];
+        let node: Node | undefined;
+        let foundStart = false;
+        let stop = false;
+
+        while (!stop && (node = nodeStack.pop())) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const nextCharIndex = charIndex + (node.textContent?.length || 0);
+                if (!foundStart && saved.start >= charIndex && saved.start <= nextCharIndex) {
+                    range.setStart(node, saved.start - charIndex);
+                    foundStart = true;
+                }
+                if (foundStart && saved.end >= charIndex && saved.end <= nextCharIndex) {
+                    range.setEnd(node, saved.end - charIndex);
+                    stop = true;
+                }
+                charIndex = nextCharIndex;
+            } else {
+                let i = node.childNodes.length;
+                while (i--) {
+                    nodeStack.push(node.childNodes[i]);
+                }
+            }
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+    };
+
+    // ========== Sync external value (only when needed) ==========
     useEffect(() => {
-        if (editorRef.current && editorRef.current.innerHTML !== value) {
+        if (!editorRef.current) return;
+
+        // Skip if the change came from inside the editor
+        if (isInternalChange.current) {
+            isInternalChange.current = false;
+            return;
+        }
+
+        if (editorRef.current.innerHTML !== value) {
+            const saved = saveSelection();
             editorRef.current.innerHTML = value || "";
+            restoreSelection(saved);
         }
     }, [value]);
 
+    // ========== Clean HTML ==========
+    const cleanHtml = (html: string): string => {
+        return html
+            .replace(/ style="[^"]*"/gi, "")
+            .replace(/ style='[^']*'/gi, "")
+            .replace(/<span[^>]*>/gi, "")
+            .replace(/<\/span>/gi, "")
+            .replace(/<b>/gi, "<strong>")
+            .replace(/<\/b>/gi, "</strong>")
+            .replace(/<i>/gi, "<em>")
+            .replace(/<\/i>/gi, "</em>")
+            .replace(/<\/?thead[^>]*>/gi, "")
+            .replace(/<\/?tbody[^>]*>/gi, "")
+            .replace(/<div><br><\/div>/gi, "<br>")
+            .replace(/<p><br><\/p>/gi, "<br>");
+    };
+
+
     const updateActiveFormats = () => {
+        const selection = window.getSelection();
+        let isSubheading = false;
+
+        if (selection?.anchorNode) {
+            let node = selection.anchorNode as HTMLElement | null;
+            while (node && node !== editorRef.current) {
+                if (node.nodeType === 1 && node.classList?.contains("subheading")) {
+                    isSubheading = true;
+                    break;
+                }
+                node = node.parentElement;
+            }
+        }
+
         setActiveFormats({
             bold: document.queryCommandState("bold"),
             underline: document.queryCommandState("underline"),
             unorderedList: document.queryCommandState("insertUnorderedList"),
             orderedList: document.queryCommandState("insertOrderedList"),
+            subheading: isSubheading,
         });
     };
+
+    const handleInput = useCallback(() => {
+        if (!editorRef.current) return;
+
+        isInternalChange.current = true;
+        const cleaned = cleanHtml(editorRef.current.innerHTML);
+        onChange(cleaned);
+        updateActiveFormats();
+    }, [onChange]);
 
     const exec = (command: string, value?: string) => {
         document.execCommand(command, false, value);
         editorRef.current?.focus();
         handleInput();
-        updateActiveFormats();
     };
 
-    const handleInput = () => {
-        if (!editorRef.current) return;
+    // ========== Subheading ==========
+    const applySubheading = () => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
 
-        let html = editorRef.current.innerHTML;
+        const range = selection.getRangeAt(0);
+        let node = range.commonAncestorContainer as HTMLElement;
 
-        html = html
-            .replace(/<div><br><\/div>/gi, "<br>")
-            .replace(/<div>/gi, "<p>")
-            .replace(/<\/div>/gi, "</p>")
-            .replace(/<b>/gi, "<strong>")
-            .replace(/<\/b>/gi, "</strong>");
-
-        onChange(html);
-        updateActiveFormats();
-    };
-
-    // Generate table with custom rows & columns
-    const insertTable = () => {
-        const rows = Math.max(1, Math.min(tableRows, 15)); // limit 1-15
-        const cols = Math.max(1, Math.min(tableCols, 8));  // limit 1-8
-
-        let tableHtml = `<table><thead><tr>`;
-
-        // Header row
-        for (let c = 0; c < cols; c++) {
-            tableHtml += `<th>Header ${c + 1}</th>`;
-        }
-        tableHtml += `</tr></thead><tbody>`;
-
-        // Body rows
-        for (let r = 0; r < rows; r++) {
-            tableHtml += `<tr>`;
-            for (let c = 0; c < cols; c++) {
-                tableHtml += `<td>Cell</td>`;
+        while (node && node !== editorRef.current) {
+            if (
+                node.nodeType === 1 &&
+                ["P", "DIV", "H1", "H2", "H3", "LI"].includes(node.nodeName)
+            ) {
+                break;
             }
-            tableHtml += `</tr>`;
+            node = node.parentElement as HTMLElement;
         }
 
-        tableHtml += `</tbody></table><p><br></p>`;
+        if (node && node !== editorRef.current) {
+            if (node.classList.contains("subheading")) {
+                // Toggle off
+                const p = document.createElement("p");
+                p.innerHTML = node.innerHTML || "<br>";
+                node.parentNode?.replaceChild(p, node);
+            } else {
+                const div = document.createElement("div");
+                div.className = "subheading";
+                div.innerHTML = node.innerHTML || "<br>";
+                node.parentNode?.replaceChild(div, node);
 
-        document.execCommand("insertHTML", false, tableHtml);
+                // Keep cursor at the end
+                const newRange = document.createRange();
+                newRange.selectNodeContents(div);
+                newRange.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
+        } else {
+            document.execCommand("insertHTML", false, `<div class="subheading"><br></div>`);
+        }
+
+        handleInput();
+    };
+
+    // ========== Lists ==========
+    const insertBulletList = () => {
+        document.execCommand("insertUnorderedList", false);
+        setTimeout(() => {
+            const selection = window.getSelection();
+            if (!selection) return;
+            let node = selection.anchorNode as HTMLElement | null;
+            while (node && node !== editorRef.current) {
+                if (node.nodeName === "UL") {
+                    node.setAttribute("class", "bullet-list");
+                    break;
+                }
+                node = node.parentElement;
+            }
+            handleInput();
+        }, 0);
+    };
+
+    const insertOrderedList = () => {
+        document.execCommand("insertOrderedList", false);
+        handleInput();
+    };
+
+    // ========== Table helpers ==========
+    const findNearestTable = (): HTMLTableElement | null => {
+        const selection = window.getSelection();
+        if (selection?.anchorNode) {
+            let node = selection.anchorNode as HTMLElement | null;
+            while (node && node !== editorRef.current) {
+                if (node.nodeName === "TABLE") return node as HTMLTableElement;
+                node = node.parentElement;
+            }
+        }
+        const tables = editorRef.current?.querySelectorAll("table.calc-table");
+        return tables && tables.length > 0
+            ? (tables[tables.length - 1] as HTMLTableElement)
+            : null;
+    };
+
+    const insertTable = () => {
+        const rows = Math.max(1, Math.min(tableRows, 15));
+        const cols = Math.max(1, Math.min(tableCols, 8));
+
+        let html = `<table class="calc-table"><tr>`;
+        for (let c = 0; c < cols; c++) html += `<th>Header ${c + 1}</th>`;
+        html += `</tr>`;
+
+        for (let r = 0; r < rows; r++) {
+            html += `<tr>`;
+            for (let c = 0; c < cols; c++) html += `<td>Cell</td>`;
+            html += `</tr>`;
+        }
+        html += `</table><p><br></p>`;
+
+        document.execCommand("insertHTML", false, html);
         handleInput();
         setTableOpen(false);
     };
 
-    const toggleList = (ordered: boolean) => {
-        const command = ordered ? "insertOrderedList" : "insertUnorderedList";
-        document.execCommand(command, false);
-        editorRef.current?.focus();
+    const addTableRow = () => {
+        const table = findNearestTable();
+        if (!table) return;
+        const cols = table.rows[0]?.cells.length || 2;
+        const newRow = table.insertRow(-1);
+        for (let i = 0; i < cols; i++) {
+            newRow.insertCell().innerHTML = "Cell";
+        }
         handleInput();
-        updateActiveFormats();
+    };
+
+    const addTotalRow = () => {
+        const table = findNearestTable();
+        if (!table) return;
+        const cols = table.rows[0]?.cells.length || 2;
+        const newRow = table.insertRow(-1);
+        newRow.className = "total-row";
+        for (let i = 0; i < cols; i++) {
+            newRow.insertCell().innerHTML = i === 0 ? "Total" : "";
+        }
+        handleInput();
+    };
+
+    const deleteTableRow = () => {
+        const selection = window.getSelection();
+        if (!selection?.anchorNode) return;
+
+        let node = selection.anchorNode as HTMLElement | null;
+        while (node && node !== editorRef.current) {
+            if (node.nodeName === "TR") {
+                const table = node.closest("table");
+                if (table && table.rows.length > 1) {
+                    node.remove();
+                    handleInput();
+                }
+                break;
+            }
+            node = node.parentElement;
+        }
     };
 
     return (
@@ -132,7 +336,6 @@ const RichTextEditor = ({
                     size="sm"
                     variant="ghost"
                     onClick={() => exec("bold")}
-                    title="Bold"
                     className={cn(activeFormats.bold && "bg-[#DC3173]/15 text-[#DC3173]")}
                 >
                     <Bold className="h-4 w-4" />
@@ -143,7 +346,6 @@ const RichTextEditor = ({
                     size="sm"
                     variant="ghost"
                     onClick={() => exec("underline")}
-                    title="Underline"
                     className={cn(activeFormats.underline && "bg-[#DC3173]/15 text-[#DC3173]")}
                 >
                     <Underline className="h-4 w-4" />
@@ -155,8 +357,7 @@ const RichTextEditor = ({
                     type="button"
                     size="sm"
                     variant="ghost"
-                    onClick={() => toggleList(false)}
-                    title="Bullet List"
+                    onClick={insertBulletList}
                     className={cn(activeFormats.unorderedList && "bg-[#DC3173]/15 text-[#DC3173]")}
                 >
                     <List className="h-4 w-4" />
@@ -166,8 +367,7 @@ const RichTextEditor = ({
                     type="button"
                     size="sm"
                     variant="ghost"
-                    onClick={() => toggleList(true)}
-                    title="Numbered List"
+                    onClick={insertOrderedList}
                     className={cn(activeFormats.orderedList && "bg-[#DC3173]/15 text-[#DC3173]")}
                 >
                     <ListOrdered className="h-4 w-4" />
@@ -175,109 +375,70 @@ const RichTextEditor = ({
 
                 <div className="w-px h-5 bg-border mx-1" />
 
+                <Button type="button" size="sm" variant="ghost" onClick={() => exec("formatBlock", "p")}>
+                    <Pilcrow className="h-4 w-4" />
+                </Button>
+
                 <Button
                     type="button"
                     size="sm"
                     variant="ghost"
-                    onClick={() => exec("formatBlock", "p")}
-                    title="Paragraph"
+                    onClick={applySubheading}
+                    className={cn(activeFormats.subheading && "bg-[#DC3173]/15 text-[#DC3173]")}
                 >
-                    <Pilcrow className="h-4 w-4" />
+                    <Heading2 className="h-4 w-4" />
                 </Button>
 
-                {/* ===== Table with size selector ===== */}
+                {/* Table */}
                 <Popover open={tableOpen} onOpenChange={setTableOpen}>
                     <PopoverTrigger asChild>
-                        <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            title="Insert Table"
-                        >
+                        <Button type="button" size="sm" variant="ghost">
                             <Table className="h-4 w-4" />
                         </Button>
                     </PopoverTrigger>
-
                     <PopoverContent className="w-64 p-4" align="start">
                         <div className="space-y-4">
                             <p className="text-sm font-medium">Insert Table</p>
-
-                            {/* Rows */}
                             <div className="flex items-center justify-between gap-3">
-                                <Label className="text-sm">Rows</Label>
+                                <Label>Rows</Label>
                                 <div className="flex items-center gap-2">
-                                    <Button
-                                        type="button"
-                                        size="icon"
-                                        variant="outline"
-                                        className="h-8 w-8"
-                                        onClick={() => setTableRows((prev) => Math.max(1, prev - 1))}
-                                    >
+                                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => setTableRows(p => Math.max(1, p - 1))}>
                                         <Minus className="h-3.5 w-3.5" />
                                     </Button>
-                                    <Input
-                                        type="number"
-                                        min={1}
-                                        max={15}
-                                        value={tableRows}
-                                        onChange={(e) => setTableRows(Number(e.target.value) || 1)}
-                                        className="w-14 h-8 text-center"
-                                    />
-                                    <Button
-                                        type="button"
-                                        size="icon"
-                                        variant="outline"
-                                        className="h-8 w-8"
-                                        onClick={() => setTableRows((prev) => Math.min(15, prev + 1))}
-                                    >
+                                    <Input type="number" min={1} max={15} value={tableRows} onChange={e => setTableRows(Number(e.target.value) || 1)} className="w-14 h-8 text-center" />
+                                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => setTableRows(p => Math.min(15, p + 1))}>
                                         <Plus className="h-3.5 w-3.5" />
                                     </Button>
                                 </div>
                             </div>
-
-                            {/* Columns */}
                             <div className="flex items-center justify-between gap-3">
-                                <Label className="text-sm">Columns</Label>
+                                <Label>Columns</Label>
                                 <div className="flex items-center gap-2">
-                                    <Button
-                                        type="button"
-                                        size="icon"
-                                        variant="outline"
-                                        className="h-8 w-8"
-                                        onClick={() => setTableCols((prev) => Math.max(1, prev - 1))}
-                                    >
+                                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => setTableCols(p => Math.max(1, p - 1))}>
                                         <Minus className="h-3.5 w-3.5" />
                                     </Button>
-                                    <Input
-                                        type="number"
-                                        min={1}
-                                        max={8}
-                                        value={tableCols}
-                                        onChange={(e) => setTableCols(Number(e.target.value) || 1)}
-                                        className="w-14 h-8 text-center"
-                                    />
-                                    <Button
-                                        type="button"
-                                        size="icon"
-                                        variant="outline"
-                                        className="h-8 w-8"
-                                        onClick={() => setTableCols((prev) => Math.min(8, prev + 1))}
-                                    >
+                                    <Input type="number" min={1} max={8} value={tableCols} onChange={e => setTableCols(Number(e.target.value) || 1)} className="w-14 h-8 text-center" />
+                                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => setTableCols(p => Math.min(8, p + 1))}>
                                         <Plus className="h-3.5 w-3.5" />
                                     </Button>
                                 </div>
                             </div>
-
-                            <Button
-                                type="button"
-                                className="w-full"
-                                onClick={insertTable}
-                            >
-                                Insert Table
-                            </Button>
+                            <Button className="w-full" onClick={insertTable}>Insert Table</Button>
                         </div>
                     </PopoverContent>
                 </Popover>
+
+                <Button type="button" size="sm" variant="ghost" onClick={addTableRow} title="Add Row">
+                    <Rows className="h-4 w-4" />
+                </Button>
+
+                <Button type="button" size="sm" variant="ghost" onClick={addTotalRow} title="Add Total Row" className="text-[#DC3173] font-bold">
+                    Σ
+                </Button>
+
+                <Button type="button" size="sm" variant="ghost" onClick={deleteTableRow} title="Delete Row" className="text-destructive">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
             </div>
 
             {/* Editable Area */}
@@ -297,42 +458,56 @@ const RichTextEditor = ({
           color: #9ca3af;
           pointer-events: none;
         }
-
-        .rich-editor ul {
+        .rich-editor .subheading {
+          font-weight: 600;
+          font-size: 1rem;
+          margin: 1rem 0 0.4rem;
+          color: #111;
+        }
+        .rich-editor ul.bullet-list {
           list-style-type: disc !important;
           padding-left: 1.75rem !important;
           margin: 0.75rem 0 !important;
         }
-
         .rich-editor ol {
           list-style-type: decimal !important;
           padding-left: 1.75rem !important;
           margin: 0.75rem 0 !important;
         }
-
         .rich-editor li {
           margin: 0.25rem 0 !important;
           display: list-item !important;
         }
-
-        .rich-editor table {
-          border-collapse: collapse;
-          width: 100%;
-          margin: 1rem 0;
+        .rich-editor table.calc-table {
+         border-collapse: collapse;
+        width: 100%;
+         margin: 1rem 0;
+         table-layout: auto;
         }
 
-        .rich-editor th,
-        .rich-editor td {
-          border: 1px solid #d1d5db;
-          padding: 0.5rem 0.75rem;
-          text-align: left;
+        .rich-editor table.calc-table th,
+        .rich-editor table.calc-table td {
+        border: 1px solid #d1d5db;
+        padding: 0.6rem 0.9rem;
+        text-align: left !important;
+        vertical-align: top;
+        white-space: normal;
         }
 
-        .rich-editor th {
-          background-color: #f3f4f6;
-          font-weight: 600;
+        .rich-editor table.calc-table th {
+        background-color: #f3f4f6;
+        font-weight: 600;
+        text-align: left !important;
         }
 
+        .rich-editor table.calc-table tr.total-row {
+        font-weight: 700;
+        background-color: #fdf2f8;
+        }
+
+        .rich-editor table.calc-table tr.total-row td {
+        text-align: left !important;
+        }
         .rich-editor p {
           margin: 0.5rem 0;
         }

@@ -203,7 +203,7 @@ export type TVendor = {
   businessLocation?: {
     street: string;
     city: string;
-    state: string;
+    state?: string;
     country: string;
     postalCode: string;
     latitude?: number;
@@ -215,10 +215,10 @@ export type TVendor = {
   // Banking & Payments
   // --------------------------------------------------------
   bankDetails?: {
-    bankName: string;
+    bankName?: string;
     accountHolderName: string;
     iban: string;
-    swiftCode: string;
+    swiftCode?: string;
   };
 
   // --------------------------------------------------------
