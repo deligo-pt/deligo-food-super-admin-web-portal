@@ -142,7 +142,7 @@ export default function DeliveryPartners({
         partnerName={approveInfo.partnerName}
         city={approveInfo.city}
         status={
-          approveInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
+          approveInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED" | "SUBMITTED"
         }
       />
 
