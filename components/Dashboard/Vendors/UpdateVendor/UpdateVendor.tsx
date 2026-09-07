@@ -592,7 +592,7 @@ export default function UpdateVendor({
           ...vendorData,
         }));
         setProfileSaved(true);
-        if (!needsAgreement) {
+        if (needsAgreement) {
           setActiveTab(AGREEMENT_START_TAB);
         } else {
           router.back();
@@ -642,10 +642,10 @@ export default function UpdateVendor({
 
     try {
       // submit user request
-      const submitRes = await submitForApproval(vendor?.userId);
-      if (submitRes?.success) {
-        // Auto-approve if not already approved
-        if (vendor.status !== USER_STATUS.APPROVED) {
+      if (vendor.status === USER_STATUS.PENDING) {
+        const submitRes = await submitForApproval(vendor?.userId);
+        if (submitRes?.success) {
+          // Auto-approve if not already approved
           const approveResult = await approveOrRejectReq(vendor.userId, {
             status: USER_STATUS.APPROVED,
           });
@@ -672,8 +672,23 @@ export default function UpdateVendor({
             { id: toastId }
           );
           return;
+        };
+
+        if (submitRes?.data?.errorSources) {
+          submitRes.data.errorSources.forEach(
+            (err: { path: string; message: string }) =>
+              toast.error(err?.message, { id: toastId })
+          );
+          return;
         }
-      }
+        toast.error(
+          submitRes.message || "Vendor status update failed",
+          { id: toastId }
+        );
+        return;
+      };
+
+      toast.success("Vendor updated successfully!", { id: toastId });
       router.refresh();
       router.back();
       return;
@@ -774,7 +789,7 @@ export default function UpdateVendor({
   const agreementProgressCount = needsAgreement
     ? [agreementCreated, agreementSigned].filter(Boolean).length
     : 2;
-
+  console.log("need agr", needsAgreement);
   return (
     <Form {...form}>
       <form
@@ -1751,7 +1766,7 @@ export default function UpdateVendor({
                 )
               ) : (
                 <>
-                  {!needsAgreement && <Button
+                  {needsAgreement && <Button
                     type="submit"
                     disabled={
                       (needsAgreement && !agreementSigned) ||
