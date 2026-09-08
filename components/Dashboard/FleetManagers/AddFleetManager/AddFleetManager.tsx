@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocationMap";
+import AgreementViewer from "@/components/common/Agreements/AgreementViewer";
+import CreateUserAgreement from "@/components/common/Agreements/CreateUserAgreement";
 import UploadFleetManagerDocuments from "@/components/Dashboard/FleetManagers/AddFleetManager/UploadFleetManagerDocuments";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Button } from "@/components/ui/button";
@@ -15,11 +18,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { USER_ROLE, USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
 import { resendOtpReq, verifyOtpReq } from "@/services/auth/otp.service";
 import {
   registerUserAndSendOtpReq,
+  submitForApproval,
   updateUserDataReq,
 } from "@/services/auth/register-user.service";
 import { TResponse } from "@/types";
@@ -33,19 +39,28 @@ import { jwtDecode } from "jwt-decode";
 import {
   BadgeCheck,
   Banknote,
+  Briefcase,
   CheckCircle,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   EyeOff,
+  FileSignature,
   FileText,
+  Lock,
   Mail,
+  MapPin,
+  Save,
+  ScrollText,
+  User,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { toast } from "sonner";
 import z from "zod";
-import { USER_ROLE } from "@/consts/user.const";
 
 const DELIGO = "#DC3173";
 
@@ -69,11 +84,26 @@ const defaultDocuments: Record<TFleetDocKey, string[] | null> = {
   idProofBack: null,
   proofOfAddress: null,
   activityDocument: null,
-  ibanProof: null
+  ibanProof: null,
 };
+
+/** First section ends at Documents (index 4). Agreements start at 5. */
+const DETAILS_LAST_TAB = 4;
+const AGREEMENT_START_TAB = 5;
+
+const TABS = [
+  { id: 0, key: "account", labelKey: "account_information", icon: User },
+  { id: 1, key: "business", labelKey: "business_details", icon: Briefcase },
+  { id: 2, key: "bank", labelKey: "bank_nd_payment_information", icon: Banknote },
+  { id: 3, key: "location", labelKey: "business_location_information", icon: MapPin },
+  { id: 4, key: "documents", labelKey: "documents_nd_verification", icon: FileText },
+  { id: 5, key: "create_agreement", labelKey: "create_agreement", icon: ScrollText },
+  { id: 6, key: "sign_agreement", labelKey: "agreement_sign", icon: FileSignature },
+] as const;
 
 export default function AddFleetManager() {
   const { t } = useTranslation();
+
   const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -82,6 +112,8 @@ export default function AddFleetManager() {
   const [fleetManagerId, setFleetManagerId] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [timer, setTimer] = useState(300);
+  const [buttonDisabled, setButtonDisabled] = useState(0);
+
   const [locationCoordinates, setLocationCoordinates] = useState({
     latitude: 0,
     longitude: 0,
@@ -89,78 +121,173 @@ export default function AddFleetManager() {
   const [previews, setPreviews] =
     useState<Record<TFleetDocKey, string[] | null>>(defaultDocuments);
 
-  const [buttonDisabled, setButtonDisabled] = useState(0);
+  const [agreementCreated, setAgreementCreated] = useState(false);
+  const [agreementData, setAgreementData] = useState<any>(null);
+  const [agreementSigned, setAgreementSigned] = useState(false);
+
+  /** True after successful Save & Continue */
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [activeTab, setActiveTab] = useState(0);
 
   const form = useForm<TFleetManagerForm>({
     resolver: zodResolver(addFleetManagerValidation),
     defaultValues: {
       firstName: "",
       lastName: "",
-      // prefixPhoneNumber: "",
       phoneNumber: "",
       businessName: "",
       businessLicenseNumber: "",
+      NIF: "",
       street: "",
       city: "",
       postalCode: "",
       country: "",
       latitude: 0,
       longitude: 0,
-      // bankName: "",
       accountHolderName: "",
       iban: "",
-      // swiftCode: "",
     },
+    mode: "onChange",
   });
 
-  const { formState: { isSubmitting } } = form;
+  const {
+    formState: { isSubmitting },
+  } = form;
 
+  const watchedValues = useWatch({ control: form.control });
+
+  const isDocumentsValid = FLEET_REQUIRED_DOCS.every(
+    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
+  );
+
+  const stepCompleted = useMemo(() => {
+    const v = watchedValues;
+
+    const accountOk =
+      emailVerified &&
+      !!fleetManagerId &&
+      !!v.firstName?.trim() &&
+      !!v.lastName?.trim() &&
+      !!v.phoneNumber &&
+      v.phoneNumber.length > 5;
+
+    const businessOk =
+      !!v.businessName?.trim() && !!v.businessLicenseNumber?.trim();
+
+    const bankOk = !!v.accountHolderName?.trim() && !!v.iban?.trim();
+
+    const locationOk =
+      !!v.street?.trim() &&
+      !!v.city?.trim() &&
+      !!v.postalCode?.trim() &&
+      !!v.country?.trim() &&
+      locationCoordinates.latitude !== 0 &&
+      locationCoordinates.longitude !== 0;
+
+    const documentsOk = isDocumentsValid;
+
+    return [
+      accountOk,
+      businessOk,
+      bankOk,
+      locationOk,
+      documentsOk,
+      agreementCreated,
+      agreementSigned,
+    ];
+  }, [
+    watchedValues,
+    emailVerified,
+    fleetManagerId,
+    locationCoordinates,
+    isDocumentsValid,
+    agreementCreated,
+    agreementSigned,
+  ]);
+
+  const canAccessTab = (tabIndex: number) => {
+    if (tabIndex === 0) return true;
+    if (tabIndex >= 1 && !fleetManagerId) return false;
+
+    if (tabIndex >= AGREEMENT_START_TAB && !profileSaved) return false;
+
+    for (let i = 0; i < tabIndex; i++) {
+      if (!stepCompleted[i]) return false;
+    }
+    return true;
+  };
+
+  const goToTab = (index: number) => {
+    if (canAccessTab(index)) {
+      setActiveTab(index);
+    } else {
+      if (index >= AGREEMENT_START_TAB && !profileSaved) {
+        toast.error(
+          "Please complete Documents and click Save & Continue before accessing Agreements."
+        );
+      } else {
+        toast.error("Please complete the previous steps first.");
+      }
+    }
+  };
+
+  const goNext = () => {
+    if (activeTab < TABS.length - 1) {
+      if (!stepCompleted[activeTab]) {
+        toast.error("Please complete all required fields in this step.");
+        return;
+      }
+      if (activeTab === DETAILS_LAST_TAB) {
+        handleSaveAndContinue();
+        return;
+      }
+      setActiveTab((prev) => prev + 1);
+    }
+  };
+
+  const goPrev = () => {
+    if (activeTab > 0) setActiveTab((prev) => prev - 1);
+  };
+
+  // ---------- OTP handlers ----------
   const sendOtp = async () => {
     if (!email || !password) return;
     setButtonDisabled(1);
-
     const toastId = toast.loading("Sending OTP...");
 
     if (!isValidEmail(email)) {
       setButtonDisabled(0);
       return toast.error("Invalid email address", { id: toastId });
     }
-
     if (!isValidPassword(password)) {
       setButtonDisabled(0);
       return toast.error(
         "Invalid password. Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
-        {
-          id: toastId,
-        },
+        { id: toastId }
       );
     }
 
-    const result = await registerUserAndSendOtpReq(
-      {
-        email,
-        password,
-        role: USER_ROLE.FLEET_MANAGER,
-      },
-    );
+    const result = await registerUserAndSendOtpReq({
+      email,
+      password,
+      role: USER_ROLE.FLEET_MANAGER,
+    });
 
     if (result.success) {
-      toast.success(result.message || "OTP sent successfully!", {
-        id: toastId,
-      });
+      toast.success(result.message || "OTP sent successfully!", { id: toastId });
       setOtpSent(true);
+      setButtonDisabled(0);
       return;
     }
-
     toast.error(result.message || "OTP send failed", { id: toastId });
-    console.log(result);
-    setButtonDisabled(0)
+    setButtonDisabled(0);
   };
 
   const resendOtp = async () => {
     const toastId = toast.loading("Resending OTP...");
     setButtonDisabled(2);
-
     try {
       const result = (await resendOtpReq({
         email,
@@ -169,17 +296,14 @@ export default function AddFleetManager() {
 
       if (result.success) {
         setTimer(300);
-        console.log("OTP resent!");
         toast.success("OTP resent successfully!", { id: toastId });
         return;
       }
       toast.error(result.message, { id: toastId });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "OTP resend failed", {
         id: toastId,
       });
-      console.log(error);
     } finally {
       setButtonDisabled(0);
     }
@@ -188,32 +312,38 @@ export default function AddFleetManager() {
   const verifyOtp = async () => {
     const toastId = toast.loading("Verifying OTP...");
     setButtonDisabled(3);
-
-    const result = await verifyOtpReq({
-      email,
-      otp,
-      role: USER_ROLE.FLEET_MANAGER,
-    });
-
-    if (result.success) {
-      toast.success(result.message || "OTP verified successfully!", {
-        id: toastId,
+    try {
+      const result = await verifyOtpReq({
+        email,
+        otp,
+        role: USER_ROLE.FLEET_MANAGER,
       });
-      const decoded = jwtDecode(result.data.accessToken) as { userId: string };
-      setFleetManagerId(decoded.userId);
-      setEmailVerified(true);
-      return;
-    }
 
-    toast.error(result.message || "OTP verification failed", { id: toastId });
-    console.log(result);
-    setButtonDisabled(0);
+      if (result && result.success) {
+        const decoded = jwtDecode(result.data.accessToken) as {
+          userId: string;
+        };
+        setFleetManagerId(decoded.userId);
+        setEmailVerified(true);
+        toast.success(result.message || "OTP verified successfully!", {
+          id: toastId,
+        });
+        return;
+      }
+      toast.error(result?.message || "OTP verification failed", { id: toastId });
+    } catch (error: any) {
+      toast.error(
+        error?.message || "Something went wrong during verification",
+        { id: toastId }
+      );
+    } finally {
+      setButtonDisabled(0);
+    }
   };
 
-  const onSubmit = async (data: TFleetManagerForm) => {
-    const toastId = toast.loading("Adding fleet manager...");
-
-    const fleetManagerData = {
+  // ---------- Build payload ----------
+  const buildFleetPayload = (data: TFleetManagerForm): Partial<TAgent> => {
+    return {
       name: {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -222,6 +352,7 @@ export default function AddFleetManager() {
       businessDetails: {
         businessName: data.businessName,
         businessLicenseNumber: data.businessLicenseNumber?.toUpperCase(),
+        NIF: data.NIF?.toUpperCase(),
       },
       businessLocation: {
         street: data.street,
@@ -232,62 +363,159 @@ export default function AddFleetManager() {
         longitude: locationCoordinates.longitude,
       },
       bankDetails: {
-        // bankName: data.bankName,
         accountHolderName: data.accountHolderName,
         iban: data.iban,
-        // swiftCode: data.swiftCode,
       },
-    } as Partial<TAgent>;
+    };
+  };
 
-    const updatedResult = await updateUserDataReq(
-      `/fleet-managers/${fleetManagerId}`,
-      fleetManagerData,
-    );
+  // ---------- Save & Continue (after Documents) ----------
+  const handleSaveAndContinue = async () => {
+    if (!fleetManagerId) {
+      toast.error("Fleet manager account not found. Please verify email first.");
+      return;
+    }
 
-    if (updatedResult.success) {
-      const approveResult = await approveOrRejectReq(fleetManagerId, {
-        status: "APPROVED",
-      });
+    const allDetailsComplete = stepCompleted
+      .slice(0, DETAILS_LAST_TAB + 1)
+      .every(Boolean);
 
-      if (approveResult.success) {
-        form.reset();
-        setPreviews(defaultDocuments);
+    if (!allDetailsComplete || !isDocumentsValid) {
+      toast.error(
+        "Please complete all required fields and upload required documents before saving."
+      );
+      return;
+    }
+
+    const isValid = await form.trigger();
+    if (!isValid) {
+      toast.error("Please fix validation errors before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+    const toastId = toast.loading("Saving fleet manager information...");
+
+    try {
+      const data = form.getValues();
+      const payload = buildFleetPayload(data);
+
+      const updatedResult = await updateUserDataReq(
+        `/fleet-managers/${fleetManagerId}`,
+        payload
+      );
+
+      if (updatedResult.success) {
+        setProfileSaved(true);
+        setActiveTab(AGREEMENT_START_TAB);
         toast.success(
-          approveResult.message || "Fleet manager added successfully!",
-          {
-            id: toastId,
-          },
+          updatedResult.message ||
+          "Fleet manager information saved. You can now create the agreement.",
+          { id: toastId }
         );
-        setEmail("");
-        setPassword("");
         return;
       }
 
-      if (approveResult?.data?.errorSources) {
-        approveResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
-          toast.error(err?.message, { id: toastId })
-        ));
+      if (updatedResult?.data?.errorSources) {
+        updatedResult.data.errorSources.forEach(
+          (err: { path: string; message: string }) =>
+            toast.error(err?.message, { id: toastId })
+        );
         return;
-      } else {
-        toast.error(approveResult.message || "Fleet manager add failed", {
-          id: toastId,
+      }
+
+      toast.error(
+        updatedResult.message || "Failed to save fleet manager information",
+        { id: toastId }
+      );
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Failed to save fleet manager information",
+        { id: toastId }
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // ---------- Final submit (Approve after agreement signed) ----------
+  const onSubmit = async (data: TFleetManagerForm) => {
+    if (!profileSaved) {
+      toast.error("Please save fleet manager information first (Save & Continue).");
+      return;
+    }
+    if (!agreementSigned) {
+      toast.error("Please sign the agreement first.");
+      return;
+    }
+
+    const toastId = toast.loading("Submitting fleet manager...");
+    if (!fleetManagerId) return;
+
+    try {
+      // submit user request
+      const submitRes = await submitForApproval(fleetManagerId);
+      if (submitRes?.success) {
+        // Auto-approve
+        const approveResult = await approveOrRejectReq(fleetManagerId, {
+          status: USER_STATUS.APPROVED,
         });
-      }
-      console.log(approveResult);
-      return;
-    }
 
-    if (updatedResult?.data?.errorSources) {
-      updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
-        toast.error(err?.message, { id: toastId })
-      ));
+        if (approveResult.success) {
+          form.reset();
+          setPreviews(defaultDocuments);
+          setOtpSent(false);
+          setEmailVerified(false);
+          setEmail("");
+          setPassword("");
+          setFleetManagerId("");
+          setAgreementCreated(false);
+          setAgreementSigned(false);
+          setAgreementData(null);
+          setProfileSaved(false);
+          setActiveTab(0);
+          toast.success(
+            approveResult.message || "Fleet manager added successfully!",
+            { id: toastId }
+          );
+          return;
+        }
+
+        if (approveResult?.data?.errorSources) {
+          approveResult.data.errorSources.forEach(
+            (err: { path: string; message: string }) =>
+              toast.error(err?.message, { id: toastId })
+          );
+          return;
+        }
+        toast.error(
+          approveResult.message || "Fleet manager update failed",
+          { id: toastId }
+        );
+        return;
+      };
+
+      if (submitRes?.data?.errorSources) {
+        submitRes.data.errorSources.forEach(
+          (err: { path: string; message: string }) =>
+            toast.error(err?.message, { id: toastId })
+        );
+        return;
+      }
+      toast.error(
+        submitRes.message || "Fleet manager update failed",
+        { id: toastId }
+      );
       return;
-    } else {
-      toast.error(updatedResult.message || "Fleet manager add failed", {
-        id: toastId,
-      });
+
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Something went wrong",
+        { id: toastId }
+      );
     }
-    console.log(updatedResult);
   };
 
   useEffect(() => {
@@ -297,11 +525,96 @@ export default function AddFleetManager() {
     }
   }, [timer]);
 
-  const isDocumentsValid = FLEET_REQUIRED_DOCS.every(
-    (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
-  );
+  useEffect(() => {
+    const currentPhone = form.getValues("phoneNumber");
+    if (!currentPhone) {
+      form.setValue("phoneNumber", "+351", { shouldValidate: true });
+    }
+  }, [form]);
 
-  const isSubmitDisabled = isSubmitting || !isDocumentsValid;
+  const getTabLabel = (key: string) => {
+    const map: Record<string, string> = {
+      account_information: t("account_information") || "Account",
+      business_details: t("business_details") || "Business",
+      bank_nd_payment_information: t("bank_nd_payment_information") || "Bank",
+      business_location_information:
+        t("business_location_information") || "Location",
+      documents_nd_verification: t("documents_nd_verification") || "Documents",
+      create_agreement: t("create_agreement") || "Create Agreement",
+      agreement_sign: t("agreement_sign") || "Sign Agreement",
+    };
+    return map[key] || key;
+  };
+
+  const renderTabButton = (
+    tab: (typeof TABS)[number],
+    index: number,
+    variant: "horizontal" | "vertical"
+  ) => {
+    const Icon = tab.icon;
+    const isActive = activeTab === index;
+    const isDone = stepCompleted[index];
+    const accessible = canAccessTab(index);
+    const locked = !accessible;
+
+    return (
+      <button
+        key={tab.id}
+        type="button"
+        onClick={() => goToTab(index)}
+        disabled={locked}
+        className={cn(
+          "flex items-center gap-2.5 text-sm font-medium transition-all",
+          variant === "horizontal" &&
+          "px-3 py-2.5 rounded-lg whitespace-nowrap",
+          variant === "vertical" && "w-full px-4 py-3 rounded-xl text-left",
+          isActive &&
+          "bg-[#DC3173] text-white shadow-md shadow-[#DC3173]/25",
+          !isActive &&
+          isDone &&
+          "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100",
+          !isActive &&
+          !isDone &&
+          accessible &&
+          "bg-white text-slate-600 border border-slate-200 hover:border-[#DC3173]/50 hover:text-[#DC3173]",
+          locked &&
+          "bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed opacity-60"
+        )}
+      >
+        <span
+          className={cn(
+            "flex items-center justify-center shrink-0 rounded-full",
+            variant === "vertical" ? "w-7 h-7 text-xs" : "w-5 h-5",
+            isActive
+              ? "bg-white/20"
+              : isDone
+                ? "bg-green-100"
+                : "bg-slate-100"
+          )}
+        >
+          {locked ? (
+            <Lock className="w-3.5 h-3.5" />
+          ) : isDone && !isActive ? (
+            <CheckCircle2 className="w-3.5 h-3.5" />
+          ) : (
+            <Icon className="w-3.5 h-3.5" />
+          )}
+        </span>
+
+        <span className={cn(variant === "horizontal" && "hidden sm:inline")}>
+          {index + 1}. {getTabLabel(tab.labelKey)}
+        </span>
+        {variant === "horizontal" && (
+          <span className="sm:hidden">{index + 1}</span>
+        )}
+      </button>
+    );
+  };
+
+  const detailsProgressCount = stepCompleted
+    .slice(0, DETAILS_LAST_TAB + 1)
+    .filter(Boolean).length;
+  const totalDetailsSteps = DETAILS_LAST_TAB + 1;
 
   return (
     <Form {...form}>
@@ -314,390 +627,494 @@ export default function AddFleetManager() {
           subtitle={t("add_a_new_fleet_manager_here")}
         />
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {/* Left Section - Registration Data */}
-          <div className="space-y-8">
-            {/* Account Information */}
-
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.2,
-              }}
-            >
-              <Card
-                className="p-6 shadow-md border-t-4"
-                style={{ borderColor: DELIGO }}
-              >
-                <h2 className="text-xl font-semibold mb-4">
-                  1. {t("account_information")}
-                </h2>
-
-                <div className="space-y-4 items-start">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("first_name")} {fleetManagerId && <span className="text-red-600">*</span>}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("first_name")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+        {/* Mobile / Tablet: Horizontal tabs */}
+        <div className="lg:hidden mb-6 overflow-x-auto">
+          <div className="flex items-center gap-1.5 min-w-max pb-2 px-1">
+            {TABS.map((tab, index) => (
+              <div key={tab.id} className="flex items-center">
+                {renderTabButton(tab, index, "horizontal")}
+                {index < TABS.length - 1 && (
+                  <div
+                    className={cn(
+                      "w-5 h-0.5 mx-0.5 rounded shrink-0",
+                      index === DETAILS_LAST_TAB
+                        ? profileSaved
+                          ? "bg-green-400"
+                          : "bg-amber-300"
+                        : stepCompleted[index]
+                          ? "bg-green-400"
+                          : "bg-slate-200"
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("last_name")} {fleetManagerId && <span className="text-red-600">*</span>}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("last_name")} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div>
-                    <Label>{t("email")} <span className="text-red-600">*</span></Label>
-                    <div className="flex items-center gap-3 mt-2">
-                      <Input
-                        type="email"
-                        placeholder={t("fleet_manager_email")}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        readOnly={!!fleetManagerId}
-                        className={
-                          !!fleetManagerId
-                            ? "bg-gray-100 cursor-not-allowed"
-                            : ""
-                        }
-                      />
-                      {!otpSent && !emailVerified && (
-                        <Button
-                          disabled={!email || !password || buttonDisabled === 1}
-                          type="button"
-                          style={{ background: DELIGO }}
-                          onClick={sendOtp}
-                          className="w-32"
-                        >
-                          <Mail className="w-4 h-4 mr-2" /> {t("send_otp")}
-                        </Button>
-                      )}
-                      {otpSent && !emailVerified && (
-                        <Button
-                          disabled={timer > 0 || buttonDisabled === 2}
-                          type="button"
-                          style={{ background: DELIGO }}
-                          onClick={resendOtp}
-                          className="w-32"
-                        >
-                          {t("resend")} {timer > 0 && `(${formatTime(timer)})`}
-                        </Button>
-                      )}
-                      {emailVerified && (
-                        <span className="text-green-600 flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4" /> {t("verified")}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {otpSent && !emailVerified && (
-                    <div>
-                      <Label className="mb-2">{t("otp")}</Label>
-                      <div className="flex items-center gap-3">
-                        <Input
-                          placeholder={t("enter_otp")}
-                          value={otp}
-                          onChange={(e) => setOtp(e.target.value)}
-                          maxLength={4}
-                        />
-                        <Button
-                          type="button"
-                          disabled={buttonDisabled === 3 || otp.length < 4}
-                          style={{ background: DELIGO }}
-                          onClick={verifyOtp}
-                          className="w-32"
-                        >
-                          <BadgeCheck className="w-4 h-4 mr-2" />{" "}
-                          {t("verify_otp")}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <Label className="mb-2">{t("password")} <span className="text-red-600">*</span></Label>
-                    <div className="relative">
-                      <Input
-                        type={showPass ? "text" : "password"}
-                        placeholder={t("password")}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      {showPass ? (
-                        <EyeOff
-                          size={18}
-                          className="absolute right-3 top-2.5 cursor-pointer"
-                          onClick={() => setShowPass(false)}
-                        />
-                      ) : (
-                        <Eye
-                          size={18}
-                          className="absolute right-3 top-2.5 cursor-pointer"
-                          onClick={() => setShowPass(true)}
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  <Label className="mb-2">{t("phone_number")} {fleetManagerId && <span className="text-red-600">*</span>}</Label>
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <PhoneInput
-                            defaultCountry="pt"
-                            value={field.value || ""}
-                            onChange={(phone) => {
-                              field.onChange(phone);
-                            }}
-                            forceDialCode={true}
-                            disableDialCodePrefill={false}
-
-                            className="w-full flex"
-
-                            inputStyle={{
-                              width: "100%",
-                              height: "40px",
-                              fontSize: "14px",
-                              color: "#374151",
-                              borderRadius: "0.5rem",
-                              border: "1px solid #D1D5DB",
-                              outline: "none",
-                              paddingLeft: "52px",
-                            }}
-                            countrySelectorStyleProps={{
-                              buttonStyle: {
-                                position: "absolute",
-                                left: "1px",
-                                top: "-1px",
-                                bottom: "1px",
-                                border: "none",
-                                backgroundColor: "transparent",
-                                height: "44px",
-                                padding: "0 12px",
-                                borderTopLeftRadius: "0.5rem",
-                                borderBottomLeftRadius: "0.5rem",
-                              },
-                            }}
-                            inputClassName="focus-visible:ring-2 focus-visible:ring-[#D1D5DB] focus-visible:border-[#D1D5DB]"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </Card>
-            </motion.div>
-            <AnimatePresence>
-              {fleetManagerId && (
-                <>
-                  {/* Business Details */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.3,
-                    }}
-                  >
-                    <Card
-                      className="p-6 shadow-md border-t-4"
-                      style={{ borderColor: DELIGO }}
-                    >
-                      <h2 className="text-xl font-semibold mb-4">
-                        2. {t("business_details")}
-                      </h2>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                        <FormField
-                          control={form.control}
-                          name="businessName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("business_name")} <span className="text-red-600">*</span></FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("business_name")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="businessLicenseNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>
-                                {t("business_license_number")} <span className="text-red-600">*</span>
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("license_number")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </Card>
-                  </motion.div>
-
-                  {/* Bank Details */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: 0.3,
-                    }}
-                  >
-                    <Card
-                      className="p-6 shadow-md border-t-4"
-                      style={{ borderColor: DELIGO }}
-                    >
-                      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <Banknote className="w-5 h-5" /> 3.{" "}
-                        {t("bank_nd_payment_information")}
-                      </h2>
-
-                      <div className="space-y-4">
-                        {/* <FormField
-                          control={form.control}
-                          name="bankName"
-                          render={({ field, fieldState }) => (
-                            <FormItem>
-                              <FormLabel>{t("bank_name")} <span className="text-red-600">*</span></FormLabel>
-                              <FormControl>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                  <SelectTrigger
-                                    className={cn(
-                                      "w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all",
-                                      fieldState.invalid
-                                        ? "border-red-500"
-                                        : "border-gray-300",
-                                    )}
-                                  >
-                                    <SelectValue placeholder="Select" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {bankNames.map((value) => (
-                                      <SelectItem key={value} value={value}>
-                                        {value}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        /> */}
-
-                        <FormField
-                          control={form.control}
-                          name="accountHolderName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("account_holder_name")} <span className="text-red-600">*</span></FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("account_holder_name")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="iban"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("iban")} <span className="text-red-600">*</span></FormLabel>
-                              <FormControl>
-                                <Input placeholder={t("iban")} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* <FormField
-                          control={form.control}
-                          name="swiftCode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t("swift_code")} <span className="text-red-600">*</span></FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={t("swift_code")}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        /> */}
-                      </div>
-                    </Card>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+                )}
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Right Section - Business Location + Documents */}
-          <AnimatePresence>
-            {fleetManagerId && (
-              <div className="space-y-8">
-                {/* Business Location */}
+        {/* Main layout */}
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Desktop: Left vertical tabs */}
+          <aside className="hidden lg:block w-64 xl:w-72 shrink-0">
+            <div className="sticky top-6 space-y-1.5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2">
+                Fleet Manager Details
+              </p>
+              {TABS.slice(0, AGREEMENT_START_TAB).map((tab, index) =>
+                renderTabButton(tab, index, "vertical")
+              )}
+
+              <div className="my-4 border-t border-dashed border-slate-200" />
+
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2 flex items-center gap-2">
+                Agreements
+                {!profileSaved && (
+                  <span className="text-[10px] font-normal normal-case text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                    Locked
+                  </span>
+                )}
+              </p>
+              {TABS.slice(AGREEMENT_START_TAB).map((tab, index) =>
+                renderTabButton(tab, index + AGREEMENT_START_TAB, "vertical")
+              )}
+
+              {/* Progress summary */}
+              <div className="mt-6 px-2 space-y-3">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                    <span>Details</span>
+                    <span>
+                      {detailsProgressCount}/{totalDetailsSteps}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#DC3173] rounded-full transition-all duration-300"
+                      style={{
+                        width: `${(detailsProgressCount / totalDetailsSteps) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                    <span>Agreements</span>
+                    <span>
+                      {profileSaved
+                        ? `${[agreementCreated, agreementSigned].filter(Boolean).length}/2`
+                        : "—"}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-300",
+                        profileSaved ? "bg-emerald-500" : "bg-slate-300"
+                      )}
+                      style={{
+                        width: profileSaved
+                          ? `${([agreementCreated, agreementSigned].filter(Boolean)
+                            .length /
+                            2) *
+                          100
+                          }%`
+                          : "0%",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {profileSaved && (
+                  <div className="flex items-center gap-1.5 text-xs text-emerald-600 mt-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Profile saved
+                  </div>
+                )}
+              </div>
+            </div>
+          </aside>
+
+          {/* Right: Content */}
+          <div className="flex-1 min-w-0">
+            <AnimatePresence mode="wait">
+              {/* TAB 0: Account */}
+              {activeTab === 0 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 16 }}
+                  key="account"
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: 0.6,
-                  }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card
+                    className="p-6 shadow-md border-t-4"
+                    style={{ borderColor: DELIGO }}
+                  >
+                    <h2 className="text-xl font-semibold mb-4">
+                      1. {t("account_information")}
+                    </h2>
+
+                    <div className="space-y-4 items-start">
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t("first_name")}{" "}
+                              {fleetManagerId && (
+                                <span className="text-[#DC3173]">*</span>
+                              )}
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder={t("first_name")} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t("last_name")}{" "}
+                              {fleetManagerId && (
+                                <span className="text-[#DC3173]">*</span>
+                              )}
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder={t("last_name")} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div>
+                        <Label>
+                          {t("email")}{" "}
+                          <span className="text-[#DC3173]">*</span>
+                        </Label>
+                        <div className="flex items-center gap-3 mt-2">
+                          <Input
+                            type="email"
+                            placeholder={t("fleet_manager_email")}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            disabled={!!fleetManagerId}
+                            className={
+                              fleetManagerId
+                                ? "bg-gray-100 cursor-not-allowed"
+                                : ""
+                            }
+                          />
+                          {!otpSent && !emailVerified && (
+                            <Button
+                              disabled={
+                                !email || !password || buttonDisabled === 1
+                              }
+                              type="button"
+                              style={{ background: DELIGO }}
+                              onClick={sendOtp}
+                              className="w-32 shrink-0"
+                            >
+                              <Mail className="w-4 h-4 mr-2" /> {t("send_otp")}
+                            </Button>
+                          )}
+                          {otpSent && !emailVerified && (
+                            <Button
+                              disabled={timer > 0 || buttonDisabled === 2}
+                              type="button"
+                              style={{ background: DELIGO }}
+                              onClick={resendOtp}
+                              className="w-32 shrink-0"
+                            >
+                              {t("resend")}{" "}
+                              {timer > 0 && `(${formatTime(timer)})`}
+                            </Button>
+                          )}
+                          {emailVerified && (
+                            <span className="text-green-600 flex items-center gap-2 text-sm shrink-0">
+                              <CheckCircle className="w-4 h-4" /> {t("verified")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {otpSent && !emailVerified && (
+                        <div>
+                          <Label className="mb-2">
+                            {t("otp")}{" "}
+                            <span className="text-[#DC3173]">*</span>
+                          </Label>
+                          <div className="flex items-center gap-3">
+                            <Input
+                              placeholder={t("enter_otp")}
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value)}
+                              maxLength={4}
+                            />
+                            <Button
+                              type="button"
+                              disabled={
+                                buttonDisabled === 3 || otp.length < 4
+                              }
+                              style={{ background: DELIGO }}
+                              onClick={verifyOtp}
+                              className="w-32 shrink-0"
+                            >
+                              <BadgeCheck className="w-4 h-4 mr-2" />{" "}
+                              {t("verify_otp")}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <Label className="mb-2">
+                          {t("password")}{" "}
+                          <span className="text-[#DC3173]">*</span>
+                        </Label>
+                        <div className="relative">
+                          <Input
+                            type={showPass ? "text" : "password"}
+                            placeholder={t("password")}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            disabled={!!fleetManagerId}
+                          />
+                          {showPass ? (
+                            <EyeOff
+                              size={18}
+                              className="absolute right-3 top-2.5 cursor-pointer"
+                              onClick={() => setShowPass(false)}
+                            />
+                          ) : (
+                            <Eye
+                              size={18}
+                              className="absolute right-3 top-2.5 cursor-pointer"
+                              onClick={() => setShowPass(true)}
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      <Label className="mb-2">
+                        {t("phone_number")}{" "}
+                        {fleetManagerId && (
+                          <span className="text-[#DC3173]">*</span>
+                        )}
+                      </Label>
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <PhoneInput
+                                defaultCountry="pt"
+                                value={field.value || ""}
+                                onChange={(phone) => field.onChange(phone)}
+                                forceDialCode={true}
+                                disableDialCodePrefill={false}
+                                className="w-full flex"
+                                inputStyle={{
+                                  width: "100%",
+                                  height: "40px",
+                                  fontSize: "14px",
+                                  color: "#374151",
+                                  borderRadius: "0.5rem",
+                                  border: "1px solid #D1D5DB",
+                                  outline: "none",
+                                  paddingLeft: "52px",
+                                }}
+                                countrySelectorStyleProps={{
+                                  buttonStyle: {
+                                    position: "absolute",
+                                    left: "1px",
+                                    top: "-1px",
+                                    bottom: "1px",
+                                    border: "none",
+                                    backgroundColor: "transparent",
+                                    height: "44px",
+                                    padding: "0 12px",
+                                    borderTopLeftRadius: "0.5rem",
+                                    borderBottomLeftRadius: "0.5rem",
+                                  },
+                                }}
+                                inputClassName="focus-visible:ring-2 focus-visible:ring-[#D1D5DB] focus-visible:border-[#D1D5DB]"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* TAB 1: Business */}
+              {activeTab === 1 && fleetManagerId && (
+                <motion.div
+                  key="business"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card
+                    className="p-6 shadow-md border-t-4"
+                    style={{ borderColor: DELIGO }}
+                  >
+                    <h2 className="text-xl font-semibold mb-4">
+                      2. {t("business_details")}
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                      <FormField
+                        control={form.control}
+                        name="businessName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t("business_name")}{" "}
+                              <span className="text-[#DC3173]">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={t("business_name")}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="businessLicenseNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t("business_license_number")}{" "}
+                              <span className="text-[#DC3173]">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={t("license_number")}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="NIF"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t("nif")}{" "}
+                              <span className="text-[#DC3173]">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={t("tax_identification_number")}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* TAB 2: Bank */}
+              {activeTab === 2 && fleetManagerId && (
+                <motion.div
+                  key="bank"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
                     style={{ borderColor: DELIGO }}
                   >
                     <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      {/* <Banknote className="w-5 h-5" /> 4. Bank & Payment
-                      Information */}
-                      <Banknote className="w-5 h-5" /> 4.{" "}
+                      <Banknote className="w-5 h-5" /> 3.{" "}
+                      {t("bank_nd_payment_information")}
+                    </h2>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="accountHolderName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t("account_holder_name")}{" "}
+                              <span className="text-[#DC3173]">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={t("account_holder_name")}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="iban"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {t("iban")}{" "}
+                              <span className="text-[#DC3173]">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input placeholder={t("iban")} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* TAB 3: Location */}
+              {activeTab === 3 && fleetManagerId && (
+                <motion.div
+                  key="location"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card
+                    className="p-6 shadow-md border-t-4"
+                    style={{ borderColor: DELIGO }}
+                  >
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <MapPin className="w-5 h-5" /> 4.{" "}
                       {t("business_location_information")}
                     </h2>
-
                     <BusinessLocationMap
                       form={form}
                       setLocationCoordinates={setLocationCoordinates}
@@ -705,15 +1122,16 @@ export default function AddFleetManager() {
                     />
                   </Card>
                 </motion.div>
+              )}
 
-                {/* Documents */}
+              {/* TAB 4: Documents */}
+              {activeTab === 4 && fleetManagerId && (
                 <motion.div
-                  initial={{ opacity: 0, y: 16 }}
+                  key="documents"
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: 0.9,
-                  }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -723,32 +1141,201 @@ export default function AddFleetManager() {
                       <FileText className="w-5 h-5" /> 5.{" "}
                       {t("documents_nd_verification")}
                     </h2>
-
                     <UploadFleetManagerDocuments
                       fleetManagerId={fleetManagerId}
                       previews={previews}
                       setPreviews={setPreviews}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSubmitting || isSaving}
                     />
+
+                    {profileSaved && (
+                      <div className="mt-6 flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        Fleet manager details & documents have been saved. You
+                        can proceed to Agreements or go back to edit.
+                      </div>
+                    )}
                   </Card>
                 </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-        </div>
+              )}
 
-        {/* SUBMIT BUTTON */}
-        {fleetManagerId && (
-          <div className="mt-10 flex justify-end">
-            <Button
-              className="px-8 py-2 text-white"
-              style={{ background: DELIGO }}
-              disabled={isSubmitDisabled}
-            >
-              {t("submit_fleetManager")}
-            </Button>
+              {/* TAB 5: Create Agreement */}
+              {activeTab === 5 && fleetManagerId && profileSaved && (
+                <motion.div
+                  key="create_agreement"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card
+                    className="p-6 shadow-md border-t-4"
+                    style={{ borderColor: DELIGO }}
+                  >
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <ScrollText className="w-5 h-5" /> 6.{" "}
+                      {t("create_agreement") || "Create Agreement"}
+                    </h2>
+
+                    {agreementCreated ? (
+                      <div className="flex flex-col items-center gap-4 py-10">
+                        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                          <CheckCircle2 className="w-8 h-8 text-green-600" />
+                        </div>
+                        <p className="text-lg font-medium text-green-700">
+                          {t("agreement_created_successfully") ||
+                            "Agreement created successfully"}
+                        </p>
+                        <p className="text-sm text-slate-500 text-center max-w-md">
+                          {t("you_can_proceed_to_the_next_step_to_sign") ||
+                            "You can proceed to the next step to sign the agreement."}
+                        </p>
+                      </div>
+                    ) : (
+                      <CreateUserAgreement
+                        user={{ userId: fleetManagerId } as any}
+                        role="FLEET_MANAGER"
+                        embedded
+                        showBackButton={false}
+                        onSuccess={(agreement) => {
+                          setAgreementData(agreement);
+                          setAgreementCreated(true);
+                          setActiveTab(6);
+                        }}
+                      />
+                    )}
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* TAB 6: Sign Agreement */}
+              {activeTab === 6 && fleetManagerId && profileSaved && (
+                <motion.div
+                  key="sign_agreement"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card
+                    className="p-6 shadow-md border-t-4"
+                    style={{ borderColor: DELIGO }}
+                  >
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <FileSignature className="w-5 h-5" /> 7.{" "}
+                      {t("agreement_sign") || "Sign Agreement"}
+                    </h2>
+
+                    {!agreementSigned ? (
+                      <div className="flex flex-col items-center gap-4 py-6">
+                        <AgreementViewer
+                          agreement={agreementData}
+                          setAgreementSigned={() => setAgreementSigned(true)}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-4 py-10">
+                        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                          <CheckCircle2 className="w-8 h-8 text-green-600" />
+                        </div>
+                        <p className="text-lg font-medium text-green-700">
+                          {t("agreement_signed_successfully") ||
+                            "Agreement signed successfully"}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {t("click_submit_vendor_below") ||
+                            "Click Submit below to finish."}
+                        </p>
+                      </div>
+                    )}
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Navigation Footer */}
+            <div className="mt-6 flex items-center justify-between pb-10">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={goPrev}
+                disabled={activeTab === 0 || isSaving}
+                className="gap-2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {t("previous") || "Previous"}
+              </Button>
+
+              <div className="text-sm text-slate-400 hidden sm:block">
+                {t("step_lg") || "Step"} {activeTab + 1} of {TABS.length}
+                {activeTab <= DETAILS_LAST_TAB && !profileSaved && (
+                  <span className="ml-2 text-amber-600">
+                    · {t("details") || "Details"}
+                  </span>
+                )}
+                {activeTab >= AGREEMENT_START_TAB && (
+                  <span className="ml-2 text-emerald-600">
+                    · {t("agreements") || "Agreements"}
+                  </span>
+                )}
+              </div>
+
+              {activeTab < TABS.length - 1 ? (
+                activeTab === DETAILS_LAST_TAB ? (
+                  <Button
+                    type="button"
+                    onClick={handleSaveAndContinue}
+                    disabled={
+                      !stepCompleted[DETAILS_LAST_TAB] ||
+                      isSaving ||
+                      isSubmitting
+                    }
+                    className="bg-[#DC3173] hover:bg-[#c22b65] text-white gap-2 min-w-40"
+                  >
+                    {isSaving ? (
+                      "Saving..."
+                    ) : profileSaved ? (
+                      <>
+                        {t("continue_to_agreements") || "Continue to Agreements"}
+                        <ChevronRight className="w-4 h-4" />
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        {t("save_nd_continue") || "Save & Continue"}
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={goNext}
+                    disabled={!stepCompleted[activeTab] || isSaving}
+                    className="bg-[#DC3173] hover:bg-[#c22b65] text-white gap-2"
+                  >
+                    {t("next") || "Next"}
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                )
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={
+                    !profileSaved ||
+                    !agreementSigned ||
+                    isSubmitting ||
+                    isSaving
+                  }
+                  className="bg-[#DC3173] hover:bg-[#c22b65] text-white px-8"
+                >
+                  {isSubmitting
+                    ? "Submitting..."
+                    : t("submit_fleetManager") || "Submit Fleet Manager"}
+                </Button>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </form>
     </Form>
   );

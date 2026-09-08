@@ -40,6 +40,12 @@ export const addFleetManagerValidation = z
       .max(50, "Business license number must be at most 50 characters long")
       .nonempty("Business license number is required"),
 
+    NIF: z
+      .string()
+      .min(2, "NIF must be at least 2 characters long")
+      .max(50, "NIF must be at most 50 characters long")
+      .nonempty("NIF is required"),
+
     street: z
       .string()
       .nonempty("Street Address is required")

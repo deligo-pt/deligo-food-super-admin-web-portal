@@ -34,6 +34,7 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
     const { t } = useTranslation();
     const router = useRouter();
     const [, startTransition] = useTransition();
+    const isFleetAgreement = agreement?.agreementType === "INITIAL_FLEET_MANAGER_AGREEMENT"
 
     const partySigRef = useRef<SignatureCanvas | null>(null);
     const signatureFileRef = useRef<HTMLInputElement | null>(null);
@@ -156,7 +157,7 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
             }
         }
 
-        if (!posPaymentOption) {
+        if (!posPaymentOption && !isFleetAgreement) {
             toast.error("Please select a payment option.", { id: toastId });
             setIsSubmitting(false);
             return;
@@ -178,6 +179,9 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
             posPaymentOption,
         };
 
+        if (isFleetAgreement) {
+            delete payload.posPaymentOption
+        }
         // Only include stamp if uploaded (optional)
         if (partyStamp) {
             payload.partyStamp = partyStamp;
@@ -221,12 +225,13 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
         }
     };
 
-    const isSubmitDisabled =
+    const isSubmitDisabled = !isFleetAgreement ?
         isPartyEmpty ||
         !posPaymentOption ||
         isSubmitting ||
         isUploading ||
-        isUploadingStamp;
+        isUploadingStamp :
+        isPartyEmpty || isUploading || isSubmitting;
 
     return (
         <div className="w-full max-w-4xl mx-auto p-4">
@@ -311,7 +316,7 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
                         </div>
 
                         {/* Party Stamp (Optional) */}
-                        <FileUploadZone
+                        {!isFleetAgreement && <FileUploadZone
                             inputRef={stampFileRef}
                             onChange={(e) => handleFileUpload(e, "stamp")}
                             isLoading={isUploadingStamp}
@@ -319,10 +324,10 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
                             onClear={clearStamp}
                             label={t("party_stamp")}
                             optional
-                        />
+                        />}
 
                         {/* Payment Option */}
-                        <div className="space-y-3">
+                        {!isFleetAgreement && <div className="space-y-3">
                             <Label className="text-sm font-bold text-slate-700">
                                 {t("payment_option")} <span className="text-[#DC3173]">*</span>
                             </Label>
@@ -361,7 +366,7 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
                                     </Label>
                                 </div>
                             </div>
-                        </div>
+                        </div>}
 
                         {/* Submit */}
                         <div className="w-full border-t border-slate-100 pt-4 flex flex-col items-center">
