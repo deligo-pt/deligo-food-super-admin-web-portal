@@ -34,7 +34,7 @@ interface IProps {
     partnerId: string;
     partnerName: string;
     city: string;
-    status: "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED" | "ASSIGN";
+    status: "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED" | "ASSIGN" | "SUBMITTED";
 }
 
 export default function ApproveRiderModal({
@@ -165,7 +165,7 @@ export default function ApproveRiderModal({
         setIsSubmitting(true);
 
         const updateStatus = {
-            status: status === "UNBLOCKED" || status === "ASSIGN" ? "APPROVED" : status,
+            status: status === "UNBLOCKED" || status === "SUBMITTED" || status === "ASSIGN" ? "APPROVED" : status,
             remarks,
         };
 

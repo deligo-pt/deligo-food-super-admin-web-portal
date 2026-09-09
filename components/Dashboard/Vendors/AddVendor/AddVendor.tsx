@@ -835,7 +835,7 @@ export default function AddVendor({
                                   disabled={timer > 0 || buttonDisabled === 2}
                                 >
                                   {timer > 0
-                                    ? `${t("resend_otp") || "Resend"} (${formatTime(timer)})`
+                                    ? `${t("resendOtp") || "Resend"} (${formatTime(timer)})`
                                     : t("resendOtp") || "Resend OTP"}
                                 </Button>
                               </div>

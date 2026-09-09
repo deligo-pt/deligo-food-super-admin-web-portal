@@ -1164,7 +1164,7 @@ export default function UpdateFleetManager({ fleetManager, agreement }: IProps) 
                             {t("view_signed_agreement_pdf")}
                           </a>
                         )}
-                        {(isAgreementFinalized && fleetManager?.status === "PENDING") && <Button
+                        {(fleetManager?.status === "PENDING") && <Button
                           type="submit"
                           disabled={
                             isSubmitting ||
