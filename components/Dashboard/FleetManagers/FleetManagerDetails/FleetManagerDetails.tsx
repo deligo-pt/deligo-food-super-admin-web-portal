@@ -21,6 +21,7 @@ import {
   BuildingIcon,
   Check,
   CheckIcon,
+  DownloadIcon,
   EditIcon,
   FileTextIcon,
   MapPinIcon,
@@ -37,11 +38,13 @@ import { TMeta } from "@/types";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { resendOtpReq } from "@/services/auth/otp.service";
 import VerifyOtpModal from "@/components/Modals/VerifyOtpModal";
+import { DocumentViewer } from "@/components/common/DocumentViewer";
 
 interface IProps {
   agentData: {
     meta: TMeta;
     data: {
+      agreement : any;
       existingFleetManager: TAgent;
       deliveryPartners: Partial<TDeliveryPartner>[];
     };
@@ -274,7 +277,7 @@ export default function FleetManagerDetails({ agentData }: IProps) {
                   {data?.existingFleetManager?.businessDetails?.businessLicenseNumber || "N/A"}
                 </p>
               </div>
-             {data?.existingFleetManager?.businessDetails?.NIF && <div>
+              {data?.existingFleetManager?.businessDetails?.NIF && <div>
                 <p className="text-sm text-gray-500">{t("nif")}</p>
                 <p className="font-medium">
                   {data?.existingFleetManager?.businessDetails?.NIF || "N/A"}
@@ -412,6 +415,66 @@ export default function FleetManagerDetails({ agentData }: IProps) {
             <div className="w-full">
               <FleetManagerDetailsDoc documents={data?.existingFleetManager?.documents as IFleetDocs} />
             </div>
+          </Section>
+          {/* agreement section */}
+          <Section
+            title={t("agreement_document") || "Agreement Document"}
+            icon={<FileTextIcon size={20} />}
+            defaultOpen={true}
+          >
+            {data?.agreement?.pdfPath ? (
+              <div className="space-y-4">
+                {/* Agreement Status Header */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-gray-200 rounded-lg p-4 bg-gray-50/50">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-900 text-sm font-mono">
+                        ID: {data?.agreement?.agreementId}
+                      </span>
+                      <span
+                        className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${data?.agreement?.status === "SIGNED"
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          : data?.agreement?.status === "PARTY_SIGNED"
+                            ? "bg-amber-100 text-amber-800 border border-amber-200"
+                            : "bg-gray-100 text-gray-700 border border-gray-200"
+                          }`}
+                      >
+                        {data?.agreement?.status.replace("_", " ")}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {t("signed_agreement_description") ||
+                        "Official signed partnership agreement PDF."}
+                    </p>
+                  </div>
+
+                  {/* Download Button */}
+                  <a
+                    href={data?.agreement?.pdfPath}
+                    download
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium text-white bg-[#DC3173] hover:bg-[#c22762] transition-colors shadow-xs"
+                  >
+                    <DownloadIcon size={14} />
+                    {t("download") || "Download"}
+                  </a>
+                </div>
+
+                {/* Embedded Document Viewer with Modal */}
+                <DocumentViewer
+                  sections={[
+                    {
+                      key: "agreement",
+                      label: t("agreement_preview") || "Agreement Preview",
+                      files: data?.agreement.pdfPath,
+                    },
+                  ]}
+                />
+              </div>
+            ) : (
+              <p className="text-gray-500 italic text-sm">
+                {t("no_agreement_found") || "No agreement document available."}
+              </p>
+            )}
           </Section>
           {/* riders table */}
           <Section
