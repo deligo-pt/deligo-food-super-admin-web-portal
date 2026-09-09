@@ -49,16 +49,12 @@ import { formatTime } from "@/utils/formatTime";
 import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import {
-  BadgeCheck,
   Banknote,
   Briefcase,
-  CheckCircle,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   Eye,
   EyeOff,
   FileSignature,
@@ -71,7 +67,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -105,10 +101,6 @@ const defaultDocuments: Record<TVendorDocKey, string[] | null> = {
   ibanProof: null,
 };
 const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "menuUpload"];
-
-/** First section ends at Documents (index 4). Agreements start at 5. */
-const DETAILS_LAST_TAB = 4;
-const AGREEMENT_START_TAB = 5;
 
 const TABS = [
   { id: 0, key: "account", labelKey: "account_information", icon: User },
@@ -151,11 +143,12 @@ export default function AddVendor({
   const [agreementData, setAgreementData] = useState<any>(null);
   const [agreementSigned, setAgreementSigned] = useState(false);
 
-  /** True after successful Save & Continue (profile + docs persisted). */
   const [profileSaved, setProfileSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
   const [activeTab, setActiveTab] = useState(0);
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const isSubVendor = vendorDetails?.role === "SUB_VENDOR";
 
@@ -243,18 +236,12 @@ export default function AddVendor({
       locationCoordinates.latitude !== 0 &&
       locationCoordinates.longitude !== 0;
 
-    // Documents step is complete only when required docs are present
-    // AND (for progression into agreements) profile has been saved.
-    // We keep documents "done" for the progress bar once valid,
-    // but gate agreements via profileSaved in canAccessTab.
-    const documentsOk = isDocumentsValid;
-
     return [
       accountOk,
       businessOk,
       bankOk,
       locationOk,
-      documentsOk,
+      isDocumentsValid,
       agreementCreated,
       agreementSigned,
     ];
@@ -268,58 +255,68 @@ export default function AddVendor({
     agreementSigned,
   ]);
 
-  const canAccessTab = (tabIndex: number) => {
-    if (tabIndex === 0) return true;
-    if (tabIndex >= 1 && !vendorDetails?.userId) return false;
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container) return;
+    const onScroll = () => {
+      const scrollTop = container.scrollTop;
+      let current = 0;
+      sectionRefs.current.forEach((el, index) => {
+        if (!el) return;
+        const top = el.offsetTop - container.offsetTop;
+        if (scrollTop >= top - 80) current = index;
+      });
+      setActiveTab(current);
+    };
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, []);
 
-    // Agreement section requires a successful Save & Continue
-    if (tabIndex >= AGREEMENT_START_TAB && !profileSaved) return false;
-
-    for (let i = 0; i < tabIndex; i++) {
-      if (!stepCompleted[i]) return false;
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+      return () => clearInterval(interval);
     }
-    return true;
+  }, [timer]);
+
+  useEffect(() => {
+    const currentPhone = form.getValues("phoneNumber");
+    if (!currentPhone) {
+      form.setValue("phoneNumber", "+351", { shouldValidate: true });
+    }
+  }, [form]);
+
+  const scrollToSection = (index: number) => {
+    const el = sectionRefs.current[index];
+    const container = contentRef.current;
+    if (!el || !container) return;
+    setActiveTab(index);
+    container.scrollTo({
+      top: el.offsetTop - container.offsetTop,
+      behavior: "smooth",
+    });
   };
 
   const goToTab = (index: number) => {
-    if (canAccessTab(index)) {
-      setActiveTab(index);
-    } else {
-      if (index >= AGREEMENT_START_TAB && !profileSaved) {
-        toast.error(
-          "Please complete Documents and click Save & Continue before accessing Agreements."
-        );
-      } else {
-        toast.error("Please complete the previous steps first.");
-      }
+    if (index >= 1 && !vendorDetails?.userId) {
+      toast.error("Please verify email first.");
+      scrollToSection(0);
+      return;
     }
-  };
-
-  const goNext = () => {
-    if (activeTab < TABS.length - 1) {
-      if (!stepCompleted[activeTab]) {
-        toast.error("Please complete all required fields in this step.");
-        return;
-      }
-      // On documents tab we force Save & Continue instead of plain next
-      if (activeTab === DETAILS_LAST_TAB) {
-        handleSaveAndContinue();
-        return;
-      }
-      setActiveTab((prev) => prev + 1);
+    if (index >= 5 && !profileSaved) {
+      toast.error(
+        "Please complete required details/documents and click Save Changes before accessing Agreements."
+      );
+      scrollToSection(4);
+      return;
     }
+    scrollToSection(index);
   };
 
-  const goPrev = () => {
-    if (activeTab > 0) setActiveTab((prev) => prev - 1);
-  };
-
-  // OTP handlers
   const sendOtp = async () => {
     if (!email || !password) return;
     setButtonDisabled(1);
     const toastId = toast.loading("Sending OTP...");
-
     if (!isValidEmail(email)) {
       setButtonDisabled(0);
       return toast.error("Invalid email address", { id: toastId });
@@ -331,13 +328,11 @@ export default function AddVendor({
         { id: toastId }
       );
     }
-
     const result = await registerUserAndSendOtpReq({
       email,
       password,
       role: USER_ROLE.VENDOR,
     });
-
     if (result.success) {
       toast.success(result.message || "OTP sent successfully!", { id: toastId });
       setOtpSent(true);
@@ -356,7 +351,6 @@ export default function AddVendor({
         email,
         role: USER_ROLE.VENDOR,
       })) as unknown as TResponse<null>;
-
       if (result.success) {
         setTimer(300);
         toast.success("OTP resent successfully!", { id: toastId });
@@ -381,18 +375,17 @@ export default function AddVendor({
         otp,
         role: USER_ROLE.VENDOR,
       });
-
       if (result && result.success) {
-        const decoded = jwtDecode(result.data.accessToken) as { userId: string };
+        const decoded = jwtDecode(result.data.accessToken) as {
+          userId: string;
+        };
         setEmailVerified(true);
-
         try {
           const vendorResult = await getSingleVendorReq(decoded.userId);
           if (vendorResult) setVendorDetails(vendorResult);
         } catch (vendorError) {
           console.error("Error fetching vendor details:", vendorError);
         }
-
         toast.success(result.message || "OTP verified successfully!", {
           id: toastId,
         });
@@ -400,108 +393,89 @@ export default function AddVendor({
       }
       toast.error(result?.message || "OTP verification failed", { id: toastId });
     } catch (error: any) {
-      toast.error(error?.message || "Something went wrong during verification", {
-        id: toastId,
-      });
+      toast.error(
+        error?.message || "Something went wrong during verification",
+        { id: toastId }
+      );
     } finally {
       setButtonDisabled(0);
     }
   };
 
-  // Build vendor payload from form
-  const buildVendorPayload = (data: TVendorForm): Partial<TVendor> => {
-    return {
-      name: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-      },
-      contactNumber: data.phoneNumber,
-      businessDetails: {
-        businessName: data.businessName,
-        businessType: data.businessType,
-        ...(data?.businessType === "restaurant" && {
-          restaurantCuisineType: data.restaurantCuisineType
-        }),
-        NIF: data.NIF?.toUpperCase(),
-        totalBranches: Number(data.branches),
-        openingHours: data.openingHours,
-        closingHours: data.closingHours,
-        closingDays: data.closingDays,
-      },
-      businessLocation: {
-        street: data.street,
-        city: data.city,
-        postalCode: data.postalCode,
-        country: data.country,
-        latitude: locationCoordinates.latitude,
-        longitude: locationCoordinates.longitude,
-      },
-      bankDetails: {
-        // bankName: data.bankName,
-        accountHolderName: data.accountHolderName,
-        iban: data.iban,
-        // swiftCode : data.swiftCode,
-      },
-    };
-  };
+  const buildVendorPayload = (data: TVendorForm): Partial<TVendor> => ({
+    name: { firstName: data.firstName, lastName: data.lastName },
+    contactNumber: data.phoneNumber,
+    businessDetails: {
+      businessName: data.businessName,
+      companyLegalName: data.companyLegalName,
+      businessType: data.businessType,
+      ...(data?.businessType === "restaurant" && {
+        restaurantCuisineType: data.restaurantCuisineType,
+      }),
+      NIF: data.NIF?.toUpperCase(),
+      totalBranches: Number(data.branches),
+      openingHours: data.openingHours,
+      closingHours: data.closingHours,
+      closingDays: data.closingDays,
+    },
+    businessLocation: {
+      street: data.street,
+      city: data.city,
+      postalCode: data.postalCode,
+      country: data.country,
+      latitude: locationCoordinates.latitude,
+      longitude: locationCoordinates.longitude,
+    },
+    bankDetails: {
+      accountHolderName: data.accountHolderName,
+      iban: data.iban,
+    },
+  });
 
-  // Save & Continue (after Documents)
-  const handleSaveAndContinue = async () => {
+  const handleSaveChanges = async () => {
     if (!vendorDetails?.userId) {
       toast.error("Vendor account not found. Please verify email first.");
+      scrollToSection(0);
       return;
     }
-
-    // Ensure all previous steps (including documents) are complete
-    const allDetailsComplete = stepCompleted
-      .slice(0, DETAILS_LAST_TAB + 1)
-      .every(Boolean);
-
-    if (!allDetailsComplete || !isDocumentsValid) {
+    const detailsComplete = stepCompleted.slice(0, 5).every(Boolean);
+    if (!detailsComplete || !isDocumentsValid) {
       toast.error(
         "Please complete all required fields and upload required documents before saving."
       );
+      const firstIncomplete = stepCompleted.findIndex((ok, i) => i < 5 && !ok);
+      if (firstIncomplete >= 0) scrollToSection(firstIncomplete);
       return;
     }
-
-    // Trigger form validation
     const isValid = await form.trigger();
-
     if (!isValid) {
       toast.error("Please fix validation errors before saving.");
       return;
     }
-
     setIsSaving(true);
     const toastId = toast.loading("Saving vendor information...");
-
     try {
-      // Upload default documents for optional keys that are empty
       for (const key of OPTIONAL_DEFAULTS) {
         if (!previews[key] || previews[key]!.length === 0) {
           await uploadDefaultDocument(key, vendorDetails.userId);
         }
       }
-
       const data = form.getValues();
       const vendorData = buildVendorPayload(data);
-
       const updatedResult = await updateUserDataReq(
         `/vendors/${vendorDetails.userId}`,
         vendorData
       );
-
       if (updatedResult.success) {
         setProfileSaved(true);
-        setActiveTab(AGREEMENT_START_TAB);
         toast.success(
           updatedResult.message ||
           "Vendor information saved successfully. You can now create the agreement.",
           { id: toastId }
         );
+        scrollToSection(5);
         return;
       }
-
       if (updatedResult?.data?.errorSources) {
         updatedResult.data.errorSources.forEach(
           (err: { path: string; message: string }) =>
@@ -509,7 +483,6 @@ export default function AddVendor({
         );
         return;
       }
-
       toast.error(updatedResult.message || "Failed to save vendor information", {
         id: toastId,
       });
@@ -523,28 +496,24 @@ export default function AddVendor({
     }
   };
 
-  // Final submit (Approve after agreement signed)
   const onSubmit = async (data: TVendorForm) => {
     if (!profileSaved) {
-      toast.error("Please save vendor information first (Save & Continue).");
+      toast.error("Please save vendor information first (Save Changes).");
       return;
     }
     if (!agreementSigned) {
       toast.error("Please sign the agreement first.");
+      scrollToSection(6);
       return;
     }
-
     const toastId = toast.loading("Submitting vendor...");
     if (!vendorDetails?.userId) return;
-
     try {
-      // Optional: re-sync latest form data before approve (in case of late edits)
       const vendorData = buildVendorPayload(data);
       const updatedResult = await updateUserDataReq(
         `/vendors/${vendorDetails.userId}`,
         vendorData
       );
-
       if (!updatedResult.success) {
         if (updatedResult?.data?.errorSources) {
           updatedResult.data.errorSources.forEach(
@@ -558,11 +527,9 @@ export default function AddVendor({
         });
         return;
       }
-
       const approveResult = await approveOrRejectReq(vendorDetails.userId, {
         status: "APPROVED",
       });
-
       if (approveResult.success) {
         form.reset();
         setPreviews(defaultDocuments);
@@ -581,7 +548,6 @@ export default function AddVendor({
         });
         return;
       }
-
       if (approveResult?.data?.errorSources) {
         approveResult.data.errorSources.forEach(
           (err: { path: string; message: string }) =>
@@ -600,20 +566,6 @@ export default function AddVendor({
     }
   };
 
-  useEffect(() => {
-    if (timer > 0) {
-      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
-      return () => clearInterval(interval);
-    }
-  }, [timer]);
-
-  useEffect(() => {
-    const currentPhone = form.getValues("phoneNumber");
-    if (!currentPhone) {
-      form.setValue("phoneNumber", "+351", { shouldValidate: true });
-    }
-  }, [form]);
-
   const getTabLabel = (key: string) => {
     const map: Record<string, string> = {
       account_information: t("account_information") || "Account",
@@ -628,7 +580,6 @@ export default function AddVendor({
     return map[key] || key;
   };
 
-  // Shared tab button renderer
   const renderTabButton = (
     tab: (typeof TABS)[number],
     index: number,
@@ -637,18 +588,14 @@ export default function AddVendor({
     const Icon = tab.icon;
     const isActive = activeTab === index;
     const isDone = stepCompleted[index];
-    const accessible = canAccessTab(index);
-    const locked = !accessible;
-
-    // Visual grouping: highlight that agreements are a separate section
-    const isAgreementTab = index >= AGREEMENT_START_TAB;
+    const locked =
+      (index >= 1 && !vendorDetails?.userId) || (index >= 5 && !profileSaved);
 
     return (
       <button
         key={tab.id}
         type="button"
         onClick={() => goToTab(index)}
-        disabled={locked}
         className={cn(
           "flex items-center gap-2.5 text-sm font-medium transition-all",
           variant === "horizontal" &&
@@ -661,10 +608,11 @@ export default function AddVendor({
           "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100",
           !isActive &&
           !isDone &&
-          accessible &&
+          !locked &&
           "bg-white text-slate-600 border border-slate-200 hover:border-[#DC3173]/50 hover:text-[#DC3173]",
           locked &&
-          "bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed opacity-60"
+          !isActive &&
+          "bg-slate-100 text-slate-400 border border-slate-100"
         )}
       >
         <span
@@ -686,7 +634,6 @@ export default function AddVendor({
             <Icon className="w-3.5 h-3.5" />
           )}
         </span>
-
         <span className={cn(variant === "horizontal" && "hidden sm:inline")}>
           {index + 1}. {getTabLabel(tab.labelKey)}
         </span>
@@ -697,689 +644,646 @@ export default function AddVendor({
     );
   };
 
-  const detailsProgressCount = stepCompleted
-    .slice(0, DETAILS_LAST_TAB + 1)
-    .filter(Boolean).length;
-  const totalDetailsSteps = DETAILS_LAST_TAB + 1;
+  const detailsProgressCount = stepCompleted.slice(0, 5).filter(Boolean).length;
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="min-h-screen bg-slate-50"
-      >
+    <div className="flex flex-col h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] overflow-hidden bg-slate-50">
+      <div className="shrink-0 z-30 border-b border-slate-200/80 bg-slate-50">
         <TitleHeader
           title={t("add_vendor")}
           subtitle={t("add_new_vendor_here")}
+          buttonInfo={{
+            text: isSaving
+              ? t("saving") || "Saving..."
+              : t("save_changes") || "Save Changes",
+            onClick: handleSaveChanges,
+            disabled: isSaving ? true : false,
+            icon: Save,
+          }}
         />
+      </div>
 
-        {/* Mobile / Tablet: Horizontal tabs */}
-        <div className="lg:hidden mb-6 overflow-x-auto">
-          <div className="flex items-center gap-1.5 min-w-max pb-2 px-1">
-            {TABS.map((tab, index) => (
-              <div key={tab.id} className="flex items-center">
-                {renderTabButton(tab, index, "horizontal")}
-                {index < TABS.length - 1 && (
-                  <div
-                    className={cn(
-                      "w-5 h-0.5 mx-0.5 rounded shrink-0",
-                      index === DETAILS_LAST_TAB
-                        ? profileSaved
-                          ? "bg-green-400"
-                          : "bg-amber-300"
-                        : stepCompleted[index]
-                          ? "bg-green-400"
-                          : "bg-slate-200"
-                    )}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Main layout */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Desktop: Left vertical tabs */}
-          <aside className="hidden lg:block w-64 xl:w-72 shrink-0">
-            <div className="sticky top-6 space-y-1.5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2">
-                Vendor Details
-              </p>
-              {TABS.slice(0, AGREEMENT_START_TAB).map((tab, index) =>
-                renderTabButton(tab, index, "vertical")
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col flex-1 min-h-0 overflow-hidden"
+        >
+          <div className="lg:hidden shrink-0 border-b bg-white overflow-x-auto">
+            <div className="flex items-center gap-1.5 min-w-max px-3 py-2">
+              {TABS.map((tab, index) =>
+                renderTabButton(tab, index, "horizontal")
               )}
-
-              <div className="my-4 border-t border-dashed border-slate-200" />
-
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2 flex items-center gap-2">
-                Agreements
-                {!profileSaved && (
-                  <span className="text-[10px] font-normal normal-case text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                    Locked
-                  </span>
-                )}
-              </p>
-              {TABS.slice(AGREEMENT_START_TAB).map((tab, index) =>
-                renderTabButton(tab, index + AGREEMENT_START_TAB, "vertical")
-              )}
-
-              {/* Progress summary */}
-              <div className="mt-6 px-2 space-y-3">
-                <div>
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                    <span>Details</span>
-                    <span>
-                      {detailsProgressCount}/{totalDetailsSteps}
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#DC3173] rounded-full transition-all duration-300"
-                      style={{
-                        width: `${(detailsProgressCount / totalDetailsSteps) * 100}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                    <span>Agreements</span>
-                    <span>
-                      {profileSaved
-                        ? `${[agreementCreated, agreementSigned].filter(Boolean).length}/2`
-                        : "—"}
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className={cn(
-                        "h-full rounded-full transition-all duration-300",
-                        profileSaved ? "bg-emerald-500" : "bg-slate-300"
-                      )}
-                      style={{
-                        width: profileSaved
-                          ? `${([agreementCreated, agreementSigned].filter(Boolean)
-                            .length /
-                            2) *
-                          100
-                          }%`
-                          : "0%",
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {profileSaved && (
-                  <div className="flex items-center gap-1.5 text-xs text-emerald-600 mt-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Profile saved
-                  </div>
-                )}
-              </div>
             </div>
-          </aside>
+          </div>
 
-          {/* Right: Content */}
-          <div className="flex-1 min-w-0">
-            <AnimatePresence mode="wait">
-              {/* TAB 0: Account */}
-              {activeTab === 0 && (
-                <motion.div
-                  key="account"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Card
-                    className="p-6 shadow-md border-t-4"
-                    style={{ borderColor: DELIGO }}
-                  >
-                    <h2 className="text-xl font-semibold mb-4">
-                      1. {t("account_information")}
-                    </h2>
-
-                    <div className="space-y-4 items-start">
-                      <FormField
-                        control={form.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("first_name")}{" "}
-                              {vendorDetails?.userId && (
-                                <span className="text-[#DC3173]">*</span>
-                              )}
-                            </FormLabel>
-                            <FormControl>
-                              <Input placeholder={t("first_name")} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("last_name")}{" "}
-                              {vendorDetails?.userId && (
-                                <span className="text-[#DC3173]">*</span>
-                              )}
-                            </FormLabel>
-                            <FormControl>
-                              <Input placeholder={t("last_name")} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div>
-                        <Label>
-                          {t("email")}{" "}
-                          <span className="text-[#DC3173]">*</span>
-                        </Label>
-                        <div className="flex items-center gap-3 mt-2">
-                          <Input
-                            type="email"
-                            placeholder={t("vendor_email")}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={!!vendorDetails?.userId}
-                          />
-                          {!otpSent && !emailVerified && (
-                            <Button
-                              disabled={
-                                !email || !password || buttonDisabled === 1
-                              }
-                              type="button"
-                              style={{ background: DELIGO }}
-                              onClick={sendOtp}
-                              className="w-32 shrink-0"
-                            >
-                              <Mail className="w-4 h-4 mr-2" /> {t("send_otp")}
-                            </Button>
-                          )}
-                          {otpSent && !emailVerified && (
-                            <Button
-                              disabled={timer > 0 || buttonDisabled === 2}
-                              type="button"
-                              style={{ background: DELIGO }}
-                              onClick={resendOtp}
-                              className="w-32 shrink-0"
-                            >
-                              {t("resend")}{" "}
-                              {timer > 0 && `(${formatTime(timer)})`}
-                            </Button>
-                          )}
-                          {emailVerified && (
-                            <span className="text-green-600 flex items-center gap-2 text-sm shrink-0">
-                              <CheckCircle className="w-4 h-4" /> {t("verified")}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {otpSent && !emailVerified && (
-                        <div>
-                          <Label className="mb-2">
-                            {t("otp")}{" "}
-                            <span className="text-[#DC3173]">*</span>
-                          </Label>
-                          <div className="flex items-center gap-3">
-                            <Input
-                              placeholder={t("enter_otp")}
-                              value={otp}
-                              onChange={(e) => setOtp(e.target.value)}
-                              maxLength={4}
-                            />
-                            <Button
-                              type="button"
-                              disabled={
-                                buttonDisabled === 3 || otp.length < 4
-                              }
-                              style={{ background: DELIGO }}
-                              onClick={verifyOtp}
-                              className="w-32 shrink-0"
-                            >
-                              <BadgeCheck className="w-4 h-4 mr-2" />{" "}
-                              {t("verify_otp")}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-
-                      <div>
-                        <Label className="mb-2">
-                          {t("password")}{" "}
-                          <span className="text-[#DC3173]">*</span>
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            type={showPass ? "text" : "password"}
-                            placeholder={t("password")}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            disabled={!!vendorDetails?.userId}
-                          />
-                          {showPass ? (
-                            <EyeOff
-                              size={18}
-                              className="absolute right-3 top-2.5 cursor-pointer"
-                              onClick={() => setShowPass(false)}
-                            />
-                          ) : (
-                            <Eye
-                              size={18}
-                              className="absolute right-3 top-2.5 cursor-pointer"
-                              onClick={() => setShowPass(true)}
-                            />
-                          )}
-                        </div>
-                      </div>
-
-                      <Label className="mb-2">
-                        {t("phone_number")}{" "}
-                        {vendorDetails?.userId && (
-                          <span className="text-[#DC3173]">*</span>
-                        )}
-                      </Label>
-                      <FormField
-                        control={form.control}
-                        name="phoneNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <PhoneInput
-                                defaultCountry="pt"
-                                value={field.value || ""}
-                                onChange={(phone) => field.onChange(phone)}
-                                forceDialCode={true}
-                                disableDialCodePrefill={false}
-                                className="w-full flex"
-                                inputStyle={{
-                                  width: "100%",
-                                  height: "40px",
-                                  fontSize: "14px",
-                                  color: "#374151",
-                                  borderRadius: "0.5rem",
-                                  border: "1px solid #D1D5DB",
-                                  outline: "none",
-                                  paddingLeft: "52px",
-                                }}
-                                countrySelectorStyleProps={{
-                                  buttonStyle: {
-                                    position: "absolute",
-                                    left: "1px",
-                                    top: "-1px",
-                                    bottom: "1px",
-                                    border: "none",
-                                    backgroundColor: "transparent",
-                                    height: "44px",
-                                    padding: "0 12px",
-                                    borderTopLeftRadius: "0.5rem",
-                                    borderBottomLeftRadius: "0.5rem",
-                                  },
-                                }}
-                                inputClassName="focus-visible:ring-2 focus-visible:ring-[#D1D5DB] focus-visible:border-[#D1D5DB]"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+          <div className="flex flex-1 min-h-0 overflow-hidden">
+            <aside className="hidden lg:flex w-64 xl:w-72 shrink-0 flex-col border-r border-slate-200 bg-white min-h-0">
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-1.5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2">
+                  Vendor Details
+                </p>
+                {TABS.slice(0, 5).map((tab, index) =>
+                  renderTabButton(tab, index, "vertical")
+                )}
+                <div className="my-4 border-t border-dashed border-slate-200" />
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2 flex items-center gap-2">
+                  Agreements
+                  {!profileSaved && (
+                    <span className="text-[10px] font-normal normal-case text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                      Locked
+                    </span>
+                  )}
+                </p>
+                {TABS.slice(5).map((tab, index) =>
+                  renderTabButton(tab, index + 5, "vertical")
+                )}
+                <div className="mt-6 px-2 space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                      <span>Details</span>
+                      <span>{detailsProgressCount}/5</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#DC3173] rounded-full transition-all duration-300"
+                        style={{
+                          width: `${(detailsProgressCount / 5) * 100}%`,
+                        }}
                       />
                     </div>
-                  </Card>
-                </motion.div>
-              )}
+                  </div>
+                  {profileSaved && (
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Profile saved
+                    </div>
+                  )}
+                </div>
+              </div>
+            </aside>
 
-              {/* TAB 1: Business */}
-              {activeTab === 1 && vendorDetails?.userId && (
-                <motion.div
-                  key="business"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+            <div
+              ref={contentRef}
+              className="flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain scroll-smooth"
+            >
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-8 pb-16">
+                {/* Account */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[0] = el;
+                  }}
+                  id="section-account"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
                     style={{ borderColor: DELIGO }}
                   >
-                    <h2 className="text-xl font-semibold mb-4">
-                      2. {t("business_details")}
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <User className="w-5 h-5" /> 1. {t("account_information")}
                     </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                      <FormField
-                        control={form.control}
-                        name="businessName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("business_name")}{" "}
+                    <div className="space-y-4">
+                      {!emailVerified && (
+                        <>
+                          <div>
+                            <Label>
+                              {t("email")}{" "}
                               <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
+                            </Label>
+                            <div className="mt-2 relative">
+                              <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                               <Input
-                                placeholder={t("business_name")}
-                                {...field}
+                                type="email"
+                                className="pl-10"
+                                placeholder={t("vendor_email") || "Email"}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={otpSent}
                               />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="companyLegalName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("company_legal_name")}{" "}
+                            </div>
+                          </div>
+                          <div>
+                            <Label>
+                              {t("password")}{" "}
                               <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
+                            </Label>
+                            <div className="mt-2 relative">
                               <Input
-                                placeholder={t("company_legal_name")}
-                                {...field}
+                                type={showPass ? "text" : "password"}
+                                placeholder={t("password")}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={otpSent}
                               />
-                            </FormControl>
-                            <FormDescription>
-                              {t("company_legal_name_description")}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="businessType"
-                        render={({ field, fieldState }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("business_type")}{" "}
-                              <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
+                              <button
+                                type="button"
+                                className="absolute right-3 top-2.5 text-slate-400"
+                                onClick={() => setShowPass((s) => !s)}
                               >
-                                <SelectTrigger
-                                  className={cn(
-                                    "w-full",
-                                    fieldState.invalid ? "border-red-500" : ""
-                                  )}
-                                >
-                                  <SelectValue
-                                    placeholder={t("select_business_type")}
-                                  />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {businessCategories?.map((category) => (
-                                    <SelectItem
-                                      key={category._id}
-                                      value={category.slug}
-                                    >
-                                      {category?.name?.[lang]}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="NIF"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("nif")}{" "}
-                              <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder={t("tax_identification_number")}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {businessType === "restaurant" && (
-                        <FormField
-                          control={form.control}
-                          name="restaurantCuisineType"
-                          render={({ field, fieldState }) => {
-                            const selectedCuisines = Array.isArray(field.value)
-                              ? field.value
-                              : [];
-                            const getCuisineName = (slug: string) =>
-                              cuisines?.find((c) => c.slug === slug)?.name?.[
-                              lang
-                              ] ?? slug;
-
-                            return (
-                              <FormItem className="col-span-2">
-                                <FormLabel className="mb-2 block text-sm font-medium text-gray-700">
-                                  {t("restaurantCuisineType")}{" "}
-                                  <span className="text-red-500">*</span>
-                                </FormLabel>
-
-                                {selectedCuisines.length > 0 && (
-                                  <div className="flex flex-wrap gap-2 mb-3 p-2 border border-dashed rounded-lg bg-gray-50/50">
-                                    {selectedCuisines.map((slug) => (
-                                      <Badge
-                                        key={slug}
-                                        variant="secondary"
-                                        className="flex items-center gap-1 bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 transition-all capitalize px-3 py-1 text-sm font-medium"
-                                      >
-                                        {getCuisineName(slug)}
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            field.onChange(
-                                              selectedCuisines.filter(
-                                                (item) => item !== slug
-                                              )
-                                            )
-                                          }
-                                          className="rounded-full outline-none hover:bg-[#DC3173]/20 p-0.5"
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </button>
-                                      </Badge>
-                                    ))}
-                                  </div>
+                                {showPass ? (
+                                  <EyeOff className="h-4 w-4" />
+                                ) : (
+                                  <Eye className="h-4 w-4" />
                                 )}
-
-                                <div className="relative">
-                                  <Briefcase className="absolute left-3 top-3.5 text-[#DC3173]/80" />
-                                  <FormControl>
-                                    <Select
-                                      value=""
-                                      onValueChange={(val) => {
-                                        if (!selectedCuisines.includes(val)) {
-                                          field.onChange([
-                                            ...selectedCuisines,
-                                            val,
-                                          ]);
-                                        }
-                                      }}
-                                    >
-                                      <SelectTrigger
-                                        className={cn(
-                                          "pl-11 pr-4 h-12 w-full bg-white/90 text-gray-700 shadow-sm focus-visible:ring-2 focus-visible:ring-[#DC3173]/70 hover:shadow-md transition-all cursor-pointer",
-                                          fieldState.invalid
-                                            ? "border-destructive"
-                                            : "border-gray-300"
-                                        )}
-                                        style={{ height: "3rem" }}
-                                      >
-                                        <SelectValue
-                                          placeholder={t(
-                                            "select_multiple_cuisine"
-                                          )}
-                                        />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {cuisines?.length < 1 ? (
-                                          <div className="p-2 text-sm text-gray-500">
-                                            {t("no_items_found")}
-                                          </div>
-                                        ) : (
-                                          cuisines?.map((type, idx) => {
-                                            const isAlreadySelected =
-                                              selectedCuisines.includes(
-                                                type?.slug
-                                              );
-                                            return (
-                                              <SelectItem
-                                                key={idx}
-                                                value={type?.slug}
-                                                className="capitalize"
-                                                disabled={isAlreadySelected}
-                                              >
-                                                {type?.name?.[lang]}{" "}
-                                                {isAlreadySelected && "✓"}
-                                              </SelectItem>
-                                            );
-                                          })
-                                        )}
-                                      </SelectContent>
-                                    </Select>
-                                  </FormControl>
-                                </div>
+                              </button>
+                            </div>
+                          </div>
+                          {!otpSent ? (
+                            <Button
+                              type="button"
+                              onClick={sendOtp}
+                              disabled={
+                                buttonDisabled === 1 || !email || !password
+                              }
+                              className="bg-[#DC3173] hover:bg-[#c22b65] text-white"
+                            >
+                              {buttonDisabled === 1
+                                ? "Sending..."
+                                : t("send_otp") || "Send OTP"}
+                            </Button>
+                          ) : (
+                            <div className="space-y-3">
+                              <div>
+                                <Label>
+                                  {t("otp")}{" "}
+                                  <span className="text-[#DC3173]">*</span>
+                                </Label>
+                                <Input
+                                  className="mt-2"
+                                  placeholder="Enter OTP"
+                                  value={otp}
+                                  onChange={(e) => setOtp(e.target.value)}
+                                />
+                              </div>
+                              <div className="flex flex-wrap gap-2 items-center">
+                                <Button
+                                  type="button"
+                                  onClick={verifyOtp}
+                                  disabled={buttonDisabled === 3 || !otp}
+                                  className="bg-[#DC3173] hover:bg-[#c22b65] text-white"
+                                >
+                                  {buttonDisabled === 3
+                                    ? "Verifying..."
+                                    : t("verify_otp") || "Verify OTP"}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={resendOtp}
+                                  disabled={timer > 0 || buttonDisabled === 2}
+                                >
+                                  {timer > 0
+                                    ? `${t("resend_otp") || "Resend"} (${formatTime(timer)})`
+                                    : t("resendOtp") || "Resend OTP"}
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      {emailVerified && (
+                        <>
+                          <div>
+                            <Label>
+                              {t("email")}{" "}
+                              <span className="text-[#DC3173]">*</span>
+                            </Label>
+                            <Input
+                              className="mt-2"
+                              type="email"
+                              value={email}
+                              disabled
+                            />
+                          </div>
+                          <FormField
+                            control={form.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  {t("first_name")}{" "}
+                                  <span className="text-[#DC3173]">*</span>
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("first_name")}
+                                    {...field}
+                                  />
+                                </FormControl>
                                 <FormMessage />
                               </FormItem>
-                            );
-                          }}
-                        />
-                      )}
-
-                      <FormField
-                        control={form.control}
-                        name="branches"
-                        render={({ field }) => (
-                          <FormItem className="col-span-2">
-                            <FormLabel>
-                              {t("total_branches")}{" "}
-                              <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder={t("total_branches")}
-                                {...field}
-                                min={0}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="openingHours"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="mb-2">
-                              {t("opening_hours")}{" "}
-                              <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input type="time" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="closingHours"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="mb-2">
-                              {t("closing_hours")}{" "}
-                              <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input type="time" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="closingDays"
-                        render={({ field }) => (
-                          <FormItem className="col-span-2">
-                            <FormLabel className="text-sm font-medium text-gray-700 mb-2">
-                              {t("closing_days")}
-                            </FormLabel>
-                            <div className="flex flex-wrap gap-2">
-                              {daysOfWeek.map((day) => {
-                                const isSelected =
-                                  field.value?.includes(day) ?? false;
-                                return (
-                                  <motion.button
-                                    key={day}
-                                    type="button"
-                                    onClick={() => {
-                                      const current = field.value ?? [];
-                                      field.onChange(
-                                        isSelected
-                                          ? current.filter((d) => d !== day)
-                                          : [...current, day]
-                                      );
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  {t("last_name")}{" "}
+                                  <span className="text-[#DC3173]">*</span>
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder={t("last_name")}
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Label className="mb-2">
+                            {t("phone_number")}{" "}
+                            <span className="text-[#DC3173]">*</span>
+                          </Label>
+                          <FormField
+                            control={form.control}
+                            name="phoneNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <PhoneInput
+                                    defaultCountry="pt"
+                                    value={field.value || ""}
+                                    onChange={(phone) => field.onChange(phone)}
+                                    forceDialCode
+                                    disableDialCodePrefill={false}
+                                    className="w-full flex"
+                                    inputStyle={{
+                                      width: "100%",
+                                      height: "46px",
+                                      fontSize: "14px",
+                                      color: "#374151",
+                                      borderRadius: "0.5rem",
+                                      border: "1px solid #D1D5DB",
+                                      outline: "none",
+                                      paddingLeft: "52px",
                                     }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${isSelected
-                                      ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                      : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                      }`}
-                                  >
-                                    {day}
-                                  </motion.button>
-                                );
-                              })}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                                    countrySelectorStyleProps={{
+                                      buttonStyle: {
+                                        position: "absolute",
+                                        left: "1px",
+                                        top: "1px",
+                                        bottom: "1px",
+                                        border: "none",
+                                        backgroundColor: "transparent",
+                                        height: "44px",
+                                        padding: "0 12px",
+                                        borderTopLeftRadius: "0.5rem",
+                                        borderBottomLeftRadius: "0.5rem",
+                                      },
+                                    }}
+                                    inputClassName="focus-visible:ring-2 focus-visible:ring-[#D1D5DB] focus-visible:border-[#D1D5DB]"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </>
+                      )}
                     </div>
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 2: Bank */}
-              {activeTab === 2 && vendorDetails?.userId && (
-                <motion.div
-                  key="bank"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* Business */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[1] = el;
+                  }}
+                  id="section-business"
+                >
+                  <Card
+                    className="p-6 shadow-md border-t-4"
+                    style={{ borderColor: DELIGO }}
+                  >
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Briefcase className="w-5 h-5" /> 2.{" "}
+                      {t("business_details")}
+                    </h2>
+                    {!vendorDetails?.userId ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Verify email in Account Information first.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                        <FormField
+                          control={form.control}
+                          name="businessName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t("business_name")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder={t("business_name")}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="companyLegalName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t("company_legal_name")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder={t("company_legal_name")}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                {t("company_legal_name_description")}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="businessType"
+                          render={({ field, fieldState }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t("business_type")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  value={field.value}
+                                >
+                                  <SelectTrigger
+                                    className={cn(
+                                      "w-full",
+                                      fieldState.invalid ? "border-red-500" : ""
+                                    )}
+                                  >
+                                    <SelectValue
+                                      placeholder={t("select_business_type")}
+                                    />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {businessCategories?.map((category) => (
+                                      <SelectItem
+                                        key={category._id}
+                                        value={category.slug}
+                                      >
+                                        {category?.name?.[lang]}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="NIF"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t("nif")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder={t("tax_identification_number")}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        {businessType === "restaurant" && (
+                          <FormField
+                            control={form.control}
+                            name="restaurantCuisineType"
+                            render={({ field, fieldState }) => {
+                              const selectedCuisines = Array.isArray(
+                                field.value
+                              )
+                                ? field.value
+                                : [];
+                              const getCuisineName = (slug: string) =>
+                                cuisines?.find((c) => c.slug === slug)?.name?.[
+                                lang
+                                ] ?? slug;
+                              return (
+                                <FormItem className="col-span-2">
+                                  <FormLabel className="mb-2 block text-sm font-medium text-gray-700">
+                                    {t("restaurantCuisineType")}{" "}
+                                    <span className="text-red-500">*</span>
+                                  </FormLabel>
+                                  {selectedCuisines.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mb-3 p-2 border border-dashed rounded-lg bg-gray-50/50">
+                                      {selectedCuisines.map((slug) => (
+                                        <Badge
+                                          key={slug}
+                                          variant="secondary"
+                                          className="flex items-center gap-1 bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 transition-all capitalize px-3 py-1 text-sm font-medium"
+                                        >
+                                          {getCuisineName(slug)}
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              field.onChange(
+                                                selectedCuisines.filter(
+                                                  (item) => item !== slug
+                                                )
+                                              )
+                                            }
+                                            className="rounded-full outline-none hover:bg-[#DC3173]/20 p-0.5"
+                                          >
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+                                  <div className="relative">
+                                    <Briefcase className="absolute left-3 top-3.5 text-[#DC3173]/80" />
+                                    <FormControl>
+                                      <Select
+                                        value=""
+                                        onValueChange={(val) => {
+                                          if (
+                                            !selectedCuisines.includes(val)
+                                          ) {
+                                            field.onChange([
+                                              ...selectedCuisines,
+                                              val,
+                                            ]);
+                                          }
+                                        }}
+                                      >
+                                        <SelectTrigger
+                                          className={cn(
+                                            "pl-11 pr-4 h-12 w-full bg-white/90 text-gray-700 shadow-sm focus-visible:ring-2 focus-visible:ring-[#DC3173]/70 hover:shadow-md transition-all cursor-pointer",
+                                            fieldState.invalid
+                                              ? "border-destructive"
+                                              : "border-gray-300"
+                                          )}
+                                          style={{ height: "3rem" }}
+                                        >
+                                          <SelectValue
+                                            placeholder={t(
+                                              "select_multiple_cuisine"
+                                            )}
+                                          />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {cuisines?.length < 1 ? (
+                                            <div className="p-2 text-sm text-gray-500">
+                                              {t("no_items_found")}
+                                            </div>
+                                          ) : (
+                                            cuisines?.map((type, idx) => {
+                                              const isAlreadySelected =
+                                                selectedCuisines.includes(
+                                                  type?.slug
+                                                );
+                                              return (
+                                                <SelectItem
+                                                  key={idx}
+                                                  value={type?.slug}
+                                                  className="capitalize"
+                                                  disabled={isAlreadySelected}
+                                                >
+                                                  {type?.name?.[lang]}{" "}
+                                                  {isAlreadySelected && "✓"}
+                                                </SelectItem>
+                                              );
+                                            })
+                                          )}
+                                        </SelectContent>
+                                      </Select>
+                                    </FormControl>
+                                  </div>
+                                  <FormMessage />
+                                </FormItem>
+                              );
+                            }}
+                          />
+                        )}
+                        <FormField
+                          control={form.control}
+                          name="branches"
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>
+                                {t("total_branches")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder={t("total_branches")}
+                                  {...field}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="openingHours"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="mb-2">
+                                {t("opening_hours")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input type="time" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="closingHours"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="mb-2">
+                                {t("closing_hours")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input type="time" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="closingDays"
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel className="text-sm font-medium text-gray-700 mb-2">
+                                {t("closing_days")}
+                              </FormLabel>
+                              <div className="flex flex-wrap gap-2">
+                                {daysOfWeek.map((day) => {
+                                  const isSelected =
+                                    field.value?.includes(day) ?? false;
+                                  return (
+                                    <motion.button
+                                      key={day}
+                                      type="button"
+                                      onClick={() => {
+                                        const current = field.value ?? [];
+                                        field.onChange(
+                                          isSelected
+                                            ? current.filter((d) => d !== day)
+                                            : [...current, day]
+                                        );
+                                      }}
+                                      whileTap={{ scale: 0.95 }}
+                                      className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${isSelected
+                                        ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                        : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                        }`}
+                                    >
+                                      {day}
+                                    </motion.button>
+                                  );
+                                })}
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </Card>
+                </div>
+
+                {/* Bank */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[2] = el;
+                  }}
+                  id="section-bank"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1389,55 +1293,61 @@ export default function AddVendor({
                       <Banknote className="w-5 h-5" /> 3.{" "}
                       {t("bank_nd_payment_information")}
                     </h2>
-                    <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="accountHolderName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("account_holder_name")}{" "}
-                              <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder={t("account_holder_name")}
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="iban"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              {t("iban")}{" "}
-                              <span className="text-[#DC3173]">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input placeholder={t("iban")} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    {!vendorDetails?.userId ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Verify email first.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="accountHolderName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t("account_holder_name")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder={t("account_holder_name")}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="iban"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                {t("iban")}{" "}
+                                <span className="text-[#DC3173]">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input placeholder={t("iban")} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 3: Location */}
-              {activeTab === 3 && vendorDetails?.userId && (
-                <motion.div
-                  key="location"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* Location */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[3] = el;
+                  }}
+                  id="section-location"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1447,23 +1357,29 @@ export default function AddVendor({
                       <MapPin className="w-5 h-5" /> 4.{" "}
                       {t("business_location_information")}
                     </h2>
-                    <BusinessLocationMap
-                      form={form}
-                      setLocationCoordinates={setLocationCoordinates}
-                      t={t}
-                    />
+                    {!vendorDetails?.userId ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Verify email first.
+                        </p>
+                      </div>
+                    ) : (
+                      <BusinessLocationMap
+                        form={form}
+                        setLocationCoordinates={setLocationCoordinates}
+                        t={t}
+                      />
+                    )}
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 4: Documents */}
-              {activeTab === 4 && vendorDetails?.userId && (
-                <motion.div
-                  key="documents"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* Documents */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[4] = el;
+                  }}
+                  id="section-documents"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1473,33 +1389,40 @@ export default function AddVendor({
                       <FileText className="w-5 h-5" /> 5.{" "}
                       {t("documents_nd_verification")}
                     </h2>
-                    <UploadVendorDocuments
-                      vendor={vendorDetails}
-                      businessType={businessType}
-                      previews={previews}
-                      setPreviews={setPreviews}
-                      isSubmitting={isSubmitting || isSaving}
-                    />
-
-                    {profileSaved && (
-                      <div className="mt-6 flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
-                        <CheckCircle2 className="w-4 h-4 shrink-0" />
-                        Vendor details & documents have been saved. You can
-                        proceed to Agreements or go back to edit.
+                    {!vendorDetails?.userId ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Verify email first.
+                        </p>
                       </div>
+                    ) : (
+                      <>
+                        <UploadVendorDocuments
+                          vendor={vendorDetails}
+                          businessType={businessType}
+                          previews={previews}
+                          setPreviews={setPreviews}
+                          isSubmitting={isSubmitting || isSaving}
+                        />
+                        {profileSaved && (
+                          <div className="mt-6 flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+                            <CheckCircle2 className="w-4 h-4 shrink-0" />
+                            Vendor details & documents saved. You can proceed to
+                            Agreements below.
+                          </div>
+                        )}
+                      </>
                     )}
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 5: Create Agreement */}
-              {activeTab === 5 && vendorDetails?.userId && profileSaved && (
-                <motion.div
-                  key="create_agreement"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* Create Agreement */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[5] = el;
+                  }}
+                  id="section-create-agreement"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1509,44 +1432,53 @@ export default function AddVendor({
                       <ScrollText className="w-5 h-5" /> 6.{" "}
                       {t("create_agreement") || "Create Agreement"}
                     </h2>
-
-                    {agreementCreated ? (
+                    {!profileSaved ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Complete the details above and click{" "}
+                          <strong>Save Changes</strong> to unlock agreement
+                          creation.
+                        </p>
+                      </div>
+                    ) : agreementCreated ? (
                       <div className="flex flex-col items-center gap-4 py-10">
                         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
                           <CheckCircle2 className="w-8 h-8 text-green-600" />
                         </div>
                         <p className="text-lg font-medium text-green-700">
-                          {t("agreement_created_successfully")}
+                          {t("agreement_created_successfully") ||
+                            "Agreement created successfully"}
                         </p>
                         <p className="text-sm text-slate-500 text-center max-w-md">
-                          {t("you_can_proceed_to_the_next_step_to_sign")}
+                          {t("you_can_proceed_to_the_next_step_to_sign") ||
+                            "Scroll down to sign the agreement."}
                         </p>
                       </div>
                     ) : (
-                      <CreateUserAgreement
-                        user={vendorDetails}
-                        role="VENDOR"
-                        embedded
-                        showBackButton={false}
-                        onSuccess={(agreement) => {
-                          setAgreementData(agreement);
-                          setAgreementCreated(true);
-                          setActiveTab(6);
-                        }}
-                      />
+                      vendorDetails && (
+                        <CreateUserAgreement
+                          user={vendorDetails}
+                          role="VENDOR"
+                          embedded
+                          showBackButton={false}
+                          onSuccess={(agreement) => {
+                            setAgreementData(agreement);
+                            setAgreementCreated(true);
+                            scrollToSection(6);
+                          }}
+                        />
+                      )
                     )}
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 6: Sign Agreement */}
-              {activeTab === 6 && vendorDetails?.userId && profileSaved && (
-                <motion.div
-                  key="sign_agreement"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* Sign Agreement */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[6] = el;
+                  }}
+                  id="section-sign-agreement"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1556,10 +1488,19 @@ export default function AddVendor({
                       <FileSignature className="w-5 h-5" /> 7.{" "}
                       {t("agreement_sign") || "Sign Agreement"}
                     </h2>
-
-                    {!agreementSigned ? (
-                      <div className="flex flex-col items-center gap-4 py-10">
-                        <AgreementViewer agreement={agreementData} />
+                    {!profileSaved ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Save changes first to unlock signing.
+                        </p>
+                      </div>
+                    ) : !agreementSigned ? (
+                      <div className="flex flex-col items-center gap-4 py-6">
+                        <AgreementViewer
+                          agreement={agreementData}
+                          setAgreementSigned={() => setAgreementSigned(true)}
+                        />
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-4 py-10">
@@ -1567,98 +1508,32 @@ export default function AddVendor({
                           <CheckCircle2 className="w-8 h-8 text-green-600" />
                         </div>
                         <p className="text-lg font-medium text-green-700">
-                          {t("agreement_signed_successfully")}
+                          {t("agreement_signed_successfully") ||
+                            "Agreement signed successfully"}
                         </p>
-                        <p className="text-sm text-slate-500">
-                          {t("click_submit_vendor_below")}
-                        </p>
+                        <Button
+                          type="submit"
+                          disabled={
+                            !profileSaved ||
+                            !agreementSigned ||
+                            isSubmitting ||
+                            isSaving
+                          }
+                          className="bg-[#DC3173] hover:bg-[#c22b65] text-white px-8 mt-2"
+                        >
+                          {isSubmitting
+                            ? "Submitting..."
+                            : t("submit_vendor") || "Submit Vendor"}
+                        </Button>
                       </div>
                     )}
                   </Card>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Navigation Footer */}
-            <div className="mt-6 flex items-center justify-between pb-10">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={goPrev}
-                disabled={activeTab === 0 || isSaving}
-                className="gap-2"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                {t("previous")}
-              </Button>
-
-              <div className="text-sm text-slate-400 hidden sm:block">
-                {t("step_lg")} {activeTab + 1} of {TABS.length}
-                {activeTab <= DETAILS_LAST_TAB && !profileSaved && (
-                  <span className="ml-2 text-amber-600">· {t("details")}</span>
-                )}
-                {activeTab >= AGREEMENT_START_TAB && (
-                  <span className="ml-2 text-emerald-600">· {t("agreements")}</span>
-                )}
+                </div>
               </div>
-
-              {activeTab < TABS.length - 1 ? (
-                activeTab === DETAILS_LAST_TAB ? (
-                  <Button
-                    type="button"
-                    onClick={handleSaveAndContinue}
-                    disabled={
-                      !stepCompleted[DETAILS_LAST_TAB] ||
-                      isSaving ||
-                      isSubmitting
-                    }
-                    className="bg-[#DC3173] hover:bg-[#c22b65] text-white gap-2 min-w-40"
-                  >
-                    {isSaving ? (
-                      "Saving..."
-                    ) : profileSaved ? (
-                      <>
-                        {t("continue_to_agreements")}
-                        <ChevronRight className="w-4 h-4" />
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        {t("save_nd_continue")}
-                      </>
-                    )}
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    onClick={goNext}
-                    disabled={!stepCompleted[activeTab] || isSaving}
-                    className="bg-[#DC3173] hover:bg-[#c22b65] text-white gap-2"
-                  >
-                    {t("next")}
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                )
-              ) : (
-                <Button
-                  type="submit"
-                  disabled={
-                    !profileSaved ||
-                    !agreementSigned ||
-                    isSubmitting ||
-                    isSaving
-                  }
-                  className="bg-[#DC3173] hover:bg-[#c22b65] text-white px-8"
-                >
-                  {isSubmitting
-                    ? "Submitting..."
-                    : t("submit_vendor") || "Submit Vendor"}
-                </Button>
-              )}
             </div>
           </div>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }

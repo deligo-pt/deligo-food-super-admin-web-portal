@@ -157,11 +157,11 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
             }
         }
 
-        if (!posPaymentOption && !isFleetAgreement) {
-            toast.error("Please select a payment option.", { id: toastId });
-            setIsSubmitting(false);
-            return;
-        }
+        // if (!posPaymentOption && !isFleetAgreement) {
+        //     toast.error("Please select a payment option.", { id: toastId });
+        //     setIsSubmitting(false);
+        //     return;
+        // }
 
         let partySignature: string;
 
@@ -176,7 +176,8 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
         const payload: any = {
             partySignatureMethod,
             partySignature,
-            posPaymentOption,
+            ...(posPaymentOption && { posPaymentOption: posPaymentOption }),
+            ...(posPaymentOption && { posPaymentDecision: "YES" })
         };
 
         if (isFleetAgreement) {
@@ -227,7 +228,7 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
 
     const isSubmitDisabled = !isFleetAgreement ?
         isPartyEmpty ||
-        !posPaymentOption ||
+        // !posPaymentOption ||
         isSubmitting ||
         isUploading ||
         isUploadingStamp :
@@ -327,9 +328,9 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
                         />}
 
                         {/* Payment Option */}
-                        {!isFleetAgreement && <div className="space-y-3">
+                        {(!isFleetAgreement || (agreement && !agreement?.hasPosPaymentDecision)) && <div className="space-y-3">
                             <Label className="text-sm font-bold text-slate-700">
-                                {t("payment_option")} <span className="text-[#DC3173]">*</span>
+                                {t("payment_option")} <span className="text-slate-400 font-normal">(optional)</span>
                             </Label>
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center space-x-2">

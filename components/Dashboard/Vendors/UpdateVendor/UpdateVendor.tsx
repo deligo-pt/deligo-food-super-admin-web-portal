@@ -33,7 +33,10 @@ import { USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
-import { submitForApproval, updateUserDataReq } from "@/services/auth/register-user.service";
+import {
+  submitForApproval,
+  updateUserDataReq,
+} from "@/services/auth/register-user.service";
 import { useStore } from "@/store/store";
 import { TBusinessCategoryResponse } from "@/types/category.type";
 import { TCuisine } from "@/types/cuisine.type";
@@ -42,13 +45,11 @@ import { TBusinessLocation, TVendor } from "@/types/user.type";
 import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Banknote,
   Briefcase,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   FileSignature,
   FileText,
   Lock,
@@ -59,7 +60,7 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -75,10 +76,6 @@ interface IProps {
 }
 
 type TVendorForm = z.infer<ReturnType<typeof addVendorValidation>>;
-
-/** First section ends at Documents (index 4). Agreements start at 5. */
-const DETAILS_LAST_TAB = 4;
-const AGREEMENT_START_TAB = 5;
 
 const TABS = [
   { id: 0, key: "account", labelKey: "account_information", icon: User },
@@ -111,7 +108,9 @@ export default function UpdateVendor({
     myPhoto: Array.isArray(vendorState?.documents?.myPhoto)
       ? vendorState?.documents?.myPhoto
       : null,
-    businessLicenseDoc: Array.isArray(vendorState?.documents?.businessLicenseDoc)
+    businessLicenseDoc: Array.isArray(
+      vendorState?.documents?.businessLicenseDoc
+    )
       ? vendorState?.documents?.businessLicenseDoc
       : null,
     taxDoc: Array.isArray(vendorState?.documents?.taxDoc)
@@ -139,23 +138,29 @@ export default function UpdateVendor({
       : null,
   });
 
-  const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto", "menuUpload"];
+  const OPTIONAL_DEFAULTS: TVendorDocKey[] = ["myPhoto"];
   const isSubVendor = vendor?.role === "SUB_VENDOR";
 
-  // Agreement status helpers
   const agreementStatus = vendorState?.agreement?.status ?? null;
-  const needsAgreement = !vendorState?.agreement || agreementStatus === "UNSIGNED";
-  const isAgreementFinalized = agreementStatus === "PARTY_SIGNED" || agreementStatus === "SIGNED";
+  const needsAgreement =
+    !vendorState?.agreement || agreementStatus === "UNSIGNED";
+  const isAgreementFinalized =
+    agreementStatus === "PARTY_SIGNED" || agreementStatus === "SIGNED";
 
-  const [agreementCreated, setAgreementCreated] = useState(isAgreementFinalized);
-  const [agreementData, setAgreementData] = useState<any>(vendorState?.agreement ?? null);
+  const [agreementCreated, setAgreementCreated] = useState(
+    isAgreementFinalized
+  );
+  const [agreementData, setAgreementData] = useState<any>(
+    vendorState?.agreement ?? null
+  );
   const [agreementSigned, setAgreementSigned] = useState(isAgreementFinalized);
 
-  /** After Save & Continue when re-agreement is required */
   const [profileSaved, setProfileSaved] = useState(!needsAgreement);
   const [isSaving, setIsSaving] = useState(false);
-
   const [activeTab, setActiveTab] = useState(0);
+
+  const contentRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const daysOfWeek = [
     t("sunday") || "Sunday",
@@ -167,7 +172,6 @@ export default function UpdateVendor({
     t("saturday") || "Saturday",
   ];
 
-  // Fallback to English labels if translations missing (matches original data shape)
   const daysOfWeekEn = [
     "Sunday",
     "Monday",
@@ -217,7 +221,6 @@ export default function UpdateVendor({
 
   const watchedValues = useWatch({ control: form.control });
 
-  // Prefill form from vendor
   useEffect(() => {
     const rawCuisineData = vendor?.businessDetails?.restaurantCuisineType;
     let normalizedCuisines: string[] = [];
@@ -267,7 +270,26 @@ export default function UpdateVendor({
     }
   }, [form]);
 
-  // Step completion
+  // Scroll-spy
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container) return;
+
+    const onScroll = () => {
+      const scrollTop = container.scrollTop;
+      let current = 0;
+      sectionRefs.current.forEach((el, index) => {
+        if (!el) return;
+        const top = el.offsetTop - container.offsetTop;
+        if (scrollTop >= top - 80) current = index;
+      });
+      setActiveTab(current);
+    };
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, []);
+
   const isDocumentsValid = REQUIRED_DOCS.every(
     (key) => previews[key] !== null && (previews[key]?.length ?? 0) > 0
   );
@@ -304,8 +326,6 @@ export default function UpdateVendor({
       locationCoordinates.longitude !== 0;
 
     const documentsOk = isDocumentsValid;
-
-    // Agreement steps
     const createOk = needsAgreement ? agreementCreated : true;
     const signOk = needsAgreement ? agreementSigned : true;
 
@@ -328,54 +348,33 @@ export default function UpdateVendor({
     isSubVendor,
   ]);
 
-  const canAccessTab = (tabIndex: number) => {
-    // When agreement is already finalized, all tabs (including agreements) are viewable
-    if (isAgreementFinalized) return true;
-
-    // When re-agreement is required, gate agreements behind profileSaved
-    if (tabIndex >= AGREEMENT_START_TAB) {
-      if (!profileSaved) return false;
-    }
-
-    for (let i = 0; i < tabIndex; i++) {
-      if (!stepCompleted[i]) return false;
-    }
-    return true;
+  const scrollToSection = (index: number) => {
+    const el = sectionRefs.current[index];
+    const container = contentRef.current;
+    if (!el || !container) return;
+    setActiveTab(index);
+    container.scrollTo({
+      top: el.offsetTop - container.offsetTop,
+      behavior: "smooth",
+    });
   };
 
   const goToTab = (index: number) => {
-    if (canAccessTab(index)) {
-      setActiveTab(index);
-    } else {
-      if (index >= AGREEMENT_START_TAB && !profileSaved && needsAgreement) {
-        toast.error(
-          "Please complete Documents and click Save & Continue before accessing Agreements."
-        );
-      } else {
-        toast.error("Please complete the previous steps first.");
-      }
+    if (
+      index >= 5 &&
+      needsAgreement &&
+      !profileSaved &&
+      !isAgreementFinalized
+    ) {
+      toast.error(
+        "Please complete required details/documents and click Save Changes before accessing Agreements."
+      );
+      scrollToSection(4);
+      return;
     }
+    scrollToSection(index);
   };
 
-  const goNext = () => {
-    if (activeTab < TABS.length - 1) {
-      if (!stepCompleted[activeTab]) {
-        toast.error("Please complete all required fields in this step.");
-        return;
-      }
-      if (activeTab === DETAILS_LAST_TAB && needsAgreement && !profileSaved) {
-        handleSaveAndContinue();
-        return;
-      }
-      setActiveTab((prev) => prev + 1);
-    }
-  };
-
-  const goPrev = () => {
-    if (activeTab > 0) setActiveTab((prev) => prev - 1);
-  };
-
-  // Build partial payload (only changed fields)
   const buildChangedPayload = (data: TVendorForm): Record<string, any> => {
     const hasChanged = (current: any, original: any) => {
       if (Array.isArray(current) || Array.isArray(original)) {
@@ -386,7 +385,6 @@ export default function UpdateVendor({
 
     const vendorData: Record<string, any> = {};
 
-    // name
     const originalFirstName = vendor?.name?.firstName || "";
     const originalLastName = vendor?.name?.lastName || "";
     if (
@@ -402,12 +400,10 @@ export default function UpdateVendor({
       }
     }
 
-    // contactNumber
     if (hasChanged(data.phoneNumber, vendor?.contactNumber || "")) {
       vendorData.contactNumber = data.phoneNumber;
     }
 
-    // businessDetails
     const originalBusinessName = vendor?.businessDetails?.businessName || "";
     const originalLegalName = vendor?.businessDetails?.companyLegalName || "";
     const originalBranchName = vendor?.businessDetails?.branchName || "";
@@ -484,7 +480,6 @@ export default function UpdateVendor({
       }
     }
 
-    // businessLocation
     const originalStreet = vendor?.businessLocation?.street || "";
     const originalCity = vendor?.businessLocation?.city || "";
     const originalPostalCode = vendor?.businessLocation?.postalCode || "";
@@ -522,7 +517,6 @@ export default function UpdateVendor({
       }
     }
 
-    // bankDetails
     const originalAccountHolder =
       vendor?.bankDetails?.accountHolderName || "";
     const originalIban = vendor?.bankDetails?.iban || "";
@@ -543,21 +537,19 @@ export default function UpdateVendor({
     return vendorData;
   };
 
-  // Save & Continue (after Documents) – only when needsAgreement
-  const handleSaveAndContinue = async () => {
+  const handleSaveChanges = async () => {
     if (!vendor?.userId) {
       toast.error("Vendor not found.");
       return;
     }
 
-    const allDetailsComplete = stepCompleted
-      .slice(0, DETAILS_LAST_TAB + 1)
-      .every(Boolean);
-
-    if (!allDetailsComplete || !isDocumentsValid) {
+    const detailsComplete = stepCompleted.slice(0, 5).every(Boolean);
+    if (!detailsComplete || !isDocumentsValid) {
       toast.error(
         "Please complete all required fields and upload required documents before saving."
       );
+      const firstIncomplete = stepCompleted.findIndex((ok, i) => i < 5 && !ok);
+      if (firstIncomplete >= 0) scrollToSection(firstIncomplete);
       return;
     }
 
@@ -580,28 +572,30 @@ export default function UpdateVendor({
       const data = form.getValues();
       const vendorData = buildChangedPayload(data);
 
-      // Always allow save even if no field changes (docs may have changed)
       const updatedResult = await updateUserDataReq(
         `/vendors/${vendor.userId}`,
         Object.keys(vendorData).length > 0 ? vendorData : {}
       );
 
       if (updatedResult.success) {
-        setVendorState((prev) => ({
-          ...prev,
-          ...vendorData,
-        }));
+        setVendorState((prev) => ({ ...prev, ...vendorData }));
         setProfileSaved(true);
+
         if (needsAgreement) {
-          setActiveTab(AGREEMENT_START_TAB);
+          toast.success(
+            updatedResult.message ||
+            "Vendor information saved. You can now create / sign the agreement.",
+            { id: toastId }
+          );
+          scrollToSection(5);
         } else {
+          toast.success(
+            updatedResult.message || "Vendor information saved successfully.",
+            { id: toastId }
+          );
+          router.refresh();
           router.back();
         }
-        toast.success(
-          updatedResult.message ||
-          "Vendor information saved. Please create / re-sign the agreement.",
-          { id: toastId }
-        );
         return;
       }
 
@@ -626,79 +620,85 @@ export default function UpdateVendor({
     }
   };
 
-  // Final submit
-  const onSubmit = async (data: TVendorForm) => {
-    if (needsAgreement && !agreementSigned) {
-      toast.error("Please sign the agreement first.");
-      return;
-    }
+  const onSubmit = useCallback(async (_data: TVendorForm) => {
+      if (needsAgreement && !agreementSigned) {
+        toast.error("Please sign the agreement first.");
+        scrollToSection(6);
+        return;
+      }
 
-    if (needsAgreement && !profileSaved) {
-      toast.error("Please save vendor information first (Save & Continue).");
-      return;
-    }
+      if (needsAgreement && !profileSaved) {
+        toast.error("Please save vendor information first (Save Changes).");
+        return;
+      }
 
-    const toastId = toast.loading("Updating vendor data...");
+      const toastId = toast.loading("Updating vendor data...");
 
-    try {
-      // submit user request
-      if (vendor.status === USER_STATUS.PENDING) {
-        const submitRes = await submitForApproval(vendor?.userId);
-        if (submitRes?.success) {
-          // Auto-approve if not already approved
-          const approveResult = await approveOrRejectReq(vendor.userId, {
-            status: USER_STATUS.APPROVED,
-          });
+      try {
+        if (vendor.status === USER_STATUS.PENDING) {
+          const submitRes = await submitForApproval(vendor?.userId);
+          if (submitRes?.success) {
+            const approveResult = await approveOrRejectReq(vendor.userId, {
+              status: USER_STATUS.APPROVED,
+            });
 
-          if (approveResult.success) {
-            toast.success(
-              approveResult.message || "Vendor updated & approved successfully!",
+            if (approveResult.success) {
+              toast.success(
+                approveResult.message ||
+                "Vendor updated & approved successfully!",
+                { id: toastId }
+              );
+              router.refresh();
+              router.back();
+              return;
+            }
+
+            if (approveResult?.data?.errorSources) {
+              approveResult.data.errorSources.forEach(
+                (err: { path: string; message: string }) =>
+                  toast.error(err?.message, { id: toastId })
+              );
+              return;
+            }
+            toast.error(
+              approveResult.message || "Vendor status update failed",
               { id: toastId }
             );
-            router.refresh();
-            router.back();
             return;
           }
 
-          if (approveResult?.data?.errorSources) {
-            approveResult.data.errorSources.forEach(
+          if (submitRes?.data?.errorSources) {
+            submitRes.data.errorSources.forEach(
               (err: { path: string; message: string }) =>
                 toast.error(err?.message, { id: toastId })
             );
             return;
           }
-          toast.error(
-            approveResult.message || "Vendor status update failed",
-            { id: toastId }
-          );
-          return;
-        };
-
-        if (submitRes?.data?.errorSources) {
-          submitRes.data.errorSources.forEach(
-            (err: { path: string; message: string }) =>
-              toast.error(err?.message, { id: toastId })
-          );
+          toast.error(submitRes.message || "Vendor status update failed", {
+            id: toastId,
+          });
           return;
         }
+
+        toast.success("Vendor updated successfully!", { id: toastId });
+        router.refresh();
+        router.back();
+      } catch (err) {
         toast.error(
-          submitRes.message || "Vendor status update failed",
+          err instanceof Error ? err.message : "Something went wrong",
           { id: toastId }
         );
-        return;
-      };
-
-      toast.success("Vendor updated successfully!", { id: toastId });
-      router.refresh();
-      router.back();
-      return;
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Something went wrong",
-        { id: toastId }
-      );
-    }
-  };
+      }
+    },
+    [
+      needsAgreement,
+      agreementSigned,
+      profileSaved,
+      vendor.status,
+      vendor.userId,
+      router,
+    ]
+  );
 
   const getTabLabel = (key: string) => {
     const map: Record<string, string> = {
@@ -714,7 +714,6 @@ export default function UpdateVendor({
     return map[key] || key;
   };
 
-  // Shared tab button renderer
   const renderTabButton = (
     tab: (typeof TABS)[number],
     index: number,
@@ -723,16 +722,14 @@ export default function UpdateVendor({
     const Icon = tab.icon;
     const isActive = activeTab === index;
     const isDone = stepCompleted[index];
-    const accessible = canAccessTab(index);
-    // Only lock when re-agreement is required and profile not saved
-    const locked = !accessible && needsAgreement;
+    const agreementLocked =
+      index >= 5 && needsAgreement && !profileSaved && !isAgreementFinalized;
 
     return (
       <button
         key={tab.id}
         type="button"
         onClick={() => goToTab(index)}
-        disabled={locked}
         className={cn(
           "flex items-center gap-2.5 text-sm font-medium transition-all",
           variant === "horizontal" &&
@@ -745,10 +742,11 @@ export default function UpdateVendor({
           "bg-green-50 text-green-700 border border-green-200 hover:bg-green-100",
           !isActive &&
           !isDone &&
-          accessible &&
+          !agreementLocked &&
           "bg-white text-slate-600 border border-slate-200 hover:border-[#DC3173]/50 hover:text-[#DC3173]",
-          locked &&
-          "bg-slate-100 text-slate-400 border border-slate-100 cursor-not-allowed opacity-60"
+          agreementLocked &&
+          !isActive &&
+          "bg-slate-100 text-slate-400 border border-slate-100"
         )}
       >
         <span
@@ -762,7 +760,7 @@ export default function UpdateVendor({
                 : "bg-slate-100"
           )}
         >
-          {locked ? (
+          {agreementLocked ? (
             <Lock className="w-3.5 h-3.5" />
           ) : isDone && !isActive ? (
             <CheckCircle2 className="w-3.5 h-3.5" />
@@ -781,170 +779,123 @@ export default function UpdateVendor({
     );
   };
 
-  const detailsProgressCount = stepCompleted
-    .slice(0, DETAILS_LAST_TAB + 1)
-    .filter(Boolean).length;
-  const totalDetailsSteps = DETAILS_LAST_TAB + 1;
+  const detailsProgressCount = stepCompleted.slice(0, 5).filter(Boolean).length;
 
-  const agreementProgressCount = needsAgreement
-    ? [agreementCreated, agreementSigned].filter(Boolean).length
-    : 2;
-  console.log("need agr", needsAgreement);
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="min-h-screen bg-slate-50"
-      >
+    <div className="flex flex-col h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] overflow-hidden bg-slate-50">
+      {/* Fixed header – does not scroll */}
+      <div className="shrink-0 z-30 border-b border-slate-200/80 bg-slate-50">
         <TitleHeader
-          title={t("edit_vendor_details")}
-          subtitle={t("update_vendor_details_information")}
+          title={t("edit_vendor_details") || "Edit Vendor Details"}
+          subtitle={
+            t("update_vendor_details_information") ||
+            "Update vendor information"
+          }
           onBackClick={() => router.back()}
+          buttonInfo={{
+            text: isSaving
+              ? t("saving") || "Saving..."
+              : t("save_changes") || "Save Changes",
+            onClick: handleSaveChanges,
+            disabled: isSaving ? true : false,
+            icon: Save,
+          }}
         />
+      </div>
 
-        {/* Mobile / Tablet: Horizontal tabs */}
-        <div className="lg:hidden mb-6 overflow-x-auto">
-          <div className="flex items-center gap-1.5 min-w-max pb-2 px-1">
-            {TABS.map((tab, index) => (
-              <div key={tab.id} className="flex items-center">
-                {renderTabButton(tab, index, "horizontal")}
-                {index < TABS.length - 1 && (
-                  <div
-                    className={cn(
-                      "w-5 h-0.5 mx-0.5 rounded shrink-0",
-                      index === DETAILS_LAST_TAB
-                        ? profileSaved || isAgreementFinalized
-                          ? "bg-green-400"
-                          : "bg-amber-300"
-                        : stepCompleted[index]
-                          ? "bg-green-400"
-                          : "bg-slate-200"
-                    )}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Main layout */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Desktop: Left vertical tabs */}
-          <aside className="hidden lg:block w-64 xl:w-72 shrink-0">
-            <div className="sticky top-6 space-y-1.5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2">
-                Vendor Details
-              </p>
-              {TABS.slice(0, AGREEMENT_START_TAB).map((tab, index) =>
-                renderTabButton(tab, index, "vertical")
+      <Form {...form}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(onSubmit)();
+          }}
+          className="flex flex-col flex-1 min-h-0 overflow-hidden"
+        >
+          {/* Mobile tabs */}
+          <div className="lg:hidden shrink-0 border-b bg-white overflow-x-auto">
+            <div className="flex items-center gap-1.5 min-w-max px-3 py-2">
+              {TABS.map((tab, index) =>
+                renderTabButton(tab, index, "horizontal")
               )}
-
-              <div className="my-4 border-t border-dashed border-slate-200" />
-
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2 flex items-center gap-2">
-                Agreements
-                {needsAgreement && !profileSaved && (
-                  <span className="text-[10px] font-normal normal-case text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                    Locked
-                  </span>
-                )}
-                {isAgreementFinalized && (
-                  <span className="text-[10px] font-normal normal-case text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                    {agreementStatus}
-                  </span>
-                )}
-              </p>
-              {TABS.slice(AGREEMENT_START_TAB).map((tab, index) =>
-                renderTabButton(tab, index + AGREEMENT_START_TAB, "vertical")
-              )}
-
-              {/* Progress summary */}
-              <div className="mt-6 px-2 space-y-3">
-                <div>
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                    <span>Details</span>
-                    <span>
-                      {detailsProgressCount}/{totalDetailsSteps}
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#DC3173] rounded-full transition-all duration-300"
-                      style={{
-                        width: `${(detailsProgressCount / totalDetailsSteps) * 100}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                    <span>Agreements</span>
-                    <span>
-                      {needsAgreement
-                        ? profileSaved
-                          ? `${agreementProgressCount}/2`
-                          : "—"
-                        : "Done"}
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div
-                      className={cn(
-                        "h-full rounded-full transition-all duration-300",
-                        !needsAgreement || profileSaved
-                          ? "bg-emerald-500"
-                          : "bg-slate-300"
-                      )}
-                      style={{
-                        width:
-                          !needsAgreement
-                            ? "100%"
-                            : profileSaved
-                              ? `${(agreementProgressCount / 2) * 100}%`
-                              : "0%",
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {profileSaved && needsAgreement && (
-                  <div className="flex items-center gap-1.5 text-xs text-emerald-600 mt-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Profile saved
-                  </div>
-                )}
-                {isAgreementFinalized && (
-                  <div className="flex items-center gap-1.5 text-xs text-emerald-600 mt-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Agreement {agreementStatus?.toLowerCase()}
-                  </div>
-                )}
-              </div>
             </div>
-          </aside>
+          </div>
 
-          {/* Right: Content */}
-          <div className="flex-1 min-w-0">
-            <AnimatePresence mode="wait">
-              {/* TAB 0: Account */}
-              {activeTab === 0 && (
-                <motion.div
-                  key="account"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+          <div className="flex flex-1 min-h-0 overflow-hidden">
+            {/* Desktop sidebar – independent scroll only if tabs overflow */}
+            <aside className="hidden lg:flex w-64 xl:w-72 shrink-0 flex-col border-r border-slate-200 bg-white min-h-0">
+              <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-1.5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2">
+                  Vendor Details
+                </p>
+                {TABS.slice(0, 5).map((tab, index) =>
+                  renderTabButton(tab, index, "vertical")
+                )}
+
+                <div className="my-4 border-t border-dashed border-slate-200" />
+
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2 flex items-center gap-2">
+                  Agreements
+                  {needsAgreement && !profileSaved && (
+                    <span className="text-[10px] font-normal normal-case text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                      Locked
+                    </span>
+                  )}
+                  {isAgreementFinalized && (
+                    <span className="text-[10px] font-normal normal-case text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      {agreementStatus}
+                    </span>
+                  )}
+                </p>
+                {TABS.slice(5).map((tab, index) =>
+                  renderTabButton(tab, index + 5, "vertical")
+                )}
+
+                <div className="mt-6 px-2 space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                      <span>Details</span>
+                      <span>{detailsProgressCount}/5</span>
+                    </div>
+                    <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#DC3173] rounded-full transition-all duration-300"
+                        style={{
+                          width: `${(detailsProgressCount / 5) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {profileSaved && needsAgreement && (
+                    <div className="flex items-center gap-1.5 text-xs text-emerald-600">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Profile saved
+                    </div>
+                  )}
+                </div>
+              </div>
+            </aside>
+
+            {/* ONLY this panel scrolls the form sections */}
+            <div
+              ref={contentRef}
+              className="flex-1 min-w-0 min-h-0 overflow-y-auto overscroll-contain scroll-smooth"
+            >
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-8 pb-16">
+                {/* 0 Account */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[0] = el;
+                  }}
+                  id="section-account"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
                     style={{ borderColor: DELIGO }}
                   >
-                    <h2 className="text-xl font-semibold mb-4">
-                      1. {t("account_information")}
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <User className="w-5 h-5" /> 1. {t("account_information")}
                     </h2>
-
-                    <div className="space-y-4 items-start">
+                    <div className="space-y-4">
                       <FormField
                         control={form.control}
                         name="firstName"
@@ -961,7 +912,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="lastName"
@@ -978,22 +928,14 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <div>
                         <Label>
-                          {t("email")}{" "}
-                          <span className="text-[#DC3173]">*</span>
+                          {t("email")} <span className="text-[#DC3173]">*</span>
                         </Label>
-                        <div className="flex items-center gap-3 mt-2">
-                          <Input
-                            type="email"
-                            placeholder={t("vendor_email")}
-                            value={vendorState.email}
-                            disabled
-                          />
+                        <div className="mt-2">
+                          <Input type="email" value={vendorState.email} disabled />
                         </div>
                       </div>
-
                       <Label className="mb-2">
                         {t("phone_number")}{" "}
                         <span className="text-[#DC3173]">*</span>
@@ -1044,26 +986,22 @@ export default function UpdateVendor({
                       />
                     </div>
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 1: Business */}
-              {activeTab === 1 && (
-                <motion.div
-                  key="business"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* 1 Business */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[1] = el;
+                  }}
+                  id="section-business"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
                     style={{ borderColor: DELIGO }}
                   >
-                    <h2 className="text-xl font-semibold mb-4">
-                      2. {t("business_details")}
+                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Briefcase className="w-5 h-5" /> 2. {t("business_details")}
                     </h2>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                       {isSubVendor && (
                         <FormField
@@ -1076,17 +1014,13 @@ export default function UpdateVendor({
                                 <span className="text-[#DC3173]">*</span>
                               </FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder={t("branch_name")}
-                                  {...field}
-                                />
+                                <Input placeholder={t("branch_name")} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                       )}
-
                       <FormField
                         control={form.control}
                         name="businessName"
@@ -1107,7 +1041,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="companyLegalName"
@@ -1131,7 +1064,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="businessType"
@@ -1143,7 +1075,7 @@ export default function UpdateVendor({
                             </FormLabel>
                             <FormControl>
                               <Select
-                                onValueChange={(value) => field.onChange(value)}
+                                onValueChange={field.onChange}
                                 value={
                                   field.value ||
                                   vendorState.businessDetails?.businessTypeSlug ||
@@ -1177,7 +1109,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="NIF"
@@ -1198,7 +1129,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       {businessType === "restaurant" && (
                         <FormField
                           control={form.control}
@@ -1218,7 +1148,6 @@ export default function UpdateVendor({
                                   {t("restaurantCuisineType")}{" "}
                                   <span className="text-red-500">*</span>
                                 </FormLabel>
-
                                 {selectedCuisines.length > 0 && (
                                   <div className="flex flex-wrap gap-2 mb-3 p-2 border border-dashed rounded-lg bg-gray-50/50">
                                     {selectedCuisines.map((slug) => (
@@ -1246,7 +1175,6 @@ export default function UpdateVendor({
                                     ))}
                                   </div>
                                 )}
-
                                 <div className="relative">
                                   <Briefcase className="absolute left-3 top-3.5 text-[#DC3173]/80" />
                                   <FormControl>
@@ -1312,7 +1240,6 @@ export default function UpdateVendor({
                           }}
                         />
                       )}
-
                       <FormField
                         control={form.control}
                         name="branches"
@@ -1334,7 +1261,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="openingHours"
@@ -1351,7 +1277,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="closingHours"
@@ -1368,7 +1293,6 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
                         name="closingDays"
@@ -1410,17 +1334,14 @@ export default function UpdateVendor({
                       />
                     </div>
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 2: Bank */}
-              {activeTab === 2 && (
-                <motion.div
-                  key="bank"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* 2 Bank */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[2] = el;
+                  }}
+                  id="section-bank"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1468,17 +1389,14 @@ export default function UpdateVendor({
                       />
                     </div>
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 3: Location */}
-              {activeTab === 3 && (
-                <motion.div
-                  key="location"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* 3 Location */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[3] = el;
+                  }}
+                  id="section-location"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1497,17 +1415,14 @@ export default function UpdateVendor({
                       t={t}
                     />
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 4: Documents */}
-              {activeTab === 4 && (
-                <motion.div
-                  key="documents"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* 4 Documents */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[4] = el;
+                  }}
+                  id="section-documents"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1524,34 +1439,29 @@ export default function UpdateVendor({
                       setPreviews={setPreviews}
                       isSubmitting={isSubmitting || isSaving}
                     />
-
                     {profileSaved && needsAgreement && (
                       <div className="mt-6 flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
                         <CheckCircle2 className="w-4 h-4 shrink-0" />
-                        Vendor details & documents have been saved. You can
-                        proceed to Agreements or go back to edit.
+                        Vendor details & documents saved. You can proceed to
+                        Agreements below.
                       </div>
                     )}
                     {isAgreementFinalized && (
                       <div className="mt-6 flex items-center gap-2 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3">
                         <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-                        Agreement is already {agreementStatus?.toLowerCase()}.
-                        You can update information and submit without
-                        re-signing.
+                        Agreement is already {agreementStatus?.toLowerCase()}. You
+                        can update information without re-signing.
                       </div>
                     )}
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 5: Create Agreement */}
-              {activeTab === 5 && (
-                <motion.div
-                  key="create_agreement"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* 5 Create Agreement */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[5] = el;
+                  }}
+                  id="section-create-agreement"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1561,8 +1471,6 @@ export default function UpdateVendor({
                       <ScrollText className="w-5 h-5" /> 6.{" "}
                       {t("create_agreement") || "Create Agreement"}
                     </h2>
-
-                    {/* View-only when already finalized */}
                     {isAgreementFinalized ? (
                       <div className="flex flex-col items-center gap-4 py-10">
                         <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -1573,14 +1481,9 @@ export default function UpdateVendor({
                         </p>
                         <p className="text-sm text-slate-500 text-center max-w-md">
                           Status:{" "}
-                          <span className="font-semibold">
-                            {agreementStatus}
-                          </span>
+                          <span className="font-semibold">{agreementStatus}</span>
                           {vendorState?.agreement?.agreementId && (
-                            <>
-                              {" "}
-                              · ID: {vendorState.agreement.agreementId}
-                            </>
+                            <> · ID: {vendorState.agreement.agreementId}</>
                           )}
                         </p>
                         {vendorState?.agreement?.pdfPath && (
@@ -1593,10 +1496,14 @@ export default function UpdateVendor({
                             View agreement PDF
                           </a>
                         )}
-                        <p className="text-xs text-slate-400 text-center max-w-sm">
-                          Agreement cannot be modified when status is{" "}
-                          {agreementStatus}. You may only update vendor
-                          information.
+                      </div>
+                    ) : !profileSaved && needsAgreement ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Complete the details above and click{" "}
+                          <strong>Save Changes</strong> to unlock agreement
+                          creation.
                         </p>
                       </div>
                     ) : agreementCreated ? (
@@ -1608,7 +1515,7 @@ export default function UpdateVendor({
                           Agreement created successfully
                         </p>
                         <p className="text-sm text-slate-500 text-center max-w-md">
-                          Proceed to the next step to sign the agreement.
+                          Scroll down to sign the agreement.
                         </p>
                       </div>
                     ) : (
@@ -1624,22 +1531,19 @@ export default function UpdateVendor({
                             ...prev,
                             agreement: agreement,
                           }));
-                          setActiveTab(6);
+                          scrollToSection(6);
                         }}
                       />
                     )}
                   </Card>
-                </motion.div>
-              )}
+                </div>
 
-              {/* TAB 6: Sign Agreement */}
-              {activeTab === 6 && (
-                <motion.div
-                  key="sign_agreement"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.2 }}
+                {/* 6 Sign Agreement */}
+                <div
+                  ref={(el) => {
+                    sectionRefs.current[6] = el;
+                  }}
+                  id="section-sign-agreement"
                 >
                   <Card
                     className="p-6 shadow-md border-t-4"
@@ -1649,7 +1553,6 @@ export default function UpdateVendor({
                       <FileSignature className="w-5 h-5" /> 7.{" "}
                       {t("agreement_sign") || "Sign Agreement"}
                     </h2>
-
                     {isAgreementFinalized ? (
                       <div className="flex flex-col items-center gap-4 py-10">
                         <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center">
@@ -1660,9 +1563,7 @@ export default function UpdateVendor({
                         </p>
                         <p className="text-sm text-slate-500">
                           Status:{" "}
-                          <span className="font-semibold">
-                            {agreementStatus}
-                          </span>
+                          <span className="font-semibold">{agreementStatus}</span>
                         </p>
                         {vendorState?.agreement?.pdfPath && (
                           <a
@@ -1674,18 +1575,23 @@ export default function UpdateVendor({
                             View signed agreement PDF
                           </a>
                         )}
-                        <p className="text-xs text-slate-400 text-center max-w-sm">
-                          No re-signing required. Submit to save any
-                          information updates.
+                      </div>
+                    ) : !profileSaved && needsAgreement ? (
+                      <div className="flex flex-col items-center gap-3 py-10 text-center">
+                        <Lock className="w-8 h-8 text-slate-400" />
+                        <p className="text-slate-600 max-w-md">
+                          Save changes first to unlock signing.
                         </p>
                       </div>
                     ) : !agreementSigned ? (
-                      <div className="flex flex-col items-center gap-4 py-10">
+                      <div className="flex flex-col items-center gap-4 py-6">
                         <p className="text-slate-600 text-center max-w-md">
-                          Review and sign the agreement below. After signing,
-                          you can submit the vendor update.
+                          Review and sign the agreement below.
                         </p>
-                        <AgreementViewer agreement={agreementData} setAgreementSigned={setAgreementSigned} />
+                        <AgreementViewer
+                          agreement={agreementData}
+                          setAgreementSigned={setAgreementSigned}
+                        />
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-4 py-10">
@@ -1695,97 +1601,32 @@ export default function UpdateVendor({
                         <p className="text-lg font-medium text-green-700">
                           Agreement signed successfully
                         </p>
-                        <p className="text-sm text-slate-500">
-                          Click Submit Vendor below to finish.
-                        </p>
+                        {(needsAgreement ||
+                          vendor?.status === USER_STATUS.PENDING) && (
+                            <Button
+                              type="submit"
+                              disabled={
+                                isSubmitting ||
+                                isSaving ||
+                                !isDocumentsValid ||
+                                (needsAgreement && !agreementSigned)
+                              }
+                              className="bg-[#DC3173] hover:bg-[#c22b65] text-white px-8 mt-2"
+                            >
+                              {isSubmitting
+                                ? "Submitting..."
+                                : t("submit_vendor") || "Submit Vendor"}
+                            </Button>
+                          )}
                       </div>
                     )}
                   </Card>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Navigation Footer */}
-            <div className="mt-6 flex items-center justify-between pb-10">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={goPrev}
-                disabled={activeTab === 0 || isSaving}
-                className="gap-2"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Previous
-              </Button>
-
-              <div className="text-sm text-slate-400 hidden sm:block">
-                Step {activeTab + 1} of {TABS.length}
-                {activeTab <= DETAILS_LAST_TAB && (
-                  <span className="ml-2 text-amber-600">· Details</span>
-                )}
-                {activeTab >= AGREEMENT_START_TAB && (
-                  <span className="ml-2 text-emerald-600">· Agreements</span>
-                )}
+                </div>
               </div>
-
-              {activeTab < TABS.length - 1 ? (
-                activeTab === DETAILS_LAST_TAB && needsAgreement && !profileSaved ? (
-                  <Button
-                    type="button"
-                    onClick={handleSaveAndContinue}
-                    disabled={
-                      !stepCompleted[DETAILS_LAST_TAB] ||
-                      isSaving ||
-                      isSubmitting
-                    }
-                    className="bg-[#DC3173] hover:bg-[#c22b65] text-white gap-2 min-w-40"
-                  >
-                    {isSaving ? (
-                      "Saving..."
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        Save & Continue
-                      </>
-                    )}
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    onClick={goNext}
-                    disabled={
-                      (!stepCompleted[activeTab] &&
-                        !(isAgreementFinalized && activeTab >= AGREEMENT_START_TAB)) ||
-                      isSaving
-                    }
-                    className="bg-[#DC3173] hover:bg-[#c22b65] text-white gap-2"
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                )
-              ) : (
-                <>
-                  {needsAgreement && <Button
-                    type="submit"
-                    disabled={
-                      (needsAgreement && !agreementSigned) ||
-                      isSubmitting ||
-                      isSaving ||
-                      !isDocumentsValid
-                    }
-                    className="bg-[#DC3173] hover:bg-[#c22b65] text-white px-8"
-                  >
-                    {isSubmitting
-                      ? "Submitting..."
-                      : t("submit_vendor") || "Submit Vendor"}
-                  </Button>}
-                </>
-              )}
             </div>
           </div>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }
