@@ -487,7 +487,7 @@ export const pt = {
   party_stamp: "Carimbo da Parte",
   payment_option: "Opção de Pagamento",
   three_installment_of_each: "Três prestações de €50,00 cada, que podem ser deduzidas dos pagamentos ao Comerciante",
-  monthly_machine_rental_cost: "Arrendamento mensal da máquina com um custo mensal de 7,5€ (com IVA incluído)",
+  monthly_machine_rental_cost: "Arrendamento mensal da máquina com um custo mensal de 7,5€ (sem IVA incluído)",
   submit_agreement: "Submeter Acordo",
   by_clicking_submit_agreement_you_legally: "Ao clicar em 'Submeter Acordo', reconhece e aceita legalmente todos os termos e condições descritos neste contrato de prestação de serviços.",
 
