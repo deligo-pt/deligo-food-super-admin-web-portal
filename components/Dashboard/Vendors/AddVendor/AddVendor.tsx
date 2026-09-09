@@ -665,7 +665,10 @@ export default function AddVendor({
 
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(onSubmit)();
+          }}
           className="flex flex-col flex-1 min-h-0 overflow-hidden"
         >
           <div className="lg:hidden shrink-0 border-b bg-white overflow-x-auto">
@@ -680,17 +683,17 @@ export default function AddVendor({
             <aside className="hidden lg:flex w-64 xl:w-72 shrink-0 flex-col border-r border-slate-200 bg-white min-h-0">
               <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-1.5">
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2">
-                  Vendor Details
+                  {t("vendor_details")}
                 </p>
                 {TABS.slice(0, 5).map((tab, index) =>
                   renderTabButton(tab, index, "vertical")
                 )}
                 <div className="my-4 border-t border-dashed border-slate-200" />
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-2 mb-2 flex items-center gap-2">
-                  Agreements
+                  {t("agreements")}
                   {!profileSaved && (
                     <span className="text-[10px] font-normal normal-case text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                      Locked
+                      {t("locked")}
                     </span>
                   )}
                 </p>
@@ -700,7 +703,7 @@ export default function AddVendor({
                 <div className="mt-6 px-2 space-y-3">
                   <div>
                     <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                      <span>Details</span>
+                      <span>{t("details")}</span>
                       <span>{detailsProgressCount}/5</span>
                     </div>
                     <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -715,7 +718,7 @@ export default function AddVendor({
                   {profileSaved && (
                     <div className="flex items-center gap-1.5 text-xs text-emerald-600">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      Profile saved
+                      {t("profile_saved")}
                     </div>
                   )}
                 </div>
@@ -965,7 +968,7 @@ export default function AddVendor({
                       <div className="flex flex-col items-center gap-3 py-10 text-center">
                         <Lock className="w-8 h-8 text-slate-400" />
                         <p className="text-slate-600 max-w-md">
-                          Verify email in Account Information first.
+                          {t("verify_email_in_account_information")}
                         </p>
                       </div>
                     ) : (
@@ -1297,7 +1300,7 @@ export default function AddVendor({
                       <div className="flex flex-col items-center gap-3 py-10 text-center">
                         <Lock className="w-8 h-8 text-slate-400" />
                         <p className="text-slate-600 max-w-md">
-                          Verify email first.
+                          {t("verify_email_first")}
                         </p>
                       </div>
                     ) : (
@@ -1361,7 +1364,7 @@ export default function AddVendor({
                       <div className="flex flex-col items-center gap-3 py-10 text-center">
                         <Lock className="w-8 h-8 text-slate-400" />
                         <p className="text-slate-600 max-w-md">
-                          Verify email first.
+                          {t("verify_email_first")}
                         </p>
                       </div>
                     ) : (
@@ -1393,7 +1396,7 @@ export default function AddVendor({
                       <div className="flex flex-col items-center gap-3 py-10 text-center">
                         <Lock className="w-8 h-8 text-slate-400" />
                         <p className="text-slate-600 max-w-md">
-                          Verify email first.
+                          {t("verify_email_first")}
                         </p>
                       </div>
                     ) : (
@@ -1408,8 +1411,7 @@ export default function AddVendor({
                         {profileSaved && (
                           <div className="mt-6 flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
                             <CheckCircle2 className="w-4 h-4 shrink-0" />
-                            Vendor details & documents saved. You can proceed to
-                            Agreements below.
+                            {t("vendor_details_documents_saved")}
                           </div>
                         )}
                       </>
@@ -1436,9 +1438,8 @@ export default function AddVendor({
                       <div className="flex flex-col items-center gap-3 py-10 text-center">
                         <Lock className="w-8 h-8 text-slate-400" />
                         <p className="text-slate-600 max-w-md">
-                          Complete the details above and click{" "}
-                          <strong>Save Changes</strong> to unlock agreement
-                          creation.
+                          {t("complete_the_details_above_click")}{" "}
+                          <strong>{t("save_changes")}</strong> {t("to_unlock_agreement_creation")}
                         </p>
                       </div>
                     ) : agreementCreated ? (
@@ -1492,7 +1493,7 @@ export default function AddVendor({
                       <div className="flex flex-col items-center gap-3 py-10 text-center">
                         <Lock className="w-8 h-8 text-slate-400" />
                         <p className="text-slate-600 max-w-md">
-                          Save changes first to unlock signing.
+                          {t("save_changes_first_to_unlock_signing")}
                         </p>
                       </div>
                     ) : !agreementSigned ? (

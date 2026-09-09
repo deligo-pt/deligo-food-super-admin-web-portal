@@ -475,6 +475,24 @@ export const pt = {
   save_nd_continue: "Guardar e Continuar",
   next: "Seguinte",
   submit_vendor: "Submeter vendedor",
+  locked: "Bloqueado",
+  profile_saved: "Perfil guardado",
+  verify_email_in_account_information: "Verifique primeiro o e-mail em Informações da Conta.",
+  verify_email_first: "Verifique primeiro o e-mail.",
+  vendor_details_documents_saved: "Detalhes e documentos do fornecedor guardados. Pode prosseguir para os Acordos abaixo.",
+  complete_the_details_above_click: "Preencha os detalhes acima e clique em",
+  to_unlock_agreement_creation: "para desbloquear a criação do acordo.",
+  save_changes_first_to_unlock_signing: "Guarde as alterações primeiro para desbloquear a assinatura.",
+  // --> update vendor
+  agreement_is_already: "O acordo já está ",
+  you_can_update_information: "Pode atualizar as informações sem voltar a assinar.",
+  agreement_already_exists: "O acordo já existe",
+  view_agreement_pdf: "Ver PDF do acordo",
+  scroll_down_to_sign_the_agreement: "Desloque-se para baixo para assinar o acordo.",
+  agreement_already_signed: "Acordo já assinado",
+  view_signed_agreement_pdf: "Ver PDF do acordo assinado",
+  review_and_sign_the_agreement_below: "Reveja e assine o acordo abaixo.",
+
   // agreement viewer
   agreement_pdf: "PDF do Acordo",
   completed_continue: "Concluído - Continuar",
@@ -612,6 +630,9 @@ export const pt = {
   add_a_new_fleet_manager_here: "Adicione um novo gerente de frota aqui",
   fleet_manager_email: "Email do gestor de frota",
   submit_fleetManager: "Submeter gestor de frota",
+  fleet_manager_details: "Detalhes do Gestor de Frota",
+  fleet_manager_details_documents_saved: "Detalhes e documentos do gestor de frota guardados. Pode prosseguir para os Acordos abaixo.",
+  create_fleet_agreement: "Criar Acordo de Frota",
 
   // fleet manager payouts
   manage_all_fleet_manager_payouts_here: "Gerencie todos os pagamentos dos gerentes de frota aqui",
