@@ -1572,6 +1572,21 @@ export default function UpdateVendor({
                             {t("view_signed_agreement_pdf")}
                           </a>
                         )}
+                        {(vendor?.status === USER_STATUS.PENDING) && (
+                          <Button
+                            type="submit"
+                            disabled={
+                              isSubmitting ||
+                              isSaving ||
+                              !isDocumentsValid ||
+                              (needsAgreement && !agreementSigned)
+                            }
+                            className="bg-[#DC3173] hover:bg-[#c22b65] text-white px-8 mt-2"
+                          >
+                            {isSubmitting
+                              ? "Submitting..."
+                              : t("submit_vendor") || "Submit Vendor"}
+                          </Button>)}
                       </div>
                     ) : !profileSaved && needsAgreement ? (
                       <div className="flex flex-col items-center gap-3 py-10 text-center">
