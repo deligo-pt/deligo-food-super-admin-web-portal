@@ -465,6 +465,24 @@ export const en = {
   save_nd_continue: "Save & Continue",
   next: "Next",
   submit_vendor: "Submit Vendor",
+  locked: "Locked",
+  profile_saved: "Profile saved",
+  verify_email_in_account_information: "Verify email in Account Information first.",
+  verify_email_first: "Verify email first.",
+  vendor_details_documents_saved: "Vendor details & documents saved. You can proceed to Agreements below.",
+  complete_the_details_above_click: "Complete the details above and click",
+  to_unlock_agreement_creation: "to unlock agreement creation.",
+  save_changes_first_to_unlock_signing: "Save changes first to unlock signing.",
+  // --> update vendor
+  agreement_is_already: "Agreement is already ",
+  you_can_update_information: "You can update information without re-signing.",
+  agreement_already_exists: "Agreement already exists",
+  view_agreement_pdf: "View agreement PDF",
+  scroll_down_to_sign_the_agreement: "Scroll down to sign the agreement.",
+  agreement_already_signed: "Agreement already signed",
+  view_signed_agreement_pdf: "View signed agreement PDF",
+  review_and_sign_the_agreement_below: "Review and sign the agreement below.",
+
   // agreement viewer
   agreement_pdf: "Agreement PDF",
   completed_continue: "Completed - Continue",
@@ -602,6 +620,9 @@ export const en = {
   add_a_new_fleet_manager_here: "Add a new fleet manager here",
   fleet_manager_email: "Fleet Manager Email",
   submit_fleetManager: "Submit FleetManager",
+  fleet_manager_details: "Fleet Manager Details",
+  fleet_manager_details_documents_saved: "Fleet manager details & documents saved. You can proceed to Agreements below.",
+  create_fleet_agreement: "Create Fleet Agreement",
 
   // fleet manager payouts
   manage_all_fleet_manager_payouts_here: "Manage all fleet manager payouts here",

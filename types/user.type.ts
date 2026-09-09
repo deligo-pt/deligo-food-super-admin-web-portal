@@ -55,12 +55,13 @@ export type TAgent = {
   businessDetails?: {
     businessName: string;
     businessLicenseNumber?: string;
+    NIF?: string;
   };
 
   businessLocation?: {
     street: string;
     city: string;
-    state: string;
+    state?: string;
     country: string;
     postalCode: string;
     latitude?: number;
@@ -72,10 +73,10 @@ export type TAgent = {
   // Bank & Payment Information
   // ---------------------------------------------
   bankDetails?: {
-    bankName: string;
+    bankName?: string;
     accountHolderName: string;
     iban: string;
-    swiftCode: string;
+    swiftCode?: string;
   };
 
   // ---------------------------------------------

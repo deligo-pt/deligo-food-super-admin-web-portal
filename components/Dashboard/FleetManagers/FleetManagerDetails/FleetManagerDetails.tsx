@@ -274,6 +274,12 @@ export default function FleetManagerDetails({ agentData }: IProps) {
                   {data?.existingFleetManager?.businessDetails?.businessLicenseNumber || "N/A"}
                 </p>
               </div>
+             {data?.existingFleetManager?.businessDetails?.NIF && <div>
+                <p className="text-sm text-gray-500">{t("nif")}</p>
+                <p className="font-medium">
+                  {data?.existingFleetManager?.businessDetails?.NIF || "N/A"}
+                </p>
+              </div>}
             </div>
           </Section>
           <Section

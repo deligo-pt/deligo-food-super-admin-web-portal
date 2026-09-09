@@ -12,6 +12,7 @@ interface IProps {
     text: string;
     onClick: () => void;
     icon?: LucideIcon;
+    disabled?: boolean;
   };
   extraComponent?: ReactNode;
   onBackClick?: () => void;
@@ -50,6 +51,7 @@ export default function TitleHeader({
             {buttonInfo && (
               <Button
                 className="bg-white text-[#DC3173] hover:bg-slate-100 hover:text-[#DC3173]/90 px-4 py-2 rounded-md font-medium flex items-center gap-2 cursor-pointer print:hidden"
+                disabled={buttonInfo?.disabled ? buttonInfo?.disabled : false}
                 onClick={buttonInfo.onClick}
               >
                 {buttonInfo.icon ? (

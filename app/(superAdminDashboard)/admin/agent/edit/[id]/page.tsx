@@ -13,5 +13,5 @@ export default async function UpdateFleetManagerPage({
   const { id } = await params;
   const result = await getSingleFleetManagerReq(id);
 
-  return <UpdateFleetManager fleetManager={result?.data?.existingFleetManager || {}} />;
+  return <UpdateFleetManager fleetManager={result?.data?.existingFleetManager || {}} agreement={result?.data?.agreement || null} />;
 }
