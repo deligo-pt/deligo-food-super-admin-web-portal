@@ -326,48 +326,49 @@ export default function AgreementViewer({ agreement, setAgreementSigned }: Agree
                             label={t("party_stamp")}
                             optional
                         />}
-
                         {/* Payment Option */}
-                        {(!isFleetAgreement || (agreement && !agreement?.hasPosPaymentDecision)) && <div className="space-y-3">
-                            <Label className="text-sm font-bold text-slate-700">
-                                {t("payment_option")} <span className="text-slate-400 font-normal">(optional)</span>
-                            </Label>
-                            <div className="flex flex-col gap-4">
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="three-installments"
-                                        checked={posPaymentOption === "THREE_INSTALLMENTS"}
-                                        onCheckedChange={(checked) => {
-                                            setPosPaymentOption(
-                                                checked ? "THREE_INSTALLMENTS" : null
-                                            );
-                                        }}
-                                    />
-                                    <Label
-                                        htmlFor="three-installments"
-                                        className="text-sm font-normal cursor-pointer"
-                                    >
-                                        {t("three_installment_of_each")}
-                                    </Label>
-                                </div>
+                        {!isFleetAgreement && (
+                            (agreement && !agreement?.hasPosPaymentDecision) && <div className="space-y-3">
+                                <Label className="text-sm font-bold text-slate-700">
+                                    {t("payment_option")} <span className="text-slate-400 font-normal">(optional)</span>
+                                </Label>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="three-installments"
+                                            checked={posPaymentOption === "THREE_INSTALLMENTS"}
+                                            onCheckedChange={(checked) => {
+                                                setPosPaymentOption(
+                                                    checked ? "THREE_INSTALLMENTS" : null
+                                                );
+                                            }}
+                                        />
+                                        <Label
+                                            htmlFor="three-installments"
+                                            className="text-sm font-normal cursor-pointer"
+                                        >
+                                            {t("three_installment_of_each")}
+                                        </Label>
+                                    </div>
 
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="monthly-rental"
-                                        checked={posPaymentOption === "MONTHLY_RENTAL"}
-                                        onCheckedChange={(checked) => {
-                                            setPosPaymentOption(checked ? "MONTHLY_RENTAL" : null);
-                                        }}
-                                    />
-                                    <Label
-                                        htmlFor="monthly-rental"
-                                        className="text-sm font-normal cursor-pointer"
-                                    >
-                                        {t("monthly_machine_rental_cost")}
-                                    </Label>
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="monthly-rental"
+                                            checked={posPaymentOption === "MONTHLY_RENTAL"}
+                                            onCheckedChange={(checked) => {
+                                                setPosPaymentOption(checked ? "MONTHLY_RENTAL" : null);
+                                            }}
+                                        />
+                                        <Label
+                                            htmlFor="monthly-rental"
+                                            className="text-sm font-normal cursor-pointer"
+                                        >
+                                            {t("monthly_machine_rental_cost")}
+                                        </Label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>}
+                        )}
 
                         {/* Submit */}
                         <div className="w-full border-t border-slate-100 pt-4 flex flex-col items-center">

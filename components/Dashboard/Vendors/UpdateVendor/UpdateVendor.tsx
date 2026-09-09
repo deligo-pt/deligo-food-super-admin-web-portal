@@ -620,7 +620,7 @@ export default function UpdateVendor({
     }
   };
 
-  const onSubmit = useCallback(async (_data: TVendorForm) => {
+  const onSubmit = useCallback(async () => {
       if (needsAgreement && !agreementSigned) {
         toast.error("Please sign the agreement first.");
         scrollToSection(6);
