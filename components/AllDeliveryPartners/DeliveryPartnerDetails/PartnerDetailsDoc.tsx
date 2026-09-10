@@ -13,6 +13,7 @@ export interface IPartnerDocs {
     activity?: string;
     insurancePolicy?: string;
     myPhoto?: string;
+    ibanProof?: string;
 }
 
 interface IPartner {
@@ -29,6 +30,7 @@ const PARTNER_DOC_MAP: { key: keyof IPartnerDocs; labelKey: string }[] = [
     { key: "activity", labelKey: "activity" },
     { key: "insurancePolicy", labelKey: "insurance_policy" },
     { key: "myPhoto", labelKey: "my_photo" },
+    { key: "ibanProof", labelKey: "iban_proof" },
 ];
 
 export function PartnerDetailsDoc({ partner }: { partner: IPartner }) {

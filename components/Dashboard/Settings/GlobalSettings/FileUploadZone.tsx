@@ -77,7 +77,7 @@ export const FileUploadZone = ({
                         </Button>
 
                         {/* Remove / Clear Button */}
-                        {/* {onClear && (
+                        {onClear && (
                             <Button
                                 type="button"
                                 variant="ghost"
@@ -88,7 +88,7 @@ export const FileUploadZone = ({
                             >
                                 <X className="h-4 w-4" />
                             </Button>
-                        )} */}
+                        )}
                     </div>
                 </div>
             ) : (

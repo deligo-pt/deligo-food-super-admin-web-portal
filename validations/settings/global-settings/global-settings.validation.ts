@@ -45,16 +45,16 @@ export const globalSettingsSchema = z
     // activity logs retention
     archiveAfterMonths: z
       .number("Archive after months value must be a number")
-      .min(0, "Archive after months value must be at least 0")
+      .min(1, "Archive after months value must be at least 1")
       .max(100, "Archive after months value cannot be more than 100"),
     deleteAfterMonths: z
       .number("Delete after months value must be a number")
-      .min(0, "Delete after months value must be at least 0")
+      .min(1, "Delete after months value must be at least 1")
       .max(100, "Delete after months value cannot be more than 100"),
     batchSize: z
       .number("Batch Size value must be a number")
-      .min(0, "Batch Size value must be at least 0")
-      .max(100, "Batch Size value cannot be more than 100"),
+      .min(1, "Batch Size value must be at least 1")
+      .max(500, "Batch Size value cannot be more than 100"),
 
     // Cancellation & automation
     cancelTimeLimitMinutes: z

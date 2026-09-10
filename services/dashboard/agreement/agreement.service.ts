@@ -90,6 +90,29 @@ export const createAgreement = async (id: string, data: Partial<TUserAgreementFo
     return result;
 };
 
+// sign agreement
+export const signAgreement = async (id: string, data: Record<string, string>) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/agreements/${id}/sign`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("agreements", {});
+        revalidatePath("/admin/add-vendor");
+    };
+
+    return result;
+
+};
+
+
 
 /**
  * draft agreement

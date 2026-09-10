@@ -12,7 +12,7 @@ interface IProps {
 }
 
 export default function PreviewCard({ commType, title, message, showPreview }: IProps) {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
 
     return (
         <AnimatePresence>
@@ -48,44 +48,44 @@ export default function PreviewCard({ commType, title, message, showPreview }: I
                         </div>
 
                         <div className="p-6">
-                            {(commType === "EMAIL" || commType === "BOTH") && (
-                                <div className="mb-6">
-                                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
-                                        <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 flex items-center justify-center">
-                                            <MailIcon className="w-5 h-5 text-[#DC3173]" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500">{t("title")}</p>
-                                            <p className="font-bold text-gray-900">
-                                                {title || "No Title"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
 
-                            {(commType === "PUSH" || commType === "BOTH") && (
-                                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 shadow-sm max-w-xs mx-auto relative">
-                                    <div className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
-                                        <span className="text-[10px] font-bold text-white">
-                                            1
-                                        </span>
+                            <div className="mb-6">
+                                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
+                                    <div className="w-10 h-10 rounded-full bg-[#DC3173]/10 flex items-center justify-center">
+                                        <MailIcon className="w-5 h-5 text-[#DC3173]" />
                                     </div>
-                                    <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-[#DC3173] flex items-center justify-center shrink-0">
-                                            <BellIcon className="w-4 h-4 text-white" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-gray-900 leading-tight">
-                                                {title || "Notification Title"}
-                                            </p>
-                                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                                                {message || "Notification message preview..."}
-                                            </p>
-                                        </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500">{t("title")}</p>
+                                        <p className="font-bold text-gray-900">
+                                            {title || "No Title"}
+                                        </p>
                                     </div>
                                 </div>
-                            )}
+                            </div>
+
+
+
+                            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 shadow-sm max-w-xs mx-auto relative">
+                                <div className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+                                    <span className="text-[10px] font-bold text-white">
+                                        1
+                                    </span>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-[#DC3173] flex items-center justify-center shrink-0">
+                                        <BellIcon className="w-4 h-4 text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-sm text-gray-900 leading-tight">
+                                            {title || "Notification Title"}
+                                        </p>
+                                        <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                                            {message || "Notification message preview..."}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </motion.div>

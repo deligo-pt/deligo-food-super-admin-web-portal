@@ -174,17 +174,31 @@ export function getDeliveryPartnerColumns({
                             )}
 
                             {dp.status === "APPROVED" && (
-                                <DropdownMenuItem
-                                    onClick={() =>
-                                        handleStatusInfo(
-                                            dp.userId as string,
-                                            fullName,
-                                            "BLOCKED",
-                                        )
-                                    }
-                                >
-                                    {t("block")}
-                                </DropdownMenuItem>
+                                <>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            handleStatusInfo(
+                                                dp.userId as string,
+                                                fullName,
+                                                "BLOCKED",
+                                            )
+                                        }
+                                    >
+                                        {t("block")}
+                                    </DropdownMenuItem>
+                                    {(!dp?.registeredBy?.id?.userId && !dp?.currentFleetManagerId?.userId) && <DropdownMenuItem
+                                        onClick={() =>
+                                            handleApproveInfo(
+                                                dp.userId as string,
+                                                fullName,
+                                                dp?.address?.city as string,
+                                                "ASSIGN",
+                                            )
+                                        }
+                                    >
+                                        {t("assign_fleet_manager")}
+                                    </DropdownMenuItem>}
+                                </>
                             )}
 
                             {dp.status === "BLOCKED" && (
