@@ -13,6 +13,7 @@ export const getAllUsersReq = async ({
   searchTerm: string;
   role: keyof typeof USER_ROLE;
 }) => {
+  const isDeleted = false;
   let endpoint: string = "";
 
   switch (role) {
@@ -35,7 +36,7 @@ export const getAllUsersReq = async ({
 
   const result = await catchAsync<unknown>(async () => {
     return await serverRequest.get(endpoint, {
-      params: { limit, ...(searchTerm ? { searchTerm } : {}) },
+      params: { limit, isDeleted, ...(searchTerm ? { searchTerm } : {}) },
     });
   });
 

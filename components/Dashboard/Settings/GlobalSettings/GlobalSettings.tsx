@@ -125,6 +125,7 @@ export default function GlobalSettings({
       platformVatRate: settings?.commission?.platformVatRate || 0,
       fleetManagerCommissionPercent: settings?.commission?.fleetManagerPercent || 0,
       serviceCharge: settings?.commission?.serviceCharge || 0,
+      serviceChargeVatRate: settings?.commission?.serviceChargeVatRate || 0,
 
       // agreements
       deligoSignatureUrl: settings?.agreement?.deligoSignatureUrl || undefined,
@@ -143,7 +144,9 @@ export default function GlobalSettings({
 
       // ingredients and delivery charges
       deliveryChargeInsideLisbon: settings?.ingredientsOrder?.deliveryChargeInsideLisbon || 20,
+      deliveryChargeInsideLisbonVatRate: settings?.ingredientsOrder?.deliveryChargeInsideLisbonVatRate || 0,
       deliveryChargeOutsideLisbon: settings?.ingredientsOrder?.deliveryChargeOutsideLisbon || 30,
+      deliveryChargeOutsideLisbonVatRate: settings?.ingredientsOrder?.deliveryChargeOutsideLisbonVatRate || 0,
     },
   });
 
@@ -215,6 +218,7 @@ export default function GlobalSettings({
         platformVatRate: data.platformVatRate,
         fleetManagerPercent: data.fleetManagerCommissionPercent,
         serviceCharge: data.serviceCharge,
+        serviceChargeVatRate: data.serviceChargeVatRate,
       },
       agreement: {
         deligoSignatureUrl: uploadedSignatureUrl,
@@ -233,7 +237,9 @@ export default function GlobalSettings({
       },
       ingredientsOrder: {
         deliveryChargeInsideLisbon: data.deliveryChargeInsideLisbon,
+        deliveryChargeInsideLisbonVatRate: data.deliveryChargeInsideLisbonVatRate,
         deliveryChargeOutsideLisbon: data.deliveryChargeOutsideLisbon,
+        deliveryChargeOutsideLisbonVatRate: data.deliveryChargeOutsideLisbonVatRate,
       },
     } as Partial<TGlobalSettings>;
 
@@ -611,6 +617,28 @@ export default function GlobalSettings({
                               </FormItem>
                             )}
                           />
+                          <FormField
+                            control={form.control}
+                            name="serviceChargeVatRate"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("service_charge_vat_rate")}
+                                    type="number"
+                                    value={field.value}
+                                    onChange={(e) =>
+                                      field.onChange(parseFloat(e.target.value))
+                                    }
+                                    suffix="%"
+                                    min={0}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </div>
                       </div>
                     </SettingsCard>
@@ -892,51 +920,99 @@ export default function GlobalSettings({
                       delay={0}
                     >
                       <div className="space-y-6">
-                        <FormField
-                          control={form.control}
-                          name="deliveryChargeInsideLisbon"
-                          render={({ field, fieldState }) => (
-                            <FormItem>
-                              <FormControl>
-                                <SettingsInput
-                                  fieldState={fieldState}
-                                  label={t("deliveryChargeInsideLisbon")}
-                                  type="number"
-                                  value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
-                                  suffix="€"
-                                  min={0}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="deliveryChargeInsideLisbon"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deliveryChargeInsideLisbon")}
+                                    type="number"
+                                    value={field.value}
+                                    onChange={(e) =>
+                                      field.onChange(parseFloat(e.target.value))
+                                    }
+                                    suffix="€"
+                                    min={0}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="deliveryChargeInsideLisbonVatRate"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deliveryChargeInsideLisbonVatRate")}
+                                    type="number"
+                                    value={field.value}
+                                    onChange={(e) =>
+                                      field.onChange(parseFloat(e.target.value))
+                                    }
+                                    suffix="%"
+                                    min={0}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="deliveryChargeOutsideLisbon"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deliveryChargeOutsideLisbon")}
+                                    type="number"
+                                    value={field.value}
+                                    onChange={(e) =>
+                                      field.onChange(parseFloat(e.target.value))
+                                    }
+                                    suffix="€"
+                                    min={0}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                        <FormField
-                          control={form.control}
-                          name="deliveryChargeOutsideLisbon"
-                          render={({ field, fieldState }) => (
-                            <FormItem>
-                              <FormControl>
-                                <SettingsInput
-                                  fieldState={fieldState}
-                                  label={t("deliveryChargeOutsideLisbon")}
-                                  type="number"
-                                  value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
-                                  suffix="€"
-                                  min={0}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                          <FormField
+                            control={form.control}
+                            name="deliveryChargeOutsideLisbonVatRate"
+                            render={({ field, fieldState }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <SettingsInput
+                                    fieldState={fieldState}
+                                    label={t("deliveryChargeOutsideLisbonVatRate")}
+                                    type="number"
+                                    value={field.value}
+                                    onChange={(e) =>
+                                      field.onChange(parseFloat(e.target.value))
+                                    }
+                                    suffix="%"
+                                    min={0}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
                     </SettingsCard>
                   )}

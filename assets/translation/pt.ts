@@ -2300,6 +2300,7 @@ export const pt = {
   percentage_paid_to_driver: "Percentagem paga ao estafeta",
   vendor_vat: "IVA do Vendedor",
   service_charge: "Taxa de Serviço",
+  service_charge_vat_rate: "Taxa de IVA da Taxa de Serviço",
   order_rules: "Regras de Encomenda",
   define_constraints_for_customer_orders:
     "Definir restrições para encomendas de clientes",
@@ -2348,7 +2349,9 @@ export const pt = {
   ingredients_delivery_charges: "Taxas de Entrega de Ingredientes",
   control_ingredients_delivery_charges_settings: "Controlar configurações das taxas de entrega de ingredientes",
   deliveryChargeInsideLisbon: "Taxa de Entrega Dentro de Lisboa",
+  deliveryChargeInsideLisbonVatRate: "Taxa de IVA da Taxa de Entrega Dentro de Lisboa",
   deliveryChargeOutsideLisbon: "Taxa de Entrega Fora de Lisboa",
+  deliveryChargeOutsideLisbonVatRate: "Taxa de IVA da Taxa de Entrega Fora de Lisboa",
   vatRate: "Taxa de IVA",
   agreements: "Acordos",
   activity_logs_retention: "Retenção de Registos de Atividade",
