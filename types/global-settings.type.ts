@@ -17,9 +17,10 @@ export type TGlobalSettings = {
     platformPercent: number;
     platformVatRate: number;
     fleetManagerPercent: number;
-    deliveryPartnerPercent: number;
-    vendorVatPercent: number;
+    // deliveryPartnerPercent: number;
+    // vendorVatPercent: number;
     serviceCharge: number;
+    serviceChargeVatRate: number;
   };
 
   // Order Rules & Automation
@@ -82,7 +83,9 @@ export type TGlobalSettings = {
   // ingredients order and delivery charges
   ingredientsOrder: {
     deliveryChargeInsideLisbon: number;
+    deliveryChargeInsideLisbonVatRate: number;
     deliveryChargeOutsideLisbon: number;
+    deliveryChargeOutsideLisbonVatRate: number;
     vatRate: number;
   };
 

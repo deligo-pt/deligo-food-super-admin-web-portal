@@ -2268,6 +2268,7 @@ export const en = {
   percentage_paid_to_driver: "Percentage paid to the driver",
   vendor_vat: "Vendor VAT",
   service_charge: "Service Charge",
+  service_charge_vat_rate: "Service Charge Vat Rate",
   order_rules: "Order Rules",
   define_constraints_for_customer_orders:
     "Define constraints for customer orders",
@@ -2311,7 +2312,9 @@ export const en = {
   ingredients_delivery_charges: "Ingredients Delivery Charges",
   control_ingredients_delivery_charges_settings: "Control ingredients delivery charges settings",
   deliveryChargeInsideLisbon: "Delivery Charge Inside Lisbon",
+  deliveryChargeInsideLisbonVatRate: "Delivery Charge Inside Lisbon Vat Rate",
   deliveryChargeOutsideLisbon: "Delivery Charge Outside Lisbon",
+  deliveryChargeOutsideLisbonVatRate: "Delivery Charge Outside Lisbon Vat Rate",
   vatRate: "Vat Rate",
   agreements: "Agreements",
   activity_logs_retention: "Activity Logs Retention",

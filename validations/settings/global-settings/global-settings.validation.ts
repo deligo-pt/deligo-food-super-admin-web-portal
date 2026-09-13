@@ -30,6 +30,9 @@ export const globalSettingsSchema = z
     serviceCharge: z
       .number("Service charge must be a number")
       .nonnegative("Service charge must be at least 0"),
+    serviceChargeVatRate: z
+      .number("Service charge VAT Rate must be a number")
+      .nonnegative("Service charge VAT Rate must be at least 0"),
 
     // Agreements
     deligoSignatureUrl: z.string().optional(),
@@ -65,9 +68,15 @@ export const globalSettingsSchema = z
     deliveryChargeInsideLisbon: z
       .number("Delivery charge inside lisbon must be a number")
       .nonnegative("Delivery charge inside lisbon must be at least 0"),
+    deliveryChargeInsideLisbonVatRate: z
+      .number("Delivery charge VAT Rate inside lisbon must be a number")
+      .nonnegative("Delivery charge VAT Rate inside lisbon must be at least 0"),
     deliveryChargeOutsideLisbon: z
       .number("Delivery charge outside lisbon must be a number")
       .nonnegative("Delivery charge outside lisbon must be at least 0"),
+    deliveryChargeOutsideLisbonVatRate: z
+      .number("Delivery charge VAT Rate outside lisbon must be a number")
+      .nonnegative("Delivery charge VAT Rate outside lisbon must be at least 0"),
 
   })
 // .refine(
