@@ -1678,6 +1678,8 @@ export const pt = {
   campaign_timeline: "Linha do Tempo da Campanha",
   start: "Início",
   now: "Agora",
+  // --> update sponsorship
+  edit_sponsorship: "Editar Patrocínio",
 
   // sales-analytics
   sales_analytics_nd_insights: "Análises e insights de vendas",

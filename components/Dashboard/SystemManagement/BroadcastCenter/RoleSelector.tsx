@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { USER_ROLE } from '@/consts/user.const';
+import { USER_ROLE, USER_STATUS } from '@/consts/user.const';
 import { TMeta } from '@/types';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import {
@@ -7,6 +7,7 @@ import {
     CheckIcon,
     ChevronDownIcon,
     ChevronUpIcon,
+    FilterIcon,
     LoaderCircleIcon,
     SearchIcon,
     ShieldIcon,
@@ -14,6 +15,12 @@ import {
     UserIcon,
     UsersIcon,
 } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getAllUsersReq } from '@/services/dashboard/system-management/email-notification-settings.service';
 import { TUser } from './BroadcastCenter';
@@ -56,6 +63,17 @@ const ROLES = [
     { id: 'CUSTOMER', label: 'customers', icon: UserIcon, color: 'emerald' },
     { id: 'DELIVERY_PARTNER', label: 'riders', icon: BikeIcon, color: 'amber' },
     { id: 'ADMIN', label: 'admins', icon: ShieldIcon, color: 'red' },
+] as const;
+
+const STATUS_OPTIONS = [
+    { label: 'All Statuses', value: '' },
+    { label: 'Pending', value: 'PENDING' },
+    { label: 'Submitted', value: 'SUBMITTED' },
+    { label: 'Approved', value: 'APPROVED' },
+    { label: 'Cancelled', value: 'CANCELED' },
+    { label: 'Rejected', value: 'REJECTED' },
+    { label: 'Blocked', value: 'BLOCKED' },
+    { label: 'Unblocked', value: 'UNBLOCKED' },
 ] as const;
 
 const Avatar = ({ name, colorClass }: { name: string; colorClass: string }) => {
@@ -122,23 +140,35 @@ export default function RoleSelector({
         ADMIN: '',
     });
 
+    const [statusFilters, setStatusFilters] = useState<
+        Record<RoleType, '' | keyof typeof USER_STATUS>
+    >({
+        VENDOR: '',
+        CUSTOMER: '',
+        DELIVERY_PARTNER: '',
+        FLEET_MANAGER: '',
+        ADMIN: '',
+    });
+
     // Core fetch
     const getUsers = useCallback(
-        async (roleId: RoleType, limit = 10, searchTerm = '') => {
+        async (
+            roleId: RoleType,
+            limit = 10,
+            searchTerm = '',
+            status: '' | keyof typeof USER_STATUS = '',
+        ) => {
             setUserDataLoading((prev) => ({ ...prev, [roleId]: true }));
-
             try {
                 const resultData = await getAllUsersReq({
                     limit,
                     role: roleId,
                     searchTerm,
+                    ...(status ? { status } : {}),
                 });
-
-                setUsersData((prev) => ({
-                    ...prev,
-                    [roleId]: resultData,
-                }));
+                setUsersData((prev) => ({ ...prev, [roleId]: resultData }));
                 lastFetchedSearch.current[roleId] = searchTerm;
+                return resultData;
             } finally {
                 setUserDataLoading((prev) => ({ ...prev, [roleId]: false }));
             }
@@ -166,15 +196,17 @@ export default function RoleSelector({
             const query = searchQueries[roleId];
             if (query === lastFetchedSearch.current[roleId]) return; // already fetched
 
+            // inside the debounced search effect
             timers[roleId] = setTimeout(() => {
-                getUsers(roleId, 10, query); // always reset to page 1 on new search
+                getUsers(roleId, 10, query, statusFilters[roleId]);
             }, 300);
+            // ...and add statusFilters to the dependency array
         });
 
         return () => {
             Object.values(timers).forEach((t) => t && clearTimeout(t));
         };
-    }, [searchQueries, targetModes, getUsers]);
+    }, [searchQueries, targetModes, getUsers, statusFilters]);
 
     // Handlers
     const toggleRole = (roleId: RoleType) => {
@@ -189,16 +221,37 @@ export default function RoleSelector({
         if (mode === 'specific') {
             setExpandedPanels((prev) => ({ ...prev, [roleId]: true }));
 
-            // Only fetch if we have never loaded this role or the search term changed
             const currentSearch = searchQueries[roleId];
+            const currentStatus = statusFilters[roleId];
             if (
                 !usersData[roleId]?.data?.length ||
                 currentSearch !== lastFetchedSearch.current[roleId]
             ) {
-                getUsers(roleId, 10, currentSearch);
+                getUsers(roleId, 10, currentSearch, currentStatus);
+            }
+        } else {
+            if (statusFilters[roleId]) {
+                setStatusFilters((prev) => ({ ...prev, [roleId]: '' }));
+                getUsers(roleId, 10, searchQueries[roleId], '');
             }
         }
     };
+    // const handleTargetMode = (roleId: RoleType, mode: 'all' | 'specific') => {
+    //     setTargetModes((prev) => ({ ...prev, [roleId]: mode }));
+
+    //     if (mode === 'specific') {
+    //         setExpandedPanels((prev) => ({ ...prev, [roleId]: true }));
+
+    //         // Only fetch if we have never loaded this role or the search term changed
+    //         const currentSearch = searchQueries[roleId];
+    //         if (
+    //             !usersData[roleId]?.data?.length ||
+    //             currentSearch !== lastFetchedSearch.current[roleId]
+    //         ) {
+    //             getUsers(roleId, 10, currentSearch);
+    //         }
+    //     }
+    // };
 
     const toggleUser = (roleId: RoleType, userId: string) => {
         setSelectedUsers((prev) => {
@@ -210,6 +263,7 @@ export default function RoleSelector({
     };
 
     const toggleAllUsers = (roleId: RoleType, filteredUserIds: string[]) => {
+        setStatusFilters((prev) => ({ ...prev, [roleId]: "" }));
         setSelectedUsers((prev) => {
             const newSet = new Set(prev[roleId] || []);
             const allSelected = filteredUserIds.every((id) => newSet.has(id));
@@ -266,7 +320,43 @@ export default function RoleSelector({
         return map[color] || map.blue;
     };
 
-    // ─── Render ───────────────────────────────────────────────────────────────
+    const handleStatusFilter = async (
+        roleId: RoleType,
+        status: '' | keyof typeof USER_STATUS,
+    ) => {
+        setStatusFilters((prev) => ({ ...prev, [roleId]: status }));
+
+        // Fetch first page for display (keeps existing pagination UX)
+        const result = await getUsers(roleId, 10, searchQueries[roleId], status);
+
+        if (!status) return;
+
+        const total = result?.meta?.total ?? 0;
+        if (total === 0) return;
+
+        // Fetch the FULL matching set (not just the displayed page) so selection
+        // covers every user with this status, not only the first 10.
+        try {
+            const fullResult = await getAllUsersReq({
+                limit: total,
+                role: roleId,
+                searchTerm: searchQueries[roleId],
+                status,
+            });
+
+            setSelectedUsers((prev) => ({
+                ...prev,
+                [roleId]: new Set(fullResult.data.map((u: TUser) => u.userId)),
+            }));
+        } catch {
+            // fall back to selecting what's visible, rather than leaving nothing selected
+            setSelectedUsers((prev) => ({
+                ...prev,
+                [roleId]: new Set(result.data.map((u: TUser) => u.userId)),
+            }));
+        }
+    };
+
     return (
         <motion.div
             variants={itemVariants}
@@ -426,6 +516,40 @@ export default function RoleSelector({
                                                             />
                                                         </div>
 
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <button
+                                                                    className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 px-3 py-2 bg-gray-100 rounded-lg whitespace-nowrap"
+                                                                >
+                                                                    <FilterIcon className="w-3.5 h-3.5" />
+                                                                    {statusFilters[roleId]
+                                                                        ? STATUS_OPTIONS.find((s) => s.value === statusFilters[roleId])?.label
+                                                                        : t('status') || 'Status'}
+                                                                    <ChevronDownIcon className="w-3 h-3" />
+                                                                </button>
+                                                            </DropdownMenuTrigger>
+
+                                                            <DropdownMenuContent align="end" className="w-40 max-h-44 overflow-y-auto">
+                                                                {STATUS_OPTIONS.map((opt) => (
+                                                                    <DropdownMenuItem
+                                                                        key={opt.value}
+                                                                        onSelect={() =>
+                                                                            handleStatusFilter(roleId, opt.value as '' | keyof typeof USER_STATUS)
+                                                                        }
+                                                                        className={`flex items-center justify-between text-xs font-medium cursor-pointer ${statusFilters[roleId] === opt.value
+                                                                            ? `${colors.text} ${colors.lightBg}`
+                                                                            : 'text-gray-700'
+                                                                            }`}
+                                                                    >
+                                                                        {opt.label}
+                                                                        {statusFilters[roleId] === opt.value && (
+                                                                            <CheckIcon className="w-3 h-3" />
+                                                                        )}
+                                                                    </DropdownMenuItem>
+                                                                ))}
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+
                                                         <button
                                                             onClick={() =>
                                                                 toggleAllUsers(
@@ -544,6 +668,7 @@ export default function RoleSelector({
                                                                                             roleId,
                                                                                             (roleData.meta?.limit || 10) + 10,
                                                                                             searchQueries[roleId],
+                                                                                            statusFilters[roleId],
                                                                                         )
                                                                                     }
                                                                                     size="sm"
@@ -563,14 +688,15 @@ export default function RoleSelector({
                                                     </AnimatePresence>
                                                 </div>
                                             </motion.div>
-                                        )}
+                                        )
+                                        }
                                     </AnimatePresence>
                                 </motion.div>
                             );
                         })}
-                    </motion.div>
+                    </motion.div >
                 )}
-            </AnimatePresence>
-        </motion.div>
+            </AnimatePresence >
+        </motion.div >
     );
 }
