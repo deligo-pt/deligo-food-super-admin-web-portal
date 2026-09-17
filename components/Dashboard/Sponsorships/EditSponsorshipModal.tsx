@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
@@ -52,6 +53,7 @@ export default function EditSponsorshipModal({
   onOpenChange,
   prevValues,
 }: IProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const form = useForm<TSponsorshipForm>({
     resolver: zodResolver(sponsorshipValidation),
@@ -62,6 +64,7 @@ export default function EditSponsorshipModal({
       endDate: new Date(prevValues?.endDate) || new Date(),
       isActive: prevValues?.isActive || true,
       sponsorBanner: { file: null, url: prevValues?.bannerImage || "" },
+      url: prevValues?.url || ""
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,6 +82,7 @@ export default function EditSponsorshipModal({
       startDate: format(data.startDate, "yyyy-MM-dd"),
       endDate: format(data.endDate, "yyyy-MM-dd"),
       isActive: data.isActive,
+      ...(data.url && { url: data.url }),
     };
 
     const formData = new FormData();
@@ -122,7 +126,7 @@ export default function EditSponsorshipModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogTitle className="text-2xl font-medium">
-          Edit Sponsorship
+          {t("edit_sponsorship")}
         </DialogTitle>
 
         {/* Edit Form */}
@@ -140,7 +144,7 @@ export default function EditSponsorshipModal({
                   <FormControl>
                     <SettingsInput
                       fieldState={fieldState}
-                      label="Sponsor Name"
+                      label={t("sponsor_name")}
                       placeholder="e.g. ABC Group"
                       value={field.value}
                       onChange={field.onChange}
@@ -159,7 +163,7 @@ export default function EditSponsorshipModal({
                   <FormControl>
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                        Sponsor Type
+                        {t("sponsor_type")}
                       </label>
                       <Select
                         value={field.value}
@@ -172,7 +176,7 @@ export default function EditSponsorshipModal({
                             fieldState.invalid && "border-destructive",
                           )}
                         >
-                          <SelectValue placeholder="Select a type" />
+                          <SelectValue placeholder={t("select_a_type")} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Ads">Ads</SelectItem>
@@ -196,7 +200,7 @@ export default function EditSponsorshipModal({
                     <SettingsInput
                       fieldState={fieldState}
                       type="date"
-                      label="Start Date"
+                      label={t("start_date")}
                       value={format(field.value, "yyyy-MM-dd")}
                       onChange={(e) => field.onChange(new Date(e.target.value))}
                     />
@@ -215,9 +219,28 @@ export default function EditSponsorshipModal({
                     <SettingsInput
                       fieldState={fieldState}
                       type="date"
-                      label="End Date"
+                      label={t("end_date")}
                       value={format(field.value, "yyyy-MM-dd")}
                       onChange={(e) => field.onChange(new Date(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormControl>
+                    <SettingsInput
+                      fieldState={fieldState}
+                      label={t("sponsor_url")}
+                      placeholder="e.g. https://example.com"
+                      value={field.value}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -233,6 +256,7 @@ export default function EditSponsorshipModal({
                   <FormControl>
                     <ImageUpload
                       value={sponsorBannerPreview}
+                      label={t("banner_image")}
                       onChange={(file) => {
                         const url = file ? URL.createObjectURL(file) : "";
                         setSponsorBannerPreview(
@@ -256,8 +280,8 @@ export default function EditSponsorshipModal({
                   <FormControl>
                     <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                       <SettingsToggle
-                        label="Active Status"
-                        description="Immediately publish this sponsorship"
+                        label={t("active_status")}
+                        description={t("immediately_publish_this_sponsorship")}
                         checked={field.value as boolean}
                         onChange={(val) => field.onChange(val)}
                       />
@@ -282,12 +306,12 @@ export default function EditSponsorshipModal({
             {isSubmitting ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              "Update"
+              t("update")
             )}
           </Button>
           <DialogClose asChild>
             <Button type="button" variant="outline">
-              Cancel
+              {t("cancel")}
             </Button>
           </DialogClose>
         </DialogFooter>

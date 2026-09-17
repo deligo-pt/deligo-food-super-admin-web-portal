@@ -1657,6 +1657,8 @@ export const en = {
   campaign_timeline: "Campaign Timeline",
   start: "Start",
   now: "Now",
+  // --> update sponsorship
+  edit_sponsorship: "Edit Sponsorship",
 
   // sales-analytics
   overview_revenue_orders_business_performance: "Overview of revenue, orders, and business performance",
