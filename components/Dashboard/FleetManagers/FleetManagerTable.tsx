@@ -6,9 +6,11 @@ import { TAgent } from "@/types/user.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getFleetManagerColumns } from "./fleetColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   agents: TAgent[];
+  meta: TMeta;
   handleStatusInfo: (
     agentId: string,
     agentName: string,
@@ -19,6 +21,7 @@ interface IProps {
 
 export default function FleetManagerTable({
   agents,
+  meta,
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
@@ -32,6 +35,9 @@ export default function FleetManagerTable({
     handleDeleteId,
   });
 
+  const currentPage = meta?.page || 1;
+  const pageSize = meta?.limit || 10;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -43,6 +49,7 @@ export default function FleetManagerTable({
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_fleet_managers_found")}
+        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

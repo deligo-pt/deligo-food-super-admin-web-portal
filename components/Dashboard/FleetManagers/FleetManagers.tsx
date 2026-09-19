@@ -131,6 +131,7 @@ export default function FleetManagers({
       {/* Fleet Manager Table */}
       <FleetManagerTable
         agents={agentsResult?.data || []}
+        meta={agentsResult?.meta as TMeta}
         handleStatusInfo={handleStatusInfo}
         handleDeleteId={handleDeleteId}
       />

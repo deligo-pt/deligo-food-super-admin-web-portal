@@ -6,13 +6,16 @@ import { motion } from "framer-motion";
 import { getFleetManagerPerformanceColumns } from "./FleetManagerPerformanceColumns";
 import ReusableTable from "@/components/common/ReusableTable";
 import { useRouter } from "next/navigation";
+import { TMeta } from "@/types";
 
 interface IProps {
   fleetManagers: TFleetManagerPerformance[];
+  meta: TMeta;
 }
 
 export default function FleetManagerPerformanceTable({
   fleetManagers,
+  meta
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -21,6 +24,9 @@ export default function FleetManagerPerformanceTable({
     t,
     router,
   });
+
+  const currentPage = meta?.page || 1;
+  const pageSize = meta?.limit || 10;
 
   return (
     <motion.div
@@ -39,6 +45,7 @@ export default function FleetManagerPerformanceTable({
           columns={columns}
           getRowKey={(row) => row._id}
           emptyMessage={t("no_fleet_manager_found")}
+          serialStart={(currentPage - 1) * pageSize + 1}
         />
       </div>
     </motion.div>

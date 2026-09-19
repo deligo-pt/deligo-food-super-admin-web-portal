@@ -270,6 +270,7 @@ export default function FleetManagerPerformance({
       {/* Fleet Manager Performance Table */}
       <FleetManagerPerformanceTable
         fleetManagers={fleetPerformanceData?.data?.fleetPerformance}
+        meta={fleetPerformanceData?.meta as TMeta}
       />
 
       {/* Pagination */}
