@@ -32,7 +32,7 @@ export default function DeliveryPartnerWallets({ walletsResult }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Wallet Table */}
-      <DeliveryPartnerWalletTable wallets={walletsResult?.data || []} />
+      <DeliveryPartnerWalletTable wallets={walletsResult?.data || []} meta={walletsResult?.meta as TMeta} />
 
       {/* Pagination */}
       {!!walletsResult?.meta?.totalPage && (

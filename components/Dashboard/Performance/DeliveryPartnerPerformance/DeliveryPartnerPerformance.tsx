@@ -244,6 +244,7 @@ export default function DeliveryPartnerPerformance({
       {/* partner Performance Table */}
       <DeliveryPartnerPerformanceTable
         partners={partnerPerformance}
+        meta={partnerPerformanceData?.meta as TMeta}
       />
 
       {/* Pagination */}
