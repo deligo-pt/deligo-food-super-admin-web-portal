@@ -6,12 +6,14 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getTransactionColumns } from "./TransactionColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
   transactions: TTransaction[];
+  meta: TMeta;
 }
 
-export default function TransactionTable({ transactions }: IProps) {
+export default function TransactionTable({ transactions, meta }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -28,6 +30,7 @@ export default function TransactionTable({ transactions }: IProps) {
     >
       <ReusableTable
         data={transactions}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_transactions_found")}

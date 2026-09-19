@@ -104,6 +104,9 @@ export default function CategoryTable({ categoriesResult }: IProps) {
     setStatusInfo,
   });
 
+  const currentPage = categoriesResult?.meta?.page || 1;
+  const pageSize = categoriesResult?.meta?.limit || 10;
+
   return (
     <>
       <AllFilters sortOptions={sortOptions} />
@@ -118,6 +121,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
           columns={columns}
           getRowKey={(row) => row._id}
           emptyMessage={t("no_categories_found")}
+          serialStart={(currentPage - 1) * pageSize + 1}
         />
       </motion.div>
 

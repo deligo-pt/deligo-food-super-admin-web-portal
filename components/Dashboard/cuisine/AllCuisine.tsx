@@ -60,6 +60,7 @@ const AllCuisine = ({ cuisineResult }: IProps) => {
             >
                 <ReusableTable
                     data={cuisineResult?.data || []}
+                    meta={cuisineResult?.meta as TMeta}
                     columns={columns}
                     getRowKey={(row) => row._id}
                     emptyMessage={t("no_cuisine_available_to_show")}

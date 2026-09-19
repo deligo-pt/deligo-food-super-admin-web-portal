@@ -10,6 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from "../ui/table";
+import { TMeta } from "@/types";
 
 export interface Column<T> {
     header: React.ReactNode;
@@ -19,23 +20,25 @@ export interface Column<T> {
 
 interface TableProps<T> {
     data: T[];
+    meta: TMeta;
     columns: Column<T>[];
     getRowKey: (row: T) => string;
     emptyMessage?: string;
     isRefreshing?: boolean;
-    serialStart?: number;
     showSerial?: boolean;
 }
 
 function ReusableTable<T>({
     data = [],
+    meta,
     columns = [],
     getRowKey,
     emptyMessage = "No records found",
     isRefreshing = false,
-    serialStart = 1,
     showSerial = true,
 }: TableProps<T>) {
+    const serialStart = (meta?.page - 1) * meta?.limit + 1;
+
     return (
         <div className="relative">
             {/* refreshing overlay */}

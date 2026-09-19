@@ -31,7 +31,7 @@ export default function Orders({ ordersResult, title, subtitle }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Order Table */}
-      <OrderTable orders={ordersResult?.data || []} />
+      <OrderTable orders={ordersResult?.data || []} meta={ordersResult?.meta as TMeta} />
 
       {/* Pagination */}
       {!!ordersResult?.meta?.totalPage && (

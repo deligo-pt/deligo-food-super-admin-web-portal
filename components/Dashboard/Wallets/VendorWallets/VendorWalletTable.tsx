@@ -22,9 +22,6 @@ export default function VendorWalletTable({ wallets, meta }: IProps) {
     router,
   });
 
-  const currentPage = meta?.page || 1;
-  const pageSize = meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,10 +30,10 @@ export default function VendorWalletTable({ wallets, meta }: IProps) {
     >
       <ReusableTable
         data={wallets}
+         meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_wallets_found")}
-        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );
