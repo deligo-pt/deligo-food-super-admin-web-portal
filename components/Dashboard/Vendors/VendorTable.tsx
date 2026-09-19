@@ -6,9 +6,13 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getVendorColumns } from "./VendorColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
-  vendors: TVendor[];
+  vendorsResult: {
+    vendors: TVendor[];
+    meta: TMeta;
+  };
   handleStatusInfo: (
     vendorId: string,
     vendorName: string,
@@ -18,7 +22,7 @@ interface IProps {
 }
 
 export default function VendorTable({
-  vendors,
+  vendorsResult,
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
@@ -32,6 +36,9 @@ export default function VendorTable({
     handleDeleteId,
   });
 
+  const currentPage = vendorsResult?.meta?.page || 1;
+  const pageSize = vendorsResult?.meta?.limit || 10;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -39,10 +46,11 @@ export default function VendorTable({
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
     >
       <ReusableTable
-        data={vendors}
+        data={vendorsResult?.vendors}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_vendors_found")}
+        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

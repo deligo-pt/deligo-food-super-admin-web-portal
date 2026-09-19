@@ -128,7 +128,10 @@ export default function Vendors({
 
       {/* Vendor Table */}
       <VendorTable
-        vendors={vendorsResult?.data || []}
+        vendorsResult={{
+          vendors: vendorsResult.data,
+          meta: vendorsResult.meta as TMeta,
+        }}
         handleStatusInfo={handleStatusInfo}
         handleDeleteId={handleDeleteId}
       />

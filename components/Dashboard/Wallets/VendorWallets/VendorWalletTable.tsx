@@ -6,12 +6,14 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getVendorWalletColumns } from "./VendorWalletColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
   wallets: TVendorWallet[];
+  meta: TMeta;
 }
 
-export default function VendorWalletTable({ wallets }: IProps) {
+export default function VendorWalletTable({ wallets, meta }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -19,6 +21,9 @@ export default function VendorWalletTable({ wallets }: IProps) {
     t,
     router,
   });
+
+  const currentPage = meta?.page || 1;
+  const pageSize = meta?.limit || 10;
 
   return (
     <motion.div
@@ -31,6 +36,7 @@ export default function VendorWalletTable({ wallets }: IProps) {
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_wallets_found")}
+        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

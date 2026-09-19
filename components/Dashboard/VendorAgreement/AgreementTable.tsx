@@ -6,12 +6,14 @@ import { IAgreement } from "@/types/agreement.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getAgreementColumns } from "./AgreementColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
     agreements: IAgreement[];
+    meta: TMeta;
 }
 
-export default function AgreementsTable({ agreements }: IProps) {
+export default function AgreementsTable({ agreements, meta }: IProps) {
     const { t } = useTranslation();
     const router = useRouter();
 
@@ -19,6 +21,9 @@ export default function AgreementsTable({ agreements }: IProps) {
         t,
         router,
     });
+
+    const currentPage = meta?.page || 1;
+    const pageSize = meta?.limit || 10;
 
     return (
         <motion.div
@@ -31,6 +36,7 @@ export default function AgreementsTable({ agreements }: IProps) {
                 columns={columns}
                 getRowKey={(row) => row._id}
                 emptyMessage={t("no_agreements_found")}
+                serialStart={(currentPage - 1) * pageSize + 1}
             />
         </motion.div>
     );
