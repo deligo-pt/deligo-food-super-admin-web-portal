@@ -25,9 +25,6 @@ export default function FleetManagerPerformanceTable({
     router,
   });
 
-  const currentPage = meta?.page || 1;
-  const pageSize = meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -42,10 +39,10 @@ export default function FleetManagerPerformanceTable({
       <div className="overflow-x-auto">
         <ReusableTable
           data={fleetManagers}
+          meta={meta}
           columns={columns}
           getRowKey={(row) => row._id}
           emptyMessage={t("no_fleet_manager_found")}
-          serialStart={(currentPage - 1) * pageSize + 1}
         />
       </div>
     </motion.div>

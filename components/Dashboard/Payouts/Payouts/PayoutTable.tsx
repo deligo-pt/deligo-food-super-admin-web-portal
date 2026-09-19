@@ -22,9 +22,6 @@ export default function PayoutTable({ payouts, meta, userRole }: IProps) {
 
   const columns = getPayoutColumns({ t, router, userRole });
 
-  const currentPage = meta?.page || 1;
-  const pageSize = meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,10 +30,10 @@ export default function PayoutTable({ payouts, meta, userRole }: IProps) {
     >
       <ReusableTable
         data={payouts}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_payouts_found")}
-        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

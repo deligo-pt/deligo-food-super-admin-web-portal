@@ -36,9 +36,6 @@ export default function VendorTable({
     handleDeleteId,
   });
 
-  const currentPage = vendorsResult?.meta?.page || 1;
-  const pageSize = vendorsResult?.meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -47,10 +44,10 @@ export default function VendorTable({
     >
       <ReusableTable
         data={vendorsResult?.vendors}
+        meta={vendorsResult?.meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_vendors_found")}
-        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

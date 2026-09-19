@@ -43,9 +43,6 @@ export default function DeliveryPartnerTable({
     handleDeleteId,
   });
 
-  const currentPage = meta?.page || 1;
-  const pageSize = meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -54,10 +51,10 @@ export default function DeliveryPartnerTable({
     >
       <ReusableTable
         data={partners || []}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id as string}
         emptyMessage={t("no_partners_found")}
-        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

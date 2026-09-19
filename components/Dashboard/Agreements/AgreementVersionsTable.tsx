@@ -24,9 +24,6 @@ export default function AgreementVersionsTable({ agreements }: IProps) {
         router,
     });
 
-    const currentPage = agreements?.meta?.page || 1;
-    const pageSize = agreements?.meta?.limit || 10;
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -35,10 +32,10 @@ export default function AgreementVersionsTable({ agreements }: IProps) {
         >
             <ReusableTable
                 data={agreements?.data}
+                meta={agreements?.meta}
                 columns={columns}
                 getRowKey={(row) => row._id}
                 emptyMessage={t("no_agreements_found")}
-                serialStart={(currentPage - 1) * pageSize + 1}
             />
         </motion.div>
     );

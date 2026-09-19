@@ -35,9 +35,6 @@ export default function FleetManagerTable({
     handleDeleteId,
   });
 
-  const currentPage = meta?.page || 1;
-  const pageSize = meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -46,10 +43,10 @@ export default function FleetManagerTable({
     >
       <ReusableTable
         data={agents || []}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_fleet_managers_found")}
-        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

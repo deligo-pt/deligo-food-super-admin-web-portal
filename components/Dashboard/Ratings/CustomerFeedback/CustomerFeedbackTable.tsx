@@ -25,9 +25,6 @@ export default function CustomerFeedbackTable({
     openDetailsSheet,
   });
 
-  const currentPage = meta?.page || 1;
-  const pageSize = meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,10 +33,10 @@ export default function CustomerFeedbackTable({
     >
       <ReusableTable
         data={feedback}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_feedback_found")}
-        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );
