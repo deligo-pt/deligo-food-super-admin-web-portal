@@ -5,14 +5,17 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TRating } from "@/types/rating.type";
 import { motion } from "framer-motion";
 import { getCustomerFeedbackColumns } from "./CustomerFeedbackColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   feedback: TRating[];
+  meta: TMeta;
   openDetailsSheet: (feedback: TRating) => void;
 }
 
 export default function CustomerFeedbackTable({
   feedback,
+  meta,
   openDetailsSheet,
 }: IProps) {
   const { t } = useTranslation();
@@ -22,6 +25,8 @@ export default function CustomerFeedbackTable({
     openDetailsSheet,
   });
 
+  const currentPage = meta?.page || 1;
+  const pageSize = meta?.limit || 10;
 
   return (
     <motion.div
@@ -34,6 +39,7 @@ export default function CustomerFeedbackTable({
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_feedback_found")}
+        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

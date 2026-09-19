@@ -7,12 +7,14 @@ import { TTransaction } from "@/types/transaction.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getCustomerSpendColumns } from "./customerSpendsColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   spends: TTransaction[];
+  meta: TMeta;
 }
 
-export default function CustomerSpendTable({ spends }: IProps) {
+export default function CustomerSpendTable({ spends, meta }: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
   const router = useRouter();
@@ -22,6 +24,9 @@ export default function CustomerSpendTable({ spends }: IProps) {
     lang,
     router,
   });
+
+  const currentPage = meta?.page || 1;
+  const pageSize = meta?.limit || 10;
 
   return (
     <motion.div
@@ -35,6 +40,7 @@ export default function CustomerSpendTable({ spends }: IProps) {
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_spends_found")}
+        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );

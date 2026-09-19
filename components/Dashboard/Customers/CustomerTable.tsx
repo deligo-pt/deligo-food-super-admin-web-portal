@@ -6,9 +6,11 @@ import { TCustomer } from "@/types/user.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getCustomerColumns } from "./customerColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   customers: TCustomer[];
+  meta: TMeta;
   handleStatusInfo: (
     customerId: string,
     customerName: string,
@@ -19,6 +21,7 @@ interface IProps {
 
 export default function CustomerTable({
   customers,
+  meta,
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
@@ -32,6 +35,9 @@ export default function CustomerTable({
     handleDeleteId,
   });
 
+  const currentPage = meta?.page || 1;
+  const pageSize = meta?.limit || 10;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -44,6 +50,7 @@ export default function CustomerTable({
         columns={columns}
         getRowKey={(row) => row._id as string}
         emptyMessage={t("no_customers_found")}
+        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );
