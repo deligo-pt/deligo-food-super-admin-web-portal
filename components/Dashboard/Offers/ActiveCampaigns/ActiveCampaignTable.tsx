@@ -10,9 +10,11 @@ import { getCampaignColumns } from "./CampaignColumns";
 import ReusableTable from "@/components/common/ReusableTable";
 import { getCookie } from "@/utils/cookies";
 import { jwtDecode } from "jwt-decode";
+import { TMeta } from "@/types";
 
 interface IProps {
   offers: TOffer[];
+  meta: TMeta;
   handleStatusInfo: (
     offerId: string,
     offerName: string,
@@ -24,6 +26,7 @@ interface IProps {
 
 export default function CampaignTable({
   offers,
+  meta,
   handleStatusInfo,
   handleOpenEditModal,
   handleDeleteId,
@@ -53,6 +56,7 @@ export default function CampaignTable({
     >
       <ReusableTable
         data={offers}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_offers_found")}

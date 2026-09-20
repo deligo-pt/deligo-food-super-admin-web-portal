@@ -165,6 +165,7 @@ export default function ActiveCampaigns({
       {/* Campaign Table */}
       <CampaignTable
         offers={offersResult?.data || []}
+        meta={offersResult?.meta as TMeta}
         handleStatusInfo={handleStatusInfo}
         handleOpenEditModal={handleOpenEditModal}
         handleDeleteId={handleDeleteId}

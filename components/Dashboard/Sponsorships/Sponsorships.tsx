@@ -107,6 +107,7 @@ export default function Sponsorships({
       {/* Vendor Table */}
       <SponsorshipTable
         sponsorships={sponsorshipsResult?.data || []}
+        meta={sponsorshipsResult?.meta as TMeta}
         handleDeleteId={handleDeleteId}
         handleOpenEditModal={handleOpenEditModal}
       />
