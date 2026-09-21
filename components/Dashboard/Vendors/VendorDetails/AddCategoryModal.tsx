@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { FileTextIcon, ActivitySquareIcon, LoaderIcon, PlusCircle } from "lucide-react";
+import { FileTextIcon, ActivitySquareIcon, LoaderIcon, PlusCircle, Edit3 } from "lucide-react";
 
 import {
     Dialog,
@@ -28,12 +28,17 @@ import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "@/hooks/use-translation";
 import { translateObject } from "@/utils/translation/translationObject";
 import { productCategoryValidation } from "@/validations/item/product-categories.validation";
-import { addAdminProductCategoryReq } from "@/services/dashboard/category/product-category.service";
+import {
+    addAdminProductCategoryReq,
+    updateAdminProductCategoryReq
+} from "@/services/dashboard/category/product-category.service";
+import { TProductCategoryResponse } from "@/types/category.type";
 
 interface AddCategoryModalProps {
     isOpen: boolean;
     onClose: () => void;
     vendorId: string;
+    initialData: TProductCategoryResponse | null;
     onSuccess?: () => void;
 }
 
@@ -43,10 +48,12 @@ export default function AddCategoryModal({
     isOpen,
     onClose,
     vendorId,
+    initialData,
     onSuccess,
 }: AddCategoryModalProps) {
     const { t, lang } = useTranslation();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isEditMode = Boolean(initialData);
 
     const form = useForm<FormData>({
         resolver: zodResolver(productCategoryValidation),
@@ -57,10 +64,33 @@ export default function AddCategoryModal({
         },
     });
 
+    // Prefill or reset form values when modal opens/closes or initialData changes
+    useEffect(() => {
+        if (initialData) {
+            form.reset({
+                name: {
+                    en: initialData.name?.en || "",
+                    pt: initialData.name?.pt || "",
+                },
+                isActive: initialData.isActive ?? true,
+                currentLang: lang,
+            });
+        } else {
+            form.reset({
+                name: { en: "", pt: "" },
+                isActive: true,
+                currentLang: lang,
+            });
+        }
+    }, [initialData, lang, form, isOpen]);
+
     const onSubmit = async (data: FormData) => {
-        const toastId = toast.loading("Creating category for vendor...");
+        const toastId = toast.loading(
+            isEditMode ? "Updating category..." : "Creating category for vendor..."
+        );
         setIsSubmitting(true);
 
+        // Translate the input object if needed
         const translated = await translateObject(data, lang);
         if (!translated) {
             toast.error("Translation failed", { id: toastId });
@@ -68,16 +98,56 @@ export default function AddCategoryModal({
             return;
         }
 
-        const payload = {
-            vendorId,
-            name: translated?.name,
-            isActive: data.isActive,
-        };
+        let result;
 
-        const result = await addAdminProductCategoryReq(payload);
+        if (isEditMode && initialData) {
+            const payload: Record<string, unknown> = {};
+
+            // Compare names
+            const originalEn = initialData.name?.en || "";
+            const originalPt = initialData.name?.pt || "";
+            const newEn = translated?.name?.en || "";
+            const newPt = translated?.name?.pt || "";
+
+            if (newEn !== originalEn || newPt !== originalPt) {
+                payload.name = {
+                    en: newEn,
+                    pt: newPt,
+                };
+            }
+
+            // Compare active status
+            if (data.isActive !== initialData.isActive) {
+                payload.isActive = data.isActive;
+            }
+
+            // Check if anything actually changed before sending the request
+            if (Object.keys(payload).length === 0) {
+                toast.info("No changes detected", { id: toastId });
+                setIsSubmitting(false);
+                onClose();
+                return;
+            }
+
+            // Fire update API request (replace with your actual update function name if different)
+            result = await updateAdminProductCategoryReq(initialData._id, payload);
+
+        } else {
+            // --- CREATE MODE ---
+            const payload = {
+                vendorId,
+                name: translated?.name,
+                isActive: data.isActive,
+            };
+
+            result = await addAdminProductCategoryReq(payload);
+        }
 
         if (result?.success) {
-            toast.success(result.message || "Category created successfully!", { id: toastId });
+            toast.success(
+                result.message || (isEditMode ? "Category updated successfully!" : "Category created successfully!"),
+                { id: toastId }
+            );
             form.reset();
             setIsSubmitting(false);
             onSuccess?.();
@@ -90,7 +160,10 @@ export default function AddCategoryModal({
                 toast.error(err?.message, { id: toastId })
             );
         } else {
-            toast.error(result.message || "Failed to create category", { id: toastId });
+            toast.error(
+                result.message || (isEditMode ? "Failed to update category" : "Failed to create category"),
+                { id: toastId }
+            );
         }
         setIsSubmitting(false);
     };
@@ -105,10 +178,10 @@ export default function AddCategoryModal({
                 >
                     <DialogHeader className="bg-linear-to-r from-[#DC3173] to-[#E95A9E] p-6 text-left space-y-1">
                         <DialogTitle className="text-xl font-bold text-white">
-                            {t("add_product_category")}
+                            {isEditMode ? t("edit_product_category") : t("add_product_category")}
                         </DialogTitle>
                         <DialogDescription className="text-pink-100 text-sm">
-                            {t("create_new_product_category")}
+                            {isEditMode ? t("update_existing_product_category") : t("create_new_product_category")}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -194,10 +267,12 @@ export default function AddCategoryModal({
                                 >
                                     {isSubmitting ? (
                                         <LoaderIcon className="w-4 h-4 mr-2 animate-spin" />
+                                    ) : isEditMode ? (
+                                        <Edit3 className="w-4 h-4 mr-2" />
                                     ) : (
                                         <PlusCircle className="w-4 h-4 mr-2" />
                                     )}
-                                    {t("save_category")}
+                                    {isEditMode ? t("update_category") : t("save_category")}
                                 </motion.button>
                             </div>
                         </form>

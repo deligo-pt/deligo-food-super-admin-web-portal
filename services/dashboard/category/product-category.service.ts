@@ -125,6 +125,29 @@ export const addAdminProductCategoryReq = async (data: any) => {
   return result;
 };
 
+// update admin product category
+export const updateAdminProductCategoryReq = async (categoryId: string, data: any) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(`/product-categories/${categoryId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("product-category", {});
+    if (data?.vendorId) {
+      revalidatePath(`/admin/vendor/${data.vendorId}`);
+    }
+  }
+
+  return result;
+};
+
 export const getAllProductCategories = async (queryString?: string) => {
   const url = `/product-categories${queryString ? `?${queryString}` : ""}`;
 
@@ -132,7 +155,6 @@ export const getAllProductCategories = async (queryString?: string) => {
     const res = await serverFetch.get(url, {
       next: {
         tags: ["product-category"],
-        revalidate: 30,
       },
     });
     return await res.json();

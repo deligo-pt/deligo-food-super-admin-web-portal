@@ -76,6 +76,7 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<TProductCategoryResponse | null>(null);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -148,10 +149,23 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
     }
   };
 
+  // Open modal for Creation
+  const handleOpenCreate = () => {
+    setSelectedCategory(null);
+    setIsCategoryModalOpen(true);
+  };
+
+  // Open modal for Editing
+  const handleOpenEdit = (category: TProductCategoryResponse) => {
+    setSelectedCategory(category);
+    setIsCategoryModalOpen(true);
+  };
+
   const categoryColumns = getProductCategoryColumns({
     t,
     lang,
-    router
+    router,
+    onEdit: handleOpenEdit,
   });
 
   return (
@@ -647,7 +661,7 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
               <div className="flex justify-between items-center mb-4">
                 <div className=""> </div>
                 <button
-                  onClick={() => setIsCategoryModalOpen(true)}
+                  onClick={handleOpenCreate}
                   className="flex items-center text-xs bg-[#DC3173] text-white px-3 py-1.5 rounded-md hover:bg-[#DC3173]/90 transition"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1" /> {t("add_category")}
@@ -747,11 +761,15 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
         </div>
       </motion.div >
 
-      {/* Render Modals */}
+      {/* Reused Modal for Add & Edit */}
       <AddCategoryModal
         isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
+        onClose={() => {
+          setIsCategoryModalOpen(false);
+          setSelectedCategory(null);
+        }}
         vendorId={vendor?._id}
+        initialData={selectedCategory}
         onSuccess={() => router.refresh()}
       />
 
