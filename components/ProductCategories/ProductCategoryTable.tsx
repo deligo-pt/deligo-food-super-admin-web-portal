@@ -99,7 +99,6 @@ export default function CategoryTable({ categoriesResult }: IProps) {
     t,
     lang,
     router,
-    setStatusInfo,
   });
 
   return (
