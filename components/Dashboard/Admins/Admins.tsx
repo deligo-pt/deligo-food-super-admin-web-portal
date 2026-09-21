@@ -131,6 +131,7 @@ export default function Admins({
       {/* Admin Table */}
       <AdminTable
         admins={adminsResult?.data || []}
+        meta={adminsResult?.meta as TMeta}
         handleStatusInfo={handleStatusInfo}
         handleDeleteId={handleDeleteId}
       />

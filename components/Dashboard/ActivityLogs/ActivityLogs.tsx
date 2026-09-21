@@ -10,6 +10,7 @@ import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { getActivityLogColumns } from "./activityLogsColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
     logsData: ActivityLogResponse;
@@ -55,6 +56,7 @@ export default function ActivityLogsPage({ logsData }: IProps) {
             >
                 <ReusableTable
                     data={logsList}
+                    meta={logsData?.meta as TMeta}
                     columns={columns}
                     getRowKey={(row) => row._id}
                     emptyMessage={t("no_logs_found")}

@@ -6,13 +6,15 @@ import { TSystemPermission } from "@/types/permission.type";
 import { useTranslation } from "@/hooks/use-translation";
 import { getPermissionsColumns } from "./PermissionsColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
     permissions: TSystemPermission[];
     onOpenEditModal?: (permission: TSystemPermission) => void;
+    meta: TMeta;
 }
 
-export default function PermissionsTable({ permissions = [], onOpenEditModal }: IProps) {
+export default function PermissionsTable({ permissions = [], onOpenEditModal, meta }: IProps) {
     const { t } = useTranslation();
     const router = useRouter();
 
@@ -31,6 +33,7 @@ export default function PermissionsTable({ permissions = [], onOpenEditModal }: 
         >
             <ReusableTable
                 data={permissions}
+                meta={meta}
                 columns={columns}
                 getRowKey={(row) => row._id}
                 emptyMessage={t("manage_view_all_admin_permissions")}

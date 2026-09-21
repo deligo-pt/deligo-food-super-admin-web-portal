@@ -6,9 +6,11 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TAdmin } from "@/types/admin.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { TMeta } from "@/types";
 
 interface IProps {
   admins: TAdmin[];
+  meta: TMeta;
   handleStatusInfo: (
     adminId: string,
     adminName: string,
@@ -19,6 +21,7 @@ interface IProps {
 
 export default function AdminTable({
   admins,
+  meta,
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
@@ -40,6 +43,7 @@ export default function AdminTable({
     >
       <ReusableTable
         data={admins}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_admins_found")}
