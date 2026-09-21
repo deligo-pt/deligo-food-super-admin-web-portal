@@ -482,7 +482,7 @@ export default function FleetManagerDetails({ agentData }: IProps) {
             icon={<BriefcaseIcon size={20} />}
             defaultOpen={true}
           >
-            <FleetRidersTable riders={data?.deliveryPartners || []} />
+            <FleetRidersTable riders={data?.deliveryPartners || []} meta={meta} />
             {!!meta?.total && meta?.total > 0 && (
               <div className="px-6 mt-4">
                 <PaginationComponent

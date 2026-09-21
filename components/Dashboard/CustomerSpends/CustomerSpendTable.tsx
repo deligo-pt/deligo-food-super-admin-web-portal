@@ -25,9 +25,6 @@ export default function CustomerSpendTable({ spends, meta }: IProps) {
     router,
   });
 
-  const currentPage = meta?.page || 1;
-  const pageSize = meta?.limit || 10;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -37,10 +34,10 @@ export default function CustomerSpendTable({ spends, meta }: IProps) {
     >
       <ReusableTable
         data={spends || []}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_spends_found")}
-        serialStart={(currentPage - 1) * pageSize + 1}
       />
     </motion.div>
   );
