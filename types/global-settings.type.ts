@@ -4,11 +4,13 @@ export type TGlobalSettings = {
   // Delivery Pricing
   delivery: {
     baseCharge: number;
-    chargePerKm: number;
     minCharge: number;
     maxCharge: number;
     freeAbove: number;
     maxDistanceKm: number;
+    chargePerKm: number;
+    distanceThresholdKm: number;
+    chargePerKmBeyondThreshold?: number;
     vatRate: number;
   };
 

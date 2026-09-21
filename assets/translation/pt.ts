@@ -2386,6 +2386,8 @@ export const pt = {
   configure_base_rates_distance:
     "Configurar tarifas base e cálculos de distância",
   base_charge: "Tarifa Base",
+  distanceThresholdKm: "Distância Limite (KM)",
+  chargePerKmBeyondThreshold: "Taxa por KM além do Limite",
   charge_per_km: "Cobrança por KM",
   min_charge: "Cobrança Mínima",
   max_charge: "Cobrança Máxima",

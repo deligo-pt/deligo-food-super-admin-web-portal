@@ -2356,6 +2356,8 @@ export const en = {
   configure_base_rates_distance:
     "Configure base rates and distance calculations",
   base_charge: "Base Charge",
+  distanceThresholdKm: "Threshold Distance KM",
+  chargePerKmBeyondThreshold: "Per KM charge beyond Threshold",
   charge_per_km: "Charge per KM",
   min_charge: "Min Charge",
   max_charge: "Max Charge",

@@ -117,7 +117,9 @@ export default function GlobalSettings({
     values: {
       // delivery
       deliveryChargePerKm: settings?.delivery?.chargePerKm || 0,
-      baseDeliveryCharge: settings?.delivery?.baseCharge || 0,
+      // baseDeliveryCharge: settings?.delivery?.baseCharge || 0,
+      chargePerKmBeyondThreshold: settings?.delivery?.chargePerKmBeyondThreshold || 0,
+      distanceThresholdKm: settings?.delivery?.distanceThresholdKm || 0,
       deliveryVatRate: settings?.delivery?.vatRate || 0,
 
       // commission
@@ -210,7 +212,9 @@ export default function GlobalSettings({
     const payload = {
       delivery: {
         chargePerKm: data.deliveryChargePerKm,
-        baseCharge: data.baseDeliveryCharge,
+        distanceThresholdKm: data.distanceThresholdKm,
+        ...(data?.chargePerKmBeyondThreshold && { chargePerKmBeyondThreshold: data.chargePerKmBeyondThreshold }),
+        // baseCharge: data.baseDeliveryCharge,
         vatRate: data.deliveryVatRate,
       },
       commission: {
@@ -418,7 +422,7 @@ export default function GlobalSettings({
                       delay={0}
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="baseDeliveryCharge"
                           render={({ field, fieldState }) => (
@@ -427,6 +431,50 @@ export default function GlobalSettings({
                                 <SettingsInput
                                   fieldState={fieldState}
                                   label={t("base_charge")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="€"
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        /> */}
+                        <FormField
+                          control={form.control}
+                          name="distanceThresholdKm"
+                          render={({ field, fieldState }) => (
+                            <FormItem>
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("distanceThresholdKm")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="km"
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="chargePerKmBeyondThreshold"
+                          render={({ field, fieldState }) => (
+                            <FormItem>
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("chargePerKmBeyondThreshold")}
                                   type="number"
                                   value={field.value}
                                   onChange={(e) =>
