@@ -31,7 +31,7 @@ export default function CustomerSpends({ customerSpendsResult }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Customer Spend Table */}
-      <CustomerSpendTable spends={customerSpendsResult?.data || []} />
+      <CustomerSpendTable spends={customerSpendsResult?.data || []} meta={customerSpendsResult?.meta as TMeta} />
 
       {/* Pagination */}
       {!!customerSpendsResult?.meta?.totalPage && (

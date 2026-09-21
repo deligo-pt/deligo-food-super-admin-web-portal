@@ -150,6 +150,7 @@ export default function PlatformEarnings({ platformsEarningsData }: IProps) {
 
           <PlatformEarningsTable
             commissions={platformsEarningsData?.data?.commissions}
+            meta={platformsEarningsData?.meta as TMeta}
           />
 
           {!!platformsEarningsData?.meta?.totalPage && (

@@ -7,14 +7,16 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ReusableTable from "@/components/common/ReusableTable";
 import { getPayoutColumns } from "./PayoutColumns";
+import { TMeta } from "@/types";
 
 
 interface IProps {
   payouts: TPayout[];
+  meta: TMeta;
   userRole: "VENDOR" | "FLEET_MANAGER" | "DELIVERY_PARTNER";
 }
 
-export default function PayoutTable({ payouts, userRole }: IProps) {
+export default function PayoutTable({ payouts, meta, userRole }: IProps) {
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -28,6 +30,7 @@ export default function PayoutTable({ payouts, userRole }: IProps) {
     >
       <ReusableTable
         data={payouts}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_payouts_found")}

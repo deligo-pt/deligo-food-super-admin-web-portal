@@ -39,6 +39,7 @@ export default function CustomerFeedback({ feedbackResult }: IProps) {
       {/* Feedback Table */}
       <CustomerFeedbackTable
         feedback={feedbackResult?.data || []}
+        meta={feedbackResult?.meta as TMeta}
         openDetailsSheet={(feedback: TRating) => setSelectedFeedback(feedback)}
       />
 

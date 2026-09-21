@@ -7,12 +7,14 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ReusableTable from "@/components/common/ReusableTable";
 import { getVendorPerformanceColumns } from "./VendorPerformanceColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   vendors: TVendorPerformance[];
+  meta: TMeta;
 }
 
-export default function VendorPerformanceTable({ vendors }: IProps) {
+export default function VendorPerformanceTable({ vendors, meta }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -32,6 +34,7 @@ export default function VendorPerformanceTable({ vendors }: IProps) {
       <div className="overflow-x-auto">
         <ReusableTable
           data={vendors}
+          meta={meta}
           columns={columns}
           getRowKey={(row) => row._id}
           emptyMessage={t("no_vendors_found")}

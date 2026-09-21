@@ -6,15 +6,18 @@ import { TIngredient } from "@/types/ingredient.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getIngredientColumns } from "./IngredientColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   ingredients: TIngredient[];
+  meta: TMeta;
   onEdit: (ingredient: TIngredient) => void;
   onDelete: (id: string, type: "soft" | "permanent") => void;
 }
 
 export default function IngredientTable({
   ingredients,
+  meta,
   onEdit,
   onDelete,
 }: IProps) {
@@ -36,6 +39,7 @@ export default function IngredientTable({
     >
       <ReusableTable
         data={ingredients}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_ingredients_found")}

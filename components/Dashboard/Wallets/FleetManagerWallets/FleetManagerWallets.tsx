@@ -32,7 +32,7 @@ export default function FleetManagerWallets({ walletsResult }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Wallet Table */}
-      <FleetManagerWalletTable wallets={walletsResult?.data || []} />
+      <FleetManagerWalletTable wallets={walletsResult?.data || []} meta={walletsResult?.meta as TMeta} />
 
       {/* Pagination */}
       {!!walletsResult?.meta?.totalPage && (

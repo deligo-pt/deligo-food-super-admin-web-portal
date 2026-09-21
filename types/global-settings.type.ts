@@ -4,11 +4,13 @@ export type TGlobalSettings = {
   // Delivery Pricing
   delivery: {
     baseCharge: number;
-    chargePerKm: number;
     minCharge: number;
     maxCharge: number;
     freeAbove: number;
     maxDistanceKm: number;
+    chargePerKm: number;
+    distanceThresholdKm: number;
+    chargePerKmBeyondThreshold?: number;
     vatRate: number;
   };
 
@@ -17,9 +19,10 @@ export type TGlobalSettings = {
     platformPercent: number;
     platformVatRate: number;
     fleetManagerPercent: number;
-    deliveryPartnerPercent: number;
-    vendorVatPercent: number;
+    // deliveryPartnerPercent: number;
+    // vendorVatPercent: number;
     serviceCharge: number;
+    serviceChargeVatRate: number;
   };
 
   // Order Rules & Automation
@@ -82,7 +85,9 @@ export type TGlobalSettings = {
   // ingredients order and delivery charges
   ingredientsOrder: {
     deliveryChargeInsideLisbon: number;
+    deliveryChargeInsideLisbonVatRate: number;
     deliveryChargeOutsideLisbon: number;
+    deliveryChargeOutsideLisbonVatRate: number;
     vatRate: number;
   };
 

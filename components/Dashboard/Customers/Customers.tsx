@@ -112,6 +112,7 @@ export default function Customers({
       {/* Customer Table */}
       <CustomerTable
         customers={customersResult?.data || []}
+        meta={customersResult?.meta as TMeta}
         handleStatusInfo={handleStatusInfo}
         handleDeleteId={handleDeleteId}
       />

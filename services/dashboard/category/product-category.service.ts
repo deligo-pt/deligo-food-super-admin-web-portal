@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TProductCategory } from "@/types/category.type";
 import { catchAsync } from "@/utils/catchAsync";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export const addProductCategoryReq = async (
   data: Partial<TProductCategory>,
@@ -98,4 +101,64 @@ export const getSingleProductCategoryReq = async (id: string, lang: "en" | "pt" 
   if (result?.success) return result.data;
 
   return {};
+};
+
+// create admin product category
+export const addAdminProductCategoryReq = async (data: any) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.post(`/product-categories/admin/create-product-category`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("product-category", {});
+    revalidatePath(`/admin/vendor/${data?.vendorId}`);
+  };
+
+
+  return result;
+};
+
+// update admin product category
+export const updateAdminProductCategoryReq = async (categoryId: string, data: any) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(`/product-categories/${categoryId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("product-category", {});
+    if (data?.vendorId) {
+      revalidatePath(`/admin/vendor/${data.vendorId}`);
+    }
+  }
+
+  return result;
+};
+
+export const getAllProductCategories = async (queryString?: string) => {
+  const url = `/product-categories${queryString ? `?${queryString}` : ""}`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["product-category"],
+      },
+    });
+    return await res.json();
+  });
+
+  return result;
 };

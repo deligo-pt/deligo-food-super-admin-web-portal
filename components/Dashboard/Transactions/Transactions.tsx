@@ -31,7 +31,7 @@ export default function Transactions({ transactionsResult }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Transaction Table */}
-      <TransactionTable transactions={transactionsResult?.data || []} />
+      <TransactionTable transactions={transactionsResult?.data || []} meta={transactionsResult?.meta as TMeta} />
 
       {/* Pagination */}
       {!!transactionsResult?.meta?.totalPage && (

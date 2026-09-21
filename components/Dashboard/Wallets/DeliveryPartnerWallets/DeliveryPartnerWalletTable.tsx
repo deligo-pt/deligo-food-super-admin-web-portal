@@ -6,12 +6,14 @@ import { TDeliveryPartnerWallet } from "@/types/wallet.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getDeliveryPartnerWalletColumns } from "./DeliveryPartnerWalletsColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   wallets: TDeliveryPartnerWallet[];
+  meta: TMeta;
 }
 
-export default function DeliveryPartnerWalletTable({ wallets }: IProps) {
+export default function DeliveryPartnerWalletTable({ wallets, meta }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -28,6 +30,7 @@ export default function DeliveryPartnerWalletTable({ wallets }: IProps) {
     >
       <ReusableTable
         data={wallets}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_wallets_found")}

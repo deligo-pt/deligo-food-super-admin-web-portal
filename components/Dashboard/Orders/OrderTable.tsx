@@ -11,12 +11,14 @@ import { refundOrderReq } from "@/services/dashboard/order/order.service";
 import { toast } from "sonner";
 import { useState } from "react";
 import RefundModal from "./RefundModal";
+import { TMeta } from "@/types";
 
 interface IProps {
   orders: TOrder[];
+  meta: TMeta;
 }
 
-export default function OrderTable({ orders }: IProps) {
+export default function OrderTable({ orders, meta }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const [orderId, setOrderId] = useState("");
@@ -54,6 +56,7 @@ export default function OrderTable({ orders }: IProps) {
     >
       <ReusableTable
         data={orders}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id as string}
         emptyMessage={t("no_orders_found")}

@@ -92,6 +92,7 @@ export default function Ingredients({ ingredientsData, taxes }: IProps) {
       {/* Ingredients Table */}
       <IngredientTable
         ingredients={ingredientsData.data || []}
+        meta={ingredientsData.meta as TMeta}
         onEdit={(ingredient: TIngredient) => setSelectedIngredient(ingredient)}
         // Pass both parameters down to the table layout
         onDelete={(id: string, type: "soft" | "permanent") => setDeleteConfig({ id, type })}

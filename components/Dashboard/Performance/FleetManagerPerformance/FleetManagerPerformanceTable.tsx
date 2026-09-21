@@ -6,13 +6,16 @@ import { motion } from "framer-motion";
 import { getFleetManagerPerformanceColumns } from "./FleetManagerPerformanceColumns";
 import ReusableTable from "@/components/common/ReusableTable";
 import { useRouter } from "next/navigation";
+import { TMeta } from "@/types";
 
 interface IProps {
   fleetManagers: TFleetManagerPerformance[];
+  meta: TMeta;
 }
 
 export default function FleetManagerPerformanceTable({
   fleetManagers,
+  meta
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -36,6 +39,7 @@ export default function FleetManagerPerformanceTable({
       <div className="overflow-x-auto">
         <ReusableTable
           data={fleetManagers}
+          meta={meta}
           columns={columns}
           getRowKey={(row) => row._id}
           emptyMessage={t("no_fleet_manager_found")}

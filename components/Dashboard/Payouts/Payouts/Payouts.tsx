@@ -62,7 +62,7 @@ export default function Payouts({
       />
 
       {/* Payouts Table */}
-      <PayoutTable payouts={payoutsResult?.data || []} userRole={userRole} />
+      <PayoutTable payouts={payoutsResult?.data || []} meta={payoutsResult?.meta as TMeta} userRole={userRole} />
 
       {/* Pagination */}
       {!!payoutsResult?.meta?.totalPage && (

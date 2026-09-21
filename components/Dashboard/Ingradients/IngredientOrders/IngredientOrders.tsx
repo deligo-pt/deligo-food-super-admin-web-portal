@@ -39,6 +39,7 @@ export default function IngredientOrders({ ingredientOrdersData }: IProps) {
       {/* Order Table */}
       <IngredientOrderTable
         orders={ingredientOrdersData?.data || []}
+        meta={ingredientOrdersData?.meta as TMeta}
       // onDeleteClick={(id: string) => setDeleteId(id)}
       />
 

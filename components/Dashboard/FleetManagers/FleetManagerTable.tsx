@@ -6,9 +6,11 @@ import { TAgent } from "@/types/user.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getFleetManagerColumns } from "./fleetColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   agents: TAgent[];
+  meta: TMeta;
   handleStatusInfo: (
     agentId: string,
     agentName: string,
@@ -19,6 +21,7 @@ interface IProps {
 
 export default function FleetManagerTable({
   agents,
+  meta,
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
@@ -40,6 +43,7 @@ export default function FleetManagerTable({
     >
       <ReusableTable
         data={agents || []}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_fleet_managers_found")}

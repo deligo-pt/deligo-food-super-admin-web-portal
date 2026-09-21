@@ -32,7 +32,7 @@ export default function VendorWallets({ walletsResult }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Wallet Table */}
-      <VendorWalletTable wallets={walletsResult?.data || []} />
+      <VendorWalletTable wallets={walletsResult?.data || []} meta={walletsResult?.meta as TMeta} />
 
       {/* Pagination */}
       {!!walletsResult?.meta?.totalPage && (

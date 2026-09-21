@@ -1,6 +1,6 @@
 "use server";
 
-import { USER_ROLE } from "@/consts/user.const";
+import { USER_ROLE, USER_STATUS } from "@/consts/user.const";
 import { serverRequest } from "@/lib/serverFetch";
 import { catchAsync } from "@/utils/catchAsync";
 
@@ -8,11 +8,14 @@ export const getAllUsersReq = async ({
   limit = 10,
   searchTerm = "",
   role,
+  status
 }: {
   limit: number;
   searchTerm: string;
   role: keyof typeof USER_ROLE;
+  status?: keyof typeof USER_STATUS;
 }) => {
+  const isDeleted = false;
   let endpoint: string = "";
 
   switch (role) {
@@ -35,7 +38,7 @@ export const getAllUsersReq = async ({
 
   const result = await catchAsync<unknown>(async () => {
     return await serverRequest.get(endpoint, {
-      params: { limit, ...(searchTerm ? { searchTerm } : {}) },
+      params: { limit, isDeleted, ...(searchTerm ? { searchTerm } : {}), ...(status ? { status } : {}) },
     });
   });
 
