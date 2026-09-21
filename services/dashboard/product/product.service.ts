@@ -127,3 +127,49 @@ export const updateAddOnsGroup = async (id: string, data: Partial<TAddonGroup>) 
 
   return result;
 };
+
+// Toggle add-on option status API
+export const toggleAddOnOptionStatus = async (addonGroupId: string, data: { optionSku: string }, vendorId?: string) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(`/add-ons/${addonGroupId}/toggle-option-status`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("addons", {});
+    if (vendorId) {
+      revalidatePath(`/admin/vendor/${vendorId}`);
+    }
+  }
+
+  return result;
+};
+
+// Delete add-on option API
+export const deleteAddOnOption = async (addonGroupId: string, data: { optionSku: string }, vendorId?: string) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.delete(`/add-ons/${addonGroupId}/delete-option`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("addons", {});
+    if (vendorId) {
+      revalidatePath(`/admin/vendor/${vendorId}`);
+    }
+  }
+
+  return result;
+};

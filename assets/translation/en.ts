@@ -367,6 +367,7 @@ export const en = {
   option_tax: "Option Tax",
   add_group: "Add Group",
   max: "Max",
+  min_lg: "Min",
   add_addon: "Add Add-On",
   no_add_ons_found: "No add ons found",
   addon_group: "Addon Group",
@@ -381,6 +382,11 @@ export const en = {
   add_option: "Add Option",
   is_active: "Active Status",
   save_category: "Save Category",
+  update_existing_product_category: "Update existing product category",
+  update_category: "Update Category",
+  deleting_option: "Deleting option...",
+  updating_status: "Updating status...",
+
   // add-new-item page
   add_new_item: "Add New Item",
   fill_the_details_to_add_new_food_item:
@@ -442,7 +448,7 @@ export const en = {
   add_variation: "Add Variation",
   quantity: "Quantity",
   unit: "Unit",
-  add_ons:"Add-ons",
+  add_ons: "Add-ons",
   deligo_metadata: "Deligo Metadata",
   deligo_metadata_information: "Deligo Metadata Information",
   featured_product: "Featured Product",

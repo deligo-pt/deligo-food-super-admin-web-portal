@@ -295,11 +295,7 @@ export function AddProductToVendor({
                             className="px-6 py-2 bg-[#DC3173] hover:bg-[#B02458] text-white rounded-lg flex items-center space-x-2 shadow-lg shadow-pink-200/50 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             <SaveIcon className="h-5 w-5" />
-                            {lang === "en" ? (
-                                <span>Translate to PT and Save Product</span>
-                            ) : (
-                                <span>{t("translate_en")}</span>
-                            )}
+                            <span>{t("save_product")}</span>
                         </motion.button>
                     }
                 />
