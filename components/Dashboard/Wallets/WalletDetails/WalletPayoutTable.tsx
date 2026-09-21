@@ -5,12 +5,14 @@ import { TPayout } from "@/types/payout.type";
 import { motion } from "framer-motion";
 import { getWalletPayoutColumns } from "./WalletPayoutColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
   payouts: TPayout[];
+  meta: TMeta;
 }
 
-export default function WalletPayoutTable({ payouts }: IProps) {
+export default function WalletPayoutTable({ payouts, meta }: IProps) {
   const { t } = useTranslation();
 
   const columns = getWalletPayoutColumns({
@@ -25,6 +27,7 @@ export default function WalletPayoutTable({ payouts }: IProps) {
     >
       <ReusableTable
         data={payouts}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_payouts_found")}
