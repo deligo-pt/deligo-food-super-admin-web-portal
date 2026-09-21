@@ -4,18 +4,23 @@
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
 import AgentOrVendorSection from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
 import { DocumentViewer } from "@/components/common/DocumentViewer";
+import ReusableTable from "@/components/common/ReusableTable";
 import VendorDetailsDoc, {
   IVendorDocs,
 } from "@/components/Dashboard/Vendors/VendorDetails/VendorDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import VerifyOtpModal from "@/components/Modals/VerifyOtpModal";
+import { getProductCategoryColumns } from "@/components/ProductCategories/productCategoryColumns";
 import { Button } from "@/components/ui/button";
 import { USER_ROLE, USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { resendOtpReq } from "@/services/auth/otp.service";
 import { useStore } from "@/store/store";
+import { TMeta } from "@/types";
+import { TAddonGroup } from "@/types/add-ons.type";
+import { TProductCategoryResponse } from "@/types/category.type";
 import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
 import { format, parse } from "date-fns";
@@ -31,6 +36,7 @@ import {
   EditIcon,
   FileTextIcon,
   MapPinIcon,
+  Plus,
   TicketIcon,
   TrashIcon,
   UserIcon,
@@ -41,13 +47,26 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import AddCategoryModal from "./AddCategoryModal";
+import { TTax } from "@/types/tax.type";
+import AddOnsManagementSection from "./AddonsManagementSection";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 
 interface IProps {
   vendor: TVendor;
   offerData: TOffer[];
+  categoriesResult: {
+    data: TProductCategoryResponse[];
+    meta: TMeta;
+  };
+  addonGroupsResult: {
+    data: TAddonGroup[];
+    meta: TMeta;
+  };
+  taxes: TTax[];
 }
 
-export default function VendorDetails({ vendor, offerData }: IProps) {
+export default function VendorDetails({ vendor, offerData, categoriesResult, addonGroupsResult, taxes }: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
   const router = useRouter();
@@ -56,6 +75,8 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<TProductCategoryResponse | null>(null);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -127,6 +148,25 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
       setIsSubmitting(false);
     }
   };
+
+  // Open modal for Creation
+  const handleOpenCreate = () => {
+    setSelectedCategory(null);
+    setIsCategoryModalOpen(true);
+  };
+
+  // Open modal for Editing
+  const handleOpenEdit = (category: TProductCategoryResponse) => {
+    setSelectedCategory(category);
+    setIsCategoryModalOpen(true);
+  };
+
+  const categoryColumns = getProductCategoryColumns({
+    t,
+    lang,
+    router,
+    onEdit: handleOpenEdit,
+  });
 
   return (
     <div>
@@ -611,6 +651,53 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               </div>
             )}
           </AgentOrVendorSection>
+          {/* 1. Product Categories Section */}
+          <AgentOrVendorSection
+            title={t("product_categories")}
+            icon={<TicketIcon size={20} />}
+            defaultOpen={true}
+          >
+            <div className="bg-white rounded-xl shadow-sm border p-4 my-4">
+              <div className="flex justify-between items-center mb-4">
+                <div className=""> </div>
+                <button
+                  onClick={handleOpenCreate}
+                  className="flex items-center text-xs bg-[#DC3173] text-white px-3 py-1.5 rounded-md hover:bg-[#DC3173]/90 transition"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> {t("add_category")}
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <ReusableTable
+                  data={categoriesResult?.data || []}
+                  meta={categoriesResult?.meta as TMeta}
+                  columns={categoryColumns}
+                  getRowKey={(row) => row._id}
+                  emptyMessage={t("no_categories_found")}
+                />
+              </div>
+
+              {!!categoriesResult?.meta?.totalPage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-4 md:px-6 pt-6 pb-2"
+                >
+                  <PaginationComponent
+                    totalPages={categoriesResult?.meta?.totalPage as number}
+                  />
+                </motion.div>
+              )}
+            </div>
+          </AgentOrVendorSection>
+
+          {/* 2. Addon Groups Section */}
+          <AddOnsManagementSection
+            addonGroupsResult={addonGroupsResult}
+            vendorId={vendor?._id}
+            taxes={taxes}
+            t={t}
+          />
         </div>
 
         {/* buttons */}
@@ -641,12 +728,20 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
               />
             )}
             {vendor.status === "APPROVED" && (
-              <ActionButton
-                onClick={() => setApproveStatus("BLOCKED")}
-                label={t("block")}
-                icon={<BanIcon size={18} />}
-                variant="warning"
-              />
+              <>
+                <ActionButton
+                  onClick={() => router.push(`/admin/vendor/${vendor?.userId}/add-product`)}
+                  label={t("add_product")}
+                  icon={<EditIcon size={18} />}
+                  variant="primary"
+                />
+                <ActionButton
+                  onClick={() => setApproveStatus("BLOCKED")}
+                  label={t("block")}
+                  icon={<BanIcon size={18} />}
+                  variant="warning"
+                />
+              </>
             )}
             {vendor.status === "BLOCKED" && (
               <ActionButton
@@ -665,6 +760,18 @@ export default function VendorDetails({ vendor, offerData }: IProps) {
           </div>
         </div>
       </motion.div >
+
+      {/* Reused Modal for Add & Edit */}
+      <AddCategoryModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => {
+          setIsCategoryModalOpen(false);
+          setSelectedCategory(null);
+        }}
+        vendorId={vendor?._id}
+        initialData={selectedCategory}
+        onSuccess={() => router.refresh()}
+      />
 
       {/* Verify unverified rider */}
       < VerifyOtpModal

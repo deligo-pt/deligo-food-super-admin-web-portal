@@ -6,12 +6,14 @@ import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getFleetRidersColumns } from "./FleetRidersColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
     riders: Partial<TDeliveryPartner>[];
+    meta: TMeta;
 }
 
-export default function FleetRidersTable({ riders }: IProps) {
+export default function FleetRidersTable({ riders, meta }: IProps) {
     const { t } = useTranslation();
     const router = useRouter();
 
@@ -28,6 +30,7 @@ export default function FleetRidersTable({ riders }: IProps) {
         >
             <ReusableTable
                 data={riders}
+                meta={meta}
                 columns={columns}
                 getRowKey={(row) => row.userId as string}
                 emptyMessage={t("no_riders_registered_yet")}

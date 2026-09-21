@@ -108,6 +108,7 @@ export default function DeliveryPartners({
       {/* Partner Table */}
       <DeliveryPartnerTable
         partners={partnersResult?.data || []}
+        meta={partnersResult?.meta as TMeta}
         handleStatusInfo={handleStatusInfo}
         handleApproveInfo={handleApproveInfo}
         handleDeleteId={handleDeleteId}

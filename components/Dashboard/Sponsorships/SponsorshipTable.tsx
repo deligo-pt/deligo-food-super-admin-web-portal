@@ -6,15 +6,18 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getSponsorshipColumns } from "./SponsorshipColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
   sponsorships: TSponsorship[];
+  meta: TMeta;
   handleDeleteId: (id: string) => void;
   handleOpenEditModal: (sponsorship: TSponsorship) => void;
 }
 
 export default function SponsorshipTable({
   sponsorships,
+  meta,
   handleDeleteId,
   handleOpenEditModal,
 }: IProps) {
@@ -36,6 +39,7 @@ export default function SponsorshipTable({
     >
       <ReusableTable
         data={sponsorships}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_sponsorships_found")}

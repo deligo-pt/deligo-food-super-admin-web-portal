@@ -6,12 +6,14 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getDeliveryPartnerPerformanceColumns } from "./DeliveryPartnerPerformanceColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
   partners: TDeliveryPartnerPerformance[];
+  meta: TMeta;
 }
 
-export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
+export default function DeliveryPartnerPerformanceTable({ partners, meta }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -19,7 +21,6 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
     t,
     router,
   });
-
 
   return (
     <motion.div
@@ -35,6 +36,7 @@ export default function DeliveryPartnerPerformanceTable({ partners }: IProps) {
       <div className="overflow-x-auto">
         <ReusableTable
           data={partners}
+          meta={meta}
           columns={columns}
           getRowKey={(row) => row._id as string}
           emptyMessage={t("no_delivery_partner_found")}

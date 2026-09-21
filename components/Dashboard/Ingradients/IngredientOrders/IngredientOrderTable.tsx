@@ -8,13 +8,15 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getIngredientOrderColumns } from "./IngredientOrdersColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
   orders: TIngredientOrder[];
+  meta: TMeta;
   // onDeleteClick: (id: string) => void;
 }
 
-export default function IngredientOrderTable({ orders }: IProps) {
+export default function IngredientOrderTable({ orders, meta }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -63,6 +65,7 @@ export default function IngredientOrderTable({ orders }: IProps) {
     >
       <ReusableTable
         data={orders}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_orders_found")}

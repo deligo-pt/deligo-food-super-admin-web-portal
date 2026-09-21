@@ -126,6 +126,7 @@ export default function Taxes({ taxesResult }: IProps) {
       {/* Tax Table */}
       <TaxTable
         taxes={taxesResult?.data}
+        meta={taxesResult?.meta as TMeta}
         onEditClick={(tax: TTax) => setEditTax(tax)}
         onStatusChange={handleUpdateStatus}
         onDeleteClick={(id: string) => setDeleteId(id)}

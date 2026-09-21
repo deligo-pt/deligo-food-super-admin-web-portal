@@ -49,7 +49,7 @@ const Permissions = ({
             />
 
             {/* Agreements Table */}
-            <PermissionsTable permissions={permissionsResult?.data || []} onOpenEditModal={handleOpenEdit} />
+            <PermissionsTable permissions={permissionsResult?.data || []} onOpenEditModal={handleOpenEdit} meta={permissionsResult?.meta as TMeta} />
 
             {/* Pagination */}
             {!!permissionsResult?.meta?.totalPage && (

@@ -6,15 +6,18 @@ import { TRestrictedItem } from "@/types/product.type";
 import { motion } from "framer-motion";
 
 import { getRestrictedItemColumns } from "./RestrictedItemsColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   restrictedItems: TRestrictedItem[];
+  meta: TMeta;
   onEdit: (item: TRestrictedItem) => void;
   onDelete: (id: string) => void;
 }
 
 export default function RestrictedItemTable({
   restrictedItems,
+  meta,
   onEdit,
   onDelete,
 }: IProps) {
@@ -34,6 +37,7 @@ export default function RestrictedItemTable({
     >
       <ReusableTable
         data={restrictedItems}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_restricted_items_found")}

@@ -28,7 +28,7 @@ export default function LoyaltyPoints({ pointsResult }: IProps) {
       <AllFilters sortOptions={sortOptions} />
 
       {/* Loyalty Points Table */}
-      <LoyaltyPointTable points={pointsResult?.data} />
+      <LoyaltyPointTable points={pointsResult?.data} meta={pointsResult?.meta as TMeta} />
     </div>
   );
 }

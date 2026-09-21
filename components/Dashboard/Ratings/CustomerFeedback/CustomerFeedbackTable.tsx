@@ -5,14 +5,17 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TRating } from "@/types/rating.type";
 import { motion } from "framer-motion";
 import { getCustomerFeedbackColumns } from "./CustomerFeedbackColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   feedback: TRating[];
+  meta: TMeta;
   openDetailsSheet: (feedback: TRating) => void;
 }
 
 export default function CustomerFeedbackTable({
   feedback,
+  meta,
   openDetailsSheet,
 }: IProps) {
   const { t } = useTranslation();
@@ -22,7 +25,6 @@ export default function CustomerFeedbackTable({
     openDetailsSheet,
   });
 
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,6 +33,7 @@ export default function CustomerFeedbackTable({
     >
       <ReusableTable
         data={feedback}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_feedback_found")}

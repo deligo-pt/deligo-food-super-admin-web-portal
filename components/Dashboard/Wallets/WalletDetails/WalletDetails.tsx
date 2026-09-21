@@ -136,7 +136,7 @@ export default function WalletDetails({ wallet, payoutsData }: IProps) {
               </div>
             </div>
 
-            <WalletPayoutTable payouts={payoutsData.data} />
+            <WalletPayoutTable payouts={payoutsData.data} meta={payoutsData.meta as TMeta} />
 
             {!!payoutsData?.meta?.totalPage && (
               <div>

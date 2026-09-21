@@ -6,12 +6,14 @@ import { IAgreement } from "@/types/agreement.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getAgreementColumns } from "./AgreementColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
     agreements: IAgreement[];
+    meta: TMeta;
 }
 
-export default function AgreementsTable({ agreements }: IProps) {
+export default function AgreementsTable({ agreements, meta }: IProps) {
     const { t } = useTranslation();
     const router = useRouter();
 
@@ -28,6 +30,7 @@ export default function AgreementsTable({ agreements }: IProps) {
         >
             <ReusableTable
                 data={agreements}
+                meta={meta}
                 columns={columns}
                 getRowKey={(row) => row._id}
                 emptyMessage={t("no_agreements_found")}

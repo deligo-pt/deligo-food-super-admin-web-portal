@@ -6,9 +6,11 @@ import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getDeliveryPartnerColumns } from "./deliveryPartnerColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   partners: TDeliveryPartner[];
+  meta: TMeta;
   handleStatusInfo: (
     partnerId: string,
     partnerName: string,
@@ -25,6 +27,7 @@ interface IProps {
 
 export default function DeliveryPartnerTable({
   partners,
+  meta,
   handleStatusInfo,
   handleApproveInfo,
   handleDeleteId,
@@ -48,6 +51,7 @@ export default function DeliveryPartnerTable({
     >
       <ReusableTable
         data={partners || []}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id as string}
         emptyMessage={t("no_partners_found")}

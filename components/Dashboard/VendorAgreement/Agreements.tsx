@@ -54,7 +54,7 @@ export default function Agreements({
             />
 
             {/* Agreements Table */}
-            <AgreementsTable agreements={agreementsResult?.data || []} />
+            <AgreementsTable agreements={agreementsResult?.data || []} meta={agreementsResult?.meta as TMeta} />
 
             {/* Pagination */}
             {!!agreementsResult?.meta?.totalPage && (

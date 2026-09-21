@@ -5,12 +5,14 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TLoyaltyPoint } from "@/types/loyalty-point.type";
 import { motion } from "framer-motion";
 import { getLoyaltyPointColumns } from "./LoyaltyPointColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   points: TLoyaltyPoint[];
+  meta: TMeta;
 }
 
-export default function LoyaltyPointTable({ points }: IProps) {
+export default function LoyaltyPointTable({ points, meta }: IProps) {
   const { t } = useTranslation();
 
   const columns = getLoyaltyPointColumns({
@@ -25,6 +27,7 @@ export default function LoyaltyPointTable({ points }: IProps) {
     >
       <ReusableTable
         data={points}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_point_found")}

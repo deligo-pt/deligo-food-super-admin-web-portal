@@ -278,6 +278,7 @@ export function VendorPerformance({ vendorPerformanceData }: IProps) {
       {/* Vendor Performance Table */}
       <VendorPerformanceTable
         vendors={vendorPerformanceData.data?.vendorPerformance}
+        meta={vendorPerformanceData?.meta as TMeta}
       />
 
       {/* Pagination */}

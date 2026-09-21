@@ -6,9 +6,13 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getVendorColumns } from "./VendorColumns";
 import ReusableTable from "@/components/common/ReusableTable";
+import { TMeta } from "@/types";
 
 interface IProps {
-  vendors: TVendor[];
+  vendorsResult: {
+    vendors: TVendor[];
+    meta: TMeta;
+  };
   handleStatusInfo: (
     vendorId: string,
     vendorName: string,
@@ -18,7 +22,7 @@ interface IProps {
 }
 
 export default function VendorTable({
-  vendors,
+  vendorsResult,
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
@@ -39,7 +43,8 @@ export default function VendorTable({
       className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
     >
       <ReusableTable
-        data={vendors}
+        data={vendorsResult?.vendors}
+        meta={vendorsResult?.meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_vendors_found")}

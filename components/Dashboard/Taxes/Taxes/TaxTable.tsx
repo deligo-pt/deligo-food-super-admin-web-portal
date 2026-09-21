@@ -7,9 +7,11 @@ import { TTax } from "@/types/tax.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getTaxColumns } from "./TaxColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   taxes: TTax[];
+  meta: TMeta;
   onEditClick: (tax: TTax) => void;
   onStatusChange: (id: string, status: boolean) => void;
   onDeleteClick: (id: string) => void;
@@ -18,6 +20,7 @@ interface IProps {
 
 export default function TaxTable({
   taxes,
+  meta,
   onEditClick,
   onStatusChange,
   onDeleteClick,
@@ -45,6 +48,7 @@ export default function TaxTable({
     >
       <ReusableTable
         data={taxes}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_tax_found")}

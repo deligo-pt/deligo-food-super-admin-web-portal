@@ -72,6 +72,7 @@ export default function RestrictedItems({ restrictedItemsData }: IProps) {
       {/* Item Table */}
       <RestrictedItemTable
         restrictedItems={restrictedItemsData?.data || []}
+        meta={restrictedItemsData?.meta as TMeta}
         onEdit={(item) => setEditItem(item)}
         onDelete={(id) => setDeleteId(id)}
       />

@@ -99,7 +99,6 @@ export default function CategoryTable({ categoriesResult }: IProps) {
     t,
     lang,
     router,
-    setStatusInfo,
   });
 
   return (
@@ -113,6 +112,7 @@ export default function CategoryTable({ categoriesResult }: IProps) {
       >
         <ReusableTable
           data={categoriesResult?.data || []}
+          meta={categoriesResult?.meta as TMeta}
           columns={columns}
           getRowKey={(row) => row._id}
           emptyMessage={t("no_categories_found")}

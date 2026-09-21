@@ -5,12 +5,14 @@ import { useTranslation } from "@/hooks/use-translation";
 import { TPlaformEarningsData } from "@/types/payment.type";
 import { motion } from "framer-motion";
 import { getPlatformEarningsColumns } from "./PlatformEarningsColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   commissions: TPlaformEarningsData["commissions"];
+  meta: TMeta;
 }
 
-export default function PlatformEarningsTable({ commissions }: IProps) {
+export default function PlatformEarningsTable({ commissions, meta }: IProps) {
   const { t } = useTranslation();
 
   const columns = getPlatformEarningsColumns({
@@ -25,6 +27,7 @@ export default function PlatformEarningsTable({ commissions }: IProps) {
     >
       <ReusableTable
         data={commissions}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id}
         emptyMessage={t("no_commissions_found")}

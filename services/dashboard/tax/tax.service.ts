@@ -1,5 +1,6 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TTax } from "@/types/tax.type";
@@ -77,4 +78,21 @@ export const getAllTaxesReq = async (
   return {
     data: [],
   };
+};
+
+
+export const getAllTaxes = async (queryString?: string) => {
+  const url = `/taxes${queryString ? `?${queryString}` : ""}`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["taxes"],
+        revalidate: 30,
+      },
+    });
+    return await res.json();
+  });
+
+  return result;
 };

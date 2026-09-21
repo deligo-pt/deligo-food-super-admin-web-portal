@@ -6,9 +6,11 @@ import { TCustomer } from "@/types/user.type";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { getCustomerColumns } from "./customerColumns";
+import { TMeta } from "@/types";
 
 interface IProps {
   customers: TCustomer[];
+  meta: TMeta;
   handleStatusInfo: (
     customerId: string,
     customerName: string,
@@ -19,6 +21,7 @@ interface IProps {
 
 export default function CustomerTable({
   customers,
+  meta,
   handleStatusInfo,
   handleDeleteId,
 }: IProps) {
@@ -41,6 +44,7 @@ export default function CustomerTable({
     >
       <ReusableTable
         data={customers || []}
+        meta={meta}
         columns={columns}
         getRowKey={(row) => row._id as string}
         emptyMessage={t("no_customers_found")}

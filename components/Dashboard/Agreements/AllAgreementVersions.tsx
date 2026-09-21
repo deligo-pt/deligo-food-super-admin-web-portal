@@ -56,7 +56,7 @@ const AllAgreementVersions = ({ agreeVersionsData }: IProps) => {
 
             {/* Agreement Versions Table */}
             <AgreementVersionsTable
-                agreements={agreeVersionsData?.data}
+                agreements={agreeVersionsData}
             />
 
             {/* Pagination */}
