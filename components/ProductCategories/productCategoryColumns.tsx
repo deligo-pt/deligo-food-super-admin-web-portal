@@ -10,7 +10,6 @@ import { TProductCategoryResponse } from "@/types/category.type";
 import {
     CircleCheckBig,
     Cog,
-    InfoIcon,
     ListIcon,
     MoreVertical,
 } from "lucide-react";
@@ -24,7 +23,7 @@ interface GetProductCategoryColumnsParams {
     t: TFunction;
     lang: string;
     router: AppRouterInstance;
-    setStatusInfo: (info: {
+    setStatusInfo?: (info: {
         categoryId: string;
         isActive?: boolean;
         isDeleted?: boolean;
@@ -63,28 +62,6 @@ export function getProductCategoryColumns({
                     </div>
                 );
             },
-        },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <InfoIcon className="w-4" />
-                    {t("business_type")}
-                </div>
-            ),
-            accessor: (category) =>
-                category?.businessCategoryId?.name?.[lang as 'en' | 'pt'] || "N/A",
-        },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <InfoIcon className="w-4" />
-                    {t("description")}
-                </div>
-            ),
-            accessor: (category) =>
-                category?.description && category.description.length > 70
-                    ? category.description.slice(0, 70) + "...."
-                    : category?.description || "N/A",
         },
         {
             header: (
@@ -141,7 +118,7 @@ export function getProductCategoryColumns({
                             <>
                                 <DropdownMenuItem
                                     onClick={() =>
-                                        setStatusInfo({
+                                        setStatusInfo?.({
                                             categoryId: category._id as string,
                                             isDeleted: true,
                                             field: "isDeleted",
@@ -153,7 +130,7 @@ export function getProductCategoryColumns({
 
                                 <DropdownMenuItem
                                     onClick={() =>
-                                        setStatusInfo({
+                                        setStatusInfo?.({
                                             categoryId: category._id as string,
                                             isActive: !category.isActive,
                                             field: "isActive",

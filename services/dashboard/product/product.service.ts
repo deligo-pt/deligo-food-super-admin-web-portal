@@ -1,8 +1,11 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
+import { TAddonGroup } from "@/types/add-ons.type";
 import { TProduct } from "@/types/product.type";
 import { catchAsync } from "@/utils/catchAsync";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export const deleteProductReq = async (id: string) => {
   return catchAsync<null>(async () => {
@@ -55,4 +58,72 @@ export const getAllProductsReq = async (
   // return {
   //   data: [],
   // };
+};
+
+export const deleteProductImage = async (productId: string, payload: { images: string[] }) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.delete(`/products/${productId}/images`, {
+      data: payload
+    });
+  });
+};
+
+// addon groups related
+export const getAllAddOnsGroup = async (queryString?: string) => {
+  const url = `/add-ons${queryString ? `?${queryString}` : ""}`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["addons"],
+      },
+    });
+    return await res.json();
+  });
+
+  return result;
+};
+
+
+// create addon groups
+export const createAdminAddonGroupReq = async (data: Partial<TAddonGroup>) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.post(`/add-ons/admin/create-group`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("addons", {});
+    revalidatePath(`/admin/vendor/${data?.vendorId}`);
+  };
+
+
+  return result;
+};
+
+export const updateAddOnsGroup = async (id: string, data: Partial<TAddonGroup>) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(`/add-ons/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("addons", {});
+    revalidatePath(`/admin/vendor/${data?.vendorId}`);
+  };
+
+
+  return result;
 };
