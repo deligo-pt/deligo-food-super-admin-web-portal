@@ -2,6 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
+  AreaChart,
   BadgeEuro,
   Bike,
   ChartNoAxesCombined,
@@ -161,6 +162,21 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         {
           name: t("rider_wallets"),
           path: "/admin/delivery-partner-wallets",
+        },
+      ],
+    },
+    {
+      id: "zones",
+      title: t("zone_management"),
+      icon: <AreaChart size={18} />,
+      items: [
+        {
+          name: t("create_zone"),
+          path: "/admin/zones/create",
+        },
+        {
+          name: t("all_zones"),
+          path: "/admin/zones",
         },
       ],
     },
