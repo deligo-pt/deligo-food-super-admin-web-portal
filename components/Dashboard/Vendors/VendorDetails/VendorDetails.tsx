@@ -51,6 +51,7 @@ import AddCategoryModal from "./AddCategoryModal";
 import { TTax } from "@/types/tax.type";
 import AddOnsManagementSection from "./AddonsManagementSection";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 
 interface IProps {
   vendor: TVendor;
@@ -610,6 +611,9 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
             icon={<TicketIcon size={20} />}
             defaultOpen={true}
           >
+            <TitleHeader
+              title={t("created_offers")}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {offerData?.map((offer) => (
                 <div
@@ -658,16 +662,15 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
             icon={<TicketIcon size={20} />}
             defaultOpen={true}
           >
+            <TitleHeader
+              title={t("product_categories")}
+              buttonInfo={{
+                text: t("add_category"),
+                icon: Plus,
+                onClick: handleOpenCreate
+              }}
+            />
             <div className="bg-white rounded-xl shadow-sm border p-4 my-4">
-              <div className="flex justify-between items-center mb-4">
-                <div className=""> </div>
-                <button
-                  onClick={handleOpenCreate}
-                  className="flex items-center text-xs bg-[#DC3173] text-white px-3 py-1.5 rounded-md hover:bg-[#DC3173]/90 transition"
-                >
-                  <Plus className="w-3.5 h-3.5 mr-1" /> {t("add_category")}
-                </button>
-              </div>
               <div className="overflow-x-auto">
                 <ReusableTable
                   data={categoriesResult?.data || []}
