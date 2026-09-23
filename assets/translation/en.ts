@@ -458,6 +458,22 @@ export const en = {
   basic_info: "Basic Info",
   images: "Images",
   meta: "Meta",
+  // apply decrease
+  update_discounts: "Update Discounts",
+  increase_prices: "Increase Prices",
+  manage_products: "Manage Products",
+  apply_price_decrease: "Apply Price Decrease",
+  decrease_any_products_if_you_want: "Decrease any products if you want",
+  select_categories_or_individual: "Select categories or individual products",
+  partial: "Partial",
+  uncategorized: 'Uncategorized',
+  base: "Base",
+  final: "Final",
+  manage_your_restaurants_food_delivery_items: "Manage your restaurant's food delivery catalog",
+
+  // apply increase
+  apply_price_increase: "Apply Price Increase",
+  update_the_base_price_your_products: "Update the base price of your products",
 
   // approve or reject modal
   are_you_sure_want_approve: "Are you sure you want to approve?",

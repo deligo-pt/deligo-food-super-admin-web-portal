@@ -68,7 +68,128 @@ export const deleteProductImage = async (productId: string, payload: { images: s
   });
 };
 
-// addon groups related
+export const getAllProducts = async (queryString?: string) => {
+  const url = `/products${queryString ? `?${queryString}` : ""}`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["products"],
+      },
+    });
+    return await res.json();
+  });
+
+  return result;
+};
+
+export const updateProduct = async (productId: string, data: Partial<TProduct>) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(`/products/${productId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+    revalidatePath(`/admin/vendor/${data?.vendorId}`);
+  };
+
+
+  return result;
+};
+
+export const updateProductPriceStock = async (productId: string, newPrice: number) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(`/products/update-inventory-and-pricing/${productId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ newPrice }),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+  };
+
+
+  return result;
+};
+
+export const applyIncreaseDecrease = async (
+  payload: {
+    type: "INCREASE" | "DECREASE",
+    percentage: number,
+    productIds: string[],
+  },
+) => {
+  const result = await catchAsync(async () => {
+    const response = await serverFetch.patch(`/products/adjust-price`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    return await response.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+  }
+
+  return result;
+};
+
+
+export const deleteProduct = async (id: string) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.delete(`/products/soft-delete/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+  }
+
+  return result;
+};
+
+export const permanentDeleteProduct = async (id: string) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.delete(`/products/permanent-delete/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+  }
+
+  return result;
+};
+
+/**
+ * add ons related apis
+ */
+// get all addon groups
 export const getAllAddOnsGroup = async (queryString?: string) => {
   const url = `/add-ons${queryString ? `?${queryString}` : ""}`;
 
@@ -83,7 +204,6 @@ export const getAllAddOnsGroup = async (queryString?: string) => {
 
   return result;
 };
-
 
 // create addon groups
 export const createAdminAddonGroupReq = async (data: Partial<TAddonGroup>) => {
