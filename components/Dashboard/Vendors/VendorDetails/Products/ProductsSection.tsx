@@ -152,6 +152,7 @@ export default function ProductsSection({
             <TitleHeader
                 title={t("food_items")}
                 subtitle={t("manage_your_restaurants_food_delivery_items")}
+                onBackClick={() => router.back()}
                 extraComponent={
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -170,11 +171,11 @@ export default function ProductsSection({
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                                onClick={() => router.push(`/admin/vendor/${vendorId}/products/update_discount`)}
+                                onClick={() => router.push(`/admin/vendor/${vendorId}/products/update-discount`)}
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
                                 <Percent className="w-4 h-4 mr-2 text-[#DC3173]" />
-                                {t("update_discount") || "Update Discount"}
+                                {t("update_discounts") || "Update Discount"}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -182,7 +183,7 @@ export default function ProductsSection({
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
                                 <TrendingUp className="w-4 h-4 mr-2 text-[#DC3173]" />
-                                {t("increase_price") || "Increase Price"}
+                                {t("increase_prices") || "Increase Price"}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -238,7 +239,7 @@ export default function ProductsSection({
                     <div className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1">
                         <div
                             ref={scrollContainerRef}
-                            className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1"
+                            className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1 no-scrollbar"
                         >
                             {groupedProducts.map((group) => {
                                 const id = group.category?._id || "uncategorized";

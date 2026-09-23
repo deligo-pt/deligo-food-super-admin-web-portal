@@ -124,6 +124,32 @@ export const updateProductPriceStock = async (productId: string, newPrice: numbe
   return result;
 };
 
+export const applyIncreaseDecrease = async (
+  payload: {
+    type: "INCREASE" | "DECREASE",
+    percentage: number,
+    productIds: string[],
+  },
+) => {
+  const result = await catchAsync(async () => {
+    const response = await serverFetch.patch(`/products/adjust-price`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    return await response.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+  }
+
+  return result;
+};
+
+
 export const deleteProduct = async (id: string) => {
   const result = await catchAsync(async () => {
     const res = await serverFetch.delete(`/products/soft-delete/${id}`, {

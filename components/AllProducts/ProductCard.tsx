@@ -190,7 +190,7 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() =>
-                router.push(`/vendor/all-items/${product.productId}`)
+                router.push(`/admin/all-products/${product.productId}`)
               }
               className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
             >
