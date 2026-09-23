@@ -651,7 +651,8 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
               </div>
             )}
           </AgentOrVendorSection>
-          {/* 1. Product Categories Section */}
+
+          {/* Product Categories Section */}
           <AgentOrVendorSection
             title={t("product_categories")}
             icon={<TicketIcon size={20} />}
@@ -730,8 +731,8 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
             {vendor.status === "APPROVED" && (
               <>
                 <ActionButton
-                  onClick={() => router.push(`/admin/vendor/${vendor?.userId}/add-product`)}
-                  label={t("add_product")}
+                  onClick={() => router.push(`/admin/vendor/${vendor?.userId}/manage-products`)}
+                  label={t("manage_products")}
                   icon={<EditIcon size={18} />}
                   variant="primary"
                 />
