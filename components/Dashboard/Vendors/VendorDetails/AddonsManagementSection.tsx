@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { deleteAddOnOption, toggleAddOnOptionStatus } from "@/services/dashboard/product/product.service";
 import { useRouter } from "next/navigation";
+import { useStore } from "@/store/store";
 
 interface IProps {
     addonGroupsResult: {
@@ -31,6 +32,7 @@ export default function AddOnsManagementSection({
     taxes,
     t,
 }: IProps) {
+    const { lang } = useStore();
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [actionType, setActionType] = useState<"create" | "edit">("create");
@@ -184,7 +186,7 @@ export default function AddOnsManagementSection({
                                                 <div className="flex items-center space-x-2">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-[#DC3173]"></span>
                                                     <span className="font-medium text-gray-700">
-                                                        {option.name?.en || option.name?.pt}
+                                                        {option.name?.[lang]}
                                                     </span>
                                                     {option.sku && (
                                                         <span className="text-[10px] text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded">
