@@ -25,6 +25,7 @@ export const BASE_REQUIRED_DOCS: TPartnerDocKey[] = [
   "idProofFront",
   "idProofBack",
   "ibanProof",
+  "activity"
 ];
 
 export default function UploadPartnerDocuments({
