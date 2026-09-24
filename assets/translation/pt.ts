@@ -1560,6 +1560,9 @@ export const pt = {
   no_items_match_current_filters:
     "Nenhum item corresponde aos filtros atuais. Tente ajustar a pesquisa ou os filtros.",
   clear_all_filters: "Limpar todos os filtros",
+  // update item
+  update_item: "Atualizar item",
+  update_product_details: "Preencha os detalhes para atualizar o produto alimentar do seu menu.",
 
   // product details
   product_details: "Detalhes do produto",

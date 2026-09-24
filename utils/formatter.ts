@@ -1,5 +1,5 @@
 export function queryStringFormatter(searchParamsObj: {
-  [key: string]: string | string[] | undefined;
+  [key: string]: string | number | string[] | undefined;
 }): string {
   const queryArray = Object.entries(searchParamsObj)
     .filter(([key]) => key !== "lang")

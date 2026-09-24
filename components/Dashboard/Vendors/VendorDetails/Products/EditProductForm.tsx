@@ -60,6 +60,7 @@ interface IProps {
     prevData: TProduct;
     closeModal: () => void;
     businessTypeSlug: string;
+    onSuccess: (value: TProduct) => void;
 }
 
 interface IData<T> {
@@ -71,6 +72,7 @@ export function EditProductForm({
     prevData,
     closeModal,
     businessTypeSlug,
+    onSuccess
 }: IProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -187,10 +189,10 @@ export function EditProductForm({
         };
 
         // name & description (with translation)
-        const originalName = prevData?.name || "";
-        const originalDescription = prevData?.description || "";
+        const originalName = prevData?.name?.[lang] || "";
+        const originalDescription = prevData?.description?.[lang] || "";
 
-        if (hasChanged(data.name, originalName) || hasChanged(data.description, originalDescription)) {
+        if (hasChanged(data.name?.[lang], originalName) || hasChanged(data.description?.[lang], originalDescription)) {
             const translated = await translateObject(
                 { name: data.name, description: data.description },
                 lang
@@ -202,10 +204,10 @@ export function EditProductForm({
                 return;
             }
 
-            if (hasChanged(data.name, originalName)) {
+            if (hasChanged(data.name?.[lang], originalName)) {
                 productData.name = translated.name;
             }
-            if (hasChanged(data.description, originalDescription)) {
+            if (hasChanged(data.description?.[lang], originalDescription)) {
                 productData.description = translated.description;
             }
         }
@@ -327,6 +329,7 @@ export function EditProductForm({
             toast.success("Product updated successfully!", { id: toastId });
             setActiveTab(0);
             setTabError({});
+            onSuccess(result?.data);
             router.refresh();
             closeModal();
             return;
