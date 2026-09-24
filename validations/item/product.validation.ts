@@ -75,13 +75,13 @@ export const productValidation = z.object({
             "Name is required"
         );
 
-        validateLocalizedField(
-            data.description,
-            data.currentLang,
-            ctx,
-            ["description"],
-            "Description is required"
-        );
+        // validateLocalizedField(
+        //     data.description,
+        //     data.currentLang,
+        //     ctx,
+        //     ["description"],
+        //     "Description is required"
+        // );
 
         // discount type and value validation
         // if (

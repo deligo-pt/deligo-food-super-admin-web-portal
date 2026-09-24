@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { deleteAddOnOption, toggleAddOnOptionStatus } from "@/services/dashboard/product/product.service";
 import { useRouter } from "next/navigation";
-import { useStore } from "@/store/store";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
     addonGroupsResult: {
@@ -23,16 +23,14 @@ interface IProps {
     };
     vendorId: string;
     taxes: TTax[];
-    t: (key: string) => string;
 }
 
 export default function AddOnsManagementSection({
     addonGroupsResult,
     vendorId,
     taxes,
-    t,
 }: IProps) {
-    const { lang } = useStore();
+    const { t, lang } = useTranslation();
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [actionType, setActionType] = useState<"create" | "edit">("create");
@@ -125,11 +123,12 @@ export default function AddOnsManagementSection({
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border p-2 my-4 space-y-6">
+        <div className="space-y-6">
             {/* Top Header Banner matching the UI */}
             <TitleHeader
                 title={t("add_ons_extras")}
                 subtitle={t("manage_your_add_on_groups_options")}
+                onBackClick={() => router.back()}
                 buttonInfo={{
                     text: t("add_group"),
                     icon: Plus,

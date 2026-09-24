@@ -12,7 +12,7 @@ const AddProductToVendorPage = async ({ params }: { params: Promise<{ id: string
 
     const vendorData: TVendor = await getSingleVendorReq(id);
 
-    const query = { vendorId: vendorData?._id };
+    const query = { vendorId: vendorData?._id, limit: "50" };
     const queryString = queryStringFormatter(query);
     const taxResults = await getAllTaxes();
     const productCategories = await getAllProductCategories(queryString);

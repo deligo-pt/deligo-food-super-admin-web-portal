@@ -4,24 +4,17 @@
 import ActionButton from "@/components/AgentOrVendorDetails/AgentOrVendorActionButton";
 import AgentOrVendorSection from "@/components/AgentOrVendorDetails/AgentOrVendorSection";
 import { DocumentViewer } from "@/components/common/DocumentViewer";
-import ReusableTable from "@/components/common/ReusableTable";
 import VendorDetailsDoc, {
   IVendorDocs,
 } from "@/components/Dashboard/Vendors/VendorDetails/VendorDetailsDoc";
 import ApproveOrRejectModal from "@/components/Modals/ApproveOrRejectModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import VerifyOtpModal from "@/components/Modals/VerifyOtpModal";
-import { getProductCategoryColumns } from "@/components/ProductCategories/productCategoryColumns";
 import { Button } from "@/components/ui/button";
 import { USER_ROLE, USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { resendOtpReq } from "@/services/auth/otp.service";
-import { useStore } from "@/store/store";
-import { TMeta } from "@/types";
-import { TAddonGroup } from "@/types/add-ons.type";
-import { TProductCategoryResponse } from "@/types/category.type";
-import { TOffer } from "@/types/offer.type";
 import { TVendor } from "@/types/user.type";
 import { format, parse } from "date-fns";
 import { motion } from "framer-motion";
@@ -36,48 +29,27 @@ import {
   EditIcon,
   FileTextIcon,
   MapPinIcon,
-  Plus,
-  TicketIcon,
   TrashIcon,
   UserIcon,
   XIcon,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import AddCategoryModal from "./AddCategoryModal";
-import { TTax } from "@/types/tax.type";
-import AddOnsManagementSection from "./AddonsManagementSection";
-import PaginationComponent from "@/components/Filtering/PaginationComponent";
-import TitleHeader from "@/components/TitleHeader/TitleHeader";
 
 interface IProps {
   vendor: TVendor;
-  offerData: TOffer[];
-  categoriesResult: {
-    data: TProductCategoryResponse[];
-    meta: TMeta;
-  };
-  addonGroupsResult: {
-    data: TAddonGroup[];
-    meta: TMeta;
-  };
-  taxes: TTax[];
 }
 
-export default function VendorDetails({ vendor, offerData, categoriesResult, addonGroupsResult, taxes }: IProps) {
+export default function VendorDetails({ vendor }: IProps) {
   const { t } = useTranslation();
-  const { lang } = useStore();
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [approveStatus, setApproveStatus] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<TProductCategoryResponse | null>(null);
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -149,25 +121,6 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
       setIsSubmitting(false);
     }
   };
-
-  // Open modal for Creation
-  const handleOpenCreate = () => {
-    setSelectedCategory(null);
-    setIsCategoryModalOpen(true);
-  };
-
-  // Open modal for Editing
-  const handleOpenEdit = (category: TProductCategoryResponse) => {
-    setSelectedCategory(category);
-    setIsCategoryModalOpen(true);
-  };
-
-  const categoryColumns = getProductCategoryColumns({
-    t,
-    lang,
-    router,
-    onEdit: handleOpenEdit,
-  });
 
   return (
     <div>
@@ -606,102 +559,6 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
               </p>
             )}
           </AgentOrVendorSection>
-          <AgentOrVendorSection
-            title={t("created_offers")}
-            icon={<TicketIcon size={20} />}
-            defaultOpen={true}
-          >
-            <TitleHeader
-              title={t("created_offers")}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {offerData?.map((offer) => (
-                <div
-                  key={offer._id}
-                  className="flex flex-col gap-2 border rounded-md p-4"
-                >
-                  <p className="text-gray-500">{offer.title?.[lang]}</p>
-                  {offer.offerType === "BOGO" && <p>{t("bogo_offer")}</p>}
-                  {offer.offerType === "PERCENT" && (
-                    <p>{t("percentage_offer")} ({offer.discountValue}% {t("off")})</p>
-                  )}
-                  {offer.offerType === "FLAT" && (
-                    <p>{t("flat_offer")} (€{offer.discountValue} {t("off")})</p>
-                  )}
-                  <p className="text-xs">
-                    {offer.validFrom
-                      ? format(offer.validFrom, "dd/MM/yyyy")
-                      : "N/A"}
-                    {" - "}
-                    {offer.expiresAt
-                      ? format(offer.expiresAt, "dd/MM/yyyy")
-                      : "N/A"}
-                  </p>
-                </div>
-              ))}
-
-              {offerData?.length === 0 && (
-                <p className="text-gray-500 italic">{t("no_offers_created")}</p>
-              )}
-            </div>
-            {offerData?.length > 0 && (
-              <div className="text-center mt-2">
-                <Link
-                  className="text-[#DC3173] text-sm font-medium hover:underline"
-                  href={`/admin/vendor/offers/${vendor.userId}`}
-                >
-                  {t("view_all")}
-                </Link>
-              </div>
-            )}
-          </AgentOrVendorSection>
-
-          {/* Product Categories Section */}
-          <AgentOrVendorSection
-            title={t("product_categories")}
-            icon={<TicketIcon size={20} />}
-            defaultOpen={true}
-          >
-            <TitleHeader
-              title={t("product_categories")}
-              buttonInfo={{
-                text: t("add_category"),
-                icon: Plus,
-                onClick: handleOpenCreate
-              }}
-            />
-            <div className="bg-white rounded-xl shadow-sm border p-4 my-4">
-              <div className="overflow-x-auto">
-                <ReusableTable
-                  data={categoriesResult?.data || []}
-                  meta={categoriesResult?.meta as TMeta}
-                  columns={categoryColumns}
-                  getRowKey={(row) => row._id}
-                  emptyMessage={t("no_categories_found")}
-                />
-              </div>
-
-              {!!categoriesResult?.meta?.totalPage && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="px-4 md:px-6 pt-6 pb-2"
-                >
-                  <PaginationComponent
-                    totalPages={categoriesResult?.meta?.totalPage as number}
-                  />
-                </motion.div>
-              )}
-            </div>
-          </AgentOrVendorSection>
-
-          {/* 2. Addon Groups Section */}
-          <AddOnsManagementSection
-            addonGroupsResult={addonGroupsResult}
-            vendorId={vendor?._id}
-            taxes={taxes}
-            t={t}
-          />
         </div>
 
         {/* buttons */}
@@ -764,18 +621,6 @@ export default function VendorDetails({ vendor, offerData, categoriesResult, add
           </div>
         </div>
       </motion.div >
-
-      {/* Reused Modal for Add & Edit */}
-      <AddCategoryModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => {
-          setIsCategoryModalOpen(false);
-          setSelectedCategory(null);
-        }}
-        vendorId={vendor?._id}
-        initialData={selectedCategory}
-        onSuccess={() => router.refresh()}
-      />
 
       {/* Verify unverified rider */}
       < VerifyOtpModal
