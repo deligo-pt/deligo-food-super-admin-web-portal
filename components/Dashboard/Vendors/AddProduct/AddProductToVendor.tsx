@@ -196,7 +196,7 @@ export function AddProductToVendor({
 
             const productData = {
                 name: translated.name,
-                description: translated.description,
+                ...(data?.description?.[lang] && { description: translated.description }),
                 category: data.category,
                 ...(data.additionalCategories && { additionalCategories: data.additionalCategories }),
                 images: data.images,
@@ -239,7 +239,7 @@ export function AddProductToVendor({
                 });
                 form.reset();
                 setActiveTab(0);
-                router.push(`/admin/vendor/${vendor?.userId}`)
+                router.push(`/admin/vendor/${vendor?.userId}/manage-products`)
                 return;
             }
 
