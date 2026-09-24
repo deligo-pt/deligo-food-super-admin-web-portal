@@ -4,10 +4,11 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Plus, Percent, TrendingUp, Loader2 } from "lucide-react";
+import { ChevronDown, Plus, Percent, TrendingUp, Loader2, Layers, Tag, Gift } from "lucide-react";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import {
@@ -291,6 +292,44 @@ export default function ProductsSection({
                             >
                                 <TrendingUp className="w-4 h-4 mr-2 text-[#DC3173]" />
                                 {t("increase_prices") || "Increase Price"}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="my-1 border-gray-100" />
+
+                            {/* Newly added sections */}
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorId}/products/categories`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                <Tag className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {t("product_categories") || "Product Categories"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorId}/products/add-ons`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                <Layers className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {t("add_ons") || "Add-ons"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorId}/products/offers`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                <Gift className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {t("created_offers") || "Created Offers"}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

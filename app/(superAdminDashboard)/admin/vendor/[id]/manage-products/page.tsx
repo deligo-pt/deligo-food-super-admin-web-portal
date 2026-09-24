@@ -41,7 +41,7 @@ const ManageProductsPage = async ({
                     vendorData?.businessDetails?.businessTypeSlug as string
                 }
                 productsData={{ data, meta: meta! }}
-                vendorId={vendorMongoId}
+                vendorId={id}
             />
         </div>
     );
