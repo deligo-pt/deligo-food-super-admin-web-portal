@@ -60,6 +60,7 @@ interface IProps {
     prevData: TProduct;
     closeModal: () => void;
     businessTypeSlug: string;
+    onSuccess: (value: TProduct) => void;
 }
 
 interface IData<T> {
@@ -71,6 +72,7 @@ export function EditProductForm({
     prevData,
     closeModal,
     businessTypeSlug,
+    onSuccess
 }: IProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -327,6 +329,7 @@ export function EditProductForm({
             toast.success("Product updated successfully!", { id: toastId });
             setActiveTab(0);
             setTabError({});
+            onSuccess(result?.data);
             router.refresh();
             closeModal();
             return;

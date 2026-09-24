@@ -241,6 +241,26 @@ export default function ProductsSection({
         }
     };
 
+    const handleProductUpdated = (updatedProduct: TProduct) => {
+        setProducts((prev) =>
+            prev.map((p) =>
+                (p._id || p.productId) === (updatedProduct._id || updatedProduct.productId)
+                    ? { ...p, ...updatedProduct }
+                    : p
+            )
+        );
+    };
+
+    useEffect(() => {
+        setProducts(productsData.data || []);
+        setMeta(productsData.meta);
+        setPage(productsData.meta?.page || 1);
+        setHasMore(
+            (productsData.meta?.page || 1) < (productsData.meta?.totalPage || 1)
+        );
+        setDeletedProductIds([]);
+    }, [productsData]);
+
     return (
         <div className="w-full flex flex-col h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] overflow-hidden">
             {/* Header */}
@@ -498,6 +518,7 @@ export default function ProductsSection({
                 }
                 prevData={selectedProduct?.product as TProduct}
                 businessTypeSlug={businessTypeSlug}
+                onSuccess={handleProductUpdated}
             />
         </div>
     );

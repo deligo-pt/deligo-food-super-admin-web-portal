@@ -97,7 +97,7 @@ export const updateProduct = async (productId: string, data: Partial<TProduct>) 
 
   if (result.success) {
     revalidateTag("products", {});
-    revalidatePath(`/admin/vendor/${data?.vendorId}`);
+    revalidatePath(`/admin/vendor/${data?.vendorId}/manage-products`);
   };
 
 
