@@ -123,8 +123,8 @@ export default function GlobalSettings({
       deliveryVatRate: settings?.delivery?.vatRate || 0,
 
       // commission
-      platformCommissionPercent: settings?.commission?.platformPercent || 0,
-      platformVatRate: settings?.commission?.platformVatRate || 0,
+      // platformCommissionPercent: settings?.commission?.platformPercent || 0,
+      // platformVatRate: settings?.commission?.platformVatRate || 0,
       fleetManagerCommissionPercent: settings?.commission?.fleetManagerPercent || 0,
       serviceCharge: settings?.commission?.serviceCharge || 0,
       serviceChargeVatRate: settings?.commission?.serviceChargeVatRate || 0,
@@ -218,8 +218,8 @@ export default function GlobalSettings({
         vatRate: data.deliveryVatRate,
       },
       commission: {
-        platformPercent: data.platformCommissionPercent,
-        platformVatRate: data.platformVatRate,
+        // platformPercent: data.platformCommissionPercent,
+        // platformVatRate: data.platformVatRate,
         fleetManagerPercent: data.fleetManagerCommissionPercent,
         serviceCharge: data.serviceCharge,
         serviceChargeVatRate: data.serviceChargeVatRate,
@@ -557,7 +557,7 @@ export default function GlobalSettings({
                       delay={0}
                     >
                       <div className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name="platformCommissionPercent"
@@ -615,7 +615,7 @@ export default function GlobalSettings({
                               </FormItem>
                             )}
                           />
-                        </div>
+                        </div> */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}

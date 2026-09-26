@@ -19,14 +19,14 @@ export const globalSettingsSchema = z
       .max(100, "Delivery VAT rate cannot be more than 100"),
 
     // Platform commission
-    platformCommissionPercent: z
-      .number("Platform commission must be a number")
-      .min(0, "Platform commission must be at least 0")
-      .max(100, "Platform commission cannot be more than 100"),
-    platformVatRate: z
-      .number("Platform VAT rate must be a number")
-      .min(0, "Platform VAT rate must be at least 0")
-      .max(100, "Platform VAT rate cannot be more than 100"),
+    // platformCommissionPercent: z
+    //   .number("Platform commission must be a number")
+    //   .min(0, "Platform commission must be at least 0")
+    //   .max(100, "Platform commission cannot be more than 100"),
+    // platformVatRate: z
+    //   .number("Platform VAT rate must be a number")
+    //   .min(0, "Platform VAT rate must be at least 0")
+    //   .max(100, "Platform VAT rate cannot be more than 100"),
     fleetManagerCommissionPercent: z
       .number("Fleet manager commission must be a number")
       .min(0, "Fleet manager commission must be at least 0")
