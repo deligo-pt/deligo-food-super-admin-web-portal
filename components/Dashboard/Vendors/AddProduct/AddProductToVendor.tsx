@@ -183,10 +183,10 @@ export function AddProductToVendor({
         return newErrors;
     }, [errors, tabs, t]);
 
-    const [watchPrice, watchDiscount, watchDiscountType, watchTaxId, watchAddons, watchVariations] =
+    const [watchName, watchPrice, watchDiscount, watchDiscountType, watchTaxId, watchAddons, watchVariations] =
         useWatch({
             control: form.control,
-            name: ["price", "discount", "discountType", "taxId", "addonGroups", "variations"],
+            name: [`name.${lang}`, "price", "discount", "discountType", "taxId", "addonGroups", "variations"],
         });
 
     const onSubmit = async (data: FormData) => {
@@ -287,7 +287,7 @@ export function AddProductToVendor({
                 className="bg-white shadow-xl rounded-2xl overflow-hidden"
             >
                 <TitleHeader
-                    title={t("add_new_item")}
+                    title={`${t("add_new_item")}${watchName && `-${watchName}`}`}
                     subtitle={t("fill_the_details_to_add_new_food_item")}
                     onBackClick={() => router.back()}
                     extraComponent={

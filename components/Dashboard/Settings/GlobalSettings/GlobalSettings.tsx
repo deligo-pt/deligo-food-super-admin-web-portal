@@ -117,14 +117,14 @@ export default function GlobalSettings({
     values: {
       // delivery
       deliveryChargePerKm: settings?.delivery?.chargePerKm || 0,
-      // baseDeliveryCharge: settings?.delivery?.baseCharge || 0,
+      baseDeliveryCharge: settings?.delivery?.baseCharge || 0,
       chargePerKmBeyondThreshold: settings?.delivery?.chargePerKmBeyondThreshold || 0,
       distanceThresholdKm: settings?.delivery?.distanceThresholdKm || 0,
       deliveryVatRate: settings?.delivery?.vatRate || 0,
 
       // commission
-      platformCommissionPercent: settings?.commission?.platformPercent || 0,
-      platformVatRate: settings?.commission?.platformVatRate || 0,
+      // platformCommissionPercent: settings?.commission?.platformPercent || 0,
+      // platformVatRate: settings?.commission?.platformVatRate || 0,
       fleetManagerCommissionPercent: settings?.commission?.fleetManagerPercent || 0,
       serviceCharge: settings?.commission?.serviceCharge || 0,
       serviceChargeVatRate: settings?.commission?.serviceChargeVatRate || 0,
@@ -214,12 +214,12 @@ export default function GlobalSettings({
         chargePerKm: data.deliveryChargePerKm,
         distanceThresholdKm: data.distanceThresholdKm,
         ...(data?.chargePerKmBeyondThreshold && { chargePerKmBeyondThreshold: data.chargePerKmBeyondThreshold }),
-        // baseCharge: data.baseDeliveryCharge,
+        baseCharge: data.baseDeliveryCharge,
         vatRate: data.deliveryVatRate,
       },
       commission: {
-        platformPercent: data.platformCommissionPercent,
-        platformVatRate: data.platformVatRate,
+        // platformPercent: data.platformCommissionPercent,
+        // platformVatRate: data.platformVatRate,
         fleetManagerPercent: data.fleetManagerCommissionPercent,
         serviceCharge: data.serviceCharge,
         serviceChargeVatRate: data.serviceChargeVatRate,
@@ -422,7 +422,7 @@ export default function GlobalSettings({
                       delay={0}
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* <FormField
+                        <FormField
                           control={form.control}
                           name="baseDeliveryCharge"
                           render={({ field, fieldState }) => (
@@ -430,7 +430,7 @@ export default function GlobalSettings({
                               <FormControl>
                                 <SettingsInput
                                   fieldState={fieldState}
-                                  label={t("base_charge")}
+                                  label={t("delivery_service_fee")}
                                   type="number"
                                   value={field.value}
                                   onChange={(e) =>
@@ -443,7 +443,7 @@ export default function GlobalSettings({
                               <FormMessage />
                             </FormItem>
                           )}
-                        /> */}
+                        />
                         <FormField
                           control={form.control}
                           name="distanceThresholdKm"
@@ -557,7 +557,7 @@ export default function GlobalSettings({
                       delay={0}
                     >
                       <div className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name="platformCommissionPercent"
@@ -615,7 +615,7 @@ export default function GlobalSettings({
                               </FormItem>
                             )}
                           />
-                        </div>
+                        </div> */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
