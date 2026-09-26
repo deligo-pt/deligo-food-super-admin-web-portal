@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Plus, Percent, TrendingUp, Loader2, Layers, Tag, Gift } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import {
@@ -299,7 +299,7 @@ export default function ProductsSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                <Plus className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {/* <Plus className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
                                 {t("add_product") || "Add Product"}
                             </DropdownMenuItem>
 
@@ -311,7 +311,7 @@ export default function ProductsSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                <Percent className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {/* <Percent className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
                                 {t("update_discounts") || "Update Discount"}
                             </DropdownMenuItem>
 
@@ -323,7 +323,7 @@ export default function ProductsSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                <TrendingUp className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {/* <TrendingUp className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
                                 {t("increase_prices") || "Increase Price"}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-1 border-gray-100" />
@@ -337,7 +337,7 @@ export default function ProductsSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                <Tag className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {/* <Tag className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
                                 {t("product_categories") || "Product Categories"}
                             </DropdownMenuItem>
 
@@ -349,7 +349,7 @@ export default function ProductsSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                <Layers className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
                                 {t("add_ons") || "Add-ons"}
                             </DropdownMenuItem>
 
@@ -361,7 +361,7 @@ export default function ProductsSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                <Gift className="w-4 h-4 mr-2 text-[#DC3173]" />
+                                {/* <Gift className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
                                 {t("created_offers") || "Created Offers"}
                             </DropdownMenuItem>
                         </DropdownMenuContent>

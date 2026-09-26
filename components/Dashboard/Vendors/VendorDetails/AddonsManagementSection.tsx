@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit, LayersIcon, Trash2, Loader2 } from "lucide-react";
+import { Plus, Edit, LayersIcon, Trash2, Loader2, ChevronDown } from "lucide-react";
 import AddAddonGroupModal from "./AddAddonGroupModal";
 import { TAddonGroup } from "@/types/add-ons.type";
 import { TTax } from "@/types/tax.type";
@@ -15,6 +15,14 @@ import DeleteModal from "@/components/Modals/DeleteModal";
 import { deleteAddOnOption, toggleAddOnOptionStatus } from "@/services/dashboard/product/product.service";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/hooks/use-translation";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface IProps {
     addonGroupsResult: {
@@ -22,12 +30,14 @@ interface IProps {
         meta?: TMeta;
     };
     vendorId: string;
+    vendorUserId: string;
     taxes: TTax[];
 }
 
 export default function AddOnsManagementSection({
     addonGroupsResult,
     vendorId,
+    vendorUserId,
     taxes,
 }: IProps) {
     const { t, lang } = useTranslation();
@@ -129,11 +139,103 @@ export default function AddOnsManagementSection({
                 title={t("add_ons_extras")}
                 subtitle={t("manage_your_add_on_groups_options")}
                 onBackClick={() => router.back()}
-                buttonInfo={{
-                    text: t("add_group"),
-                    icon: Plus,
-                    onClick: handleOpenCreateModal
-                }}
+                extraComponent={
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white flex items-center gap-2">
+                                {t("actions") || "Actions"}
+                                <ChevronDown className="w-4 h-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-48 bg-white shadow-lg border rounded-lg p-1"
+                        >
+                            <DropdownMenuItem
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                <motion.button
+                                    whileHover={{
+                                        scale: 1.05,
+                                    }}
+                                    whileTap={{
+                                        scale: 0.98,
+                                    }}
+                                    type="button"
+                                    onClick={handleOpenCreateModal}
+                                >
+                                    <span>{t("add_group")}</span>
+                                </motion.button>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(`/admin/vendor/${vendorUserId}/manage-products`)
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("manage_products") || "Manage Product"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/update-discount`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("update_discounts") || "Update Discount"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/increase-price`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("increase_prices") || "Increase Price"}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="my-1 border-gray-100" />
+
+                            {/* Newly added sections */}
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/categories`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("product_categories") || "Product Categories"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/add-ons`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("add_ons") || "Add-ons"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/offers`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("created_offers") || "Created Offers"}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                }
             />
 
             {/* Add-on Groups List Cards */}
