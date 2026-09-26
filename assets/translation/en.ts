@@ -2375,6 +2375,7 @@ export const en = {
   configure_base_rates_distance:
     "Configure base rates and distance calculations",
   base_charge: "Base Charge",
+  delivery_service_fee: "Delivery Service Fee",
   distanceThresholdKm: "Threshold Distance KM",
   chargePerKmBeyondThreshold: "Per KM charge beyond Threshold",
   charge_per_km: "Charge per KM",

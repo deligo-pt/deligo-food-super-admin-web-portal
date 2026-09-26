@@ -6,9 +6,9 @@ export const globalSettingsSchema = z
     deliveryChargePerKm: z
       .number("Delivery charge per km must be a number")
       .nonnegative("Delivery charge must be at least 0"),
-    // baseDeliveryCharge: z
-    //   .number("Base delivery charge must be a number")
-    //   .nonnegative("Base delivery charge must be at least 0"),
+    baseDeliveryCharge: z
+      .number("Base delivery charge must be a number")
+      .nonnegative("Base delivery charge must be at least 0"),
     distanceThresholdKm: z
       .number("Distance Threshold KM must be a number")
       .nonnegative("Distance Threshold KM must be at least 0"),
