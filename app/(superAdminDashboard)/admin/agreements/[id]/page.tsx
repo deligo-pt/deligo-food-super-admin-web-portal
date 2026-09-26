@@ -1,5 +1,6 @@
 import AgreementVersionsDetails from "@/components/Dashboard/Agreements/AgreementVersionsDetails";
-import { getSingleAgreementVersion } from "@/services/dashboard/agreement/agreement.service";
+import { getAllCommissionRates, getEffectiveCommissionRate, getSingleAgreementVersion } from "@/services/dashboard/agreement/agreement.service";
+import { getAllTaxes } from "@/services/dashboard/tax/tax.service";
 
 interface IProps {
     params: Promise<{ id: string }>
@@ -8,10 +9,18 @@ interface IProps {
 const AgreementVersionsDetailsPage = async ({ params }: IProps) => {
     const { id } = await params;
     const { data } = await getSingleAgreementVersion(id);
+    const { data: effectiveRate } = await getEffectiveCommissionRate();
+    const { data: allCommissionRates } = await getAllCommissionRates();
+    const { data: taxes } = await getAllTaxes();
 
     return (
         <div>
-            <AgreementVersionsDetails agreeVersion={data} />
+            <AgreementVersionsDetails
+                agreeVersion={data}
+                effectiveRate={effectiveRate}
+                allCommissionRates={allCommissionRates}
+                taxes={taxes}
+            />
         </div>
     );
 };
