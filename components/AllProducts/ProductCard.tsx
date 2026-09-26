@@ -27,19 +27,28 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
   const availabilityColors = {
     "In Stock": "bg-green-100 text-green-800",
     "Out of Stock": "bg-red-100 text-red-800",
-    "Limited": "bg-yellow-100 text-yellow-800",
+    Limited: "bg-yellow-100 text-yellow-800",
   };
 
   // VAT helpers (supports common field names)
   const taxPercentage = product.pricing?.taxRate ?? null;
   const taxAmount = product.pricing?.taxAmount ?? null;
 
-  const hasTax =
-    (taxAmount !== null && taxAmount !== undefined);
+  const hasTax = taxAmount !== null && taxAmount !== undefined;
+
+  // Description handling: fixed length + ellipsis, or fallback text
+  const rawDescription = product.description?.[lang]?.trim() || "";
+  const maxDescLength = 90;
+  const displayDescription =
+    rawDescription.length > 0
+      ? rawDescription.length > maxDescLength
+        ? `${rawDescription.slice(0, maxDescLength)}....`
+        : rawDescription
+      : "No description provided";
 
   return (
     <motion.div
-      className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100"
+      className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 flex flex-col h-105"
       initial={{
         opacity: 0,
         y: 20,
@@ -59,7 +68,8 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
         },
       }}
     >
-      <div className="relative h-48 flex items-center justify-center overflow-hidden">
+      {/* Fixed image height */}
+      <div className="relative h-48 shrink-0 flex items-center justify-center overflow-hidden">
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images[0]}
@@ -73,32 +83,28 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
             <ShoppingBag className="h-12 w-12 text-gray-400" />
           </div>
         )}
-        {/* {product.meta.isFeatured && (
-          <div className="absolute top-2 right-2 bg-[#DC3173] text-white text-xs font-bold px-2 py-1 rounded-md">
-            Featured
-          </div>
-        )} */}
+
         <div
-          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[
-            product.isDeleted ? "DELETED" : product.meta.status
-          ]
+          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[product.isDeleted ? "DELETED" : product.meta.status]
             }`}
         >
           {product.isDeleted ? "DELETED" : product.meta.status}
         </div>
-        {product?.pricing?.discount && <div
-          className={`absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-md bg-[#DC3173] text-white`}
-        >
-          {product.pricing?.discount} % OFF
-        </div>}
+
+        {product?.pricing?.discount && (
+          <div className="absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-md bg-[#DC3173] text-white">
+            {product.pricing?.discount} % OFF
+          </div>
+        )}
       </div>
 
-      <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-bold text-gray-900 truncate">
+      {/* Content area – grows and pushes buttons to bottom */}
+      <div className="p-4 flex flex-col flex-1 min-h-0">
+        <div className="flex justify-between items-start mb-2 shrink-0">
+          <h3 className="text-lg font-bold text-gray-900 truncate pr-2">
             {product.name?.[lang]}
           </h3>
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
             <Star
               className="h-4 w-4 text-yellow-400 mr-1"
               fill="currentColor"
@@ -109,12 +115,13 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
           </div>
         </div>
 
-        {product.description?.[lang] && <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {product.description?.[lang]}
-        </p>}
+        {/* Fixed-height description area */}
+        <p className="text-gray-600 text-sm mb-3 h-10 line-clamp-2 overflow-hidden shrink-0">
+          {displayDescription}
+        </p>
 
         {/* Price + VAT section */}
-        <div className="mb-3">
+        <div className="mb-3 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
               <span className="text-lg font-bold text-[#DC3173]">
@@ -133,11 +140,12 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
                 </span>
               ) : null}
 
-              {/* VAT inline */}
               {hasTax && (
                 <span className="inline-flex items-center gap-1 text-xs text-gray-500 ml-1">
                   <span className="text-gray-400">•</span>
-                  <span className="font-medium text-gray-600">{t("inc_vat")}</span>
+                  <span className="font-medium text-gray-600">
+                    {t("inc_vat")}
+                  </span>
 
                   {taxPercentage !== null && taxPercentage !== undefined && (
                     <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded">
@@ -170,7 +178,7 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
         </div>
 
         {product.deliveryInfo && (
-          <div className="flex items-center text-xs text-gray-500 mb-3">
+          <div className="flex items-center text-xs text-gray-500 mb-3 shrink-0">
             <Clock className="h-3 w-3 mr-1" />
             <span>{product.deliveryInfo.deliveryType}</span>
             {product.deliveryInfo.estimatedTime && (
@@ -181,11 +189,12 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="text-xs text-gray-500">
+        {/* Buttons always pinned to the bottom */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto shrink-0">
+          <div className="text-xs text-gray-500 truncate pr-2">
             {product.vendorId?.vendorName}
           </div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 shrink-0">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -204,14 +213,16 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
             >
               {t("edit")}
             </motion.button>
-            {!product?.isDeleted ? <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onDelete(product.productId, "soft")}
-              className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
-            >
-              {t("delete")}
-            </motion.button> :
+            {!product?.isDeleted ? (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onDelete(product.productId, "soft")}
+                className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+              >
+                {t("delete")}
+              </motion.button>
+            ) : (
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -219,7 +230,8 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
                 className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
               >
                 {t("permanent_delete")}
-              </motion.button>}
+              </motion.button>
+            )}
           </div>
         </div>
       </div>
