@@ -27,6 +27,7 @@ const AddOnsForVendor = async ({ params, searchParams }: IProps) => {
         <div>
             <AddOnsManagementSection
                 vendorId={vendorData?._id}
+                vendorUserId={vendorData?.userId}
                 addonGroupsResult={addonGroupsData as { data: TAddonGroup[], meta: TMeta }}
                 taxes={taxes?.data}
             />

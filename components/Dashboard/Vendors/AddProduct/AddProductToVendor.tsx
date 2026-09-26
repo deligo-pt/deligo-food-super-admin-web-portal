@@ -2,6 +2,14 @@
 "use client";
 
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
     Form,
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
@@ -12,12 +20,12 @@ import { productValidation } from "@/validations/item/product.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import {
+    ChevronDown,
     ChevronLeftIcon,
     ChevronRightIcon,
     ImageIcon,
     LayersIcon,
     PackageIcon,
-    SaveIcon,
     StarIcon,
     TagIcon,
 } from "lucide-react";
@@ -223,7 +231,7 @@ export function AddProductToVendor({
                         },
                     }
                     : {}),
-                vendorId: vendor?._id,
+                userId: vendor?._id,
             };
 
             const result = await catchAsync<TProduct>(async () => {
@@ -281,22 +289,105 @@ export function AddProductToVendor({
                 <TitleHeader
                     title={t("add_new_item")}
                     subtitle={t("fill_the_details_to_add_new_food_item")}
+                    onBackClick={() => router.back()}
                     extraComponent={
-                        <motion.button
-                            whileHover={{
-                                scale: 1.05,
-                            }}
-                            whileTap={{
-                                scale: 0.98,
-                            }}
-                            type="button"
-                            disabled={isSubmitting}
-                            onClick={() => form.handleSubmit(onSubmit)()}
-                            className="px-6 py-2 bg-[#DC3173] hover:bg-[#B02458] text-white rounded-lg flex items-center space-x-2 shadow-lg shadow-pink-200/50 disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                            <SaveIcon className="h-5 w-5" />
-                            <span>{t("save_product")}</span>
-                        </motion.button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white flex items-center gap-2">
+                                    {t("actions") || "Actions"}
+                                    <ChevronDown className="w-4 h-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="end"
+                                className="w-48 bg-white shadow-lg border rounded-lg p-1"
+                            >
+                                <DropdownMenuItem
+                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    <motion.button
+                                        whileHover={{
+                                            scale: 1.05,
+                                        }}
+                                        whileTap={{
+                                            scale: 0.98,
+                                        }}
+                                        type="button"
+                                        disabled={isSubmitting}
+                                        onClick={() => form.handleSubmit(onSubmit)()}
+                                    >
+                                        {/* <SaveIcon className="h-5 w-5" /> */}
+                                        <span>{t("save_product")}</span>
+                                    </motion.button>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        router.push(`/admin/vendor/${vendor?.userId}/manage-products`)
+                                    }
+                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    {t("manage_products") || "Manage Product"}
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        router.push(
+                                            `/admin/vendor/${vendor?.userId}/products/update-discount`
+                                        )
+                                    }
+                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    {t("update_discounts") || "Update Discount"}
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        router.push(
+                                            `/admin/vendor/${vendor?.userId}/products/increase-price`
+                                        )
+                                    }
+                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    {t("increase_prices") || "Increase Price"}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="my-1 border-gray-100" />
+
+                                {/* Newly added sections */}
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        router.push(
+                                            `/admin/vendor/${vendor?.userId}/products/categories`
+                                        )
+                                    }
+                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    {t("product_categories") || "Product Categories"}
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        router.push(
+                                            `/admin/vendor/${vendor?.userId}/products/add-ons`
+                                        )
+                                    }
+                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    {t("add_ons") || "Add-ons"}
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        router.push(
+                                            `/admin/vendor/${vendor?.userId}/products/offers`
+                                        )
+                                    }
+                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    {t("created_offers") || "Created Offers"}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     }
                 />
                 <div className="flex flex-col md:flex-row">
