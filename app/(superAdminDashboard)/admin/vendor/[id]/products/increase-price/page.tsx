@@ -23,7 +23,7 @@ const IncreasePricePage = async ({ params }: { params: Promise<{ id: string }> }
 
     return (
         <div>
-            <IncreasePrice products={data} productCategries={productCategries?.data} />
+            <IncreasePrice products={data} productCategries={productCategries?.data} vendorId={vendorData?.userId} />
         </div>
     );
 };

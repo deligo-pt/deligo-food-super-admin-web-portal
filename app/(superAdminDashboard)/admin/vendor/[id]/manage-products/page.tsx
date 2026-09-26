@@ -6,12 +6,14 @@ import { TProductCategoryResponse } from "@/types/category.type";
 import { TVendor } from "@/types/user.type";
 import { queryStringFormatter } from "@/utils/formatter";
 
-const ManageProductsPage = async ({
-    params,
-}: {
+interface IProps {
     params: Promise<{ id: string }>;
-}) => {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+const ManageProductsPage = async ({ params, searchParams }: IProps) => {
     const { id } = await params;
+    const searchParamsObj = await searchParams;
 
     const vendorData: TVendor = await getSingleVendorReq(id);
 
@@ -19,8 +21,10 @@ const ManageProductsPage = async ({
 
     const productsQuery = queryStringFormatter({
         vendorId: vendorMongoId,
-        limit: "20",
+        limit: "30",
         page: "1",
+        sortBy: "name",
+        ...searchParamsObj
     });
     const { data, meta } = await getAllProducts(productsQuery);
 
@@ -28,6 +32,8 @@ const ManageProductsPage = async ({
     const categoriesQuery = queryStringFormatter({
         vendorId: vendorMongoId,
         limit: "30",
+        sortBy: "name",
+        ...searchParamsObj
     });
     const productCategories = await getAllProductCategories(categoriesQuery);
 
@@ -41,6 +47,7 @@ const ManageProductsPage = async ({
                     vendorData?.businessDetails?.businessTypeSlug as string
                 }
                 productsData={{ data, meta: meta! }}
+                vendorMongoId={vendorMongoId}
                 vendorId={id}
             />
         </div>

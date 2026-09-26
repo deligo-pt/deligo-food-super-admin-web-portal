@@ -47,6 +47,14 @@ const SORT_OPTIONS = {
         label: "tax_name_z_a",
         value: "-taxName",
     },
+    alphaNameAZ: {
+        label: "name_a_z",
+        value: "name",
+    },
+    alphaNameZA: {
+        label: "name_z_a",
+        value: "-name",
+    },
 } as const;
 
 export type SortOptionKey = keyof typeof SORT_OPTIONS;

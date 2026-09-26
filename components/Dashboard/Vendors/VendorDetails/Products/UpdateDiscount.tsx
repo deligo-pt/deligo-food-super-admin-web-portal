@@ -11,17 +11,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Package, Percent } from 'lucide-react';
+import { ChevronDown, Package, Percent } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
 import { applyIncreaseDecrease } from '@/services/dashboard/product/product.service';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Props = {
     products: TProduct[];
     productCategries: TProductCategoryResponse[];
+    vendorId: string;
 };
 
-const UpdateDiscount = ({ products, productCategries }: Props) => {
+const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
     const { t } = useTranslation();
     const router = useRouter();
 
@@ -174,6 +182,84 @@ const UpdateDiscount = ({ products, productCategries }: Props) => {
                 title={t('apply_price_decrease')}
                 subtitle={t('decrease_any_products_if_you_want')}
                 onBackClick={() => router.back()}
+                extraComponent={
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white flex items-center gap-2">
+                                {t("actions") || "Actions"}
+                                <ChevronDown className="w-4 h-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-48 bg-white shadow-lg border rounded-lg p-1"
+                        >
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(`/admin/vendor/${vendorId}/manage-products`)
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("manage_products") || "Manage Product"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(`/admin/vendor/${vendorId}/add-product`)
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("add_product") || "Add Product"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorId}/products/increase-price`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("increase_prices") || "Increase Price"}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="my-1 border-gray-100" />
+
+                            {/* Newly added sections */}
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorId}/products/categories`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("product_categories") || "Product Categories"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorId}/products/add-ons`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("add_ons") || "Add-ons"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorId}/products/offers`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("created_offers") || "Created Offers"}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                }
             />
 
             {/* Control bar */}

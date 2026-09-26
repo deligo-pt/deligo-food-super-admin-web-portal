@@ -23,7 +23,7 @@ const UpdateDiscountPage = async ({ params }: { params: Promise<{ id: string }> 
 
     return (
         <div>
-            <UpdateDiscount products={data} productCategries={productCategries?.data} />
+            <UpdateDiscount products={data} productCategries={productCategries?.data} vendorId={vendorData?.userId} />
         </div>
     );
 };
