@@ -293,6 +293,7 @@ export const en = {
   manage_all_agreements_versions: "Manage all agreements versions",
   date_created: "Date Created",
   // details
+  change_rate: "Change Rate",
   agreement_overview: "Agreement Overview",
   is_current: "Is Current",
   version_number: "Version Number",
@@ -305,6 +306,12 @@ export const en = {
   select_effective_date_description: "Select when this agreement version should take effect.",
   publishing: "Publishing...",
   confirm_and_publish: "Confirm and Publish",
+  commission_rates: "Commission Rates",
+  no_commission_rates_found: "No commission rates found",
+  platform_percent: "Platform %",
+  platform_vat_rate: "Vat Rate",
+  baseline: "Baseline",
+  
 
   // edit draft agreement
   edit_draft_agreement: "Edit Draft Agreement",

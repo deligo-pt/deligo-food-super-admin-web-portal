@@ -71,3 +71,19 @@ export interface IAgreementVersionResponse {
     data: IAgreementVersion[];
     meta: TMeta;
 }
+
+export interface ICommissionRate {
+    _id: string;
+    isBaseline: boolean;
+    status: string;
+    platformPercent: number;
+    platformVatRate: number;
+    note: string | null;
+    agreementVersionId: string;
+    createdAt: string;
+    agreementVersionNumber: number | null;
+    agreementVersionStatus?: string;
+    effectiveFrom: string | null;
+    isPublished: boolean;
+    state: string; // "EFFECTIVE" | "AWAITING_PUBLISH" | ...
+}

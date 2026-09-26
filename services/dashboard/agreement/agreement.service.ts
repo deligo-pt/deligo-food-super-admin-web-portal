@@ -223,3 +223,73 @@ export const previewAgreementVersion = async (versionId: string) => {
         data: Buffer.from(buffer).toString("base64"),
     };
 };
+
+/**
+ * commission rates
+*/
+
+// create commission rate
+export const createCommissionRate = async (data: Record<string, unknown>) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.post(`/commission-rates`, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        return await res.json();
+    });
+
+    if (result.success) {
+        revalidateTag("commission-rate", {});
+        revalidatePath("/admin/agreements/*");
+    };
+
+
+    return result;
+};
+
+
+// get effective commission rate
+export const getAllCommissionRates = async () => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.get("/commission-rates", {
+            next: {
+                tags: ["commission-rate"],
+            }
+        });
+        return await res.json();
+    });
+
+    return result;
+};
+
+// get effective commission rate
+export const getEffectiveCommissionRate = async () => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.get("/commission-rates/effective", {
+            next: {
+                tags: ["commission-rate"],
+            }
+        });
+        return await res.json();
+    });
+
+    return result;
+};
+
+
+// get effective commission rate
+export const cancelEffectiveRate = async (id: string) => {
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.delete(`/commission-rates/${id}`, {
+            next: {
+                tags: ["commission-rate"],
+            }
+        });
+        return await res.json();
+    });
+
+    return result;
+};

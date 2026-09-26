@@ -315,6 +315,12 @@ export const pt = {
   select_effective_date_description: "Selecione quando esta versão do acordo deve entrar em vigor.",
   publishing: "A publicar...",
   confirm_and_publish: "Confirmar e Publicar",
+  change_rate: "Alterar Taxa",
+  commission_rates: "Taxas de Comissão",
+  no_commission_rates_found: "Nenhuma taxa de comissão encontrada",
+  platform_percent: "% Plataforma",
+  platform_vat_rate: "Taxa de IVA",
+  baseline: "Linha de Base",
 
   // edit draft agreement
   edit_draft_agreement: "Editar Rascunho de Acordo",
