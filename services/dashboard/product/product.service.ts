@@ -68,6 +68,26 @@ export const deleteProductImage = async (productId: string, payload: { images: s
   });
 };
 
+export const createProduct = async (data: Record<string, unknown>) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.post(`/products/admin/create-product`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+  };
+
+
+  return result;
+};
+
 export const getAllProducts = async (queryString?: string) => {
   const url = `/products${queryString ? `?${queryString}` : ""}`;
 
