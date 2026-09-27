@@ -11,6 +11,7 @@ import { Pencil, Trash2, Check } from "lucide-react";
 import { ValidateBoundaryResponse } from "@/types/zone.type";
 import { toGeoJsonPolygon } from "@/utils/toGeoJsonPolygon";
 import { validateBoundary } from "@/services/dashboard/zone/zone.service";
+import { useTranslation } from "@/hooks/use-translation";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 
@@ -27,6 +28,7 @@ export function ZoneMapDrawer({
     onValidationChange,
     onPolygonChange,
 }: Props) {
+    const { t } = useTranslation();
     const map = useMap();
 
     const [isDrawing, setIsDrawing] = useState(false);
@@ -291,7 +293,7 @@ export function ZoneMapDrawer({
                 {!isDrawing && !polygon && (
                     <Button type="button" size="sm" onClick={startDrawing} className="bg-[#DC3173]">
                         <Pencil className="mr-2 h-4 w-4" />
-                        Draw Zone
+                        {t("draw_zone")}
                     </Button>
                 )}
 
@@ -299,7 +301,7 @@ export function ZoneMapDrawer({
                     <>
                         <Button type="button" size="sm" onClick={finishDrawing}>
                             <Check className="mr-2 h-4 w-4" />
-                            Finish Drawing
+                            {t("finish_drawing")}
                         </Button>
                         <Button
                             type="button"
@@ -310,7 +312,7 @@ export function ZoneMapDrawer({
                                 clearDrawing();
                             }}
                         >
-                            Cancel
+                            {t("cancel")}
                         </Button>
                     </>
                 )}
@@ -323,7 +325,7 @@ export function ZoneMapDrawer({
                         onClick={clearDrawing}
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Clear
+                        {t("clear")}
                     </Button>
                 )}
             </div>
@@ -340,7 +342,7 @@ export function ZoneMapDrawer({
                 />
                 {isDrawing && (
                     <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur px-3 py-1.5 rounded-md text-sm shadow border z-10">
-                        Click to add points • {path.length} point{path.length !== 1 ? "s" : ""}
+                        {t("click_to_add_points")} • {path.length} {t("point")}{path.length !== 1 ? "s" : ""}
                     </div>
                 )}
             </div>

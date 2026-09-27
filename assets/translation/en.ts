@@ -144,6 +144,7 @@ export const en = {
   coupon_analytics: "Coupon Analytics",
   sponsorships: "Sponsorships",
   add_sponsorship: "Add Sponsorship",
+  create_zone: "Create Zone",
 
   analytics_and_insights: "Analytics & Insights",
   sales_analytics: "Sales Analytics",
@@ -311,7 +312,7 @@ export const en = {
   platform_percent: "Platform %",
   platform_vat_rate: "Vat Rate",
   baseline: "Baseline",
-  
+
 
   // edit draft agreement
   edit_draft_agreement: "Edit Draft Agreement",
@@ -1787,6 +1788,56 @@ export const en = {
   now: "Now",
   // --> update sponsorship
   edit_sponsorship: "Edit Sponsorship",
+
+  // create zone
+  search_a_district_to_auto_load: "Search a district to auto-load its boundary, or draw manually.",
+  zone_details: "Zone Details",
+  // --> zone map drawer
+  draw_zone: "Draw Zone",
+  finish_drawing: "Finish Drawing",
+  click_to_add_points: "Click to add points",
+  point: "point",
+  checking_boundary: "Checking boundary",
+  area: "Area",
+  valid: "Valid",
+  invalid: "Invalid",
+  overlap: "overlap",
+  overlaps_with_existing_zones: "Overlaps with existing zones",
+  no_overlaps_safe_to_save_as_active: "No overlaps — safe to save as an active zone.",
+  // --> zone form
+  district: "District",
+  search_district_in_portugal: "Search district in Portugal...",
+  zone_id: "Zone ID",
+  min_delivery_fee: "Min Delivery Fee",
+  max_distance_km: "Max Distance (km)",
+  update_zone: "Update Zone",
+  save_zone: "Save Zone",
+  // all zones
+  manage_delivery_zones_and_boundaries: "Manage delivery zones and their boundaries",
+  min_fee: "Min Fee",
+  max_distance: "Max Distance",
+  activate_zone: "Activate Zone",
+  deactivate_zone: "Deactivate Zone",
+  are_you_sure_you_want_to: "Are you sure you want to",
+  activate_sm: "activate",
+  deactivate_sm: "deactivate",
+  soft_delete_zone: "Soft Delete Zone",
+  are_you_sure_want_to_soft_delete: "Are you sure you want to soft delete",
+  it_can_be_restored_later: "It can be restored later if needed.",
+  permanently_delete_zone: "Permanently Delete Zone",
+  warning_this_action_is_permanent: "Warning: This action is permanent and cannot be undone. Are you sure you want to permanently delete",
+  // -> details
+  coverage_boundary: "Coverage Boundary",
+  no_boundary_data: "No boundary data",
+  this_zone_has_no_polygon: "This zone has no polygon stored yet.",
+  zone_information: "Zone Information",
+  max_delivery_distance: "Max Delivery Distance",
+  centroid: "Centroid",
+  status_nd_timeline: "Status & Timeline",
+  deactivation_reason: "Deactivation Reason",
+
+  // -> edit zone
+  update_details_and_boundary_for: "Update details and boundary for",
 
   // sales-analytics
   overview_revenue_orders_business_performance: "Overview of revenue, orders, and business performance",

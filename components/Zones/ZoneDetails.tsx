@@ -25,6 +25,7 @@ import {
     LocateFixed,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
     zoneDetails: IZone;
@@ -92,6 +93,7 @@ function InfoItem({
 
 const ZoneDetails = ({ zoneDetails }: IProps) => {
     const router = useRouter();
+    const { t } = useTranslation();
 
     const path = useMemo(() => {
         const coords = zoneDetails.boundary?.coordinates;
@@ -118,26 +120,26 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
         <div className="space-y-6 pb-8">
             <TitleHeader
                 title={zoneDetails.zoneName}
-                subtitle={`Zone ID: ${zoneDetails.zoneId}`}
+                subtitle={`${t("zone_id")}: ${zoneDetails.zoneId}`}
                 onBackClick={() => router.push("/admin/zones")}
                 extraComponent={
                     <div className="flex items-center gap-2">
                         {zoneDetails.isOperational ? (
                             <Badge className="bg-green-50 text-green-700 border-green-200 gap-1">
                                 <CheckCircle2 className="h-3.5 w-3.5" />
-                                Operational
+                                {t("operational")}
                             </Badge>
                         ) : (
                             <Badge variant="secondary" className="bg-gray-100 text-gray-600 gap-1">
                                 <XCircle className="h-3.5 w-3.5" />
-                                Inactive
+                                {t("inactive")}
                             </Badge>
                         )}
 
                         <Button asChild className="bg-[#DC3173] hover:bg-[#DC3173]/90">
                             <Link href={`/admin/zones/${zoneDetails.zoneId}/edit`}>
                                 <Pencil className="mr-2 h-4 w-4" />
-                                Edit Zone
+                                {t("edit_zone")}
                             </Link>
                         </Button>
                     </div>
@@ -151,7 +153,7 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
                             <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
                                 <MapPin className="h-4 w-4 text-[#DC3173]" />
-                                Coverage Boundary
+                                {t("coverage_boundary")}
                             </div>
                             {zoneDetails.areaKm2 != null && (
                                 <span className="text-xs text-gray-500">
@@ -174,9 +176,9 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                             ) : (
                                 <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 bg-gray-50">
                                     <MapPin className="h-10 w-10 mb-2 opacity-40" />
-                                    <p className="text-sm font-medium">No boundary data</p>
+                                    <p className="text-sm font-medium">{t("no_boundary_data")}</p>
                                     <p className="text-xs mt-1">
-                                        This zone has no polygon stored yet.
+                                        {t("this_zone_has_no_polygon")}
                                     </p>
                                 </div>
                             )}
@@ -188,24 +190,24 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                 <div className="space-y-4">
                     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-4 space-y-3">
                         <h3 className="text-sm font-semibold text-gray-800 mb-1">
-                            Zone Information
+                            {t("zone_information")}
                         </h3>
 
                         <InfoItem
                             icon={Hash}
-                            label="Zone ID"
+                            label={t("zone_id")}
                             value={
                                 <span className="font-mono text-xs">{zoneDetails.zoneId}</span>
                             }
                         />
                         <InfoItem
                             icon={MapPin}
-                            label="District"
+                            label={t('district')}
                             value={zoneDetails.district || "—"}
                         />
                         <InfoItem
                             icon={Ruler}
-                            label="Area"
+                            label={t("area")}
                             value={
                                 zoneDetails.areaKm2 != null
                                     ? `${zoneDetails.areaKm2.toFixed(2)} km²`
@@ -214,7 +216,7 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                         />
                         <InfoItem
                             icon={Banknote}
-                            label="Min Delivery Fee"
+                            label={t("min_delivery_fee")}
                             value={
                                 zoneDetails.minDeliveryFee != null
                                     ? `€${zoneDetails.minDeliveryFee.toFixed(2)}`
@@ -223,7 +225,7 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                         />
                         <InfoItem
                             icon={Navigation}
-                            label="Max Delivery Distance"
+                            label={t("max_delivery_distance")}
                             value={
                                 zoneDetails.maxDeliveryDistanceKm != null
                                     ? `${zoneDetails.maxDeliveryDistanceKm} km`
@@ -232,7 +234,7 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                         />
                         <InfoItem
                             icon={LocateFixed}
-                            label="Centroid"
+                            label={t("centroid")}
                             value={
                                 zoneDetails.centroid?.coordinates ? (
                                     <span className="font-mono text-xs">
@@ -248,17 +250,17 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
 
                     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-4 space-y-3">
                         <h3 className="text-sm font-semibold text-gray-800 mb-1">
-                            Status & Timeline
+                            {t("status_nd_timeline")}
                         </h3>
 
                         <InfoItem
                             icon={zoneDetails.isOperational ? CheckCircle2 : XCircle}
-                            label="Status"
+                            label={t("status")}
                             value={
                                 zoneDetails.isOperational ? (
-                                    <span className="text-green-700">Operational</span>
+                                    <span className="text-green-700">{t("operational")}</span>
                                 ) : (
-                                    <span className="text-gray-600">Inactive</span>
+                                    <span className="text-gray-600">{t("inactive")}</span>
                                 )
                             }
                         />
@@ -266,26 +268,26 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                         {zoneDetails.deactivationReason && (
                             <InfoItem
                                 icon={XCircle}
-                                label="Deactivation Reason"
+                                label={t("deactivation_reason")}
                                 value={zoneDetails.deactivationReason}
                             />
                         )}
 
-                        <InfoItem icon={Calendar} label="Created" value={createdAt} />
-                        <InfoItem icon={Calendar} label="Last Updated" value={updatedAt} />
+                        <InfoItem icon={Calendar} label={t("created")} value={createdAt} />
+                        <InfoItem icon={Calendar} label={t("last_updated")} value={updatedAt} />
                     </div>
 
                     <div className="flex gap-2">
                         <Button variant="outline" className="flex-1" asChild>
                             <Link href="/admin/zones">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
-                                Back to list
+                                {t("back_to_list")}
                             </Link>
                         </Button>
                         <Button className="flex-1 bg-[#DC3173] hover:bg-[#DC3173]/90" asChild>
                             <Link href={`/admin/zones/${zoneDetails.zoneId}/edit`}>
                                 <Pencil className="mr-2 h-4 w-4" />
-                                Edit
+                                {t("edit")}
                             </Link>
                         </Button>
                     </div>

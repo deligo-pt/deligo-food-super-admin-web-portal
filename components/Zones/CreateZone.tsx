@@ -10,8 +10,10 @@ import type { ValidateBoundaryResponse } from "@/types/zone.type";
 import { boundsToPath, toGeoJsonPolygon } from "@/utils/toGeoJsonPolygon";
 import { createZone } from "@/services/dashboard/zone/zone.service";
 import TitleHeader from "../TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 
 const CreateZone = () => {
+    const { t } = useTranslation();
     const router = useRouter();
 
     const [validation, setValidation] = useState<ValidateBoundaryResponse | null>(null);
@@ -80,8 +82,8 @@ const CreateZone = () => {
     return (
         <div className="space-y-6">
             <TitleHeader
-                title="Create Zone"
-                subtitle="Search a district to auto-load its boundary, or draw manually."
+                title={t("create_zone")}
+                subtitle={t("search_a_district_to_auto_load")}
             />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -94,7 +96,7 @@ const CreateZone = () => {
                 </div>
 
                 <div className="border rounded-lg p-4 h-fit sticky top-6 space-y-4">
-                    <h2 className="font-semibold">Zone Details</h2>
+                    <h2 className="font-semibold">{t("zone_details")}</h2>
                     <ZoneForm
                         onSubmit={handleSubmit}
                         isSubmitting={isSubmitting}

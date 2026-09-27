@@ -14,12 +14,14 @@ import {
     geoJsonToPath,
     boundsToPath,
 } from "@/utils/toGeoJsonPolygon";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface IProps {
     zoneDetails: IZone;
 }
 
 const EditZone = ({ zoneDetails }: IProps) => {
+    const { t } = useTranslation();
     const router = useRouter();
 
     // Convert stored GeoJSON → map path
@@ -93,8 +95,8 @@ const EditZone = ({ zoneDetails }: IProps) => {
     return (
         <div className="space-y-6">
             <TitleHeader
-                title="Edit Zone"
-                subtitle={`Update details and boundary for ${zoneDetails.zoneName}`}
+                title={t("edit_zone")}
+                subtitle={`${t("update_details_and_boundary_for")} ${zoneDetails.zoneName}`}
             />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -110,7 +112,7 @@ const EditZone = ({ zoneDetails }: IProps) => {
 
                 {/* Form */}
                 <div className="border rounded-lg p-4 h-fit sticky top-6 space-y-4">
-                    <h2 className="font-semibold">Zone Details</h2>
+                    <h2 className="font-semibold">{t("zone_details")}</h2>
 
                     <ZoneForm
                         isEdit

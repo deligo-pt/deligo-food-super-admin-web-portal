@@ -21,6 +21,7 @@ import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Loader2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateZoneId } from "@/utils/toGeoJsonPolygon";
+import { useTranslation } from "@/hooks/use-translation";
 
 const zoneFormSchema = z.object({
     zoneId: z
@@ -69,6 +70,7 @@ export function ZoneForm({
     onDistrictSelect,
     isEdit
 }: Props) {
+    const { t } = useTranslation();
     const places = useMapsLibrary("places");
     const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
     const placesService = useRef<google.maps.places.PlacesService | null>(null);
@@ -205,12 +207,12 @@ export function ZoneForm({
                     render={({ field }) => (
                         <FormItem className="relative">
                             <FormLabel>
-                                District <span className="text-red-600">*</span>
+                                {t("district")} <span className="text-red-600">*</span>
                             </FormLabel>
                             <FormControl>
                                 <div className="relative">
                                     <Input
-                                        placeholder="Search district in Portugal..."
+                                        placeholder={t("search_district_in_portugal")}
                                         value={query}
                                         onChange={(e) => {
                                             setQuery(e.target.value);
@@ -265,7 +267,7 @@ export function ZoneForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
-                                Zone ID <span className="text-red-600">*</span>
+                                {t("zone_id")} <span className="text-red-600">*</span>
                             </FormLabel>
                             <FormControl>
                                 <Input
@@ -286,7 +288,7 @@ export function ZoneForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
-                                Zone Name <span className="text-red-600">*</span>
+                                {t("zone_name")} <span className="text-red-600">*</span>
                             </FormLabel>
                             <FormControl>
                                 <Input placeholder="Lisbon Centre" {...field} />
@@ -301,7 +303,7 @@ export function ZoneForm({
                     name="isOperational"
                     render={({ field }) => (
                         <FormItem className="flex items-center justify-between rounded-lg border p-3">
-                            <FormLabel>Operational</FormLabel>
+                            <FormLabel>{t("min_delivery_fee")}</FormLabel>
                             <FormControl>
                                 <Switch
                                     checked={field.value}
@@ -319,7 +321,7 @@ export function ZoneForm({
                         name="minDeliveryFee"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Min Delivery Fee</FormLabel>
+                                <FormLabel>{t("min_delivery_fee")}</FormLabel>
                                 <FormControl>
                                     <Input
                                         type="number"
@@ -338,7 +340,7 @@ export function ZoneForm({
                         name="maxDeliveryDistanceKm"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Max Distance (km)</FormLabel>
+                                <FormLabel>{t("max_distance_km")}</FormLabel>
                                 <FormControl>
                                     <Input
                                         type="number"
@@ -359,7 +361,7 @@ export function ZoneForm({
                     className="w-full bg-[#DC3173]"
                     disabled={isSubmitting || !isValidBoundary}
                 >
-                    {isSubmitting ? "Saving…" : isEdit ? "Update Zone" : "Save Zone"}
+                    {isSubmitting ? t("saving") : isEdit ? t("update_zone") : t("save_zone")}
                 </Button>
             </form>
         </Form>
