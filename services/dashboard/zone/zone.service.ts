@@ -6,7 +6,6 @@ import type {
   ZoneSingleResponse,
   CreateZonePayload,
   GeoJsonPolygon,
-  IZone,
 } from "@/types/zone.type";
 import { catchAsync } from "@/utils/catchAsync";
 import { serverFetch } from "@/lib/fetchHelper";

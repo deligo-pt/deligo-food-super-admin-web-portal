@@ -52,6 +52,7 @@ type Props = {
     isSubmitting?: boolean;
     isValidBoundary?: boolean;
     onDistrictSelect?: (place: DistrictPlaceResult) => void;
+    isEdit?: boolean;
 };
 
 type Prediction = {
@@ -66,6 +67,7 @@ export function ZoneForm({
     isSubmitting = false,
     isValidBoundary = false,
     onDistrictSelect,
+    isEdit
 }: Props) {
     const places = useMapsLibrary("places");
     const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
@@ -85,7 +87,7 @@ export function ZoneForm({
         },
     });
 
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = useState(defaultValues?.district || "");
     const [predictions, setPredictions] = useState<Prediction[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -256,6 +258,7 @@ export function ZoneForm({
                     )}
                 />
 
+                {/* Zone ID field – disable when editing */}
                 <FormField
                     control={form.control}
                     name="zoneId"
@@ -265,7 +268,12 @@ export function ZoneForm({
                                 Zone ID <span className="text-red-600">*</span>
                             </FormLabel>
                             <FormControl>
-                                <Input placeholder="Lisbon-Zone" {...field} />
+                                <Input
+                                    placeholder="Lisbon-Zone"
+                                    {...field}
+                                    disabled={isEdit} // ← cannot change id on edit
+                                    className={isEdit ? "bg-muted cursor-not-allowed" : ""}
+                                />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -351,7 +359,7 @@ export function ZoneForm({
                     className="w-full bg-[#DC3173]"
                     disabled={isSubmitting || !isValidBoundary}
                 >
-                    {isSubmitting ? "Saving…" : "Save Zone"}
+                    {isSubmitting ? "Saving…" : isEdit ? "Update Zone" : "Save Zone"}
                 </Button>
             </form>
         </Form>
