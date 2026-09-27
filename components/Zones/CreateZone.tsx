@@ -1,19 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// components/Zones/CreateZone.tsx
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ZoneMapDrawer } from "./ZoneMapDrawer";
-import { ZoneForm, type ZoneFormValues } from "./ZoneForm";
+import { DistrictPlaceResult, ZoneForm, type ZoneFormValues } from "./ZoneForm";
 import { toast } from "sonner";
-import { ValidateBoundaryResponse } from "@/types/zone.type";
-import { toGeoJsonPolygon } from "@/utils/toGeoJsonPolygon";
+import type { ValidateBoundaryResponse } from "@/types/zone.type";
+import { boundsToPath, toGeoJsonPolygon } from "@/utils/toGeoJsonPolygon";
 import { createZone } from "@/services/dashboard/zone/zone.service";
 import TitleHeader from "../TitleHeader/TitleHeader";
-import { useTranslation } from "@/hooks/use-translation";
 
 const CreateZone = () => {
-    const { t } = useTranslation();
     const router = useRouter();
 
     const [validation, setValidation] = useState<ValidateBoundaryResponse | null>(null);
@@ -21,10 +19,22 @@ const CreateZone = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const canSave = !!validation?.valid && currentPath.length >= 4;
+    const [districtPath, setDistrictPath] = useState<
+        google.maps.LatLngLiteral[] | undefined
+    >();
+
+    const handleDistrictSelect = (place: DistrictPlaceResult) => {
+        const path = boundsToPath(place.bounds);
+        setDistrictPath([...path]);
+        setCurrentPath(path);
+        toast.success(`Loaded area for ${place.name}`);
+    };
+
 
     const handleSubmit = async (values: ZoneFormValues) => {
+        const toastId = toast.loading("Creating Zone...");
         if (!canSave) {
-            toast.error("Please draw a valid boundary first");
+            toast.error("Please draw or select a valid boundary first", { id: toastId });
             return;
         }
 
@@ -43,13 +53,25 @@ const CreateZone = () => {
             });
 
             if (result.success) {
-                toast.success("Zone created successfully");
+                toast.success("Zone created successfully", { id: toastId });
                 router.push("/admin/zones");
+                return;
+            };
+
+            const errorSources = result?.data?.errorSources;
+            if (errorSources?.length > 0) {
+                toast.error(
+                    errorSources
+                        ?.map((err: { path: string; message: string }) => err?.message)
+                        .join(", "),
+                    { id: toastId }
+                );
             } else {
-                toast.error(result.message || "Failed to create zone");
+                toast.error(
+                    result.message || "Failed to create zone.",
+                    { id: toastId }
+                );
             }
-        } catch (e: any) {
-            toast.error(e.message || "Something went wrong");
         } finally {
             setIsSubmitting(false);
         }
@@ -59,31 +81,30 @@ const CreateZone = () => {
         <div className="space-y-6">
             <TitleHeader
                 title="Create Zone"
-                subtitle="Draw the coverage area, then fill in the zone details."
+                subtitle="Search a district to auto-load its boundary, or draw manually."
             />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                {/* Map */}
                 <div className="xl:col-span-2">
                     <ZoneMapDrawer
+                        initialPath={districtPath}
                         onValidationChange={setValidation}
                         onPolygonChange={setCurrentPath}
                     />
                 </div>
 
-                {/* Form */}
                 <div className="border rounded-lg p-4 h-fit sticky top-6 space-y-4">
                     <h2 className="font-semibold">Zone Details</h2>
-
                     <ZoneForm
                         onSubmit={handleSubmit}
                         isSubmitting={isSubmitting}
-                        isValidBoundary={canSave}   // ← this controls the Save button
+                        isValidBoundary={canSave}
+                        onDistrictSelect={handleDistrictSelect}
                     />
                 </div>
             </div>
         </div>
     );
-}
+};
 
 export default CreateZone;

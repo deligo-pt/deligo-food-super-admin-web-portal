@@ -24,3 +24,37 @@ export function toGeoJsonPolygon(
         coordinates: [coords],
     };
 }
+
+
+export function generateZoneId(name: string): string {
+    const base = name
+        .trim()
+        .replace(/[^a-zA-Z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+    return `${base}-Zone`;
+}
+
+/** Build a closed polygon from a Google LatLngBounds (viewport) */
+export function boundsToPath(
+    bounds: google.maps.LatLngBounds
+): google.maps.LatLngLiteral[] {
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+    return [
+        { lat: sw.lat(), lng: sw.lng() },
+        { lat: sw.lat(), lng: ne.lng() },
+        { lat: ne.lat(), lng: ne.lng() },
+        { lat: ne.lat(), lng: sw.lng() },
+        { lat: sw.lat(), lng: sw.lng() }, // close ring
+    ];
+}
+
+/** Convert GeoJSON coordinates [lng, lat][] → Google LatLngLiteral[] */
+export function geoJsonToPath(
+    coordinates: number[][][]
+): google.maps.LatLngLiteral[] {
+    const ring = coordinates[0] || [];
+    return ring.map(([lng, lat]) => ({ lat, lng }));
+}

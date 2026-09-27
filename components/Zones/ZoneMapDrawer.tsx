@@ -3,7 +3,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Map, useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
+import { Map, useMap } from "@vis.gl/react-google-maps";
 import { ZoneValidationFeedback } from "./ZoneValidationFeedback";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,6 @@ export function ZoneMapDrawer({
     onPolygonChange,
 }: Props) {
     const map = useMap();
-    const geometry = useMapsLibrary("geometry");
 
     const [isDrawing, setIsDrawing] = useState(false);
     const [path, setPath] = useState<LatLngLiteral[]>(initialPath ?? []);
@@ -225,9 +224,10 @@ export function ZoneMapDrawer({
     useEffect(() => {
         if (!map || !initialPath || initialPath.length < 3) return;
 
+        // clear previous
         polygon?.setMap(null);
         polyline?.setMap(null);
-        markers.forEach((marker) => marker.setMap(null));
+        markers.forEach((m) => m.setMap(null));
 
         const poly = new google.maps.Polygon({
             paths: initialPath,
@@ -240,15 +240,12 @@ export function ZoneMapDrawer({
             map,
         });
 
+        setPolygon(poly);
+        setPolyline(null);
+        setMarkers([]);
+        setPath(initialPath);
         pathRef.current = initialPath;
-
-        queueMicrotask(() => {
-            setPolygon(poly);
-            setPolyline(null);
-            setMarkers([]);
-            setPath(initialPath);
-            setValidation(null);
-        });
+        setIsDrawing(false);
 
         const pathObj = poly.getPath();
         const updateFromPoly = () => {
@@ -267,12 +264,18 @@ export function ZoneMapDrawer({
         google.maps.event.addListener(pathObj, "remove_at", updateFromPoly);
 
         onPolygonChange?.(initialPath);
-        queueMicrotask(() => runValidation(initialPath));
+        runValidation(initialPath);
+
+        // Fit map to the district
+        const bounds = new google.maps.LatLngBounds();
+        initialPath.forEach((p) => bounds.extend(p));
+        map.fitBounds(bounds);
 
         return () => {
             poly.setMap(null);
         };
-    }, [map, initialPath, polygon, polyline, markers]);
+        // Only re-run when the selected district path changes
+    }, [map, initialPath]);
 
     // Start drawing
     const startDrawing = () => {

@@ -19,7 +19,7 @@ export function GoogleMapsProvider({
     return (
         <APIProvider
             apiKey={apiKey}
-            libraries={["drawing", "geometry", "marker"]} // important
+            libraries={["drawing", "geometry", "marker", "places"]} // important
             onLoad={() => console.log("Google Maps loaded")}
             onError={(e) => console.error("Google Maps error", e)}
         >
