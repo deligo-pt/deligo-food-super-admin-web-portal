@@ -11,7 +11,7 @@ import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getZoneColumns } from "./getZoneColumns";
+import { useZoneColumns } from "./getZoneColumns";
 
 interface IProps {
     zonesData: ZoneListResponse;
@@ -37,7 +37,7 @@ export default function AllZones({ zonesData }: IProps) {
         }
     ];
 
-    const columns = getZoneColumns({
+    const { columns, renderModal } = useZoneColumns({
         t,
         onRefresh: () => router.refresh(),
     });
@@ -81,6 +81,8 @@ export default function AllZones({ zonesData }: IProps) {
                     <PaginationComponent totalPages={zonesData?.meta?.totalPage || 0} />
                 </div>
             )}
+
+            {renderModal}
         </div>
     );
 }

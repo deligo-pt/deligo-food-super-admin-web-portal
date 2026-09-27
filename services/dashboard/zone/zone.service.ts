@@ -6,6 +6,7 @@ import type {
   ZoneSingleResponse,
   CreateZonePayload,
   GeoJsonPolygon,
+  IZone,
 } from "@/types/zone.type";
 import { catchAsync } from "@/utils/catchAsync";
 import { serverFetch } from "@/lib/fetchHelper";
@@ -18,7 +19,6 @@ export const getAllZones = async (queryString?: string) => {
     const res = await serverFetch.get(url, {
       next: {
         tags: ["zones"],
-        revalidate: 30,
       },
     });
     return await res.json();
@@ -33,7 +33,6 @@ export const getZoneById = async (zoneId: string) => {
     const res = await serverFetch.get(`/zones/${zoneId}`, {
       next: {
         tags: [`zone-${zoneId}`],
-        revalidate: 30,
       },
     });
     return await res.json();
@@ -74,6 +73,24 @@ export const createZone = async (data: CreateZonePayload) => {
   return result;
 };
 
+// UPDATE ZONE
+export const updateZone = async (zoneId: string, data: Partial<CreateZonePayload>) => {
+  const result = await catchAsync<ZoneSingleResponse>(async () => {
+    const res = await serverFetch.patch(`/zones/${zoneId}`, {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("zones", {});
+    revalidatePath("/admin/zones");
+  }
+
+  return result;
+};
+
 // TOGGLE STATUS
 export const toggleZoneStatus = async (
   zoneId: string,
@@ -98,7 +115,7 @@ export const toggleZoneStatus = async (
 // SOFT DELETE
 export const softDeleteZone = async (zoneId: string) => {
   const result = await catchAsync(async () => {
-    const res = await serverFetch.patch(`/zones/${zoneId}/soft-delete`);
+    const res = await serverFetch.delete(`/zones/${zoneId}/soft-delete`);
     return await res.json();
   });
 

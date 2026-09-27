@@ -9,7 +9,11 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { softDeleteZone, toggleZoneStatus } from "@/services/dashboard/zone/zone.service";
+import {
+    softDeleteZone,
+    permanentDeleteZone,
+    toggleZoneStatus
+} from "@/services/dashboard/zone/zone.service";
 import { IZone } from "@/types/zone.type";
 import {
     MapPin,
@@ -21,43 +25,109 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useState } from "react";
+import DeleteModal from "../Modals/DeleteModal";
 
 type TFunction = (key: string) => string;
 
-interface GetZoneColumnsParams {
+interface UseZoneColumnsParams {
     t: TFunction;
     onRefresh?: () => void;
 }
 
-export function getZoneColumns({
+export function useZoneColumns({
     t,
     onRefresh,
-}: GetZoneColumnsParams): Column<IZone>[] {
-    const handleToggle = async (zone: IZone) => {
-        const result = await toggleZoneStatus(zone.zoneId, !zone.isOperational);
-        if (result.success) {
-            toast.success(
-                zone.isOperational ? "Zone deactivated" : "Zone activated"
-            );
+}: UseZoneColumnsParams) {
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        confirmText: string;
+        variant: "default" | "destructive";
+        action: () => Promise<unknown>;
+    }>({
+        isOpen: false,
+        title: "",
+        description: "",
+        confirmText: "Confirm",
+        variant: "destructive",
+        action: async () => { },
+    });
+    const [isPending, setIsPending] = useState(false);
+
+    const handleConfirmAction = async () => {
+        setIsPending(true);
+        try {
+            await modalState.action();
+            setModalState((prev) => ({ ...prev, isOpen: false }));
             onRefresh?.();
-        } else {
-            toast.error(result.message || "Failed to update status");
+        } catch (error) {
+            console.log("error in zone", error);
+        } finally {
+            setIsPending(false);
         }
     };
 
-    const handleSoftDelete = async (zone: IZone) => {
-        if (!confirm(`Soft delete zone "${zone.zoneName}"?`)) return;
-
-        const result = await softDeleteZone(zone.zoneId);
-        if (result.success) {
-            toast.success("Zone soft-deleted");
-            onRefresh?.();
-        } else {
-            toast.error(result.message || "Failed to delete");
-        }
+    const openToggleModal = (zone: IZone) => {
+        const willBeOperational = !zone.isOperational;
+        setModalState({
+            isOpen: true,
+            title: willBeOperational ? "Activate Zone" : "Deactivate Zone",
+            description: `Are you sure you want to ${willBeOperational ? "activate" : "deactivate"} "${zone.zoneName}"?`,
+            confirmText: willBeOperational ? "Activate" : "Deactivate",
+            variant: "default",
+            action: async () => {
+                const toastId = toast.loading("Updating status...");
+                const result = await toggleZoneStatus(zone.zoneId, willBeOperational);
+                if (result.success) {
+                    toast.success(result?.message, { id: toastId });
+                } else {
+                    toast.error(result.message || "Failed to update status", { id: toastId });
+                }
+            },
+        });
     };
 
-    return [
+    const openSoftDeleteModal = (zone: IZone) => {
+        setModalState({
+            isOpen: true,
+            title: "Soft Delete Zone",
+            description: `Are you sure you want to soft delete "${zone.zoneName}"? It can be restored later if needed.`,
+            confirmText: "Soft Delete",
+            variant: "destructive",
+            action: async () => {
+                const toastId = toast.loading("Deleting zone...");
+                const result = await softDeleteZone(zone.zoneId);
+                if (result.success) {
+                    toast.success("Zone soft-deleted successfully", { id: toastId });
+                } else {
+                    toast.error(result.message || "Failed to soft delete zone", { id: toastId });
+                }
+            },
+        });
+    };
+
+    const openPermanentDeleteModal = (zone: IZone) => {
+        setModalState({
+            isOpen: true,
+            title: "Permanently Delete Zone",
+            description: `Warning: This action is permanent and cannot be undone. Are you sure you want to permanently delete "${zone.zoneName}"?`,
+            confirmText: "Permanent Delete",
+            variant: "destructive",
+            action: async () => {
+                const toastId = toast.loading("Deleting zone....");
+                const result = await permanentDeleteZone(zone.zoneId);
+                if (result.success) {
+                    toast.success("Zone permanently deleted", { id: toastId });
+                } else {
+                    toast.error(result.message || "Failed to permanently delete zone", { id: toastId });
+                }
+            },
+        });
+    };
+
+    const columns: Column<IZone>[] = [
         {
             header: (
                 <div className="flex items-center gap-2 text-[#DC3173] font-medium">
@@ -160,23 +230,49 @@ export function getZoneColumns({
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                            onClick={() => handleToggle(zone)}
+                            onClick={() => openToggleModal(zone)}
                             className="flex items-center gap-2 cursor-pointer"
                         >
                             <Power size={16} />
                             {zone.isOperational ? "Deactivate" : "Activate"}
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem
-                            onClick={() => handleSoftDelete(zone)}
-                            className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
-                        >
-                            <Trash2 size={16} />
-                            Soft Delete
-                        </DropdownMenuItem>
+                        {zone.isDeleted ? (
+                            <DropdownMenuItem
+                                onClick={() => openPermanentDeleteModal(zone)}
+                                className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                            >
+                                <Trash2 size={16} />
+                                Permanent Delete
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem
+                                onClick={() => openSoftDeleteModal(zone)}
+                                className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                            >
+                                <Trash2 size={16} />
+                                Soft Delete
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),
         },
     ];
+
+    return {
+        columns,
+        renderModal: (
+            <DeleteModal
+                open={modalState.isOpen}
+                onOpenChange={(open) => setModalState((prev) => ({ ...prev, isOpen: open }))}
+                onConfirm={handleConfirmAction}
+                isDeleting={isPending}
+                title={modalState.title}
+                description={modalState.description}
+                confirmText={modalState.confirmText}
+                variant={modalState.variant}
+            />
+        ),
+    };
 }
