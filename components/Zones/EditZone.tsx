@@ -74,8 +74,6 @@ const EditZone = ({ zoneDetails }: IProps) => {
                 zoneName: values.zoneName,
                 boundary,
                 isOperational: values.isOperational,
-                minDeliveryFee: values.minDeliveryFee,
-                maxDeliveryDistanceKm: values.maxDeliveryDistanceKm,
             });
 
             if (result.success) {
@@ -125,8 +123,8 @@ const EditZone = ({ zoneDetails }: IProps) => {
                             district: zoneDetails.district,
                             zoneName: zoneDetails.zoneName,
                             isOperational: zoneDetails.isOperational,
-                            minDeliveryFee: zoneDetails.minDeliveryFee ?? 2,
-                            maxDeliveryDistanceKm: zoneDetails.maxDeliveryDistanceKm ?? 7,
+                            // minDeliveryFee: zoneDetails.minDeliveryFee ?? 2,
+                            // maxDeliveryDistanceKm: zoneDetails.maxDeliveryDistanceKm ?? 7,
                         }}
                     />
                 </div>

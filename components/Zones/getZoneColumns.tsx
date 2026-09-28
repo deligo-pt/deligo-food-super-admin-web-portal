@@ -172,24 +172,24 @@ export function useZoneColumns({
                     </Badge>
                 ),
         },
-        {
-            header: <span className="text-[#DC3173] font-medium">{t("min_fee")}</span>,
-            accessor: (zone) => (
-                <span className="text-sm">
-                    {zone.minDeliveryFee != null ? `€${zone.minDeliveryFee}` : "—"}
-                </span>
-            ),
-        },
-        {
-            header: <span className="text-[#DC3173] font-medium">{t("max_distance")}</span>,
-            accessor: (zone) => (
-                <span className="text-sm">
-                    {zone.maxDeliveryDistanceKm != null
-                        ? `${zone.maxDeliveryDistanceKm} km`
-                        : "—"}
-                </span>
-            ),
-        },
+        // {
+        //     header: <span className="text-[#DC3173] font-medium">{t("min_fee")}</span>,
+        //     accessor: (zone) => (
+        //         <span className="text-sm">
+        //             {zone.minDeliveryFee != null ? `€${zone.minDeliveryFee}` : "—"}
+        //         </span>
+        //     ),
+        // },
+        // {
+        //     header: <span className="text-[#DC3173] font-medium">{t("max_distance")}</span>,
+        //     accessor: (zone) => (
+        //         <span className="text-sm">
+        //             {zone.maxDeliveryDistanceKm != null
+        //                 ? `${zone.maxDeliveryDistanceKm} km`
+        //                 : "—"}
+        //         </span>
+        //     ),
+        // },
         {
             header: (
                 <div className="text-right pr-4 text-[#DC3173] font-medium">

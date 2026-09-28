@@ -35,8 +35,6 @@ const zoneFormSchema = z.object({
     district: z.string().min(1, "Required").max(100),
     zoneName: z.string().min(1, "Required").max(100),
     isOperational: z.boolean(),
-    minDeliveryFee: z.coerce.number().min(0).max(100),
-    maxDeliveryDistanceKm: z.coerce.number().min(0).max(100),
 });
 
 export type ZoneFormValues = z.infer<typeof zoneFormSchema>;
@@ -83,8 +81,6 @@ export function ZoneForm({
             district: "",
             zoneName: "",
             isOperational: true,
-            minDeliveryFee: 2,
-            maxDeliveryDistanceKm: 7,
             ...defaultValues,
         },
     });
@@ -303,7 +299,7 @@ export function ZoneForm({
                     name="isOperational"
                     render={({ field }) => (
                         <FormItem className="flex items-center justify-between rounded-lg border p-3">
-                            <FormLabel>{t("min_delivery_fee")}</FormLabel>
+                            <FormLabel>{t("active_status")}</FormLabel>
                             <FormControl>
                                 <Switch
                                     checked={field.value}
@@ -315,7 +311,7 @@ export function ZoneForm({
                     )}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-2 gap-4">
                     <FormField
                         control={form.control}
                         name="minDeliveryFee"
@@ -354,7 +350,7 @@ export function ZoneForm({
                             </FormItem>
                         )}
                     />
-                </div>
+                </div> */}
 
                 <Button
                     type="submit"

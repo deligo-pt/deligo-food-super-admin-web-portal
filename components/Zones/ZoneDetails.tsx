@@ -214,7 +214,7 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                                     : "—"
                             }
                         />
-                        <InfoItem
+                        {/* <InfoItem
                             icon={Banknote}
                             label={t("min_delivery_fee")}
                             value={
@@ -231,7 +231,7 @@ const ZoneDetails = ({ zoneDetails }: IProps) => {
                                     ? `${zoneDetails.maxDeliveryDistanceKm} km`
                                     : "—"
                             }
-                        />
+                        /> */}
                         <InfoItem
                             icon={LocateFixed}
                             label={t("centroid")}
