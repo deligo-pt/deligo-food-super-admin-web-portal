@@ -31,6 +31,9 @@ export const catchAsync = async <T>(
       ...response,
       success: false,
       message: result.message,
+      data: "errorSources" in result && {
+        errorSources: result.errorSources ? result.errorSources : null
+      },
       error: result.error,
     };
 

@@ -9,7 +9,11 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { softDeleteZone, toggleZoneStatus } from "@/services/dashboard/zone/zone.service";
+import {
+    softDeleteZone,
+    permanentDeleteZone,
+    toggleZoneStatus
+} from "@/services/dashboard/zone/zone.service";
 import { IZone } from "@/types/zone.type";
 import {
     MapPin,
@@ -21,48 +25,114 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useState } from "react";
+import DeleteModal from "../Modals/DeleteModal";
 
 type TFunction = (key: string) => string;
 
-interface GetZoneColumnsParams {
+interface UseZoneColumnsParams {
     t: TFunction;
     onRefresh?: () => void;
 }
 
-export function getZoneColumns({
+export function useZoneColumns({
     t,
     onRefresh,
-}: GetZoneColumnsParams): Column<IZone>[] {
-    const handleToggle = async (zone: IZone) => {
-        const result = await toggleZoneStatus(zone.zoneId, !zone.isOperational);
-        if (result.success) {
-            toast.success(
-                zone.isOperational ? "Zone deactivated" : "Zone activated"
-            );
+}: UseZoneColumnsParams) {
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        confirmText: string;
+        variant: "default" | "destructive";
+        action: () => Promise<unknown>;
+    }>({
+        isOpen: false,
+        title: "",
+        description: "",
+        confirmText: "Confirm",
+        variant: "destructive",
+        action: async () => { },
+    });
+    const [isPending, setIsPending] = useState(false);
+
+    const handleConfirmAction = async () => {
+        setIsPending(true);
+        try {
+            await modalState.action();
+            setModalState((prev) => ({ ...prev, isOpen: false }));
             onRefresh?.();
-        } else {
-            toast.error(result.message || "Failed to update status");
+        } catch (error) {
+            console.log("error in zone", error);
+        } finally {
+            setIsPending(false);
         }
     };
 
-    const handleSoftDelete = async (zone: IZone) => {
-        if (!confirm(`Soft delete zone "${zone.zoneName}"?`)) return;
-
-        const result = await softDeleteZone(zone.zoneId);
-        if (result.success) {
-            toast.success("Zone soft-deleted");
-            onRefresh?.();
-        } else {
-            toast.error(result.message || "Failed to delete");
-        }
+    const openToggleModal = (zone: IZone) => {
+        const willBeOperational = !zone.isOperational;
+        setModalState({
+            isOpen: true,
+            title: willBeOperational ? t("activate_zone") : t("deactivate_zone"),
+            description: `${t("are_you_sure_you_want_to")} ${willBeOperational ? t("activate_sm") : t("deactivate_sm")} "${zone.zoneName}"?`,
+            confirmText: willBeOperational ? t("activate") : t("deactivate"),
+            variant: "default",
+            action: async () => {
+                const toastId = toast.loading("Updating status...");
+                const result = await toggleZoneStatus(zone.zoneId, willBeOperational);
+                if (result.success) {
+                    toast.success(result?.message, { id: toastId });
+                } else {
+                    toast.error(result.message || "Failed to update status", { id: toastId });
+                }
+            },
+        });
     };
 
-    return [
+    const openSoftDeleteModal = (zone: IZone) => {
+        setModalState({
+            isOpen: true,
+            title: t("soft_delete_zone"),
+            description: `${t("are_you_sure_want_to_soft_delete")} "${zone.zoneName}"? ${t("it_can_be_restored_later")}`,
+            confirmText: t("soft_delete"),
+            variant: "destructive",
+            action: async () => {
+                const toastId = toast.loading("Deleting zone...");
+                const result = await softDeleteZone(zone.zoneId);
+                if (result.success) {
+                    toast.success(result?.message || "Zone soft-deleted successfully", { id: toastId });
+                } else {
+                    toast.error(result.message || "Failed to soft delete zone", { id: toastId });
+                }
+            },
+        });
+    };
+
+    const openPermanentDeleteModal = (zone: IZone) => {
+        setModalState({
+            isOpen: true,
+            title: t("permanently_delete_zone"),
+            description: `${t("warning_this_action_is_permanent")} "${zone.zoneName}"?`,
+            confirmText: t("permanent_delete"),
+            variant: "destructive",
+            action: async () => {
+                const toastId = toast.loading("Deleting zone....");
+                const result = await permanentDeleteZone(zone.zoneId);
+                if (result.success) {
+                    toast.success(result?.message || "Zone permanently deleted", { id: toastId });
+                } else {
+                    toast.error(result.message || "Failed to permanently delete zone", { id: toastId });
+                }
+            },
+        });
+    };
+
+    const columns: Column<IZone>[] = [
         {
             header: (
                 <div className="flex items-center gap-2 text-[#DC3173] font-medium">
                     <MapPin size={16} />
-                    <span>Zone</span>
+                    <span>{t("zone")}</span>
                 </div>
             ),
             accessor: (zone) => (
@@ -73,13 +143,13 @@ export function getZoneColumns({
             ),
         },
         {
-            header: <span className="text-[#DC3173] font-medium">District</span>,
+            header: <span className="text-[#DC3173] font-medium">{t("district")}</span>,
             accessor: (zone) => (
                 <span className="text-sm text-gray-700">{zone.district}</span>
             ),
         },
         {
-            header: <span className="text-[#DC3173] font-medium">Area</span>,
+            header: <span className="text-[#DC3173] font-medium">{t('area')}</span>,
             accessor: (zone) => (
                 <span className="text-sm font-medium">
                     {zone.areaKm2?.toFixed(2)} km²
@@ -88,22 +158,22 @@ export function getZoneColumns({
         },
         {
             header: (
-                <div className="text-center text-[#DC3173] font-medium">Status</div>
+                <div className="text-center text-[#DC3173] font-medium">{t("status")}</div>
             ),
             className: "text-center",
             accessor: (zone) =>
                 zone.isOperational ? (
                     <Badge className="bg-green-50 text-green-700 border-green-200">
-                        Operational
+                        {t("operational")}
                     </Badge>
                 ) : (
                     <Badge variant="secondary" className="bg-gray-100 text-gray-600">
-                        Inactive
+                        {t("inactive")}
                     </Badge>
                 ),
         },
         {
-            header: <span className="text-[#DC3173] font-medium">Min Fee</span>,
+            header: <span className="text-[#DC3173] font-medium">{t("min_fee")}</span>,
             accessor: (zone) => (
                 <span className="text-sm">
                     {zone.minDeliveryFee != null ? `€${zone.minDeliveryFee}` : "—"}
@@ -111,7 +181,7 @@ export function getZoneColumns({
             ),
         },
         {
-            header: <span className="text-[#DC3173] font-medium">Max Distance</span>,
+            header: <span className="text-[#DC3173] font-medium">{t("max_distance")}</span>,
             accessor: (zone) => (
                 <span className="text-sm">
                     {zone.maxDeliveryDistanceKm != null
@@ -123,7 +193,7 @@ export function getZoneColumns({
         {
             header: (
                 <div className="text-right pr-4 text-[#DC3173] font-medium">
-                    Actions
+                    {t("actions")}
                 </div>
             ),
             className: "text-right pr-4",
@@ -145,7 +215,7 @@ export function getZoneColumns({
                                 className="flex items-center gap-2 cursor-pointer"
                             >
                                 <Eye size={16} />
-                                View Details
+                                {t("view_details")}
                             </Link>
                         </DropdownMenuItem>
 
@@ -155,28 +225,54 @@ export function getZoneColumns({
                                 className="flex items-center gap-2 cursor-pointer"
                             >
                                 <Pencil size={16} />
-                                Edit
+                                {t("edit")}
                             </Link>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
-                            onClick={() => handleToggle(zone)}
+                            onClick={() => openToggleModal(zone)}
                             className="flex items-center gap-2 cursor-pointer"
                         >
                             <Power size={16} />
-                            {zone.isOperational ? "Deactivate" : "Activate"}
+                            {zone.isOperational ? t("deactivate") : t("activate")}
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem
-                            onClick={() => handleSoftDelete(zone)}
-                            className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
-                        >
-                            <Trash2 size={16} />
-                            Soft Delete
-                        </DropdownMenuItem>
+                        {zone.isDeleted ? (
+                            <DropdownMenuItem
+                                onClick={() => openPermanentDeleteModal(zone)}
+                                className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                            >
+                                <Trash2 size={16} />
+                                {t("permanent_delete")}
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem
+                                onClick={() => openSoftDeleteModal(zone)}
+                                className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                            >
+                                <Trash2 size={16} />
+                                {t("soft_delete")}
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),
         },
     ];
+
+    return {
+        columns,
+        renderModal: (
+            <DeleteModal
+                open={modalState.isOpen}
+                onOpenChange={(open) => setModalState((prev) => ({ ...prev, isOpen: open }))}
+                onConfirm={handleConfirmAction}
+                isDeleting={isPending}
+                title={modalState.title}
+                description={modalState.description}
+                confirmText={modalState.confirmText}
+                variant={modalState.variant}
+            />
+        ),
+    };
 }

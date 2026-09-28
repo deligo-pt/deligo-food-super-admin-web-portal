@@ -1,8 +1,12 @@
 import { z } from "zod";
 
+/** 21:8 — e.g. 2100×800, 2625×1000 */
+const EXPECTED_RATIO = 21 / 8; // 2.625
+const RATIO_TOLERANCE = 0.05;
+
 const checkImageRatio = (
   file: File,
-  expectedRatio: number,
+  expectedRatio: number = EXPECTED_RATIO,
 ): Promise<boolean> => {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -12,7 +16,7 @@ const checkImageRatio = (
       img.src = event.target?.result as string;
       img.onload = () => {
         const ratio = img.width / img.height;
-        resolve(Math.abs(ratio - expectedRatio) < 0.05);
+        resolve(Math.abs(ratio - expectedRatio) < RATIO_TOLERANCE);
       };
       img.onerror = () => resolve(false);
     };
@@ -41,7 +45,12 @@ export const sponsorshipValidation = z
       .default(true)
       .optional(),
 
-    url: z.string().url("Invalid URL format").max(255).or(z.literal("")).optional(),
+    url: z
+      .string()
+      .url("Invalid URL format")
+      .max(255)
+      .or(z.literal(""))
+      .optional(),
 
     sponsorBanner: z.object(
       {
@@ -57,12 +66,16 @@ export const sponsorshipValidation = z
   })
   .superRefine(async (data, ctx) => {
     if (data.sponsorBanner.file instanceof File) {
-      const isCorrectRatio = await checkImageRatio(data.sponsorBanner.file, 2);
+      const isCorrectRatio = await checkImageRatio(
+        data.sponsorBanner.file,
+        EXPECTED_RATIO,
+      );
 
       if (!isCorrectRatio) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Image must have a 2:1 aspect ratio (e.g., 1920x960)",
+          message:
+            "Image must have a 21:8 aspect ratio (e.g. 2100×800 or 2625×1000)",
           path: ["sponsorBanner"],
         });
       }

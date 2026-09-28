@@ -11,7 +11,7 @@ import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { getZoneColumns } from "./getZoneColumns";
+import { useZoneColumns } from "./getZoneColumns";
 
 interface IProps {
     zonesData: ZoneListResponse;
@@ -37,7 +37,7 @@ export default function AllZones({ zonesData }: IProps) {
         }
     ];
 
-    const columns = getZoneColumns({
+    const { columns, renderModal } = useZoneColumns({
         t,
         onRefresh: () => router.refresh(),
     });
@@ -47,8 +47,8 @@ export default function AllZones({ zonesData }: IProps) {
     return (
         <div className="min-h-screen space-y-6">
             <TitleHeader
-                title="Zones & Coverage Areas"
-                subtitle="Manage delivery zones and their boundaries"
+                title={t("zones_and_coverage_areas")}
+                subtitle={t("manage_delivery_zones_and_boundaries")}
                 buttonInfo={{
                     text: t("create_zone"),
                     icon: Plus,
@@ -72,7 +72,7 @@ export default function AllZones({ zonesData }: IProps) {
                     meta={zonesData?.meta as TMeta}
                     columns={columns}
                     getRowKey={(row) => row._id}
-                    emptyMessage="No zones found"
+                    emptyMessage={t("no_zones_found")}
                 />
             </motion.div>
 
@@ -81,6 +81,8 @@ export default function AllZones({ zonesData }: IProps) {
                     <PaginationComponent totalPages={zonesData?.meta?.totalPage || 0} />
                 </div>
             )}
+
+            {renderModal}
         </div>
     );
 }

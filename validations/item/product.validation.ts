@@ -19,14 +19,16 @@ export const productValidation = z.object({
 
     additionalCategories: z.array(z.string().optional()).optional(),
 
-    images: z
-        .array(
-            z
-                .url("Each image must be a valid URL")
-                .nonempty("Image URL is required"),
-        )
-        .min(1, "At least one image is required")
-        .max(5, "No more than 5 images are allowed"),
+    images: z.array(z.string().optional()).optional(),
+
+    // images: z
+    //     .array(
+    //         z
+    //             .url("Each image must be a valid URL")
+    //             .nonempty("Image URL is required"),
+    //     )
+    //     .min(1, "At least one image is required")
+    //     .max(5, "No more than 5 images are allowed"),
 
     price: z.number().optional(),
 

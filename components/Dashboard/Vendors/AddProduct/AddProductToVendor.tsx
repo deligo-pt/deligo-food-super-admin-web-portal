@@ -36,10 +36,6 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/store";
 import { translateObject } from "@/utils/translation/translationObject";
-import { TProduct } from "@/types/product.type";
-import { catchAsync } from "@/utils/catchAsync";
-import { postData } from "@/utils/requests";
-import { TResponse } from "@/types";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import BasicInfoForm from "./BasicInfoForm";
@@ -49,6 +45,8 @@ import ImageAndDescriptionForm from "./Image&DescriptionForm";
 import StockInformationForm from "./StockInformationForm";
 import DeligoMetadata from "./DeligoMetadata";
 import { TVendor } from "@/types/user.type";
+import { uploadImagesReq } from "@/services/upload/upload.service";
+import { createProduct } from "@/services/dashboard/product/product.service";
 
 type FormData = z.infer<typeof productValidation>;
 
@@ -195,6 +193,52 @@ export function AddProductToVendor({
         const status = data.isActive === true ? "ACTIVE" : "INACTIVE";
 
         try {
+            // Images: string[] (already uploaded URLs)
+            let imageUrls: string[] = Array.isArray(data.images)
+                ? data.images.filter((url): url is string => typeof url === "string" && url.trim() !== "")
+                : [];
+
+            // Max 1
+            imageUrls = imageUrls.slice(0, 1);
+
+            // If no image → upload default from public
+            if (imageUrls.length === 0) {
+                try {
+                    const imagePath = "/defaults/dl1.png";
+                    const response = await fetch(imagePath, { cache: "no-store" });
+                    const blob = await response.blob();
+
+                    if (blob.size === 0) {
+                        throw new Error(
+                            `Default image fetched with 0 bytes — check the asset path: ${imagePath}`
+                        );
+                    }
+
+                    const file = new window.File(
+                        [blob],
+                        imagePath.split("/").pop() ?? "default.png",
+                        { type: blob.type || "image/png" }
+                    );
+
+                    const uploadResult = await uploadImagesReq([file]);
+
+                    if (!uploadResult?.success || !uploadResult?.data?.length) {
+                        toast.error(
+                            uploadResult?.message || "Default image upload failed!",
+                            { id: toastId }
+                        );
+                        return;
+                    }
+
+                    imageUrls = [uploadResult.data[0]];
+                } catch (err) {
+                    console.error("Default image error:", err);
+                    toast.error("Failed to load default product image", { id: toastId });
+                    return;
+                }
+            }
+
+            // Translate + build payload
             const translated = await translateObject(data, lang);
 
             if (!translated) {
@@ -204,10 +248,14 @@ export function AddProductToVendor({
 
             const productData = {
                 name: translated.name,
-                ...(data?.description?.[lang] && { description: translated.description }),
+                ...(data?.description?.[lang] && {
+                    description: translated.description,
+                }),
                 category: data.category,
-                ...(data.additionalCategories && { additionalCategories: data.additionalCategories }),
-                images: data.images,
+                ...(data.additionalCategories && {
+                    additionalCategories: data.additionalCategories,
+                }),
+                images: imageUrls,
                 pricing: {
                     price: data.price,
                     discountType: data.discountType,
@@ -231,15 +279,10 @@ export function AddProductToVendor({
                         },
                     }
                     : {}),
-                userId: vendor?._id,
+                vendorId: vendor?._id,
             };
 
-            const result = await catchAsync<TProduct>(async () => {
-                return (await postData(
-                    "/products/admin/create-product",
-                    productData,
-                )) as unknown as TResponse<TProduct>;
-            });
+            const result = await createProduct(productData);
 
             if (result.success) {
                 toast.success(result.message || "Product created successfully!", {
@@ -247,21 +290,21 @@ export function AddProductToVendor({
                 });
                 form.reset();
                 setActiveTab(0);
-                router.push(`/admin/vendor/${vendor?.userId}/manage-products`)
+                router.push(`/admin/vendor/${vendor?.userId}/manage-products`);
                 return;
             }
 
             if (result?.data?.errorSources) {
-                result?.data?.errorSources?.map((err: { path: string, message: string }) => (
-                    toast.error(err?.message, { id: toastId })
-                ));
+                result.data.errorSources.forEach(
+                    (err: { path: string; message: string }) =>
+                        toast.error(err?.message, { id: toastId })
+                );
                 return;
-            } else {
-                toast.error(result.message || "Product creation failed", {
-                    id: toastId,
-                });
             }
 
+            toast.error(result.message || "Product creation failed", {
+                id: toastId,
+            });
         } catch (error) {
             console.error(error);
             toast.error("Something went wrong", {

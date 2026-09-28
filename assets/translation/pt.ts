@@ -149,6 +149,7 @@ export const pt = {
   coupon_analytics: "Análise de Cupões",
   sponsorships: "Patrocínios",
   add_sponsorship: "Adicionar Patrocínio",
+  create_zone: "Criar Zona",
 
   analytics_and_insights: "Análises e Insights",
   sales_analytics: "Análise de Vendas",
@@ -1806,6 +1807,55 @@ export const pt = {
   now: "Agora",
   // --> update sponsorship
   edit_sponsorship: "Editar Patrocínio",
+  // create zone
+  search_a_district_to_auto_load: "Pesquise um distrito para carregar automaticamente o seu limite ou desenhe manualmente.",
+  zone_details: "Detalhes da Zona",
+  // --> zone map drawer
+  draw_zone: "Desenhar Zona",
+  finish_drawing: "Concluir Desenho",
+  click_to_add_points: "Clique para adicionar pontos",
+  point: "ponto",
+  checking_boundary: "A verificar limite",
+  area: "Área",
+  valid: "Válido",
+  invalid: "Inválido",
+  overlap: "sobreposição",
+  overlaps_with_existing_zones: "Sobrepõe-se a zonas existentes",
+  no_overlaps_safe_to_save_as_active: "Sem sobreposições — seguro para guardar como zona ativa.",
+  // --> zone form
+  district: "Distrito",
+  search_district_in_portugal: "Pesquisar distrito em Portugal...",
+  zone_id: "ID da Zona",
+  min_delivery_fee: "Taxa Mínima de Entrega",
+  max_distance_km: "Distância Máxima (km)",
+  update_zone: "Atualizar Zona",
+  save_zone: "Guardar Zona",
+  // all zones
+  manage_delivery_zones_and_boundaries: "Gerir zonas de entrega e os seus limites",
+  min_fee: "Taxa Mínima",
+  max_distance: "Distância Máxima",
+  activate_zone: "Ativar Zona",
+  deactivate_zone: "Desativar Zona",
+  are_you_sure_you_want_to: "Tem a certeza de que pretende",
+  activate_sm: "ativar",
+  deactivate_sm: "desativar",
+  soft_delete_zone: "Eliminação Lógica de Zona",
+  are_you_sure_want_to_soft_delete: "Tem a certeza de que pretende eliminar temporariamente",
+  it_can_be_restored_later: "Pode ser restaurada mais tarde, se necessário.",
+  permanently_delete_zone: "Eliminar Zona Permanentemente",
+  warning_this_action_is_permanent: "Aviso: Esta ação é permanente e não pode ser desfeita. Tem a certeza de que pretende eliminar permanentemente",
+  // -> details
+  coverage_boundary: "Limite de Cobertura",
+  no_boundary_data: "Sem dados de limite",
+  this_zone_has_no_polygon: "Esta zona ainda não tem nenhum polígono guardado.",
+  zone_information: "Informação da Zona",
+  max_delivery_distance: "Distância Máxima de Entrega",
+  centroid: "Centroide",
+  status_nd_timeline: "Estado e Cronologia",
+  deactivation_reason: "Motivo da Desativação",
+
+  // -> edit zone
+  update_details_and_boundary_for: "Atualizar detalhes e limite para",
 
   // sales-analytics
   sales_analytics_nd_insights: "Análises e insights de vendas",

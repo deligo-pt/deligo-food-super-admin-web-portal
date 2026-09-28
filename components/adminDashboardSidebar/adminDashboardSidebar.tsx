@@ -284,6 +284,8 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           path: "/admin/sponsorships",
         },
         { name: t("add_sponsorship"), path: "/admin/add-sponsorship" },
+        { name: t("create_zone"), path: "/admin/zones/create" },
+        { name: t("all_zones"), path: "/admin/zones" },
       ],
     },
     {
