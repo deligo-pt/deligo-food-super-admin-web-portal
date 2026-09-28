@@ -53,6 +53,7 @@ import DeligoMetadata from "../../AddProduct/DeligoMetadata";
 import { getAllProductCategories } from "@/services/dashboard/category/product-category.service";
 import { getAllTaxes } from "@/services/dashboard/tax/tax.service";
 import { getAllAddOnsGroup, updateProduct, updateProductPriceStock } from "@/services/dashboard/product/product.service";
+import { uploadImagesReq } from "@/services/upload/upload.service";
 
 type FormData = z.infer<typeof productValidation>;
 
@@ -223,15 +224,67 @@ export function EditProductForm({
         }
 
         // images update
+        // images update
         const originalImages: string[] = prevData?.images || [];
-        const currentImages: string[] = data.images || [];
+        let currentImages: string[] = Array.isArray(data.images)
+            ? (data.images as string[]).filter(
+                (url): url is string => typeof url === "string" && url.trim() !== ""
+            )
+            : [];
+
+        // Max 1 image
+        currentImages = currentImages.slice(0, 1);
+
+        // If no image left → upload default from public
+        if (currentImages.length === 0) {
+            try {
+                const imagePath = "/defaults/dl1.png";
+                const response = await fetch(imagePath, { cache: "no-store" });
+                const blob = await response.blob();
+
+                if (blob.size === 0) {
+                    throw new Error(
+                        `Default image fetched with 0 bytes — check the asset path: ${imagePath}`
+                    );
+                }
+
+                const file = new window.File(
+                    [blob],
+                    imagePath.split("/").pop() ?? "default.png",
+                    { type: blob.type || "image/png" }
+                );
+
+                const uploadResult = await uploadImagesReq([file]);
+
+                if (!uploadResult?.success || !uploadResult?.data?.length) {
+                    toast.error(
+                        uploadResult?.message || "Default image upload failed!",
+                        { id: toastId }
+                    );
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                currentImages = [uploadResult.data[0]];
+            } catch (err) {
+                console.error("Default image error:", err);
+                toast.error("Failed to load default product image", { id: toastId });
+                setIsSubmitting(false);
+                return;
+            }
+        }
 
         const newlyUploaded = currentImages.filter(
             (url) => !originalImages.includes(url)
         );
 
-        if (newlyUploaded.length > 0) {
-            productData.images = newlyUploaded;
+        // Send images if something new was uploaded OR the set actually changed
+        const imagesChanged =
+            newlyUploaded.length > 0 ||
+            JSON.stringify(currentImages) !== JSON.stringify(originalImages.slice(0, 1));
+
+        if (imagesChanged) {
+            productData.images = currentImages; // always the final list (max 1)
         }
 
         // pricing update

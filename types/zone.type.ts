@@ -99,3 +99,13 @@ export type ZoneSingleResponse = {
   message: string;
   data: IZone;
 };
+
+// types/zone.type.ts (add)
+export type DistrictOption = {
+  id: string;
+  name: string;
+  boundary: {
+    type: "Polygon";
+    coordinates: number[][][]; // [[[lng, lat], ...]]
+  };
+};

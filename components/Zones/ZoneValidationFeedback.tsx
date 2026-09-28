@@ -2,6 +2,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "@/hooks/use-translation";
 import { ValidateBoundaryResponse } from "@/types/zone.type";
 import { Loader2, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 
@@ -11,11 +12,13 @@ type Props = {
 };
 
 export function ZoneValidationFeedback({ validation, isValidating }: Props) {
+  const { t } = useTranslation();
+
   if (isValidating) {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Checking boundary…
+        {t("checking_boundary")}…
       </div>
     );
   }
@@ -34,16 +37,16 @@ export function ZoneValidationFeedback({ validation, isValidating }: Props) {
         )}
 
         <span className="font-medium">
-          Area: {validation.areaKm2.toFixed(2)} km²
+          {t("area")}: {validation.areaKm2.toFixed(2)} km²
         </span>
 
         <Badge variant={validation.valid ? "default" : "destructive"}>
-          {validation.valid ? "Valid" : "Invalid"}
+          {validation.valid ? t("valid") : t("invalid")}
         </Badge>
 
         {hasOverlaps && (
           <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-            {validation.overlaps.length} overlap(s)
+            {validation.overlaps.length} {t("overlap")}(s)
           </Badge>
         )}
       </div>
@@ -52,7 +55,7 @@ export function ZoneValidationFeedback({ validation, isValidating }: Props) {
         <div className="space-y-1">
           <p className="flex items-center gap-1.5 text-amber-700 font-medium">
             <AlertTriangle className="h-4 w-4" />
-            Overlaps with existing zones:
+            {t("overlaps_with_existing_zones")}:
           </p>
           <ul className="list-disc list-inside text-amber-800 pl-1">
             {validation.overlaps.map((o) => (
@@ -67,7 +70,7 @@ export function ZoneValidationFeedback({ validation, isValidating }: Props) {
 
       {validation.valid && !hasOverlaps && (
         <p className="text-green-700">
-          No overlaps — safe to save as an active zone.
+          {t("no_overlaps_safe_to_save_as_active")}
         </p>
       )}
     </div>

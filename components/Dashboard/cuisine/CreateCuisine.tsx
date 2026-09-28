@@ -68,7 +68,7 @@ const CreateCuisine = () => {
         };
 
         const result = await createCuisine(cuisineData, image?.file);
-        console.log("cuis result", result);
+
         if (result?.success) {
             toast.success(result.message || "Cuisine created successfully!", {
                 id: toastId,
