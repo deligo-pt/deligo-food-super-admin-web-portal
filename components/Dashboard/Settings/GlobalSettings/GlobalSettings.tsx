@@ -138,6 +138,9 @@ export default function GlobalSettings({
       // order
       customerNearestVendorRadiusKm: settings?.order?.nearestVendorRadiusKm || 0,
       cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
+      autoAcceptTimeoutMinutes: settings?.order?.autoAcceptTimeoutMinutes || 0,
+      autoDispatchLeadMinutes: settings?.order?.autoDispatchLeadMinutes || 0,
+      preparationExtensionMinutes: settings?.order?.preparationExtensionMinutes || 0,
 
       // activity logs retention
       archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 12,
@@ -238,6 +241,9 @@ export default function GlobalSettings({
       order: {
         nearestVendorRadiusKm: data.customerNearestVendorRadiusKm,
         cancelTimeLimitMinutes: data.cancelTimeLimitMinutes,
+        autoAcceptTimeoutMinutes: data.autoAcceptTimeoutMinutes,
+        autoDispatchLeadMinutes: data.autoDispatchLeadMinutes,
+        preparationExtensionMinutes: data.preparationExtensionMinutes,
       },
       ingredientsOrder: {
         deliveryChargeInsideLisbon: data.deliveryChargeInsideLisbon,
@@ -817,18 +823,89 @@ export default function GlobalSettings({
                           control={form.control}
                           name="customerNearestVendorRadiusKm"
                           render={({ field, fieldState }) => (
-                            <FormItem className="col-span-2">
+                            <FormItem className="">
                               <FormControl>
                                 <SettingsInput
                                   fieldState={fieldState}
-                                  label="Customer Nearest Vendor Radius"
+                                  label={t("customer_nearest_vendor_radius")}
                                   type="number"
                                   value={field.value}
                                   onChange={(e) =>
                                     field.onChange(parseFloat(e.target.value))
                                   }
                                   suffix="km"
-                                  description="Maximum distance between customer and nearest vendor"
+                                  description={t("maximum_dis_between_customer_nearest_vendor")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="autoAcceptTimeoutMinutes"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("order_auto_accept_timeout_minutes")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="m"
+                                  description={t("automatically_accepts_order")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="autoDispatchLeadMinutes"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("order_auto_dispatch_lead_minutes")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="m"
+                                  description={t("defines_how_many_minutes_before_estimated")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="preparationExtensionMinutes"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("order_preparation_extension_minutes")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="m"
+                                  description={t("defines_the_number_of_extra_preparation")}
                                   min={0}
                                 />
                               </FormControl>
