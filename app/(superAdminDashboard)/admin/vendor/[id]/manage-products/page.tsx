@@ -23,7 +23,7 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
         vendorId: vendorMongoId,
         limit: "30",
         page: "1",
-        sortBy: "name",
+        // sortBy: "name",
         ...searchParamsObj
     });
     const { data, meta } = await getAllProducts(productsQuery);
@@ -32,7 +32,7 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
     const categoriesQuery = queryStringFormatter({
         vendorId: vendorMongoId,
         limit: "30",
-        sortBy: "name",
+        // sortBy: "name",
         ...searchParamsObj
     });
     const productCategories = await getAllProductCategories(categoriesQuery);

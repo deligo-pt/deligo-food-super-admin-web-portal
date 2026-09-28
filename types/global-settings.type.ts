@@ -30,10 +30,14 @@ export type TGlobalSettings = {
     minAmount: number;
     maxAmount: number;
     maxItemsPerOrder: number;
-    nearestVendorRadiusKm: number;
     autoCancelUnacceptedMinutes: number;
     autoMarkDeliveredMinutes: number;
+    // workable
+    nearestVendorRadiusKm: number;
     cancelTimeLimitMinutes: number;
+    autoAcceptTimeoutMinutes: number;
+    autoDispatchLeadMinutes: number;
+    preparationExtensionMinutes: number;
   };
 
   // Agreements
