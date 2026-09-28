@@ -2464,7 +2464,7 @@ export const pt = {
   delivery_service_fee: "Taxa do Serviço de Entrega",
   distanceThresholdKm: "Distância Limite (KM)",
   chargePerKmBeyondThreshold: "Taxa por KM além do Limite",
-  charge_per_km: "Cobrança por KM",
+  charge_per_km: "Taxa por KM Dentro do Limite",
   min_charge: "Cobrança Mínima",
   max_charge: "Cobrança Máxima",
   maximum_delivery_distance: "Distância Máxima de Entrega",

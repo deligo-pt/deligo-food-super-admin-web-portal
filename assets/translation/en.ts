@@ -2436,7 +2436,7 @@ export const en = {
   delivery_service_fee: "Delivery Service Fee",
   distanceThresholdKm: "Threshold Distance KM",
   chargePerKmBeyondThreshold: "Per KM charge beyond Threshold",
-  charge_per_km: "Charge per KM",
+  charge_per_km: "Within Threshold Charge per KM",
   min_charge: "Min Charge",
   max_charge: "Max Charge",
   maximum_delivery_distance: "Maximum Delivery Distance",

@@ -474,13 +474,13 @@ export default function GlobalSettings({
                         />
                         <FormField
                           control={form.control}
-                          name="chargePerKmBeyondThreshold"
+                          name="deliveryChargePerKm"
                           render={({ field, fieldState }) => (
                             <FormItem>
                               <FormControl>
                                 <SettingsInput
                                   fieldState={fieldState}
-                                  label={t("chargePerKmBeyondThreshold")}
+                                  label={t("charge_per_km")}
                                   type="number"
                                   value={field.value}
                                   onChange={(e) =>
@@ -496,13 +496,13 @@ export default function GlobalSettings({
                         />
                         <FormField
                           control={form.control}
-                          name="deliveryChargePerKm"
+                          name="chargePerKmBeyondThreshold"
                           render={({ field, fieldState }) => (
                             <FormItem>
                               <FormControl>
                                 <SettingsInput
                                   fieldState={fieldState}
-                                  label={t("charge_per_km")}
+                                  label={t("chargePerKmBeyondThreshold")}
                                   type="number"
                                   value={field.value}
                                   onChange={(e) =>

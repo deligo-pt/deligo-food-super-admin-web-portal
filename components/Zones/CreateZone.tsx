@@ -50,8 +50,8 @@ const CreateZone = () => {
                 zoneName: values.zoneName,
                 boundary,
                 isOperational: values.isOperational,
-                minDeliveryFee: values.minDeliveryFee,
-                maxDeliveryDistanceKm: values.maxDeliveryDistanceKm,
+                // minDeliveryFee: values.minDeliveryFee,
+                // maxDeliveryDistanceKm: values.maxDeliveryDistanceKm,
             });
 
             if (result.success) {
