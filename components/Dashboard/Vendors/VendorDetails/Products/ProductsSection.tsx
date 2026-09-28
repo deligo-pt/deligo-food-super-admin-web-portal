@@ -71,18 +71,51 @@ export default function ProductsSection({
     const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const searchParams = useSearchParams();
 
-    // Filter out optimistically deleted products
-    const visibleProducts = useMemo(
-        () =>
-            products.filter((product) => {
-                const productId = (product._id || product.productId) as string;
-                return !deletedProductIds.includes(productId);
-            }),
-        [products, deletedProductIds]
-    );
+    // --- Frontend alphabetical sort (temporary until backend supports PT) ---
+    const currentSort =
+        searchParams.get("sort") ||
+        searchParams.get("sortBy") ||
+        searchParams.get("sortOption") ||
+        "";
 
-    // Group by category (show ALL categories)
+    const getProductName = (product: TProduct) => {
+        const name = product.name;
+        if (!name) return "";
+        // prefer current language, fallback to the other, then empty
+        if (typeof name === "object") {
+            return (name as Record<string, string>)[lang]
+                || (name as Record<string, string>).en
+                || (name as Record<string, string>).pt
+                || "";
+        }
+        return String(name);
+    };
+
+    const visibleProducts = useMemo(() => {
+        let list = products.filter((product) => {
+            const productId = (product._id || product.productId) as string;
+            return !deletedProductIds.includes(productId);
+        });
+
+        // Frontend sort by name in current language
+        if (currentSort === "name" || currentSort === "-name") {
+            const direction = currentSort === "name" ? 1 : -1;
+            list = [...list].sort((a, b) => {
+                const nameA = getProductName(a);
+                const nameB = getProductName(b);
+                return nameA.localeCompare(nameB, lang, {
+                    sensitivity: "base",
+                    numeric: true,
+                }) * direction;
+            });
+        }
+
+        return list;
+    }, [products, deletedProductIds, currentSort, lang]);
+
+    // Group by category (show ALL categories) + sort categories by name
     const groupedProducts = useMemo(() => {
         const groups: Record<
             string,
@@ -105,8 +138,65 @@ export default function ProductsSection({
             }
         });
 
-        return Object.values(groups);
-    }, [visibleProducts, productCategories]);
+        let result = Object.values(groups);
+
+        // Frontend sort categories by name (same direction as products)
+        if (currentSort === "name" || currentSort === "-name") {
+            const direction = currentSort === "name" ? 1 : -1;
+
+            result = [...result].sort((a, b) => {
+                const nameA = a.category
+                    ? (a.category.name?.[lang] || a.category.name?.en || a.category.name?.pt || "")
+                    : (t("uncategorized") || "Uncategorized");
+                const nameB = b.category
+                    ? (b.category.name?.[lang] || b.category.name?.en || b.category.name?.pt || "")
+                    : (t("uncategorized") || "Uncategorized");
+
+                return nameA.localeCompare(nameB, lang, {
+                    sensitivity: "base",
+                    numeric: true,
+                }) * direction;
+            });
+        }
+
+        return result;
+    }, [visibleProducts, productCategories, currentSort, lang, t]);
+
+    // Filter out optimistically deleted products
+    // const visibleProducts = useMemo(
+    //     () =>
+    //         products.filter((product) => {
+    //             const productId = (product._id || product.productId) as string;
+    //             return !deletedProductIds.includes(productId);
+    //         }),
+    //     [products, deletedProductIds]
+    // );
+
+    // Group by category (show ALL categories)
+    // const groupedProducts = useMemo(() => {
+    //     const groups: Record<
+    //         string,
+    //         { category: TProductCategoryResponse | null; products: TProduct[] }
+    //     > = {};
+
+    //     productCategories.forEach((cat) => {
+    //         groups[cat._id] = { category: cat, products: [] };
+    //     });
+
+    //     visibleProducts.forEach((product) => {
+    //         const categoryId = product.category?._id;
+    //         if (categoryId && groups[categoryId]) {
+    //             groups[categoryId].products.push(product);
+    //         } else {
+    //             if (!groups["uncategorized"]) {
+    //                 groups["uncategorized"] = { category: null, products: [] };
+    //             }
+    //             groups["uncategorized"].products.push(product);
+    //         }
+    //     });
+
+    //     return Object.values(groups);
+    // }, [visibleProducts, productCategories]);
 
     const effectiveActiveCategoryId =
         activeCategoryId || groupedProducts[0]?.category?._id || "uncategorized";
@@ -117,10 +207,6 @@ export default function ProductsSection({
     };
 
     // Load more products
-
-    // inside the component:
-    const searchParams = useSearchParams();
-
     const loadMore = useCallback(async () => {
         if (isLoadingMore || !hasMore) return;
 
@@ -427,7 +513,7 @@ export default function ProductsSection({
                 {/* RIGHT CONTENT – infinite scroll container */}
                 <div
                     ref={scrollContainerRef}
-                    className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1 no-scrollbar"
+                    className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1 custom-scrollbar"
                 >
                     {groupedProducts.some((g) => g.products.length > 0) ? (
                         <>

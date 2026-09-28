@@ -26,6 +26,7 @@ import {
     ImageIcon,
     LayersIcon,
     PackageIcon,
+    SaveIcon,
     StarIcon,
     TagIcon,
 } from "lucide-react";
@@ -122,7 +123,7 @@ export function AddProductToVendor({
             price: 0,
             discountType: "PERCENTAGE",
             discount: 0,
-            taxId: "",
+            taxId: taxesData.find((tax) => tax.taxRate === 23)?._id ?? "",
             quantity: 0,
             unit: "",
             availabilityStatus: "",
@@ -330,7 +331,7 @@ export function AddProductToVendor({
                 className="bg-white shadow-xl rounded-2xl overflow-hidden"
             >
                 <TitleHeader
-                    title={`${t("add_new_item")}${watchName && `-${watchName}`}`}
+                    title={`${t("add_new_item")}${watchName && ` - ${watchName}`}`}
                     subtitle={t("fill_the_details_to_add_new_food_item")}
                     onBackClick={() => router.back()}
                     extraComponent={
@@ -345,25 +346,6 @@ export function AddProductToVendor({
                                 align="end"
                                 className="w-48 bg-white shadow-lg border rounded-lg p-1"
                             >
-                                <DropdownMenuItem
-                                    className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                                >
-                                    <motion.button
-                                        whileHover={{
-                                            scale: 1.05,
-                                        }}
-                                        whileTap={{
-                                            scale: 0.98,
-                                        }}
-                                        type="button"
-                                        disabled={isSubmitting}
-                                        onClick={() => form.handleSubmit(onSubmit)()}
-                                    >
-                                        {/* <SaveIcon className="h-5 w-5" /> */}
-                                        <span>{t("save_product")}</span>
-                                    </motion.button>
-                                </DropdownMenuItem>
-
                                 <DropdownMenuItem
                                     onClick={() =>
                                         router.push(`/admin/vendor/${vendor?.userId}/manage-products`)
@@ -432,6 +414,12 @@ export function AddProductToVendor({
                             </DropdownMenuContent>
                         </DropdownMenu>
                     }
+                    buttonInfo={{
+                        text: t("save_product"),
+                        icon: SaveIcon,
+                        onClick: form.handleSubmit(onSubmit),
+                        disabled: isSubmitting
+                    }}
                 />
                 <div className="flex flex-col md:flex-row">
                     {/* Tabs */}
