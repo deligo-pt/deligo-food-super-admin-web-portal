@@ -546,7 +546,7 @@ export default function ProductsSection({
 
                                                 <motion.div
                                                     layout
-                                                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-5"
+                                                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5"
                                                 >
                                                     <AnimatePresence mode="popLayout">
                                                         {group.products.map((product) => (

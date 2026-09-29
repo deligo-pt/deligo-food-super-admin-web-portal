@@ -31,12 +31,14 @@ interface GetOrderColumnsParams {
     t: TFunction;
     router: AppRouterInstance;
     setOrderId: (value: string) => void;
+    lang: "en" | 'pt';
 }
 
 export function getOrderColumns({
     t,
     router,
-    setOrderId
+    setOrderId,
+    lang
 }: GetOrderColumnsParams): Column<TOrder>[] {
     return [
         {
@@ -144,7 +146,7 @@ export function getOrderColumns({
             accessor: (order) =>
                 order?.items?.map((i, index) => (
                     <span key={index}>
-                        {i.name} x {i.itemSummary?.quantity}
+                        {i.name?.[lang as 'en' | 'pt']} x {i.itemSummary?.quantity}
                         {index < (order.items?.length ?? 0) - 1 ? ", " : ""}
                     </span>
                 )),
