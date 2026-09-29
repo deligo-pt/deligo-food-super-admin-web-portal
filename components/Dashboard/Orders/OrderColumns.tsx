@@ -36,7 +36,7 @@ interface GetOrderColumnsParams {
 export function getOrderColumns({
     t,
     router,
-    setOrderId
+    setOrderId,
 }: GetOrderColumnsParams): Column<TOrder>[] {
     return [
         {

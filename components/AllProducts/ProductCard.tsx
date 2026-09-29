@@ -98,15 +98,15 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
           {product.isDeleted ? "DELETED" : product.meta.status}
         </div>
 
-        {product?.pricing?.discount && (
+        {(product?.pricing?.discount ?? 0) > 0 && (
           <div className="absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-md bg-[#DC3173] text-white">
-            {product.pricing?.discount} % OFF
+            {product.pricing.discount} % OFF
           </div>
         )}
       </div>
 
       {/* Content area – grows and pushes buttons to bottom */}
-      <div className="p-4 flex flex-col flex-1 min-h-0">
+      <div className="p-2 flex flex-col flex-1 min-h-0">
         <div className="flex justify-between items-start mb-2 shrink-0">
           <h3 className="text-lg font-bold text-gray-900 truncate pr-2">
             {product.name?.[lang]}
@@ -148,7 +148,7 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
               ) : null}
 
               {hasTax && (
-                <span className="inline-flex items-center gap-1 text-xs text-gray-500 ml-1">
+                <span className="inline-flex items-center gap-1 text-xs text-gray-500">
                   <span className="text-gray-400">•</span>
                   <span className="font-medium text-gray-600">
                     {t("inc_vat")}
