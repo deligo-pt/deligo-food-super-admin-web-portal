@@ -113,7 +113,7 @@ export function AddProductToVendor({
                 en: "",
                 pt: ""
             },
-            images: [],
+            image: "",
             description: {
                 en: "",
                 pt: ""
@@ -194,16 +194,14 @@ export function AddProductToVendor({
         const status = data.isActive === true ? "ACTIVE" : "INACTIVE";
 
         try {
-            // Images: string[] (already uploaded URLs)
-            let imageUrls: string[] = Array.isArray(data.images)
-                ? data.images.filter((url): url is string => typeof url === "string" && url.trim() !== "")
-                : [];
+            // Normalize: support both form.image (string) and legacy data.images (array)
+            let imageUrl =
+                typeof data.image === "string" && data.image.trim()
+                    ? data.image.trim()
+                    : "";
 
-            // Max 1
-            imageUrls = imageUrls.slice(0, 1);
-
-            // If no image → upload default from public
-            if (imageUrls.length === 0) {
+            // If no image → upload default
+            if (!imageUrl) {
                 try {
                     const imagePath = "/defaults/dl1.png";
                     const response = await fetch(imagePath, { cache: "no-store" });
@@ -231,7 +229,7 @@ export function AddProductToVendor({
                         return;
                     }
 
-                    imageUrls = [uploadResult.data[0]];
+                    imageUrl = uploadResult.data[0];
                 } catch (err) {
                     console.error("Default image error:", err);
                     toast.error("Failed to load default product image", { id: toastId });
@@ -256,7 +254,7 @@ export function AddProductToVendor({
                 ...(data.additionalCategories && {
                     additionalCategories: data.additionalCategories,
                 }),
-                images: imageUrls,
+                image: imageUrl,
                 pricing: {
                     price: data.price,
                     discountType: data.discountType,
