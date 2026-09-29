@@ -123,7 +123,10 @@ export function EditProductForm({
         resolver: zodResolver(productValidation),
         defaultValues: {
             name: prevData?.name || "",
-            images: prevData?.images || [],
+            image:
+                (typeof prevData?.image === "string" && prevData.image.trim()) ||
+                (Array.isArray(prevData?.images) && prevData.images[0]?.trim()) ||
+                "",
             description: prevData?.description || "",
             category: prevData?.category?._id || "",
             price: prevData?.pricing?.price || 0,
@@ -153,10 +156,10 @@ export function EditProductForm({
         ),
     );
 
-    const [watchPrice, watchDiscount, watchDiscountType, watchTaxId, watchAddons, watchVariations] =
+    const [watchName, watchPrice, watchDiscount, watchDiscountType, watchTaxId, watchAddons, watchVariations] =
         useWatch({
             control: form.control,
-            name: ["price", "discount", "discountType", "taxId", "addonGroups", "variations"],
+            name: [`name.${lang}`, "price", "discount", "discountType", "taxId", "addonGroups", "variations"],
         });
 
     const addAddon = (id: string) => {
@@ -223,20 +226,16 @@ export function EditProductForm({
             productData.addonGroups = data.addonGroups;
         }
 
-        // images update
-        // images update
-        const originalImages: string[] = prevData?.images || [];
-        let currentImages: string[] = Array.isArray(data.images)
-            ? (data.images as string[]).filter(
-                (url): url is string => typeof url === "string" && url.trim() !== ""
-            )
-            : [];
+        // ---------- image (single string) ----------
+        const originalImage =
+            (typeof prevData?.image === "string" && prevData.image.trim()) ||
+            (Array.isArray(prevData?.images) && prevData.images[0]?.trim()) ||
+            "";
 
-        // Max 1 image
-        currentImages = currentImages.slice(0, 1);
+        let currentImage = typeof data.image === "string" && data.image.trim() ? data.image.trim() : "";
 
-        // If no image left → upload default from public
-        if (currentImages.length === 0) {
+        // No image left → upload default
+        if (!currentImage) {
             try {
                 const imagePath = "/defaults/dl1.png";
                 const response = await fetch(imagePath, { cache: "no-store" });
@@ -265,7 +264,7 @@ export function EditProductForm({
                     return;
                 }
 
-                currentImages = [uploadResult.data[0]];
+                currentImage = uploadResult.data[0];
             } catch (err) {
                 console.error("Default image error:", err);
                 toast.error("Failed to load default product image", { id: toastId });
@@ -274,17 +273,9 @@ export function EditProductForm({
             }
         }
 
-        const newlyUploaded = currentImages.filter(
-            (url) => !originalImages.includes(url)
-        );
-
-        // Send images if something new was uploaded OR the set actually changed
-        const imagesChanged =
-            newlyUploaded.length > 0 ||
-            JSON.stringify(currentImages) !== JSON.stringify(originalImages.slice(0, 1));
-
-        if (imagesChanged) {
-            productData.images = currentImages; // always the final list (max 1)
+        // Only send when the URL actually changed (replace or default fill)
+        if (currentImage !== originalImage) {
+            productData.image = currentImage; // ← single string for API
         }
 
         // pricing update
@@ -343,15 +334,7 @@ export function EditProductForm({
         const hasAnyChange = Object.keys(productData).length > 0 || priceChanged;
 
         if (!hasAnyChange) {
-            const onlyImagesWereDeleted =
-                originalImages.length > currentImages.length && newlyUploaded.length === 0;
-
-            if (onlyImagesWereDeleted) {
-                toast.success("Image removed successfully", { id: toastId });
-            } else {
-                toast.info("No changes detected", { id: toastId });
-            }
-
+            toast.info("No changes detected", { id: toastId });
             setActiveTab(0);
             setTabError({});
             router.refresh();
@@ -488,7 +471,7 @@ export function EditProductForm({
                 className="bg-white overflow-hidden"
             >
                 <TitleHeader
-                    title={t("update_item")}
+                    title={`${t("update_item")}${watchName && ` - ${watchName}`}`}
                     subtitle={t("update_product_details")}
                     extraComponent={
                         <motion.button

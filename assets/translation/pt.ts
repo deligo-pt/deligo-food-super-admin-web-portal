@@ -434,6 +434,8 @@ export const pt = {
   png_jpg_svg: "PNG, JPG, SVG até 5MB",
   select_files: "Selecionar Ficheiros",
   uploaded_images: "Imagens Carregadas",
+  replacing: "A substituir",
+  replace_image: "Substituir Imagem",
   main_image: "Imagem Principal",
   upload_one_image_only: "Por favor, carregue apenas um ficheiro de imagem",
   // single image uploader

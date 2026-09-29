@@ -4,6 +4,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
+import { getProductImageUrl, getProductImageUrls } from "@/utils/product.utils";
 import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
 import {
@@ -107,6 +108,10 @@ export default function ProductDetails({ product }: IProps) {
     },
   };
 
+  // inside component:
+  const imageUrls = getProductImageUrls(product);
+  const mainImageUrl = imageUrls[currentImageIndex] || getProductImageUrl(product);
+
   return (
     <motion.div
       className="bg-white rounded-lg shadow-xl overflow-hidden"
@@ -121,17 +126,17 @@ export default function ProductDetails({ product }: IProps) {
         onBackClick={() => router.back()}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-        {/* Product Images */}
+        {/* replace the images column: */}
         <motion.div
           className="col-span-1 md:col-span-1"
           variants={itemVariants as Variants}
         >
           <div className="relative aspect-square rounded-lg overflow-hidden mb-4 bg-gray-100">
-            {product.images && product.images.length > 0 ? (
+            {mainImageUrl ? (
               <motion.img
-                key={currentImageIndex}
-                src={product.images[currentImageIndex]}
-                alt={product.name?.[lang]}
+                key={mainImageUrl}
+                src={mainImageUrl}
+                alt={product.name?.[lang] || "Product"}
                 className="w-full h-full object-cover"
                 variants={imageVariants}
                 initial="hidden"
@@ -144,24 +149,22 @@ export default function ProductDetails({ product }: IProps) {
               </div>
             )}
           </div>
-          {product.images && product.images.length > 1 && (
+
+          {/* Thumbnails only when more than one unique URL (legacy multi-image) */}
+          {(!mainImageUrl && imageUrls.length > 1) && (
             <div className="grid grid-cols-5 gap-2">
-              {product.images.map((image, index) => (
+              {imageUrls.map((image, index) => (
                 <motion.div
-                  key={index}
+                  key={image}
                   className={`aspect-square rounded-md overflow-hidden cursor-pointer ${index === currentImageIndex ? "ring-2 ring-[#DC3173]" : ""
                     }`}
                   onClick={() => setCurrentImageIndex(index)}
-                  whileHover={{
-                    scale: 1.05,
-                  }}
-                  whileTap={{
-                    scale: 0.95,
-                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Image
                     src={image}
-                    alt={`${product.name?.[lang]} - view ${index + 1}`}
+                    alt={`${product.name?.[lang] || "Product"} - view ${index + 1}`}
                     className="w-full h-full object-cover"
                     width={500}
                     height={500}

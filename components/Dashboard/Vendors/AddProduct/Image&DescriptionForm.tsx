@@ -93,19 +93,23 @@ const ImageAndDescriptionForm = ({ form, selectedLanguage, productId }: IProps) 
                 <div className="flex-1">
                     <FormField
                         control={form.control}
-                        name="images"
+                        name="image"
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
                                     <ProductImageUpload
-                                        images={field.value}
+                                        // always pass a single string (or "")
+                                        image={typeof field.value === "string" ? field.value : ""}
                                         productId={productId}
-                                        onChange={(urls) => {
-                                            form.setValue("images", urls, {
-                                                shouldDirty: true,
-                                                shouldTouch: true,
-                                                shouldValidate: true,
-                                            });
+                                        onChange={(url) => {
+                                            // url is string | "" 
+                                            field.onChange(url);
+                                            // or:
+                                            // form.setValue("image", url, {
+                                            //   shouldDirty: true,
+                                            //   shouldTouch: true,
+                                            //   shouldValidate: true,
+                                            // });
                                         }}
                                     />
                                 </FormControl>
