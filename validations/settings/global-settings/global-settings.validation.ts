@@ -54,9 +54,9 @@ export const globalSettingsSchema = z
     autoDispatchLeadMinutes: z
       .number("Order Auto Dispatch Lead Minutes must be a number")
       .positive("Order Auto Dispatch Lead Minutes must be greater than 0"),
-    preparationExtensionMinutes: z
-      .number("Preparation Extension Minutes must be a number")
-      .positive("Preparation Extension Minutes must be greater than 0"),
+    // preparationExtensionMinutes: z
+    //   .number("Preparation Extension Minutes must be a number")
+    //   .positive("Preparation Extension Minutes must be greater than 0"),
 
     // activity logs retention
     archiveAfterMonths: z
