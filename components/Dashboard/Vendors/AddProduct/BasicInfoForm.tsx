@@ -32,12 +32,14 @@ interface IProps {
     form: UseFormReturn<BasicInfoFormValues>;
     productCategories: TProductCategory[];
     selectedLanguage: "en" | "pt";
+    categoryLoading?: boolean;
 }
 
 const BasicInfoForm = ({
     form,
     productCategories,
     selectedLanguage,
+    categoryLoading
 }: IProps) => {
     const { t, lang } = useTranslation();
 
@@ -213,73 +215,76 @@ const BasicInfoForm = ({
                                         )}
                                     >
                                         <div className="flex flex-wrap items-center gap-1.5 w-full text-left">
-                                            {!primaryId && additional.length === 0 ? (
-                                                <span className="text-muted-foreground">
-                                                    {t("select_category_placeholder")}
-                                                </span>
-                                            ) : (
-                                                <>
-                                                    {primaryId && (
-                                                        <Badge
-                                                            variant="secondary"
-                                                            className="bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 gap-1 pl-2 pr-1 py-0.5 text-xs"
-                                                        >
-                                                            <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70">
-                                                                {t("main")}
-                                                            </span>
-                                                            {getCategoryName(primaryId)}
-                                                            <span
-                                                                role="button"
-                                                                tabIndex={0}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    e.preventDefault();
-                                                                    removeCategory(primaryId);
-                                                                }}
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === "Enter" || e.key === " ") {
+                                            {categoryLoading ? <div className="flex items-center justify-center text-sm text-gray-500">
+                                                {t("loading") || "Loading categories..."}
+                                            </div> :
+                                                !primaryId && additional.length === 0 ? (
+                                                    <span className="text-muted-foreground">
+                                                        {t("select_category_placeholder")}
+                                                    </span>
+                                                ) : (
+                                                    <>
+                                                        {primaryId && (
+                                                            <Badge
+                                                                variant="secondary"
+                                                                className="bg-[#DC3173]/10 text-[#DC3173] hover:bg-[#DC3173]/20 gap-1 pl-2 pr-1 py-0.5 text-xs"
+                                                            >
+                                                                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70">
+                                                                    {t("main")}
+                                                                </span>
+                                                                {getCategoryName(primaryId)}
+                                                                <span
+                                                                    role="button"
+                                                                    tabIndex={0}
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         e.preventDefault();
                                                                         removeCategory(primaryId);
-                                                                    }
-                                                                }}
-                                                                className="ml-0.5 rounded-full p-0.5 hover:bg-[#DC3173]/20 cursor-pointer"
-                                                            >
-                                                                <X className="h-3 w-3" />
-                                                            </span>
-                                                        </Badge>
-                                                    )}
+                                                                    }}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === "Enter" || e.key === " ") {
+                                                                            e.stopPropagation();
+                                                                            e.preventDefault();
+                                                                            removeCategory(primaryId);
+                                                                        }
+                                                                    }}
+                                                                    className="ml-0.5 rounded-full p-0.5 hover:bg-[#DC3173]/20 cursor-pointer"
+                                                                >
+                                                                    <X className="h-3 w-3" />
+                                                                </span>
+                                                            </Badge>
+                                                        )}
 
-                                                    {additional.map((id) => (
-                                                        <Badge
-                                                            key={id}
-                                                            variant="outline"
-                                                            className="gap-1 pl-2 pr-1 py-0.5 text-xs text-slate-700"
-                                                        >
-                                                            {getCategoryName(id)}
-                                                            <span
-                                                                role="button"
-                                                                tabIndex={0}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    e.preventDefault();
-                                                                    removeCategory(id);
-                                                                }}
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === "Enter" || e.key === " ") {
+                                                        {additional.map((id) => (
+                                                            <Badge
+                                                                key={id}
+                                                                variant="outline"
+                                                                className="gap-1 pl-2 pr-1 py-0.5 text-xs text-slate-700"
+                                                            >
+                                                                {getCategoryName(id)}
+                                                                <span
+                                                                    role="button"
+                                                                    tabIndex={0}
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         e.preventDefault();
                                                                         removeCategory(id);
-                                                                    }
-                                                                }}
-                                                                className="ml-0.5 rounded-full p-0.5 hover:bg-slate-200 cursor-pointer"
-                                                            >
-                                                                <X className="h-3 w-3" />
-                                                            </span>
-                                                        </Badge>
-                                                    ))}
-                                                </>
-                                            )}
+                                                                    }}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === "Enter" || e.key === " ") {
+                                                                            e.stopPropagation();
+                                                                            e.preventDefault();
+                                                                            removeCategory(id);
+                                                                        }
+                                                                    }}
+                                                                    className="ml-0.5 rounded-full p-0.5 hover:bg-slate-200 cursor-pointer"
+                                                                >
+                                                                    <X className="h-3 w-3" />
+                                                                </span>
+                                                            </Badge>
+                                                        ))}
+                                                    </>
+                                                )}
                                         </div>
                                     </SelectTrigger>
 
