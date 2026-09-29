@@ -140,7 +140,7 @@ export default function GlobalSettings({
       cancelTimeLimitMinutes: settings?.order?.cancelTimeLimitMinutes || 0,
       autoAcceptTimeoutMinutes: settings?.order?.autoAcceptTimeoutMinutes || 0,
       autoDispatchLeadMinutes: settings?.order?.autoDispatchLeadMinutes || 0,
-      preparationExtensionMinutes: settings?.order?.preparationExtensionMinutes || 0,
+      // preparationExtensionMinutes: settings?.order?.preparationExtensionMinutes || 0,
 
       // activity logs retention
       archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 12,
@@ -243,7 +243,7 @@ export default function GlobalSettings({
         cancelTimeLimitMinutes: data.cancelTimeLimitMinutes,
         autoAcceptTimeoutMinutes: data.autoAcceptTimeoutMinutes,
         autoDispatchLeadMinutes: data.autoDispatchLeadMinutes,
-        preparationExtensionMinutes: data.preparationExtensionMinutes,
+        // preparationExtensionMinutes: data.preparationExtensionMinutes,
       },
       ingredientsOrder: {
         deliveryChargeInsideLisbon: data.deliveryChargeInsideLisbon,
@@ -890,7 +890,7 @@ export default function GlobalSettings({
                             </FormItem>
                           )}
                         />
-                        <FormField
+                        {/* <FormField
                           control={form.control}
                           name="preparationExtensionMinutes"
                           render={({ field, fieldState }) => (
@@ -912,7 +912,7 @@ export default function GlobalSettings({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     </SettingsCard>
                   )}

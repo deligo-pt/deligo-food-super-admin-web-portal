@@ -54,6 +54,7 @@ import { getAllProductCategories } from "@/services/dashboard/category/product-c
 import { getAllTaxes } from "@/services/dashboard/tax/tax.service";
 import { getAllAddOnsGroup, updateProduct, updateProductPriceStock } from "@/services/dashboard/product/product.service";
 import { uploadImagesReq } from "@/services/upload/upload.service";
+import { queryStringFormatter } from "@/utils/formatter";
 
 type FormData = z.infer<typeof productValidation>;
 
@@ -62,6 +63,7 @@ interface IProps {
     closeModal: () => void;
     businessTypeSlug: string;
     onSuccess: (value: TProduct) => void;
+    vendorMongoId: string;
 }
 
 interface IData<T> {
@@ -73,13 +75,15 @@ export function EditProductForm({
     prevData,
     closeModal,
     businessTypeSlug,
-    onSuccess
+    onSuccess,
+    vendorMongoId
 }: IProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { t } = useTranslation();
     const { lang } = useStore();
     const [activeTab, setActiveTab] = useState(0);
+    const [categoriesLoading, setCategoriesLoading] = useState(true);
 
     const tabs = [
         {
@@ -129,6 +133,9 @@ export function EditProductForm({
                 "",
             description: prevData?.description || "",
             category: prevData?.category?._id || "",
+            additionalCategories: Array.isArray((prevData as TProduct)?.additionalCategories)
+                ? (prevData as TProduct)?.additionalCategories?.map((c: Partial<TProduct>) => (typeof c === "string" ? c : c._id))
+                : [],
             price: prevData?.pricing?.price || 0,
             discountType: prevData?.pricing?.discountType ?? "",
             discount: prevData?.pricing?.discount ?? 0,
@@ -216,9 +223,27 @@ export function EditProductForm({
             }
         }
 
-        // category
-        if (hasChanged(data.category, prevData?.category?._id || "")) {
-            productData.category = data.category;
+        // category + additionalCategories
+        const originalCategoryId = prevData?.category?._id || "";
+        const originalAdditional: string[] = Array.isArray(prevData?.additionalCategories)
+            ? prevData.additionalCategories
+                .map((c: any) => (typeof c === "string" ? c : c?._id))
+                .filter(Boolean)
+            : [];
+
+        const currentCategoryId = data.category || "";
+        const currentAdditional: string[] = Array.isArray(data.additionalCategories)
+            ? data.additionalCategories.filter((category): category is string => Boolean(category))
+            : [];
+
+        const categoryChanged = hasChanged(currentCategoryId, originalCategoryId);
+        const additionalChanged = hasChanged(currentAdditional, originalAdditional);
+
+        if (categoryChanged || additionalChanged) {
+            if (categoryChanged) {
+                productData.category = currentCategoryId;
+            }
+            productData.additionalCategories = currentAdditional;
         }
 
         // addonGroups
@@ -226,7 +251,7 @@ export function EditProductForm({
             productData.addonGroups = data.addonGroups;
         }
 
-        // ---------- image (single string) ----------
+        // image (single string)
         const originalImage =
             (typeof prevData?.image === "string" && prevData.image.trim()) ||
             (Array.isArray(prevData?.images) && prevData.images[0]?.trim()) ||
@@ -389,12 +414,21 @@ export function EditProductForm({
     };
 
     const getProductCategories = async () => {
-        const result = await catchAsync<TProductCategory[]>(async () => {
-            return (await getAllProductCategories()) as unknown as TResponse<TProductCategory[]>;
-        });
+        setCategoriesLoading(true);
+        const query = queryStringFormatter({
+            vendorId: vendorMongoId,
+            limit: "30",
+        })
+        try {
+            const result = await catchAsync<TProductCategory[]>(async () => {
+                return (await getAllProductCategories(query)) as unknown as TResponse<TProductCategory[]>;
+            });
 
-        if (result.success) {
-            setProductCategoriesData(result.data);
+            if (result.success) {
+                setProductCategoriesData(result.data ?? []);
+            }
+        } finally {
+            setCategoriesLoading(false);
         }
     };
 
@@ -533,6 +567,7 @@ export function EditProductForm({
                                         form={form as any}
                                         productCategories={productCategoriesData}
                                         selectedLanguage={lang}
+                                        categoryLoading={categoriesLoading}
                                     />
                                 )}
                                 {/* Images Tab */}
