@@ -19,7 +19,7 @@ interface IProps {
 }
 
 export default function OrderTable({ orders, meta }: IProps) {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const [orderId, setOrderId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,8 +45,7 @@ export default function OrderTable({ orders, meta }: IProps) {
   const columns = getOrderColumns({
     t,
     router,
-    setOrderId,
-    lang
+    setOrderId
   });
 
   return (
