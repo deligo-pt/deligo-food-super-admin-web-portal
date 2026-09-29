@@ -3,6 +3,7 @@
 import { useTranslation } from "@/hooks/use-translation";
 import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
+import { getProductImageUrl } from "@/utils/product.utils";
 import { motion } from "framer-motion";
 import { Clock, ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
@@ -46,6 +47,9 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
         : rawDescription
       : "No description provided";
 
+  // inside component:
+  const imageUrl = getProductImageUrl(product);
+
   return (
     <motion.div
       className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 flex flex-col h-105"
@@ -70,16 +74,16 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
     >
       {/* Fixed image height */}
       <div className="relative h-48 shrink-0 flex items-center justify-center overflow-hidden">
-        {product.images && product.images.length > 0 ? (
+        {imageUrl ? (
           <Image
-            src={product.images[0]}
-            alt={product?.name?.[lang] as string}
+            src={imageUrl}
+            alt={(product?.name?.[lang] as string) || "Product"}
             className="w-full h-full object-fill"
             width={500}
             height={500}
           />
         ) : (
-          <div className="flex items-center justify-center h-full bg-gray-100">
+          <div className="flex items-center justify-center h-full bg-gray-100 w-full">
             <ShoppingBag className="h-12 w-12 text-gray-400" />
           </div>
         )}

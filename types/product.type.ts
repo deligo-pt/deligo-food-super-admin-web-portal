@@ -59,7 +59,8 @@ export type TProduct = {
     hasVariations: boolean;
   };
 
-  images: string[];
+  images?: string[];
+  image?: string;
 
   vendorId: {
     _id: string;
