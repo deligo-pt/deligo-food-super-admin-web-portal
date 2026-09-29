@@ -3,10 +3,11 @@
 import { useTranslation } from "@/hooks/use-translation";
 import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
+import { getProductImageUrl } from "@/utils/product.utils";
 import { motion } from "framer-motion";
 import { Clock, ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface IProps {
   product: TProduct;
@@ -18,6 +19,9 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const isAllProductsPage = pathname === "/admin/all-products" || pathname.startsWith("/admin/all-products/");
+
   const statusColors = {
     ACTIVE: "bg-green-100 text-green-800",
     INACTIVE: "bg-gray-100 text-gray-800",
@@ -46,6 +50,9 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
         : rawDescription
       : "No description provided";
 
+  // inside component:
+  const imageUrl = getProductImageUrl(product);
+
   return (
     <motion.div
       className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 flex flex-col h-105"
@@ -70,16 +77,16 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
     >
       {/* Fixed image height */}
       <div className="relative h-48 shrink-0 flex items-center justify-center overflow-hidden">
-        {product.images && product.images.length > 0 ? (
+        {imageUrl ? (
           <Image
-            src={product.images[0]}
-            alt={product?.name?.[lang] as string}
+            src={imageUrl}
+            alt={(product?.name?.[lang] as string) || "Product"}
             className="w-full h-full object-fill"
             width={500}
             height={500}
           />
         ) : (
-          <div className="flex items-center justify-center h-full bg-gray-100">
+          <div className="flex items-center justify-center h-full bg-gray-100 w-full">
             <ShoppingBag className="h-12 w-12 text-gray-400" />
           </div>
         )}
@@ -205,14 +212,16 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
             >
               {t("view")}
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onEdit?.(product)}
-              className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
-            >
-              {t("edit")}
-            </motion.button>
+            {!isAllProductsPage && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onEdit?.(product)}
+                className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
+              >
+                {t("edit")}
+              </motion.button>
+            )}
             {!product?.isDeleted ? (
               <motion.button
                 whileHover={{ scale: 1.05 }}

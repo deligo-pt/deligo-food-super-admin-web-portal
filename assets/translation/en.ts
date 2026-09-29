@@ -427,6 +427,8 @@ export const en = {
   png_jpg_svg: "PNG, JPG, SVG up to 5MB",
   select_files: "Select Files",
   uploaded_images: "Uploaded Images",
+  replacing: "Replacing",
+  replace_image: "Replace Image",
   main_image: "Main Image",
   upload_one_image_only: "Please upload only image file",
   // single image uploader

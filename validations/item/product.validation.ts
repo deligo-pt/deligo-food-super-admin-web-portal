@@ -19,7 +19,8 @@ export const productValidation = z.object({
 
     additionalCategories: z.array(z.string().optional()).optional(),
 
-    images: z.array(z.string().optional()).optional(),
+    // images: z.array(z.string().optional()).optional(),
+    image: z.string().optional().or(z.literal("")),
 
     // images: z
     //     .array(
