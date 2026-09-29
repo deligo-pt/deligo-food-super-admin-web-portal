@@ -156,10 +156,10 @@ export function EditProductForm({
         ),
     );
 
-    const [watchPrice, watchDiscount, watchDiscountType, watchTaxId, watchAddons, watchVariations] =
+    const [watchName, watchPrice, watchDiscount, watchDiscountType, watchTaxId, watchAddons, watchVariations] =
         useWatch({
             control: form.control,
-            name: ["price", "discount", "discountType", "taxId", "addonGroups", "variations"],
+            name: [`name.${lang}`, "price", "discount", "discountType", "taxId", "addonGroups", "variations"],
         });
 
     const addAddon = (id: string) => {
@@ -471,7 +471,7 @@ export function EditProductForm({
                 className="bg-white overflow-hidden"
             >
                 <TitleHeader
-                    title={t("update_item")}
+                    title={`${t("update_item")}${watchName && ` - ${watchName}`}`}
                     subtitle={t("update_product_details")}
                     extraComponent={
                         <motion.button

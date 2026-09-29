@@ -7,7 +7,7 @@ import { getProductImageUrl } from "@/utils/product.utils";
 import { motion } from "framer-motion";
 import { Clock, ShoppingBag, Star } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface IProps {
   product: TProduct;
@@ -19,6 +19,9 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
   const router = useRouter();
+  const pathname = usePathname();
+  const isAllProductsPage = pathname === "/admin/all-products" || pathname.startsWith("/admin/all-products/");
+
   const statusColors = {
     ACTIVE: "bg-green-100 text-green-800",
     INACTIVE: "bg-gray-100 text-gray-800",
@@ -209,14 +212,16 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
             >
               {t("view")}
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onEdit?.(product)}
-              className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
-            >
-              {t("edit")}
-            </motion.button>
+            {!isAllProductsPage && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onEdit?.(product)}
+                className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
+              >
+                {t("edit")}
+              </motion.button>
+            )}
             {!product?.isDeleted ? (
               <motion.button
                 whileHover={{ scale: 1.05 }}

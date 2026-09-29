@@ -5,7 +5,7 @@ import ProductCard from "@/components/AllProducts/ProductCard";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
-import { deleteProductReq } from "@/services/dashboard/product/product.service";
+import { deleteProductReq, permanentDeleteProduct } from "@/services/dashboard/product/product.service";
 import { TMeta } from "@/types";
 import { TProduct } from "@/types/product.type";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,6 +30,7 @@ export default function Products({
     id: string | null;
     action: "edit" | "delete" | null;
     product?: TProduct | null;
+    type?: string;
   }>({ id: null, action: null });
   const [isDeleting, setIsDeleting] = useState(false);
   const sortOptions = getSortOptions(t, sortFields);
@@ -78,6 +79,7 @@ export default function Products({
         toast.success("Product deleted successfully", { id: toastId });
         router.refresh();
         setSelectedProduct({ id: null, action: null });
+        setIsDeleting(false);
         return;
       }
 
@@ -88,6 +90,19 @@ export default function Products({
     }
 
     setIsDeleting(false);
+  };
+
+  const handlePermanentDeleteProduct = async () => {
+    const toastId = toast.loading("Deleting product...");
+    if (selectedProduct.id && selectedProduct.action === "delete") {
+      const result = await permanentDeleteProduct(selectedProduct.id);
+      if (result.success) {
+        toast.success("Product deleted successfully", { id: toastId });
+        setSelectedProduct({ id: null, action: null, type: undefined });
+        return;
+      }
+      toast.error(result.message || "Product deletion failed", { id: toastId });
+    }
   };
 
   return (
@@ -174,7 +189,11 @@ export default function Products({
         onOpenChange={() =>
           setSelectedProduct({ id: null, action: null, product: null })
         }
-        onConfirm={handleDeleteProduct}
+        onConfirm={
+          selectedProduct?.type === ""
+            ? handleDeleteProduct
+            : handlePermanentDeleteProduct
+        }
         isDeleting={isDeleting}
       />
     </div>
