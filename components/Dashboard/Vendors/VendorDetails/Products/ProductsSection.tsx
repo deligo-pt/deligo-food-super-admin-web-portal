@@ -620,6 +620,7 @@ export default function ProductsSection({
                 prevData={selectedProduct?.product as TProduct}
                 businessTypeSlug={businessTypeSlug}
                 onSuccess={handleProductUpdated}
+                vendorMongoId={vendorMongoId}
             />
         </div>
     );

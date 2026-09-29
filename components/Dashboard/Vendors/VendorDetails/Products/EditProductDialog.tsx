@@ -10,6 +10,7 @@ interface IProps {
     prevData: TProduct;
     businessTypeSlug: string;
     onSuccess: (value: TProduct) => void;
+    vendorMongoId: string;
 }
 
 const EditProductDialog = ({
@@ -17,7 +18,8 @@ const EditProductDialog = ({
     onOpenChange,
     prevData,
     businessTypeSlug,
-    onSuccess
+    onSuccess,
+    vendorMongoId
 }: IProps) => {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -30,6 +32,7 @@ const EditProductDialog = ({
                         closeModal={onOpenChange}
                         businessTypeSlug={businessTypeSlug}
                         onSuccess={onSuccess}
+                        vendorMongoId={vendorMongoId}
                     />
                 </DialogContent>
             </form>
