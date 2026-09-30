@@ -88,7 +88,7 @@ export default function Sponsorships({
     console.log(result);
     setIsDeleting(false);
   };
-  console.log("sponsorships", sponsorshipsResult);
+
   return (
     <div className="space-y-6 max-w-full">
       {/* Page Title */}

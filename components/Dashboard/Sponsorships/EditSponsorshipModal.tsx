@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
+import { getAllZones } from "@/services/dashboard/zone/zone.service";
 import { TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
 import { catchAsync } from "@/utils/catchAsync";
@@ -34,8 +35,9 @@ import { updateData } from "@/utils/requests";
 import { sponsorshipValidation } from "@/validations/sponsorship/sponsorship.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { MapPin, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -48,6 +50,13 @@ interface IProps {
   prevValues: TSponsorship;
 }
 
+interface TZone {
+  _id: string;
+  zoneName: string;
+  district: string;
+  zoneId?: string;
+}
+
 export default function EditSponsorshipModal({
   open,
   onOpenChange,
@@ -55,6 +64,13 @@ export default function EditSponsorshipModal({
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
+
+  const [zones, setZones] = useState<TZone[]>([]);
+  const [loadingZones, setLoadingZones] = useState(false);
+
+  // Extract initial zone IDs from prevValues (handles populated objects or raw IDs)
+  const initialZoneIds = prevValues?.targetZoneIds?.map((z:  Partial<TSponsorship>) => (typeof z === "object" ? z._id : z)) || [];
+
   const form = useForm<TSponsorshipForm>({
     resolver: zodResolver(sponsorshipValidation),
     defaultValues: {
@@ -62,15 +78,37 @@ export default function EditSponsorshipModal({
       sponsorType: prevValues?.sponsorType || "Ads",
       startDate: new Date(prevValues?.startDate) || new Date(),
       endDate: new Date(prevValues?.endDate) || new Date(),
-      isActive: prevValues?.isActive || true,
+      isActive: prevValues?.isActive ?? true,
       sponsorBanner: { file: null, url: prevValues?.bannerImage || "" },
-      url: prevValues?.url || ""
+      url: prevValues?.url || "",
+      targetZoneIds: initialZoneIds,
     },
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sponsorBannerPreview, setSponsorBannerPreview] = useState<
     string | undefined
   >(prevValues?.bannerImage);
+
+  // Fetch available zones for selection
+  useEffect(() => {
+    if (open) {
+      const fetchZones = async () => {
+        setLoadingZones(true);
+        try {
+          const res = await getAllZones();
+          if (res?.success || Array.isArray(res?.data)) {
+            setZones(res.data || res);
+          }
+        } catch (error) {
+          console.error("Failed to fetch zones", error);
+        } finally {
+          setLoadingZones(false);
+        }
+      };
+      fetchZones();
+    }
+  }, [open]);
 
   const onSubmit = async (data: TSponsorshipForm) => {
     setIsSubmitting(true);
@@ -82,6 +120,7 @@ export default function EditSponsorshipModal({
       startDate: format(data.startDate, "yyyy-MM-dd"),
       endDate: format(data.endDate, "yyyy-MM-dd"),
       isActive: data.isActive,
+      targetZoneIds: data.targetZoneIds,
       ...(data.url && { url: data.url }),
     };
 
@@ -118,13 +157,12 @@ export default function EditSponsorshipModal({
     toast.error(result.message || "Failed to update Sponsorship", {
       id: toastId,
     });
-    console.log(result);
     setIsSubmitting(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto max-w-xl">
         <DialogTitle className="text-2xl font-medium">
           {t("edit_sponsorship")}
         </DialogTitle>
@@ -191,43 +229,142 @@ export default function EditSponsorshipModal({
               )}
             />
 
+            {/* Target Zones Selection */}
             <FormField
               control={form.control}
-              name="startDate"
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormControl>
-                    <SettingsInput
-                      fieldState={fieldState}
-                      type="date"
-                      label={t("start_date")}
-                      value={format(field.value, "yyyy-MM-dd")}
-                      onChange={(e) => field.onChange(new Date(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              name="targetZoneIds"
+              render={({ field }) => {
+                const selectedZones = (field.value || []).filter(
+                  (zoneId): zoneId is string => typeof zoneId === "string",
+                );
+
+                return (
+                  <FormItem>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                          <MapPin className="w-4 h-4 text-[#DC3173]" />
+                          {t("targeted_zones") || "Target Zones"}
+                        </label>
+                        {selectedZones.length === 0 && (
+                          <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md font-medium">
+                            {t("no_zones_set") || "No zones set - Please select zones"}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Selected Badges */}
+                      <div className="flex flex-wrap gap-1.5 min-h-9.5 p-2 rounded-xl bg-gray-50 border border-gray-200">
+                        {selectedZones.length === 0 ? (
+                          <p className="text-sm text-gray-400 px-1 py-0.5">
+                            {t("select_target_zones") || "Select zones below..."}
+                          </p>
+                        ) : (
+                          selectedZones.map((zoneId) => {
+                            const foundZone = zones.find((z) => z._id === zoneId);
+                            const prevFound = prevValues?.targetZoneIds?.find(
+                              (pz: Partial<TSponsorship>) => (typeof pz === "object" ? pz._id === zoneId : pz === zoneId)
+                            );
+                            const displayName =
+                              foundZone?.zoneName ||
+                              (typeof prevFound === "object" ? (prevFound as { zoneName?: string })?.zoneName : zoneId);
+
+                            return (
+                              <span
+                                key={zoneId}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border text-xs font-medium text-gray-800 shadow-2xs"
+                              >
+                                {displayName}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    field.onChange(
+                                      selectedZones.filter((id) => id !== zoneId)
+                                    )
+                                  }
+                                  className="text-gray-400 hover:text-red-500"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            );
+                          })
+                        )}
+                      </div>
+
+                      {/* Zone Selector Dropdown */}
+                      <Select
+                        onValueChange={(value) => {
+                          if (!selectedZones.includes(value)) {
+                            field.onChange([...selectedZones, value]);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full rounded-xl bg-gray-50 border-0 h-11">
+                          <SelectValue
+                            placeholder={
+                              loadingZones
+                                ? "Loading zones..."
+                                : "Add target zone..."
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {zones
+                            .filter((z) => !selectedZones.includes(z._id))
+                            .map((zone) => (
+                              <SelectItem key={zone._id} value={zone._id}>
+                                {zone.zoneName} ({zone.district})
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormControl>
-                    <SettingsInput
-                      fieldState={fieldState}
-                      type="date"
-                      label={t("end_date")}
-                      value={format(field.value, "yyyy-MM-dd")}
-                      onChange={(e) => field.onChange(new Date(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormControl>
+                      <SettingsInput
+                        fieldState={fieldState}
+                        type="date"
+                        label={t("start_date")}
+                        value={format(field.value, "yyyy-MM-dd")}
+                        onChange={(e) => field.onChange(new Date(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormControl>
+                      <SettingsInput
+                        fieldState={fieldState}
+                        type="date"
+                        label={t("end_date")}
+                        value={format(field.value, "yyyy-MM-dd")}
+                        onChange={(e) => field.onChange(new Date(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -294,7 +431,7 @@ export default function EditSponsorshipModal({
           </form>
         </Form>
 
-        <DialogFooter>
+        <DialogFooter className="mt-4">
           <Button
             disabled={isSubmitting}
             className={cn(
