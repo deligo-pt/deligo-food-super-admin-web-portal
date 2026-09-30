@@ -1784,6 +1784,7 @@ export const en = {
   starts_in: "Starts in",
   days_sm: "days",
   days_remaining: "days remaining",
+  targeted_zones: "Targeted Zones",
   sponsorship_category: "Sponsorship category",
   campaign_timeline: "Campaign Timeline",
   start: "Start",
