@@ -491,6 +491,8 @@ export const pt = {
   // apply increase
   apply_price_increase: "Aplicar Aumento de Preço",
   update_the_base_price_your_products: "Atualizar o preço base dos seus produtos",
+  loading_more: "A carregar mais produtos...",
+  no_more_products: "Sem mais produtos",
 
   // approve or reject modal
   are_you_sure_want_approve: "Tem certeza de que deseja aprovar?",
@@ -1803,6 +1805,11 @@ export const pt = {
   starts_in: "Começa em",
   days_sm: "dias",
   days_remaining: "dias restantes",
+  targeted_zones: "Zonas Alvo",
+  no_zones_set: "Nenhuma zona definida - Por favor, selecione zonas",
+  select_target_zones: "Selecione as zonas abaixo...",
+  loading_zones: "A carregar zonas...",
+  add_target_zone: "Adicionar zona alvo...",
   sponsorship_category: "Categoria do patrocínio",
   campaign_timeline: "Linha do Tempo da Campanha",
   start: "Início",

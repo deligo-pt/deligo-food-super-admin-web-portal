@@ -164,6 +164,7 @@ export const applyIncreaseDecrease = async (
 
   if (result.success) {
     revalidateTag("products", {});
+    revalidatePath('/admin/')
   }
 
   return result;

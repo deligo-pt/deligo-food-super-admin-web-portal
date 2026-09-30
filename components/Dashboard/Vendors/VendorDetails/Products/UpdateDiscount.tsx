@@ -4,17 +4,17 @@ import TitleHeader from '@/components/TitleHeader/TitleHeader';
 import { TProductCategoryResponse } from '@/types/category.type';
 import { TProduct } from '@/types/product.type';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronDown, Package, Percent } from 'lucide-react';
+import { ChevronDown, Loader2, Package, Percent } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
-import { applyIncreaseDecrease } from '@/services/dashboard/product/product.service';
+import { applyIncreaseDecrease, getAllProducts } from '@/services/dashboard/product/product.service';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,22 +22,121 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { queryStringFormatter } from '@/utils/formatter';
+import { TMeta } from '@/types';
 
 type Props = {
     products: TProduct[];
     productCategries: TProductCategoryResponse[];
     vendorId: string;
+    vendorMongoId?: string;
+    initialMeta?: TMeta
 };
 
-const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
+const PAGE_LIMIT = 10;
+
+const UpdateDiscount = ({
+    products: initialProducts,
+    productCategries,
+    vendorId,
+    vendorMongoId,
+    initialMeta,
+}: Props) => {
     const { t } = useTranslation();
     const router = useRouter();
+    const [, startTransition] = useTransition();
+
+    // Infinite-scroll state
+    const [products, setProducts] = useState<TProduct[]>(initialProducts);
+    const [page, setPage] = useState(initialMeta?.page ?? 1);
+    const [hasMore, setHasMore] = useState(() => {
+        if (initialMeta?.totalPage !== undefined) return (initialMeta.page ?? 1) < initialMeta.totalPage;
+        return initialProducts.length >= PAGE_LIMIT;
+    });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [percentage, setPercentage] = useState<string>('');
     const [isUpdating, setIsUpdating] = useState(false);
 
-    // Group products by category
+    // Sentinel for IntersectionObserver
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+    // Fetch next page
+    const fetchMoreProducts = useCallback(async () => {
+        if (isLoadingMore || !hasMore || !vendorMongoId) return;
+
+        setIsLoadingMore(true);
+        try {
+            const nextPage = page + 1;
+            const query = {
+                "meta.status": "ACTIVE",
+                vendorId: vendorMongoId,
+                page: nextPage,
+                limit: PAGE_LIMIT,
+            };
+            const queryString = queryStringFormatter(query);
+            const res = await getAllProducts(queryString);
+
+            const newProducts: TProduct[] = res?.data ?? [];
+            const meta = res?.meta;
+
+            if (newProducts.length === 0) {
+                setHasMore(false);
+                return;
+            }
+
+            // Deduplicate by product key (in case of overlap)
+            setProducts((prev) => {
+                const existingKeys = new Set(
+                    prev.map((p) => p.productId || p._id).filter(Boolean)
+                );
+                const unique = newProducts.filter((p) => {
+                    const key = p.productId || p._id;
+                    return key && !existingKeys.has(key);
+                });
+                return [...prev, ...unique];
+            });
+
+            setPage(nextPage);
+
+            // Determine if there is still more data
+            if (meta?.totalPage !== undefined) {
+                setHasMore(nextPage < meta.totalPage);
+            } else {
+                setHasMore(newProducts.length >= PAGE_LIMIT);
+            }
+        } catch (err) {
+            console.error('Failed to load more products', err);
+            toast.error(t('failed_to_load_more') || 'Failed to load more products');
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }, [isLoadingMore, hasMore, vendorMongoId, page, t]);
+
+    // IntersectionObserver
+    useEffect(() => {
+        const node = loadMoreRef.current;
+        if (!node || !hasMore) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting && hasMore && !isLoadingMore) {
+                    fetchMoreProducts();
+                }
+            },
+            {
+                root: null,
+                rootMargin: '200px', // start loading a bit before the user reaches the end
+                threshold: 0,
+            }
+        );
+
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [hasMore, isLoadingMore, fetchMoreProducts]);
+
+    // Grouping (same as before, now uses the growing `products` state)
     const groupedProducts = useMemo(() => {
         const groups: Record<
             string,
@@ -64,6 +163,7 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
         return Object.values(groups).filter((g) => g.products.length > 0);
     }, [products, productCategries]);
 
+    // Helpers 
     const getLocalizedName = (name: { en?: string; pt?: string } | string) => {
         if (typeof name === 'string') return name;
         return name?.en || name?.pt || 'Unnamed';
@@ -71,7 +171,6 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
 
     const getProductKey = (product: TProduct) => product.productId || product._id;
 
-    // Toggle a single product
     const toggleProduct = (product: TProduct) => {
         const key = getProductKey(product);
         if (!key) return;
@@ -81,7 +180,6 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
         );
     };
 
-    // Toggle all products under a category
     const toggleCategory = (catProducts: TProduct[]) => {
         const ids = catProducts
             .map(getProductKey)
@@ -89,15 +187,12 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
         const allSelected = ids.every((id) => selectedProductIds.includes(id));
 
         if (allSelected) {
-            // Deselect all in this category
             setSelectedProductIds((prev) => prev.filter((id) => !ids.includes(id)));
         } else {
-            // Select all in this category
             setSelectedProductIds((prev) => Array.from(new Set([...prev, ...ids])));
         }
     };
 
-    // Category is considered "selected" if at least one product under it is selected
     const isCategorySelected = (catProducts: TProduct[]) => {
         return catProducts.some((p) => {
             const key = getProductKey(p);
@@ -105,7 +200,6 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
         });
     };
 
-    // All products under category are selected
     const isCategoryFullySelected = (catProducts: TProduct[]) => {
         if (catProducts.length === 0) return false;
         return catProducts.every((p) => {
@@ -114,7 +208,6 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
         });
     };
 
-    // Calculate discounted price
     const getDiscountedPrice = (price: number) => {
         const pct = Number(percentage);
         if (isNaN(pct) || pct <= 0) return null;
@@ -152,13 +245,16 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
             if (result.success) {
                 toast.success(result?.message || "Decrease applied successfully!", { id: toastId });
 
+                startTransition(() => {
+                    router.refresh();
+                })
                 setPercentage('');
                 setSelectedProductIds([]);
                 return;
             }
 
             if (result?.data?.errorSources) {
-                result?.data?.errorSources?.map((err: { path: string, message: string }) => (
+                result?.data?.errorSources?.map((err: { path: string; message: string }) => (
                     toast.error(err?.message, { id: toastId })
                 ));
                 return;
@@ -175,6 +271,18 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
             setIsUpdating(false);
         }
     };
+
+    // Sync local products when server props update (e.g. after router.refresh())
+    useEffect(() => {
+        setProducts(initialProducts);
+        setPage(initialMeta?.page ?? 1);
+        setHasMore(() => {
+            if (initialMeta?.totalPage !== undefined) {
+                return (initialMeta.page ?? 1) < initialMeta.totalPage;
+            }
+            return initialProducts.length >= PAGE_LIMIT;
+        });
+    }, [initialProducts, initialMeta]);
 
     return (
         <div className="space-y-6">
@@ -262,7 +370,7 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
                 }
             />
 
-            {/* Control bar */}
+            {/* Control bar – unchanged */}
             <Card className="border-border/60 sticky top-0 z-10 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
                 <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="text-sm text-muted-foreground">
@@ -309,7 +417,7 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
             </Card>
 
             {/* Product list */}
-            {groupedProducts.length === 0 ? (
+            {groupedProducts.length === 0 && !isLoadingMore ? (
                 <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                     <Package className="h-12 w-12 mb-3 opacity-40" />
                     <p>{t('no_products_found')}</p>
@@ -325,7 +433,7 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
                                 key={category?._id || 'uncategorized'}
                                 className="space-y-2"
                             >
-                                {/* Category header */}
+                                {/* Category header – unchanged */}
                                 <div
                                     className={cn(
                                         'flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all cursor-pointer',
@@ -339,9 +447,7 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
                                         checked={categorySelected}
                                         className={cn(
                                             'data-[state=checked]:bg-[#DC3173] data-[state=checked]:border-[#DC3173]',
-                                            categorySelected &&
-                                            !fullySelected &&
-                                            'opacity-70'
+                                            categorySelected && !fullySelected && 'opacity-70'
                                         )}
                                         onCheckedChange={() => toggleCategory(catProducts)}
                                         onClick={(e) => e.stopPropagation()}
@@ -372,7 +478,7 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
                                     </Badge>
                                 </div>
 
-                                {/* Products - compact + variations support */}
+                                {/* Products grid – unchanged */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 ml-10">
                                     {catProducts?.map((product) => {
                                         const productKey = getProductKey(product);
@@ -495,6 +601,21 @@ const UpdateDiscount = ({ products, productCategries, vendorId }: Props) => {
                             </section>
                         );
                     })}
+
+                    {/* Infinite-scroll sentinel + loading indicator */}
+                    <div ref={loadMoreRef} className="py-6 flex justify-center">
+                        {isLoadingMore && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                {t('loading_more') || 'Loading more products…'}
+                            </div>
+                        )}
+                        {!hasMore && products.length > 0 && (
+                            <p className="text-xs text-muted-foreground">
+                                {t('no_more_products') || 'No more products'}
+                            </p>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

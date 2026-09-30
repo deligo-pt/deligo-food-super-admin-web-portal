@@ -4,17 +4,17 @@ import TitleHeader from '@/components/TitleHeader/TitleHeader';
 import { TProductCategory } from '@/types/category.type';
 import { TProduct } from '@/types/product.type';
 import { useRouter } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronDown, Package, Percent } from 'lucide-react';
+import { ChevronDown, Loader2, Package, Percent } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { cn } from '@/lib/utils';
-import { applyIncreaseDecrease } from '@/services/dashboard/product/product.service';
+import { applyIncreaseDecrease, getAllProducts } from '@/services/dashboard/product/product.service';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,22 +22,118 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { queryStringFormatter } from '@/utils/formatter';
+import { TMeta } from '@/types';
 
 type Props = {
     products: TProduct[];
     productCategries: TProductCategory[];
     vendorId: string;
+    vendorMongoId?: string;
+    initialMeta?: TMeta;
 };
 
-const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
+const PAGE_LIMIT = 10;
+
+const IncreasePrice = ({
+    products: initialProducts,
+    productCategries,
+    vendorId,
+    vendorMongoId,
+    initialMeta,
+}: Props) => {
     const { t } = useTranslation();
     const router = useRouter();
+    const [, startTransition] = useTransition();
+
+    // Infinite-scroll state
+    const [products, setProducts] = useState<TProduct[]>(initialProducts);
+    const [page, setPage] = useState(initialMeta?.page ?? 1);
+    const [hasMore, setHasMore] = useState(() => {
+        if (initialMeta?.totalPage !== undefined) return (initialMeta.page ?? 1) < initialMeta.totalPage;
+        return initialProducts.length >= PAGE_LIMIT;
+    });
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [percentage, setPercentage] = useState<string>('');
     const [isUpdating, setIsUpdating] = useState(false);
 
-    // Group products by category
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+    // Fetch next page
+    const fetchMoreProducts = useCallback(async () => {
+        if (isLoadingMore || !hasMore || !vendorMongoId) return;
+
+        setIsLoadingMore(true);
+        try {
+            const nextPage = page + 1;
+            const query = {
+                "meta.status": "ACTIVE",
+                vendorId: vendorMongoId,
+                page: nextPage,
+                limit: PAGE_LIMIT,
+            };
+            const queryString = queryStringFormatter(query);
+            const res = await getAllProducts(queryString);
+
+            const newProducts: TProduct[] = res?.data ?? [];
+            const meta = res?.meta;
+
+            if (newProducts.length === 0) {
+                setHasMore(false);
+                return;
+            }
+
+            setProducts((prev) => {
+                const existingKeys = new Set(
+                    prev.map((p) => p.productId || p._id).filter(Boolean)
+                );
+                const unique = newProducts.filter((p) => {
+                    const key = p.productId || p._id;
+                    return key && !existingKeys.has(key);
+                });
+                return [...prev, ...unique];
+            });
+
+            setPage(nextPage);
+
+            if (meta?.totalPage !== undefined) {
+                setHasMore(nextPage < meta.totalPage);
+            } else {
+                setHasMore(newProducts.length >= PAGE_LIMIT);
+            }
+        } catch (err) {
+            console.error('Failed to load more products', err);
+            toast.error(t('failed_to_load_more') || 'Failed to load more products');
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }, [isLoadingMore, hasMore, vendorMongoId, page, t]);
+
+    // IntersectionObserver
+    useEffect(() => {
+        const node = loadMoreRef.current;
+        if (!node || !hasMore) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting && hasMore && !isLoadingMore) {
+                    fetchMoreProducts();
+                }
+            },
+            {
+                root: null,
+                rootMargin: '200px',
+                threshold: 0,
+            }
+        );
+
+        observer.observe(node);
+        return () => observer.disconnect();
+    }, [hasMore, isLoadingMore, fetchMoreProducts]);
+
+    // Groupin
     const groupedProducts = useMemo(() => {
         const groups: Record<
             string,
@@ -64,6 +160,7 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
         return Object.values(groups).filter((g) => g.products.length > 0);
     }, [products, productCategries]);
 
+    // Helpers
     const getLocalizedName = (name: { en?: string; pt?: string } | string) => {
         if (typeof name === 'string') return name;
         return name?.en || name?.pt || 'Unnamed';
@@ -72,7 +169,6 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
     const getProductKey = (product: TProduct): string | undefined =>
         product.productId || product._id;
 
-    // Toggle a single product
     const toggleProduct = (product: TProduct) => {
         const key = getProductKey(product);
         if (!key) return;
@@ -81,7 +177,6 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
         );
     };
 
-    // Toggle all products under a category
     const toggleCategory = (catProducts: TProduct[]) => {
         const ids = catProducts
             .map(getProductKey)
@@ -90,15 +185,12 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
         const allSelected = ids.every((id) => selectedProductIds.includes(id));
 
         if (allSelected) {
-            // Deselect all in this category
             setSelectedProductIds((prev) => prev.filter((id) => !ids.includes(id)));
         } else {
-            // Select all in this category
             setSelectedProductIds((prev) => Array.from(new Set([...prev, ...ids])));
         }
     };
 
-    // Category is considered "selected" if at least one product under it is selected
     const isCategorySelected = (catProducts: TProduct[]) => {
         return catProducts.some((p) => {
             const key = getProductKey(p);
@@ -106,7 +198,6 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
         });
     };
 
-    // All products under category are selected
     const isCategoryFullySelected = (catProducts: TProduct[]) => {
         if (catProducts.length === 0) return false;
         return catProducts.every((p) => {
@@ -115,14 +206,14 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
         });
     };
 
-    // Calculate discounted price
     const getIncreasedPrice = (price: number) => {
         const pct = Number(percentage);
         if (isNaN(pct) || pct <= 0) return null;
-        const discounted = price * (1 + pct / 100);
-        return Math.max(0, Number(discounted.toFixed(2)));
+        const increased = price * (1 + pct / 100);
+        return Math.max(0, Number(increased.toFixed(2)));
     };
 
+    // handleApply – left completely unchanged
     const handleApply = async () => {
         const numericPercentage = Number(percentage);
 
@@ -153,6 +244,9 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
             if (result.success) {
                 toast.success(result?.message || "Increase applied successfully!", { id: toastId });
 
+                startTransition(() => {
+                    router.refresh();
+                })
                 setPercentage('');
                 setSelectedProductIds([]);
                 return;
@@ -176,6 +270,18 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
             setIsUpdating(false);
         }
     };
+
+    // Sync local products when server props update (e.g. after router.refresh())
+    useEffect(() => {
+        setProducts(initialProducts);
+        setPage(initialMeta?.page ?? 1);
+        setHasMore(() => {
+            if (initialMeta?.totalPage !== undefined) {
+                return (initialMeta.page ?? 1) < initialMeta.totalPage;
+            }
+            return initialProducts.length >= PAGE_LIMIT;
+        });
+    }, [initialProducts, initialMeta]);
 
     return (
         <div className="space-y-6">
@@ -225,7 +331,6 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-1 border-gray-100" />
 
-                            {/* Newly added sections */}
                             <DropdownMenuItem
                                 onClick={() =>
                                     router.push(
@@ -310,7 +415,7 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
             </Card>
 
             {/* Product list */}
-            {groupedProducts.length === 0 ? (
+            {groupedProducts.length === 0 && !isLoadingMore ? (
                 <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                     <Package className="h-12 w-12 mb-3 opacity-40" />
                     <p>{t('no_products_found')}</p>
@@ -373,7 +478,7 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
                                     </Badge>
                                 </div>
 
-                                {/* Products - compact + variations support */}
+                                {/* Products grid */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-1.5 ml-10">
                                     {catProducts.map((product) => {
                                         const productKey = getProductKey(product);
@@ -399,7 +504,6 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
                                                         : 'border-[#DC3173]/30 hover:bg-muted/20'
                                                 )}
                                             >
-                                                {/* Main product row */}
                                                 <div
                                                     className="flex items-center gap-2 px-2.5 py-1.5 cursor-pointer"
                                                     onClick={() => toggleProduct(product)}
@@ -436,17 +540,14 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
                                                     </div>
                                                 </div>
 
-                                                {/* Variations (if any) */}
                                                 {hasVariations && (
                                                     <div className="border-t border-dashed border-[#DC3173]/20 px-2.5 pb-2 pt-1.5 space-y-1.5">
                                                         {product.variations.map((variation, vIdx) => (
                                                             <div key={vIdx} className="space-y-1">
-                                                                {/* Variation group name */}
                                                                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide pl-5">
                                                                     {getLocalizedName(variation.name)}
                                                                 </p>
 
-                                                                {/* Options */}
                                                                 <div className="space-y-1">
                                                                     {variation.options?.map((option, oIdx) => {
                                                                         const optionPrice = option.price;
@@ -496,6 +597,21 @@ const IncreasePrice = ({ products, productCategries, vendorId }: Props) => {
                             </section>
                         );
                     })}
+
+                    {/* Infinite-scroll sentinel */}
+                    <div ref={loadMoreRef} className="py-6 flex justify-center">
+                        {isLoadingMore && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                {t('loading_more') || 'Loading more products…'}
+                            </div>
+                        )}
+                        {!hasMore && products.length > 0 && (
+                            <p className="text-xs text-muted-foreground">
+                                {t('no_more_products') || 'No more products'}
+                            </p>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

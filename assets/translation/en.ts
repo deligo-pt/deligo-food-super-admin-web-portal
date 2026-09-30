@@ -484,6 +484,8 @@ export const en = {
   // apply increase
   apply_price_increase: "Apply Price Increase",
   update_the_base_price_your_products: "Update the base price of your products",
+  loading_more: 'Loading more products…',
+  no_more_products: 'No more products',
 
   // approve or reject modal
   are_you_sure_want_approve: "Are you sure you want to approve?",
@@ -1784,6 +1786,11 @@ export const en = {
   starts_in: "Starts in",
   days_sm: "days",
   days_remaining: "days remaining",
+  targeted_zones: "Targeted Zones",
+  no_zones_set: "No zones set - Please select zones",
+  select_target_zones: "Select zones below...",
+  loading_zones: "Loading zones...",
+  add_target_zone: "Add target zone...",
   sponsorship_category: "Sponsorship category",
   campaign_timeline: "Campaign Timeline",
   start: "Start",

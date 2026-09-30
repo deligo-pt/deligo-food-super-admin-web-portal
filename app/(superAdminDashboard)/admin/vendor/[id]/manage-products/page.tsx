@@ -31,7 +31,7 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
     // Categories – keep a high limit so all categories appear
     const categoriesQuery = queryStringFormatter({
         vendorId: vendorMongoId,
-        limit: "30",
+        limit: "50",
         // sortBy: "name",
         ...searchParamsObj
     });
