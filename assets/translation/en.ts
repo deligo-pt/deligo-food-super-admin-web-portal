@@ -484,6 +484,8 @@ export const en = {
   // apply increase
   apply_price_increase: "Apply Price Increase",
   update_the_base_price_your_products: "Update the base price of your products",
+  loading_more: 'Loading more products…',
+  no_more_products: 'No more products',
 
   // approve or reject modal
   are_you_sure_want_approve: "Are you sure you want to approve?",
