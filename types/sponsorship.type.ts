@@ -3,7 +3,13 @@ export type TSponsorship = {
   sponsorName: string;
   sponsorType: "Ads" | "Offer" | "Other";
   bannerImage: string;
-  url: string;
+  url?: string;
+  targetZoneIds?: {
+    _id: string;
+    district: string;
+    zoneId: string;
+    zoneName: string;
+  }[];
 
   isActive: boolean;
   startDate: Date;

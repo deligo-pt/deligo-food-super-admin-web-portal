@@ -52,6 +52,8 @@ export const sponsorshipValidation = z
       .or(z.literal(""))
       .optional(),
 
+    targetZoneIds: z.array(z.string().optional()).optional(),
+
     sponsorBanner: z.object(
       {
         file: z.file().nullable(),

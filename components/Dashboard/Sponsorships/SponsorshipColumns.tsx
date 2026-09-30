@@ -13,6 +13,7 @@ import {
     CircleCheckBig,
     Cog,
     ImageIcon,
+    MapPin,
     MoreVertical,
 } from "lucide-react";
 import Image from "next/image";
@@ -51,7 +52,6 @@ export function getSponsorshipColumns({
                 />
             ),
         },
-
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
@@ -61,7 +61,6 @@ export function getSponsorshipColumns({
             ),
             accessor: "sponsorName",
         },
-
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
@@ -71,7 +70,34 @@ export function getSponsorshipColumns({
             ),
             accessor: "sponsorType",
         },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                    <MapPin className="w-4" />
+                    {t("targeted_zones") || "Targeted Zones"}
+                </div>
+            ),
+            accessor: (s) => {
+                const zones = s?.targetZoneIds || [];
+                if (zones.length === 0) return <span className="text-slate-400">N/A</span>;
 
+                const firstZone = zones[0].zoneName;
+                const remainingCount = zones.length - 1;
+
+                return (
+                    <div className="flex items-center gap-1.5">
+                        <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 text-xs font-medium">
+                            {firstZone}
+                        </span>
+                        {remainingCount > 0 && (
+                            <span className="text-xs text-slate-500 font-semibold">
+                                +{remainingCount}
+                            </span>
+                        )}
+                    </div>
+                );
+            },
+        },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
@@ -81,7 +107,6 @@ export function getSponsorshipColumns({
             ),
             accessor: (s) => (s.isActive ? t("active") : t("inactive")),
         },
-
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
@@ -90,12 +115,11 @@ export function getSponsorshipColumns({
                 </div>
             ),
             accessor: (s) =>
-                `${format(s.startDate, "do MMM yyyy")} - ${format(
-                    s.endDate,
+                `${format(new Date(s.startDate), "do MMM yyyy")} - ${format(
+                    new Date(s.endDate),
                     "do MMM yyyy"
                 )}`,
         },
-
         {
             header: (
                 <div className="text-[#DC3173] flex justify-end gap-2 items-center">

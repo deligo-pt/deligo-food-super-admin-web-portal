@@ -23,6 +23,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
+import { IZone } from "@/types/zone.type";
 import { catchAsync } from "@/utils/catchAsync";
 import { postData } from "@/utils/requests";
 import { sponsorshipValidation } from "@/validations/sponsorship/sponsorship.validation";
@@ -30,6 +31,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,8 +39,10 @@ import z from "zod";
 
 type TSponsorshipForm = z.infer<typeof sponsorshipValidation>;
 
-export default function AddSponsorship() {
+export default function AddSponsorship({ zones }: { zones: IZone[] }) {
   const { t } = useTranslation();
+  const router = useRouter();
+
   const form = useForm<TSponsorshipForm>({
     resolver: zodResolver(sponsorshipValidation),
     defaultValues: {
@@ -48,13 +52,15 @@ export default function AddSponsorship() {
       endDate: new Date(),
       isActive: true,
       sponsorBanner: { file: null, url: "" },
-      url: ""
+      url: "",
+      targetZoneIds: [],
     },
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sponsorBannerPreview, setSponsorBannerPreview] = useState<
     string | undefined
   >(undefined);
+  const [isOpen, setIsOpen] = useState(false);
 
   const onSubmit = async (data: TSponsorshipForm) => {
     setIsSubmitting(true);
@@ -67,6 +73,10 @@ export default function AddSponsorship() {
       endDate: format(data.endDate, "yyyy-MM-dd"),
       isActive: data.isActive,
       ...(data.url && { url: data.url }),
+      ...(data.targetZoneIds &&
+        data.targetZoneIds.length > 0 && {
+        targetZoneIds: data.targetZoneIds,
+      }),
     };
 
     const formData = new FormData();
@@ -90,6 +100,7 @@ export default function AddSponsorship() {
       form.reset();
       setSponsorBannerPreview(undefined);
       setIsSubmitting(false);
+      router.push('/admin/sponsorships');
       return;
     }
 
@@ -168,6 +179,104 @@ export default function AddSponsorship() {
                   <FormMessage />
                 </FormItem>
               )}
+            />
+
+            {/* Target Zones Multi-Select with Badges */}
+            <FormField
+              control={form.control}
+              name="targetZoneIds"
+              render={({ field, fieldState }) => {
+
+                const selectedZones = zones.filter((zone) =>
+                  field.value?.includes(zone._id)
+                );
+
+                const toggleZone = (zoneId: string) => {
+                  const current = field.value || [];
+                  const updated = current.includes(zoneId)
+                    ? current.filter((id) => id !== zoneId)
+                    : [...current, zoneId];
+                  field.onChange(updated);
+                };
+
+                return (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                          {t("target_zones")} <span className="text-gray-400 font-normal">(Optional)</span>
+                        </label>
+                        <div
+                          onClick={() => setIsOpen(!isOpen)}
+                          className={cn(
+                            "w-full min-h-11 rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-gray-900 shadow-sm transition-all duration-200 cursor-pointer flex flex-wrap items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-[#DC3173]/20",
+                            fieldState.invalid && "border border-destructive"
+                          )}
+                        >
+                          {selectedZones.length > 0 ? (
+                            selectedZones.map((zone) => (
+                              <span
+                                key={zone._id}
+                                className="inline-flex items-center gap-1 bg-[#DC3173]/10 text-[#DC3173] text-xs font-medium px-2.5 py-1 rounded-lg"
+                              >
+                                {zone.zoneName}
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleZone(zone._id);
+                                  }}
+                                  className="hover:text-destructive hover:bg-[#DC3173]/20 rounded-full p-0.5"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-gray-400 text-sm">
+                              {t("select_target_zones") || "Select target zones..."}
+                            </span>
+                          )}
+                        </div>
+
+                        {isOpen && (
+                          <div className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-100 max-h-60 overflow-y-auto p-2">
+                            {zones.length > 0 ? (
+                              zones.map((zone) => {
+                                const isSelected = field.value?.includes(zone._id);
+                                return (
+                                  <div
+                                    key={zone._id}
+                                    onClick={() => toggleZone(zone._id)}
+                                    className={cn(
+                                      "flex items-center my-1 justify-between px-3 py-2 rounded-lg cursor-pointer text-sm transition-colors",
+                                      isSelected
+                                        ? "bg-[#DC3173]/10 text-[#DC3173] font-medium"
+                                        : "hover:bg-gray-50 text-gray-700"
+                                    )}
+                                  >
+                                    <span>
+                                      {zone.zoneName} ({zone.district})
+                                    </span>
+                                    {isSelected && (
+                                      <span className="text-xs font-bold">✓</span>
+                                    )}
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <div className="p-3 text-center text-sm text-gray-400">
+                                {t("no_zones_available") || "No zones available"}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField
