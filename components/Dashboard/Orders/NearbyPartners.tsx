@@ -20,6 +20,7 @@ import {
     Loader2,
 } from "lucide-react";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { useTranslation } from "@/hooks/use-translation";
 
 type Partner = {
     deliveryPartnerId: string;
@@ -55,6 +56,7 @@ type Props = {
 };
 
 const NearbyPartners = ({ nearbyPartners }: Props) => {
+    const { t } = useTranslation();
     const router = useRouter();
     const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
     const [note, setNote] = useState("");
@@ -117,26 +119,14 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
     const getFullName = (name: Partner["name"]) =>
         `${name?.firstName || ""} ${name?.lastName || ""}`.trim() || "Unknown";
 
-    // if (!partners.length) {
-    //     return (
-    //         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-    //             <Bike className="h-12 w-12 mb-3 opacity-40" />
-    //             <p className="text-sm font-medium">No nearby partners found</p>
-    //             <p className="text-xs mt-1">
-    //                 Search radius: {nearbyPartners?.searchRadiusKm ?? 5} km
-    //             </p>
-    //         </div>
-    //     );
-    // }
-
     return (
         <div className="space-y-6">
             {/* Header info */}
             <TitleHeader
-                title="Nearby Delivery Partners"
-                subtitle={`Order ${nearbyPartners.orderId} ${nearbyPartners.totalAvailablePartners} partner
-                        ${nearbyPartners.totalAvailablePartners !== 1 ? "s" : ""} within 
-                        ${nearbyPartners.searchRadiusKm} km`}
+                title={t("nearby_delivery_partners")}
+                subtitle={`${t("order")} ${nearbyPartners.orderId} ${nearbyPartners.totalAvailablePartners}
+                        ${nearbyPartners.totalAvailablePartners > 1 ? t("partners") : t("partner_sm")} ${t("within")} 
+                        ${nearbyPartners.searchRadiusKm} ${t("km")}`}
                 extraComponent={
                     <>
                         <Badge
@@ -153,9 +143,9 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                 partners?.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                         <Bike className="h-12 w-12 mb-3 opacity-40" />
-                        <p className="text-sm font-medium">No nearby partners found</p>
+                        <p className="text-sm font-medium">{t("no_nearby_partners_found")}</p>
                         <p className="text-xs mt-1">
-                            Search radius: {nearbyPartners?.searchRadiusKm ?? 5} km
+                            {t("search_radius")}: {nearbyPartners?.searchRadiusKm ?? 5} {t("km")}
                         </p>
                     </div>
                 )
@@ -217,7 +207,7 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                                             </span>
                                             <span className="inline-flex items-center gap-1">
                                                 <MapPin className="h-3 w-3" />
-                                                {partner.distanceKm.toFixed(2)} km
+                                                {partner.distanceKm.toFixed(2)} {t("km")}
                                             </span>
                                             <span className="inline-flex items-center gap-1">
                                                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
@@ -257,7 +247,7 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                                             handleSelect(partner.deliveryPartnerId);
                                         }}
                                     >
-                                        {isSelected ? "Selected" : "Select"}
+                                        {isSelected ? t("selected") : t("select")}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -273,12 +263,12 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                         <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-[#DC3173]" />
                             <span>
-                                Selected:{" "}
+                                {t("selected")}:{" "}
                                 <span className="font-semibold">
                                     {getFullName(selectedPartner.name)}
                                 </span>
                                 <span className="text-muted-foreground ml-1">
-                                    ({selectedPartner.distanceKm.toFixed(2)} km away)
+                                    ({selectedPartner.distanceKm.toFixed(2)} {t("km_away")})
                                 </span>
                             </span>
                         </div>
@@ -286,10 +276,10 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
 
                     <div className="space-y-1.5">
                         <label className="text-xs font-medium text-muted-foreground">
-                            Note (optional)
+                            {t("note")} (optional)
                         </label>
                         <Textarea
-                            placeholder="Add a note for this assignment..."
+                            placeholder={t("add_a_note_for_assignment")}
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
                             maxLength={500}
@@ -309,10 +299,10 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                         {isAssigning ? (
                             <>
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                Assigning...
+                                {t("assigning")}...
                             </>
                         ) : (
-                            "Assign Partner"
+                            t("assign_partner")
                         )}
                     </Button>
                 </CardContent>

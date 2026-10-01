@@ -6,6 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import {
   allMarkReadReq,
@@ -21,6 +22,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function TopbarNotification() {
+  const { t } = useTranslation();
   const [notificationsData, setNotificationsData] = useState<{
     data: TNotification[];
     meta?: TMeta;
@@ -81,7 +83,7 @@ export default function TopbarNotification() {
           <div className="grid gap-1">
             <div className="flex justify-between items-center">
               <div>
-                <h4 className="leading-none font-medium">Notifications</h4>
+                <h4 className="leading-none font-medium">{t("notifications")}</h4>
               </div>
               <div>
                 <Button
@@ -89,14 +91,14 @@ export default function TopbarNotification() {
                   className="text-[#DC3173] text-xs cursor-pointer"
                   onClick={markAllAsRead}
                 >
-                  Mark all as read
+                  {t("mark_all_as_read")}
                 </Button>
               </div>
             </div>
             <div className="space-y-2">
               {notificationsData?.meta?.total === 0 && (
                 <div className="text-center">
-                  <p className="text-sm text-slate-500">No notifications</p>
+                  <p className="text-sm text-slate-500">{t("no_notifications")}</p>
                 </div>
               )}
               {notificationsData?.data?.map((notification) => {
@@ -142,7 +144,7 @@ export default function TopbarNotification() {
                       })
                     }
                   >
-                    See More
+                    {t("see_more")}
                   </Button>
                 </div>
               )}
