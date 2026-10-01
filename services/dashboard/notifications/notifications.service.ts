@@ -1,9 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TNotification } from "@/types/notification.type";
 import { catchAsync } from "@/utils/catchAsync";
+
+
+export const getAllNotifications = async (queryString?: string) => {
+  const url = `/notifications/my-notifications${queryString ? `?${queryString}` : ""}`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["notifications"],
+      },
+    });
+    return await res.json();
+  });
+
+  return result;
+};
 
 export const singleMarkReadReq = async (id: string) => {
   return catchAsync<TNotification[]>(async () => {
@@ -18,7 +35,7 @@ export const allMarkReadReq = async () => {
 };
 
 
-export const broadcastNotificationReq = async (payload : any) => {
+export const broadcastNotificationReq = async (payload: any) => {
   return catchAsync<TNotification>(async () => {
     return await serverRequest.post("/notifications/broadcast", {
       data: payload,
