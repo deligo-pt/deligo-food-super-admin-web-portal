@@ -9,14 +9,15 @@ import {
 import { cn } from "@/lib/utils";
 import {
   allMarkReadReq,
+  getAllNotifications,
   singleMarkReadReq,
 } from "@/services/dashboard/notifications/notifications.service";
 import { TMeta } from "@/types";
 import { TNotification } from "@/types/notification.type";
-import { catchAsync } from "@/utils/catchAsync";
-import { fetchData } from "@/utils/requests";
+import { queryStringFormatter } from "@/utils/formatter";
 import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function TopbarNotification() {
@@ -26,11 +27,9 @@ export default function TopbarNotification() {
   }>({ data: [] });
 
   const getNotifications = async ({ limit = 10 }) => {
-    const result = await catchAsync<TNotification[]>(async () => {
-      return await fetchData("/notifications/my-notifications", {
-        params: { limit },
-      });
-    });
+    const query = queryStringFormatter({ limit });
+
+    const result = await getAllNotifications(query);
 
     if (result.success) {
       setNotificationsData({ data: result.data, meta: result.meta });
@@ -56,6 +55,16 @@ export default function TopbarNotification() {
   useEffect(() => {
     (() => getNotifications({ limit: 10 }))();
   }, []);
+
+  const getNotificationLink = (notification: TNotification): string | null => {
+    const orderId = notification?.data?.orderId;
+    const orderStatus = notification?.data?.orderStatus;
+
+    if (orderId && orderStatus === "AWAITING_PARTNER") {
+      return `/admin/all-orders/${orderId}/nearby-partners`;
+    }
+    return null;
+  };
 
   return (
     <div className="relative shrink-0">
@@ -90,40 +99,53 @@ export default function TopbarNotification() {
                   <p className="text-sm text-slate-500">No notifications</p>
                 </div>
               )}
-              {notificationsData?.data?.map((notification) => (
-                <div
-                  onClick={() =>
-                    !notification?.isRead && markSingleAsRead(notification)
-                  }
-                  key={notification._id}
-                  className={cn(
-                    "bg-slate-50 px-4 py-2 rounded-md shadow cursor-pointer",
-                    notification?.isRead
-                      ? "bg-slate-50 hover:bg-slate-100"
-                      : "bg-[#DC3173]/30 hover:bg-[#DC3173]/20",
-                  )}
-                >
-                  <h2 className="text-sm font-medium">{notification?.title}</h2>
-                  <p className="text-[10px]">{notification?.message}</p>
-                </div>
-              ))}
+              {notificationsData?.data?.map((notification) => {
+                const link = getNotificationLink(notification);
+
+                const content = (
+                  <div
+                    onClick={() =>
+                      !notification?.isRead && markSingleAsRead(notification)
+                    }
+                    className={cn(
+                      "bg-slate-50 px-4 py-2 rounded-md shadow cursor-pointer",
+                      notification?.isRead
+                        ? "bg-slate-50 hover:bg-slate-100"
+                        : "bg-[#DC3173]/30 hover:bg-[#DC3173]/20",
+                    )}
+                  >
+                    <h2 className="text-sm font-medium">{notification?.title}</h2>
+                    <p className="text-[10px]">{notification?.message}</p>
+                  </div>
+                );
+
+                if (link) {
+                  return (
+                    <Link key={notification._id} href={link} className="block">
+                      {content}
+                    </Link>
+                  );
+                }
+
+                return <div key={notification._id}>{content}</div>;
+              })}
             </div>
             {(notificationsData?.meta?.total || 0) >
               (notificationsData?.meta?.limit || 10) && (
-              <div className="text-center">
-                <Button
-                  variant="link"
-                  className="text-[#DC3173] text-sm cursor-pointer"
-                  onClick={() =>
-                    getNotifications({
-                      limit: (notificationsData?.meta?.limit || 0) + 10,
-                    })
-                  }
-                >
-                  See More
-                </Button>
-              </div>
-            )}
+                <div className="text-center">
+                  <Button
+                    variant="link"
+                    className="text-[#DC3173] text-sm cursor-pointer"
+                    onClick={() =>
+                      getNotifications({
+                        limit: (notificationsData?.meta?.limit || 0) + 10,
+                      })
+                    }
+                  >
+                    See More
+                  </Button>
+                </div>
+              )}
           </div>
         </PopoverContent>
       </Popover>
