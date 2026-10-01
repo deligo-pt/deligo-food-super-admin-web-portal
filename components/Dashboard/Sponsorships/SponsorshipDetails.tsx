@@ -121,7 +121,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
           animate={{ opacity: 1, y: 0 }}
           className="relative rounded-3xl overflow-hidden shadow-2xl mb-8"
         >
-          <div className="relative aspect-21/9 bg-slate-100">
+          <div className="relative aspect-21/8 bg-slate-100">
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center z-10">
                 <ImageIcon className="w-16 h-16 text-slate-300 animate-pulse" />
@@ -152,7 +152,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="absolute top-6 right-6 z-10"
+              className="absolute top-1 right-1 lg:top-6 lg:right-6 z-10"
             >
               <span
                 className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 ${isLive && sponsorship.isActive
@@ -179,7 +179,7 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
               </span>
             </motion.div>
 
-            <div className="absolute bottom-0 left-0 right-0 p-8 pointer-events-none z-10">
+            <div className="absolute bottom-0 left-0 right-0 lg:p-8 p-2 pointer-events-none z-10">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -188,14 +188,14 @@ export function SponsorshipDetails({ sponsorship }: IProps) {
               >
                 <div>
                   <div
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${config.lightBg} ${config.text} mb-4`}
+                    className={`inline-flex items-center gap-2 px-3 py-0.5 lg:py-1.5 rounded-lg ${config.lightBg} ${config.text} mb-4`}
                   >
                     <IconComponent className="w-4 h-4" />
-                    <span className="text-sm font-semibold">
+                    <span className="lg:text-sm font-semibold">
                       {sponsorship.sponsorType}
                     </span>
                   </div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+                  <h1 className="lg:text-4xl md:text-5xl font-bold text-white mb-2">
                     {sponsorship.sponsorName}
                   </h1>
                 </div>
