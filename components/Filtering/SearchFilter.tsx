@@ -42,13 +42,20 @@ export default function SearchFilter({
   }, []);
 
   const updateURL = (term: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (term.trim()) {
-      params.set(paramName, term.trim());
+    const trimmed = term.trim();
+
+    if (trimmed) {
+      // ONLY searchTerm — drop page, filters, everything else
+      const params = new URLSearchParams();
+      params.set(paramName, trimmed);
+      router.push(`?${params.toString()}`);
     } else {
+      // Empty search → remove searchTerm + page
+      const params = new URLSearchParams(searchParams.toString());
       params.delete(paramName);
+      params.delete("page");
+      router.push(`?${params.toString()}`);
     }
-    router.push(`?${params.toString()}`);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,12 +76,12 @@ export default function SearchFilter({
 
     const params = new URLSearchParams(searchParams.toString());
     params.delete(paramName);
+    params.delete("page");
     router.push(`?${params.toString()}`);
   };
 
   return (
     <div className={`relative w-full ${className}`}>
-      {/* Search icon */}
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
 
       <Input
