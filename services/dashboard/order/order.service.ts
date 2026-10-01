@@ -83,6 +83,35 @@ export const getAllOrders = async () => {
   }
 };
 
+export const getNearbyPartnersForOrders = async (orderId: string) => {
+  const url = `/orders/${orderId}/nearby-partners`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["partners"],
+      },
+    });
+    return await res.json();
+  });
+
+  return result;
+};
+
+export const assignPartnerToOrder = async (orderId: string, data : any) => {
+  const url = `/orders/${orderId}/assign-partner`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(url, {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  });
+
+  return result;
+};
+
 // refund order
 export const refundOrderReq = async (id: string) => {
   const result = await catchAsync<TOrder>(async () => {

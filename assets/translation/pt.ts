@@ -279,6 +279,22 @@ export const pt = {
   no_top_rated_items_found: "Nenhum item bem avaliado encontrado",
   orders: "encomendas",
 
+  // notifiaction
+  mark_all_as_read: "Marcar todas como lidas",
+  no_notifications: "Sem notificações",
+  see_more: "Ver Mais",
+  // --> nearby partners
+  nearby_delivery_partners: "Estafetas Próximos",
+  partner_sm: "estafeta",
+  within: "num raio de",
+  no_nearby_partners_found: "Nenhum estafeta próximo encontrado",
+  search_radius: "Raio de pesquisa",
+  km: "km",
+  km_away: "km de distância",
+  add_a_note_for_assignment: "Adicione uma nota para esta atribuição...",
+  assigning: "A atribuir",
+  assign_partner: "Atribuir Estafeta",
+
   // create draft agreement
   create_draft_agreement_subtitle: "Crie um novo rascunho de acordo para fornecedores ou gestores de frota. Preencha os detalhes necessários e submeta o formulário para gerar um rascunho do documento de acordo.",
   agreement_info: "Informação do Acordo",

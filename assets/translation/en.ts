@@ -269,6 +269,22 @@ export const en = {
   no_top_rated_items_found: "No top rated items found",
   orders: "orders",
 
+  // notifiaction
+  mark_all_as_read: "Mark all as read",
+  no_notifications: "No notifications",
+  see_more: "See More",
+  // --> nearby partners
+  nearby_delivery_partners: "Nearby Delivery Partners",
+  partner_sm: "partner",
+  within: "within",
+  no_nearby_partners_found: "No nearby partners found",
+  search_radius: "Search radius",
+  km: "km",
+  km_away: "km away",
+  add_a_note_for_assignment: "Add a note for this assignment...",
+  assigning:" Assigning",
+  assign_partner:"Assign Partner",
+
   // create draft agreement
   create_draft_agreement_subtitle: "Create a new draft agreement for vendors or fleet managers. Fill in the required details and submit the form to generate a draft agreement document.",
   agreement_info: "Agreement Info",
