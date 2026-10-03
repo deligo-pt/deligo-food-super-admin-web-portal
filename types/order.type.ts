@@ -1,5 +1,15 @@
 import { TAddonGroup } from "./add-ons.type";
 
+export interface TOfferApplied {
+  rewardSnapshot?: Record<string, unknown>;
+  promoId: string;
+  title: string;
+  promoType: string;
+  discountType: string;
+  discountValue: number;
+  maxDiscountAmount?: number | null;
+}
+
 export interface TOrder {
   _id: string;
   orderId: string;
@@ -156,8 +166,8 @@ export interface TOrder {
   };
   offer: {
     isApplied: boolean;
-    offerApplied: unknown | null;
-  };
+    offerApplied: TOfferApplied | null;
+  } | null;
   paymentMethod: string;
   paymentStatus: string;
   transactionId: string;

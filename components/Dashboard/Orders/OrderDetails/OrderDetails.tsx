@@ -748,16 +748,76 @@ export default function OrderDetails({ order }: IProps) {
                     {order?.transactionId || "N/A"}
                   </span>
                 </div>
+                {/* OFFER */}
                 <div className="pt-2 border-t">
-                  <span className="text-gray-500 text-xs">{t("offer_applied")}</span>
-                  <div className="font-medium">
-                    {order?.offer?.isApplied ? "Yes" : "No"}
-                    {/* {order?.offer?.offerApplied && (
-                      <pre className="text-xs mt-1 bg-gray-50 p-2 rounded overflow-auto">
-                        {JSON.stringify(order.offer.offerApplied, null, 2)}
-                      </pre>
-                    )} */}
-                  </div>
+                  <span className="text-gray-500 text-xs block mb-1">
+                    {t("offer_applied") || "Offer Applied"}
+                  </span>
+
+                  {!order?.offer ? (
+                    <div className="text-sm text-gray-400 italic">{t("no_offer_data")}</div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {order.offer.isApplied ? "Yes" : "No"}
+                        </span>
+                        {order.offer.isApplied && (
+                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full">
+                            {t("active")}
+                          </span>
+                        )}
+                      </div>
+
+                      {order.offer.isApplied && order.offer.offerApplied ? (
+                        <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-1.5 border border-gray-100">
+                          <div className="font-medium text-gray-900">
+                            {order.offer.offerApplied.title || "Untitled Offer"}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600">
+                            <div>
+                              <span className="text-gray-500">{t("promo_id")}:</span>{" "}
+                              <span className="font-mono break-all">
+                                {order.offer.offerApplied.promoId || "N/A"}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">{t("discount_type")}:</span>{" "}
+                              {order.offer.offerApplied.discountType || "N/A"}
+                            </div>
+                            <div>
+                              <span className="text-gray-500">{t("discount_value")}:</span>{" "}
+                              {order.offer.offerApplied.discountType === "PERCENT"
+                                ? `${order.offer.offerApplied.discountValue}%`
+                                : `€${order.offer.offerApplied.discountValue}`}
+                            </div>
+                            {order.offer.offerApplied.maxDiscountAmount != null && (
+                              <div className="col-span-2">
+                                <span className="text-gray-500">{t("max_discount")}:</span>{" "}
+                                €{order.offer.offerApplied.maxDiscountAmount}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Optional: show rewardSnapshot if it has content */}
+                          {order.offer.offerApplied.rewardSnapshot &&
+                            Object.keys(order.offer.offerApplied.rewardSnapshot).length > 0 && (
+                              <div className="pt-2 mt-2 border-t border-gray-200">
+                                <div className="text-xs text-gray-500 mb-1">{t("reward_snapshot")}</div>
+                                <pre className="text-[11px] bg-white p-2 rounded border overflow-auto max-h-32">
+                                  {JSON.stringify(order.offer.offerApplied.rewardSnapshot, null, 2)}
+                                </pre>
+                              </div>
+                            )}
+                        </div>
+                      ) : order.offer.isApplied ? (
+                        <div className="text-xs text-amber-600 italic">
+                          {t("offer_is_applied_but_no_details_found")}
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>

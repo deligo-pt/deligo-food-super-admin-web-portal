@@ -1440,6 +1440,12 @@ export const en = {
   is_deleted: "Is Deleted",
   is_paid: "Is Paid",
   offer_applied: "Offer Applied",
+  no_offer_data: "No Offer Data",
+  promo_id: "Promo ID",
+  discount_type: "Discount Type",
+  discount_value: "Discount Value",
+  reward_snapshot: "Reward Snapshot",
+  offer_is_applied_but_no_details_found: "Offer is applied but no details found",
 
   order_calculation: "Order Calculation",
   total_original_price: "Total Original Price",

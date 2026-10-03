@@ -1456,6 +1456,12 @@ export const pt = {
   is_deleted: "Eliminado",
   is_paid: "Pago",
   offer_applied: "Oferta Aplicada",
+  no_offer_data: "Sem Dados da Oferta",
+  promo_id: "ID da Promoção",
+  discount_type: "Tipo de Desconto",
+  discount_value: "Valor do Desconto",
+  reward_snapshot: "Resumo da Recompensa",
+  offer_is_applied_but_no_details_found: "A oferta foi aplicada, mas não foram encontrados detalhes",
 
   order_calculation: "Cálculo do Pedido",
   total_original_price: "Preço Original Total",
