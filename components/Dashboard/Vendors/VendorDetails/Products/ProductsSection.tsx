@@ -115,47 +115,116 @@ export default function ProductsSection({
         return list;
     }, [products, deletedProductIds, currentSort, lang]);
 
-    // Group by category (show ALL categories) + sort categories by name
+    // Group by category (main + additional categories)
+    // A product will appear in EVERY category it belongs to
     const groupedProducts = useMemo(() => {
         const groups: Record<
             string,
             { category: TProductCategoryResponse | null; products: TProduct[] }
         > = {};
 
+        // Initialize all known categories
         productCategories.forEach((cat) => {
             groups[cat._id] = { category: cat, products: [] };
         });
 
+        // Always have a single uncategorized bucket
+        groups["uncategorized"] = { category: null, products: [] };
+
+        // Helper: collect ALL category IDs a product belongs to
+        const getAllCategoryIds = (product: TProduct): string[] => {
+            const ids = new Set<string>();
+
+            // Main category
+            if (product.category?._id) {
+                ids.add(String(product.category._id));
+            }
+
+            // Additional categories
+            const extra = product.additionalCategories || [];
+
+            if (Array.isArray(extra)) {
+                extra.forEach((cat) => {
+                    // cat can be full object or just id
+                    const id = typeof cat === "string" ? cat : cat?._id;
+                    if (id) ids.add(String(id));
+                });
+            }
+
+            return Array.from(ids);
+        };
+
+        // Place each product into ALL its categories
         visibleProducts.forEach((product) => {
-            const categoryId = product.category?._id;
-            if (categoryId && groups[categoryId]) {
-                groups[categoryId].products.push(product);
-            } else {
-                if (!groups["uncategorized"]) {
-                    groups["uncategorized"] = { category: null, products: [] };
-                }
+            const categoryIds = getAllCategoryIds(product);
+
+            if (categoryIds.length === 0) {
+                // Truly uncategorized
                 groups["uncategorized"].products.push(product);
+                return;
+            }
+
+            let placedInAtLeastOneKnownCategory = false;
+
+            categoryIds.forEach((catId) => {
+                if (groups[catId]) {
+                    // Avoid duplicate inside the same category
+                    const alreadyExists = groups[catId].products.some(
+                        (p) =>
+                            String(p._id || p.productId) ===
+                            String(product._id || product.productId)
+                    );
+                    if (!alreadyExists) {
+                        groups[catId].products.push(product);
+                        placedInAtLeastOneKnownCategory = true;
+                    }
+                }
+            });
+
+            // If none of the category IDs exist in the known list → put in uncategorized
+            if (!placedInAtLeastOneKnownCategory) {
+                const alreadyExists = groups["uncategorized"].products.some(
+                    (p) =>
+                        String(p._id || p.productId) ===
+                        String(product._id || product.productId)
+                );
+                if (!alreadyExists) {
+                    groups["uncategorized"].products.push(product);
+                }
             }
         });
 
+        // Remove empty uncategorized if not needed
+        if (groups["uncategorized"].products.length === 0) {
+            delete groups["uncategorized"];
+        }
+
         let result = Object.values(groups);
 
-        // Frontend sort categories by name (same direction as products)
+        // Frontend sort categories by name
         if (currentSort === "name" || currentSort === "-name") {
             const direction = currentSort === "name" ? 1 : -1;
 
             result = [...result].sort((a, b) => {
                 const nameA = a.category
-                    ? (a.category.name?.[lang] || a.category.name?.en || a.category.name?.pt || "")
-                    : (t("uncategorized") || "Uncategorized");
+                    ? a.category.name?.[lang] ||
+                    a.category.name?.en ||
+                    a.category.name?.pt ||
+                    ""
+                    : t("uncategorized") || "Uncategorized";
                 const nameB = b.category
-                    ? (b.category.name?.[lang] || b.category.name?.en || b.category.name?.pt || "")
-                    : (t("uncategorized") || "Uncategorized");
+                    ? b.category.name?.[lang] ||
+                    b.category.name?.en ||
+                    b.category.name?.pt ||
+                    ""
+                    : t("uncategorized") || "Uncategorized";
 
-                return nameA.localeCompare(nameB, lang, {
-                    sensitivity: "base",
-                    numeric: true,
-                }) * direction;
+                return (
+                    nameA.localeCompare(nameB, lang, {
+                        sensitivity: "base",
+                        numeric: true,
+                    }) * direction
+                );
             });
         }
 
