@@ -66,11 +66,11 @@ export default function CustomerOrdersSection({ orders }: IProps) {
                 <TableCell>
                   {order.items?.map((i, index) => (
                     <span key={index}>
-                      {i.name} x {i.quantity}
+                      {i.name} x {i.itemSummary?.quantity}
                     </span>
                   ))}
                 </TableCell>
-                <TableCell> €{order.totalPrice?.toLocaleString()}</TableCell>
+                <TableCell> €{order.payoutSummary.grandTotal?.toLocaleString()}</TableCell>
                 <TableCell>{format(order.createdAt, "do MMM yyyy")}</TableCell>
               </TableRow>
             ))}

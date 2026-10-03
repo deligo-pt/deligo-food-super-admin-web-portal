@@ -79,8 +79,6 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
             return;
         }
 
-        // Matches backend schema:
-        // { deliveryPartnerId: string (ObjectId), note?: string }
         const payload = {
             deliveryPartnerId: selectedPartnerId,
             ...(note.trim() ? { note: note.trim() } : {}),
@@ -99,8 +97,7 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                 setSelectedPartnerId(null);
                 setNote("");
                 router.refresh();
-                // optional: redirect somewhere
-                // router.push(`/admin/all-orders/${orderId}`);
+                router.push(`/admin/all-orders/${orderId}`);
             } else {
                 toast.error(result?.message || "Failed to assign partner", {
                     id: toastId,
@@ -247,7 +244,7 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                                             handleSelect(partner.deliveryPartnerId);
                                         }}
                                     >
-                                        {isSelected ? t("selected") : t("select")}
+                                        {isSelected ? t("selected_lg") : t("select")}
                                     </Button>
                                 </div>
                             </CardContent>
@@ -263,7 +260,7 @@ const NearbyPartners = ({ nearbyPartners }: Props) => {
                         <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-[#DC3173]" />
                             <span>
-                                {t("selected")}:{" "}
+                                {t("selected_lg")}:{" "}
                                 <span className="font-semibold">
                                     {getFullName(selectedPartner.name)}
                                 </span>
