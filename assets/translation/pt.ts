@@ -2623,6 +2623,13 @@ export const pt = {
   defines_how_many_minutes_before_estimated: "Define quantos minutos antes do tempo estimado de preparação o sistema deve iniciar o processo de expedição da entrega",
   order_preparation_extension_minutes: "Minutos de Extensão de Preparação do Pedido",
   defines_the_number_of_extra_preparation: "Define o número de minutos extras de preparação adicionados quando o comerciante solicita Preciso de Mais Tempo.",
+  order_pickup_radius_meters: "Raio de Recolha do Pedido (Metros)",
+  defines_the_maximum_distance: "Define a distância máxima em metros entre o comerciante e o estafeta atribuído para recolha.",
+  products: "Produtos",
+  configure_default_product_settings_used: "Configure as definições padrão de produtos utilizadas na plataforma",
+  replace: "Substituir",
+  view_full_image: "Ver Imagem Completa",
+  deligo_default_product_image: "Imagem Padrão de Produto DeliGo",
   time_widow_customers_cancel:
     "Período para os clientes cancelarem sem penalização",
   refund_processing_days: "Dias de Processamento de Reembolso",

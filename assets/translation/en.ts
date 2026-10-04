@@ -2595,6 +2595,13 @@ export const en = {
   defines_how_many_minutes_before_estimated: "Defines how many minutes before the estimated ready time the system should start the delivery dispatch process",
   order_preparation_extension_minutes: "Order Preparation Extension Minutes",
   defines_the_number_of_extra_preparation: "Defines the number of extra preparation minutes added when the vendor requests Need More Time.",
+  order_pickup_radius_meters: "Order Pickup Radius Meters",
+  defines_the_maximum_distance: "Defines the maximum distance in meters between the vendor and the assigned driver for pickup.",
+  products: "Products",
+  configure_default_product_settings_used: "Configure default product settings used across the platform",
+  replace: "Replace",
+  view_full_image:"View Full Image",
+  deligo_default_product_image: "DeliGo Default Product Image",
   time_widow_customers_cancel:
     "Time window for customers to cancel without penalty",
   refund_processing_days: "Refund Processing Days",
