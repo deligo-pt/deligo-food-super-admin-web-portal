@@ -286,7 +286,7 @@ export default function ProductsSection({
             // Keep the same filters/sort that the server used
             const params = new URLSearchParams(searchParams.toString());
             params.set("page", String(nextPage));
-            params.set("limit", "5");
+            params.set("limit", "30");
             params.set("vendorId", vendorMongoId);
 
             const result = await getAllProducts(params.toString());
@@ -675,7 +675,7 @@ export default function ProductsSection({
                     setSelectedProduct({ id: null, action: null, product: null })
                 }
                 onConfirm={
-                    selectedProduct?.type === ""
+                    selectedProduct?.type === "soft"
                         ? handleDeleteProduct
                         : handlePermanentDeleteProduct
                 }
