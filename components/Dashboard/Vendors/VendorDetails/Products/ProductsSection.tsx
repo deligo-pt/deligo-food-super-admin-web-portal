@@ -531,10 +531,20 @@ export default function ProductsSection({
                 {/* LEFT SIDEBAR */}
                 <div className="hidden lg:flex flex-col w-64 shrink-0 h-full">
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full max-h-full overflow-hidden">
-                        <div className="p-4 border-b border-gray-50 shrink-0">
+
+                        {/* Header with loading indicator */}
+                        <div className="p-4 border-b border-gray-50 shrink-0 flex items-center justify-between">
                             <h3 className="text-sm font-semibold text-gray-800">
                                 {t("product_categories") || "Product categories"}
                             </h3>
+
+                            {/* Spinner when loading more products */}
+                            {isLoadingMore && (
+                                <div className="flex items-center gap-1.5 text-xs text-[#DC3173]">
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    <span className="hidden sm:inline">Loading...</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-3 space-y-1 no-scrollbar">
@@ -556,20 +566,26 @@ export default function ProductsSection({
                                                 scrollToCategory(id);
                                             }}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
-                                                ? "bg-[#DC3173]/10 text-[#DC3173]"
-                                                : "text-gray-600 hover:bg-gray-50"
+                                                    ? "bg-[#DC3173]/10 text-[#DC3173]"
+                                                    : "text-gray-600 hover:bg-gray-50"
                                                 }`}
                                         >
                                             <span className="truncate uppercase tracking-wide">
                                                 {getCategoryName(group.category)}
                                             </span>
+
                                             <span
-                                                className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${isActive
-                                                    ? "bg-[#DC3173]/15 text-[#DC3173]"
-                                                    : "bg-gray-100 text-gray-500"
+                                                className={`text-xs px-2 py-0.5 rounded-full shrink-0 min-w-7 text-center ${isActive
+                                                        ? "bg-[#DC3173]/15 text-[#DC3173]"
+                                                        : "bg-gray-100 text-gray-500"
                                                     }`}
                                             >
-                                                {count}
+                                                {/* Show spinner instead of count while loading more */}
+                                                {isLoadingMore ? (
+                                                    <Loader2 className="h-3 w-3 animate-spin mx-auto" />
+                                                ) : (
+                                                    count
+                                                )}
                                             </span>
                                         </button>
                                     );
