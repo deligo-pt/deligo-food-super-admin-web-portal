@@ -1,12 +1,12 @@
 import { Column } from "@/components/common/ReusableTable";
-import { TDeliveryException } from "@/types/delivery-exception.type";
+import { TDeliveryException, TExceptionAction } from "@/types/delivery-exception.type";
 import { format } from "date-fns";
 import {
     AlertTriangle,
     CalendarIcon,
     Cog,
     HashIcon,
-    MapPin,
+    Lock,
     MoreVertical,
     PackageIcon,
     Phone,
@@ -27,6 +27,7 @@ type TFunction = (key: string) => string;
 interface GetDeliveryExceptionColumnsParams {
     t: TFunction;
     router: AppRouterInstance;
+    setAction: (action: TExceptionAction | null) => void;
 }
 
 const formatStatus = (status?: string) =>
@@ -38,6 +39,7 @@ const formatStatus = (status?: string) =>
 export function getDeliveryExceptionColumns({
     t,
     router,
+    setAction,
 }: GetDeliveryExceptionColumnsParams): Column<TDeliveryException>[] {
     return [
         {
@@ -49,6 +51,7 @@ export function getDeliveryExceptionColumns({
             ),
             accessor: "orderId",
         },
+
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
@@ -89,6 +92,15 @@ export function getDeliveryExceptionColumns({
                     </Badge>
                 );
             },
+        },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                    <PackageIcon className="w-4" />
+                    {t("order_status")}
+                </div>
+            ),
+            accessor: (row) => formatStatus(row.orderStatus),
         },
         {
             header: (
@@ -141,33 +153,33 @@ export function getDeliveryExceptionColumns({
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
-                    <MapPin className="w-4" />
-                    {t("location")}
+                    <Lock className="w-4" />
+                    {t("otp_locked")}
                 </div>
             ),
             accessor: (row) => {
-                const loc = row.exception?.location;
-                if (!loc) return "N/A";
+                const otp = row.deliveryOtp;
+                const isLocked = !!otp?.lockedAt;
+
                 return (
-                    <div className="text-xs">
-                        <div>
-                            {loc.latitude.toFixed(5)}, {loc.longitude.toFixed(5)}
-                        </div>
-                        {loc.isStale && (
-                            <span className="text-amber-600 font-medium">Stale</span>
+                    <div className="text-sm">
+                        {isLocked ? (
+                            <>
+                                <Badge className="bg-red-100 text-red-700 hover:bg-red-100">
+                                    {t("yes") || "Yes"}
+                                </Badge>
+                                <div className="text-xs text-slate-500 mt-1">
+                                    {format(new Date(otp.lockedAt!), "do MMM yyyy, HH:mm")}
+                                </div>
+                            </>
+                        ) : (
+                            <Badge variant="secondary" className="bg-green-50 text-green-700">
+                                {t("no") || "No"}
+                            </Badge>
                         )}
                     </div>
                 );
             },
-        },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <AlertTriangle className="w-4" />
-                    {t("reports")}
-                </div>
-            ),
-            accessor: (row) => row.exception?.reportCount ?? 0,
         },
         {
             header: (
@@ -178,12 +190,31 @@ export function getDeliveryExceptionColumns({
             ),
             className: "text-right",
             accessor: (row) => {
+                const isAcknowledged = !!row.exception?.acknowledgedAt;
+                const status = row.orderStatus;
+
+                const inTransit =
+                    status === "PICKED_UP" || status === "ON_THE_WAY";
+                const atReady = status === "READY_FOR_PICKUP";
+
+                const isOtpLocked = !!row.deliveryOtp?.lockedAt;
+
+                // ── Visibility rules (aligned with your docs) ──
+                const canAcknowledge = !isAcknowledged;
+                const canReplace = (inTransit || atReady);
+                const canFaultCancel = (inTransit || atReady);
+
+                // Reset OTP only when actually locked + in transit
+                // (at READY_FOR_PICKUP no OTP exists yet)
+                const canResetOtp = isOtpLocked && inTransit;
+
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger>
                             <MoreVertical className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                            {/* Always available */}
                             <DropdownMenuItem
                                 onClick={() =>
                                     router.push(`/admin/delivery-exceptions/${row.orderId}`)
@@ -191,7 +222,57 @@ export function getDeliveryExceptionColumns({
                             >
                                 {t("view")}
                             </DropdownMenuItem>
-                            {/* More actions later */}
+
+                            {canAcknowledge && (
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setAction({ type: "acknowledge", orderId: row.orderId })
+                                    }
+                                >
+                                    {t("acknowledge")}
+                                </DropdownMenuItem>
+                            )}
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    setAction({ type: "resolve", orderId: row.orderId })
+                                }
+                            >
+                                {t("resolve")}
+                            </DropdownMenuItem>
+
+
+                            {canReplace && (
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setAction({ type: "replace", orderId: row.orderId })
+                                    }
+                                >
+                                    {t("replace_rider")}
+                                </DropdownMenuItem>
+                            )}
+
+                            {/* Only when OTP is locked */}
+                            {canResetOtp && (
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setAction({ type: "resetOtp", orderId: row.orderId })
+                                    }
+                                >
+                                    {t("reset_otp")}
+                                </DropdownMenuItem>
+                            )}
+
+                            {canFaultCancel && (
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setAction({ type: "faultCancel", orderId: row.orderId })
+                                    }
+                                    className="text-red-600 focus:text-red-600"
+                                >
+                                    {t("fault_cancel")}
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );

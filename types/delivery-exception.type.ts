@@ -60,3 +60,11 @@ export type TDeliveryExceptionsResponse = {
     meta: TMeta;
     data: TDeliveryException[];
 };
+
+export type TExceptionAction =
+    | { type: "acknowledge"; orderId: string }
+    | { type: "resolve"; orderId: string }
+    | { type: "replace"; orderId: string }
+    | { type: "resetOtp"; orderId: string }
+    | { type: "faultCancel"; orderId: string }
+    | { type: "complete"; orderId: string };
