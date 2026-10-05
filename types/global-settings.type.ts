@@ -38,6 +38,11 @@ export type TGlobalSettings = {
     autoAcceptTimeoutMinutes: number;
     autoDispatchLeadMinutes: number;
     preparationExtensionMinutes: number;
+    pickupRadiusMeters?: number;
+  };
+
+  product: {
+    defaultImageUrl?: string;
   };
 
   // Agreements

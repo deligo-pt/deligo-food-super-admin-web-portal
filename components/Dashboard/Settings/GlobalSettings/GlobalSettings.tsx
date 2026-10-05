@@ -45,8 +45,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import { cn } from "@/lib/utils";
-import { uploadImagesReq } from "@/services/upload/upload.service";
 import { FileUploadZone } from "./FileUploadZone";
+import { useImageUploads } from "@/utils/useImageUploads";
 
 type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
@@ -70,6 +70,11 @@ const TABS = [
     id: "order",
     labelKey: "order_rules",
     icon: Package,
+  },
+  {
+    id: "products",
+    labelKey: "products",
+    icon: Gift,
   },
   {
     id: "activity-logs",
@@ -103,14 +108,23 @@ export default function GlobalSettings({
     "idle",
   );
   const [activeTab, setActiveTab] = useState<TabId>("delivery");
+
+  // Reusable image uploads (add any new key here)
+  const {
+    handleUpload,
+    clearImage,
+    getImage,
+    isUploading,
+  } = useImageUploads({
+    deligoSignatureUrl: settings?.agreement?.deligoSignatureUrl || null,
+    deligoCompanyStampUrl: settings?.agreement?.deligoCompanyStampUrl || null,
+    defaultImageUrl: settings?.product?.defaultImageUrl || null,
+  });
+
+  // refs for file inputs (still needed for clearing native input)
   const signatureFileRef = useRef<HTMLInputElement | null>(null);
   const stampFileRef = useRef<HTMLInputElement | null>(null);
-  const [uploadedSignatureUrl, setUploadedSignatureUrl] = useState<string | null>(
-    settings?.agreement?.deligoSignatureUrl || null
-  );
-  const [partyStamp, setPartyStamp] = useState<string | null>(settings?.agreement?.deligoCompanyStampUrl || null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isUploadingStamp, setIsUploadingStamp] = useState(false);
+  const defaultProductImageRef = useRef<HTMLInputElement | null>(null);
 
   const form = useForm<TGlobalSettingsForm>({
     resolver: zodResolver(globalSettingsSchema),
@@ -130,10 +144,10 @@ export default function GlobalSettings({
       serviceChargeVatRate: settings?.commission?.serviceChargeVatRate || 0,
 
       // agreements
-      deligoSignatureUrl: settings?.agreement?.deligoSignatureUrl || undefined,
+      // deligoSignatureUrl: settings?.agreement?.deligoSignatureUrl || undefined,
       deligoSignatoryName: settings?.agreement?.deligoSignatoryName || undefined,
       deligoSignatoryRole: settings?.agreement?.deligoSignatoryRole || undefined,
-      deligoCompanyStampUrl: settings?.agreement?.deligoSignatureUrl || undefined,
+      // deligoCompanyStampUrl: settings?.agreement?.deligoSignatureUrl || undefined,
 
       // order
       customerNearestVendorRadiusKm: settings?.order?.nearestVendorRadiusKm || 0,
@@ -141,6 +155,7 @@ export default function GlobalSettings({
       autoAcceptTimeoutMinutes: settings?.order?.autoAcceptTimeoutMinutes || 0,
       autoDispatchLeadMinutes: settings?.order?.autoDispatchLeadMinutes || 0,
       // preparationExtensionMinutes: settings?.order?.preparationExtensionMinutes || 0,
+      pickupRadiusMeters: settings?.order?.pickupRadiusMeters || 0,
 
       // activity logs retention
       archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 12,
@@ -154,59 +169,6 @@ export default function GlobalSettings({
       deliveryChargeOutsideLisbonVatRate: settings?.ingredientsOrder?.deliveryChargeOutsideLisbonVatRate || 0,
     },
   });
-
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: "signature" | "stamp"
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file (PNG, JPG, etc.)");
-      return;
-    }
-
-    const toastId = toast.loading(
-      type === "signature" ? "Uploading signature..." : "Uploading stamp..."
-    );
-
-    if (type === "signature") setIsUploading(true);
-    else setIsUploadingStamp(true);
-
-    try {
-      const uploadResult = await uploadImagesReq([file]);
-
-      if (uploadResult.success && uploadResult.data?.[0]) {
-        if (type === "signature") {
-          setUploadedSignatureUrl(uploadResult.data[0]);
-        } else {
-          setPartyStamp(uploadResult.data[0]);
-        }
-        toast.success(
-          type === "signature"
-            ? "Signature uploaded successfully!"
-            : "Stamp uploaded successfully!",
-          { id: toastId }
-        );
-      } else {
-        toast.error(uploadResult.message || "Upload failed", { id: toastId });
-      }
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      toast.error(error?.message || "Failed to upload", { id: toastId });
-    } finally {
-      if (type === "signature") setIsUploading(false);
-      else setIsUploadingStamp(false);
-    }
-  };
-
-  const clearStamp = () => {
-    setPartyStamp(null);
-    if (stampFileRef.current) {
-      stampFileRef.current.value = "";
-    }
-  };
 
   const onSubmit = async (data: TGlobalSettingsForm) => {
     setIsSaving(true);
@@ -228,10 +190,12 @@ export default function GlobalSettings({
         serviceChargeVatRate: data.serviceChargeVatRate,
       },
       agreement: {
-        deligoSignatureUrl: uploadedSignatureUrl,
+        // deligoSignatureUrl: uploadedSignatureUrl,
+        deligoSignatureUrl: getImage("deligoSignatureUrl"),
         deligoSignatoryName: data.deligoSignatoryName,
         deligoSignatoryRole: data.deligoSignatoryRole,
-        ...(partyStamp && { deligoCompanyStampUrl: partyStamp }),
+        deligoCompanyStampUrl: getImage("deligoCompanyStampUrl"),
+        // ...(partyStamp && { deligoCompanyStampUrl: partyStamp }),
       },
       activityLogRetention: {
         archiveAfterMonths: data.archiveAfterMonths,
@@ -244,6 +208,10 @@ export default function GlobalSettings({
         autoAcceptTimeoutMinutes: data.autoAcceptTimeoutMinutes,
         autoDispatchLeadMinutes: data.autoDispatchLeadMinutes,
         // preparationExtensionMinutes: data.preparationExtensionMinutes,
+        ...(data.pickupRadiusMeters && { pickupRadiusMeters: data.pickupRadiusMeters }),
+      },
+      product: {
+        defaultImageUrl: getImage("defaultImageUrl"),
       },
       ingredientsOrder: {
         deliveryChargeInsideLisbon: data.deliveryChargeInsideLisbon,
@@ -750,23 +718,25 @@ export default function GlobalSettings({
                         </div>
                         <FileUploadZone
                           inputRef={signatureFileRef}
-                          onChange={(e) => handleFileUpload(e, "signature")}
-                          isLoading={isUploading}
-                          previewUrl={uploadedSignatureUrl}
+                          onChange={(e) => handleUpload(e, "deligoSignatureUrl")}
+                          isLoading={isUploading("deligoSignatureUrl")}
+                          previewUrl={getImage("deligoSignatureUrl")}
                           onClear={() => {
-                            setUploadedSignatureUrl(null);
-                            if (signatureFileRef.current) {
-                              signatureFileRef.current.value = "";
-                            }
+                            clearImage("deligoSignatureUrl");
+                            if (signatureFileRef.current) signatureFileRef.current.value = "";
                           }}
                           label={t("deligo_signature_url")}
                         />
+
                         <FileUploadZone
                           inputRef={stampFileRef}
-                          onChange={(e) => handleFileUpload(e, "stamp")}
-                          isLoading={isUploadingStamp}
-                          previewUrl={partyStamp}
-                          onClear={clearStamp}
+                          onChange={(e) => handleUpload(e, "deligoCompanyStampUrl")}
+                          isLoading={isUploading("deligoCompanyStampUrl")}
+                          previewUrl={getImage("deligoCompanyStampUrl")}
+                          onClear={() => {
+                            clearImage("deligoCompanyStampUrl");
+                            if (stampFileRef.current) stampFileRef.current.value = "";
+                          }}
                           label={t("deligo_company_stamp_url")}
                           optional
                         />
@@ -890,6 +860,29 @@ export default function GlobalSettings({
                             </FormItem>
                           )}
                         />
+                        <FormField
+                          control={form.control}
+                          name="pickupRadiusMeters"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("order_pickup_radius_meters")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="meters"
+                                  description={t("defines_the_maximum_distance")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                         {/* <FormField
                           control={form.control}
                           name="preparationExtensionMinutes"
@@ -913,6 +906,35 @@ export default function GlobalSettings({
                             </FormItem>
                           )}
                         /> */}
+                      </div>
+                    </SettingsCard>
+                  )}
+
+                  {/* products */}
+                  {activeTab === "products" && (
+                    <SettingsCard
+                      title={t("products") || "Products"}
+                      description={
+                        t("configure_default_product_settings_used") ||
+                        "Configure default product settings used across the platform"
+                      }
+                      icon={Package}
+                      delay={0}
+                    >
+                      <div className="space-y-4">
+                        <FileUploadZone
+                          inputRef={defaultProductImageRef}
+                          onChange={(e) => handleUpload(e, "defaultProductImageUrl")}
+                          isLoading={isUploading("defaultProductImageUrl")}
+                          previewUrl={getImage("defaultProductImageUrl")}
+                          onClear={() => {
+                            clearImage("defaultProductImageUrl");
+                            if (defaultProductImageRef.current) {
+                              defaultProductImageRef.current.value = "";
+                            }
+                          }}
+                          label={t("deligo_default_product_image") || "Default Product Image"}
+                        />
                       </div>
                     </SettingsCard>
                   )}

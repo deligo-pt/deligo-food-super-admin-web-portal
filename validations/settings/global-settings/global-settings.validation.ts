@@ -57,6 +57,10 @@ export const globalSettingsSchema = z
     // preparationExtensionMinutes: z
     //   .number("Preparation Extension Minutes must be a number")
     //   .positive("Preparation Extension Minutes must be greater than 0"),
+    pickupRadiusMeters: z.number().optional(),
+
+    // products
+    defaultImageUrl: z.string().optional(),
 
     // activity logs retention
     archiveAfterMonths: z
