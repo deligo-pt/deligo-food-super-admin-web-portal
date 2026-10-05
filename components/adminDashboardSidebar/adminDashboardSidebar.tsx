@@ -165,21 +165,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         },
       ],
     },
-    // {
-    //   id: "zones",
-    //   title: t("zone_management"),
-    //   icon: <AreaChart size={18} />,
-    //   items: [
-    //     {
-    //       name: t("create_zone"),
-    //       path: "/admin/zones/create",
-    //     },
-    //     {
-    //       name: t("all_zones"),
-    //       path: "/admin/zones",
-    //     },
-    //   ],
-    // },
     {
       id: "business-categories",
       title: t("business_categories"),
@@ -238,6 +223,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("pending_orders"), path: "/admin/pending-orders" },
         { name: t("preparing_orders"), path: "/admin/preparing-orders" },
         { name: t("on_the_way_orders"), path: "/admin/on-the-way-orders" },
+        { name: t("delivery_exceptions"), path: "/admin/delivery-exceptions" },
       ],
     },
     {

@@ -98,7 +98,7 @@ export const getNearbyPartnersForOrders = async (orderId: string) => {
   return result;
 };
 
-export const assignPartnerToOrder = async (orderId: string, data : any) => {
+export const assignPartnerToOrder = async (orderId: string, data: any) => {
   const url = `/orders/${orderId}/assign-partner`;
 
   const result = await catchAsync(async () => {
@@ -116,6 +116,23 @@ export const assignPartnerToOrder = async (orderId: string, data : any) => {
 export const refundOrderReq = async (id: string) => {
   const result = await catchAsync<TOrder>(async () => {
     return await serverRequest.post(`/payment/reduniq/refund/${id}`);
+  });
+
+  return result;
+};
+
+// get delivery exceptions
+export const getDeliveryExceptions = async () => {
+  const url = `/orders/delivery-exceptions`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["orders"],
+        revalidate: 30,
+      },
+    });
+    return await res.json();
   });
 
   return result;
