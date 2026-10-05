@@ -229,7 +229,7 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
                 onClick={() => onDelete(product.productId, "soft")}
                 className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
               >
-                {t("delete")}
+                {t("soft_delete")}
               </motion.button>
             ) : (
               <motion.button

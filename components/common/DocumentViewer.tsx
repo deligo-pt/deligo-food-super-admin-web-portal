@@ -19,16 +19,18 @@ export interface IDocSection {
 interface DocumentViewerProps {
     sections: IDocSection[];
     emptyMessageKey?: string;
+    /** When false, only the "View Full File" buttons are shown (no thumbnails) */
+    showPreview?: boolean;
 }
 
 export function DocumentViewer({
     sections,
     emptyMessageKey = "no_documents_uploaded",
+    showPreview = true, // ← default stays true (no breaking change)
 }: DocumentViewerProps) {
     const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
-    // Helper to normalize single string or string[] into string[]
     const normalizeFiles = (files?: string | string[]): string[] => {
         if (!files) return [];
         return Array.isArray(files) ? files : [files];
@@ -53,12 +55,14 @@ export function DocumentViewer({
 
     return (
         <>
-            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6 w-full">
+            <div className={`w-full ${showPreview ? "grid grid-cols-1 md:grid-cols-2 md:gap-4 xl:grid-cols-4 lg:gap-6" : ""}`}>
                 {activeSections.map((section) => (
-                    <div key={section.key} className="mb-4">
-                        <p className="text-sm text-gray-500 mb-2 font-medium">
-                            {section.label}
-                        </p>
+                    <div key={section.key} className={showPreview ? "mb-4" : ""}>
+                        {showPreview && (
+                            <p className="text-sm text-gray-500 mb-2 font-medium">
+                                {section.label}
+                            </p>
+                        )}
 
                         <div className="space-y-3">
                             {section.fileList.map((file, index) => {
@@ -66,22 +70,24 @@ export function DocumentViewer({
 
                                 return (
                                     <div key={index} className="flex flex-col items-start">
-                                        <div className="w-full h-40 relative rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
-                                            {isPdf ? (
-                                                <iframe
-                                                    src={file}
-                                                    className="w-full h-full pointer-events-none"
-                                                    title={`${section.key}-${index}`}
-                                                />
-                                            ) : (
-                                                <Image
-                                                    src={file}
-                                                    alt={`${section.key}-${index}`}
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            )}
-                                        </div>
+                                        {showPreview && (
+                                            <div className="w-full h-40 relative rounded-lg border border-gray-200 overflow-hidden bg-gray-50">
+                                                {isPdf ? (
+                                                    <iframe
+                                                        src={file}
+                                                        className="w-full h-full pointer-events-none"
+                                                        title={`${section.key}-${index}`}
+                                                    />
+                                                ) : (
+                                                    <Image
+                                                        src={file}
+                                                        alt={`${section.key}-${index}`}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
 
                                         <Button
                                             type="button"
@@ -100,7 +106,7 @@ export function DocumentViewer({
                 ))}
             </div>
 
-            {/* Lightbox Modal */}
+            {/* Lightbox Modal – unchanged */}
             <Dialog open={!!selectedFile} onOpenChange={(open) => !open && setSelectedFile(null)}>
                 <DialogContent className="max-w-5xl! w-[92vw]! h-[95vh] p-0 overflow-hidden flex flex-col bg-background">
                     <DialogTitle className="sr-only">Document Preview</DialogTitle>
@@ -119,25 +125,24 @@ export function DocumentViewer({
                     </div>
 
                     <div className="flex-1 w-full h-full p-4 flex items-center justify-center overflow-auto bg-black/5">
-                        {selectedFile && (
-                            isSelectedPdf ? (
+                        {selectedFile &&
+                            (isSelectedPdf ? (
                                 <iframe
                                     src={selectedFile}
                                     className="w-full h-full rounded-md border-0"
                                     title="PDF Preview"
                                 />
                             ) : (
-                                <div style={{}} className="relative h-full flex items-center justify-center overflow-hidden">
+                                <div className="relative h-full flex items-center justify-center overflow-hidden">
                                     <Image
                                         src={selectedFile}
                                         alt="Document preview"
                                         width={750}
                                         height={500}
-                                         className="object-fill"
+                                        className="object-contain max-h-full"
                                     />
                                 </div>
-                            )
-                        )}
+                            ))}
                     </div>
                 </DialogContent>
             </Dialog>

@@ -1543,6 +1543,35 @@ export const en = {
   cannot_approve_reject_buttons:
     "Note: connect approve/reject buttons to your refund processing API.",
 
+  // delivery-exceptions
+  delivery_exceptions: "Delivery Exceptions",
+  manage_all_delivery_exceptions: "Manage all delivery exceptions efficiently.",
+  no_delivery_exceptions_found: "No delivery exceptions found.",
+  opened_at: "Opened At",
+  exception_type: "Exception Type",
+  issue_tags: "Issue Tags",
+  otp_locked: "OTP Locked",
+  acknowledge: "Acknowledge",
+  replace_rider: "Replace Rider",
+  reset_otp: "Reset OTP",
+  fault_cancel: "Fault Cancel",
+  reset_delivery_otp: "Reset Delivery OTP",
+  a_new_delivery_otp_will_be_generated_and_sent_to_customer:
+    "A new delivery OTP will be generated for the customer. Attempts are reset to 0 and the lock is cleared. This does not close an open RIDER_SOS.",
+  why_are_you_resetting_otp: "Why are you resetting the delivery OTP?",
+  complete_delivery_manually: "Complete Delivery Manually",
+  order_will_be_marked_as_delivered: "Order will be marked DELIVERED. Any open exception is closed. Requires proof (customer YES or verified OTP while exception was open).",
+  why_are_you_completing_delivery: "Why are you completing this delivery manually?",
+  complete_delivery: "Complete Delivery",
+  this_will_cancel_the_order: "This will cancel the order, set refund to PENDING, close the exception and set the rider OFFLINE. Stock is not restored.",
+  explain_why_you_are_cancelling: "Explain why you are cancelling this order.",
+  resolve_exception: "Resolve Exception",
+  resolution: "Resolution",
+  rider_continues: "Rider Continues",
+  add_a_note_to_this_exception: "Add a note to this exception",
+  acknowledge_exception: "Acknowledge Exception",
+  mark_this_rider_sos_acknowledged: "Mark this RIDER_SOS as acknowledged. The rider can continue delivering.",
+
   // platform earnings
   revenue_commissions_platform_fee_analytics: "Revenue, commissions & platform fee analytics",
   track_platform_revenue_fees_simple:
@@ -2595,6 +2624,13 @@ export const en = {
   defines_how_many_minutes_before_estimated: "Defines how many minutes before the estimated ready time the system should start the delivery dispatch process",
   order_preparation_extension_minutes: "Order Preparation Extension Minutes",
   defines_the_number_of_extra_preparation: "Defines the number of extra preparation minutes added when the vendor requests Need More Time.",
+  order_pickup_radius_meters: "Order Pickup Radius Meters",
+  defines_the_maximum_distance: "Defines the maximum distance in meters between the vendor and the assigned driver for pickup.",
+  products: "Products",
+  configure_default_product_settings_used: "Configure default product settings used across the platform",
+  replace: "Replace",
+  view_full_image: "View Full Image",
+  deligo_default_product_image: "DeliGo Default Product Image",
   time_widow_customers_cancel:
     "Time window for customers to cancel without penalty",
   refund_processing_days: "Refund Processing Days",
