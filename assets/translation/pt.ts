@@ -1559,6 +1559,34 @@ export const pt = {
   cannot_approve_reject_buttons:
     "Nota: ligar os botões aprovar/rejeitar à sua API de processamento de reembolsos.",
 
+  // delivery-exceptions
+  delivery_exceptions: "Exceções de Entrega",
+  manage_all_delivery_exceptions: "Gerir todas as exceções de entrega com eficiência.",
+  no_delivery_exceptions_found: "Nenhuma exceção de entrega encontrada.",
+  opened_at: "Aberta às",
+  exception_type: "Tipo de Exceção",
+  issue_tags: "Etiquetas do Problema",
+  otp_locked: "OTP Bloqueado",
+  acknowledge: "Reconhecer",
+  replace_rider: "Substituir Estafeta",
+  reset_otp: "Repor OTP",
+  fault_cancel: "Cancelamento por Falha",
+  reset_delivery_otp: "Repor OTP de Entrega",
+  a_new_delivery_otp_will_be_generated_and_sent_to_customer: "Um novo OTP de entrega será gerado para o cliente. As tentativas serão repostas a 0 e o bloqueio será removido. Isto não fecha um RIDER_SOS em aberto.",
+  why_are_you_resetting_otp: "Por que motivo está a repor o OTP de entrega?",
+  complete_delivery_manually: "Concluir Entrega Manualmente",
+  order_will_be_marked_as_delivered: "O pedido será marcado como ENTREGUE. Qualquer exceção em aberto será fechada. Requer comprovativo (confirmação do cliente ou OTP verificado enquanto a exceção estava aberta).",
+  why_are_you_completing_delivery: "Por que motivo está a concluir esta entrega manualmente?",
+  complete_delivery: "Concluir Entrega",
+  this_will_cancel_the_order: "Isto irá cancelar o pedido, definir o reembolso como PENDENTE, fechar a exceção e colocar o estafeta OFFLINE. O stock não é reposto.",
+  explain_why_you_are_cancelling: "Explique o motivo do cancelamento deste pedido.",
+  resolve_exception: "Resolver Exceção",
+  resolution: "Resolução",
+  rider_continues: "Estafeta Continua",
+  add_a_note_to_this_exception: "Adicionar uma nota a esta exceção",
+  acknowledge_exception: "Reconhecer Exceção",
+  mark_this_rider_sos_acknowledged: "Marcar este RIDER_SOS como reconhecido. O estafeta pode continuar a entrega.",
+
   // platform earnings
   revenue_commissions_platform_fee_analytics: "Análise de receita, comissões e taxas da plataforma",
   track_platform_revenue_fees_simple:
