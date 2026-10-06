@@ -156,6 +156,8 @@ export default function GlobalSettings({
       autoDispatchLeadMinutes: settings?.order?.autoDispatchLeadMinutes || 0,
       // preparationExtensionMinutes: settings?.order?.preparationExtensionMinutes || 0,
       pickupRadiusMeters: settings?.order?.pickupRadiusMeters || 0,
+      etaMinutesPerKm: settings?.order?.etaMinutesPerKm || 4.0,
+      etaBufferMinutes: settings?.order?.etaBufferMinutes || 8,
 
       // activity logs retention
       archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 12,
@@ -209,6 +211,8 @@ export default function GlobalSettings({
         autoDispatchLeadMinutes: data.autoDispatchLeadMinutes,
         // preparationExtensionMinutes: data.preparationExtensionMinutes,
         ...(data.pickupRadiusMeters && { pickupRadiusMeters: data.pickupRadiusMeters }),
+        etaMinutesPerKm: data.etaMinutesPerKm,
+        etaBufferMinutes: data.etaBufferMinutes,
       },
       product: {
         defaultImageUrl: getImage("defaultImageUrl"),
@@ -906,6 +910,54 @@ export default function GlobalSettings({
                             </FormItem>
                           )}
                         /> */}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="etaMinutesPerKm"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("order_eta_minutes_per_km")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="min/km"
+                                  description={t("defines_how_many_extra_minutes")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="etaBufferMinutes"
+                          render={({ field, fieldState }) => (
+                            <FormItem className="">
+                              <FormControl>
+                                <SettingsInput
+                                  fieldState={fieldState}
+                                  label={t("order_eta_buffer_minutes")}
+                                  type="number"
+                                  value={field.value}
+                                  onChange={(e) =>
+                                    field.onChange(parseFloat(e.target.value))
+                                  }
+                                  suffix="min"
+                                  description={t("defines_how_many_minutes")}
+                                  min={0}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </SettingsCard>
                   )}
