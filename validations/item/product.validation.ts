@@ -13,14 +13,27 @@ export const productValidation = z.object({
 
     category: z
         .string()
-        .min(2, "Category must be at least 2 characters")
+        .min(2, "Category is a required field")
         .max(50, "Category must be at most 50 characters")
         .nonempty("Category is required"),
 
     additionalCategories: z.array(z.string().optional()).optional(),
 
     // images: z.array(z.string().optional()).optional(),
-    image: z.string().optional().or(z.literal("")),
+    image: z
+        .string()
+        .optional()
+        .or(z.literal(""))
+        .refine(
+            (val) => {
+                if (!val || val === "") return true; // optional
+                // Accept only JPG / PNG / WEBP (case-insensitive)
+                return /\.(jpe?g|png|webp)$/i.test(val);
+            },
+            {
+                message: "Image must be JPG, PNG or WEBP",
+            }
+        ),
 
     // images: z
     //     .array(

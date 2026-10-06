@@ -40,7 +40,7 @@ export default function SettingsInput({
             error
               ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
               : "border-gray-200"
-          } ${suffix ? "pr-12" : ""}`}
+          } ${suffix ? "pr-20" : ""}`}
           {...props}
         />
         {suffix && (

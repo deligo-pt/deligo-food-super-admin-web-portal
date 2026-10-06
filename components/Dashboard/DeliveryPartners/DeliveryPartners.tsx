@@ -46,6 +46,7 @@ export default function DeliveryPartners({
     partnerName: "",
     city: "",
     status: "",
+    currentFleetManagerId: "" as string | null,
   });
 
   const [deleteId, setDeleteId] = useState("");
@@ -62,7 +63,15 @@ export default function DeliveryPartners({
     partnerName: string,
     city: string,
     status: string,
-  ) => setApproveInfo({ partnerId, partnerName, city, status });
+    currentFleetManagerId?: string | null
+  ) =>
+    setApproveInfo({
+      partnerId,
+      partnerName,
+      city,
+      status,
+      currentFleetManagerId: currentFleetManagerId || null,
+    });
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -137,14 +146,30 @@ export default function DeliveryPartners({
 
       {/* Approve rider*/}
       <ApproveRiderModal
-        open={approveInfo.partnerId.length > 0 && (approveInfo.status === "APPROVED" || approveInfo.status === "UNBLOCKED" || approveInfo.status === "ASSIGN")}
-        onOpenChange={() => setApproveInfo({ partnerId: "", partnerName: "", city: "", status: "" })}
+        open={
+          approveInfo.partnerId.length > 0 &&
+          (approveInfo.status === "APPROVED" ||
+            approveInfo.status === "UNBLOCKED" ||
+            approveInfo.status === "ASSIGN" ||
+            approveInfo.status === "RE_ASSIGN")
+        }
+        onOpenChange={() =>
+          setApproveInfo({ partnerId: "", partnerName: "", city: "", status: "", currentFleetManagerId: null })
+        }
         partnerId={approveInfo.partnerId}
         partnerName={approveInfo.partnerName}
         city={approveInfo.city}
         status={
-          approveInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED" | "SUBMITTED"
+          approveInfo.status as
+          | "APPROVED"
+          | "REJECTED"
+          | "BLOCKED"
+          | "UNBLOCKED"
+          | "ASSIGN"
+          | "RE_ASSIGN"
+          | "SUBMITTED"
         }
+        currentFleetManagerId={approveInfo.currentFleetManagerId}
       />
 
       {/* Approve or Reject or Block Modal */}

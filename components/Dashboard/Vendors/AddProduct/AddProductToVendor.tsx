@@ -46,7 +46,6 @@ import ImageAndDescriptionForm from "./Image&DescriptionForm";
 import StockInformationForm from "./StockInformationForm";
 import DeligoMetadata from "./DeligoMetadata";
 import { TVendor } from "@/types/user.type";
-import { uploadImagesReq } from "@/services/upload/upload.service";
 import { createProduct } from "@/services/dashboard/product/product.service";
 
 type FormData = z.infer<typeof productValidation>;
@@ -123,7 +122,7 @@ export function AddProductToVendor({
             price: 0,
             discountType: "PERCENTAGE",
             discount: 0,
-            taxId: taxesData.find((tax) => tax.taxRate === 23)?._id ?? "",
+            taxId: "",
             quantity: 0,
             unit: "",
             availabilityStatus: "",
@@ -195,47 +194,47 @@ export function AddProductToVendor({
 
         try {
             // Normalize: support both form.image (string) and legacy data.images (array)
-            let imageUrl =
+            const imageUrl =
                 typeof data.image === "string" && data.image.trim()
                     ? data.image.trim()
                     : "";
 
             // If no image → upload default
-            if (!imageUrl) {
-                try {
-                    const imagePath = "/defaults/dl1.png";
-                    const response = await fetch(imagePath, { cache: "no-store" });
-                    const blob = await response.blob();
+            // if (!imageUrl) {
+            //     try {
+            //         const imagePath = "/defaults/dl1.png";
+            //         const response = await fetch(imagePath, { cache: "no-store" });
+            //         const blob = await response.blob();
 
-                    if (blob.size === 0) {
-                        throw new Error(
-                            `Default image fetched with 0 bytes — check the asset path: ${imagePath}`
-                        );
-                    }
+            //         if (blob.size === 0) {
+            //             throw new Error(
+            //                 `Default image fetched with 0 bytes — check the asset path: ${imagePath}`
+            //             );
+            //         }
 
-                    const file = new window.File(
-                        [blob],
-                        imagePath.split("/").pop() ?? "default.png",
-                        { type: blob.type || "image/png" }
-                    );
+            //         const file = new window.File(
+            //             [blob],
+            //             imagePath.split("/").pop() ?? "default.png",
+            //             { type: blob.type || "image/png" }
+            //         );
 
-                    const uploadResult = await uploadImagesReq([file]);
+            //         const uploadResult = await uploadImagesReq([file]);
 
-                    if (!uploadResult?.success || !uploadResult?.data?.length) {
-                        toast.error(
-                            uploadResult?.message || "Default image upload failed!",
-                            { id: toastId }
-                        );
-                        return;
-                    }
+            //         if (!uploadResult?.success || !uploadResult?.data?.length) {
+            //             toast.error(
+            //                 uploadResult?.message || "Default image upload failed!",
+            //                 { id: toastId }
+            //             );
+            //             return;
+            //         }
 
-                    imageUrl = uploadResult.data[0];
-                } catch (err) {
-                    console.error("Default image error:", err);
-                    toast.error("Failed to load default product image", { id: toastId });
-                    return;
-                }
-            }
+            //         imageUrl = uploadResult.data[0];
+            //     } catch (err) {
+            //         console.error("Default image error:", err);
+            //         toast.error("Failed to load default product image", { id: toastId });
+            //         return;
+            //     }
+            // }
 
             // Translate + build payload
             const translated = await translateObject(data, lang);

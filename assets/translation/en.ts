@@ -440,6 +440,7 @@ export const en = {
   description_generation_failed: "Description generation failed",
   // -> image uploader
   drag_drop_product_images: "Drag & drop product images here",
+  image_specs: "Required: 1200 × 1200 px · Max 5 MB · JPG / PNG / WEBP",
   or_click: "or click to browse files",
   png_jpg_svg: "PNG, JPG, SVG up to 5MB",
   select_files: "Select Files",
@@ -1147,6 +1148,12 @@ export const en = {
   approve_without_assign: "Approve without Assign",
   assign_fleet_manager: "Assign Fleet Manager",
   assign_to_fleet_manager: "Assign to Fleet Manager",
+  re_assign_fleet: "Re-Assign Fleet",
+  current: "Current",
+  re_assign_rider: "Re-Assign Rider",
+  re_assign_reason: "Re-Assign Reason",
+  enter_reason_for_reassign: "Enter reason for reassign",
+  re_assign: "Re-Assign",
 
   // active delivery partners
   all_active_riders_system: "All active riders in the system",
@@ -2626,6 +2633,11 @@ export const en = {
   defines_the_number_of_extra_preparation: "Defines the number of extra preparation minutes added when the vendor requests Need More Time.",
   order_pickup_radius_meters: "Order Pickup Radius Meters",
   defines_the_maximum_distance: "Defines the maximum distance in meters between the vendor and the assigned driver for pickup.",
+  order_eta_minutes_per_km: "Order ETA Minutes per KM",
+  defines_how_many_minutes: "Defines how many minutes per KM the system should add to the estimated delivery time.",
+  order_eta_buffer_minutes: "Order ETA Buffer Minutes",
+  defines_how_many_extra_minutes: "Defines how many extra minutes the system should add to the estimated delivery time.",
+
   products: "Products",
   configure_default_product_settings_used: "Configure default product settings used across the platform",
   replace: "Replace",

@@ -35,6 +35,7 @@ interface GetDeliveryPartnerColumnsParams {
         partnerName: string,
         city: string,
         status: string,
+        currentFleetManagerId?: string | null,
     ) => void;
     handleDeleteId: (id: string) => void;
 }
@@ -197,6 +198,19 @@ export function getDeliveryPartnerColumns({
                                         }
                                     >
                                         {t("assign_fleet_manager")}
+                                    </DropdownMenuItem>}
+                                    {(dp?.currentFleetManagerId?.userId) && <DropdownMenuItem
+                                        onClick={() =>
+                                            handleApproveInfo(
+                                                dp.userId as string,
+                                                fullName,
+                                                dp?.address?.city as string,
+                                                "RE_ASSIGN",
+                                                dp?.currentFleetManagerId?._id || null
+                                            )
+                                        }
+                                    >
+                                        {t("re_assign_fleet")}
                                     </DropdownMenuItem>}
                                 </>
                             )}

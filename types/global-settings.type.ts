@@ -39,6 +39,8 @@ export type TGlobalSettings = {
     autoDispatchLeadMinutes: number;
     preparationExtensionMinutes: number;
     pickupRadiusMeters?: number;
+    etaMinutesPerKm: number;
+    etaBufferMinutes: number;
   };
 
   product: {
