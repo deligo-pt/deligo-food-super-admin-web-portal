@@ -446,6 +446,7 @@ export const pt = {
   description_generation_failed: "Falha ao gerar descrição",
   // -> image uploader
   drag_drop_product_images: "Arraste e largue as imagens do produto aqui",
+  image_specs: "Obrigatório: 1200 × 1200 px · Máx. 5 MB · JPG / PNG / WEBP",
   or_click: "ou clique para explorar ficheiros",
   png_jpg_svg: "PNG, JPG, SVG até 5MB",
   select_files: "Selecionar Ficheiros",
@@ -1159,6 +1160,12 @@ export const pt = {
   approve_without_assign: "Aprovar sem Atribuir",
   assign_fleet_manager: "Atribuir Gestor de Frota",
   assign_to_fleet_manager: "Atribuir ao Gestor de Frota",
+  re_assign_fleet: "Reatribuir Frota",
+  current: "Atual",
+  re_assign_rider: "Reatribuir Estafeta",
+  re_assign_reason: "Motivo da Reatribuição",
+  enter_reason_for_reassign: "Introduza o motivo da reatribuição",
+  re_assign: "Reatribuir",
 
   // active delivery partners
   all_active_riders_system: "Todos os Estafetas ativos no sistema",
@@ -2653,6 +2660,10 @@ export const pt = {
   defines_the_number_of_extra_preparation: "Define o número de minutos extras de preparação adicionados quando o comerciante solicita Preciso de Mais Tempo.",
   order_pickup_radius_meters: "Raio de Recolha do Pedido (Metros)",
   defines_the_maximum_distance: "Define a distância máxima em metros entre o comerciante e o estafeta atribuído para recolha.",
+  order_eta_minutes_per_km: "Minutos por KM para ETA do Pedido",
+  defines_how_many_minutes: "Define quantos minutos por KM o sistema deve adicionar ao tempo estimado de entrega.",
+  order_eta_buffer_minutes: "Margem de Minutos para ETA do Pedido",
+  defines_how_many_extra_minutes: "Define quantos minutos adicionais o sistema deve acrescentar ao tempo estimado de entrega.",
   products: "Produtos",
   configure_default_product_settings_used: "Configure as definições padrão de produtos utilizadas na plataforma",
   replace: "Substituir",
