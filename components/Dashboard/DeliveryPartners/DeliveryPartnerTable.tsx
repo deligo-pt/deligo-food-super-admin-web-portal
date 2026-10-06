@@ -21,6 +21,7 @@ interface IProps {
     partnerName: string,
     city: string,
     status: string,
+    currentFleetManagerId?: string | null,
   ) => void;
   handleDeleteId: (id: string) => void;
 }

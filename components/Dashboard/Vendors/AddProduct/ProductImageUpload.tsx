@@ -19,13 +19,8 @@ interface IProps {
 }
 
 const MAX_FILE_SIZE_MB = 5;
-const ACCEPTED_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-  "image/svg+xml",
-];
+const REQUIRED_SIZE = 1200; // must be exactly 1200 × 1200 px
+const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export function ProductImageUpload({ image, onChange, productId }: IProps) {
   const { t } = useTranslation();
@@ -38,7 +33,8 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
 
-  const currentImage = typeof image === "string" && image.trim() ? image.trim() : "";
+  const currentImage =
+    typeof image === "string" && image.trim() ? image.trim() : "";
   const hasImage = !!currentImage;
   const isBusy = isUploading || isRemoving || isReplacing;
 
@@ -49,13 +45,18 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
     else if (e.type === "dragleave") setDragActive(false);
   };
 
+  /** Basic type + size validation (sync) */
   const validateFile = (file: File): string | null => {
     if (!file) return t("no_file_selected") || "No file selected";
 
-    if (!ACCEPTED_TYPES.includes(file.type) && !file.type.match(/^image\//)) {
+    const isAccepted =
+      ACCEPTED_TYPES.includes(file.type) ||
+      /\.(jpe?g|png|webp)$/i.test(file.name);
+
+    if (!isAccepted) {
       return (
         t("only_image_files") ||
-        "Please upload only image files (PNG, JPG, WEBP, SVG)"
+        "Please upload only image files (JPG, PNG, WEBP)"
       );
     }
 
@@ -70,6 +71,26 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
     return null;
   };
 
+  /** Load image and return its natural dimensions */
+  const checkImageDimensions = (
+    file: File
+  ): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new window.Image();
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Failed to load image for dimension check"));
+      };
+      img.src = url;
+    });
+  };
+
   /** Upload and set a single URL. Optionally delete previous URL on server. */
   const uploadAndSet = async (file: File, oldUrl?: string) => {
     const toastId = toast.loading(
@@ -79,6 +100,19 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
     if (oldUrl) setIsReplacing(true);
 
     try {
+      // Hard dimension check
+      const { width, height } = await checkImageDimensions(file);
+
+      if (width !== REQUIRED_SIZE || height !== REQUIRED_SIZE) {
+        const msg =
+          // t("image_dimension_required") ||
+          `Image must be exactly ${REQUIRED_SIZE}×${REQUIRED_SIZE}px. Current: ${width}×${height}px`;
+
+        setError(msg);
+        toast.error(msg, { id: toastId });
+        return; // ← stop here, do NOT upload
+      }
+
       const result = await uploadImagesReq([file]);
 
       if (!result.success || !result.data?.length) {
@@ -87,14 +121,11 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
       }
 
       const newUrl = result.data[0];
-
-      // Always a single string
       onChange(newUrl);
 
       // Remove old image from product when editing
       if (productId && oldUrl && oldUrl !== newUrl) {
         try {
-          // API still accepts { images: string[] } for delete
           await deleteProductImage(productId, { images: [oldUrl] });
         } catch (err) {
           console.error("Failed to delete old image after replace:", err);
@@ -131,6 +162,7 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
 
     const file = fileList[0];
     const validationError = validateFile(file);
+
     if (validationError) {
       setError(validationError);
       toast.error(validationError);
@@ -147,6 +179,7 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
 
     const file = fileList[0];
     const validationError = validateFile(file);
+
     if (validationError) {
       setError(validationError);
       toast.error(validationError);
@@ -186,7 +219,6 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
 
     try {
       const res = await deleteProductImage(productId, { images: [previous] });
-      console.log("delete image res", res);
       if (res?.success) {
         toast.success(res?.message || "Image removed successfully", {
           id: toastId,
@@ -217,8 +249,8 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
           onDragOver={handleDrag}
           onDrop={handleDrop}
           className={`relative border-2 border-dashed rounded-lg p-8 text-center ${dragActive
-            ? "border-[#DC3173] bg-pink-50"
-            : "border-gray-300 hover:border-gray-400"
+              ? "border-[#DC3173] bg-pink-50"
+              : "border-gray-300 hover:border-gray-400"
             } transition-colors duration-200`}
         >
           <motion.div
@@ -232,8 +264,8 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
             </p>
             <p className="text-sm text-gray-500 mt-1">{t("or_click")}</p>
             <p className="text-xs text-gray-400 mt-2">
-              {t("png_jpg_svg") ||
-                "PNG, JPG, WEBP, SVG • Max 1 image • Max 5MB"}
+              {t("image_specs") ||
+                "Required: 1200 × 1200 px · Max 5 MB · JPG / PNG / WEBP"}
             </p>
             <label className="mt-4">
               <motion.span
@@ -252,7 +284,7 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
                 type="file"
                 className="hidden"
                 onChange={handleChange}
-                accept="image/jpeg,image/jpg,image/png,image/webp,image/svg+xml"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 disabled={isBusy}
               />
             </label>
@@ -292,7 +324,7 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
                 type="file"
                 className="hidden"
                 onChange={handleReplaceChange}
-                accept="image/jpeg,image/jpg,image/png,image/webp,image/svg+xml"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
                 disabled={isBusy}
               />
             </label>
@@ -322,8 +354,8 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
                   disabled={isBusy}
                   onClick={removeImage}
                   className={`absolute -top-2 -right-2 text-white rounded-full p-1.5 shadow-sm bg-red-500 ${isRemoving
-                    ? "opacity-50"
-                    : "opacity-0 group-hover:opacity-100 transition-opacity"
+                      ? "opacity-50"
+                      : "opacity-0 group-hover:opacity-100 transition-opacity"
                     }`}
                   title={t("remove") || "Remove"}
                 >

@@ -58,6 +58,12 @@ export const globalSettingsSchema = z
     //   .number("Preparation Extension Minutes must be a number")
     //   .positive("Preparation Extension Minutes must be greater than 0"),
     pickupRadiusMeters: z.number().optional(),
+    etaMinutesPerKm: z
+      .number("Order ETA Minutes Per Km must be a number")
+      .positive("Order ETA Minutes Per Km must be greater than 0"),
+    etaBufferMinutes: z
+      .number("Order ETA Buffer Minutes must be a number")
+      .positive("Order ETA Buffer Minutes must be greater than 0"),
 
     // products
     defaultImageUrl: z.string().optional(),
