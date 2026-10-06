@@ -61,3 +61,16 @@ export const assignFleetAndApproveRiderReq = async (payload: { fleetManagerId: s
 
   return result;
 };
+
+// re_assign - fleet - manager
+export const reAssignFleetApprovedRider = async (payload: { fleetManagerId: string, reason?: string }, userId: string) => {
+  const url = `/delivery-partners/${userId}/transfer-fleet-manager`;
+
+  const result = catchAsync(async () => {
+    return await serverRequest.patch(url, {
+      data: payload
+    });
+  });
+
+  return result;
+};
