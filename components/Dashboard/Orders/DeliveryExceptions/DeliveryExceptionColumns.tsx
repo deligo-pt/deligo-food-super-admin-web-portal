@@ -215,13 +215,13 @@ export function getDeliveryExceptionColumns({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             {/* Always available */}
-                            <DropdownMenuItem
+                            {/* <DropdownMenuItem
                                 onClick={() =>
                                     router.push(`/admin/delivery-exceptions/${row.orderId}`)
                                 }
                             >
                                 {t("view")}
-                            </DropdownMenuItem>
+                            </DropdownMenuItem> */}
 
                             {canAcknowledge && (
                                 <DropdownMenuItem
