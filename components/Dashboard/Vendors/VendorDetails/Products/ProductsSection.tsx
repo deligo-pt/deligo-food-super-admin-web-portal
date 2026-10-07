@@ -72,6 +72,7 @@ export default function ProductsSection({
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const searchParams = useSearchParams();
+    const isClickScrolling = useRef(false); // prevent spy from fighting with click
 
     // --- Frontend alphabetical sort (temporary until backend supports PT) ---
     const currentSort =
@@ -400,14 +401,6 @@ export default function ProductsSection({
         }
     };
 
-    const scrollToCategory = (id: string) => {
-        setActiveCategoryId(id);
-        const target = sectionRefs.current[id];
-        if (target) {
-            target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    };
-
     const handleProductUpdated = (updatedProduct: TProduct) => {
         setProducts((prev) =>
             prev.map((p) =>
@@ -428,6 +421,59 @@ export default function ProductsSection({
         setDeletedProductIds([]);
     }, [productsData]);
 
+    // ────────────────────────────────────────────────
+    // SCROLL SPY – automatically highlight the category
+    // that is currently in view while scrolling
+    // ────────────────────────────────────────────────
+
+    useEffect(() => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                // Ignore while we are programmatically scrolling from a click
+                if (isClickScrolling.current) return;
+
+                // Find the section that is most visible
+                const visible = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+                if (visible.length > 0) {
+                    const id = visible[0].target.id.replace("category-", "");
+                    setActiveCategoryId(id);
+                }
+            },
+            {
+                root: container,           // observe inside the products scroll container
+                rootMargin: "-20% 0px -60% 0px", // trigger when section is near the top
+                threshold: [0, 0.1, 0.25, 0.5],
+            }
+        );
+
+        // Observe every category section
+        Object.values(sectionRefs.current).forEach((el) => {
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
+    }, [groupedProducts]);
+
+    const scrollToCategory = (id: string) => {
+        setActiveCategoryId(id);
+        const target = sectionRefs.current[id];
+        if (!target || !scrollContainerRef.current) return;
+
+        isClickScrolling.current = true;
+
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        // Re-enable spy after the smooth scroll finishes
+        setTimeout(() => {
+            isClickScrolling.current = false;
+        }, 800);
+    };
 
     return (
         <div className="w-full flex flex-col h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] overflow-hidden">
@@ -566,8 +612,8 @@ export default function ProductsSection({
                                                 scrollToCategory(id);
                                             }}
                                             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
-                                                    ? "bg-[#DC3173]/10 text-[#DC3173]"
-                                                    : "text-gray-600 hover:bg-gray-50"
+                                                ? "bg-[#DC3173]/10 text-[#DC3173]"
+                                                : "text-gray-600 hover:bg-gray-50"
                                                 }`}
                                         >
                                             <span className="truncate uppercase tracking-wide">
@@ -576,8 +622,8 @@ export default function ProductsSection({
 
                                             <span
                                                 className={`text-xs px-2 py-0.5 rounded-full shrink-0 min-w-7 text-center ${isActive
-                                                        ? "bg-[#DC3173]/15 text-[#DC3173]"
-                                                        : "bg-gray-100 text-gray-500"
+                                                    ? "bg-[#DC3173]/15 text-[#DC3173]"
+                                                    : "bg-gray-100 text-gray-500"
                                                     }`}
                                             >
                                                 {/* Show spinner instead of count while loading more */}
@@ -596,9 +642,12 @@ export default function ProductsSection({
                 </div>
 
                 {/* RIGHT CONTENT – infinite scroll container */}
+                {/* RIGHT CONTENT */}
                 <div
                     ref={scrollContainerRef}
-                    className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1 custom-scrollbar"
+                    className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1 
+             scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent
+             hover:scrollbar-thumb-gray-400"
                 >
                     {groupedProducts.some((g) => g.products.length > 0) ? (
                         <>
