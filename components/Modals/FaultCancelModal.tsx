@@ -71,6 +71,7 @@ export default function FaultCancelModal({
                         variant="destructive"
                         onClick={handleConfirm}
                         disabled={isSubmitting || !isValid}
+                        className="bg-[#DC3173]"
                     >
                         {isSubmitting ? t("processing") : t("fault_cancel")}
                     </Button>

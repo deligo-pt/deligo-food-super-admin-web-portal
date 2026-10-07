@@ -54,7 +54,7 @@ export default function RequestReceiptConfirmationModal({
                     >
                         {t("cancel")}
                     </Button>
-                    <Button onClick={onConfirm} disabled={isSubmitting}>
+                    <Button className="bg-[#DC3173]" onClick={onConfirm} disabled={isSubmitting}>
                         {isSubmitting
                             ? t("processing")
                             : t("send_request") || "Send Request to Customer"}
