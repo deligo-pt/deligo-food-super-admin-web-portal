@@ -87,7 +87,7 @@ export default function ResolveModal({
                     <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                         {t("cancel")}
                     </Button>
-                    <Button onClick={handleConfirm} disabled={isSubmitting}>
+                    <Button className="bg-[#DC3173]" onClick={handleConfirm} disabled={isSubmitting}>
                         {isSubmitting ? t("processing") : t("resolve")}
                     </Button>
                 </DialogFooter>
