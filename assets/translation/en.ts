@@ -273,6 +273,16 @@ export const en = {
   mark_all_as_read: "Mark all as read",
   no_notifications: "No notifications",
   see_more: "See More",
+  tap_to_resolve_otp: "Tap to resolve OTP lock",
+  tap_to_resolve_verification: "Tap to resolve verification issue",
+  delivery_otp_locked: "Delivery OTP Locked",
+  delivery_verification_issue: "Delivery Verification Issue",
+  otp_locked_desc: "The delivery code was entered incorrectly too many times. Reset the OTP so the same rider can continue.",
+  verification_issue_desc: "The rider reported a verification issue. You can reset the OTP (same rider continues) or request the customer to confirm they received the order.",
+  same_rider_continues: "Same rider continues",
+  request_receipt_confirmation: "Request receipt confirmation from customer",
+  view_order: "View Order",
+
   // --> nearby partners
   nearby_delivery_partners: "Nearby Delivery Partners",
   partner_sm: "partner",
