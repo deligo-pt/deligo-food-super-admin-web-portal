@@ -76,7 +76,7 @@ export default function CompleteDeliveryModal({
                     >
                         {t("cancel")}
                     </Button>
-                    <Button onClick={handleConfirm} disabled={isSubmitting || !isValid}>
+                    <Button className="bg-[#DC3173]" onClick={handleConfirm} disabled={isSubmitting || !isValid}>
                         {isSubmitting ? t("processing") : t("complete_delivery")}
                     </Button>
                 </DialogFooter>

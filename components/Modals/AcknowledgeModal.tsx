@@ -39,7 +39,7 @@ export default function AcknowledgeModal({
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
             {t("cancel")}
           </Button>
-          <Button onClick={onConfirm} disabled={isSubmitting}>
+          <Button className="bg-[#DC3173]" onClick={onConfirm} disabled={isSubmitting}>
             {isSubmitting ? t("processing") : t("acknowledge")}
           </Button>
         </DialogFooter>
