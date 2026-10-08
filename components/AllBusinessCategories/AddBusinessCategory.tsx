@@ -195,6 +195,7 @@ export function AddBusinessCategoryForm() {
                   <FormControl>
                     <Textarea
                       {...field}
+                      placeholder={t("write_about_the_category")}
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#DC3173] focus:border-[#DC3173] outline-none transition-all border-gray-300"
                     />
                   </FormControl>
