@@ -13,7 +13,7 @@ export type TLastKnownLocation = {
     lastLocationUpdate: string;
 };
 
-export type TDeliveryPartner = {
+type TDeliveryPartner = {
     deliveryPartnerId: string;
     userId: string;
     name: string;

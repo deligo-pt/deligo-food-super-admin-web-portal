@@ -96,6 +96,7 @@ export const en = {
   rider_wallets: "Rider Wallets",
   rider_payouts: "Rider Payouts",
   rider_analytics: "Rider Analytics",
+  live_rider_tracking: "Live Rider Tracking",
 
   cuisine: "Cuisine",
   create_cuisine: "Create Cuisine",
@@ -1294,6 +1295,14 @@ export const en = {
 
   // delivery partner wallets
   manage_all_the_rider_wallets: "Manage all the rider wallets",
+
+  // rider live tracking
+  tracking_riders_live_location_and_where_they_are: "Tracking rider's live location and where they are actually",
+  search_riders: "Search Riders",
+  on_map: "on map",
+  no_riders_on_map: "No riders with location",
+  no_more_riders: "No more riders",
+  refreshing: "Refreshing",
 
   // add-business-category
   add_business_category: "Add Business Category",

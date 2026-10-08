@@ -101,6 +101,7 @@ export const pt = {
   rider_wallets: "Carteiras dos Estafetas",
   rider_payouts: "Pagamentos aos Estafetas",
   rider_analytics: "Análises de Estafetas",
+  live_rider_tracking: "Rastreio do Estafeta em Tempo Real",
 
   cuisine: "Culinária",
   create_cuisine: "Criar Culinária",
@@ -1306,6 +1307,14 @@ export const pt = {
 
   // delivery partner wallets
   manage_all_the_rider_wallets: "Gerencie todas as carteiras dos Estafetas",
+
+  // rider live tracking
+  tracking_riders_live_location_and_where_they_are: "A rastrear a localização em tempo real dos estafetas e a sua posição atual",
+  search_riders: "Pesquisar Estafetas",
+  on_map: "no mapa",
+  no_riders_on_map: "Nenhum estafeta com localização",
+  no_more_riders: "Sem mais estafetas",
+  refreshing: "A atualizar",
 
   // add-business-category
   add_business_category: "Adicionar categoria de negócio",
