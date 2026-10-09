@@ -2,20 +2,62 @@ import { TMeta } from ".";
 
 export interface IAgreement {
     _id: string;
-    establishmentName: string;
+
+    // Party reference
+    partyId: string;
+    partyModel: "FleetManager" | "Vendor" | "DeliveryPartner" | string;
+    agreementType: string; // e.g. "INITIAL_FLEET_MANAGER_AGREEMENT"
+    agreementVersionId: string;
+    versionNumber: number;
+    isCurrentForParty: boolean;
+    supersededAt: string | null;
+
+    // Party details
+    partyLegalName: string;
     email: string;
     contactNumber: string;
     nif: string;
-    isEmailVerified: boolean;
-    emailVerifiedAt: string;
-    draftPdfPath: string;
-    signaturePath: string;
-    signedPdfPath: string;
-    status: 'draft' | 'emailed' | 'signed' | string;
-    signedAt?: string;
-    emailedAt?: string;
-    vendor?: string | null;
-    createdBy?: string | null;
+    commercialName: string;
+    headOfficeAddress: string;
+    zipCode: string;
+    country: string;
+    partyRepresentativeName: string;
+    partyRepresentativeRole: string | null;
+    partyIban: string;
+
+    // DeliGo side
+    deligoRepresentativeName: string | null;
+    deligoRepresentativeRole: string | null;
+
+    // Documents / files
+    draftPdfPath: string | null;
+    deligoSignaturePath: string | null;
+    partySignaturePath: string | null;
+    partyStampPath: string | null;
+    signedPdfPath: string | null;
+
+    // Signature meta
+    partySignatureMethod: "DRAWN" | "UPLOADED" | "TYPED" | string | null;
+    partySignatoryType: "SELF" | "REPRESENTATIVE" | string | null;
+
+    // Status & timestamps
+    status: "DRAFT" | "EMAILED" | "SIGNED" | "SUPERSEDED" | "CANCELLED" | string;
+    posPaymentOption: string | null;
+    signedAt: string | null;
+    deligoSignedAt: string | null;
+    emailedAt: string | null;
+
+    // Created by
+    createdBy: {
+        _id: string;
+        email: string;
+        name: {
+            firstName: string;
+            lastName: string;
+        };
+    } | null;
+    createdByModel: "Admin" | "Vendor" | "FleetManager" | string | null;
+
     createdAt: string;
     updatedAt: string;
     __v: number;

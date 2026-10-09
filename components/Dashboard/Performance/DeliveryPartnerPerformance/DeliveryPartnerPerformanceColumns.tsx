@@ -89,8 +89,7 @@ export function getDeliveryPartnerPerformanceColumns({
                     {t("rating")}
                 </div>
             ),
-            accessor: (partner) =>
-                partner.operationalData?.rating?.average || 0,
+            accessor: (partner) => partner?.rating || 0,
         },
 
         {

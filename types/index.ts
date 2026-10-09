@@ -32,3 +32,13 @@ export type TDeviceDetails = {
   deviceName: string;
   userAgent: string;
 };
+
+export type TGeoJSONPoint = {
+  type: "Point";
+  coordinates: [number, number]; // [longitude, latitude]
+  geoAccuracy?: number;
+  heading?: number;
+  speed?: number;
+  isMocked?: boolean;
+  lastLocationUpdate: Date;
+};

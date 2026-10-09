@@ -488,11 +488,11 @@ export const DeliveryPartnerDetails = ({ partner }: IProps) => {
             <div className="bg-white p-4 rounded-lg shadow-sm text-center">
               <div className="text-gray-500 text-xs mb-1">{t("rating")}</div>
               <div className="text-2xl font-bold text-amber-500 flex items-center justify-center">
-                {partner.operationalData?.rating?.average.toFixed(1) || "N/A"}{" "}
+                {partner?.rating?.average.toFixed(1) || "N/A"}{" "}
                 <Star className="w-4 h-4 ml-1" fill="currentColor" />
               </div>
               <div className="text-xs text-gray-500">
-                {partner.operationalData?.rating?.totalReviews || 0}{" "}
+                {partner?.rating?.totalReviews || 0}{" "}
                 {t("reviews")}
               </div>
             </div>

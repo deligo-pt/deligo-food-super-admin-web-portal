@@ -46,7 +46,7 @@ export function getAgreementColumns({
                     {t("establishment")}
                 </div>
             ),
-            accessor: (row) => row.establishmentName || "N/A",
+            accessor: (row) => row.commercialName || "N/A",
         },
 
         {

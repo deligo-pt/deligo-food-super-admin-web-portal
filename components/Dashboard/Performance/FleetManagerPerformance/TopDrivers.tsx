@@ -60,7 +60,7 @@ export default function TopRatedDeliveryPartners({ partners }: IProps) {
                 </div>
                 <div>
                   <h4 className="font-medium">
-                    {partner?.name?.firstName} {partner?.name?.lastName}
+                    {partner?.name}
                   </h4>
                   <p className="text-sm">{partner?.userId}</p>
                 </div>

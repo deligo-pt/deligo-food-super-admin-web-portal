@@ -95,6 +95,7 @@ const EditZone = ({ zoneDetails }: IProps) => {
             <TitleHeader
                 title={t("edit_zone")}
                 subtitle={`${t("update_details_and_boundary_for")} ${zoneDetails.zoneName}`}
+                onBackClick={() => router.back()}
             />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

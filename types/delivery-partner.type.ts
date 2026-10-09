@@ -1,4 +1,5 @@
 import { USER_STATUS } from "@/consts/user.const";
+import { TGeoJSONPoint } from ".";
 
 export type TVehicleType =
   | "BICYCLE"
@@ -6,6 +7,12 @@ export type TVehicleType =
   | "SCOOTER"
   | "MOTORBIKE"
   | "CAR";
+
+export const currentStatusOptions = {
+  IDLE: "IDLE",
+  OFFLINE: "OFFLINE",
+  ON_DELIVERY: "ON_DELIVERY",
+} as const;
 
 export type TDeliveryPartner = {
   // -------------------------------------------------
@@ -40,6 +47,12 @@ export type TDeliveryPartner = {
   // FCM tokens
   fcmTokens?: string[];
 
+  // --------------------------------------------------------
+  // Pending temporary Email and contact number
+  // --------------------------------------------------------
+  pendingEmail?: string;
+  pendingContactNumber?: string;
+
   // ------------------------------------------------------
   // OTP & Password Reset
   // ------------------------------------------------------
@@ -70,6 +83,7 @@ export type TDeliveryPartner = {
     longitude?: number;
     geoAccuracy?: number;
   };
+  currentSessionLocation: TGeoJSONPoint;
   personalInfo?: {
     dateOfBirth?: string;
     gender?: "MALE" | "FEMALE" | "OTHER";
@@ -147,10 +161,20 @@ export type TDeliveryPartner = {
     totalDeliveries?: number;
     completedDeliveries?: number;
     canceledDeliveries?: number;
-    rating?: {
-      average: number;
-      totalReviews: number;
-    };
+
+    totalOfferedOrders?: number;
+    totalAcceptedOrders?: number;
+    totalRejectedOrders?: number;
+    totalDeliveryMinutes?: number;
+
+    currentStatus: keyof typeof currentStatusOptions; // Current working state (IDLE, ON_DELIVERY, OFFLINE)
+    assignmentZoneId: string;
+    currentZoneId?: string; // DeliGo Zone ID (e.g., 'Lisbon-Zone-02')
+    currentOrderId?: string; // List of active order IDs they are currently fulfilling
+    capacity: number; // Max number of orders the driver can carry (e.g., 2 or 3)
+    isWorking: boolean; // Simple flag: Clocked in/out
+
+    lastActivityAt?: Date;
   };
 
   // -------------------------------------------------
@@ -186,6 +210,11 @@ export type TDeliveryPartner = {
   submittedForApprovalAt?: Date;
   approvedOrRejectedOrBlockedAt?: Date;
   remarks?: string;
+
+  rating?: {
+    average: number;
+    totalReviews: number;
+  };
 
   // -------------------------------------------------
   // Timestamps

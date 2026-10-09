@@ -101,6 +101,7 @@ export const pt = {
   rider_wallets: "Carteiras dos Estafetas",
   rider_payouts: "Pagamentos aos Estafetas",
   rider_analytics: "Análises de Estafetas",
+  live_rider_tracking: "Rastreio do Estafeta em Tempo Real",
 
   cuisine: "Culinária",
   create_cuisine: "Criar Culinária",
@@ -347,6 +348,13 @@ export const pt = {
   platform_percent: "% Plataforma",
   platform_vat_rate: "Taxa de IVA",
   baseline: "Linha de Base",
+  commission_rate_changed_title: "Alterou a taxa de comissão?",
+  commission_rate_changed_desc: "Se pretende atualizar a percentagem da comissão da plataforma ou a taxa de IVA, escolha Sim.",
+  update_commission_rate: "Atualizar Taxa de Comissão",
+  update_commission_rate_desc: "Introduza a nova percentagem de comissão da plataforma e a taxa de IVA.",
+  select_vat_rate: "Selecione a taxa de IVA",
+  raised_from_15: "ex.: Aumentado de 15%",
+  back: "Voltar",
 
   // edit draft agreement
   edit_draft_agreement: "Editar Rascunho de Acordo",
@@ -1307,6 +1315,14 @@ export const pt = {
   // delivery partner wallets
   manage_all_the_rider_wallets: "Gerencie todas as carteiras dos Estafetas",
 
+  // rider live tracking
+  tracking_riders_live_location_and_where_they_are: "A rastrear a localização em tempo real dos estafetas e a sua posição atual",
+  search_riders: "Pesquisar Estafetas",
+  on_map: "no mapa",
+  no_riders_on_map: "Nenhum estafeta com localização",
+  no_more_riders: "Sem mais estafetas",
+  refreshing: "A atualizar",
+
   // add-business-category
   add_business_category: "Adicionar categoria de negócio",
   create_new_business_category_details_visuals:
@@ -1319,6 +1335,7 @@ export const pt = {
   png_jpg_jpeg: "PNG, JPG, JPEG",
   upload_image: "Carregar imagem",
   description: "Descrição",
+  write_about_the_category: "Escreva sobre a categoria",
 
   // business categories
   // -> categories title
@@ -2626,6 +2643,10 @@ export const pt = {
   enter_message_shown_to_users:
     "Introduza a mensagem a mostrar aos utilizadores...",
   delivery_pricing: "Preços de Entrega",
+  base_fee_charged_for_every_delivery: "Taxa base cobrada por cada pedido de entrega",
+  distance_up_to_which_base_rate_applies: "Distância até à qual se aplica a taxa padrão por km",
+  rate_charged_per_km_beyond_threshold: "Taxa cobrada por km além do limite de distância",
+  rate_charged_per_km_within_threshold: "Taxa cobrada por km dentro do limite de distância",
   configure_base_rates_distance:
     "Configurar tarifas base e cálculos de distância",
   base_charge: "Tarifa Base",
@@ -2650,6 +2671,8 @@ export const pt = {
   vendor_vat: "IVA do Vendedor",
   service_charge: "Taxa de Serviço",
   service_charge_vat_rate: "Taxa de IVA da Taxa de Serviço",
+  fixed_service_fee_added_to_orders: "Taxa de serviço fixa adicionada aos pedidos dos clientes",
+  vat_applied_on_service_charge: "Percentagem de IVA aplicada sobre a taxa de serviço",
   order_rules: "Regras de Encomenda",
   define_constraints_for_customer_orders:
     "Definir restrições para encomendas de clientes",
@@ -2720,6 +2743,10 @@ export const pt = {
   deliveryChargeInsideLisbonVatRate: "Taxa de IVA da Taxa de Entrega Dentro de Lisboa",
   deliveryChargeOutsideLisbon: "Taxa de Entrega Fora de Lisboa",
   deliveryChargeOutsideLisbonVatRate: "Taxa de IVA da Taxa de Entrega Fora de Lisboa",
+  delivery_fee_for_ingredient_orders_inside_lisbon: "Taxa de entrega para pedidos de ingredientes dentro de Lisboa",
+  vat_on_ingredient_delivery_inside_lisbon: "Taxa de IVA na entrega de ingredientes dentro de Lisboa",
+  delivery_fee_for_ingredient_orders_outside_lisbon: "Taxa de entrega para pedidos de ingredientes fora de Lisboa",
+  vat_on_ingredient_delivery_outside_lisbon: "Taxa de IVA na entrega de ingredientes fora de Lisboa",
   vatRate: "Taxa de IVA",
   agreements: "Acordos",
   activity_logs_retention: "Retenção de Registos de Atividade",

@@ -1,5 +1,6 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { catchAsync } from "@/utils/catchAsync";
@@ -37,6 +38,22 @@ export const getAllDeliveryPartnersReq = async (
   return {
     data: [],
   };
+};
+
+// GET ALL ZONES
+export const getAllDeliveryPartners = async (queryString?: string) => {
+  const url = `/delivery-partners${queryString ? `?${queryString}` : ""}`;
+
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.get(url, {
+      next: {
+        tags: ["delivery-partners"],
+      },
+    });
+    return await res.json();
+  });
+
+  return result;
 };
 
 export const getSingleDeliveryPartnerReq = async (id: string) => {
