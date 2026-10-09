@@ -805,7 +805,7 @@ export default function AgreementVersionsDetails({
                                                     >
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Select VAT rate" />
+                                                                <SelectValue placeholder={t("select_vat_rate")} />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
@@ -852,7 +852,7 @@ export default function AgreementVersionsDetails({
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Textarea
-                                                        placeholder="e.g. Raised from 15%"
+                                                        placeholder={t("raised_from_15")}
                                                         rows={2}
                                                         {...field}
                                                     />

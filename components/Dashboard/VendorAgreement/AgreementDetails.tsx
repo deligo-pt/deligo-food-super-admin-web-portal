@@ -38,7 +38,7 @@ export default function AgreementDetails({ agreement }: IProps) {
         <div className="space-y-6 max-w-full">
             {/* 1. TitleHeader Integration with Action Buttons */}
             <TitleHeader
-                title={agreement.establishmentName || "N/A"}
+                title={agreement?.commercialName || "N/A"}
                 subtitle={t("comprehensive_breakdown_original")}
                 onBackClick={() => router.push("/admin/vendor-agreements")}
                 extraComponent={
@@ -120,7 +120,7 @@ export default function AgreementDetails({ agreement }: IProps) {
                         <iframe
                             src={`${targetingPdfUrl}#toolbar=1&navpanes=0`}
                             className="w-full h-full border-none"
-                            title={`${t("document_space_viewer_for")} ${agreement.establishmentName}`}
+                            title={`${t("document_space_viewer_for")} ${agreement.commercialName}`}
                             allow="autoplay"
                         />
                     ) : (

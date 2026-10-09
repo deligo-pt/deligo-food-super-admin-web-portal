@@ -163,6 +163,10 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
           name: t("rider_wallets"),
           path: "/admin/delivery-partner-wallets",
         },
+        {
+          name: t("live_rider_tracking"),
+          path: "/admin/delivery-partner-live-tracking",
+        },
       ],
     },
     {

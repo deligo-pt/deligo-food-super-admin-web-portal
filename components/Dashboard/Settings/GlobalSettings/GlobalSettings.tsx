@@ -411,11 +411,10 @@ export default function GlobalSettings({
                                   label={t("delivery_service_fee")}
                                   type="number"
                                   value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                   suffix="€"
                                   min={0}
+                                  description={t("base_fee_charged_for_every_delivery") || "Base fee charged for every delivery order"}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -433,11 +432,10 @@ export default function GlobalSettings({
                                   label={t("distanceThresholdKm")}
                                   type="number"
                                   value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                   suffix="km"
                                   min={0}
+                                  description={t("distance_up_to_which_base_rate_applies") || "Distance up to which the standard per-km rate applies"}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -455,11 +453,10 @@ export default function GlobalSettings({
                                   label={t("charge_per_km")}
                                   type="number"
                                   value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                   suffix="€"
                                   min={0}
+                                  description={t("rate_charged_per_km_within_threshold") || "Rate charged per km within the distance threshold"}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -477,11 +474,10 @@ export default function GlobalSettings({
                                   label={t("chargePerKmBeyondThreshold")}
                                   type="number"
                                   value={field.value}
-                                  onChange={(e) =>
-                                    field.onChange(parseFloat(e.target.value))
-                                  }
+                                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                   suffix="€"
                                   min={0}
+                                  description={t("rate_charged_per_km_beyond_threshold") || "Rate charged per km beyond the distance threshold"}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -632,11 +628,10 @@ export default function GlobalSettings({
                                     label={t("service_charge")}
                                     type="number"
                                     value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     suffix="€"
                                     min={0}
+                                    description={t("fixed_service_fee_added_to_orders") || "Fixed service fee added to customer orders"}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -654,11 +649,10 @@ export default function GlobalSettings({
                                     label={t("service_charge_vat_rate")}
                                     type="number"
                                     value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     suffix="%"
                                     min={0}
+                                    description={t("vat_applied_on_service_charge") || "VAT percentage applied on the service charge"}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1131,11 +1125,10 @@ export default function GlobalSettings({
                                     label={t("deliveryChargeInsideLisbon")}
                                     type="number"
                                     value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     suffix="€"
                                     min={0}
+                                    description={t("delivery_fee_for_ingredient_orders_inside_lisbon") || "Delivery fee for ingredient orders inside Lisbon"}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1153,11 +1146,10 @@ export default function GlobalSettings({
                                     label={t("deliveryChargeInsideLisbonVatRate")}
                                     type="number"
                                     value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     suffix="%"
                                     min={0}
+                                    description={t("vat_on_ingredient_delivery_inside_lisbon") || "VAT rate on ingredient delivery inside Lisbon"}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1177,11 +1169,10 @@ export default function GlobalSettings({
                                     label={t("deliveryChargeOutsideLisbon")}
                                     type="number"
                                     value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     suffix="€"
                                     min={0}
+                                    description={t("delivery_fee_for_ingredient_orders_outside_lisbon") || "Delivery fee for ingredient orders outside Lisbon"}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -1200,11 +1191,10 @@ export default function GlobalSettings({
                                     label={t("deliveryChargeOutsideLisbonVatRate")}
                                     type="number"
                                     value={field.value}
-                                    onChange={(e) =>
-                                      field.onChange(parseFloat(e.target.value))
-                                    }
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     suffix="%"
                                     min={0}
+                                    description={t("vat_on_ingredient_delivery_outside_lisbon") || "VAT rate on ingredient delivery outside Lisbon"}
                                   />
                                 </FormControl>
                                 <FormMessage />

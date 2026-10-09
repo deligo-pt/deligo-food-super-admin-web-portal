@@ -96,6 +96,7 @@ export const en = {
   rider_wallets: "Rider Wallets",
   rider_payouts: "Rider Payouts",
   rider_analytics: "Rider Analytics",
+  live_rider_tracking: "Live Rider Tracking",
 
   cuisine: "Cuisine",
   create_cuisine: "Create Cuisine",
@@ -339,6 +340,13 @@ export const en = {
   platform_percent: "Platform %",
   platform_vat_rate: "Vat Rate",
   baseline: "Baseline",
+  commission_rate_changed_title: "Have you changed the commission rate?",
+  commission_rate_changed_desc: "If you want to update the platform commission percentage or VAT rate, choose Yes.",
+  update_commission_rate: "Update Commission Rate",
+  update_commission_rate_desc: "Enter the new platform commission percentage and VAT rate.",
+  select_vat_rate: "Select VAT rate",
+  raised_from_15: "e.g. Raised from 15%",
+  back: "Back",
 
 
   // edit draft agreement
@@ -1295,6 +1303,14 @@ export const en = {
   // delivery partner wallets
   manage_all_the_rider_wallets: "Manage all the rider wallets",
 
+  // rider live tracking
+  tracking_riders_live_location_and_where_they_are: "Tracking rider's live location and where they are actually",
+  search_riders: "Search Riders",
+  on_map: "on map",
+  no_riders_on_map: "No riders with location",
+  no_more_riders: "No more riders",
+  refreshing: "Refreshing",
+
   // add-business-category
   add_business_category: "Add Business Category",
   create_new_business_category_details_visuals:
@@ -1307,6 +1323,7 @@ export const en = {
   png_jpg_jpeg: "PNG, JPG, JPEG",
   upload_image: "Upload Image",
   description: "Description",
+  write_about_the_category: "Wrtie about the category",
 
   // business categories
   // -> categories title
@@ -2608,6 +2625,10 @@ export const en = {
   distanceThresholdKm: "Threshold Distance KM",
   chargePerKmBeyondThreshold: "Per KM charge beyond Threshold",
   charge_per_km: "Within Threshold Charge per KM",
+  base_fee_charged_for_every_delivery: "Base fee charged for every delivery order",
+  distance_up_to_which_base_rate_applies: "Distance up to which the standard per-km rate applies",
+  rate_charged_per_km_beyond_threshold: "Rate charged per km beyond the distance threshold",
+  rate_charged_per_km_within_threshold: "Rate charged per km within the distance threshold",
   min_charge: "Min Charge",
   max_charge: "Max Charge",
   maximum_delivery_distance: "Maximum Delivery Distance",
@@ -2624,6 +2645,8 @@ export const en = {
   vendor_vat: "Vendor VAT",
   service_charge: "Service Charge",
   service_charge_vat_rate: "Service Charge Vat Rate",
+  fixed_service_fee_added_to_orders: "Fixed service fee added to customer orders",
+  vat_applied_on_service_charge: "VAT percentage applied on the service charge",
   order_rules: "Order Rules",
   define_constraints_for_customer_orders:
     "Define constraints for customer orders",
@@ -2690,6 +2713,10 @@ export const en = {
   deliveryChargeInsideLisbonVatRate: "Delivery Charge Inside Lisbon Vat Rate",
   deliveryChargeOutsideLisbon: "Delivery Charge Outside Lisbon",
   deliveryChargeOutsideLisbonVatRate: "Delivery Charge Outside Lisbon Vat Rate",
+  delivery_fee_for_ingredient_orders_inside_lisbon: "Delivery fee for ingredient orders inside Lisbon",
+  vat_on_ingredient_delivery_inside_lisbon: "VAT rate on ingredient delivery inside Lisbon",
+  delivery_fee_for_ingredient_orders_outside_lisbon: "Delivery fee for ingredient orders outside Lisbon",
+  vat_on_ingredient_delivery_outside_lisbon: "VAT rate on ingredient delivery outside Lisbon",
   vatRate: "Vat Rate",
   agreements: "Agreements",
   activity_logs_retention: "Activity Logs Retention",
