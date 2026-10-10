@@ -42,3 +42,8 @@ export type TGeoJSONPoint = {
   isMocked?: boolean;
   lastLocationUpdate: Date;
 };
+
+export type LocalizedType = {
+  en?: string;
+  pt?: string;
+}
