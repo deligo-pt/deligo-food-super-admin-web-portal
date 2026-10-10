@@ -13,7 +13,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/use-translation";
-import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
+import {
+  approveOrRejectReq,
+  blockUnblockUser,
+} from "@/services/auth/approve-or-reject.service";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,12 +37,23 @@ export default function ApproveOrRejectModal({
   userId,
 }: IProps) {
   const { t } = useTranslation();
-  const [remarks, setRemarks] = useState<string>("");
+  const [remarks, setRemarks] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const approveOrReject = async (e: React.FormEvent) => {
+  // unmount completely when closed / no data
+  if (!open || !userId || !status) {
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    const isBlockAction = status === "BLOCKED" || status === "UNBLOCKED";
+
     const toastId = toast.loading(
       status === "APPROVED"
         ? "Approving..."
@@ -47,93 +61,117 @@ export default function ApproveOrRejectModal({
           ? "Rejecting..."
           : status === "BLOCKED"
             ? "Blocking..."
-            : "Unblocking...",
+            : "Unblocking..."
     );
-    setIsSubmitting(true);
 
-    const updateStatus = {
-      status: status === "UNBLOCKED" ? "APPROVED" : status,
-      remarks,
-    };
+    try {
+      let result;
 
-    const result = await approveOrRejectReq(userId, updateStatus);
+      if (isBlockAction) {
+        result = await blockUnblockUser(userId, {
+          expectedAction: status === "BLOCKED" ? "BLOCK" : "UNBLOCK",
+          remarks: remarks.trim() || undefined,
+        });
+      } else {
+        result = await approveOrRejectReq(userId, {
+          status,
+          remarks,
+        });
+      }
 
-    if (result?.success) {
-      setRemarks("");
-      onOpenChange(false);
-      toast.success(
-        result.message ? result?.message :
-          status === "APPROVED"
+      if (result?.success) {
+        setRemarks("");
+        toast.success(
+          result.message ||
+          (status === "APPROVED"
             ? "Approved successfully!"
             : status === "REJECTED"
               ? "Rejected successfully!"
               : status === "BLOCKED"
                 ? "Blocked successfully!"
-                : "Unblocked successfully!",
-        { id: toastId },
-      );
-      router.refresh();
-      setIsSubmitting(false);
-      return;
-    }
+                : "Unblocked successfully!"),
+          { id: toastId }
+        );
 
-    toast.error(
-      result.message ||
-      (status === "APPROVED"
-        ? "Approving failed"
-        : status === "REJECTED"
-          ? "Rejecting failed"
-          : status === "BLOCKED"
-            ? "Blocking failed"
-            : "Unblocking failed"),
-      { id: toastId },
-    );
-    console.log(result);
-    setIsSubmitting(false);
+        onOpenChange(false);
+        router.refresh();
+        return;
+      }
+
+      if (result?.data?.errorSources?.length) {
+        result.data.errorSources.forEach(
+          (err: { path: string; message: string }) =>
+            toast.error(err.message, { id: toastId })
+        );
+      } else {
+        toast.error(
+          result?.message ||
+          (status === "APPROVED"
+            ? "Approving failed"
+            : status === "REJECTED"
+              ? "Rejecting failed"
+              : status === "BLOCKED"
+                ? "Blocking failed"
+                : "Unblocking failed"),
+          { id: toastId }
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An unexpected error occurred", { id: toastId });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <form>
-        <DialogContent className="sm:max-w-106.25">
+    <Dialog
+      open={true}
+      onOpenChange={(next) => {
+        if (!next) onOpenChange(false);
+      }}
+    >
+      <DialogContent className="sm:max-w-106.25">
+        <form onSubmit={handleSubmit} className="grid gap-4">
           <DialogHeader>
             <DialogTitle>
               {status === "APPROVED" && t("approve")}
               {status === "REJECTED" && t("reject")}
               {status === "BLOCKED" && t("block")}
-              {status === "UNBLOCKED" && t("unblock")} - {userName}
+              {status === "UNBLOCKED" && t("unblock")}
+              {userName ? ` - ${userName}` : ""}
             </DialogTitle>
             <DialogDescription>
               {status === "APPROVED"
                 ? t("are_you_sure_want_approve")
-                : t("let_them_know_why_you_are") + " "}
+                : `${t("let_them_know_why_you_are")} `}
               {status === "REJECTED" && t("rejecting")}
               {status === "BLOCKED" && t("blocking")}
               {status === "UNBLOCKED" && t("unblocking")}
             </DialogDescription>
           </DialogHeader>
-          <form
-            onSubmit={approveOrReject}
-            id="remarksForm"
-            className="grid gap-4"
-          >
-            <div className={status === "APPROVED" ? "hidden" : "grid gap-3"}>
+
+          {status !== "APPROVED" && (
+            <div className="grid gap-3">
               <Label htmlFor="remarks">{t("remarks")}</Label>
               <Input
                 id="remarks"
                 name="remarks"
-                onBlur={(e) => setRemarks(e.target.value)}
-                hidden={status === "APPROVED"}
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
               />
             </div>
-          </form>
+          )}
+
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">{t("cancel")}</Button>
+              <Button type="button" variant="outline" disabled={isSubmitting}>
+                {t("cancel")}
+              </Button>
             </DialogClose>
+
             {status === "APPROVED" && (
               <Button
-                form="remarksForm"
                 type="submit"
                 disabled={isSubmitting}
                 className="bg-green-600 hover:bg-green-500"
@@ -142,13 +180,12 @@ export default function ApproveOrRejectModal({
               </Button>
             )}
             {status === "REJECTED" && (
-              <Button form="remarksForm" type="submit" disabled={isSubmitting} variant="destructive">
+              <Button type="submit" disabled={isSubmitting} variant="destructive">
                 {t("reject")}
               </Button>
             )}
             {status === "BLOCKED" && (
               <Button
-                form="remarksForm"
                 type="submit"
                 disabled={isSubmitting}
                 className="bg-yellow-500 hover:bg-yellow-600"
@@ -158,7 +195,6 @@ export default function ApproveOrRejectModal({
             )}
             {status === "UNBLOCKED" && (
               <Button
-                form="remarksForm"
                 type="submit"
                 disabled={isSubmitting}
                 className="bg-[#DC3173] hover:bg-[#DC3173]/90"
@@ -167,8 +203,8 @@ export default function ApproveOrRejectModal({
               </Button>
             )}
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
