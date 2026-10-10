@@ -158,6 +158,13 @@ export function getOrderColumns({
             ),
             className: "text-right",
             accessor: (order) => {
+                const hasNoPartner = !order.deliveryPartnerId;
+                const isDeadlineExpired =
+                    order.autoAcceptDeadlineAt &&
+                    new Date(order.autoAcceptDeadlineAt).getTime() < Date.now();
+
+                const canAssignPartner = hasNoPartner && isDeadlineExpired;
+
                 return (
                     <DropdownMenu>
                         <DropdownMenuTrigger>
@@ -169,19 +176,26 @@ export function getOrderColumns({
                             >
                                 {t("view")}
                             </DropdownMenuItem>
-                            {
-                                order?.refundStatus === REFUND_STATUS.PENDING && (
-                                    <DropdownMenuItem
-                                        onClick={() => setOrderId(order?.orderId)}
-                                    >
-                                        {t("refund")}
-                                    </DropdownMenuItem>
-                                )
-                            }
+
+                            {order?.refundStatus === REFUND_STATUS.PENDING && (
+                                <DropdownMenuItem onClick={() => setOrderId(order?.orderId)}>
+                                    {t("refund")}
+                                </DropdownMenuItem>
+                            )}
+
+                            {canAssignPartner && (
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        router.push(`/admin/all-orders/${order.orderId}/nearby-partners`)
+                                    }}
+                                >
+                                    {t("assign_partner") || "Assign Partner"}
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                )
-            }
+                );
+            },
         },
     ];
 }
