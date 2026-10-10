@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit, LayersIcon, Trash2, Loader2, ChevronDown } from "lucide-react";
+import { Plus, Edit, LayersIcon, Trash2, Loader2, ChevronDown, SaveIcon } from "lucide-react";
 import AddAddonGroupModal from "./AddAddonGroupModal";
 import { TAddonGroup } from "@/types/add-ons.type";
 import { TTax } from "@/types/tax.type";
@@ -152,29 +152,21 @@ export default function AddOnsManagementSection({
                             className="w-48 bg-white shadow-lg border rounded-lg p-1"
                         >
                             <DropdownMenuItem
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                <motion.button
-                                    whileHover={{
-                                        scale: 1.05,
-                                    }}
-                                    whileTap={{
-                                        scale: 0.98,
-                                    }}
-                                    type="button"
-                                    onClick={handleOpenCreateModal}
-                                >
-                                    <span>{t("add_group")}</span>
-                                </motion.button>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
                                 onClick={() =>
                                     router.push(`/admin/vendor/${vendorUserId}/manage-products`)
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
                                 {t("manage_products") || "Manage Product"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(`/admin/vendor/${vendorId}/add-product`)
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("add_product") || "Add Product"}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -215,12 +207,13 @@ export default function AddOnsManagementSection({
                             <DropdownMenuItem
                                 onClick={() =>
                                     router.push(
-                                        `/admin/vendor/${vendorUserId}/products/add-ons`
+                                        `/admin/vendor/${vendorId}/products/variation-management`
                                     )
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                {t("add_ons") || "Add-ons"}
+                                {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
+                                {t("variation_management") || "Variation Management"}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -236,6 +229,11 @@ export default function AddOnsManagementSection({
                         </DropdownMenuContent>
                     </DropdownMenu>
                 }
+                buttonInfo={{
+                    text: t("add_group"),
+                    icon: SaveIcon,
+                    onClick: handleOpenCreateModal,
+                }}
             />
 
             {/* Add-on Groups List Cards */}

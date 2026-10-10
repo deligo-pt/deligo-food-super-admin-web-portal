@@ -99,6 +99,18 @@ const VendorCreatedOffers = ({ offerData, vendorId }: IProps) => {
                             <DropdownMenuItem
                                 onClick={() =>
                                     router.push(
+                                        `/admin/vendor/${vendorId}/products/variation-management`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
+                                {t("variation_management") || "Variation Management"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
                                         `/admin/vendor/${vendorId}/products/add-ons`
                                     )
                                 }
