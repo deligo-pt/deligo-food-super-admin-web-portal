@@ -43,7 +43,7 @@ export type TTopRatedItems = {
   rating: {
     average: number;
   };
-  images: string[];
+  image: string;
   totalOrders: number;
 };
 

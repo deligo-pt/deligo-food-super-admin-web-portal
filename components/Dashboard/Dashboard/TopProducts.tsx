@@ -47,7 +47,7 @@ const TopProducts = ({ topRatedItems }: IProps) => {
           >
             <div className="h-32 w-full overflow-hidden">
               <Image
-                src={item.images?.[0] || ""}
+                src={item.image || ""}
                 alt={item.name?.[lang]}
                 className="w-full h-full object-cover"
                 width={500}
