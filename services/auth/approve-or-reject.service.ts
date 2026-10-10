@@ -13,3 +13,14 @@ export const approveOrRejectReq = async (
     });
   });
 };
+
+export const blockUnblockUser = async (
+  id: string,
+  data: { expectedAction: "UNBLOCK" | "BLOCK"; remarks?: string, restoreTo?: 'PENDING' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' },
+) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.patch(`/auth/${id}/block-status`, {
+      data,
+    });
+  });
+};
