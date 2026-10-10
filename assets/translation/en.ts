@@ -523,6 +523,22 @@ export const en = {
   loading_more: 'Loading more products…',
   no_more_products: 'No more products',
 
+  // variation management
+  variation_management: "Variation Management",
+  add_edit_manage_product_variation: "Add, edit, and manage product variations",
+  try_adjusting_your_search_or_filter: "Try adjusting your search or filter",
+  variation: "variation",
+  option: "option",
+  no_variations: "No variations",
+  variation_name: "Variation Name",
+  option_lg: "Option",
+  delete_variation: "Delete variation",
+  option_label: "Option Label",
+  delete_option: "Delete option",
+  no_options_add_one: "No options — add one to get started",
+  you_have_reached_the_end: "You've reached the end",
+  no_products_found: "No products found",
+
   // approve or reject modal
   are_you_sure_want_approve: "Are you sure you want to approve?",
 
