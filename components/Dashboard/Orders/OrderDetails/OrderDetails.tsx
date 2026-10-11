@@ -47,7 +47,7 @@ const formatCoord = (coords?: number[]) => {
 };
 
 export default function OrderDetails({ order }: IProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const router = useRouter();
 
   const containerVariants = {
@@ -119,7 +119,7 @@ export default function OrderDetails({ order }: IProps) {
                 <span>{t("created")}: {formatDate(order?.createdAt)}</span>
               </div>
               <div className="text-white/60 text-xs mt-0.5">
-                {t("updated")}: {formatDate(order?.updatedAt)} • _id: {order?._id || "N/A"}
+                {t("updated")}: {formatDate(order?.updatedAt)}
               </div>
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function OrderDetails({ order }: IProps) {
                   <div>
                     <span className="text-gray-500">{t("vendor_id")} / {t("user_id")}:</span>
                     <div className="text-xs text-gray-600 break-all">
-                      {order?.vendorId?._id || "N/A"} / {order?.vendorId?.userId || "N/A"}
+                      {order?.vendorId?.userId || "N/A"}
                     </div>
                   </div>
 
@@ -226,10 +226,8 @@ export default function OrderDetails({ order }: IProps) {
                       </div>
                       <div className="col-span-2">
                         <span className="text-gray-500">{t("business_type")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.businessType?.name?.en ||
-                          order?.vendorId?.businessDetails?.businessType?.name?.pt ||
-                          "N/A"}{" "}
-                        ({order?.vendorId?.businessDetails?.businessType?._id || "—"})
+                        {order?.vendorId?.businessDetails?.businessType?.name?.[lang] || "N/A"}{" "}
+                        {/* ({order?.vendorId?.businessDetails?.businessType?._id || "—"}) */}
                       </div>
                     </div>
                   </div>
@@ -315,10 +313,10 @@ export default function OrderDetails({ order }: IProps) {
                     </div>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <span className="text-gray-500">{t("customer_id")}:</span>
                     <div className="text-xs break-all">{order?.customerId?._id || "N/A"}</div>
-                  </div>
+                  </div> */}
 
                   {/* Current Session Location */}
                   {order?.customerId?.currentSessionLocation && (
@@ -615,7 +613,7 @@ export default function OrderDetails({ order }: IProps) {
                       <div>
                         <span className="text-gray-500">{t("user_id")}:</span>
                         <div className="break-all">
-                          {order.deliveryPartnerId._id} / {order.deliveryPartnerId.userId}
+                          {order.deliveryPartnerId.userId}
                         </div>
                       </div>
                       {order.deliveryPartnerId.currentSessionLocation && (
