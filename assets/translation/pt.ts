@@ -1519,6 +1519,7 @@ export const pt = {
   items_subtotal: "Subtotal dos Artigos",
   service_charge_vat_amount: "Valor de IVA da Taxa de Serviço",
   total_tax_amount: "Valor Total do Imposto",
+  delivery: "Entrega",
   delivery_vat_amount: "Valor de IVA da Entrega",
   total_delivery_charge: "Taxa Total de Entrega",
   distance: "Distância",

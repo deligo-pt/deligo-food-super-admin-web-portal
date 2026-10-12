@@ -1503,6 +1503,7 @@ export const en = {
   total_offer_discount: "Total Offer Discount",
   items_subtotal: "Items Subtotal",
   service_charge_vat_amount: "Service Charge VAT Amount",
+  delivery: "Delivery",
   total_tax_amount: "Total Tax Amount",
   delivery_vat_amount: "Delivery VAT Amount",
   total_delivery_charge: "Total Delivery Charge",
