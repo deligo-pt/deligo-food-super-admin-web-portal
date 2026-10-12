@@ -47,7 +47,7 @@ const formatCoord = (coords?: number[]) => {
 };
 
 export default function OrderDetails({ order }: IProps) {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const router = useRouter();
 
   const containerVariants = {
@@ -119,7 +119,7 @@ export default function OrderDetails({ order }: IProps) {
                 <span>{t("created")}: {formatDate(order?.createdAt)}</span>
               </div>
               <div className="text-white/60 text-xs mt-0.5">
-                {t("updated")}: {formatDate(order?.updatedAt)} • _id: {order?._id || "N/A"}
+                {t("updated")}: {formatDate(order?.updatedAt)}
               </div>
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function OrderDetails({ order }: IProps) {
                   <div>
                     <span className="text-gray-500">{t("vendor_id")} / {t("user_id")}:</span>
                     <div className="text-xs text-gray-600 break-all">
-                      {order?.vendorId?._id || "N/A"} / {order?.vendorId?.userId || "N/A"}
+                      {order?.vendorId?.userId || "N/A"}
                     </div>
                   </div>
 
@@ -226,10 +226,8 @@ export default function OrderDetails({ order }: IProps) {
                       </div>
                       <div className="col-span-2">
                         <span className="text-gray-500">{t("business_type")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.businessType?.name?.en ||
-                          order?.vendorId?.businessDetails?.businessType?.name?.pt ||
-                          "N/A"}{" "}
-                        ({order?.vendorId?.businessDetails?.businessType?._id || "—"})
+                        {order?.vendorId?.businessDetails?.businessType?.name?.[lang] || "N/A"}{" "}
+                        {/* ({order?.vendorId?.businessDetails?.businessType?._id || "—"}) */}
                       </div>
                     </div>
                   </div>
@@ -315,10 +313,10 @@ export default function OrderDetails({ order }: IProps) {
                     </div>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <span className="text-gray-500">{t("customer_id")}:</span>
                     <div className="text-xs break-all">{order?.customerId?._id || "N/A"}</div>
-                  </div>
+                  </div> */}
 
                   {/* Current Session Location */}
                   {order?.customerId?.currentSessionLocation && (
@@ -420,29 +418,55 @@ export default function OrderDetails({ order }: IProps) {
                 <TruckIcon className="w-5 h-5" />
                 <h3 className="font-semibold text-gray-900">{t("dispatch_information")}</h3>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                {/* Partner Pool */}
                 <div>
-                  <span className="text-gray-500 block text-xs mb-1">{t("dispatch_partner_pool")}</span>
-                  {order?.dispatchPartnerPool?.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {order.dispatchPartnerPool.map((id, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-gray-100 rounded text-xs break-all">
-                          {id}
-                        </span>
+                  <span className="text-gray-500 block text-xs mb-1">
+                    {t("dispatch_partner_pool")}
+                  </span>
+                  {Array.isArray(order?.dispatchPartnerPool) &&
+                    order.dispatchPartnerPool.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {order.dispatchPartnerPool.map((partner) => (
+                        <div
+                          key={partner._id || partner.userId}
+                          className="px-2.5 py-1 bg-gray-100 rounded-md text-xs"
+                        >
+                          <div className="font-medium text-gray-800">
+                            {partner.name?.en || partner.name?.pt || "—"}
+                          </div>
+                          <div className="text-[10px] text-gray-500 font-mono">
+                            {partner.userId}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   ) : (
                     <span className="text-gray-400">{t("empty")}</span>
                   )}
                 </div>
+
+                {/* Rejected Partner Pool */}
                 <div>
-                  <span className="text-gray-500 block text-xs mb-1">{t("dispatch_rejected_partner_pool")}</span>
-                  {order?.dispatchRejectedPartnerPool?.length > 0 ? (
-                    <div className="flex flex-wrap gap-1">
-                      {order.dispatchRejectedPartnerPool.map((id, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-red-50 text-red-700 rounded text-xs break-all">
-                          {id}
-                        </span>
+                  <span className="text-gray-500 block text-xs mb-1">
+                    {t("dispatch_rejected_partner_pool")}
+                  </span>
+                  {Array.isArray(order?.dispatchRejectedPartnerPool) &&
+                    order.dispatchRejectedPartnerPool.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {order.dispatchRejectedPartnerPool.map((partner) => (
+                        <div
+                          key={partner._id || partner.userId}
+                          className="px-2.5 py-1 bg-red-50 text-red-700 rounded-md text-xs"
+                        >
+                          <div className="font-medium">
+                            {partner.name?.en || partner.name?.pt || "—"}
+                          </div>
+                          <div className="text-[10px] text-red-500/80 font-mono">
+                            {partner.userId}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   ) : (
@@ -464,26 +488,67 @@ export default function OrderDetails({ order }: IProps) {
                     {t("status_history_activity") || "Status History & Activity"}
                   </h3>
                 </div>
+
                 <div className="space-y-3 pl-2 border-l-2 border-gray-100 ml-2">
-                  {order.statusHistory.map((history, idx) => (
-                    <div key={idx} className="relative pl-4 text-sm">
-                      <div className="absolute left-[-1.4rem] top-1.5 w-2.5 h-2.5 rounded-full bg-[#DC3173] ring-4 ring-white" />
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-semibold text-gray-900">
-                          {history.status?.replace(/_/g, " ")}
-                        </span>
-                        <span className="text-xs text-gray-400 whitespace-nowrap">
-                          {formatDate(history.timestamp)}
-                        </span>
+                  {order.statusHistory.map((history, idx) => {
+                    const status = (history.status || "").toUpperCase();
+
+                    // Decide who to show based on status
+                    let actorLabel: string | null = null;
+                    let actorName: string | null = null;
+                    let actorUserId: string | null = null;
+
+                    if (status === "PENDING") {
+                      actorLabel = "Customer";
+                      actorName = `${order.customerId?.name?.firstName || ""} ${order.customerId?.name?.lastName || ""}`.trim();
+                      actorUserId = order.customerId?.userId || null;
+                    } else if (status === "ACCEPTED") {
+                      actorLabel = "Vendor";
+                      actorName =
+                        order.vendorId?.businessDetails?.businessName ||
+                        `${order.vendorId?.name?.firstName || ""} ${order.vendorId?.name?.lastName || ""}`.trim();
+                      actorUserId = order.vendorId?.userId || null;
+                    } else if (
+                      ["PICKED_UP", "ON_THE_WAY", "DELIVERED"].includes(status)
+                    ) {
+                      actorLabel = "Rider";
+                      actorName = `${order.deliveryPartnerId?.name?.firstName || ""} ${order.deliveryPartnerId?.name?.lastName || ""}`.trim();
+                      actorUserId = order.deliveryPartnerId?.userId || null;
+                    }
+
+                    return (
+                      <div key={idx} className="relative pl-4 text-sm">
+                        <div className="absolute left-[-1.4rem] top-1.5 w-2.5 h-2.5 rounded-full bg-[#DC3173] ring-4 ring-white" />
+
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-gray-900">
+                            {history.status?.replace(/_/g, " ")}
+                          </span>
+                          <span className="text-xs text-gray-400 whitespace-nowrap">
+                            {formatDate(history.timestamp)}
+                          </span>
+                        </div>
+
+                        {/* Actor info only for specific statuses */}
+                        {actorLabel && (actorName || actorUserId) && (
+                          <div className="text-xs text-gray-500 mt-0.5">
+                            <span className="font-medium text-gray-600">{actorLabel}:</span>{" "}
+                            {actorName || "—"}
+                            {actorUserId && (
+                              <span className="ml-1.5 font-mono text-[10px] text-gray-400">
+                                ({actorUserId})
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Note (always show if present) */}
+                        {history.note && (
+                          <p className="text-xs text-gray-600 mt-0.5">{history.note}</p>
+                        )}
                       </div>
-                      {history.updatedBy && (
-                        <div className="text-xs text-gray-500">By: {history.updatedBy}</div>
-                      )}
-                      {history.note && (
-                        <p className="text-xs text-gray-600 mt-0.5">{history.note}</p>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </motion.div>
             )}
@@ -613,10 +678,8 @@ export default function OrderDetails({ order }: IProps) {
                         {order.deliveryPartnerId.role || "N/A"}
                       </div>
                       <div>
-                        <span className="text-gray-500">{t("user_id")}:</span>
-                        <div className="break-all">
-                          {order.deliveryPartnerId._id} / {order.deliveryPartnerId.userId}
-                        </div>
+                        <span className="text-gray-500">{t("user_id")}: </span> {" "}
+                        {order.deliveryPartnerId.userId}
                       </div>
                       {order.deliveryPartnerId.currentSessionLocation && (
                         <div className="mt-1">
@@ -673,7 +736,11 @@ export default function OrderDetails({ order }: IProps) {
                   </div>
                   <div>
                     <span className="text-gray-500 text-xs">{t("verified_by")}:</span>
-                    <div>{order.deliveryOtp.verifiedBy || "N/A"}</div>
+                    <div className="font-medium text-gray-900">
+                      {order.deliveryPartnerId.name?.firstName}{" "}
+                      {order.deliveryPartnerId.name?.lastName} {" "}
+                      ({order.deliveryPartnerId?.userId})
+                    </div>
                   </div>
                   <div>
                     <span className="text-gray-500 text-xs">{t("attempts")}:</span>
