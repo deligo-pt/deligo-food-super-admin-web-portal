@@ -84,12 +84,12 @@ export default function OrderItemsTable({ items }: IProps) {
                         <span className="font-medium text-gray-900">
                           {item?.name || "Unnamed Product"}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        {/* <span className="text-xs text-gray-400">
                           {t("product_id")}: {item.productId || "N/A"}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          {t("vendor_id")}: {item.vendorId || "N/A"}
-                        </span>
+                        </span> */}
+                        {/* <span className="text-xs text-gray-400">
+                          {t("vendor_id")}: { || "N/A"}
+                        </span> */}
                         {item.hasVariations && (
                           <span className="text-xs text-blue-600">
                             {t("variation_sku")}: {item.variationSku || "N/A"}

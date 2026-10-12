@@ -182,8 +182,22 @@ export interface TOrder {
   refundStatus: string;
   remarks: string;
   vendorInstructions: string;
-  dispatchPartnerPool: string[];
-  dispatchRejectedPartnerPool: string[];
+  dispatchPartnerPool: {
+    _id: string;
+    name: {
+      en: string;
+      pt: string;
+    };
+    userId: string;
+  }[] | [];
+  dispatchRejectedPartnerPool: {
+    _id: string;
+    name: {
+      en: string;
+      pt: string;
+    };
+    userId: string;
+  }[] | [];
   dispatchEscalatedAt: string | null;
   deliveryAddress: {
     street: string;
