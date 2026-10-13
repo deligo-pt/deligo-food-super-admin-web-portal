@@ -26,6 +26,7 @@ interface IProps {
   onOpenChange: (open: boolean) => void;
   status: "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED";
   userName: string;
+  branchName?: string;
   userId: string;
 }
 
@@ -34,6 +35,7 @@ export default function ApproveOrRejectModal({
   onOpenChange,
   status,
   userName,
+  branchName,
   userId,
 }: IProps) {
   const { t } = useTranslation();
@@ -139,7 +141,7 @@ export default function ApproveOrRejectModal({
               {status === "REJECTED" && t("reject")}
               {status === "BLOCKED" && t("block")}
               {status === "UNBLOCKED" && t("unblock")}
-              {userName ? ` - ${userName}` : ""}
+              {userName ? ` - ${branchName ? `${branchName} (${userName})` : userName}` : ""}
             </DialogTitle>
             <DialogDescription>
               {status === "APPROVED"

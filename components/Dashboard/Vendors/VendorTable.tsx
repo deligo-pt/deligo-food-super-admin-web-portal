@@ -16,6 +16,7 @@ interface IProps {
   handleStatusInfo: (
     vendorId: string,
     vendorName: string,
+    branchName: string,
     status: string,
   ) => void;
   handleDeleteId: (id: string) => void;
