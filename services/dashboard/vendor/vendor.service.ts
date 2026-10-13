@@ -1,10 +1,12 @@
 "use server";
 
 import { USER_ROLE } from "@/consts/user.const";
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
 import { catchAsync } from "@/utils/catchAsync";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export const getAllVendorsReq = async (
   queries: Record<string, string | undefined>,
@@ -53,4 +55,44 @@ export const getSingleVendorReq = async (id: string) => {
   if (result?.success) return result.data;
 
   return {};
+};
+
+export const getAllBranches = async (id: string, query?: string,) => {
+  const result = await catchAsync(async () => {
+    const response = await serverFetch.get(
+      `/vendors/${id}/branches${query ? `?${query}` : ""}`,
+    );
+
+    return await response.json();
+  });
+
+  return result;
+};
+
+// product.service.ts
+export const copyProductsToSubVendors = async (payload: {
+  sourceVendorId: string;
+  productIds?: string[];
+  targetSubVendorIds?: string[];
+  copyAllProducts?: boolean;
+  copyToAllTargetSubVendors?: boolean;
+}) => {
+  const result = await catchAsync(async () => {
+    const response = await serverFetch.post(
+      `/products/copy-to-sub-vendors`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }
+    );
+    return await response.json();
+  });
+
+  if (result.success) {
+    revalidateTag("products", {});
+    revalidatePath("/admin/vendor/branch/all");
+  };
+
+  return result;
 };
