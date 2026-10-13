@@ -155,6 +155,7 @@ export const getAllProductCategories = async (queryString?: string) => {
     const res = await serverFetch.get(url, {
       next: {
         tags: ["product-category"],
+        revalidate: 120,
       },
     });
     return await res.json();
