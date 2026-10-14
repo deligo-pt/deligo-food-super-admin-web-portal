@@ -30,6 +30,7 @@ import { useEffect, useState } from "react";
 
 import TopbarIcons from "@/components/adminTopbar/TopbarIcons";
 import { Input } from "@/components/ui/input";
+import { useSubmissionStats } from "@/hooks/use-submission-stats";
 import { useTranslation } from "@/hooks/use-translation";
 import { TAdmin } from "@/types/admin.type";
 import Image from "next/image";
@@ -40,14 +41,45 @@ interface IProps {
   admin: TAdmin;
 }
 
+type TMenuItem = {
+  name: string;
+  path: string;
+  badge?: number;
+};
+
+type TMenu = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  path?: string;
+  badge?: number;
+  items?: TMenuItem[];
+};
+
 const PRIMARY = "#DC3173";
+
+function Badge({ count, className = "" }: { count?: number; className?: string }) {
+  if (!count || count <= 0) return null;
+  return (
+    <span
+      className={`min-w-5 h-5 px-1.5 rounded-full text-[11px] font-semibold text-white flex items-center justify-center shrink-0 ${className}`}
+      style={{ background: PRIMARY }}
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+const menuBadge = (menu: TMenu): number =>
+  menu.badge ?? menu.items?.reduce((sum, i) => sum + (i.badge ?? 0), 0) ?? 0;
 
 export default function Sidebar({ open, setOpen, admin }: IProps) {
   const { t } = useTranslation();
   const pathname = usePathname();
   const [searchTerm, setSearchTerm] = useState("");
+  const { stats } = useSubmissionStats();
 
-  const MENU = [
+  const MENU: TMenu[] = [
     {
       id: "dashboard",
       title: t("dashboard"),
@@ -71,9 +103,17 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("add_vendor"), path: "/admin/add-vendor" },
         { name: t("all_vendors"), path: "/admin/all-vendors" },
         { name: t("active_vendors"), path: "/admin/active-vendors" },
-        { name: t("pending_approvals"), path: "/admin/pending-approvals" },
+        {
+          name: t("pending_approvals"),
+          path: "/admin/pending-approvals",
+          badge: stats.vendor,
+        },
         { name: t("suspended_vendors"), path: "/admin/suspended-vendors" },
-        { name: t("vendor_branches"), path: "/admin/vendor-branch/all" },
+        {
+          name: t("vendor_branches"),
+          path: "/admin/vendor-branch/all",
+          badge: stats.subVendor,
+        },
         { name: t("vendor_payouts"), path: "/admin/vendor-payouts" },
         {
           name: t("vendor_performance_analytics"),
@@ -88,6 +128,9 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       id: "fleets",
       title: t("fleet_managers"),
       icon: <Users size={18} />,
+      // Fleet has no dedicated "pending" page in the menu, so the badge
+      // sits on the parent. Move it to an item once such a page exists.
+      badge: stats.fleetManager,
       items: [
         { name: t("add_fleet_manager"), path: "/admin/add-fleet-manager" },
         { name: t("all_fleet_managers"), path: "/admin/all-fleet-managers" },
@@ -142,6 +185,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         {
           name: t("pending_approvals"),
           path: "/admin/delivery-partner-onboarding-requests",
+          badge: stats.deliveryPartner,
         },
         {
           name: t("suspended_riders"),
@@ -185,35 +229,20 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       ],
     },
     {
-      id: 'cuisine',
+      id: "cuisine",
       title: t("cuisine"),
       icon: <Grid size={18} />,
       items: [
         {
           name: t("create_cuisine"),
-          path: '/admin/cuisine/create'
+          path: "/admin/cuisine/create",
         },
         {
           name: t("all_cuisines"),
-          path: '/admin/cuisine/all'
+          path: "/admin/cuisine/all",
         },
-      ]
+      ],
     },
-    // {
-    //   id: "product-categories",
-    //   title: t("product_categories"),
-    //   icon: <SquareChartGantt size={18} />,
-    //   items: [
-    //     {
-    //       name: t("add_product_categories"),
-    //       path: "/admin/product-categories/add",
-    //     },
-    //     {
-    //       name: t("all_product_categories"),
-    //       path: "/admin/product-categories",
-    //     },
-    //   ],
-    // },
     {
       id: "orders",
       title: t("orders_management"),
@@ -235,7 +264,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       title: t("payments_and_earnings"),
       icon: <BadgeEuro size={18} />,
       items: [
-        // { name: t("payment_disputes"), path: "/admin/payment-disputes" },
         { name: t("platform_earnings"), path: "/admin/platform-earnings" },
         { name: t("transaction_history"), path: "/admin/transaction-history" },
         {
@@ -268,7 +296,6 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("all_offers"), path: "/admin/all-offers" },
         { name: t("active_campaigns"), path: "/admin/active-campaigns" },
         { name: t("expired_offers"), path: "/admin/expired-offers" },
-        // { name: t("coupon_analytics"), path: "/admin/coupon-analytics" },
         {
           name: t("sponsorships"),
           path: "/admin/sponsorships",
@@ -305,6 +332,9 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       id: "admin-management",
       title: t("admin_management"),
       icon: <ShieldUser size={18} />,
+      // stats.admin: admin submissions. No pending-admin page in this menu yet,
+      // so it is shown on the parent only.
+      badge: stats.admin,
       items: [
         { name: t("all_admins"), path: "/admin/all-admins" },
         { name: t("activity_logs"), path: "/admin/activity-logs" },
@@ -402,8 +432,16 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         </div>
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0 relative z-1001">
           <TopbarIcons admin={admin} />
-          <button onClick={() => setMobileOpen(true)}>
+          <button onClick={() => setMobileOpen(true)} className="relative">
             <Menu size={24} className="text-gray-700" />
+            {stats.total > 0 && (
+              <span
+                className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full text-[10px] font-semibold text-white flex items-center justify-center ring-2 ring-white"
+                style={{ background: PRIMARY }}
+              >
+                {stats.total > 99 ? "99+" : stats.total}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -459,75 +497,90 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          {filteredMenu.map((menu) => (
-            <div key={menu.id} className="mb-1">
-              {menu.path ? (
-                <Link
-                  href={menu.path}
-                  className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${pathname === menu.path
-                    ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                    : "hover:bg-pink-100"
-                    } ${!open ? "justify-center" : ""}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="text-pink-600">{menu.icon}</div>
-                    {open && (
-                      <span className="font-medium text-gray-700">
-                        {menu.title}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              ) : (
-                <>
-                  <button
-                    onClick={() => toggleExpand(menu.id)}
-                    className={`flex items-center w-full justify-between p-2 rounded-lg hover:bg-pink-100 transition-colors  ${!open ? "justify-center" : ""}`}
+          {filteredMenu.map((menu) => {
+            const count = menuBadge(menu);
+            return (
+              <div key={menu.id} className="mb-1">
+                {menu.path ? (
+                  <Link
+                    href={menu.path}
+                    className={`flex items-center w-full justify-between p-2 rounded-lg transition-colors ${pathname === menu.path
+                      ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                      : "hover:bg-pink-100"
+                      } ${!open ? "justify-center" : ""}`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="text-pink-600">{menu.icon}</div>
                       {open && (
-                        <span className="font-medium text-gray-700 text-left">
+                        <span className="font-medium text-gray-700">
                           {menu.title}
                         </span>
                       )}
                     </div>
-                    {menu.items && open && (
-                      <motion.div
-                        animate={{ rotate: expanded[menu.id] ? 180 : 0 }}
-                      >
-                        <ChevronDown size={16} />
-                      </motion.div>
-                    )}
-                  </button>
-
-                  <AnimatePresence>
-                    {expanded[menu.id] && open && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="pl-9 mt-1 flex flex-col gap-1"
-                      >
-                        {menu.items?.map((sub) => (
-                          <Link
-                            key={sub.name}
-                            href={sub.path}
-                            className={`text-sm px-2 py-1 rounded-md transition-all duration-300 ${pathname === sub.path
-                              ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
-                              : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
-                              }`}
+                  </Link>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => toggleExpand(menu.id)}
+                      className={`flex items-center w-full justify-between p-2 rounded-lg hover:bg-pink-100 transition-colors  ${!open ? "justify-center" : ""}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="text-pink-600 relative">
+                          {menu.icon}
+                          {!open && count > 0 && (
+                            <span
+                              className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ring-2 ring-white"
+                              style={{ background: PRIMARY }}
+                            />
+                          )}
+                        </div>
+                        {open && (
+                          <span className="font-medium text-gray-700 text-left">
+                            {menu.title}
+                          </span>
+                        )}
+                      </div>
+                      {menu.items && open && (
+                        <div className="flex items-center gap-2">
+                          <Badge count={count} />
+                          <motion.div
+                            animate={{ rotate: expanded[menu.id] ? 180 : 0 }}
                           >
-                            {sub.name}
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </>
-              )}
-            </div>
-          ))}
+                            <ChevronDown size={16} />
+                          </motion.div>
+                        </div>
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {expanded[menu.id] && open && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="pl-9 mt-1 flex flex-col gap-1"
+                        >
+                          {menu.items?.map((sub) => (
+                            <Link
+                              key={sub.name + sub.path}
+                              href={sub.path}
+                              className={`flex items-center justify-between gap-2 text-sm px-2 py-1 rounded-md transition-all duration-300 ${pathname === sub.path
+                                ? "bg-linear-to-r from-pink-200 to-pink-100 text-pink-700 font-semibold"
+                                : "text-gray-600 hover:text-pink-600 hover:bg-pink-50"
+                                }`}
+                            >
+                              <span>{sub.name}</span>
+                              <Badge count={sub.badge} className="scale-90" />
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         {open && (
@@ -599,11 +652,14 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                           <div className="text-pink-600">{menu.icon}</div>
                           <span>{menu.title}</span>
                         </div>
-                        <ChevronDown
-                          size={16}
-                          className={`transition-transform ${expanded[menu.id] ? "rotate-180" : ""
-                            }`}
-                        />
+                        <div className="flex items-center gap-2">
+                          <Badge count={menuBadge(menu)} />
+                          <ChevronDown
+                            size={16}
+                            className={`transition-transform ${expanded[menu.id] ? "rotate-180" : ""
+                              }`}
+                          />
+                        </div>
                       </button>
 
                       <AnimatePresence>
@@ -616,15 +672,16 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
                           >
                             {menu.items?.map((sub) => (
                               <Link
-                                key={sub.name}
+                                key={sub.name + sub.path}
                                 href={sub.path}
                                 onClick={() => setMobileOpen(false)}
-                                className={`text-sm py-1 transition-all ${pathname === sub.path
+                                className={`flex items-center justify-between gap-2 text-sm py-1 transition-all ${pathname === sub.path
                                   ? "text-pink-700 font-semibold"
                                   : "text-gray-600 hover:text-pink-600"
                                   }`}
                               >
-                                {sub.name}
+                                <span>{sub.name}</span>
+                                <Badge count={sub.badge} className="scale-90" />
                               </Link>
                             ))}
                           </motion.div>
