@@ -399,6 +399,7 @@ export const en = {
   edit_vendor_details: "Edit Vendor Details",
   update_vendor_details_information: "Update vendor details and information",
   add_product: "Add Product",
+  all_branches: "All Branches",
   // add-ons page
   inc_vat: "Inc. VAT",
   no_options_added: "No options added in this group yet.",

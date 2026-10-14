@@ -406,6 +406,7 @@ export const pt = {
   edit_vendor_details: "Editar Detalhes do Vendedor",
   update_vendor_details_information: "Atualizar dados e informações do vendedor",
   add_product: "Adicionar Produto",
+  all_branches: "Todas as Filiais",
   // add-ons page
   inc_vat: "Com IVA",
   no_options_added: "Ainda não foram adicionadas opções a este grupo.",
