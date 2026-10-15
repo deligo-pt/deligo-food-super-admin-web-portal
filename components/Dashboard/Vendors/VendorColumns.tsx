@@ -25,6 +25,7 @@ interface GetVendorColumnsParams {
     handleStatusInfo: (
         vendorId: string,
         vendorName: string,
+        branchName: string,
         status: string,
     ) => void;
     handleDeleteId: (id: string) => void;
@@ -111,6 +112,7 @@ export function getVendorColumns({
                                         handleStatusInfo(
                                             vendor.userId as string,
                                             vendor.businessDetails?.businessName as string,
+                                            vendor.businessDetails?.branchName as string,
                                             "APPROVED",
                                         )
                                     }
@@ -125,6 +127,7 @@ export function getVendorColumns({
                                         handleStatusInfo(
                                             vendor.userId as string,
                                             vendor.businessDetails?.businessName as string,
+                                            vendor.businessDetails?.branchName as string,
                                             "REJECTED",
                                         )
                                     }
@@ -139,6 +142,7 @@ export function getVendorColumns({
                                         handleStatusInfo(
                                             vendor.userId as string,
                                             vendor.businessDetails?.businessName as string,
+                                            vendor.businessDetails?.branchName as string,
                                             "BLOCKED",
                                         )
                                     }
@@ -153,6 +157,7 @@ export function getVendorColumns({
                                         handleStatusInfo(
                                             vendor.userId as string,
                                             vendor.businessDetails?.businessName as string,
+                                            vendor.businessDetails?.branchName as string,
                                             "UNBLOCKED",
                                         )
                                     }

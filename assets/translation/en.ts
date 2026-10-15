@@ -399,6 +399,7 @@ export const en = {
   edit_vendor_details: "Edit Vendor Details",
   update_vendor_details_information: "Update vendor details and information",
   add_product: "Add Product",
+  all_branches: "All Branches",
   // add-ons page
   inc_vat: "Inc. VAT",
   no_options_added: "No options added in this group yet.",
@@ -539,8 +540,14 @@ export const en = {
   you_have_reached_the_end: "You've reached the end",
   no_products_found: "No products found",
 
+  // manage products
+  copy_to_branch: "Copy to Branch",
+  select_a_branch_to_copy: "Select a branch to copy this product",
+  copy_product: "Copy Product",
+
   // approve or reject modal
   are_you_sure_want_approve: "Are you sure you want to approve?",
+  parent_vendor: "Parent Vendor",
 
   // pending approvals
   pending_vendor_approvals: "Pending Vendor Approvals",
@@ -688,6 +695,7 @@ export const en = {
   submit_branch: "Submit Branch",
   add_branch: "Add Branch",
   manage_all_registered_vendor_branches: "Manage all registered vendor branches",
+  no_branches_found: "No branches found",
 
   // vendor-payouts
   manage_all_vendor_payouts_here: "Manage all vendor payouts here",
