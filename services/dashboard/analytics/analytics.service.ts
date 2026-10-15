@@ -1,5 +1,6 @@
 "use server";
 
+import { serverFetch } from "@/lib/fetchHelper";
 import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TAnalytics } from "@/types/analytics.type";
@@ -159,4 +160,27 @@ export const getTopVendorsReq = async () => {
   if (result?.success) return result.data;
 
   return {};
+};
+
+export type TSubmissionStatsResponse = {
+  success: boolean;
+  message?: string;
+  data?: {
+    admin: { submitted: number };
+    vendor: { submitted: number };
+    subVendor: { submitted: number };
+    deliveryPartner: { submitted: number };
+    fleetManager: { submitted: number };
+    totals: { submitted: number };
+  };
+};
+
+export const getSubmissionStats = async () => {
+  const result = await catchAsync<TSubmissionStatsResponse>(async () => {
+    const response = await serverFetch.get(`/admins/submission-stats`);
+
+    return await response.json();
+  });
+
+  return result;
 };

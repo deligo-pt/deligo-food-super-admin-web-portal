@@ -39,6 +39,7 @@ export default function Vendors({
   const [statusInfo, setStatusInfo] = useState({
     vendorId: "",
     vendorName: "",
+    branchName: "",
     status: "",
   });
   const [deleteId, setDeleteId] = useState("");
@@ -47,8 +48,9 @@ export default function Vendors({
   const handleStatusInfo = (
     vendorId: string,
     vendorName: string,
+    branchName: string,
     status: string,
-  ) => setStatusInfo({ vendorId, vendorName, status });
+  ) => setStatusInfo({ vendorId, vendorName, branchName, status });
 
   const closeDeleteModal = (open: boolean) => {
     if (!open) {
@@ -161,13 +163,14 @@ export default function Vendors({
       <ApproveOrRejectModal
         open={statusInfo?.vendorId?.length > 0}
         onOpenChange={() =>
-          setStatusInfo({ vendorId: "", status: "", vendorName: "" })
+          setStatusInfo({ vendorId: "", status: "", vendorName: "", branchName: "" })
         }
         status={
           statusInfo.status as "APPROVED" | "REJECTED" | "BLOCKED" | "UNBLOCKED"
         }
         userId={statusInfo.vendorId}
         userName={statusInfo.vendorName}
+        branchName={statusInfo.branchName}
       />
     </div>
   );

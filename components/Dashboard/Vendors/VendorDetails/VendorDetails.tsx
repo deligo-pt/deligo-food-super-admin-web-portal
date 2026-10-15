@@ -15,6 +15,7 @@ import { USER_ROLE, USER_STATUS } from "@/consts/user.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { resendOtpReq } from "@/services/auth/otp.service";
+import { TMeta } from "@/types";
 import { TVendor } from "@/types/user.type";
 import { format, parse } from "date-fns";
 import { motion } from "framer-motion";
@@ -37,12 +38,19 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { getVendorBranchColumns } from "../VendorBranchColumns";
+import ReusableTable from "@/components/common/ReusableTable";
+import PaginationComponent from "@/components/Filtering/PaginationComponent";
 
 interface IProps {
   vendor: TVendor;
+  branchesResult: {
+    data: TVendor[];
+    meta: TMeta;
+  }
 }
 
-export default function VendorDetails({ vendor }: IProps) {
+export default function VendorDetails({ vendor, branchesResult }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -121,6 +129,11 @@ export default function VendorDetails({ vendor }: IProps) {
       setIsSubmitting(false);
     }
   };
+
+  const columns = getVendorBranchColumns({
+    t,
+    router,
+  });
 
   return (
     <div>
@@ -559,6 +572,39 @@ export default function VendorDetails({ vendor }: IProps) {
               </p>
             )}
           </AgentOrVendorSection>
+
+          {vendor?.role === "VENDOR" && <AgentOrVendorSection
+            title={t("all_branches")}
+            icon={<FileTextIcon size={20} />}
+            defaultOpen={true}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
+            >
+              <ReusableTable
+                data={branchesResult?.data}
+                meta={branchesResult?.meta}
+                columns={columns}
+                getRowKey={(row) => row._id}
+                emptyMessage={t("no_vendors_no_branches_foundfound")}
+              />
+            </motion.div>
+
+            {/* Pagination */}
+            {!!branchesResult?.meta?.totalPage && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="px-4 md:px-6 mt-5"
+              >
+                <PaginationComponent
+                  totalPages={branchesResult?.meta?.totalPage as number}
+                />
+              </motion.div>
+            )}
+          </AgentOrVendorSection>}
         </div>
 
         {/* buttons */}

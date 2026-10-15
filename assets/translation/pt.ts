@@ -406,6 +406,7 @@ export const pt = {
   edit_vendor_details: "Editar Detalhes do Vendedor",
   update_vendor_details_information: "Atualizar dados e informações do vendedor",
   add_product: "Adicionar Produto",
+  all_branches: "Todas as Filiais",
   // add-ons page
   inc_vat: "Com IVA",
   no_options_added: "Ainda não foram adicionadas opções a este grupo.",
@@ -544,8 +545,14 @@ export const pt = {
   you_have_reached_the_end: "Chegou ao fim",
   no_products_found: "Nenhum produto encontrado",
 
+  // manage products
+  copy_to_branch: "Copiar para Filial",
+  select_a_branch_to_copy: "Selecione uma filial para copiar este produto",
+  copy_product: "Copiar Produto",
+
   // approve or reject modal
   are_you_sure_want_approve: "Tem certeza de que deseja aprovar?",
+  parent_vendor: "Comerciante Principal",
 
   // pending approvals
   pending_vendor_approvals: "Aprovações de vendedores pendentes",
@@ -694,6 +701,7 @@ export const pt = {
   submit_branch: "Submeter Filial",
   add_branch: "Adicionar Filial",
   manage_all_registered_vendor_branches: "Gerir todas as filiais de fornecedores registadas",
+  no_branches_found: "Nenhuma filial encontrada",
 
   // vendor-payouts
   manage_all_vendor_payouts_here: "Gerencie todos os pagamentos dos vendedores aqui",

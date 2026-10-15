@@ -4,8 +4,9 @@ import { useTranslation } from "@/hooks/use-translation";
 import { useStore } from "@/store/store";
 import { TProduct } from "@/types/product.type";
 import { getProductImageUrl } from "@/utils/product.utils";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Clock, ShoppingBag, Star } from "lucide-react";
+import { Clock, ShoppingBag, Star, Check } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -13,14 +14,27 @@ interface IProps {
   product: TProduct;
   onDelete: (id: string, type: string) => void;
   onEdit?: (product: TProduct) => void;
+  // Selection mode
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }
 
-export default function ProductCard({ product, onDelete, onEdit }: IProps) {
+export default function ProductCard({
+  product,
+  onDelete,
+  onEdit,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect,
+}: IProps) {
   const { t } = useTranslation();
   const { lang } = useStore();
   const router = useRouter();
   const pathname = usePathname();
-  const isAllProductsPage = pathname === "/admin/all-products" || pathname.startsWith("/admin/all-products/");
+  const isAllProductsPage =
+    pathname === "/admin/all-products" ||
+    pathname.startsWith("/admin/all-products/");
 
   const statusColors = {
     ACTIVE: "bg-green-100 text-green-800",
@@ -34,13 +48,10 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
     Limited: "bg-yellow-100 text-yellow-800",
   };
 
-  // VAT helpers (supports common field names)
   const taxPercentage = product.pricing?.taxRate ?? null;
   const taxAmount = product.pricing?.taxAmount ?? null;
-
   const hasTax = taxAmount !== null && taxAmount !== undefined;
 
-  // Description handling: fixed length + ellipsis, or fallback text
   const rawDescription = product.description?.[lang]?.trim() || "";
   const maxDescLength = 90;
   const displayDescription =
@@ -50,32 +61,38 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
         : rawDescription
       : "No description provided";
 
-  // inside component:
   const imageUrl = getProductImageUrl(product);
 
   return (
     <motion.div
-      className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 flex flex-col h-105"
-      initial={{
-        opacity: 0,
-        y: 20,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.3,
-      }}
-      whileHover={{
-        y: -5,
-        boxShadow: "0 10px 20px rgba(220, 49, 115, 0.15)",
-        transition: {
-          duration: 0.2,
-        },
-      }}
+      className={cn(
+        "bg-white rounded-lg shadow-md overflow-hidden border flex flex-col h-105 transition-all",
+        isSelectionMode && isSelected
+          ? "border-[#DC3173] ring-2 ring-[#DC3173]/20"
+          : "border-gray-100"
+      )}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={
+        isSelectionMode
+          ? undefined
+          : {
+            y: -5,
+            boxShadow: "0 10px 20px rgba(220, 49, 115, 0.15)",
+            transition: { duration: 0.2 },
+          }
+      }
+      onClick={
+        isSelectionMode
+          ? (e) => {
+            e.stopPropagation();
+            onToggleSelect?.();
+          }
+          : undefined
+      }
     >
-      {/* Fixed image height */}
+      {/* Image */}
       <div className="relative h-48 shrink-0 flex items-center justify-center overflow-hidden">
         {imageUrl ? (
           <Image
@@ -92,7 +109,9 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
         )}
 
         <div
-          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[product.isDeleted ? "DELETED" : product.meta.status]
+          className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[
+            product.isDeleted ? "DELETED" : product.meta.status
+            ]
             }`}
         >
           {product.isDeleted ? "DELETED" : product.meta.status}
@@ -103,9 +122,32 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
             {product.pricing.discount} % OFF
           </div>
         )}
+
+        {/* Selection checkbox overlay (top-right when no discount, else bottom-right of image) */}
+        {isSelectionMode && (
+          <div
+            className={cn(
+              "absolute z-10",
+              (product?.pricing?.discount ?? 0) > 0
+                ? "bottom-2 right-2"
+                : "top-2 right-2"
+            )}
+          >
+            <div
+              className={cn(
+                "w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors shadow-sm",
+                isSelected
+                  ? "bg-[#DC3173] border-[#DC3173] text-white"
+                  : "bg-white/90 border-gray-300"
+              )}
+            >
+              {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Content area – grows and pushes buttons to bottom */}
+      {/* Content */}
       <div className="p-2 flex flex-col flex-1 min-h-0">
         <div className="flex justify-between items-start mb-2 shrink-0">
           <h3 className="text-lg font-bold text-gray-900 truncate pr-2">
@@ -122,12 +164,11 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
           </div>
         </div>
 
-        {/* Fixed-height description area */}
         <p className="text-gray-600 text-sm mb-3 h-10 line-clamp-2 overflow-hidden shrink-0">
           {displayDescription}
         </p>
 
-        {/* Price + VAT section */}
+        {/* Price + VAT */}
         <div className="mb-3 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
@@ -153,13 +194,11 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
                   <span className="font-medium text-gray-600">
                     {t("inc_vat")}
                   </span>
-
                   {taxPercentage !== null && taxPercentage !== undefined && (
                     <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded">
                       {taxPercentage}%
                     </span>
                   )}
-
                   {taxAmount !== null && taxAmount !== undefined && (
                     <span>
                       ({product.pricing.currency}{" "}
@@ -196,52 +235,81 @@ export default function ProductCard({ product, onDelete, onEdit }: IProps) {
           </div>
         )}
 
-        {/* Buttons always pinned to the bottom */}
+        {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto shrink-0">
-          <div className="text-xs text-gray-500 truncate pr-2">
-            {product.vendorId?.vendorName}
-          </div>
-          <div className="flex space-x-2 shrink-0">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() =>
-                router.push(`/admin/all-products/${product.productId}`)
-              }
-              className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
-            >
-              {t("view")}
-            </motion.button>
-            {!isAllProductsPage && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => onEdit?.(product)}
-                className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
+          {isSelectionMode ? (
+            /* Selection mode: only show the checkbox + selected label */
+            <div className="flex items-center justify-between w-full">
+              <span className="text-xs text-gray-500 truncate pr-2">
+                {product.vendorId?.vendorName}
+              </span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleSelect?.();
+                }}
+                className={cn(
+                  "w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors",
+                  isSelected
+                    ? "bg-[#DC3173] border-[#DC3173] text-white"
+                    : "border-gray-300 hover:border-[#DC3173] bg-white"
+                )}
               >
-                {t("edit")}
-              </motion.button>
-            )}
-            {!product?.isDeleted ? (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => onDelete(product.productId, "soft")}
-                className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
-              >
-                {t("soft_delete")}
-              </motion.button>
-            ) : (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => onDelete(product.productId, "permanent")}
-                className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
-              >
-                {t("permanent_delete")}
-              </motion.button>
-            )}
-          </div>
+                {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+              </button>
+            </div>
+          ) : (
+            /* Normal mode: View / Edit / Delete */
+            <>
+              <div className="text-xs text-gray-500 truncate pr-2">
+                {product.vendorId?.vendorName}
+              </div>
+              <div className="flex space-x-2 shrink-0">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() =>
+                    router.push(`/admin/all-products/${product.productId}`)
+                  }
+                  className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
+                >
+                  {t("view")}
+                </motion.button>
+
+                {!isAllProductsPage && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onEdit?.(product)}
+                    className="text-xs px-3 py-1 rounded-md border border-[#DC3173] text-[#DC3173] hover:bg-[#DC3173] hover:text-white transition-colors"
+                  >
+                    {t("edit")}
+                  </motion.button>
+                )}
+
+                {!product?.isDeleted ? (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onDelete(product.productId, "soft")}
+                    className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+                  >
+                    {t("soft_delete")}
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onDelete(product.productId, "permanent")}
+                    className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+                  >
+                    {t("permanent_delete")}
+                  </motion.button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </motion.div>
