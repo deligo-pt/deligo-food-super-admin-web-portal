@@ -46,6 +46,23 @@ export const getAllSdrDeposits = async (queryString?: string) => {
 };
 
 
+// GET EFFECTIVE SDR DEPOSITS
+export const getAllEffectiveSdrDeposits = async () => {
+    const url = `/sdr-deposits/effective`;
+
+    const result = await catchAsync(async () => {
+        const res = await serverFetch.get(url, {
+            next: {
+                tags: ["sdr-deposits"],
+            },
+        });
+        return await res.json();
+    });
+
+    return result;
+};
+
+// cancel non-effective sdr
 export const cancelSdrDeposit = async (id: string) => {
     const result = await catchAsync(async () => {
         const res = await serverFetch.delete(`/sdr-deposits/${id}`);

@@ -16,3 +16,12 @@ export type TSdrDeposit = {
     state: TSdrDepositState;
     __v?: number;
 };
+
+export type TEffectiveSdrDeposit = {
+    isActive: boolean;
+    depositAmount: number;
+    currency: string;
+    source: "SCHEDULE" | "MANUAL" | string;
+    depositId: string;
+    effectiveFrom: string; // ISO datetime
+};
