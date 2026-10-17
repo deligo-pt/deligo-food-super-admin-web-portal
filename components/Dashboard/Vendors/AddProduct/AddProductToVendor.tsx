@@ -129,6 +129,7 @@ export function AddProductToVendor({
             addonGroups: [],
             variations: [],
             isFeatured: false,
+            sdrApplicable: false,
             isAvailableForPreOrder: false,
             isActive: false,
             businessTypeSlug,
@@ -199,43 +200,6 @@ export function AddProductToVendor({
                     ? data.image.trim()
                     : "";
 
-            // If no image → upload default
-            // if (!imageUrl) {
-            //     try {
-            //         const imagePath = "/defaults/dl1.png";
-            //         const response = await fetch(imagePath, { cache: "no-store" });
-            //         const blob = await response.blob();
-
-            //         if (blob.size === 0) {
-            //             throw new Error(
-            //                 `Default image fetched with 0 bytes — check the asset path: ${imagePath}`
-            //             );
-            //         }
-
-            //         const file = new window.File(
-            //             [blob],
-            //             imagePath.split("/").pop() ?? "default.png",
-            //             { type: blob.type || "image/png" }
-            //         );
-
-            //         const uploadResult = await uploadImagesReq([file]);
-
-            //         if (!uploadResult?.success || !uploadResult?.data?.length) {
-            //             toast.error(
-            //                 uploadResult?.message || "Default image upload failed!",
-            //                 { id: toastId }
-            //             );
-            //             return;
-            //         }
-
-            //         imageUrl = uploadResult.data[0];
-            //     } catch (err) {
-            //         console.error("Default image error:", err);
-            //         toast.error("Failed to load default product image", { id: toastId });
-            //         return;
-            //     }
-            // }
-
             // Translate + build payload
             const translated = await translateObject(data, lang);
 
@@ -253,7 +217,7 @@ export function AddProductToVendor({
                 ...(data.additionalCategories && {
                     additionalCategories: data.additionalCategories,
                 }),
-                image: imageUrl,
+                ...(imageUrl && { image: imageUrl }),
                 pricing: {
                     price: data.price,
                     discountType: data.discountType,
@@ -263,6 +227,9 @@ export function AddProductToVendor({
                 },
                 addonGroups: data.addonGroups,
                 variations: translated.variations,
+                sdr: {
+                    applicable: data.sdrApplicable ?? false
+                },
                 meta: {
                     isFeatured: data.isFeatured,
                     isAvailableForPreOrder: data.isAvailableForPreOrder,

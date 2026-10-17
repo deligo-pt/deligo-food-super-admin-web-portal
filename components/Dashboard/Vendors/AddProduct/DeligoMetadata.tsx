@@ -86,6 +86,40 @@ const DeligoMetadata = ({ form }: IProps) => {
 
                 <FormField
                     control={form.control}
+                    name="sdrApplicable"
+                    render={({ field }) => (
+                        <FormItem className="flex items-center justify-between gap-3">
+                            <div className="space-y-1">
+                                <FormLabel
+                                    htmlFor="sdrApplicable"
+                                    className="text-sm font-medium text-gray-700"
+                                >
+                                    {t("sdr_container_deposit")}
+                                </FormLabel>
+
+                                <p className="text-sm text-muted-foreground">
+                                    {field.value
+                                        ? t("sdr_helper_active") ||
+                                        "For bottles and cans. Customers pay this deposit per unit, on top of the price."
+                                        : t("sdr_helper_inactive") ||
+                                        "For bottles and cans. SDR is not active right now — the deposit is charged once it is switched on."}
+                                </p>
+                            </div>
+                            <FormControl>
+                                <Switch
+                                    id="sdrApplicable"
+                                    checked={!!field.value}
+                                    onCheckedChange={field.onChange}
+                                    className="data-[state=checked]:bg-[#DC3173]"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
                     name="isActive"
                     render={({ field }) => (
                         <FormItem className="flex items-center justify-between gap-3">

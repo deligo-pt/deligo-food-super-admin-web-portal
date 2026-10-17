@@ -249,8 +249,8 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
           onDragOver={handleDrag}
           onDrop={handleDrop}
           className={`relative border-2 border-dashed rounded-lg p-8 text-center ${dragActive
-              ? "border-[#DC3173] bg-pink-50"
-              : "border-gray-300 hover:border-gray-400"
+            ? "border-[#DC3173] bg-pink-50"
+            : "border-gray-300 hover:border-gray-400"
             } transition-colors duration-200`}
         >
           <motion.div
@@ -354,8 +354,8 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
                   disabled={isBusy}
                   onClick={removeImage}
                   className={`absolute -top-2 -right-2 text-white rounded-full p-1.5 shadow-sm bg-red-500 ${isRemoving
-                      ? "opacity-50"
-                      : "opacity-0 group-hover:opacity-100 transition-opacity"
+                    ? "opacity-50"
+                    : "opacity-0 group-hover:opacity-100 transition-opacity"
                     }`}
                   title={t("remove") || "Remove"}
                 >
