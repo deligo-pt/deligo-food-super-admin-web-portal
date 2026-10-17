@@ -97,6 +97,10 @@ export type TProduct = {
     totalReviews: number;
   };
 
+  sdr?: {
+    applicable?: boolean;
+  }
+
   meta: {
     isFeatured?: boolean;
     isAvailableForPreOrder?: boolean;

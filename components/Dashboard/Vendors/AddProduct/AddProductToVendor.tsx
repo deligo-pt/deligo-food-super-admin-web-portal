@@ -129,6 +129,7 @@ export function AddProductToVendor({
             addonGroups: [],
             variations: [],
             isFeatured: false,
+            sdrApplicable: false,
             isAvailableForPreOrder: false,
             isActive: false,
             businessTypeSlug,
@@ -263,6 +264,9 @@ export function AddProductToVendor({
                 },
                 addonGroups: data.addonGroups,
                 variations: translated.variations,
+                sdr: {
+                    applicable: data.sdrApplicable ?? false
+                },
                 meta: {
                     isFeatured: data.isFeatured,
                     isAvailableForPreOrder: data.isAvailableForPreOrder,
