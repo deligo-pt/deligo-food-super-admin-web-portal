@@ -75,6 +75,8 @@ export const productValidation = z.object({
 
     isFeatured: z.boolean().optional(),
 
+    sdrApplicable: z.boolean().optional(),
+
     isAvailableForPreOrder: z.boolean().optional(),
 
     isActive: z.boolean().optional(),

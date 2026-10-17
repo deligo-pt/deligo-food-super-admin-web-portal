@@ -103,6 +103,11 @@ export const pt = {
   rider_analytics: "Análises de Estafetas",
   live_rider_tracking: "Rastreio do Estafeta em Tempo Real",
 
+  sdr_management: "Gestão do SDR",
+  create_sdr_deposit: "Criar Depósito SDR",
+  all_sdr_deposits: "Todos os Depósitos SDR",
+  effective_sdr: "SDR em Vigor",
+
   cuisine: "Culinária",
   create_cuisine: "Criar Culinária",
   all_cuisines: "Todas as Culinárias",
@@ -505,6 +510,9 @@ export const pt = {
   deligo_metadata_information: "Informação de Metadados Deligo",
   featured_product: "Produto em Destaque",
   available_for_pre_order: "Disponível para Pré-Encomenda",
+  sdr_container_deposit: "Depósito de embalagem (SDR)",
+  sdr_helper_active: "Para garrafas e latas. Os clientes pagam este depósito por unidade, além do preço:",
+  sdr_helper_inactive: "Para garrafas e latas. O SDR não está ativo de momento — o depósito é cobrado assim que for ativado.",
   save_product: "Guardar Produto",
   // -> tabs
   basic_info: "Info Básica",
@@ -1426,6 +1434,29 @@ export const pt = {
   business_category: "Categoria de negócio",
   select_business_category: "Selecionar categoria de negócio",
   eg_pizza: "ex.: Pizza",
+
+  // sdr deposits
+  // --> create
+  create_a_new_sdr_deposit: "Definir valor do depósito e regras de ativação",
+  create_a_new_sdr_deposit_desc: "Defina o valor do depósito, data de vigor e estado de ativação",
+  deposit_amount: "Valor do Depósito",
+  note_placeholder: "ex.: Postman SDR Fase 1 - ativo brevemente",
+  if_enabled_deposit_amount: "Se ativado, o valor do depósito deve ser superior a 0",
+  // --> all
+  manage_sdr_deposit_configurations: "Gerir configurações de depósito SDR",
+  no_sdr_deposits_available: "Nenhum depósito SDR encontrado",
+  already_cancelled: "Já cancelado",
+  cannot_cancel_effective: "Não é possível cancelar (já iniciado)",
+  confirm_cancel_sdr: "Cancelar Depósito SDR?",
+  confirm_cancel_sdr_desc: "Esta ação não pode ser desfeita. Apenas os depósitos que ainda não iniciaram podem ser cancelados.",
+  keep: "Manter",
+  cancelling: "A cancelar...",
+  yes_cancel: "Sim, Cancelar",
+  // --> effective
+  effective_sdr_deposit: "Depósito SDR em Vigor",
+  no_effective_sdr: "Nenhum depósito SDR em vigor de momento.",
+  currently_active_sdr_config: "Configuração de depósito atualmente ativa",
+  source: "Origem",
 
   // product categories
   // -> title

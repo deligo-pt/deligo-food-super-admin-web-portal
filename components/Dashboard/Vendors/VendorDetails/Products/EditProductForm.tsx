@@ -146,6 +146,7 @@ export function EditProductForm({
             unit: prevData?.stock?.unit || "",
             availabilityStatus: prevData?.stock?.availabilityStatus || "",
             isFeatured: prevData?.meta?.isFeatured || false,
+            sdrApplicable: prevData?.sdr?.applicable ?? false,
             isAvailableForPreOrder: prevData?.meta?.isAvailableForPreOrder || false,
             isActive: prevData?.meta?.status === "ACTIVE" ? true : false,
             businessTypeSlug,
@@ -321,6 +322,16 @@ export function EditProductForm({
             if (hasChanged(data.taxId, String(originalPricing.taxId || ""))) {
                 productData.pricing.taxId = data.taxId;
             }
+        }
+
+        // sdr update
+        const originalSdr = prevData?.sdr;
+        const sdrChanged = hasChanged(data.sdrApplicable, originalSdr?.applicable ?? false);
+
+        if (sdrChanged) {
+            productData.sdr = {
+                applicable: data.sdrApplicable,
+            };
         }
 
         // meta update

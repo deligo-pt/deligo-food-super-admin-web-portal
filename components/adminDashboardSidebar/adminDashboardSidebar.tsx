@@ -229,6 +229,25 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       ],
     },
     {
+      id: "sdr",
+      title: t("sdr_management"),
+      icon: <Grid size={18} />,
+      items: [
+        {
+          name: t("create_sdr_deposit"),
+          path: "/admin/sdr/create",
+        },
+        {
+          name: t("all_sdr_deposits"),
+          path: "/admin/sdr/all",
+        },
+        {
+          name: t("effective_sdr"),
+          path: "/admin/sdr/effective",
+        },
+      ],
+    },
+    {
       id: "cuisine",
       title: t("cuisine"),
       icon: <Grid size={18} />,
