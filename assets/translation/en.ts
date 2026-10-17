@@ -98,6 +98,11 @@ export const en = {
   rider_analytics: "Rider Analytics",
   live_rider_tracking: "Live Rider Tracking",
 
+  sdr_management: "SDR Management",
+  create_sdr_deposit: "Create SDR Deposit",
+  all_sdr_deposits: "All SDR Deposits",
+  effective_sdr: "Effective SDR",
+
   cuisine: "Cuisine",
   create_cuisine: "Create Cuisine",
   all_cuisines: "All Cuisines",
@@ -500,6 +505,9 @@ export const en = {
   deligo_metadata_information: "Deligo Metadata Information",
   featured_product: "Featured Product",
   available_for_pre_order: "Available for Pre-Order",
+  sdr_container_deposit: "Container deposit (SDR)",
+  sdr_helper_active: "For bottles and cans. Customers pay this deposit per unit, on top of the price:",
+  sdr_helper_inactive: "For bottles and cans. SDR is not active right now — the deposit is charged once it is switched on.",
   save_product: "Save Product",
   // -> tabs
   basic_info: "Basic Info",
@@ -1378,6 +1386,29 @@ export const en = {
   business_category: "Business Category",
   select_business_category: "Select Business Category",
   eg_pizza: "e.g. Pizza",
+
+  // sdr deposits
+  // --> create
+  create_a_new_sdr_deposit: "Set deposit amount and activation rules",
+  create_a_new_sdr_deposit_desc: "Define the deposit amount, effective date and activation status",
+  deposit_amount: "Deposit Amount",
+  note_placeholder: "e.g. Postman SDR Phase 1 - active upcoming",
+  if_enabled_deposit_amount: "If enabled, deposit amount must be greater than 0",
+  // --> all
+  manage_sdr_deposit_configurations: "Manage SDR deposit configurations",
+  no_sdr_deposits_available: "No SDR deposits found",
+  already_cancelled: "Already cancelled",
+  cannot_cancel_effective: "Cannot cancel (already started)",
+  confirm_cancel_sdr: "Cancel SDR Deposit?",
+  confirm_cancel_sdr_desc: "This action cannot be undone. Only deposits that have not started yet can be cancelled.",
+  keep: "Keep",
+  cancelling: "Cancelling...",
+  yes_cancel: "Yes, Cancel",
+  // --> effective
+  effective_sdr_deposit: "Effective SDR Deposit",
+  no_effective_sdr: "No effective SDR deposit is currently active.",
+  currently_active_sdr_config: "Currently active deposit configuration",
+  source: "Source",
 
   // cuisine
   // --> create cuisine

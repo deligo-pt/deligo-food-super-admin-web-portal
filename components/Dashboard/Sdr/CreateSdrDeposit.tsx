@@ -182,7 +182,7 @@ export default function CreateSdrDeposit() {
                                             </FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    placeholder="e.g. Postman SDR Phase 1 - active upcoming"
+                                                    placeholder={t("note_placeholder")}
                                                     className="resize-none"
                                                     rows={3}
                                                     {...field}
@@ -205,7 +205,7 @@ export default function CreateSdrDeposit() {
                                                     {t("active_status") || "Active Status"}
                                                 </FormLabel>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {t("active_status_desc") ||
+                                                    {t("if_enabled_deposit_amount") ||
                                                         "If enabled, deposit amount must be greater than 0"}
                                                 </p>
                                             </div>
