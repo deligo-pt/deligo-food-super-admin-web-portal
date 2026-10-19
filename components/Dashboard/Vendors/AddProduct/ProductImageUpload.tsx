@@ -19,7 +19,7 @@ interface IProps {
 }
 
 const MAX_FILE_SIZE_MB = 5;
-const REQUIRED_SIZE = 1200; // must be exactly 1200 × 1200 px
+const SUGGESTED_SIZE = 1200; // suggestion only – not enforced
 const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export function ProductImageUpload({ image, onChange, productId }: IProps) {
@@ -45,7 +45,7 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
     else if (e.type === "dragleave") setDragActive(false);
   };
 
-  /** Basic type + size validation (sync) */
+  /** Basic type + size validation only (no dimension check) */
   const validateFile = (file: File): string | null => {
     if (!file) return t("no_file_selected") || "No file selected";
 
@@ -71,26 +71,6 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
     return null;
   };
 
-  /** Load image and return its natural dimensions */
-  const checkImageDimensions = (
-    file: File
-  ): Promise<{ width: number; height: number }> => {
-    return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(file);
-      const img = new window.Image();
-
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-        resolve({ width: img.naturalWidth, height: img.naturalHeight });
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error("Failed to load image for dimension check"));
-      };
-      img.src = url;
-    });
-  };
-
   /** Upload and set a single URL. Optionally delete previous URL on server. */
   const uploadAndSet = async (file: File, oldUrl?: string) => {
     const toastId = toast.loading(
@@ -100,19 +80,6 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
     if (oldUrl) setIsReplacing(true);
 
     try {
-      // Hard dimension check
-      const { width, height } = await checkImageDimensions(file);
-
-      if (width !== REQUIRED_SIZE || height !== REQUIRED_SIZE) {
-        const msg =
-          // t("image_dimension_required") ||
-          `Image must be exactly ${REQUIRED_SIZE}×${REQUIRED_SIZE}px. Current: ${width}×${height}px`;
-
-        setError(msg);
-        toast.error(msg, { id: toastId });
-        return; // ← stop here, do NOT upload
-      }
-
       const result = await uploadImagesReq([file]);
 
       if (!result.success || !result.data?.length) {
@@ -264,8 +231,7 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
             </p>
             <p className="text-sm text-gray-500 mt-1">{t("or_click")}</p>
             <p className="text-xs text-gray-400 mt-2">
-              {t("image_specs") ||
-                "Required: 1200 × 1200 px · Max 5 MB · JPG / PNG / WEBP"}
+              {`Recommended: ${SUGGESTED_SIZE} × ${SUGGESTED_SIZE} px for best quality · Max ${MAX_FILE_SIZE_MB} MB · JPG / PNG / WEBP`}
             </p>
             <label className="mt-4">
               <motion.span
@@ -304,7 +270,7 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
 
       {hasImage && (
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1">
             <h3 className="text-sm font-medium text-gray-700">
               {t("uploaded_images") || "Uploaded Images"} (1/1)
             </h3>
@@ -329,6 +295,11 @@ export function ProductImageUpload({ image, onChange, productId }: IProps) {
               />
             </label>
           </div>
+
+          {/* Visible size suggestion */}
+          <p className="text-xs text-gray-400 mb-3">
+            {`Tip: Use a ${SUGGESTED_SIZE} × ${SUGGESTED_SIZE} px image for the best quality.`}
+          </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <AnimatePresence mode="wait">
