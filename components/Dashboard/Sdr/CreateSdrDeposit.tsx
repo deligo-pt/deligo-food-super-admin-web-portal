@@ -43,7 +43,7 @@ export default function CreateSdrDeposit() {
         resolver: zodResolver(sdrDepositValidation),
         defaultValues: {
             depositAmount: 0,
-            isActive: false,
+            isActive: true,
             effectiveFrom: "",
             note: "",
         },
