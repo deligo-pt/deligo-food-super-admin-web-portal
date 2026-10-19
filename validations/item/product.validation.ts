@@ -124,18 +124,18 @@ export const productValidation = z.object({
         //   });
         // }
     })
-    .refine(
-        (data) => {
-            if (data.variations.length === 0 && !data.price) {
-                return false;
-            }
-            return true;
-        },
-        {
-            message: "Price is required",
-            path: ["price"],
-        },
-    )
+    // .refine(
+    //     (data) => {
+    //         if (data.variations.length === 0 && !data.price) {
+    //             return false;
+    //         }
+    //         return true;
+    //     },
+    //     {
+    //         message: "Price is required",
+    //         path: ["price"],
+    //     },
+    // )
     .refine(
         (data) => {
             if (data.variations.length === 0 && data.price && data.price < 0) {
