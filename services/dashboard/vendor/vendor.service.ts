@@ -57,6 +57,18 @@ export const getSingleVendorReq = async (id: string) => {
   return {};
 };
 
+export const getAllVendors = async (query?: string,) => {
+  const result = await catchAsync(async () => {
+    const response = await serverFetch.get(
+      `/vendors${query ? `?${query}` : ""}`,
+    );
+
+    return await response.json();
+  });
+
+  return result;
+};
+
 export const getAllBranches = async (id: string, query?: string,) => {
   const result = await catchAsync(async () => {
     const response = await serverFetch.get(

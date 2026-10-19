@@ -8,7 +8,7 @@ const localizedTextSchema = z.object({
 
 export const createAddonOptionValidationSchema = z.object({
     name: localizedTextSchema,
-    price: z.number("Price must be a number").min(1, "Price cannot be zero"),
+    price: z.number("Price must be a number").min(0, "Price cannot be negative"),
     tax: z.string().nonempty("Tax is required"),
 
     currentLang: z.enum(["en", "pt"]),
