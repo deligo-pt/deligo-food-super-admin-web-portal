@@ -21,10 +21,13 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { TResponse } from "@/types";
+import { getAllVendors } from "@/services/dashboard/vendor/vendor.service";
+import { TMeta, TResponse } from "@/types";
 import { TSponsorship } from "@/types/sponsorship.type";
+import { TVendor } from "@/types/user.type";
 import { IZone } from "@/types/zone.type";
 import { catchAsync } from "@/utils/catchAsync";
+import { queryStringFormatter } from "@/utils/formatter";
 import { postData } from "@/utils/requests";
 import { sponsorshipValidation } from "@/validations/sponsorship/sponsorship.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,14 +35,22 @@ import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 
 type TSponsorshipForm = z.infer<typeof sponsorshipValidation>;
 
-export default function AddSponsorship({ zones }: { zones: IZone[] }) {
+interface IProps {
+  zones: IZone[],
+  vendorResults: {
+    data: TVendor[];
+    meta: TMeta;
+  }
+}
+
+export default function AddSponsorship({ zones, vendorResults }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -56,12 +67,96 @@ export default function AddSponsorship({ zones }: { zones: IZone[] }) {
       targetZoneIds: [],
     },
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sponsorBannerPreview, setSponsorBannerPreview] = useState<
     string | undefined
   >(undefined);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // zones dropdown
 
+  // ── vendors / progressive load (same pattern as ProductsSection) ──
+  const [allVendors, setAllVendors] = useState<TVendor[]>(vendorResults?.data || []);
+  const [page, setPage] = useState(vendorResults?.meta?.page || 1);
+  const [hasMore, setHasMore] = useState(
+    (vendorResults?.meta?.page || 1) < (vendorResults?.meta?.totalPage || 1)
+  );
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const loadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMore) return false;
+
+    setIsLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+
+      const queryString = queryStringFormatter({
+        page: String(nextPage),
+        limit: "20",
+        status: "APPROVED",
+        fields: "businessDetails.businessName",
+      });
+
+      // Same style as getAllProducts in ProductsSection
+      const result = await getAllVendors(queryString);
+
+      const newVendors: TVendor[] = Array.isArray(result?.data)
+        ? result.data
+        : result?.data?.data || [];
+
+      const newMeta: TMeta | undefined = result?.meta || result?.data?.meta;
+
+      if (newVendors.length > 0) {
+        setAllVendors((prev) => {
+          const existingIds = new Set(prev.map((v) => v._id));
+          const filtered = newVendors.filter((v) => !existingIds.has(v._id));
+          return [...prev, ...filtered];
+        });
+
+        setPage(nextPage);
+
+        if (newMeta) {
+          setHasMore(nextPage < (newMeta.totalPage || 1));
+        } else {
+          setHasMore(newVendors.length >= 20);
+        }
+        return true;
+      } else {
+        setHasMore(false);
+        return false;
+      }
+    } catch (err) {
+      console.error("Load more vendors error:", err);
+      setHasMore(false);
+      return false;
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, hasMore, page]);
+
+  // Auto-fetch next page every 1200ms (exact same idea as ProductsSection)
+  useEffect(() => {
+    if (!hasMore || isLoadingMore) return;
+
+    const timer = setTimeout(() => {
+      loadMore();
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [hasMore, isLoadingMore, page, loadMore]);
+
+  // Reset when server props change
+  useEffect(() => {
+    setAllVendors(vendorResults?.data || []);
+    setPage(vendorResults?.meta?.page || 1);
+    setHasMore(
+      (vendorResults?.meta?.page || 1) < (vendorResults?.meta?.totalPage || 1)
+    );
+  }, [vendorResults]);
+
+  // Submit
   const onSubmit = async (data: TSponsorshipForm) => {
     setIsSubmitting(true);
     const toastId = toast.loading("Adding Sponsorship...");
@@ -99,15 +194,21 @@ export default function AddSponsorship({ zones }: { zones: IZone[] }) {
       });
       form.reset();
       setSponsorBannerPreview(undefined);
+      setSearchQuery("");
       setIsSubmitting(false);
-      router.push('/admin/sponsorships');
+      router.push("/admin/sponsorships");
       return;
     }
 
     toast.error(result.message || "Failed to add Sponsorship", { id: toastId });
-    console.log(result);
     setIsSubmitting(false);
   };
+
+  // Client-side filter
+  const filteredVendors = allVendors.filter((vendor) => {
+    const name = vendor.businessDetails?.businessName?.toLowerCase() || "";
+    return name.includes(searchQuery.toLowerCase());
+  });
 
   return (
     <div className="">
@@ -126,7 +227,7 @@ export default function AddSponsorship({ zones }: { zones: IZone[] }) {
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <FormField
+            {/* <FormField
               control={form.control}
               name="sponsorName"
               render={({ field, fieldState }) => (
@@ -143,6 +244,114 @@ export default function AddSponsorship({ zones }: { zones: IZone[] }) {
                   <FormMessage />
                 </FormItem>
               )}
+            /> */}
+
+            {/* Sponsor Name */}
+            <FormField
+              control={form.control}
+              name="sponsorName"
+              render={({ field, fieldState }) => {
+                const handleSelect = (businessName: string) => {
+                  field.onChange(businessName);
+                  setSearchQuery(businessName);
+                  setSearchOpen(false);
+                };
+
+                const handleInputChange = (value: string) => {
+                  setSearchQuery(value);
+                  field.onChange(value);
+                  setSearchOpen(true);
+                };
+
+                return (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                          {t("sponsor_name")}
+                        </label>
+
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => handleInputChange(e.target.value)}
+                          onFocus={() => setSearchOpen(true)}
+                          onBlur={() =>
+                            setTimeout(() => setSearchOpen(false), 200)
+                          }
+                          placeholder={
+                            t("search_or_type_sponsor_name") ||
+                            "Search vendor or type name..."
+                          }
+                          className={cn(
+                            "w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-gray-900 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-[#DC3173] focus:bg-white focus:ring-2 focus:ring-[#DC3173]/20 sm:text-sm sm:leading-6",
+                            fieldState.invalid && "border border-destructive"
+                          )}
+                        />
+
+                        {searchOpen && (
+                          <div className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-100 max-h-60 overflow-y-auto">
+                            {filteredVendors.length > 0 ? (
+                              <>
+                                {filteredVendors.map((vendor) => {
+                                  const businessName =
+                                    vendor.businessDetails?.businessName ||
+                                    "Unknown";
+                                  return (
+                                    <div
+                                      key={vendor._id}
+                                      onMouseDown={() =>
+                                        handleSelect(businessName)
+                                      }
+                                      className="px-4 py-2.5 text-sm cursor-pointer hover:bg-[#DC3173]/10 hover:text-[#DC3173] transition-colors"
+                                    >
+                                      <p className="font-medium">
+                                        {businessName}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {vendor.parentVendorId?.name
+                                          ? `${vendor.parentVendorId.name.firstName} ${vendor.parentVendorId.name.lastName}`
+                                          : "—"}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+
+                                {isLoadingMore && (
+                                  <div className="px-4 py-2 text-xs text-center text-muted-foreground border-t">
+                                    {t("loadingMore") || "Loading more..."}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <div className="px-4 py-3 text-sm text-gray-500">
+                                {searchQuery.trim() ? (
+                                  <>
+                                    <p>
+                                      {t("no_vendors_found") ||
+                                        "No vendors found"}
+                                    </p>
+                                    <p className="text-xs mt-1 text-[#DC3173]">
+                                      {t("use_custom_name") ||
+                                        `"${searchQuery}" will be used as sponsor name`}
+                                    </p>
+                                  </>
+                                ) : isLoadingMore ? (
+                                  t("loadingMore") || "Loading more..."
+                                ) : (
+                                  t("type_to_search_vendors") ||
+                                  "Type to search vendors..."
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField
