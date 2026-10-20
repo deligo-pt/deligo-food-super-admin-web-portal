@@ -7,7 +7,7 @@ import { useState } from "react";
 import AddCategoryModal from "../AddCategoryModal";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ReusableTable from "@/components/common/ReusableTable";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SaveIcon } from "lucide-react";
 import { TMeta } from "@/types";
 import { useRouter } from "next/navigation";
 import { getProductCategoryColumns } from "@/components/ProductCategories/productCategoryColumns";
@@ -74,23 +74,6 @@ const ProductCategories = ({ vendor, categoriesResult }: IProps) => {
                             align="end"
                             className="w-48 bg-white shadow-lg border rounded-lg p-1"
                         >
-                            <DropdownMenuItem
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                <motion.button
-                                    whileHover={{
-                                        scale: 1.05,
-                                    }}
-                                    whileTap={{
-                                        scale: 0.98,
-                                    }}
-                                    type="button"
-                                    onClick={handleOpenCreate}
-                                >
-                                    <span>{t("add_category")}</span>
-                                </motion.button>
-                            </DropdownMenuItem>
-
                             <DropdownMenuItem
                                 onClick={() =>
                                     router.push(`/admin/vendor/${vendor?.userId}/manage-products`)
@@ -169,6 +152,11 @@ const ProductCategories = ({ vendor, categoriesResult }: IProps) => {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 }
+                buttonInfo={{
+                    text: t("save_product"),
+                    icon: SaveIcon,
+                    onClick: handleOpenCreate,
+                }}
             />
             <div className="bg-white rounded-xl shadow-sm border p-4 my-4">
                 <div className="overflow-x-auto">

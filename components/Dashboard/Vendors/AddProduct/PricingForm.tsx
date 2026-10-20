@@ -104,7 +104,7 @@ const PricingForm = ({
             </h2>
 
             {/* Form Fields */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-6 items-start">
                 {watchVariations.length === 0 && (
                     <FormField
                         control={form.control}

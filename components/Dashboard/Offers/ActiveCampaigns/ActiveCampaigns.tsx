@@ -29,41 +29,6 @@ interface IProps {
 
 const sortFields = ["newest", "oldest"] as SortOptionKey[];
 
-const filterOptions = [
-  {
-    label: "active_status",
-    key: "activeStatus",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Active",
-        value: "ACTIVE",
-      },
-      {
-        label: "Inactive",
-        value: "INACTIVE",
-      },
-    ],
-  },
-  {
-    label: "validity_status",
-    key: "validStatus",
-    placeholder: "Select Status",
-    type: "select",
-    items: [
-      {
-        label: "Valid",
-        value: "VALID",
-      },
-      {
-        label: "Expired",
-        value: "EXPIRED",
-      },
-    ],
-  },
-];
-
 export default function ActiveCampaigns({
   offersResult,
   showFilters,
@@ -82,6 +47,41 @@ export default function ActiveCampaigns({
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
+
+  const filterOptions = [
+    {
+      label: "active_status",
+      key: "activeStatus",
+      placeholder: t("select_status"),
+      type: "select",
+      items: [
+        {
+          label: t("active"),
+          value: "ACTIVE",
+        },
+        {
+          label: t("inactive"),
+          value: "INACTIVE",
+        },
+      ],
+    },
+    {
+      label: "validity_status",
+      key: "validStatus",
+      placeholder: t("select_status"),
+      type: "select",
+      items: [
+        {
+          label: t("valid"),
+          value: "VALID",
+        },
+        {
+          label: t("expired"),
+          value: "EXPIRED",
+        },
+      ],
+    },
+  ];
 
   const handleStatusInfo = (
     offerId: string,

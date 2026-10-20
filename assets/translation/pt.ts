@@ -552,6 +552,8 @@ export const pt = {
   no_options_add_one: "Sem opções — adicione uma para começar",
   you_have_reached_the_end: "Chegou ao fim",
   no_products_found: "Nenhum produto encontrado",
+  variation_name_placeholder: "ex.: Tamanho, Cor ou Porção",
+  add_an_option_label: "Adicionar Opção",
 
   // manage products
   copy_to_branch: "Copiar para Filial",
@@ -2923,6 +2925,7 @@ export const pt = {
   selected_permissions: "Permissões Selecionadas",
   no_permissions_available: "Nenhuma permissão disponível",
   no_system_permissions_definitions_found: "Nenhuma definição de permissões do sistema encontrada no registro.",
+  no_selections_available: "Nenhuma seleção disponível",
   //--> revoke permission
   revoke_permission: "Revogar Permissão",
   revoke_system_permissions: "Revogar Permissões do Sistema",

@@ -241,7 +241,7 @@ export default function AllFilters({
                 {filterOptions?.map((options, i) => (
                   <div key={i}>
                     <label className="block text-sm font-medium mb-1">
-                      {options.label}
+                      {t(`${options.label}`)}
                     </label>
                     <Select
                       value={activeFilters[options.key]}
