@@ -11,33 +11,41 @@ export async function translateTexts({
 }) {
     if (!texts.length) return [];
 
+    const apiKey = process.env.DEEPL_API_KEY?.trim();
+    if (!apiKey) {
+        throw new Error("DEEPL_API_KEY is missing in environment");
+    }
+
+    const baseUrl = (
+        process.env.DEEPL_API_URL || "https://api-free.deepl.com"
+    ).replace(/\/$/, "");
+
+    const url = `${baseUrl}/v2/translate`;
+
     const params = new URLSearchParams();
-
-    texts.forEach((text) => {
-        params.append("text", text);
-    });
-
+    texts.forEach((text) => params.append("text", text));
     params.append("source_lang", sourceLang);
     params.append("target_lang", targetLang);
 
-    const response = await fetch(
-        "https://api-free.deepl.com/v2/translate",
-        {
-            method: "POST",
-            headers: {
-                Authorization: `DeepL-Auth-Key ${process.env.DEEPL_API_KEY}`,
-                "Content-Type":
-                    "application/x-www-form-urlencoded",
-            },
-            body: params,
-        }
-    );
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            Authorization: `DeepL-Auth-Key ${apiKey}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: params.toString(),
+    });
+
+    const bodyText = await response.text();
 
     if (!response.ok) {
-        throw new Error("DeepL Translation Failed");
+        throw new Error(
+            `DeepL Translation Failed (${response.status}): ${bodyText || response.statusText}`
+        );
     }
 
-    const result = await response.json();
+    // Body already read as text — parse it (do NOT call response.json())
+    const result = JSON.parse(bodyText);
 
     return result.translations.map(
         (translation: any) => translation.text
