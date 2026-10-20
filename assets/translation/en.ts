@@ -547,6 +547,8 @@ export const en = {
   no_options_add_one: "No options — add one to get started",
   you_have_reached_the_end: "You've reached the end",
   no_products_found: "No products found",
+  variation_name_placeholder: "e.g., Size, Color, or Portion",
+  add_an_option_label: "Add Option",
 
   // manage products
   copy_to_branch: "Copy to Branch",
@@ -2893,6 +2895,7 @@ export const en = {
   selected_permissions: "Selected Permissions",
   no_permissions_available: "No permissions available",
   no_system_permissions_definitions_found: "No system permissions definitions found in registry.",
+  no_selections_available: "No selection available",
   //--> revoke permission
   revoke_permission: "Revoke Permission",
   revoke_system_permissions: "Revoke System Permissions",

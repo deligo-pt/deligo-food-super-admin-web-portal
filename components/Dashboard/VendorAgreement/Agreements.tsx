@@ -24,11 +24,9 @@ const filterOptions = [
         placeholder: "Select Status",
         type: "select",
         items: [
-            { label: "Pending Verification", value: "pending_verification" },
-            { label: "Verified", value: "verified" },
-            { label: "Draft", value: "draft" },
-            { label: "Emailed", value: "emailed" },
-            { label: "Signed", value: "signed" },
+            { label: "Signed", value: "SIGNED" },
+            { label: "Unsigned", value: "UNSIGNED" },
+            { label: "Party Signed", value: "PARTY_SIGNED" },
         ],
     },
 ];

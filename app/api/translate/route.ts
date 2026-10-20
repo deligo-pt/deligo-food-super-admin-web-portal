@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { translateTexts } from "@/lib/deepl";
 import { NextResponse } from "next/server";
 
@@ -20,17 +21,15 @@ export async function POST(req: Request) {
             success: true,
             translations,
         });
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        console.error("Translate route error:", error);
 
         return NextResponse.json(
             {
                 success: false,
-                message: "Translation failed",
+                message: error?.message || "Translation failed",
             },
-            {
-                status: 500,
-            }
+            { status: 500 }
         );
     }
 }
