@@ -6,7 +6,7 @@ import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TProductCategory } from "@/types/category.type";
 import { catchAsync } from "@/utils/catchAsync";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 
 export const addProductCategoryReq = async (
   data: Partial<TProductCategory>,
@@ -161,5 +161,18 @@ export const getAllProductCategories = async (queryString?: string) => {
     return await res.json();
   });
 
+  return result;
+};
+
+// SOFT DELETE
+export const softDeleteProductCategory = async (id: string) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.delete(`/product-categories/soft-delete/${id}`);
+    return await res.json();
+  });
+
+  if (result.success) {
+    updateTag("product-category");
+  }
   return result;
 };

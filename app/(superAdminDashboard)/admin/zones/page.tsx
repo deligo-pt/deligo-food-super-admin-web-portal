@@ -9,7 +9,7 @@ interface IProps {
 
 const ZonesPage = async ({ searchParams }: IProps) => {
     const searchParamsObj = await searchParams;
-    const queryString = queryStringFormatter(searchParamsObj);
+    const queryString = queryStringFormatter({ isDeleted: false, ...searchParamsObj });
     const zonesData = await getAllZones(queryString);
 
     return (

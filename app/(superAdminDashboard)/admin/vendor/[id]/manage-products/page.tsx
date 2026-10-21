@@ -33,6 +33,8 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
         vendorId: vendorMongoId,
         limit: "50",
         // sortBy: "name",
+        isDeleted: false,
+        isActive: true,
         ...searchParamsObj
     });
     const productCategories = await getAllProductCategories(categoriesQuery);

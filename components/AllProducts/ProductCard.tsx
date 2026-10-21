@@ -288,25 +288,24 @@ export default function ProductCard({
                   </motion.button>
                 )}
 
-                {!product?.isDeleted ? (
+                {!product?.isDeleted && (
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onDelete(product.productId, "soft")}
                     className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
                   >
-                    {t("soft_delete")}
+                    {t("delete")}
                   </motion.button>
-                ) : (
-                  <motion.button
+                )}
+                  {/* <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onDelete(product.productId, "permanent")}
                     className="text-xs px-3 py-1 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
                   >
                     {t("permanent_delete")}
-                  </motion.button>
-                )}
+                  </motion.button> */}
               </div>
             </>
           )}

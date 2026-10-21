@@ -126,7 +126,7 @@ export function getIngredientColumns({
                             className="text-destructive font-medium cursor-pointer"
                             onClick={() => onDelete(ingredient._id, "soft")}
                         >
-                            {t("soft_delete")}
+                            {t("delete")}
                         </DropdownMenuItem>
 
                         {/* <DropdownMenuItem

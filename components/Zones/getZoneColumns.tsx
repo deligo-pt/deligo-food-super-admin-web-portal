@@ -236,8 +236,15 @@ export function useZoneColumns({
                             <Power size={16} />
                             {zone.isOperational ? t("deactivate") : t("activate")}
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => openSoftDeleteModal(zone)}
+                            className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                        >
+                            <Trash2 size={16} />
+                            {t("delete")}
+                        </DropdownMenuItem>
 
-                        {zone.isDeleted ? (
+                        {/* {zone.isDeleted ? (
                             <DropdownMenuItem
                                 onClick={() => openPermanentDeleteModal(zone)}
                                 className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
@@ -253,7 +260,7 @@ export function useZoneColumns({
                                 <Trash2 size={16} />
                                 {t("soft_delete")}
                             </DropdownMenuItem>
-                        )}
+                        )} */}
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),

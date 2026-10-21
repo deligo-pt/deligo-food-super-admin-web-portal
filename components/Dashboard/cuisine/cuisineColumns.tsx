@@ -126,7 +126,7 @@ export function getCuisineColumns({
                                         setStatusInfo({ cuisineId: cuisine._id, field: "isDeleted" })
                                     }
                                 >
-                                    {t("soft_delete")}
+                                    {t("delete")}
                                 </DropdownMenuItem>
                             </>
                         ) : (
@@ -135,7 +135,7 @@ export function getCuisineColumns({
                             </DropdownMenuItem>
                         )}
 
-                        <DropdownMenuItem
+                        {/* <DropdownMenuItem
                             className="text-red-600 focus:text-red-700 font-semibold"
                             onClick={() =>
                                 setStatusInfo({
@@ -145,7 +145,7 @@ export function getCuisineColumns({
                             }
                         >
                             {t("permanent_delete")}
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),
