@@ -86,86 +86,109 @@ export default function AddCategoryModal({
 
     const onSubmit = async (data: FormData) => {
         const toastId = toast.loading(
-            isEditMode ? "Updating category..." : "Creating category for vendor..."
+            isEditMode ? "Updating category..." : "Creating category..."
         );
         setIsSubmitting(true);
 
-        // Translate the input object if needed
-        const translated = await translateObject(data, lang);
-        if (!translated) {
-            toast.error("Translation failed", { id: toastId });
-            setIsSubmitting(false);
-            return;
-        }
+        try {
+            let result;
 
-        let result;
+            // UPDATE MODE
+            if (isEditMode && initialData) {
+                const payload: Record<string, unknown> = {};
 
-        if (isEditMode && initialData) {
-            const payload: Record<string, unknown> = {};
+                // Check if name changed in the current language
+                const currentLangName = data.name?.[lang as "en" | "pt"] || "";
+                const originalLangName = initialData.name?.[lang as "en" | "pt"] || "";
+                const isNameChanged = currentLangName.trim() !== originalLangName.trim();
 
-            // Compare names
-            const originalEn = initialData.name?.en || "";
-            const originalPt = initialData.name?.pt || "";
-            const newEn = translated?.name?.en || "";
-            const newPt = translated?.name?.pt || "";
+                // Check if isActive changed
+                const isActiveChanged = data.isActive !== initialData.isActive;
 
-            if (newEn !== originalEn || newPt !== originalPt) {
-                payload.name = {
-                    en: newEn,
-                    pt: newPt,
+                // Nothing changed
+                if (!isNameChanged && !isActiveChanged) {
+                    toast.info("No changes detected", { id: toastId });
+                    onClose();
+                    return;
+                }
+
+                // Only translate if the name was actually changed
+                if (isNameChanged) {
+                    const translated = await translateObject(data, lang);
+
+                    if (!translated) {
+                        toast.error("Translation failed", { id: toastId });
+                        return;
+                    }
+
+                    payload.name = {
+                        en: translated.name?.en || "",
+                        pt: translated.name?.pt || "",
+                    };
+                }
+
+                if (isActiveChanged) {
+                    payload.isActive = data.isActive;
+                }
+
+                result = await updateAdminProductCategoryReq(initialData._id, payload);
+            }
+
+            // CREATE MODE
+            else {
+                // Always translate on create
+                const translated = await translateObject(data, lang);
+
+                if (!translated) {
+                    toast.error("Translation failed", { id: toastId });
+                    return;
+                }
+
+                const payload = {
+                    vendorId,
+                    name: translated.name,
+                    isActive: data.isActive,
                 };
+
+                result = await addAdminProductCategoryReq(payload);
             }
 
-            // Compare active status
-            if (data.isActive !== initialData.isActive) {
-                payload.isActive = data.isActive;
-            }
+            // HANDLE RESPONSE
+            if (result?.success) {
+                toast.success(
+                    result.message ||
+                    (isEditMode
+                        ? "Category updated successfully!"
+                        : "Category created successfully!"),
+                    { id: toastId }
+                );
 
-            // Check if anything actually changed before sending the request
-            if (Object.keys(payload).length === 0) {
-                toast.info("No changes detected", { id: toastId });
-                setIsSubmitting(false);
+                form.reset();
+                onSuccess?.();
                 onClose();
                 return;
             }
 
-            // Fire update API request (replace with your actual update function name if different)
-            result = await updateAdminProductCategoryReq(initialData._id, payload);
-
-        } else {
-            // --- CREATE MODE ---
-            const payload = {
-                vendorId,
-                name: translated?.name,
-                isActive: data.isActive,
-            };
-
-            result = await addAdminProductCategoryReq(payload);
-        }
-
-        if (result?.success) {
-            toast.success(
-                result.message || (isEditMode ? "Category updated successfully!" : "Category created successfully!"),
-                { id: toastId }
-            );
-            form.reset();
+            // Error handling
+            if (result?.data?.errorSources?.length) {
+                result.data.errorSources.forEach((err: { path: string; message: string }) => {
+                    toast.error(err.message, { id: toastId });
+                });
+            } else {
+                toast.error(
+                    result?.message ||
+                    (isEditMode
+                        ? "Failed to update category"
+                        : "Failed to create category"),
+                    { id: toastId }
+                );
+            }
+        } catch (error) {
+            console.error("Category submit error:", error);
+            toast.error("Something went wrong. Please try again.", { id: toastId });
+        } finally {
             setIsSubmitting(false);
-            onSuccess?.();
-            onClose();
-            return;
         }
-
-        if (result?.data?.errorSources) {
-            result.data.errorSources.map((err: { path: string; message: string }) =>
-                toast.error(err?.message, { id: toastId })
-            );
-        } else {
-            toast.error(
-                result.message || (isEditMode ? "Failed to update category" : "Failed to create category"),
-                { id: toastId }
-            );
-        }
-        setIsSubmitting(false);
     };
 
     return (
