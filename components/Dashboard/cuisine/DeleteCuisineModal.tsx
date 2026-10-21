@@ -86,24 +86,17 @@ export default function DeleteCuisineModal({ statusInfo, onClose, t }: DeleteMod
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>
-                        {statusInfo.field === "isDeleted" && t("soft_delete")}
-                        {statusInfo.field === "isPermanentDelete" && t("permanent_delete")}
+                        {statusInfo.field === "isDeleted" && t("delete")}
                         {statusInfo.field === "isActive" && (statusInfo.isActive ? t("activate") : t("deactivate"))}
                         {" "}{t("cuisine")}
                     </DialogTitle>
                     <DialogDescription>
-                        {statusInfo.field === "isPermanentDelete" ? (
-                            <span className="text-red-500 font-medium">
-                                {t("warings_this_action_cannot_be_undone")}
-                            </span>
-                        ) : (
-                            `${t("Are you sure you want to change this action item status to")} ${statusInfo.field === "isDeleted"
-                                ? t("soft_delete")
-                                : statusInfo.isActive
-                                    ? t("active")
-                                    : t("inactive")
-                            }?`
-                        )}
+                        {`${t("Are you sure you want to change this action item status to")} ${statusInfo.field === "isDeleted"
+                            ? t("delete")
+                            : statusInfo.isActive
+                                ? t("active")
+                                : t("inactive")
+                            }?`}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="gap-2 sm:gap-0">
@@ -113,15 +106,10 @@ export default function DeleteCuisineModal({ statusInfo, onClose, t }: DeleteMod
 
                     {statusInfo.field === "isDeleted" && (
                         <Button variant="destructive" disabled={isLoading} onClick={handleSoftDelete}>
-                            {t("soft_delete")}
+                            {t("delete")}
                         </Button>
                     )}
 
-                    {statusInfo.field === "isPermanentDelete" && (
-                        <Button className="bg-red-700 hover:bg-red-800 text-white" disabled={isLoading} onClick={handlePermanentDelete}>
-                            {t("permanent_delete")}
-                        </Button>
-                    )}
                     {statusInfo.field === "isActive" && (
                         <Button
                             onClick={handleActiveToggle}
