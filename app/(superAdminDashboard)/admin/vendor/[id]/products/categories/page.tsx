@@ -17,7 +17,7 @@ const ProductCategoriesForVendor = async ({ params, searchParams }: IProps) => {
 
     const vendorData: TVendor = await getSingleVendorReq(id);
 
-    const query = { vendorId: vendorData?._id, ...searchParamsObj };
+    const query = { vendorId: vendorData?._id, isDeleted: false, ...searchParamsObj };
     const queryString = queryStringFormatter(query);
     const productCategories = await getAllProductCategories(queryString);
 

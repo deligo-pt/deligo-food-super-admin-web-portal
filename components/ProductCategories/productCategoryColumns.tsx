@@ -1,7 +1,7 @@
 import { Column } from "../common/ReusableTable";
 import { TProductCategoryResponse } from "@/types/category.type";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { CircleCheckBig, Cog, ListIcon, Edit } from "lucide-react";
+import { CircleCheckBig, Cog, ListIcon, Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -11,13 +11,13 @@ interface GetProductCategoryColumnsParams {
     t: TFunction;
     lang: string;
     router: AppRouterInstance;
-    onEdit?: (category: TProductCategoryResponse) => void;
+    onOpen?: (category: TProductCategoryResponse, type: string) => void;
 }
 
 export function getProductCategoryColumns({
     t,
     lang,
-    onEdit,
+    onOpen,
 }: GetProductCategoryColumnsParams): Column<TProductCategoryResponse>[] {
     return [
         {
@@ -82,13 +82,22 @@ export function getProductCategoryColumns({
             accessor: (category) => (
                 <div className="flex justify-end">
                     {!category.isDeleted && (
-                        <button
-                            onClick={() => onEdit?.(category)}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-1.5 text-xs font-medium text-[#DC3173] hover:bg-rose-50 shadow-xs transition-all active:scale-98 cursor-pointer"
-                        >
-                            <Edit size={14} />
-                            {t("edit")}
-                        </button>
+                        <div className="flex flex-row gap-2 items-center">
+                            <button
+                                onClick={() => onOpen?.(category, "edit")}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-1.5 text-xs font-medium text-[#DC3173] hover:bg-rose-50 shadow-xs transition-all active:scale-98 cursor-pointer"
+                            >
+                                <Edit size={14} />
+                                {t("edit")}
+                            </button>
+                            <button
+                                onClick={() => onOpen?.(category, "delete")}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-1.5 text-xs font-medium text-[#DC3173] hover:bg-rose-50 shadow-xs transition-all active:scale-98 cursor-pointer"
+                            >
+                                <Trash2 size={14} />
+                                {t("delete")}
+                            </button>
+                        </div>
                     )}
                 </div>
             ),

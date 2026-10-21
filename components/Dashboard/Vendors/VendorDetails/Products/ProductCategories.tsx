@@ -7,7 +7,7 @@ import { useState } from "react";
 import AddCategoryModal from "../AddCategoryModal";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import ReusableTable from "@/components/common/ReusableTable";
-import { ChevronDown, SaveIcon } from "lucide-react";
+import { ChevronDown, PlusIcon } from "lucide-react";
 import { TMeta } from "@/types";
 import { useRouter } from "next/navigation";
 import { getProductCategoryColumns } from "@/components/ProductCategories/productCategoryColumns";
@@ -21,6 +21,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { softDeleteProductCategory } from "@/services/dashboard/category/product-category.service";
+import DeleteModal from "@/components/Modals/DeleteModal";
 
 interface IProps {
     vendor: TVendor;
@@ -33,28 +36,48 @@ interface IProps {
 const ProductCategories = ({ vendor, categoriesResult }: IProps) => {
     const { t, lang } = useTranslation();
     const router = useRouter();
-    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+    const [modalType, setModalType] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<TProductCategoryResponse | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
 
     // Open modal for Creation
     const handleOpenCreate = () => {
         setSelectedCategory(null);
-        setIsCategoryModalOpen(true);
+        setModalType("edit");
     };
 
     // Open modal for Editing
-    const handleOpenEdit = (category: TProductCategoryResponse) => {
+    const handleOpen = (category: TProductCategoryResponse, type: string) => {
         setSelectedCategory(category);
-        setIsCategoryModalOpen(true);
+        setModalType(type);
     };
 
     const categoryColumns = getProductCategoryColumns({
         t,
         lang,
         router,
-        onEdit: handleOpenEdit,
+        onOpen: handleOpen,
     });
+
+    const softDeleteCategory = async () => {
+        if (!selectedCategory) return;
+
+        setIsDeleting(true);
+        const toastId = toast.loading("Deleting category...");
+
+        const result = await softDeleteProductCategory(selectedCategory?._id);
+
+        if (result?.success) {
+            toast.success(result?.message || "Category deleted successfully!", { id: toastId });
+            router.refresh();
+            setIsDeleting(false);
+            return;
+        }
+
+        toast.error(result?.message || "Category delete failed", { id: toastId });
+        setIsDeleting(false);
+    };
 
     return (
         <>
@@ -153,8 +176,8 @@ const ProductCategories = ({ vendor, categoriesResult }: IProps) => {
                     </DropdownMenu>
                 }
                 buttonInfo={{
-                    text: t("save_product"),
-                    icon: SaveIcon,
+                    text: t("add_product_category"),
+                    icon: PlusIcon,
                     onClick: handleOpenCreate,
                 }}
             />
@@ -184,14 +207,28 @@ const ProductCategories = ({ vendor, categoriesResult }: IProps) => {
 
             {/* Reused Modal for Add & Edit */}
             <AddCategoryModal
-                isOpen={isCategoryModalOpen}
+                isOpen={modalType === "edit"}
                 onClose={() => {
-                    setIsCategoryModalOpen(false);
+                    setModalType("");
                     setSelectedCategory(null);
                 }}
                 vendorId={vendor?._id}
                 initialData={selectedCategory}
                 onSuccess={() => router.refresh()}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <DeleteModal
+                open={modalType === "delete"}
+                onOpenChange={(open) => {
+                    setModalType("");
+                    if (!open) {
+                        setSelectedCategory(null);
+                    }
+                }}
+                onConfirm={softDeleteCategory}
+                isDeleting={isDeleting}
+                variant="destructive"
             />
         </>
     );
