@@ -580,6 +580,7 @@ export const pt = {
   rating: "Avaliação",
   docs: "Documentos",
   no_active_vendors_found: "Nenhum vendedor ativo encontrado.",
+  business_branch_name: "Nome da Empresa / Filial",
 
   // suspended vendors
   manage_review_vendors_suspended_due_policy:

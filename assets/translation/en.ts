@@ -575,6 +575,7 @@ export const en = {
   rating: "Rating",
   docs: "Docs",
   no_active_vendors_found: "No active vendors found.",
+  business_branch_name: "Business / Branch Name",
 
   // suspended vendors
   manage_review_vendors_suspended_due_policy:
