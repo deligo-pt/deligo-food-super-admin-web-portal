@@ -42,14 +42,13 @@ export function getDeliveryPartnerPerformanceColumns({
                     <Avatar className="w-8 h-8">
                         <AvatarImage src={partner.profilePhoto} />
                         <AvatarFallback>
-                            {partner.name?.firstName?.charAt(0)}
-                            {partner.name?.lastName?.charAt(0)}
+                            {partner.name?.charAt(0)}
                         </AvatarFallback>
                     </Avatar>
 
                     <div>
                         <h3>
-                            {partner.name?.firstName} {partner.name?.lastName}
+                            {partner.name}
                         </h3>
 
                         <p className="text-gray-700 text-sm">

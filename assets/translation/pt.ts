@@ -1267,6 +1267,11 @@ export const pt = {
   monthly_growth: "Crescimento mensal",
   message_partner: "Enviar mensagem ao parceiro",
   view_violations: "Ver infrações",
+  disbursed_earnings: "Rendimentos Desembolsados",
+  completed_deliveries: "Entregas Concluídas",
+  canceled_deliveries: "Entregas Canceladas",
+  acceptance_rate: "Taxa de Aceitação",
+  current_status: "Estado Atual",
 
   // delivery partner payouts
   manage_all_rider_payouts_here: "Gerencie todos os pagamentos de Estafetas aqui",

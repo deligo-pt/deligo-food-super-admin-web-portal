@@ -45,7 +45,7 @@ export function getVendorColumns({
                     {t("business_branch_name") || "Business / Branch Name"}
                 </div>
             ),
-            accessor: (row) => row.businessDetails?.businessName || "N/A",
+            accessor: (row) => row.role === "VENDOR" ? row.businessDetails?.businessName || "N/A" : row.businessDetails?.branchName || "N/A",
         },
         {
             header: (
