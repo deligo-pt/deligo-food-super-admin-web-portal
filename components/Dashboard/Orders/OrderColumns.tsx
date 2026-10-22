@@ -98,19 +98,19 @@ export function getOrderColumns({
                     ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
                     ?.join(" "),
         },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <CheckCheckIcon className="w-4" />
-                    {t("payment_status")}
-                </div>
-            ),
-            accessor: (order) =>
-                order.paymentStatus
-                    ?.split("_")
-                    ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
-                    ?.join(" "),
-        },
+        // {
+        //     header: (
+        //         <div className="text-[#DC3173] flex gap-2 items-center">
+        //             <CheckCheckIcon className="w-4" />
+        //             {t("payment_status")}
+        //         </div>
+        //     ),
+        //     accessor: (order) =>
+        //         order.paymentStatus
+        //             ?.split("_")
+        //             ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
+        //             ?.join(" "),
+        // },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
@@ -134,21 +134,21 @@ export function getOrderColumns({
             accessor: (order) =>
                 `€${formatPrice(order.payoutSummary?.grandTotal || 0)}`,
         },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <PackageIcon className="w-4" />
-                    {t("items")}
-                </div>
-            ),
-            accessor: (order) =>
-                order?.items?.map((i, index) => (
-                    <span key={index}>
-                        {i.name} x {i.itemSummary?.quantity}
-                        {index < (order.items?.length ?? 0) - 1 ? ", " : ""}
-                    </span>
-                )),
-        },
+        // {
+        //     header: (
+        //         <div className="text-[#DC3173] flex gap-2 items-center">
+        //             <PackageIcon className="w-4" />
+        //             {t("items")}
+        //         </div>
+        //     ),
+        //     accessor: (order) =>
+        //         order?.items?.map((i, index) => (
+        //             <span key={index}>
+        //                 {i.name} x {i.itemSummary?.quantity}
+        //                 {index < (order.items?.length ?? 0) - 1 ? ", " : ""}
+        //             </span>
+        //         )),
+        // },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center justify-end">

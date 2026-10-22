@@ -148,6 +148,35 @@ export const updateAdminProductCategoryReq = async (categoryId: string, data: an
   return result;
 };
 
+
+// update admin product category
+export const reOrderProductCategory = async (payload: {
+  categoryId: string;
+  newOrder: number; // 1-based
+  vendorId: string;
+}) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.patch(`/product-categories/reorder`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidateTag("product-category", {});
+    updateTag("product-category");
+    if (payload?.vendorId) {
+      revalidatePath(`/admin/vendor/${payload.vendorId}`);
+    }
+  }
+
+  return result;
+};
+
 export const getAllProductCategories = async (queryString?: string) => {
   const url = `/product-categories${queryString ? `?${queryString}` : ""}`;
 

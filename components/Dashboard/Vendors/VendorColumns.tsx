@@ -42,10 +42,10 @@ export function getVendorColumns({
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
                     <IdCard className="w-4" />
-                    {t("name")}
+                    {t("business_branch_name") || "Business / Branch Name"}
                 </div>
             ),
-            accessor: (row) => row.businessDetails?.businessName || "N/A",
+            accessor: (row) => row.role === "VENDOR" ? row.businessDetails?.businessName || "N/A" : row.businessDetails?.branchName || "N/A",
         },
         {
             header: (

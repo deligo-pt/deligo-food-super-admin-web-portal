@@ -580,6 +580,7 @@ export const pt = {
   rating: "Avaliação",
   docs: "Documentos",
   no_active_vendors_found: "Nenhum vendedor ativo encontrado.",
+  business_branch_name: "Nome da Empresa / Filial",
 
   // suspended vendors
   manage_review_vendors_suspended_due_policy:
@@ -1266,6 +1267,11 @@ export const pt = {
   monthly_growth: "Crescimento mensal",
   message_partner: "Enviar mensagem ao parceiro",
   view_violations: "Ver infrações",
+  disbursed_earnings: "Rendimentos Desembolsados",
+  completed_deliveries: "Entregas Concluídas",
+  canceled_deliveries: "Entregas Canceladas",
+  acceptance_rate: "Taxa de Aceitação",
+  current_status: "Estado Atual",
 
   // delivery partner payouts
   manage_all_rider_payouts_here: "Gerencie todos os pagamentos de Estafetas aqui",

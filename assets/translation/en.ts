@@ -575,6 +575,7 @@ export const en = {
   rating: "Rating",
   docs: "Docs",
   no_active_vendors_found: "No active vendors found.",
+  business_branch_name: "Business / Branch Name",
 
   // suspended vendors
   manage_review_vendors_suspended_due_policy:
@@ -1255,6 +1256,11 @@ export const en = {
   monthly_growth: "Monthly Growth",
   message_partner: "Message Partner",
   view_violations: "View Violations",
+  disbursed_earnings: "Disbursed Earnings",
+  completed_deliveries: "Completed Deliveries",
+  canceled_deliveries: "Cancelled Deliveries",
+  acceptance_rate: "Acceptance Rate",
+  current_status: "Current Status",
 
   // delivery partner payouts
   manage_all_rider_payouts_here: "Manage all rider payouts here",

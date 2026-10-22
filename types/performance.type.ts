@@ -135,6 +135,8 @@ export type TFleetPerformanceDetailsData = {
   topRatedDrivers: TTopRatedDeliveryPartner[];
 };
 
+
+// delivery partner performance analytics
 export type TDeliveryPartnerPerformance = Pick<
   TDeliveryPartner,
   | "_id"
@@ -142,15 +144,16 @@ export type TDeliveryPartnerPerformance = Pick<
   | "userId"
   | "email"
   | "status"
-  | "name"
   | "address"
   | "earnings"
   | "operationalData"
 > & {
+  name: string;
   totalDeliveries: number;
   completedDeliveries: number;
   rating: number;
   totalEarnings: number;
+  disbursedEarnings: number;
 };
 
 export type TPartnerPerformanceStat = {
@@ -180,6 +183,7 @@ export type TPartnerMonthlyPerformance = {
 };
 
 export type TTopPartnerPerformers = {
+  _id: string;
   totalEarnings: number;
   initials: string;
   name: string;
