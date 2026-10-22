@@ -1255,6 +1255,11 @@ export const en = {
   monthly_growth: "Monthly Growth",
   message_partner: "Message Partner",
   view_violations: "View Violations",
+  disbursed_earnings: "Disbursed Earnings",
+  completed_deliveries: "Completed Deliveries",
+  canceled_deliveries: "Cancelled Deliveries",
+  acceptance_rate: "Acceptance Rate",
+  current_status: "Current Status",
 
   // delivery partner payouts
   manage_all_rider_payouts_here: "Manage all rider payouts here",
