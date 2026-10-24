@@ -77,6 +77,9 @@ export const productValidation = z.object({
 
     sdrApplicable: z.boolean().optional(),
 
+    //  Only required when sdrApplicable === true
+    sdrContainerCount: z.number().min(1).optional(),
+
     isAvailableForPreOrder: z.boolean().optional(),
 
     isActive: z.boolean().optional(),
@@ -93,36 +96,20 @@ export const productValidation = z.object({
             "Name is required"
         );
 
-        // validateLocalizedField(
-        //     data.description,
-        //     data.currentLang,
-        //     ctx,
-        //     ["description"],
-        //     "Description is required"
-        // );
-
-        // discount type and value validation
-        // if (
-        //   data.discountType === "PERCENTAGE" &&
-        //   data.discount > 100
-        // ) {
-        //   ctx.addIssue({
-        //     code: "custom",
-        //     path: ["discount"],
-        //     message: "Percentage discount cannot exceed 100%.",
-        //   });
-        // }
-
-        // if (data?.price &&
-        //   data.discountType === "FLAT" &&
-        //   data?.discount > data.price
-        // ) {
-        //   ctx.addIssue({
-        //     code: "custom",
-        //     path: ["discount"],
-        //     message: "Flat discount cannot exceed the product price.",
-        //   });
-        // }
+        // Require container count when SDR is applicable
+        if (data.sdrApplicable === true) {
+            if (
+                data.sdrContainerCount === undefined ||
+                data.sdrContainerCount === null ||
+                data.sdrContainerCount < 1
+            ) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["sdrContainerCount"],
+                    message: "Container count is required when SDR is applicable (minimum 1)",
+                });
+            }
+        }
     })
     // .refine(
     //     (data) => {

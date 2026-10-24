@@ -165,7 +165,7 @@ export default function PayoutSettlement({ payout }: IProps) {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen">
       <motion.div
         variants={containerVariants}
         initial="hidden"
