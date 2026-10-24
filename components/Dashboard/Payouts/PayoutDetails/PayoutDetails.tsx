@@ -366,7 +366,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-                  NIF
+                  {t("nif")}
                 </p>
                 <p className="font-mono text-sm font-medium text-gray-900 mt-0.5">
                   {payout.userId?.NIF || "—"}
