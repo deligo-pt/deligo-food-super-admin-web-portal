@@ -187,7 +187,7 @@ export function getPayoutColumns({
                             {t("view")}
                         </DropdownMenuItem>
 
-                        {payout.status === "PENDING" && (
+                        {/* {payout.status === "PENDING" && (
                             <DropdownMenuItem
                                 onClick={() =>
                                     router.push(
@@ -197,7 +197,7 @@ export function getPayoutColumns({
                             >
                                 {t("settle_payout")}
                             </DropdownMenuItem>
-                        )}
+                        )} */}
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),

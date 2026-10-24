@@ -1,94 +1,95 @@
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
 import { TAgent, TVendor } from "@/types/user.type";
 
+export type TIncludedOrder = {
+  orderId: string;
+  orderCreatedAt: Date | string;
+  grossEarnings: number;
+  platformDeduction: number;
+  taxAmount: number;
+  sdrReimbursement: number;
+  netPayout: number;
+};
+
 export type TPayout = {
   _id: string;
   payoutId: string;
+
   userId: {
+    _id?: string;
+    id?: string;
     userId: string;
     name: {
       firstName: string;
       lastName: string;
     };
-    profilePhoto: string;
-    bankDetails: {
-      iban: string;
-      accountHolderName: string;
-      accountNumber: string;
-      bankName: string;
-      swiftCode: string;
+    profilePhoto?: string;
+    role?: string;
+    NIF?: string;
+    bankDetails?: {
+      iban?: string;
+      accountHolderName?: string;
+      accountNumber?: string;
+      bankName?: string;
+      swiftCode?: string;
     };
   };
+
   userModel: "Vendor" | "DeliveryPartner" | "FleetManager";
 
-  senderId: unknown;
-  senderModel: "Admin" | "FleetManager";
+  senderId?: {
+    _id?: string;
+    name?: {
+      firstName: string;
+      lastName: string;
+    };
+    role?: string;
+  };
+  senderModel?: "Admin" | "FleetManager" | "SUPER_ADMIN";
 
-  startDate: Date;
-  endDate: Date;
-  paymentDate?: Date;
+  /** Period covered by this payout */
+  startDate: Date | string;
+  endDate: Date | string;
+  paymentDate?: Date | string;
+
+  /** Optional explicit date range (sometimes present) */
+  dateRange?: {
+    from: Date | string;
+    to: Date | string;
+  };
 
   amount: number;
-  status: "PENDING" | "PAID";
+  status: "PENDING" | "PAID" | "FAILED" | "PROCESSING";
   paymentMethod: "BANK_TRANSFER" | "MOBILE_BANKING" | "CASH";
+
+  /** Snapshot of bank details at the time of payout (optional) */
   bankDetails?: {
-    bankName: string;
-    accountHolderName: string;
-    accountNumber: string;
+    bankName?: string;
+    accountHolderName?: string;
+    accountNumber?: string;
     iban?: string;
     swiftCode?: string;
   };
+
   bankReferenceId?: string;
   payoutProof?: string;
   remarks?: string;
 
-  failedAt?: Date;
+  /** Orders included in this payout */
+  includedOrders?: TIncludedOrder[];
+
+  /** Category of the payout (e.g. GENERAL) */
+  payoutCategory?: string;
+
+  failedAt?: Date | string;
   failedReason?: string;
 
-  retryAt?: Date;
+  retryAt?: Date | string;
   retryRemarks?: string;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 };
-
-// export type TPayout = {
-//   _id: string;
-//   payoutId: string;
-
-//   amount: number;
-
-//   status: "PENDING" | "PROCESSING" | "PAID" | "FAILED";
-//   paymentMethod: "BANK_TRANSFER" | "MOBILE_BANKING" | "CASH";
-
-//   bankReferenceId: string;
-
-//   payoutCategory: string;
-//   remarks: string;
-
-//   payoutProof: string;
-
-//   userId: {
-//     userId: string;
-//     name: {
-//       firstName: string;
-//       lastName: string;
-//     };
-//     email: string;
-//     profilePhoto: string;
-//     bankDetails: {
-//       iban: string;
-//       accountHolderName: string;
-//       bankName: string;
-//       swiftCode: string;
-//     };
-//   };
-
-//   userModel: "Vendor" | "DeliveryPartner" | "FleetManager";
-
-//   createdAt: string;
-//   updatedAt: string;
-// };
 
 export type TVendorPayout = TPayout & {
   userId: TVendor;

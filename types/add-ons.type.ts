@@ -1,10 +1,15 @@
 import { TTax } from "./tax.type";
 
-
 type LocalizedType = {
     en?: string;
     pt?: string;
 }
+
+
+export type TAddonOptionSdr = {
+    applicable: boolean;
+    containerCount: number;
+};
 
 export type TAddonOption = {
     _id?: string;
@@ -13,6 +18,7 @@ export type TAddonOption = {
     price: number;
     tax: TTax | string;
     isActive?: boolean;
+    sdr?: TAddonOptionSdr;
 };
 
 export type TAddonGroup = {

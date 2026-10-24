@@ -99,6 +99,7 @@ export type TProduct = {
 
   sdr?: {
     applicable?: boolean;
+    containerCount?: number;
   }
 
   meta: {

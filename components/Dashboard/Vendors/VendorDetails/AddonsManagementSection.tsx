@@ -43,7 +43,7 @@ export default function AddOnsManagementSection({
     const { t, lang } = useTranslation();
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [actionType, setActionType] = useState<"create" | "edit">("create");
+    const [actionType, setActionType] = useState<"create" | "edit" | "add-option">("create");
     const [selectedGroup, setSelectedGroup] = useState<TAddonGroup | undefined>(undefined);
 
     // States for Delete Option modal
@@ -64,6 +64,13 @@ export default function AddOnsManagementSection({
     // Handler to open modal for editing group details or adding options (`+ Add Add-On`)
     const handleOpenEditModal = (group: TAddonGroup) => {
         setActionType("edit");
+        setSelectedGroup(group);
+        setIsModalOpen(true);
+    };
+
+    // Add option(s) only (no existing options shown / sent)
+    const handleOpenAddOptionModal = (group: TAddonGroup) => {
+        setActionType("add-option");
         setSelectedGroup(group);
         setIsModalOpen(true);
     };
@@ -162,7 +169,7 @@ export default function AddOnsManagementSection({
 
                             <DropdownMenuItem
                                 onClick={() =>
-                                    router.push(`/admin/vendor/${vendorId}/add-product`)
+                                    router.push(`/admin/vendor/${vendorUserId}/add-product`)
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
@@ -207,7 +214,7 @@ export default function AddOnsManagementSection({
                             <DropdownMenuItem
                                 onClick={() =>
                                     router.push(
-                                        `/admin/vendor/${vendorId}/products/variation-management`
+                                        `/admin/vendor/${vendorUserId}/products/variation-management`
                                     )
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
@@ -255,17 +262,22 @@ export default function AddOnsManagementSection({
                                     </p>
                                 </div>
                                 <div className="flex items-center space-x-2">
+                                    {/* + Add Add-On → only adds new options */}
                                     <button
-                                        onClick={() => handleOpenEditModal(group)}
+                                        onClick={() => handleOpenAddOptionModal(group)}
                                         className="flex items-center text-xs border border-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 transition font-medium"
                                     >
-                                        <Plus className="w-3.5 h-3.5 mr-1 text-[#DC3173]" /> {t("add_addon") || "Add Add-On"}
+                                        <Plus className="w-3.5 h-3.5 mr-1 text-[#DC3173]" />
+                                        {t("add_addon") || "Add Add-On"}
                                     </button>
+
+                                    {/* Edit → only group settings */}
                                     <button
                                         onClick={() => handleOpenEditModal(group)}
                                         className="flex items-center text-xs border border-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 transition font-medium"
                                     >
-                                        <Edit className="w-3.5 h-3.5 mr-1 text-gray-500" /> {t("edit") || "Edit"}
+                                        <Edit className="w-3.5 h-3.5 mr-1 text-gray-500" />
+                                        {t("edit") || "Edit"}
                                     </button>
                                 </div>
                             </div>
@@ -275,48 +287,82 @@ export default function AddOnsManagementSection({
                                 {group.options && group.options.length > 0 ? (
                                     group.options.map((option, idx) => {
                                         const taxObj = taxes.find(
-                                            (tx) => tx._id === (typeof option.tax === "string" ? option.tax : option.tax?._id)
+                                            (tx) =>
+                                                tx._id ===
+                                                (typeof option.tax === "string"
+                                                    ? option.tax
+                                                    : option.tax?._id)
                                         );
+
+                                        const hasSdr = option.sdr?.applicable === true;
+                                        const containerCount = option.sdr?.containerCount ?? 0;
+
                                         return (
                                             <div
-                                                key={idx}
+                                                key={option._id || option.sku || idx}
                                                 className="flex justify-between items-center border border-gray-100 bg-gray-50/50 px-4 py-2.5 rounded-lg text-sm"
                                             >
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#DC3173]"></span>
+                                                {/* Left side */}
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#DC3173] shrink-0" />
+
                                                     <span className="font-medium text-gray-700">
                                                         {option.name?.[lang]}
                                                     </span>
+
                                                     {option.sku && (
                                                         <span className="text-[10px] text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded">
                                                             {option.sku}
                                                         </span>
                                                     )}
+
+                                                    {/* SDR Badge */}
+                                                    {hasSdr && (
+                                                        <span
+                                                            className="inline-flex items-center gap-1 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded"
+                                                            title={
+                                                                t("sdr_container_deposit") ||
+                                                                "This option participates in the SDR deposit system"
+                                                            }
+                                                        >
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                            SDR · {containerCount}{" "}
+                                                            {containerCount === 1
+                                                                ? t("container") || "container"
+                                                                : t("containers") || "containers"}
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                <div className="flex items-center space-x-4">
+
+                                                {/* Right side */}
+                                                <div className="flex items-center space-x-4 shrink-0">
                                                     <span className="text-xs text-gray-600 font-medium">
                                                         €{option.price?.toFixed(2)}
-                                                        {taxObj ? ` (${t("inc_vat")}: ${taxObj.taxRate}%)` : ` (${t("inc_vat")}: 0%)`}
+                                                        {taxObj
+                                                            ? ` (${t("inc_vat")}: ${taxObj.taxRate}%)`
+                                                            : ` (${t("inc_vat")}: 0%)`}
                                                     </span>
 
-                                                    {/* Toggle Status Switch */}
-                                                    <div className="flex items-center space-x-2">
-                                                        <div className="flex items-center space-x-2">
-                                                            {togglingSku === option.sku ? (
-                                                                <Loader2 className="w-4 h-4 animate-spin text-[#DC3173]" />
-                                                            ) : (
-                                                                <Switch
-                                                                    checked={option.isActive ?? true}
-                                                                    onCheckedChange={() => handleToggleOptionStatus(group._id, option.sku)}
-                                                                    className="data-[state=checked]:bg-[#DC3173]"
-                                                                />
-                                                            )}
-                                                        </div>
+                                                    {/* Toggle Status */}
+                                                    <div className="flex items-center">
+                                                        {togglingSku === option.sku ? (
+                                                            <Loader2 className="w-4 h-4 animate-spin text-[#DC3173]" />
+                                                        ) : (
+                                                            <Switch
+                                                                checked={option.isActive ?? true}
+                                                                onCheckedChange={() =>
+                                                                    handleToggleOptionStatus(group._id, option.sku)
+                                                                }
+                                                                className="data-[state=checked]:bg-[#DC3173]"
+                                                            />
+                                                        )}
                                                     </div>
 
-                                                    {/* Trash Button to Open Delete Modal */}
+                                                    {/* Delete */}
                                                     <button
-                                                        onClick={() => handleOpenDeleteModal(group._id, option.sku)}
+                                                        onClick={() =>
+                                                            handleOpenDeleteModal(group._id, option.sku)
+                                                        }
                                                         className="text-gray-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition"
                                                         title={t("delete_option") || "Delete Option"}
                                                     >
@@ -327,7 +373,9 @@ export default function AddOnsManagementSection({
                                         );
                                     })
                                 ) : (
-                                    <p className="text-xs text-gray-400 italic">{t("no_options_added")}</p>
+                                    <p className="text-xs text-gray-400 italic">
+                                        {t("no_options_added")}
+                                    </p>
                                 )}
                             </div>
                         </div>
