@@ -49,6 +49,12 @@ export const createAddonGroupValidationSchema = z.object({
     optionName: z.string().optional(),
     optionPrice: z.number().min(0).optional(),
     optionTax: z.string().optional(),
+    sdr: z
+        .object({
+            applicable: z.boolean(),
+            containerCount: z.number().min(1),
+        })
+        .optional(),
 
     currentLang: z.enum(["en", "pt"]),
 })
