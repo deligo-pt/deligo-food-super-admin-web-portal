@@ -130,6 +130,7 @@ export function AddProductToVendor({
             variations: [],
             isFeatured: false,
             sdrApplicable: false,
+            sdrContainerCount: 1,
             isAvailableForPreOrder: false,
             isActive: false,
             businessTypeSlug,
@@ -228,7 +229,10 @@ export function AddProductToVendor({
                 addonGroups: data.addonGroups,
                 variations: translated.variations,
                 sdr: {
-                    applicable: data.sdrApplicable ?? false
+                    applicable: data.sdrApplicable ?? false,
+                    ...(data.sdrApplicable
+                        ? { containerCount: data.sdrContainerCount ?? 1 }
+                        : {}),
                 },
                 meta: {
                     isFeatured: data.isFeatured,

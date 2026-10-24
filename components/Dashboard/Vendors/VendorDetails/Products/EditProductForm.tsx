@@ -147,6 +147,7 @@ export function EditProductForm({
             availabilityStatus: prevData?.stock?.availabilityStatus || "",
             isFeatured: prevData?.meta?.isFeatured || false,
             sdrApplicable: prevData?.sdr?.applicable ?? false,
+            sdrContainerCount: prevData?.sdr?.containerCount ?? 1,
             isAvailableForPreOrder: prevData?.meta?.isAvailableForPreOrder || false,
             isActive: prevData?.meta?.status === "ACTIVE" ? true : false,
             businessTypeSlug,
@@ -326,11 +327,17 @@ export function EditProductForm({
 
         // sdr update
         const originalSdr = prevData?.sdr;
-        const sdrChanged = hasChanged(data.sdrApplicable, originalSdr?.applicable ?? false);
+        const sdrApplicableChanged = hasChanged(data.sdrApplicable, originalSdr?.applicable ?? false);
+        const sdrContainerCountChanged = hasChanged(data.sdrContainerCount, originalSdr?.containerCount ?? 1);
 
-        if (sdrChanged) {
+        if (sdrApplicableChanged) {
             productData.sdr = {
                 applicable: data.sdrApplicable,
+            };
+        }
+        if (sdrContainerCountChanged) {
+            productData.sdr = {
+                containerCount: data.sdrContainerCount,
             };
         }
 
