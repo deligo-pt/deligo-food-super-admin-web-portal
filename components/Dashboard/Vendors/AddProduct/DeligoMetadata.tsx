@@ -133,7 +133,7 @@ const DeligoMetadata = ({ form }: IProps) => {
                 />
 
                 {/* Container Count – only visible when SDR is applicable */}
-                {sdrApplicable && (
+                {/* {sdrApplicable && (
                     <FormField
                         control={form.control}
                         name="sdrContainerCount"
@@ -166,7 +166,7 @@ const DeligoMetadata = ({ form }: IProps) => {
                             </FormItem>
                         )}
                     />
-                )}
+                )} */}
 
                 {/* Active Status */}
                 <FormField
