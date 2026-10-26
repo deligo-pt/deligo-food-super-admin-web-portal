@@ -309,11 +309,6 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
       label: "Paid",
       desc: "Funds delivered",
     },
-    {
-      key: "FAILED",
-      label: "Failed",
-      desc: "Payout failed",
-    },
   ] as const;
 
   // Map every possible status to an index
@@ -321,13 +316,9 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
     PENDING: 0,
     PROCESSING: 1,
     PAID: 2,
-    FAILED: 3,
   };
 
   const currentIndex = statusOrder[status];
-
-  // For FAILED we still want to show it as the current (last) step
-  const isFailed = status === "FAILED";
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -338,30 +329,22 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
       <div className="space-y-0">
         {steps.map((step, index) => {
           // Normal flow
-          const isDone =
-            !isFailed && (status === "PAID" || index < currentIndex);
+          const isDone = (status === "PAID" || index < currentIndex);
 
           const isCurrent = index === currentIndex;
-
-          // Special styling when the payout failed
-          const isFailedStep = isFailed && step.key === "FAILED";
 
           return (
             <div key={step.key} className="flex gap-4">
               <div className="flex flex-col items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 transition-all ${isFailedStep
-                      ? "bg-red-500 border-red-500 text-white"
-                      : isDone
-                        ? "bg-[#DC3173] border-[#DC3173] text-white"
-                        : isCurrent
-                          ? "bg-[#DC3173]/10 border-[#DC3173] text-[#DC3173]"
-                          : "bg-white border-gray-200 text-gray-300"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shrink-0 transition-all ${isDone
+                    ? "bg-[#DC3173] border-[#DC3173] text-white"
+                    : isCurrent
+                      ? "bg-[#DC3173]/10 border-[#DC3173] text-[#DC3173]"
+                      : "bg-white border-gray-200 text-gray-300"
                     }`}
                 >
-                  {isFailedStep ? (
-                    <XCircle size={16} />
-                  ) : isDone ? (
+                  {isDone ? (
                     <CheckCircle size={16} />
                   ) : isCurrent ? (
                     <Loader2 size={16} className="animate-spin" />
@@ -380,21 +363,17 @@ export const StatusTimeline = ({ status }: { status: TPayout["status"] }) => {
 
               <div className="pb-6">
                 <p
-                  className={`font-bold text-sm ${isFailedStep
-                      ? "text-red-600"
-                      : isDone || isCurrent
-                        ? "text-gray-900"
-                        : "text-gray-400"
+                  className={`font-bold text-sm ${isDone || isCurrent
+                    ? "text-gray-900"
+                    : "text-gray-400"
                     }`}
                 >
                   {step.label}
                 </p>
                 <p
-                  className={`text-xs mt-0.5 ${isFailedStep
-                      ? "text-red-500"
-                      : isDone || isCurrent
-                        ? "text-gray-500"
-                        : "text-gray-300"
+                  className={`text-xs mt-0.5 ${isDone || isCurrent
+                    ? "text-gray-500"
+                    : "text-gray-300"
                     }`}
                 >
                   {step.desc}

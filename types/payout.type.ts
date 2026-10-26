@@ -59,7 +59,7 @@ export type TPayout = {
   };
 
   amount: number;
-  status: "PENDING" | "PAID" | "FAILED" | "PROCESSING";
+  status: "PENDING" | "PAID" | "PROCESSING";
   paymentMethod: "BANK_TRANSFER" | "MOBILE_BANKING" | "CASH";
 
   /** Snapshot of bank details at the time of payout (optional) */
