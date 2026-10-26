@@ -343,6 +343,11 @@ export type TCustomer = {
     longitude?: number;
     geoAccuracy?: number;
     isActive: boolean;
+    detailedAddress: string;
+    zoneId: string;
+    addressType: string;
+    customAddressType: string;
+    _id: string;
   }>;
 
   // ------------------------------------------------------

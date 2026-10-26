@@ -225,6 +225,105 @@ export const CustomerDetails = ({ customer, orders }: IProps) => {
             </div>
           </div>
         </Section>
+        {/* Saved Delivery Addresses */}
+        <Section
+          title={t("delivery_addresses") || "Delivery Addresses"}
+          icon={<MapPin />}
+          defaultOpen={true}
+        >
+          {customer.deliveryAddresses && customer.deliveryAddresses.length > 0 ? (
+            <div className="space-y-4">
+              {customer.deliveryAddresses.map((addr, index) => {
+                const typeLabel =
+                  addr.addressType === "OTHER" && addr.customAddressType
+                    ? addr.customAddressType
+                    : addr.addressType || t("address") || "Address";
+
+                return (
+                  <div
+                    key={addr._id || index}
+                    className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+                  >
+                    {/* Header: type + active badge */}
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#DC3173]/10 text-[#DC3173]">
+                          <MapPin className="h-4 w-4" />
+                        </span>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {typeLabel}
+                          </p>
+                          {addr.detailedAddress && (
+                            <p className="text-xs text-gray-500">
+                              {addr.detailedAddress}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${addr.isActive
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-gray-100 text-gray-500"
+                          }`}
+                      >
+                        {addr.isActive
+                          ? t("active") || "Active"
+                          : t("inactive") || "Inactive"}
+                      </span>
+                    </div>
+
+                    {/* Address fields */}
+                    <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+                      <InfoRow
+                        label={t("street") || "Street"}
+                        value={addr.street || "N/A"}
+                      />
+                      <InfoRow
+                        label={t("city") || "City"}
+                        value={addr.city || "N/A"}
+                      />
+                      <InfoRow
+                        label={t("state") || "State"}
+                        value={addr.state || "N/A"}
+                      />
+                      <InfoRow
+                        label={t("country") || "Country"}
+                        value={addr.country || "N/A"}
+                      />
+                      <InfoRow
+                        label={t("zip_code") || "Postal Code"}
+                        value={addr.postalCode || "N/A"}
+                      />
+                      {(addr.latitude != null || addr.longitude != null) && (
+                        <InfoRow
+                          label={t("coordinates") || "Coordinates"}
+                          value={
+                            addr.latitude != null && addr.longitude != null
+                              ? `${addr.latitude}, ${addr.longitude}`
+                              : "N/A"
+                          }
+                        />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white py-10 text-center">
+              <MapPin className="mb-2 h-8 w-8 text-gray-300" />
+              <p className="text-sm font-medium text-gray-500">
+                {t("no_delivery_addresses") || "No saved delivery addresses"}
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
+                {t("no_delivery_addresses_hint") ||
+                  "This customer has not saved any delivery addresses yet."}
+              </p>
+            </div>
+          )}
+        </Section>
         <Section title={t("orders_lg")} icon={<Package />}>
           <CustomerOrdersSection orders={orders} />
           <div className="text-center my-3">
