@@ -25,7 +25,7 @@ import WalletTransactionTable from "./WalletTransactionTable";
 interface IProps {
   wallet: TWalletDetails;
   payoutsData: { data: TPayout[]; meta?: TMeta };
-  transactionsResult: { data: TTransaction[]; meta?: TMeta };
+  transactionsResult?: { data: TTransaction[]; meta?: TMeta };
 }
 
 export default function WalletDetails({ wallet, payoutsData, transactionsResult }: IProps) {
@@ -151,11 +151,11 @@ export default function WalletDetails({ wallet, payoutsData, transactionsResult 
           </div>
 
           {/* Transaction History Card */}
-          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+          {(transactionsResult?.data && transactionsResult?.data?.length > 0) && <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
             <div className="flex justify-between items-start mb-8">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  {t("transaction_history")} 
+                  {t("transaction_history")}
                 </p>
                 <h2 className="text-3xl font-black tracking-tight text-gray-800">
                   {transactionsResult.meta?.total}
@@ -175,7 +175,7 @@ export default function WalletDetails({ wallet, payoutsData, transactionsResult 
                 />
               </div>
             )}
-          </div>
+          </div>}
         </div>
 
         {/* Sidebar Columns */}
