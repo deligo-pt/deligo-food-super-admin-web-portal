@@ -47,7 +47,7 @@ export default function PayoutSettings({
       payoutWindowDays: settings?.payout?.payoutWindowDays || 0,
     },
   });
-  console.log("auto generate", settings?.payout?.autoGenerate);
+
   const daysOfWeek = [
     "Sunday",
     "Monday",
