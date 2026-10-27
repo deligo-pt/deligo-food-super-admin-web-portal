@@ -439,6 +439,15 @@ export const en = {
   deleting_option: "Deleting option...",
   updating_status: "Updating status...",
 
+  // create new offer page
+  add_promotion_boost_restaurant: "Add a promotion to boost your restaurant's sales",
+  offer_title_20_perc_off: "Offer Title (e.g., 20% OFF on Burgers)",
+  discount_perc_20: "Discount % (e.g., 20)",
+  buy_product: "Buy Product",
+  get_product: "Get Product",
+  buy_quantity: "Buy Quantity (e.g., 2)",
+  get_quantity: "Get Quantity (e.g., 1)",
+
   // add-new-item page
   add_new_item: "Add New Item",
   fill_the_details_to_add_new_food_item:

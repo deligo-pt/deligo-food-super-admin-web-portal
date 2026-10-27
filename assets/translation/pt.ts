@@ -444,6 +444,15 @@ export const pt = {
   update_category: "Atualizar Categoria",
   deleting_option: "A eliminar opção...",
   updating_status: "A atualizar estado...",
+  // create new offer page
+  add_promotion_boost_restaurant: "Adicionar uma promoção para impulsionar as vendas do seu restaurante",
+  offer_title_20_perc_off: "Título da Oferta (ex.: 20% OFF em Hambúrgueres)",
+  discount_perc_20: "Desconto % (ex.: 20)",
+  buy_product: "Comprar Produto",
+  get_product: "Receber Produto",
+  buy_quantity: "Quantidade a Comprar (ex.: 2)",
+  get_quantity: "Quantidade a Receber (ex.: 1)",
+
   // add-new-item page
   add_new_item: "Adicionar Novo Item",
   fill_the_details_to_add_new_food_item:
