@@ -217,15 +217,15 @@ export default function ProductsSection({
       result = [...result].sort((a, b) => {
         const nameA = a.category
           ? a.category.name?.[lang] ||
-            a.category.name?.en ||
-            a.category.name?.pt ||
-            ""
+          a.category.name?.en ||
+          a.category.name?.pt ||
+          ""
           : t("uncategorized") || "Uncategorized";
         const nameB = b.category
           ? b.category.name?.[lang] ||
-            b.category.name?.en ||
-            b.category.name?.pt ||
-            ""
+          b.category.name?.en ||
+          b.category.name?.pt ||
+          ""
           : t("uncategorized") || "Uncategorized";
         return (
           nameA.localeCompare(nameB, lang, {
@@ -642,6 +642,17 @@ export default function ProductsSection({
                 {t("increase_prices") || "Increase Price"}
               </DropdownMenuItem>
 
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push(
+                    `/admin/vendor/${vendorId}/products/offers/create-new`
+                  )
+                }
+                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+              >
+                {t("create_new_offer") || "Create New Offer"}
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator className="my-1 border-gray-100" />
 
               <DropdownMenuItem
@@ -804,21 +815,19 @@ export default function ProductsSection({
                         setActiveCategoryId(id);
                         scrollToCategory(id);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                        isActive
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
                           ? "bg-[#DC3173]/10 text-[#DC3173]"
                           : "text-gray-600 hover:bg-gray-50"
-                      }`}
+                        }`}
                     >
                       <span className="truncate uppercase tracking-wide">
                         {getCategoryName(group.category)}
                       </span>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full shrink-0 min-w-7 text-center ${
-                          isActive
+                        className={`text-xs px-2 py-0.5 rounded-full shrink-0 min-w-7 text-center ${isActive
                             ? "bg-[#DC3173]/15 text-[#DC3173]"
                             : "bg-gray-100 text-gray-500"
-                        }`}
+                          }`}
                       >
                         {showSpinner ? (
                           <Loader2 className="h-3 w-3 animate-spin mx-auto" />

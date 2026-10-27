@@ -36,6 +36,13 @@ import {
     productHasVariations,
     TOfferForm,
 } from "@/validations/offer/offer.validation";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -49,6 +56,7 @@ import { queryStringFormatter } from "@/utils/formatter";
 import { getAllProductCategories } from "@/services/dashboard/category/product-category.service";
 import { usePaginatedList } from "@/hooks/use-paginated-list";
 import { getAllProducts } from "@/services/dashboard/product/product.service";
+import { ChevronDown } from "lucide-react";
 
 const PRIMARY = "#DC3173";
 
@@ -478,6 +486,108 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
             <TitleHeader
                 title={t("create_new_offer")}
                 subtitle={t("add_promotion_boost_restaurant")}
+                onBackClick={() => router.back()}
+                extraComponent={
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white flex items-center gap-2">
+                                {t("actions") || "Actions"}
+                                <ChevronDown className="w-4 h-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-48 bg-white shadow-lg border rounded-lg p-1"
+                        >
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(`/admin/vendor/${vendorUserId}/manage-products`)
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("manage_products") || "Manage Product"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(`/admin/vendor/${vendorUserId}/add-product`)
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("add_product") || "Add Product"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/update-discount`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("update_discounts") || "Update Discount"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/increase-price`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("increase_prices") || "Increase Price"}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="my-1 border-gray-100" />
+
+                            {/* Newly added sections */}
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/categories`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("product_categories") || "Product Categories"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/variation-management`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
+                                {t("variation_management") || "Variation Management"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/add-ons`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("add_ons") || "Add-ons"}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendorUserId}/products/offers`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("created_offers") || ""}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                }
             />
 
             <Card className="rounded-3xl bg-white border shadow-lg">

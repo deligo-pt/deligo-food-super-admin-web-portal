@@ -266,6 +266,17 @@ const ProductCategories = ({ vendor, categoriesResult }: IProps) => {
                             >
                                 {t("increase_prices") || "Increase Price"}
                             </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    router.push(
+                                        `/admin/vendor/${vendor?.userId}/products/offers/create-new`
+                                    )
+                                }
+                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                            >
+                                {t("create_new_offer") || "Create New Offer"}
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-1 border-gray-100" />
 
                             {/* Newly added sections */}
