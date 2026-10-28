@@ -39,8 +39,7 @@ export function getPlatformEarningsColumns({
                 </div>
             ),
             accessor: (row) =>
-                `${row.customer?.name?.firstName || "N/A"} ${row.customer?.name?.lastName || ""
-                }`,
+                `${row.customer?.name || ""}`,
         },
 
         {
