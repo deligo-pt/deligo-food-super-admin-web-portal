@@ -66,18 +66,27 @@ export type TGlobalSettings = {
 
   // Loyalty & Rewards
   rewards: {
-    customerPointsPerEuro: number;
-    riderPointsPerDelivery: number;
-    referralPoints: number;
-    newRiderWelcomeBonus: number;
+    customerOrderPoints: number;
+    riderDeliveryPoints: number;
+    vendorOrderPoints: number;
+    referralPoints: { customer: number; rider: number; vendor: number };
+    welcomeBonus: { customer: number; rider: number; vendor: number };
     pointsExpiryDays: number;
-    customerReferralMilestones: {
-      friendsRequired: number;
-      rewardType: "CASHBACK" | "FREE_MEAL" | "FREE_DELIVERY" | "CREDIT";
-      rewardValue: number;
-      minOrderAmountPerFriend: number;
-    }[];
+    maxRewardClaimsPerYear: number;
   };
+  // rewards: {
+  //   customerPointsPerEuro: number;
+  //   riderPointsPerDelivery: number;
+  //   referralPoints: number;
+  //   newRiderWelcomeBonus: number;
+  //   pointsExpiryDays: number;
+  //   customerReferralMilestones: {
+  //     friendsRequired: number;
+  //     rewardType: "CASHBACK" | "FREE_MEAL" | "FREE_DELIVERY" | "CREDIT";
+  //     rewardValue: number;
+  //     minOrderAmountPerFriend: number;
+  //   }[];
+  // };
 
   // Security & System State
   system: {
