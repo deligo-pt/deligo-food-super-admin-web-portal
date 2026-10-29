@@ -101,8 +101,8 @@ export default function ProductsSection({
         {
           label: "SDR Products Only",
           value: "SDR_ONLY",
-          queryKey: "sdr",
-          queryValue: "only",
+          queryKey: "sdr.applicable",
+          queryValue: "true",
           clearKeys: ["meta.status"],
         },
       ],
@@ -301,7 +301,7 @@ export default function ProductsSection({
     }
 
     // Only if AllFilters hasn't written status yet
-    if (!params.get("meta.status") && !params.get("sdr")) {
+    if (!params.get("meta.status") && !params.get("sdr.applicable")) {
       params.set("meta.status", "ACTIVE");
       changed = true;
     }
@@ -806,8 +806,8 @@ export default function ProductsSection({
                         scrollToCategory(id);
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
-                          ? "bg-[#DC3173]/10 text-[#DC3173]"
-                          : "text-gray-600 hover:bg-gray-50"
+                        ? "bg-[#DC3173]/10 text-[#DC3173]"
+                        : "text-gray-600 hover:bg-gray-50"
                         }`}
                     >
                       <span className="truncate uppercase tracking-wide">
@@ -815,8 +815,8 @@ export default function ProductsSection({
                       </span>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full shrink-0 min-w-7 text-center ${isActive
-                            ? "bg-[#DC3173]/15 text-[#DC3173]"
-                            : "bg-gray-100 text-gray-500"
+                          ? "bg-[#DC3173]/15 text-[#DC3173]"
+                          : "bg-gray-100 text-gray-500"
                           }`}
                       >
                         {showSpinner ? (
