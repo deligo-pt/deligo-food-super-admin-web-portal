@@ -14,6 +14,7 @@ export const getAllTransactionsReq = async (
   const sortBy = queries.sortBy || "-createdAt";
   const type = queries.type;
   const status = queries.status;
+  const vendorId = queries.vendorId;
 
   const params = {
     limit,
@@ -22,6 +23,7 @@ export const getAllTransactionsReq = async (
     ...(searchTerm ? { searchTerm } : {}),
     ...(type ? { type } : {}),
     ...(status ? { status } : {}),
+    ...(vendorId ? { vendorId } : {}),
   };
 
   const result = await catchAsync<{ data: TTransaction[]; meta?: TMeta }>(

@@ -41,7 +41,7 @@ export default function PayoutSettings({
   const form = useForm<TPayoutSettingsForm>({
     resolver: zodResolver(payoutSettingsSchema),
     values: {
-      autoGenerate: settings?.payout?.autoGenerate || true,
+      autoGenerate: settings?.payout?.autoGenerate ?? true,
       payoutDays: settings?.payout?.payoutDays || [],
       minPayoutAmount: settings?.payout?.minPayoutAmount || 0,
       payoutWindowDays: settings?.payout?.payoutWindowDays || 0,
@@ -127,11 +127,10 @@ export default function PayoutSettings({
                 disabled={isSaving}
                 className={`
               relative overflow-hidden group flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-[#DC3173] transition-all
-              ${
-                isSaving
-                  ? "bg-white/50 cursor-wait"
-                  : "bg-white hover:bg-white/90 cursor-pointer"
-              }
+              ${isSaving
+                    ? "bg-white/50 cursor-wait"
+                    : "bg-white hover:bg-white/90 cursor-pointer"
+                  }
             `}
               >
                 {isSaving ? (
@@ -297,11 +296,10 @@ export default function PayoutSettings({
                                 );
                               }}
                               whileTap={{ scale: 0.95 }}
-                              className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${
-                                field.value.includes(day)
-                                  ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                  : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                              }`}
+                              className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ${field.value.includes(day)
+                                ? "bg-[#DC3173] text-white border-[#DC3173]"
+                                : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
+                                }`}
                             >
                               {t(day.toLowerCase())}
                             </motion.button>

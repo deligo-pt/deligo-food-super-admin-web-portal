@@ -40,6 +40,7 @@ export default function ProductCard({
     ACTIVE: "bg-green-100 text-green-800",
     INACTIVE: "bg-gray-100 text-gray-800",
     DELETED: "bg-red-100 text-red-800",
+    SDR: "bg-gray-100 text-gray-800"
   };
 
   const availabilityColors = {
@@ -111,11 +112,18 @@ export default function ProductCard({
         <div
           className={`absolute top-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${statusColors[
             product.isDeleted ? "DELETED" : product.meta.status
-            ]
+          ]
             }`}
         >
           {product.isDeleted ? "DELETED" : product.meta.status}
         </div>
+
+        {product.sdr?.applicable === true && <div
+          className={`absolute bottom-2 left-2 text-xs font-medium px-2 py-1 rounded-md ${product?.sdr?.applicable === true ? statusColors.SDR : ""
+            }`}
+        >
+          {product?.sdr?.applicable === true && "SDR"}
+        </div>}
 
         {(product?.pricing?.discount ?? 0) > 0 && (
           <div className="absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-md bg-[#DC3173] text-white">
@@ -298,7 +306,7 @@ export default function ProductCard({
                     {t("delete")}
                   </motion.button>
                 )}
-                  {/* <motion.button
+                {/* <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onDelete(product.productId, "permanent")}

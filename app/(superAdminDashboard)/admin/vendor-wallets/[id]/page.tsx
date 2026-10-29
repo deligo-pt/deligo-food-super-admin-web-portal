@@ -1,5 +1,6 @@
 import WalletDetails from "@/components/Dashboard/Wallets/WalletDetails/WalletDetails";
 import { getAllPayoutsReq } from "@/services/dashboard/payout/payout.service";
+import { getAllTransactionsReq } from "@/services/dashboard/transaction/transaction.service";
 import { getSingleWalletReq } from "@/services/dashboard/wallet/wallet.service";
 
 export default async function VendorWalletDetailsPage({
@@ -18,5 +19,11 @@ export default async function VendorWalletDetailsPage({
     userId: wallet.userId?._id,
   });
 
-  return <WalletDetails wallet={wallet} payoutsData={payoutsData} />;
+  const transactionQuery = {
+    vendorId: wallet?.userId?._id,
+    type: "VENDOR_EARNING"
+  };
+  const transactionsResult = await getAllTransactionsReq(transactionQuery);
+
+  return <WalletDetails wallet={wallet} payoutsData={payoutsData} transactionsResult={transactionsResult} />;
 }
