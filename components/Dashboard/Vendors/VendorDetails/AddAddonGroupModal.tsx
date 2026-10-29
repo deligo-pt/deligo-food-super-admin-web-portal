@@ -508,7 +508,7 @@ export default function AddAddonGroupModal({
                                             </Label>
                                         </div>
 
-                                        {sdrApplicable && (
+                                        {/* {sdrApplicable && (
                                             <div className="space-y-1.5">
                                                 <Label>
                                                     {t("container_count") || "Container Count"}
@@ -528,7 +528,7 @@ export default function AddAddonGroupModal({
                                                     placeholder="e.g. 1"
                                                 />
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
 
                                     <div className="text-right">

@@ -85,21 +85,85 @@ export default function EditTaxModal({ open, onOpenChange, prevTax }: IProps) {
     if (!translated) {
       toast.error("Translation failed", { id: toastId });
       return;
-    };
-
-    const payload = {
-      taxName: translated?.taxName,
-      taxCode: data.taxCode,
-      taxRate: data.taxRate,
-      countryID: data.countryID,
-      description: translated?.description,
-      taxExemptionCode: data.taxExemptionCode,
     }
 
-    const result = await updateTaxReq(
-      prevTax?._id as string,
-      payload as Partial<TTax>,
-    );
+    // Helper: detect change between previous and current values
+    const hasChanged = (prev: unknown, next: unknown) => {
+      // normalize undefined/null/"" for simple scalars
+      const normalize = (v: unknown) => {
+        if (v === undefined || v === null || v === "") return null;
+        return v;
+      };
+
+      // deep-ish compare for plain objects (localized fields)
+      if (
+        typeof prev === "object" &&
+        prev !== null &&
+        typeof next === "object" &&
+        next !== null
+      ) {
+        return JSON.stringify(prev) !== JSON.stringify(next);
+      }
+
+      return normalize(prev) !== normalize(next);
+    };
+
+    const payload: Partial<TTax> = {};
+
+    // Localized name
+    if (hasChanged(prevTax?.taxName, translated.taxName)) {
+      payload.taxName = {
+        en: translated.taxName?.en ?? "",
+        pt: translated.taxName?.pt ?? "",
+      };
+    }
+
+    // Tax code
+    if (hasChanged(prevTax?.taxCode, data.taxCode)) {
+      payload.taxCode = data.taxCode as TTax["taxCode"];
+    }
+
+    // Tax rate
+    if (hasChanged(prevTax?.taxRate, data.taxRate)) {
+      payload.taxRate = data.taxRate as TTax["taxRate"];
+    }
+
+    // Country
+    if (hasChanged(prevTax?.countryID, data.countryID)) {
+      payload.countryID = data.countryID;
+    }
+
+    // Description
+    if (hasChanged(prevTax?.description, translated.description)) {
+      payload.description = {
+        en: translated.description?.en ?? "",
+        pt: translated.description?.pt ?? "",
+      };
+    }
+
+    // Exemption code
+    if (hasChanged(prevTax?.taxExemptionCode, data.taxExemptionCode)) {
+      payload.taxExemptionCode = data.taxExemptionCode;
+    }
+
+    // Exemption reason
+    if (
+      hasChanged(prevTax?.taxExemptionReason, translated.taxExemptionReason)
+    ) {
+      payload.taxExemptionReason = {
+        en: translated.taxExemptionReason?.en ?? "",
+        pt: translated.taxExemptionReason?.pt ?? "",
+      };
+    }
+
+    // Nothing changed → skip API call
+    if (Object.keys(payload).length === 0) {
+      toast.info("No changes detected", { id: toastId });
+      onOpenChange(false);
+      return;
+    }
+
+    const result = await updateTaxReq(prevTax?._id as string, payload);
 
     if (result.success) {
       router.refresh();

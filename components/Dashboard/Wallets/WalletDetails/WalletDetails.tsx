@@ -6,6 +6,7 @@ import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { TMeta } from "@/types";
 import { TPayout } from "@/types/payout.type";
+import { TTransaction } from "@/types/transaction.type";
 import { TWalletDetails } from "@/types/wallet.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
@@ -19,13 +20,15 @@ import {
   Wallet,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import WalletTransactionTable from "./WalletTransactionTable";
 
 interface IProps {
   wallet: TWalletDetails;
   payoutsData: { data: TPayout[]; meta?: TMeta };
+  transactionsResult?: { data: TTransaction[]; meta?: TMeta };
 }
 
-export default function WalletDetails({ wallet, payoutsData }: IProps) {
+export default function WalletDetails({ wallet, payoutsData, transactionsResult }: IProps) {
   const { t } = useTranslation();
   const brandColor = "#DC3173";
   const router = useRouter();
@@ -120,7 +123,7 @@ export default function WalletDetails({ wallet, payoutsData }: IProps) {
             </div>
           </div>
 
-          {/* Transaction History Card */}
+          {/* Payout History Card */}
           <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
             <div className="flex justify-between items-start mb-8">
               <div>
@@ -146,6 +149,33 @@ export default function WalletDetails({ wallet, payoutsData }: IProps) {
               </div>
             )}
           </div>
+
+          {/* Transaction History Card */}
+          {(transactionsResult?.data && transactionsResult?.data?.length > 0) && <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm relative overflow-hidden">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
+                  {t("transaction_history")}
+                </p>
+                <h2 className="text-3xl font-black tracking-tight text-gray-800">
+                  {transactionsResult.meta?.total}
+                </h2>
+              </div>
+              <div className="p-4 rounded-xl bg-pink-50">
+                <Wallet className="w-8 h-8" style={{ color: brandColor }} />
+              </div>
+            </div>
+
+            <WalletTransactionTable transactions={transactionsResult.data} meta={transactionsResult.meta as TMeta} />
+
+            {!!transactionsResult?.meta?.totalPage && (
+              <div>
+                <PaginationComponent
+                  totalPages={transactionsResult?.meta?.totalPage as number}
+                />
+              </div>
+            )}
+          </div>}
         </div>
 
         {/* Sidebar Columns */}

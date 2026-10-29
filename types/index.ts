@@ -47,3 +47,28 @@ export type LocalizedType = {
   en?: string;
   pt?: string;
 }
+
+export type FilterOptionItem = {
+  label: string;
+  value: string; // UI / badge value
+  /** Write to this query key instead of parent `key` */
+  queryKey?: string;
+  /** Write this value instead of `value` */
+  queryValue?: string;
+  /** Extra query keys to remove when this item is selected */
+  clearKeys?: string[];
+  /** Remove parent key and set nothing (e.g. "All") */
+  clear?: boolean;
+};
+
+export type FilterOption = {
+  label: string;
+  key: string;
+  placeholder: string;
+  type: string;
+  items: FilterOptionItem[];
+  /** Set in URL only when this key is missing */
+  defaultValue?: string;
+  /** Don’t apply default if any of these keys already exist (e.g. `sdr`) */
+  defaultUnlessKeys?: string[];
+};

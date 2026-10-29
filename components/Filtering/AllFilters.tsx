@@ -10,22 +10,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, LoaderIcon, RefreshCcw, SlidersHorizontal, X } from "lucide-react";
+import {
+  Loader2,
+  LoaderIcon,
+  RefreshCcw,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import SearchFilter from "./SearchFilter";
 import SelectFilter from "./SelectFilter";
 import { useTranslation } from "@/hooks/use-translation";
+import { FilterOption, FilterOptionItem } from "@/types";
+
 
 interface IProps {
   sortOptions: { label: string; value: string }[];
-  filterOptions?: {
-    label: string;
-    key: string;
-    placeholder: string;
-    type: string;
-    items: { label: string; value: string }[];
-  }[];
+  filterOptions?: FilterOption[];
   searchPlaceholder?: string;
   extraSelectFilter?: {
     key: string;
@@ -37,12 +39,83 @@ interface IProps {
   refreshButton?: boolean;
 }
 
+/*
+ * Helpers
+ */
+
+function findItem(
+  option: FilterOption,
+  value: string
+): FilterOptionItem | undefined {
+  return option.items.find((i) => i.value === value);
+}
+
+/** Apply one filter selection onto URLSearchParams */
+function applyFilterValue(
+  params: URLSearchParams,
+  option: FilterOption,
+  value: string
+) {
+  const item = findItem(option, value);
+
+  item?.clearKeys?.forEach((k) => params.delete(k));
+
+  if (!value || item?.clear) {
+    params.delete(option.key);
+    // also clear any custom queryKeys this option might own
+    option.items.forEach((i) => {
+      if (i.queryKey) params.delete(i.queryKey);
+    });
+    return;
+  }
+
+  const queryKey = item?.queryKey || option.key;
+  const queryValue = item?.queryValue ?? value;
+
+  if (queryKey !== option.key) {
+    params.delete(option.key);
+  }
+
+  // clear other custom keys belonging to this option
+  option.items.forEach((i) => {
+    if (i.queryKey && i.queryKey !== queryKey) {
+      params.delete(i.queryKey);
+    }
+  });
+
+  params.set(queryKey, queryValue);
+}
+
+/** Resolve UI value from current URL for one filter option */
+function resolveUiValue(
+  option: FilterOption,
+  searchParams: URLSearchParams
+): string {
+  for (const item of option.items) {
+    if (item.clear) continue;
+    const qKey = item.queryKey || option.key;
+    const qVal = item.queryValue ?? item.value;
+    if (searchParams.get(qKey) === qVal) {
+      return item.value;
+    }
+  }
+
+  const raw = searchParams.get(option.key);
+  if (raw) return raw;
+
+  return option.defaultValue || "";
+}
+
+/* ─────────────────────────────────────────────
+ * Component
+ * ───────────────────────────────────────────── */
+
 export default function AllFilters({
   sortOptions,
   filterOptions,
   searchPlaceholder,
   extraSelectFilter,
-  refreshButton = false
+  refreshButton = false,
 }: IProps) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -56,58 +129,144 @@ export default function AllFilters({
   };
 
   const oldFilters =
-    filterOptions?.reduce((acc, option) => {
-      acc[option.key] = searchParams.get(option.key) || "";
-      return acc;
-    }, {} as Record<string, string>) || {};
+    filterOptions?.reduce(
+      (acc, option) => {
+        acc[option.key] = resolveUiValue(option, searchParams);
+        return acc;
+      },
+      {} as Record<string, string>
+    ) || {};
 
   const [showFilters, setShowFilters] = useState(false);
   const [activeFilters, setActiveFilters] =
     useState<Record<string, string>>(oldFilters);
-  const [paramFilters, setParamFilters] = useState(oldFilters);
+  const [paramFilters, setParamFilters] =
+    useState<Record<string, string>>(oldFilters);
 
-  // Current search term from URL
   const searchTerm = searchParams.get("searchTerm") || "";
+
+  // Apply defaultValue only for options that define it
+  useEffect(() => {
+    if (!filterOptions?.length) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    let changed = false;
+
+    filterOptions.forEach((option) => {
+      if (!option.defaultValue) return;
+
+      const hasOwn = searchParams.has(option.key);
+      const hasUnless = option.defaultUnlessKeys?.some((k) =>
+        searchParams.has(k)
+      );
+      const hasCustom = option.items.some(
+        (item) => item.queryKey && searchParams.has(item.queryKey)
+      );
+
+      if (!hasOwn && !hasUnless && !hasCustom) {
+        applyFilterValue(params, option, option.defaultValue);
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      router.replace(`?${params.toString()}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep local state in sync when URL changes externally
+  useEffect(() => {
+    if (!filterOptions?.length) return;
+
+    const next =
+      filterOptions.reduce(
+        (acc, option) => {
+          acc[option.key] = resolveUiValue(option, searchParams);
+          return acc;
+        },
+        {} as Record<string, string>
+      ) || {};
+
+    setActiveFilters(next);
+    setParamFilters(next);
+  }, [searchParams, filterOptions]);
 
   const handleAddFilter = () => {
     const params = new URLSearchParams(searchParams.toString());
+    const nextParamFilters = { ...paramFilters };
+
     Object.entries(activeFilters).forEach(([key, value]) => {
-      if (value) {
-        if (value !== "all") {
-          setParamFilters((prev) => ({ ...prev, [key]: value }));
-          params.set(key, value);
-        } else {
-          setParamFilters((prev) => ({ ...prev, [key]: "" }));
-          params.delete(key);
-        }
-      }
+      const option = filterOptions?.find((o) => o.key === key);
+      if (!option) return;
+
+      applyFilterValue(params, option, value);
+
+      const item = findItem(option, value);
+      nextParamFilters[key] = !value || item?.clear ? "" : value;
     });
+
+    setParamFilters(nextParamFilters);
     router.push(`?${params.toString()}`);
     setShowFilters(false);
   };
 
   const removeFilter = (key: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    setParamFilters((prev) => ({ ...prev, [key]: "" }));
-    params.delete(key);
+    const option = filterOptions?.find((o) => o.key === key);
+    if (!option) return;
+
+    params.delete(option.key);
+    option.items.forEach((item) => {
+      if (item.queryKey) params.delete(item.queryKey);
+      item.clearKeys?.forEach((k) => params.delete(k));
+    });
+
+    if (option.defaultValue) {
+      applyFilterValue(params, option, option.defaultValue);
+      setParamFilters((prev) => ({
+        ...prev,
+        [key]: option.defaultValue!,
+      }));
+      setActiveFilters((prev) => ({
+        ...prev,
+        [key]: option.defaultValue!,
+      }));
+    } else {
+      setParamFilters((prev) => ({ ...prev, [key]: "" }));
+      setActiveFilters((prev) => ({ ...prev, [key]: "" }));
+    }
+
     router.push(`?${params.toString()}`);
   };
 
   const clearAllFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
+    const next: Record<string, string> = {};
+
     filterOptions?.forEach((option) => {
-      setParamFilters((prev) => ({ ...prev, [option.key]: "" }));
       params.delete(option.key);
+      option.items.forEach((item) => {
+        if (item.queryKey) params.delete(item.queryKey);
+        item.clearKeys?.forEach((k) => params.delete(k));
+      });
+      next[option.key] = "";
     });
+
+    setParamFilters(next);
+    setActiveFilters(next);
     router.push(`?${params.toString()}`);
   };
 
-  // Clear search handler
   const clearSearch = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("searchTerm");
     router.push(`?${params.toString()}`);
   };
+
+  const activeFilterCount = Object.entries(paramFilters).filter(
+    ([, v]) => v !== ""
+  ).length;
 
   return (
     <motion.div
@@ -117,7 +276,7 @@ export default function AllFilters({
     >
       <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
         <div className="flex flex-col lg:flex-row gap-2 w-full">
-          {/* Search + Clear button */}
+          {/* Search */}
           <div className="relative w-full lg:w-auto flex-1 lg:max-w-xs">
             <SearchFilter
               paramName="searchTerm"
@@ -125,8 +284,6 @@ export default function AllFilters({
                 searchPlaceholder ? t(`${searchPlaceholder}`) : t("search")
               }
             />
-
-            {/* Cross button – only visible when there is a search term */}
             {searchTerm.length > 0 && (
               <button
                 type="button"
@@ -138,6 +295,7 @@ export default function AllFilters({
               </button>
             )}
           </div>
+
           {extraSelectFilter && (
             <div className="w-full lg:w-32">
               <SelectFilter
@@ -149,40 +307,40 @@ export default function AllFilters({
               />
             </div>
           )}
-          <Button
-            className={`bg-[#DC3173] text-white`}
-            variant="outline"
-            disabled={isPending}
-            onClick={handleRefresh}
-          >
-            {isPending ? <LoaderIcon className="w-5 h-5 mr-2 animate-spin" /> : (
-              <>
-                <Loader2 /> <span>Refresh</span>
-              </>
-            )}
-          </Button>
+
+          {(refreshButton || true) && (
+            <Button
+              className="bg-[#DC3173] text-white"
+              variant="outline"
+              disabled={isPending}
+              onClick={handleRefresh}
+            >
+              {isPending ? (
+                <LoaderIcon className="w-5 h-5 mr-2 animate-spin" />
+              ) : (
+                <>
+                  <Loader2 /> <span>Refresh</span>
+                </>
+              )}
+            </Button>
+          )}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-          {filterOptions && (
+          {filterOptions && filterOptions.length > 0 && (
             <Button
               variant="outline"
-              className={`flex items-center ${showFilters ||
-                Object.entries(paramFilters)?.filter(
-                  (filter) => filter[1] !== ""
-                )?.length > 0
+              className={`flex items-center ${showFilters || activeFilterCount > 0
                 ? "border-[#DC3173] text-[#DC3173]"
                 : ""
                 }`}
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="mr-2 h-4 w-4" />
-              {t("filters")}{" "}
-              {Object.entries(paramFilters)?.filter(
-                (filter) => filter[1] !== ""
-              )?.length || ""}
+              {t("filters")} {activeFilterCount > 0 ? activeFilterCount : ""}
             </Button>
           )}
+
           <div className="w-full lg:w-40">
             <SelectFilter
               paramName="sortBy"
@@ -195,14 +353,20 @@ export default function AllFilters({
 
       {/* Active filter badges */}
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        {filterOptions?.map((option, i) =>
-          paramFilters[option.key]?.length > 0 ? (
+        {filterOptions?.map((option, i) => {
+          const value = paramFilters[option.key];
+          if (!value) return null;
+
+          const label =
+            option.items.find((item) => item.value === value)?.label || value;
+
+          return (
             <Badge
               key={i}
               variant="outline"
               className="text-[#DC3173] border-[#DC3173]"
             >
-              {paramFilters[option.key]}
+              {label}
               <span>
                 <X
                   className="ml-2 h-4 w-4 cursor-pointer"
@@ -210,20 +374,19 @@ export default function AllFilters({
                 />
               </span>
             </Badge>
-          ) : null
-        )}
+          );
+        })}
 
-        {Object.entries(paramFilters)?.filter((filter) => filter[1] !== "")
-          ?.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
-            >
-              <RefreshCcw className="h-3 w-3 mr-1" /> {t("clear_all")}
-            </Button>
-          )}
+        {activeFilterCount > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearAllFilters}
+            className="text-sm text-[#DC3173] hover:text-[#DC3173] hover:bg-pink-50"
+          >
+            <RefreshCcw className="h-3 w-3 mr-1" /> {t("clear_all")}
+          </Button>
+        )}
       </div>
 
       {/* Filters panel */}
@@ -238,25 +401,25 @@ export default function AllFilters({
           >
             <div className="mt-4 p-4 border rounded-lg bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {filterOptions?.map((options, i) => (
+                {filterOptions?.map((option, i) => (
                   <div key={i}>
                     <label className="block text-sm font-medium mb-1">
-                      {t(`${options.label}`)}
+                      {t(`${option.label}`)}
                     </label>
                     <Select
-                      value={activeFilters[options.key]}
+                      value={activeFilters[option.key] || undefined}
                       onValueChange={(value) =>
                         setActiveFilters((prev) => ({
                           ...prev,
-                          [options.key]: value,
+                          [option.key]: value,
                         }))
                       }
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder={options.placeholder} />
+                        <SelectValue placeholder={option.placeholder} />
                       </SelectTrigger>
                       <SelectContent>
-                        {options?.items?.map((item, i2) => (
+                        {option.items.map((item, i2) => (
                           <SelectItem key={i2} value={item.value}>
                             {item.label}
                           </SelectItem>
@@ -266,6 +429,7 @@ export default function AllFilters({
                   </div>
                 ))}
               </div>
+
               <div className="mt-4 flex justify-end">
                 <Button
                   variant="ghost"

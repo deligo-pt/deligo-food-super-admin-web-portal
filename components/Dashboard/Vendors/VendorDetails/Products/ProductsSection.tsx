@@ -8,15 +8,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronDown,
-  Loader2,
-  CheckSquare,
-  X,
-  Copy,
-} from "lucide-react";
+import { ChevronDown, Loader2, CheckSquare, X, Copy } from "lucide-react";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
+import {
+  useProgressiveProducts,
+  invalidateProductsCache,
+} from "@/hooks/use-progressive-products";
 import {
   deleteProduct,
   getAllProducts,
@@ -27,7 +25,7 @@ import { TProductCategoryResponse } from "@/types/category.type";
 import { TProduct } from "@/types/product.type";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useMemo, useState, useRef, useEffect, useCallback } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import EditProductDialog from "./EditProductDialog";
 import DeleteProductDialog from "./DeleteProductDialog";
@@ -44,6 +42,8 @@ import CopyToBranchModal from "./CopyToBranchModal";
 
 interface IProps {
   productsData: { data: TProduct[]; meta?: TMeta };
+  /** filters the server applied for page 1 (no page / limit / vendorId) */
+  baseQuery: string;
   businessTypeSlug: string;
   productCategories: TProductCategoryResponse[];
   vendorMongoId: string;
@@ -63,6 +63,7 @@ type Branch = {
 
 export default function ProductsSection({
   productsData,
+  baseQuery,
   businessTypeSlug,
   productCategories,
   vendorMongoId,
@@ -72,15 +73,50 @@ export default function ProductsSection({
   const router = useRouter();
   const sortOptions = getSortOptions(t, sortFields);
   const searchParams = useSearchParams();
+  const filterOptions = [
+    {
+      label: "Status",
+      key: "meta.status",
+      placeholder: "Select Status",
+      type: "select",
+      defaultValue: "ACTIVE",
+      defaultUnlessKeys: ["sdr"],
+      items: [
+        {
+          label: "All",
+          value: "ALL",
+          clear: true,
+          clearKeys: ["meta.status", "sdr"],
+        },
+        {
+          label: "Active",
+          value: "ACTIVE",
+          clearKeys: ["sdr"],
+        },
+        {
+          label: "Inactive",
+          value: "INACTIVE",
+          clearKeys: ["sdr"],
+        },
+        {
+          label: "SDR Products Only",
+          value: "SDR_ONLY",
+          queryKey: "sdr.applicable",
+          queryValue: "true",
+          clearKeys: ["meta.status"],
+        },
+      ],
+    },
+  ];
 
-  // ── products / pagination ──────────────────────────────────────
-  const [products, setProducts] = useState<TProduct[]>(productsData.data || []);
-  const [meta, setMeta] = useState<TMeta | undefined>(productsData.meta);
-  const [page, setPage] = useState(productsData.meta?.page || 1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(
-    (productsData.meta?.page || 1) < (productsData.meta?.totalPage || 1)
-  );
+  // ── products (progressive + cached) ────────────────────────────
+  const { products, setProducts, meta, hasMore, hasError, retry } =
+    useProgressiveProducts({
+      initial: productsData,
+      baseQuery,
+      vendorMongoId,
+    });
+
   const [deletedProductIds, setDeletedProductIds] = useState<string[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<{
@@ -152,6 +188,7 @@ export default function ProductsSection({
       });
     }
     return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, deletedProductIds, currentSort, lang]);
 
   // ── group by category ──────────────────────────────────────────
@@ -217,15 +254,15 @@ export default function ProductsSection({
       result = [...result].sort((a, b) => {
         const nameA = a.category
           ? a.category.name?.[lang] ||
-            a.category.name?.en ||
-            a.category.name?.pt ||
-            ""
+          a.category.name?.en ||
+          a.category.name?.pt ||
+          ""
           : t("uncategorized") || "Uncategorized";
         const nameB = b.category
           ? b.category.name?.[lang] ||
-            b.category.name?.en ||
-            b.category.name?.pt ||
-            ""
+          b.category.name?.en ||
+          b.category.name?.pt ||
+          ""
           : t("uncategorized") || "Uncategorized";
         return (
           nameA.localeCompare(nameB, lang, {
@@ -239,103 +276,37 @@ export default function ProductsSection({
   }, [visibleProducts, productCategories, currentSort, lang, t, hasMore]);
 
   const effectiveActiveCategoryId =
-    activeCategoryId ||
-    groupedProducts[0]?.category?._id ||
-    "uncategorized";
+    activeCategoryId || groupedProducts[0]?.category?._id || "uncategorized";
 
   const getCategoryName = (category: TProductCategoryResponse | null) => {
     if (!category) return t("uncategorized") || "Uncategorized";
     return category.name?.[lang] || "Unnamed";
   };
 
-  // ── progressive auto-load ──────────────────────────────────────
-  const loadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return false;
-
-    setIsLoadingMore(true);
-    try {
-      const nextPage = page + 1;
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("page", String(nextPage));
-      params.set("limit", "30");
-      params.set("vendorId", vendorMongoId);
-
-      if (
-        !params.get("sortBy") &&
-        !params.get("sort") &&
-        !params.get("sortOption")
-      ) {
-        params.set("sortBy", "name");
-      }
-
-      const result = await getAllProducts(params.toString());
-      const newProducts: TProduct[] = Array.isArray(result?.data)
-        ? result.data
-        : result?.data?.data || [];
-      const newMeta: TMeta | undefined = result?.meta || result?.data?.meta;
-
-      if (newProducts.length > 0) {
-        setProducts((prev) => {
-          const existingIds = new Set(prev.map((p) => getId(p)));
-          const filtered = newProducts.filter(
-            (p) => !existingIds.has(getId(p))
-          );
-          return [...prev, ...filtered];
-        });
-        setPage(nextPage);
-
-        if (newMeta) {
-          setMeta(newMeta);
-          setHasMore(nextPage < (newMeta.totalPage || 1));
-        } else {
-          setHasMore(newProducts.length >= 30);
-        }
-        return true;
-      } else {
-        setHasMore(false);
-        return false;
-      }
-    } catch (err) {
-      console.error("Load more error:", err);
-      toast.error("Failed to load more products");
-      return false;
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [isLoadingMore, hasMore, page, vendorMongoId, searchParams]);
-
-  // Auto-fetch next page every 1200ms until everything is loaded
+  // Reset deleted ids when fresh server data arrives
   useEffect(() => {
-    if (!hasMore || isLoadingMore) return;
-
-    const timer = setTimeout(() => {
-      loadMore();
-    }, 1200);
-
-    return () => clearTimeout(timer);
-  }, [hasMore, isLoadingMore, page, loadMore]);
-
-  // Reset when server data / filters change
-  useEffect(() => {
-    setProducts(productsData.data || []);
-    setMeta(productsData.meta);
-    setPage(productsData.meta?.page || 1);
-    setHasMore(
-      (productsData.meta?.page || 1) < (productsData.meta?.totalPage || 1)
-    );
     setDeletedProductIds([]);
   }, [productsData]);
 
-  // Default sortBy = name (ascending)
+  // Default sortBy=name & meta.status=ACTIVE when URL has nothing
   useEffect(() => {
-    const sort =
-      searchParams.get("sort") ||
-      searchParams.get("sortBy") ||
-      searchParams.get("sortOption");
+    const params = new URLSearchParams(searchParams.toString());
+    let changed = false;
 
-    if (!sort) {
-      const params = new URLSearchParams(searchParams.toString());
+    const hasSort =
+      params.get("sortBy") || params.get("sort") || params.get("sortOption");
+    if (!hasSort) {
       params.set("sortBy", "name");
+      changed = true;
+    }
+
+    // Only if AllFilters hasn't written status yet
+    if (!params.get("meta.status") && !params.get("sdr.applicable")) {
+      params.set("meta.status", "ACTIVE");
+      changed = true;
+    }
+
+    if (changed) {
       router.replace(`?${params.toString()}`, { scroll: false });
     }
   }, [searchParams, router]);
@@ -369,6 +340,15 @@ export default function ProductsSection({
   };
 
   const selectAllProducts = async () => {
+    // Everything already loaded → instant, no network
+    if (!hasMore && !hasError) {
+      setSelectedIds(new Set(visibleProducts.map(getId)));
+      setSelectAllMode(true);
+      toast.success(`${visibleProducts.length} products selected`);
+      return;
+    }
+
+    // Fallback: still loading or a page failed → fetch ids from the server
     setIsSelectAllLoading(true);
     try {
       const allIds = new Set<string>();
@@ -376,11 +356,16 @@ export default function ProductsSection({
       let totalPages = 1;
 
       do {
-        const params = new URLSearchParams();
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (!params.get("meta.status") && !params.get("sdr")) {
+          params.set("meta.status", "ACTIVE");
+        }
+
         params.set("vendorId", vendorMongoId);
         params.set("page", String(currentPage));
         params.set("limit", "100");
-        params.set("sortBy", "name");
+        if (!params.get("sortBy")) params.set("sortBy", "name");
 
         const result = await getAllProducts(params.toString());
         const list: TProduct[] = Array.isArray(result?.data)
@@ -504,6 +489,7 @@ export default function ProductsSection({
     if (selectedProduct.id && selectedProduct.action === "delete") {
       const result = await deleteProduct(selectedProduct.id);
       if (result.success) {
+        invalidateProductsCache();
         setDeletedProductIds((prev) =>
           prev.includes(selectedProduct.id as string)
             ? prev
@@ -524,6 +510,7 @@ export default function ProductsSection({
     if (selectedProduct.id && selectedProduct.action === "delete") {
       const result = await permanentDeleteProduct(selectedProduct.id);
       if (result.success) {
+        invalidateProductsCache();
         setDeletedProductIds((prev) =>
           prev.includes(selectedProduct.id as string)
             ? prev
@@ -540,6 +527,7 @@ export default function ProductsSection({
   };
 
   const handleProductUpdated = (updatedProduct: TProduct) => {
+    invalidateProductsCache();
     setProducts((prev) =>
       prev.map((p) =>
         getId(p) === getId(updatedProduct) ? { ...p, ...updatedProduct } : p
@@ -547,7 +535,7 @@ export default function ProductsSection({
     );
   };
 
-  // ── scroll spy ─────────────────────────────────────────────────
+  //scroll spy
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -590,9 +578,6 @@ export default function ProductsSection({
 
   const totalProducts = meta?.total ?? products.length;
 
-  // ────────────────────────────────────────────────────────────────
-  // RENDER
-  // ────────────────────────────────────────────────────────────────
   return (
     <div className="w-full flex flex-col h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] overflow-hidden">
       <TitleHeader
@@ -642,6 +627,17 @@ export default function ProductsSection({
                 {t("increase_prices") || "Increase Price"}
               </DropdownMenuItem>
 
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push(
+                    `/admin/vendor/${vendorId}/products/offers/create-new`
+                  )
+                }
+                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+              >
+                {t("create_new_offer") || "Create New Offer"}
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator className="my-1 border-gray-100" />
 
               <DropdownMenuItem
@@ -686,7 +682,7 @@ export default function ProductsSection({
         }
       />
 
-      <AllFilters sortOptions={sortOptions} />
+      <AllFilters sortOptions={sortOptions} filterOptions={filterOptions} />
 
       {/* Selection toolbar */}
       <div className="flex items-center justify-between gap-3 px-1 py-2">
@@ -753,7 +749,12 @@ export default function ProductsSection({
             <span className="text-sm text-gray-500">
               {totalProducts} {t("products") || "products"}
               {hasMore && (
-                <Loader2 className="inline w-3.5 h-3.5 ml-1.5 animate-spin text-[#DC3173]" />
+                <>
+                  <span className="ml-1.5 text-xs text-gray-400">
+                    {products.length}/{totalProducts}
+                  </span>
+                  <Loader2 className="inline w-3.5 h-3.5 ml-1.5 animate-spin text-[#DC3173]" />
+                </>
               )}
             </span>
             <Button
@@ -778,7 +779,7 @@ export default function ProductsSection({
               <h3 className="text-sm font-semibold text-gray-800">
                 {t("product_categories") || "Product categories"}
               </h3>
-              {isLoadingMore && (
+              {hasMore && (
                 <div className="flex items-center gap-1.5 text-xs text-[#DC3173]">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 </div>
@@ -804,21 +805,19 @@ export default function ProductsSection({
                         setActiveCategoryId(id);
                         scrollToCategory(id);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                        isActive
-                          ? "bg-[#DC3173]/10 text-[#DC3173]"
-                          : "text-gray-600 hover:bg-gray-50"
-                      }`}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
+                        ? "bg-[#DC3173]/10 text-[#DC3173]"
+                        : "text-gray-600 hover:bg-gray-50"
+                        }`}
                     >
                       <span className="truncate uppercase tracking-wide">
                         {getCategoryName(group.category)}
                       </span>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full shrink-0 min-w-7 text-center ${
-                          isActive
-                            ? "bg-[#DC3173]/15 text-[#DC3173]"
-                            : "bg-gray-100 text-gray-500"
-                        }`}
+                        className={`text-xs px-2 py-0.5 rounded-full shrink-0 min-w-7 text-center ${isActive
+                          ? "bg-[#DC3173]/15 text-[#DC3173]"
+                          : "bg-gray-100 text-gray-500"
+                          }`}
                       >
                         {showSpinner ? (
                           <Loader2 className="h-3 w-3 animate-spin mx-auto" />
@@ -901,9 +900,13 @@ export default function ProductsSection({
                           </motion.div>
                         ) : (
                           hasMore && (
-                            <div className="flex items-center gap-2 text-sm text-gray-400 py-6">
-                              <Loader2 className="h-4 w-4 animate-spin text-[#DC3173]" />
-                              Loading...
+                            <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5">
+                              {Array.from({ length: 3 }).map((_, i) => (
+                                <div
+                                  key={i}
+                                  className="h-40 rounded-2xl bg-gray-100 animate-pulse"
+                                />
+                              ))}
                             </div>
                           )
                         )}
@@ -914,16 +917,20 @@ export default function ProductsSection({
 
               {/* Bottom status */}
               <div className="flex justify-center items-center py-8">
-                {isLoadingMore && (
+                {hasMore && (
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Loader2 className="h-5 w-5 animate-spin text-[#DC3173]" />
                     {t("loading_more") || "Loading more"}...
                   </div>
                 )}
-                {!hasMore && products.length > 0 && (
+                {hasError && (
+                  <Button variant="outline" size="sm" onClick={retry}>
+                    Retry loading products
+                  </Button>
+                )}
+                {!hasMore && !hasError && products.length > 0 && (
                   <p className="text-sm text-gray-400">
-                    {t("you_have_reached_the_end") ||
-                      "You’ve reached the end"}
+                    {t("you_have_reached_the_end") || "You've reached the end"}
                   </p>
                 )}
               </div>

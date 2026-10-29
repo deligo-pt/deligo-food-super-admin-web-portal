@@ -262,6 +262,17 @@ export default function VariationManagement({
                 <DropdownMenuItem
                   onClick={() =>
                     router.push(
+                      `/admin/vendor/${vendorId}/products/offers/create-new`
+                    )
+                  }
+                  className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+                >
+                  {t("create_new_offer") || "Create New Offer"}
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    router.push(
                       `/admin/vendor/${vendorId}/products/add-ons`
                     )
                   }

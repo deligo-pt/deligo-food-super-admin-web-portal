@@ -39,7 +39,10 @@ export const taxValidation = z.object({
 
   taxExemptionCode: z.string().optional(),
 
-  taxExemptionReason: localizedTextSchema,
+  taxExemptionReason: z.object({
+    en: z.string().max(500, "Cannot exceed 500 characters").optional(),
+    pt: z.string().max(500, "Cannot exceed 500 characters").optional()
+  }),
 
   currentLang: z.enum(["en", "pt"]),
 })
