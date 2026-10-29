@@ -16,26 +16,46 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
     const searchParamsObj = await searchParams;
 
     const vendorData: TVendor = await getSingleVendorReq(id);
-
     const vendorMongoId = vendorData?._id;
 
-    const productsQuery = queryStringFormatter({
-        vendorId: vendorMongoId,
-        limit: "30",
-        page: "1",
-        // sortBy: "name",
-        ...searchParamsObj
+    // Normalize search params (Next may give string | string[])
+    const flatParams: Record<string, string> = {};
+    Object.entries(searchParamsObj).forEach(([key, value]) => {
+        if (value === undefined) return;
+        flatParams[key] = Array.isArray(value) ? value[0] : value;
     });
+
+    const hasStatusFilter = Boolean(flatParams["meta.status"]) || Boolean(flatParams["sdr"]);
+
+    const hasSort =
+        Boolean(flatParams.sortBy) ||
+        Boolean(flatParams.sort) ||
+        Boolean(flatParams.sortOption);
+
+
+    // Default: only ACTIVE products when no status/sdr in URL
+    const productsQueryObj: Record<string, string> = {
+        vendorId: vendorMongoId as string,
+        limit: "30",
+        page: flatParams.page || "1",
+        ...flatParams,
+        ...(hasStatusFilter ? {} : { "meta.status": "ACTIVE" }),
+        ...(hasSort ? {} : { sortBy: "name" }),
+    };
+
+    const productsQuery = queryStringFormatter(productsQueryObj);
     const { data, meta } = await getAllProducts(productsQuery);
 
-    // Categories – keep a high limit so all categories appear
+    // filters only (no paging / vendor) – used by the client to load the rest
+    const { page: _p, limit: _l, vendorId: _v, ...baseQueryObj } = productsQueryObj;
+    const baseQuery = queryStringFormatter(baseQueryObj);
+
+    // Categories: NEVER spread product filters (meta.status, sdr, sortBy, searchTerm…)
     const categoriesQuery = queryStringFormatter({
         vendorId: vendorMongoId,
-        limit: "50",
-        // sortBy: "name",
+        limit: "100",
         isDeleted: false,
         isActive: true,
-        ...searchParamsObj
     });
     const productCategories = await getAllProductCategories(categoriesQuery);
 
@@ -49,6 +69,7 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
                     vendorData?.businessDetails?.businessTypeSlug as string
                 }
                 productsData={{ data, meta: meta! }}
+                baseQuery={baseQuery}
                 vendorMongoId={vendorMongoId}
                 vendorId={id}
             />
