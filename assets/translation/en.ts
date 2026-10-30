@@ -1816,6 +1816,8 @@ export const en = {
   no_items_match_current_filters:
     "No items match your current filters. Try adjusting your search or filters to find what you're looking for.",
   clear_all_filters: "Clear All Filters",
+  sdr_products: "SDR Products",
+  retry_loading_products: "Retry loading products",
   // update items
   update_item: "Update Item",
   update_product_details: "Fill in the details to update the food product of your menu.",
