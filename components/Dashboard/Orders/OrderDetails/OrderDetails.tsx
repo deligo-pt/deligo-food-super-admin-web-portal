@@ -252,10 +252,13 @@ export default function OrderDetails({ order }: IProps) {
                       <MapPinIcon className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" />
                       <div>
                         <div className="font-medium">
-                          {order?.pickupAddress?.street || "N/A"}, {order?.pickupAddress?.city || ""}
+                          {order?.pickupAddress?.street || "N/A"}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {order?.pickupAddress?.state || ""} {order?.pickupAddress?.postalCode || ""} •{" "}
+                          {order?.pickupAddress?.postalCode || ""} • {order?.pickupAddress?.city || ""}
+                          {/* {order?.pickupAddress?.state || ""} */}
+                        </div>
+                        <div className="text-xs text-gray-500">
                           {order?.pickupAddress?.country || ""}
                         </div>
                         {order?.pickupAddress?.detailedAddress && (
@@ -341,10 +344,13 @@ export default function OrderDetails({ order }: IProps) {
                       <MapPinIcon className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" />
                       <div>
                         <div className="font-medium">
-                          {order?.deliveryAddress?.street || "N/A"}, {order?.deliveryAddress?.city || ""}
+                          {order?.deliveryAddress?.street || "N/A"}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {order?.deliveryAddress?.state || ""} {order?.deliveryAddress?.postalCode || ""} •{" "}
+                          {order?.deliveryAddress?.postalCode || ""} • {order?.deliveryAddress?.city || ""}
+                          {/* {order?.deliveryAddress?.state || ""} */}
+                        </div>
+                        <div className="text-xs text-gray-500">
                           {order?.deliveryAddress?.country || ""}
                         </div>
                         {order?.deliveryAddress?.detailedAddress && (
