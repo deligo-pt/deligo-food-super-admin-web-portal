@@ -32,7 +32,7 @@ export const en = {
   verifyOTP: "Verify OTP",
   otp4DigitCode: "Enter the 4-digit code sent to your email",
   remaining: "Remaining",
-  resendOTP: "Resend OTP",
+  resendOtp: "Resend OTP",
   verify: "Verify",
   verify_email: "Verify Email",
 

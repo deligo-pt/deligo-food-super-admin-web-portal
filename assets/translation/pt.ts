@@ -36,7 +36,7 @@ export const pt = {
   verifyOTP: "Verificar OTP",
   otp4DigitCode: "Digite o código de 4 dígitos enviado para o seu e-mail",
   remaining: "Restante",
-  resendOTP: "Reenviar OTP",
+  resendOtp: "Reenviar OTP",
   verify: "Verificar",
   verify_email: "Verificar E-mail",
 
