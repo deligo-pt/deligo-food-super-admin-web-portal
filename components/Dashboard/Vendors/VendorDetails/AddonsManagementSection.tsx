@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit, LayersIcon, Trash2, Loader2, ChevronDown, SaveIcon } from "lucide-react";
+import { Edit, LayersIcon, Trash2, Loader2, ChevronDown, SaveIcon } from "lucide-react";
 import AddAddonGroupModal from "./AddAddonGroupModal";
 import { TAddonGroup } from "@/types/add-ons.type";
 import { TTax } from "@/types/tax.type";
@@ -43,7 +43,7 @@ export default function AddOnsManagementSection({
     const { t, lang } = useTranslation();
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [actionType, setActionType] = useState<"create" | "edit" | "add-option">("create");
+    const [actionType, setActionType] = useState<"create" | "edit">("create");
     const [selectedGroup, setSelectedGroup] = useState<TAddonGroup | undefined>(undefined);
 
     // States for Delete Option modal
@@ -64,13 +64,6 @@ export default function AddOnsManagementSection({
     // Handler to open modal for editing group details or adding options (`+ Add Add-On`)
     const handleOpenEditModal = (group: TAddonGroup) => {
         setActionType("edit");
-        setSelectedGroup(group);
-        setIsModalOpen(true);
-    };
-
-    // Add option(s) only (no existing options shown / sent)
-    const handleOpenAddOptionModal = (group: TAddonGroup) => {
-        setActionType("add-option");
         setSelectedGroup(group);
         setIsModalOpen(true);
     };
@@ -273,15 +266,6 @@ export default function AddOnsManagementSection({
                                     </p>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    {/* + Add Add-On → only adds new options */}
-                                    <button
-                                        onClick={() => handleOpenAddOptionModal(group)}
-                                        className="flex items-center text-xs border border-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 transition font-medium"
-                                    >
-                                        <Plus className="w-3.5 h-3.5 mr-1 text-[#DC3173]" />
-                                        {t("add_addon") || "Add Add-On"}
-                                    </button>
-
                                     {/* Edit → only group settings */}
                                     <button
                                         onClick={() => handleOpenEditModal(group)}

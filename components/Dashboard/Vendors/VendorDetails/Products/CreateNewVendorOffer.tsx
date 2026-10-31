@@ -50,7 +50,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Resolver, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { ProductSelector } from "./ProductSelector";
-import { createOfferReq } from "@/services/dashboard/offer/offer.service";
+import { createOfferReq, createVendorOffer } from "@/services/dashboard/offer/offer.service";
 import { TProductCategoryResponse } from "@/types/category.type";
 import { queryStringFormatter } from "@/utils/formatter";
 import { getAllProductCategories } from "@/services/dashboard/category/product-category.service";
@@ -380,7 +380,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                 title: translated.title,
                 description: translated.description,
                 offerType: data.offerType,
-                vendorId: vendorMongoId,
+                targetVendorId: vendorMongoId,
                 validFrom: format(data.validFrom, "yyyy-MM-dd"),
                 expiresAt: format(data.expiresAt, "yyyy-MM-dd"),
                 ...(data.minOrderAmount != null && data.minOrderAmount > 0
@@ -449,7 +449,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                 offerData.buyAndReward = { buy, reward };
             }
 
-            const result = await createOfferReq(offerData as Partial<TOffer>);
+            const result = await createVendorOffer(offerData as Partial<TOffer>);
 
             if (result.success) {
                 toast.success(result.message || "Offer created successfully!", {

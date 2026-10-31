@@ -32,7 +32,7 @@ export const en = {
   verifyOTP: "Verify OTP",
   otp4DigitCode: "Enter the 4-digit code sent to your email",
   remaining: "Remaining",
-  resendOTP: "Resend OTP",
+  resendOtp: "Resend OTP",
   verify: "Verify",
   verify_email: "Verify Email",
 
@@ -430,6 +430,9 @@ export const en = {
   select_tax: "Select Tax",
   sdr_applicable: "SDR Applicable",
   container_count: "Container Count",
+  container_deposit_sdr: "Container deposit (SDR)",
+  sdr_description: "For bottles and cans. Customers pay this deposit per container, on top of the price:",
+  incl_tax: "incl. Tax",
   container_count_description: "Enter the total number of bottles or cans included. When SDR is enabled, the refundable deposit will be multiplied by this count.",
   add_option: "Add Option",
   is_active: "Active Status",
@@ -1029,6 +1032,10 @@ export const en = {
   recipients: "recipients",
   this_action_irreversible_queued_batch:
     "This action is irreversible for the queued batch. You can cancel scheduled sends from the scheduled tasks panel.",
+
+  // active fleet managers
+  active_fleet_managers: "Active Fleet Managers",
+  all_active_fleet_managers_from_system: "All active fleet managers from the system",
 
   // suspended/blocked-fleet-managers
   suspended_fleet_managers: "Suspended Fleet Managers",

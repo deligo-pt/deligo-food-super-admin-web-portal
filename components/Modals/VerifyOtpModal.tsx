@@ -240,7 +240,7 @@ export default function VerifyOtpModal({
                                     } transition-colors`}
                             >
                                 <RefreshCcw className="w-4 h-4" />
-                                {t("resendOTP")}
+                                {t("resendOtp")}
                             </button>
                         </div>
 
