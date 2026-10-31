@@ -344,7 +344,9 @@ export default function OrderDetails({ order }: IProps) {
                       <MapPinIcon className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" />
                       <div>
                         <div className="font-medium">
-                          {order?.deliveryAddress?.street || "N/A"}
+                          {order?.deliveryAddress?.street || "N/A"} {order?.deliveryAddress?.detailedAddress &&
+                            `• ${order.deliveryAddress.detailedAddress}`
+                          }
                         </div>
                         <div className="text-xs text-gray-500">
                           {order?.deliveryAddress?.postalCode || ""} • {order?.deliveryAddress?.city || ""}
@@ -353,11 +355,11 @@ export default function OrderDetails({ order }: IProps) {
                         <div className="text-xs text-gray-500">
                           {order?.deliveryAddress?.country || ""}
                         </div>
-                        {order?.deliveryAddress?.detailedAddress && (
+                        {/* {order?.deliveryAddress?.detailedAddress && (
                           <div className="text-xs text-gray-500 mt-0.5">
                             {order.deliveryAddress.detailedAddress}
                           </div>
-                        )}
+                        )} */}
                         <div className="text-xs text-gray-400 mt-1">
                           {t("lat_long")}: {order?.deliveryAddress?.latitude ?? "N/A"},{" "}
                           {order?.deliveryAddress?.longitude ?? "N/A"} • {t("accuracy")}:{" "}
