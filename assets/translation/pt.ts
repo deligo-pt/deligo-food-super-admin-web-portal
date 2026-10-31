@@ -1039,6 +1039,10 @@ export const pt = {
   this_action_irreversible_queued_batch:
     "Esta ação é irreversível para o lote em fila. Pode cancelar envios agendados no painel de tarefas agendadas.",
 
+  // active fleet managers
+  active_fleet_managers: "Gestores de Frota Ativos",
+  all_active_fleet_managers_from_system: "Todos os gestores de frota ativos do sistema",
+
   // suspended/blocked-fleet-managers
   suspended_fleet_managers: "Gerentes de Frota Suspensos",
   all_blocked_fleet_managers_from_system: "Todos os gerentes de frota bloqueados no sistema",

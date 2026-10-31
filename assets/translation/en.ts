@@ -1030,6 +1030,10 @@ export const en = {
   this_action_irreversible_queued_batch:
     "This action is irreversible for the queued batch. You can cancel scheduled sends from the scheduled tasks panel.",
 
+  // active fleet managers
+  active_fleet_managers: "Active Fleet Managers",
+  all_active_fleet_managers_from_system: "All active fleet managers from the system",
+
   // suspended/blocked-fleet-managers
   suspended_fleet_managers: "Suspended Fleet Managers",
   all_blocked_fleet_managers_from_system: "All blocked fleet managers from the system",
