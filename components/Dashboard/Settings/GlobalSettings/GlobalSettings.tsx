@@ -970,11 +970,11 @@ export default function GlobalSettings({
                       <div className="space-y-4">
                         <FileUploadZone
                           inputRef={defaultProductImageRef}
-                          onChange={(e) => handleUpload(e, "defaultProductImageUrl")}
-                          isLoading={isUploading("defaultProductImageUrl")}
-                          previewUrl={getImage("defaultProductImageUrl")}
+                          onChange={(e) => handleUpload(e, "defaultImageUrl")}
+                          isLoading={isUploading("defaultImageUrl")}
+                          previewUrl={getImage("defaultImageUrl")}
                           onClear={() => {
-                            clearImage("defaultProductImageUrl");
+                            clearImage("defaultImageUrl");
                             if (defaultProductImageRef.current) {
                               defaultProductImageRef.current.value = "";
                             }
