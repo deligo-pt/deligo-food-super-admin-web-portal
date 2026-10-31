@@ -111,19 +111,19 @@ export function getOrderColumns({
         //             ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
         //             ?.join(" "),
         // },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <CheckLine className="w-4" />
-                    {t("refund_status")}
-                </div>
-            ),
-            accessor: (order) =>
-                order.refundStatus
-                    ?.split("_")
-                    ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
-                    ?.join(" "),
-        },
+        // {
+        //     header: (
+        //         <div className="text-[#DC3173] flex gap-2 items-center">
+        //             <CheckLine className="w-4" />
+        //             {t("refund_status")}
+        //         </div>
+        //     ),
+        //     accessor: (order) =>
+        //         order.refundStatus
+        //             ?.split("_")
+        //             ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
+        //             ?.join(" "),
+        // },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">

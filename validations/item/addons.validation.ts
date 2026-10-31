@@ -3,16 +3,17 @@ import z from "zod";
 
 const localizedTextSchema = z.object({
     en: z.string().max(50, "Cannot exceed 50 characters").optional(),
-    pt: z.string().max(50, "Cannot exceed 50 characters").optional()
+    pt: z.string().max(50, "Cannot exceed 50 characters").optional(),
 });
 
-export const createAddonOptionValidationSchema = z.object({
-    name: localizedTextSchema,
-    price: z.number("Price must be a number").min(0, "Price cannot be negative"),
-    tax: z.string().nonempty("Tax is required"),
+export const createAddonOptionValidationSchema = z
+    .object({
+        name: localizedTextSchema,
+        price: z.number("Price must be a number").min(0, "Price cannot be negative"),
+        tax: z.string().nonempty("Tax is required"),
 
-    currentLang: z.enum(["en", "pt"]),
-})
+        currentLang: z.enum(["en", "pt"]),
+    })
     .superRefine((data, ctx) => {
         validateLocalizedField(
             data.name,
@@ -23,41 +24,45 @@ export const createAddonOptionValidationSchema = z.object({
         );
     });
 
-export const createAddonGroupValidationSchema = z.object({
-
-    title: localizedTextSchema,
-
-    minSelectable: z
-        .number("Minimum selection must be a number")
-        .min(0, "Minimum selection cannot be negative"),
-
-    maxSelectable: z
-        .number("Maximum selection must be a number")
-        .min(1, "Maximum selection must be at least 1"),
-
-    options: z
-        .array(
-            z.object({
-                name: localizedTextSchema,
-                price: z
-                    .number("Price must be a number")
-                    .min(0, "Price cannot be negative"),
-                tax: z.string().min(1, "Tax selection is required"),
-            })
-        )
-        .min(1, "At least one option must be provided in the group"),
-    optionName: z.string().optional(),
-    optionPrice: z.number().min(0).optional(),
-    optionTax: z.string().optional(),
+/** One option inside a group. Existing options also carry _id / sku. */
+const addonGroupOptionSchema = z.object({
+    _id: z.string().optional(),
+    sku: z.string().optional(),
+    isActive: z.boolean().optional(),
+    name: localizedTextSchema,
+    price: z.number("Price must be a number").min(0, "Price cannot be negative"),
+    tax: z.string().min(1, "Tax selection is required"),
+    // only present when SDR is ON for this option
     sdr: z
         .object({
             applicable: z.boolean(),
-            containerCount: z.number().min(1),
+            containerCount: z
+                .number("Container count must be a number")
+                .min(1, "Container count must be at least 1"),
         })
         .optional(),
+});
 
-    currentLang: z.enum(["en", "pt"]),
-})
+export const createAddonGroupValidationSchema = z
+    .object({
+        title: localizedTextSchema,
+
+        minSelectable: z
+            .number("Minimum selection must be a number")
+            .int("Minimum selection must be a whole number")
+            .min(0, "Minimum selection cannot be negative"),
+
+        maxSelectable: z
+            .number("Maximum selection must be a number")
+            .int("Maximum selection must be a whole number")
+            .min(1, "Maximum selection must be at least 1"),
+
+        options: z
+            .array(addonGroupOptionSchema)
+            .min(1, "At least one option must be provided in the group"),
+
+        currentLang: z.enum(["en", "pt"]),
+    })
     .superRefine((data, ctx) => {
         validateLocalizedField(
             data.title,
@@ -81,12 +86,11 @@ export const createAddonGroupValidationSchema = z.object({
         message: "Minimum selection cannot be greater than maximum selection",
         path: ["minSelectable"],
     })
-    .refine((data) => data.maxSelectable <= data.options.length, {
-        message: "Max selection cannot exceed the number of available options",
-        path: ["maxSelectable"],
-    })
-    .refine((data) => data.options.length >= 1, {
-        message: "At least one option must be provided in the group",
-        path: ["optionTax"],
-    });
-
+    // skip when there are no options: that case already has its own error
+    .refine(
+        (data) => data.options.length === 0 || data.maxSelectable <= data.options.length,
+        {
+            message: "Max selection cannot exceed the number of available options",
+            path: ["maxSelectable"],
+        }
+    );

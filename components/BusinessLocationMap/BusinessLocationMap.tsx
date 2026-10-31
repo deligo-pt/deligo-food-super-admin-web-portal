@@ -85,17 +85,30 @@ const BusinessLocationMap = ({
 
   const fillAddressFields = useCallback(
     (components: any[]) => {
-      const address: any = {};
+      const get = (type: string, key: "long_name" | "short_name" = "long_name") =>
+        components.find((c) => c.types.includes(type))?.[key] as
+        | string
+        | undefined;
 
-      components.forEach((c) => {
-        if (c.types.includes("route")) address.street = c.long_name;
-        if (c.types.includes("locality")) address.city = c.long_name;
-        if (c.types.includes("postal_code")) address.postalCode = c.long_name;
-        if (c.types.includes("country")) address.country = c.long_name;
-      });
+      const route = get("route", "short_name");
+      const streetNumber = get("street_number");
 
+      const address = {
+        street: [route, streetNumber].filter(Boolean).join(" "),
+        city:
+          get("locality") ||
+          get("postal_town") ||
+          get("administrative_area_level_2") ||
+          "",
+        postalCode: get("postal_code") || "",
+        country: get("country") || "",
+      };
+
+      // set every field, so old values don't stay when a new place lacks one
       Object.entries(address).forEach(([key, value]) =>
-        form.setValue(key as keyof LocationFormType, (value || "") as string)
+        form.setValue(key as keyof LocationFormType, value, {
+          shouldValidate: true,
+        })
       );
     },
     [form]

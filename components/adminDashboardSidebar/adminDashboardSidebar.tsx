@@ -2,7 +2,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
-  AreaChart,
   BadgeEuro,
   Bike,
   ChartNoAxesCombined,
@@ -134,6 +133,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       items: [
         { name: t("add_fleet_manager"), path: "/admin/add-fleet-manager" },
         { name: t("all_fleet_managers"), path: "/admin/all-fleet-managers" },
+        { name: t("active_fleet_managers"), path: "/admin/active-fleet-managers" },
         {
           name: t("fleet_manager_payouts"),
           path: "/admin/fleet-manager-payouts",

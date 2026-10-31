@@ -13,6 +13,14 @@ export const createOfferReq = async (data: Partial<TOffer>) => {
   });
 };
 
+export const createVendorOffer = async (data: Partial<TOffer>) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.post("/offers/admin/create-vendor-offer", {
+      data,
+    });
+  });
+};
+
 export const updateOfferReq = async (id: string, data: Partial<TOffer>) => {
   return catchAsync<null>(async () => {
     return await serverRequest.patch(`/offers/${id}`, {

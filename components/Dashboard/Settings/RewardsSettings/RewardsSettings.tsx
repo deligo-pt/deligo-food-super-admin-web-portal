@@ -146,12 +146,22 @@ export default function RewardsSettings({
         id: toastId,
       });
       setSaveStatus("success");
+    }
+
+    if (result?.data?.errorSources) {
+      result?.data?.errorSources?.map((err: { path: string, message: string }) => (
+        toast.error(err?.message, { id: toastId })
+      ));
+      setIsSaving(false);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+      return;
     } else {
       toast.error(result.message || "Global settings save failed", {
         id: toastId,
       });
-      setSaveStatus("error");
     }
+
     setTimeout(() => setSaveStatus("idle"), 3000);
     setIsSaving(false);
   };

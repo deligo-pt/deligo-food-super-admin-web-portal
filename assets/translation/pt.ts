@@ -36,7 +36,7 @@ export const pt = {
   verifyOTP: "Verificar OTP",
   otp4DigitCode: "Digite o código de 4 dígitos enviado para o seu e-mail",
   remaining: "Restante",
-  resendOTP: "Reenviar OTP",
+  resendOtp: "Reenviar OTP",
   verify: "Verificar",
   verify_email: "Verificar E-mail",
 
@@ -436,6 +436,9 @@ export const pt = {
   select_tax: "Selecionar Taxa de Imposto",
   sdr_applicable: "SDR Aplicável",
   container_count: "Quantidade de Embalagens",
+  container_deposit_sdr: "Depósito de embalagem (SDR)",
+  sdr_description: "Para garrafas e latas. Os clientes pagam este depósito por embalagem, além do preço:",
+  incl_tax: "com IVA incl.",
   container_count_description: "Introduza o número total de garrafas ou latas incluídas. Quando o SDR estiver ativado, o depósito reembolsável será multiplicado por esta quantidade.",
   add_option: "Adicionar Opção",
   is_active: "Estado Ativo",
@@ -1038,6 +1041,10 @@ export const pt = {
   recipients: "destinatários",
   this_action_irreversible_queued_batch:
     "Esta ação é irreversível para o lote em fila. Pode cancelar envios agendados no painel de tarefas agendadas.",
+
+  // active fleet managers
+  active_fleet_managers: "Gestores de Frota Ativos",
+  all_active_fleet_managers_from_system: "Todos os gestores de frota ativos do sistema",
 
   // suspended/blocked-fleet-managers
   suspended_fleet_managers: "Gerentes de Frota Suspensos",
