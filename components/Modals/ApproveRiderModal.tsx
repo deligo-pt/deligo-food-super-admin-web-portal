@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Building2, Mail, User, UserCheck, MapPin, Briefcase, Loader2 } from "lucide-react";
@@ -23,8 +23,9 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea"; // make sure you have this
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { TMeta } from "@/types";
 import { TAgent } from "@/types/user.type";
 import { getAllFleetManagersReq } from "@/services/dashboard/fleet-manager/fleet-manager.service";
 import {
@@ -32,6 +33,8 @@ import {
     reAssignFleetApprovedRider,
 } from "@/services/dashboard/delivery-partner/delivery-partner.service";
 import { approveOrRejectReq } from "@/services/auth/approve-or-reject.service";
+
+const PAGE_LIMIT = 10;
 
 interface IProps {
     open: boolean;
@@ -62,58 +65,154 @@ export default function ApproveRiderModal({
     const { t } = useTranslation();
     const router = useRouter();
 
+    // fleet list + pagination state
     const [fleets, setFleets] = useState<TAgent[]>([]);
+    const [meta, setMeta] = useState<TMeta | undefined>(undefined);
     const [isLoadingFleets, setIsLoadingFleets] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [loadError, setLoadError] = useState(false);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedFleetId, setSelectedFleetId] = useState<string>("");
     const [remarks, setRemarks] = useState("");
 
-    // Reset state when modal closes
+    // refs used by the loader / infinite scroll
+    const sessionRef = useRef(0); // bumps on every reset → stale responses are ignored
+    const loadingRef = useRef(false); // prevents double requests
+    const scrollRef = useRef<HTMLDivElement | null>(null);
+    const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+    const hasMore = !!meta && (meta.page ?? 1) < (meta.totalPage ?? 1);
+
+
+    const loadPage = useCallback(
+        async (page: number, session: number) => {
+            if (loadingRef.current) return;
+            loadingRef.current = true;
+
+            if (page === 1) {
+                setFleets([]);
+                setMeta(undefined);
+                setLoadError(false);
+                setIsLoadingMore(false);
+                setIsLoadingFleets(true);
+            }
+            else setIsLoadingMore(true);
+            if (page !== 1) setLoadError(false);
+
+            try {
+                const res = await getAllFleetManagersReq({
+                    city,
+                    page,
+                    limit: PAGE_LIMIT,
+                } as Parameters<typeof getAllFleetManagersReq>[0]);
+
+                // modal closed / city changed while waiting → ignore
+                if (session !== sessionRef.current) return;
+
+                const list: TAgent[] = Array.isArray(res?.data)
+                    ? res.data
+                    : [];
+                const newMeta: TMeta | undefined = res?.meta || res?.meta;
+
+                setFleets((prev) => {
+                    if (page === 1) return list;
+                    const seen = new Set(prev.map((f) => f._id));
+                    return [...prev, ...list.filter((f) => !seen.has(f._id))];
+                });
+                setMeta(newMeta);
+            } catch (error) {
+                if (session !== sessionRef.current) return;
+                console.error("Failed to load fleet managers for city:", city, error);
+                setLoadError(true);
+                toast.error("Could not load fleet managers for this city.");
+            } finally {
+                if (session === sessionRef.current) {
+                    loadingRef.current = false;
+                    setIsLoadingFleets(false);
+                    setIsLoadingMore(false);
+                }
+            }
+        },
+        [city]
+    );
+
+    // reset + first page whenever the modal opens / city changes ─
     useEffect(() => {
-        if (!open) {
-            setSelectedFleetId("");
-            setRemarks("");
+        sessionRef.current += 1;
+        loadingRef.current = false;
+
+        if (!open || !city) {
             return;
         }
 
-        // Pre-select the already assigned fleet (especially useful for RE_ASSIGN)
-        if (currentFleetManagerId) {
-            setSelectedFleetId(currentFleetManagerId);
-        } else {
-            setSelectedFleetId("");
-        }
-    }, [open, currentFleetManagerId]);
+        const timer = window.setTimeout(() => {
+            loadPage(1, sessionRef.current);
+        }, 0);
 
+        return () => window.clearTimeout(timer);
+    }, [open, city, loadPage]);
+
+    const loadMore = useCallback(() => {
+        if (loadingRef.current || !hasMore || loadError) return;
+        loadPage((meta?.page ?? 1) + 1, sessionRef.current);
+    }, [hasMore, loadError, meta, loadPage]);
+
+    const retry = () => {
+        setLoadError(false);
+        loadPage(meta ? (meta.page ?? 1) + 1 : 1, sessionRef.current);
+    };
+
+    // infinite scroll: observe the sentinel at the bottom of the list ─
     useEffect(() => {
-        if (open && city) {
-            const fetchFleetsByCity = async () => {
-                setIsLoadingFleets(true);
-                try {
-                    const res = await getAllFleetManagersReq({ city });
-                    setFleets(res?.data || []);
-                } catch (error) {
-                    console.error("Failed to load fleet managers for city:", city, error);
-                    toast.error("Could not load fleet managers for this city.");
-                } finally {
-                    setIsLoadingFleets(false);
-                }
-            };
+        const root = scrollRef.current;
+        const target = sentinelRef.current;
+        if (!open || !root || !target || !hasMore) return;
 
-            fetchFleetsByCity();
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) loadMore();
+            },
+            { root, rootMargin: "120px", threshold: 0 }
+        );
+
+        observer.observe(target);
+        return () => observer.disconnect();
+    }, [open, hasMore, loadMore, fleets.length]);
+
+    // Reset when the modal closes, in the event handler rather than an effect.
+    const handleOpenChange = (nextOpen: boolean) => {
+        if (!nextOpen) {
+            setSelectedFleetId("");
+            setRemarks("");
         }
-    }, [open, city]);
+        onOpenChange(nextOpen);
+    };
+
+    // Derive the pre-selected fleet instead of synchronously updating state
+    // from an effect. currentFleetManagerId can be a userId, so map it to the
+    // row's _id, which is the value used by the radio and API calls.
+    const effectiveSelectedFleetId =
+        selectedFleetId ||
+        (open && currentFleetManagerId
+            ? fleets.find(
+                (f) =>
+                    f.userId === currentFleetManagerId ||
+                    f._id === currentFleetManagerId
+            )?._id || ""
+            : "");
 
     // ASSIGN
     const handleAssignToFleet = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedFleetId) return;
+        if (!effectiveSelectedFleetId) return;
 
         const toastId = toast.loading("Assigning to fleet manager...");
         setIsSubmitting(true);
 
         try {
             const result = await assignFleetAndApproveRiderReq(
-                { fleetManagerId: selectedFleetId },
+                { fleetManagerId: effectiveSelectedFleetId },
                 partnerId
             );
 
@@ -143,7 +242,7 @@ export default function ApproveRiderModal({
     // RE-ASSIGN
     const handleReAssignToFleet = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedFleetId) return;
+        if (!effectiveSelectedFleetId) return;
 
         const toastId = toast.loading("Re-assigning to fleet manager...");
         setIsSubmitting(true);
@@ -151,7 +250,7 @@ export default function ApproveRiderModal({
         try {
             const result = await reAssignFleetApprovedRider(
                 {
-                    fleetManagerId: selectedFleetId,
+                    fleetManagerId: effectiveSelectedFleetId,
                     reason: remarks.trim() || undefined,
                 },
                 partnerId
@@ -184,14 +283,14 @@ export default function ApproveRiderModal({
     // ASSIGN + APPROVE
     const handleAssignAndApprove = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedFleetId) return;
+        if (!effectiveSelectedFleetId) return;
 
         const toastId = toast.loading("Assigning fleet manager and approving rider...");
         setIsSubmitting(true);
 
         try {
             const result = await assignFleetAndApproveRiderReq(
-                { fleetManagerId: selectedFleetId },
+                { fleetManagerId: effectiveSelectedFleetId },
                 partnerId
             );
 
@@ -290,7 +389,7 @@ export default function ApproveRiderModal({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-6">
                 <DialogHeader className="pb-4">
                     <DialogTitle className="flex items-center gap-2" style={{ color: "#DC3173" }}>
@@ -309,8 +408,9 @@ export default function ApproveRiderModal({
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* Fleet Managers Table */}
+                {/* Fleet Managers Table (infinite scroll container) */}
                 <div
+                    ref={scrollRef}
                     className="flex-1 overflow-y-auto my-2 border rounded-xl bg-white min-h-50 max-h-87.5"
                     style={{ borderColor: "#DC317320" }}
                 >
@@ -320,99 +420,139 @@ export default function ApproveRiderModal({
                             {t("loading_fleet_managers_in")} {city}...
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader
-                                className="sticky top-0 backdrop-blur-xs z-10 border-b"
-                                style={{ backgroundColor: "#DC317308", borderColor: "#DC317315" }}
-                            >
-                                <TableRow className="hover:bg-transparent">
-                                    <TableHead style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center gap-1 font-semibold">
-                                            <User size={13} /> {t("manager")}
-                                        </div>
-                                    </TableHead>
-                                    <TableHead style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center gap-1 font-semibold">
-                                            <Building2 size={13} /> {t("business")}
-                                        </div>
-                                    </TableHead>
-                                    <TableHead style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center gap-1 font-semibold">
-                                            <MapPin size={13} /> {t("city")}
-                                        </div>
-                                    </TableHead>
-                                    <TableHead className="text-right" style={{ color: "#DC3173" }}>
-                                        <div className="flex items-center justify-end gap-1 font-semibold">
-                                            <Briefcase size={13} /> {t("select")}
-                                        </div>
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody className="text-gray-600">
-                                {fleets.map((fleet) => {
-                                    const fullName = `${fleet.name?.firstName || ""} ${fleet.name?.lastName || ""}`.trim() || "N/A";
-                                    const isSelected = selectedFleetId === fleet?._id;
-                                    const isCurrent = currentFleetManagerId === fleet.userId;
+                        <>
+                            <Table>
+                                <TableHeader
+                                    className="sticky top-0 backdrop-blur-xs z-10 border-b"
+                                    style={{ backgroundColor: "#DC317308", borderColor: "#DC317315" }}
+                                >
+                                    <TableRow className="hover:bg-transparent">
+                                        <TableHead style={{ color: "#DC3173" }}>
+                                            <div className="flex items-center gap-1 font-semibold">
+                                                <User size={13} /> {t("manager")}
+                                            </div>
+                                        </TableHead>
+                                        <TableHead style={{ color: "#DC3173" }}>
+                                            <div className="flex items-center gap-1 font-semibold">
+                                                <Building2 size={13} /> {t("business")}
+                                            </div>
+                                        </TableHead>
+                                        <TableHead style={{ color: "#DC3173" }}>
+                                            <div className="flex items-center gap-1 font-semibold">
+                                                <MapPin size={13} /> {t("city")}
+                                            </div>
+                                        </TableHead>
+                                        <TableHead className="text-right" style={{ color: "#DC3173" }}>
+                                            <div className="flex items-center justify-end gap-1 font-semibold">
+                                                <Briefcase size={13} /> {t("select")}
+                                            </div>
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody className="text-gray-600">
+                                    {fleets.map((fleet) => {
+                                        const fullName = `${fleet.name?.firstName || ""} ${fleet.name?.lastName || ""}`.trim() || "N/A";
+                                        const isSelected = effectiveSelectedFleetId === fleet?._id;
+                                        const isCurrent =
+                                            !!currentFleetManagerId &&
+                                            (currentFleetManagerId === fleet.userId ||
+                                                currentFleetManagerId === fleet._id);
 
-                                    return (
-                                        <TableRow
-                                            key={fleet._id}
-                                            className="transition-colors cursor-pointer"
-                                            style={{
-                                                backgroundColor: isSelected ? "#DC317308" : "transparent",
-                                            }}
-                                            onClick={() => setSelectedFleetId(fleet._id)}
-                                        >
-                                            <TableCell className="p-3">
-                                                <div className="font-medium text-gray-900 line-clamp-1">
-                                                    {fullName}
-                                                </div>
-                                                {isCurrent && (
-                                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium whitespace-nowrap">
-                                                        {t("current") || "Current"}
-                                                    </span>
-                                                )}
-                                                <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                                                    <Mail size={11} /> {fleet.email}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="p-3 text-xs font-medium text-gray-700">
-                                                {fleet.businessDetails?.businessName || "—"}
-                                            </TableCell>
-                                            <TableCell className="p-3 text-xs text-gray-500 capitalize">
-                                                {fleet.businessLocation?.city || fleet.address?.city || city}
-                                            </TableCell>
-                                            <TableCell
-                                                className="p-3 text-right"
-                                                onClick={(e) => e.stopPropagation()}
+                                        return (
+                                            <TableRow
+                                                key={fleet._id}
+                                                className="transition-colors cursor-pointer"
+                                                style={{
+                                                    backgroundColor: isSelected ? "#DC317308" : "transparent",
+                                                }}
+                                                onClick={() => setSelectedFleetId(fleet._id)}
                                             >
-                                                <input
-                                                    type="radio"
-                                                    name="selectedFleet"
-                                                    checked={isSelected}
-                                                    onChange={() => setSelectedFleetId(fleet._id)}
-                                                    className="h-4 w-4 border-gray-300 cursor-pointer"
-                                                    style={{ accentColor: "#DC3173" }}
-                                                />
+                                                <TableCell className="p-3">
+                                                    <div className="font-medium text-gray-900 line-clamp-1">
+                                                        {fullName}
+                                                    </div>
+                                                    {isCurrent && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium whitespace-nowrap">
+                                                            {t("current") || "Current"}
+                                                        </span>
+                                                    )}
+                                                    <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                                                        <Mail size={11} /> {fleet.email}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="p-3 text-xs font-medium text-gray-700">
+                                                    {fleet.businessDetails?.businessName || "—"}
+                                                </TableCell>
+                                                <TableCell className="p-3 text-xs text-gray-500 capitalize">
+                                                    {fleet.businessLocation?.city || fleet.address?.city || city}
+                                                </TableCell>
+                                                <TableCell
+                                                    className="p-3 text-right"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        name="selectedFleet"
+                                                        checked={isSelected}
+                                                        onChange={() => setSelectedFleetId(fleet._id)}
+                                                        className="h-4 w-4 border-gray-300 cursor-pointer"
+                                                        style={{ accentColor: "#DC3173" }}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+
+                                    {fleets.length === 0 && (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={4}
+                                                className="p-8 text-center text-xs text-gray-400 hover:bg-transparent"
+                                            >
+                                                {t("no_fleet_managers_found_in")} {city}.
                                             </TableCell>
                                         </TableRow>
-                                    );
-                                })}
+                                    )}
+                                </TableBody>
+                            </Table>
 
-                                {fleets.length === 0 && (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={4}
-                                            className="p-8 text-center text-xs text-gray-400 hover:bg-transparent"
-                                        >
-                                            {t("no_fleet_managers_found_in")} {city}.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                            {/* Infinite-scroll sentinel + status */}
+                            <div
+                                ref={sentinelRef}
+                                className="flex min-h-10 items-center justify-center py-3 text-xs text-gray-400"
+                            >
+                                {isLoadingMore ? (
+                                    <span className="flex items-center gap-2">
+                                        <Loader2
+                                            className="animate-spin"
+                                            style={{ color: "#DC3173" }}
+                                            size={16}
+                                        />
+                                        {t("loadingMore") || "Loading more"}...
+                                    </span>
+                                ) : loadError ? (
+                                    <button
+                                        type="button"
+                                        onClick={retry}
+                                        className="font-medium underline"
+                                        style={{ color: "#DC3173" }}
+                                    >
+                                        {t("retry") || "Retry"}
+                                    </button>
+                                ) : !hasMore && fleets.length > 0 ? (
+                                    <span>{t("no_more_fleet_managers") || "No more fleet managers"}</span>
+                                ) : null}
+                            </div>
+                        </>
                     )}
                 </div>
+
+                {/* Loaded / total counter (from meta) */}
+                {!!meta?.total && !isLoadingFleets && (
+                    <p className="-mt-1 text-right text-xs text-gray-400">
+                        {fleets.length} / {meta.total}
+                    </p>
+                )}
 
                 {/* Reason textarea – only for RE_ASSIGN */}
                 {status === "RE_ASSIGN" && (
@@ -443,7 +583,7 @@ export default function ApproveRiderModal({
                     {status === "RE_ASSIGN" ? (
                         <Button
                             onClick={handleReAssignToFleet}
-                            disabled={isSubmitting || !selectedFleetId || isLoadingFleets}
+                            disabled={isSubmitting || !effectiveSelectedFleetId || isLoadingFleets}
                             size="sm"
                             className="text-white font-medium"
                             style={{ backgroundColor: "#DC3173" }}
@@ -460,7 +600,7 @@ export default function ApproveRiderModal({
                     ) : status === "ASSIGN" ? (
                         <Button
                             onClick={handleAssignToFleet}
-                            disabled={isSubmitting || !selectedFleetId || isLoadingFleets}
+                            disabled={isSubmitting || !effectiveSelectedFleetId || isLoadingFleets}
                             size="sm"
                             className="text-white font-medium"
                             style={{ backgroundColor: "#DC3173" }}
@@ -471,7 +611,7 @@ export default function ApproveRiderModal({
                         <>
                             <Button
                                 onClick={handleAssignAndApprove}
-                                disabled={isSubmitting || !selectedFleetId || isLoadingFleets}
+                                disabled={isSubmitting || !effectiveSelectedFleetId || isLoadingFleets}
                                 size="sm"
                                 className="text-white font-medium"
                                 style={{ backgroundColor: "#DC3173" }}

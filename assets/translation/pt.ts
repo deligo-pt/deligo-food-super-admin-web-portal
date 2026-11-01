@@ -1246,6 +1246,7 @@ export const pt = {
   re_assign_reason: "Motivo da Reatribuição",
   enter_reason_for_reassign: "Introduza o motivo da reatribuição",
   re_assign: "Reatribuir",
+  no_more_fleet_managers: "Sem mais gestores de frota",
 
   // active delivery partners
   all_active_riders_system: "Todos os Estafetas ativos no sistema",

@@ -14,6 +14,7 @@ import PreviewCard from "./PreviewCard";
 import RoleSelector from "./RoleSelector";
 import { broadcastNotificationReq } from "@/services/dashboard/notifications/notifications.service";
 import { useTranslation } from "@/hooks/use-translation";
+import { TMeta } from "@/types";
 
 export type TUser = {
   _id: string;
@@ -31,7 +32,15 @@ type RoleType = keyof Pick<
   "ADMIN" | "CUSTOMER" | "FLEET_MANAGER" | "VENDOR" | "DELIVERY_PARTNER"
 >;
 
-export default function BroadcastCenter() {
+export type TInitialUsers = Partial<
+  Record<RoleType, { data: TUser[]; meta?: TMeta }>
+>;
+
+export default function BroadcastCenter({
+  initialUsers,
+}: {
+  initialUsers?: TInitialUsers;
+}) {
   const { t } = useTranslation();
   const [notificationCategory, setNotificationCategory] = useState<TNotificationType | undefined>();
   const [commType, setCommType] = useState<"PUSH" | "BOTH" | "EMAIL">("EMAIL");
@@ -227,6 +236,7 @@ export default function BroadcastCenter() {
               searchQueries={searchQueries}
               setSearchQueries={setSearchQueries}
               itemVariants={itemVariants}
+              initialUsers={initialUsers}
             />
 
             {/* Message Composition */}
