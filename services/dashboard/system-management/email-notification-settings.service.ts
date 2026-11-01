@@ -5,13 +5,15 @@ import { serverRequest } from "@/lib/serverFetch";
 import { catchAsync } from "@/utils/catchAsync";
 
 export const getAllUsersReq = async ({
+  page = 1,
   limit = 10,
   searchTerm = "",
   role,
-  status
+  status,
 }: {
-  limit: number;
-  searchTerm: string;
+  page?: number;
+  limit?: number;
+  searchTerm?: string;
   role: keyof typeof USER_ROLE;
   status?: keyof typeof USER_STATUS;
 }) => {
@@ -38,7 +40,13 @@ export const getAllUsersReq = async ({
 
   const result = await catchAsync<unknown>(async () => {
     return await serverRequest.get(endpoint, {
-      params: { limit, isDeleted, ...(searchTerm ? { searchTerm } : {}), ...(status ? { status } : {}) },
+      params: {
+        page, // ← new: lets "Show more" fetch only the NEXT page
+        limit,
+        isDeleted,
+        ...(searchTerm ? { searchTerm } : {}),
+        ...(status ? { status } : {}),
+      },
     });
   });
 
