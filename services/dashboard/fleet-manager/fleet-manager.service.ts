@@ -6,7 +6,7 @@ import { TAgent } from "@/types/user.type";
 import { catchAsync } from "@/utils/catchAsync";
 
 export const getAllFleetManagersReq = async (
-  queries: Record<string, string | undefined>,
+  queries: Record<string, string | number | undefined>,
 ): Promise<{ data: TAgent[]; meta?: TMeta }> => {
   const limit = Number(queries?.limit || 10);
   const page = Number(queries.page || 1);

@@ -22,14 +22,18 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getAllUsersReq } from '@/services/dashboard/system-management/email-notification-settings.service';
-import { TUser } from './BroadcastCenter';
+import { toast } from 'sonner';
+import { TUser, TInitialUsers } from './BroadcastCenter';
 import { useTranslation } from '@/hooks/use-translation';
+import { fetchUsers, seedUsers } from '@/lib/broadcast-users-client';
 
 type RoleType = keyof Pick<
     typeof USER_ROLE,
     'ADMIN' | 'CUSTOMER' | 'FLEET_MANAGER' | 'VENDOR' | 'DELIVERY_PARTNER'
 >;
+
+type StatusType = '' | keyof typeof USER_STATUS;
+type RoleUsers = { data: TUser[]; meta?: TMeta };
 
 interface IProps {
     selectedRoles: RoleType[];
@@ -55,7 +59,11 @@ interface IProps {
             | ((prev: Record<RoleType, string>) => Record<RoleType, string>),
     ) => void;
     itemVariants: Variants;
+    /** first page of every role, fetched on the server (optional) */
+    initialUsers?: TInitialUsers;
 }
+
+const PAGE_SIZE = 10;
 
 const ROLES = [
     { id: 'VENDOR', label: 'vendors', icon: StoreIcon, color: 'blue' },
@@ -64,6 +72,11 @@ const ROLES = [
     { id: 'DELIVERY_PARTNER', label: 'riders', icon: BikeIcon, color: 'amber' },
     { id: 'ADMIN', label: 'admins', icon: ShieldIcon, color: 'red' },
 ] as const;
+
+const ROLE_IDS = ROLES.map((r) => r.id) as RoleType[];
+
+const makeRecord = <T,>(factory: () => T): Record<RoleType, T> =>
+    Object.fromEntries(ROLE_IDS.map((id) => [id, factory()])) as Record<RoleType, T>;
 
 const STATUS_OPTIONS = [
     { label: 'All Statuses', value: '' },
@@ -102,113 +115,158 @@ export default function RoleSelector({
     searchQueries,
     setSearchQueries,
     itemVariants,
+    initialUsers,
 }: IProps) {
     const { t } = useTranslation();
 
-    const [targetModes, setTargetModes] = useState<Record<RoleType, 'all' | 'specific'>>({
-        VENDOR: 'all',
-        CUSTOMER: 'all',
-        DELIVERY_PARTNER: 'all',
-        FLEET_MANAGER: 'all',
-        ADMIN: 'all',
+    const [targetModes, setTargetModes] = useState<Record<RoleType, 'all' | 'specific'>>(
+        () => makeRecord<'all' | 'specific'>(() => 'all'),
+    );
+
+    // Starts with the server-fetched first pages → counts + lists are there immediately
+    const [usersData, setUsersData] = useState<Record<RoleType, RoleUsers>>(() => {
+        const base = makeRecord<RoleUsers>(() => ({ data: [] }));
+        ROLE_IDS.forEach((id) => {
+            const initial = initialUsers?.[id];
+            if (initial) base[id] = initial as RoleUsers;
+        });
+        return base;
     });
 
-    const [usersData, setUsersData] = useState<
-        Record<RoleType, { data: TUser[]; meta?: TMeta }>
-    >({
-        VENDOR: { data: [] },
-        CUSTOMER: { data: [] },
-        DELIVERY_PARTNER: { data: [] },
-        FLEET_MANAGER: { data: [] },
-        ADMIN: { data: [] },
-    });
+    // list is being replaced (first load / search / status change)
+    const [userDataLoading, setUserDataLoading] = useState<Record<RoleType, boolean>>(
+        () => makeRecord(() => false),
+    );
+    // "show more" is appending the next page
+    const [moreLoading, setMoreLoading] = useState<Record<RoleType, boolean>>(
+        () => makeRecord(() => false),
+    );
 
-    const [userDataLoading, setUserDataLoading] = useState<Record<RoleType, boolean>>({
-        VENDOR: false,
-        CUSTOMER: false,
-        DELIVERY_PARTNER: false,
-        FLEET_MANAGER: false,
-        ADMIN: false,
-    });
+    const [statusFilters, setStatusFilters] = useState<Record<RoleType, StatusType>>(
+        () => makeRecord<StatusType>(() => ''),
+    );
 
-    // Keep track of the last search term that was actually sent to the API
-    const lastFetchedSearch = useRef<Record<RoleType, string>>({
-        VENDOR: '',
-        CUSTOMER: '',
-        DELIVERY_PARTNER: '',
-        FLEET_MANAGER: '',
-        ADMIN: '',
-    });
+    // what the list on screen currently reflects
+    const lastFetchedSearch = useRef<Record<RoleType, string>>(makeRecord(() => ''));
+    const lastFetchedStatus = useRef<Record<RoleType, StatusType>>(
+        makeRecord<StatusType>(() => ''),
+    );
+    // bumps on every new "replace" request → older responses are ignored (no race conditions)
+    const requestTokens = useRef<Record<RoleType, number>>(makeRecord(() => 0));
 
-    const [statusFilters, setStatusFilters] = useState<
-        Record<RoleType, '' | keyof typeof USER_STATUS>
-    >({
-        VENDOR: '',
-        CUSTOMER: '',
-        DELIVERY_PARTNER: '',
-        FLEET_MANAGER: '',
-        ADMIN: '',
-    });
-
-    // Core fetch
-    const getUsers = useCallback(
-        async (
-            roleId: RoleType,
-            limit = 10,
-            searchTerm = '',
-            status: '' | keyof typeof USER_STATUS = '',
-        ) => {
+    // load page 1 (replaces the list)
+    const loadFirstPage = useCallback(
+        async (roleId: RoleType, searchTerm: string, status: StatusType) => {
+            const token = ++requestTokens.current[roleId];
+            lastFetchedSearch.current[roleId] = searchTerm;
+            lastFetchedStatus.current[roleId] = status;
             setUserDataLoading((prev) => ({ ...prev, [roleId]: true }));
+
             try {
-                const resultData = await getAllUsersReq({
-                    limit,
+                const result = await fetchUsers<TUser>({
                     role: roleId,
+                    page: 1,
+                    limit: PAGE_SIZE,
                     searchTerm,
-                    ...(status ? { status } : {}),
+                    status,
                 });
-                setUsersData((prev) => ({ ...prev, [roleId]: resultData }));
-                lastFetchedSearch.current[roleId] = searchTerm;
-                return resultData;
+                if (token !== requestTokens.current[roleId]) return undefined;
+                setUsersData((prev) => ({ ...prev, [roleId]: result }));
+                return result;
+            } catch (error) {
+                if (token === requestTokens.current[roleId]) {
+                    console.error(error);
+                    toast.error(t('failed_to_load_users') || 'Failed to load users');
+                }
+                return undefined;
             } finally {
-                setUserDataLoading((prev) => ({ ...prev, [roleId]: false }));
+                if (token === requestTokens.current[roleId]) {
+                    setUserDataLoading((prev) => ({ ...prev, [roleId]: false }));
+                }
             }
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
     );
 
-    // Initial load (counts + first page) – runs once 
+    // load next page (appends, never re-fetches what we already have) ─
+    const loadMore = async (roleId: RoleType) => {
+        if (moreLoading[roleId] || userDataLoading[roleId]) return;
+
+        const current = usersData[roleId];
+        const nextPage =
+            (current.meta?.page ?? Math.ceil(current.data.length / PAGE_SIZE)) + 1;
+        const token = requestTokens.current[roleId];
+
+        setMoreLoading((prev) => ({ ...prev, [roleId]: true }));
+        try {
+            const result = await fetchUsers<TUser>({
+                role: roleId,
+                page: nextPage,
+                limit: PAGE_SIZE,
+                searchTerm: lastFetchedSearch.current[roleId],
+                status: lastFetchedStatus.current[roleId],
+            });
+            // filters changed while waiting → drop this page
+            if (token !== requestTokens.current[roleId]) return;
+
+            setUsersData((prev) => {
+                const existing = prev[roleId];
+                const seen = new Set(existing.data.map((u) => u._id));
+                return {
+                    ...prev,
+                    [roleId]: {
+                        data: [...existing.data, ...result.data.filter((u) => !seen.has(u._id))],
+                        meta: result.meta ?? existing.meta,
+                    },
+                };
+            });
+        } catch (error) {
+            console.error(error);
+            toast.error(t('failed_to_load_users') || 'Failed to load users');
+        } finally {
+            setMoreLoading((prev) => ({ ...prev, [roleId]: false }));
+        }
+    };
+
+    // on mount: seed the client cache + load any role the server didn't give us ─
     useEffect(() => {
-        const roles = Object.keys(USER_ROLE) as RoleType[];
-        // Fire all requests in parallel
-        roles.forEach((role) => {
-            getUsers(role, 10, '');
+        ROLE_IDS.forEach((roleId) => {
+            const initial = initialUsers?.[roleId];
+            if (initial) {
+                seedUsers(
+                    { role: roleId, page: 1, limit: PAGE_SIZE, searchTerm: '', status: '' },
+                    initial,
+                );
+            } else {
+                loadFirstPage(roleId, '', '');
+            }
         });
-    }, [getUsers]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    // Debounced search
+    // debounced search
     useEffect(() => {
-        const timers: Partial<Record<RoleType, ReturnType<typeof setTimeout>>> = {};
+        const timers: ReturnType<typeof setTimeout>[] = [];
 
-        (Object.keys(searchQueries) as RoleType[]).forEach((roleId) => {
-            // Only care about roles that are currently in “specific” mode
+        ROLE_IDS.forEach((roleId) => {
+            // Only roles in "specific" mode show a list
             if (targetModes[roleId] !== 'specific') return;
 
             const query = searchQueries[roleId];
             if (query === lastFetchedSearch.current[roleId]) return; // already fetched
 
-            // inside the debounced search effect
-            timers[roleId] = setTimeout(() => {
-                getUsers(roleId, 10, query, statusFilters[roleId]);
-            }, 300);
-            // ...and add statusFilters to the dependency array
+            timers.push(
+                setTimeout(() => {
+                    loadFirstPage(roleId, query, statusFilters[roleId]);
+                }, 300),
+            );
         });
 
-        return () => {
-            Object.values(timers).forEach((t) => t && clearTimeout(t));
-        };
-    }, [searchQueries, targetModes, getUsers, statusFilters]);
+        return () => timers.forEach((timer) => clearTimeout(timer));
+    }, [searchQueries, targetModes, statusFilters, loadFirstPage]);
 
-    // Handlers
+    // handlers
     const toggleRole = (roleId: RoleType) => {
         setSelectedRoles((prev) =>
             prev.includes(roleId) ? prev.filter((r) => r !== roleId) : [...prev, roleId],
@@ -227,31 +285,13 @@ export default function RoleSelector({
                 !usersData[roleId]?.data?.length ||
                 currentSearch !== lastFetchedSearch.current[roleId]
             ) {
-                getUsers(roleId, 10, currentSearch, currentStatus);
+                loadFirstPage(roleId, currentSearch, currentStatus);
             }
-        } else {
-            if (statusFilters[roleId]) {
-                setStatusFilters((prev) => ({ ...prev, [roleId]: '' }));
-                getUsers(roleId, 10, searchQueries[roleId], '');
-            }
+        } else if (statusFilters[roleId]) {
+            setStatusFilters((prev) => ({ ...prev, [roleId]: '' }));
+            loadFirstPage(roleId, searchQueries[roleId], '');
         }
     };
-    // const handleTargetMode = (roleId: RoleType, mode: 'all' | 'specific') => {
-    //     setTargetModes((prev) => ({ ...prev, [roleId]: mode }));
-
-    //     if (mode === 'specific') {
-    //         setExpandedPanels((prev) => ({ ...prev, [roleId]: true }));
-
-    //         // Only fetch if we have never loaded this role or the search term changed
-    //         const currentSearch = searchQueries[roleId];
-    //         if (
-    //             !usersData[roleId]?.data?.length ||
-    //             currentSearch !== lastFetchedSearch.current[roleId]
-    //         ) {
-    //             getUsers(roleId, 10, currentSearch);
-    //         }
-    //     }
-    // };
 
     const toggleUser = (roleId: RoleType, userId: string) => {
         setSelectedUsers((prev) => {
@@ -263,7 +303,7 @@ export default function RoleSelector({
     };
 
     const toggleAllUsers = (roleId: RoleType, filteredUserIds: string[]) => {
-        setStatusFilters((prev) => ({ ...prev, [roleId]: "" }));
+        setStatusFilters((prev) => ({ ...prev, [roleId]: '' }));
         setSelectedUsers((prev) => {
             const newSet = new Set(prev[roleId] || []);
             const allSelected = filteredUserIds.every((id) => newSet.has(id));
@@ -320,26 +360,24 @@ export default function RoleSelector({
         return map[color] || map.blue;
     };
 
-    const handleStatusFilter = async (
-        roleId: RoleType,
-        status: '' | keyof typeof USER_STATUS,
-    ) => {
+    const handleStatusFilter = async (roleId: RoleType, status: StatusType) => {
         setStatusFilters((prev) => ({ ...prev, [roleId]: status }));
 
-        // Fetch first page for display (keeps existing pagination UX)
-        const result = await getUsers(roleId, 10, searchQueries[roleId], status);
+        // First page for display
+        const result = await loadFirstPage(roleId, searchQueries[roleId], status);
 
-        if (!status) return;
+        if (!status || !result) return;
 
-        const total = result?.meta?.total ?? 0;
+        const total = result.meta?.total ?? 0;
         if (total === 0) return;
 
         // Fetch the FULL matching set (not just the displayed page) so selection
         // covers every user with this status, not only the first 10.
         try {
-            const fullResult = await getAllUsersReq({
-                limit: total,
+            const fullResult = await fetchUsers<TUser>({
                 role: roleId,
+                page: 1,
+                limit: total,
                 searchTerm: searchQueries[roleId],
                 status,
             });
@@ -439,6 +477,11 @@ export default function RoleSelector({
                             const isExpanded = expandedPanels[roleId];
                             const selectedCount = selectedUsers[roleId]?.size || 0;
 
+                            const isLoading = userDataLoading[roleId];
+                            const isMoreLoading = moreLoading[roleId];
+                            const total = roleData.meta?.total ?? 0;
+                            const hasMore = roleData.data.length < total;
+
                             return (
                                 <motion.div
                                     key={roleId}
@@ -534,7 +577,7 @@ export default function RoleSelector({
                                                                     <DropdownMenuItem
                                                                         key={opt.value}
                                                                         onSelect={() =>
-                                                                            handleStatusFilter(roleId, opt.value as '' | keyof typeof USER_STATUS)
+                                                                            handleStatusFilter(roleId, opt.value as StatusType)
                                                                         }
                                                                         className={`flex items-center justify-between text-xs font-medium cursor-pointer ${statusFilters[roleId] === opt.value
                                                                             ? `${colors.text} ${colors.lightBg}`
@@ -586,8 +629,10 @@ export default function RoleSelector({
 
                                                     <AnimatePresence>
                                                         {isExpanded &&
-                                                            (userDataLoading[roleId] ? (
+                                                            (isLoading && roleData.data.length === 0 ? (
+                                                                // nothing to show yet → spinner
                                                                 <motion.div
+                                                                    key="spinner"
                                                                     initial={{ opacity: 0 }}
                                                                     animate={{ opacity: 1 }}
                                                                     exit={{ opacity: 0 }}
@@ -596,11 +641,14 @@ export default function RoleSelector({
                                                                     <LoaderCircleIcon className="w-6 h-6 text-gray-400 animate-spin" />
                                                                 </motion.div>
                                                             ) : (
+                                                                // list stays visible (dimmed) while a search / filter reloads
                                                                 <motion.div
+                                                                    key="list"
                                                                     initial={{ opacity: 0 }}
                                                                     animate={{ opacity: 1 }}
                                                                     exit={{ opacity: 0 }}
-                                                                    className="max-h-60 overflow-y-auto pr-2 space-y-1 custom-scrollbar"
+                                                                    className={`max-h-60 overflow-y-auto pr-2 space-y-1 custom-scrollbar transition-opacity ${isLoading ? 'opacity-50 pointer-events-none' : ''
+                                                                        }`}
                                                                 >
                                                                     {roleData.meta?.total === 0 ||
                                                                         !roleData.data?.length ? (
@@ -659,44 +707,38 @@ export default function RoleSelector({
                                                                         })
                                                                     )}
 
-                                                                    {(roleData.meta?.limit || 10) <
-                                                                        (roleData.meta?.total || 0) && (
-                                                                            <div className="text-center mt-2">
-                                                                                <Button
-                                                                                    onClick={() =>
-                                                                                        getUsers(
-                                                                                            roleId,
-                                                                                            (roleData.meta?.limit || 10) + 10,
-                                                                                            searchQueries[roleId],
-                                                                                            statusFilters[roleId],
-                                                                                        )
-                                                                                    }
-                                                                                    size="sm"
-                                                                                    disabled={userDataLoading[roleId]}
-                                                                                    className={`text-xs cursor-pointer hover:opacity-90 ${colors.bg} hover:${colors.bg} transition-colors`}
-                                                                                >
-                                                                                    {userDataLoading[roleId] ? (
-                                                                                        <LoaderCircleIcon className="w-3.5 h-3.5 animate-spin" />
-                                                                                    ) : (
-                                                                                        t('show_more')
-                                                                                    )}
-                                                                                </Button>
-                                                                            </div>
-                                                                        )}
+                                                                    {hasMore && (
+                                                                        <div className="text-center mt-2 space-y-1">
+                                                                            <Button
+                                                                                onClick={() => loadMore(roleId)}
+                                                                                size="sm"
+                                                                                disabled={isMoreLoading || isLoading}
+                                                                                className={`text-xs cursor-pointer hover:opacity-90 ${colors.bg} transition-colors`}
+                                                                            >
+                                                                                {isMoreLoading ? (
+                                                                                    <LoaderCircleIcon className="w-3.5 h-3.5 animate-spin" />
+                                                                                ) : (
+                                                                                    t('show_more')
+                                                                                )}
+                                                                            </Button>
+                                                                            <p className="text-[11px] text-gray-400">
+                                                                                {roleData.data.length} / {total}
+                                                                            </p>
+                                                                        </div>
+                                                                    )}
                                                                 </motion.div>
                                                             ))}
                                                     </AnimatePresence>
                                                 </div>
                                             </motion.div>
-                                        )
-                                        }
+                                        )}
                                     </AnimatePresence>
                                 </motion.div>
                             );
                         })}
-                    </motion.div >
+                    </motion.div>
                 )}
-            </AnimatePresence >
-        </motion.div >
+            </AnimatePresence>
+        </motion.div>
     );
 }
