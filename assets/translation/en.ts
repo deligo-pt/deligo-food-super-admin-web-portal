@@ -1235,6 +1235,7 @@ export const en = {
   re_assign_reason: "Re-Assign Reason",
   enter_reason_for_reassign: "Enter reason for reassign",
   re_assign: "Re-Assign",
+  no_more_fleet_managers: "No more fleet managers",
 
   // active delivery partners
   all_active_riders_system: "All active riders in the system",
