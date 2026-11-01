@@ -41,7 +41,7 @@ interface IProps {
     onOpenChange: (open: boolean) => void;
     partnerId: string;
     partnerName: string;
-    city: string;
+    city?: string;
     status:
     | "APPROVED"
     | "REJECTED"
@@ -58,7 +58,6 @@ export default function ApproveRiderModal({
     onOpenChange,
     partnerId,
     partnerName,
-    city,
     status,
     currentFleetManagerId = null,
 }: IProps) {
@@ -102,7 +101,7 @@ export default function ApproveRiderModal({
 
             try {
                 const res = await getAllFleetManagersReq({
-                    city,
+                    // city,
                     page,
                     limit: PAGE_LIMIT,
                 } as Parameters<typeof getAllFleetManagersReq>[0]);
@@ -123,9 +122,9 @@ export default function ApproveRiderModal({
                 setMeta(newMeta);
             } catch (error) {
                 if (session !== sessionRef.current) return;
-                console.error("Failed to load fleet managers for city:", city, error);
+                console.error("Failed to load fleet managers:", error);
                 setLoadError(true);
-                toast.error("Could not load fleet managers for this city.");
+                toast.error("Could not load fleet managers.");
             } finally {
                 if (session === sessionRef.current) {
                     loadingRef.current = false;
@@ -134,7 +133,7 @@ export default function ApproveRiderModal({
                 }
             }
         },
-        [city]
+        []
     );
 
     // reset + first page whenever the modal opens / city changes ─
@@ -142,16 +141,14 @@ export default function ApproveRiderModal({
         sessionRef.current += 1;
         loadingRef.current = false;
 
-        if (!open || !city) {
-            return;
-        }
+        if (!open) return;
 
         const timer = window.setTimeout(() => {
             loadPage(1, sessionRef.current);
         }, 0);
 
         return () => window.clearTimeout(timer);
-    }, [open, city, loadPage]);
+    }, [open, loadPage]);
 
     const loadMore = useCallback(() => {
         if (loadingRef.current || !hasMore || loadError) return;
@@ -400,11 +397,11 @@ export default function ApproveRiderModal({
                         — {partnerName}
                     </DialogTitle>
                     <DialogDescription>
-                        {t("rider_city")}:{" "}
-                        <span className="font-semibold text-gray-900 capitalize mx-1">
+                        {/* {t("rider_city")}:{" "} */}
+                        {/* <span className="font-semibold text-gray-900 capitalize mx-1">
                             {city || "N/A"}
-                        </span>
-                        . {t("showing_available_fleet_managers")}
+                        </span> */}
+                        {t("showing_available_fleet_managers")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -417,7 +414,8 @@ export default function ApproveRiderModal({
                     {isLoadingFleets ? (
                         <div className="flex flex-col items-center justify-center p-12 text-sm text-gray-400 gap-2">
                             <Loader2 className="animate-spin" style={{ color: "#DC3173" }} size={24} />
-                            {t("loading_fleet_managers_in")} {city}...
+                            {t("loading_fleet_managers_in")}
+                            {/* {city}... */}
                         </div>
                     ) : (
                         <>
@@ -484,7 +482,7 @@ export default function ApproveRiderModal({
                                                     {fleet.businessDetails?.businessName || "—"}
                                                 </TableCell>
                                                 <TableCell className="p-3 text-xs text-gray-500 capitalize">
-                                                    {fleet.businessLocation?.city || fleet.address?.city || city}
+                                                    {fleet.businessLocation?.city || fleet.address?.city || "-"}
                                                 </TableCell>
                                                 <TableCell
                                                     className="p-3 text-right"
@@ -509,7 +507,8 @@ export default function ApproveRiderModal({
                                                 colSpan={4}
                                                 className="p-8 text-center text-xs text-gray-400 hover:bg-transparent"
                                             >
-                                                {t("no_fleet_managers_found_in")} {city}.
+                                                {t("no_fleet_managers_found_in")}
+                                                {/* {city}. */}
                                             </TableCell>
                                         </TableRow>
                                     )}
