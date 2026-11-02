@@ -268,6 +268,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
       icon: <ShoppingBag size={18} />,
       items: [
         { name: t("all_orders"), path: "/admin/all-orders" },
+        { name: t("scheduled_orders"), path: "/admin/scheduled-orders" },
         { name: t("cancelled_orders"), path: "/admin/cancelled-orders" },
         { name: t("rejected_orders"), path: "/admin/rejected-orders" },
         { name: t("refunded_orders"), path: "/admin/refunded-orders" },

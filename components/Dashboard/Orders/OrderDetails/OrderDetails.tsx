@@ -24,6 +24,7 @@ import {
   TruckIcon,
   InfoIcon,
   StarIcon,
+  CalendarClockIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -108,6 +109,11 @@ export default function OrderDetails({ order }: IProps) {
                 <span className="text-xs px-2.5 py-0.5 bg-white/20 rounded-full font-medium">
                   {order?.fulfillmentType}
                 </span>
+                {order?.orderType && (
+                  <span className="text-xs px-2.5 py-0.5 bg-white/20 rounded-full font-medium">
+                    {order.orderType}
+                  </span>
+                )}
                 {order?.isDeleted && (
                   <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded uppercase">
                     DELETED
@@ -116,7 +122,9 @@ export default function OrderDetails({ order }: IProps) {
               </div>
               <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
                 <CalendarIcon className="w-4 h-4" />
-                <span>{t("created")}: {formatDate(order?.createdAt)}</span>
+                <span>
+                  {t("created")}: {formatDate(order?.createdAt)}
+                </span>
               </div>
               <div className="text-white/60 text-xs mt-0.5">
                 {t("updated")}: {formatDate(order?.updatedAt)}
@@ -143,7 +151,9 @@ export default function OrderDetails({ order }: IProps) {
               <span className="font-semibold">{t("invoice_sync_warning")}: </span>
               {order.invoiceSync.syncError || "Failed to synchronize invoice."}
               {order.invoiceSync.syncedAt && (
-                <span className="ml-2 text-xs">({t("last_attempt")}: {formatDate(order.invoiceSync.syncedAt)})</span>
+                <span className="ml-2 text-xs">
+                  ({t("last_attempt")}: {formatDate(order.invoiceSync.syncedAt)})
+                </span>
               )}
             </div>
           </div>
@@ -156,6 +166,65 @@ export default function OrderDetails({ order }: IProps) {
             <motion.div variants={itemVariants as Variants}>
               <OrderItemsTable items={order?.items || []} />
             </motion.div>
+
+            {/* SCHEDULED ORDER INFO (new) */}
+            {(order?.orderType === "SCHEDULED" ||
+              order?.scheduledFor ||
+              order?.scheduledReleaseAt) && (
+                <motion.div
+                  variants={itemVariants as Variants}
+                  className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm"
+                >
+                  <div className="flex items-center gap-2 mb-4 text-[#DC3173]">
+                    <CalendarClockIcon className="w-5 h-5" />
+                    <h3 className="font-semibold text-gray-900">
+                      {t("scheduled_order_details") || "Scheduled Order Details"}
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-500 block text-xs">
+                        {t("order_type") || "Order Type"}
+                      </span>
+                      <span className="font-medium">
+                        {order?.orderType || "N/A"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 block text-xs">
+                        {t("scheduled_window") || "Scheduled Window"}
+                      </span>
+                      <span className="font-medium">
+                        {order?.scheduledFor?.start
+                          ? `${formatDate(order.scheduledFor.start)} → ${formatDate(
+                            order.scheduledFor.end
+                          )}`
+                          : "N/A"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 block text-xs">
+                        {t("scheduled_release_at") || "Scheduled Release At"}
+                      </span>
+                      <span className="font-medium">
+                        {formatDate(order?.scheduledReleaseAt)}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 block text-xs">
+                        {t("released_at") || "Released At"}
+                      </span>
+                      <span className="font-medium">
+                        {formatDate(order?.releasedAt)}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
             {/* Locations Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -193,7 +262,9 @@ export default function OrderDetails({ order }: IProps) {
 
                   <div>
                     <span className="text-gray-500">{t("contact")}:</span>
-                    <div className="font-medium">{order?.vendorId?.contactNumber || "N/A"}</div>
+                    <div className="font-medium">
+                      {order?.vendorId?.contactNumber || "N/A"}
+                    </div>
                   </div>
 
                   <div>
@@ -202,7 +273,9 @@ export default function OrderDetails({ order }: IProps) {
                   </div>
 
                   <div>
-                    <span className="text-gray-500">{t("vendor_id")} / {t("user_id")}:</span>
+                    <span className="text-gray-500">
+                      {t("vendor_id")} / {t("user_id")}:
+                    </span>
                     <div className="text-xs text-gray-600 break-all">
                       {order?.vendorId?.userId || "N/A"}
                     </div>
@@ -210,7 +283,9 @@ export default function OrderDetails({ order }: IProps) {
 
                   {/* Business Details */}
                   <div className="pt-2 border-t border-gray-100">
-                    <div className="font-medium text-gray-800 mb-1">{t("business_details")}</div>
+                    <div className="font-medium text-gray-800 mb-1">
+                      {t("business_details")}
+                    </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                       <div>
                         <span className="text-gray-500">{t("opening")}:</span>{" "}
@@ -222,12 +297,15 @@ export default function OrderDetails({ order }: IProps) {
                       </div>
                       <div className="col-span-2">
                         <span className="text-gray-500">{t("closing_days")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.closingDays?.join(", ") || "None"}
+                        {order?.vendorId?.businessDetails?.closingDays?.join(
+                          ", "
+                        ) || "None"}
                       </div>
                       <div className="col-span-2">
                         <span className="text-gray-500">{t("business_type")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.businessType?.name?.[lang] || "N/A"}{" "}
-                        {/* ({order?.vendorId?.businessDetails?.businessType?._id || "—"}) */}
+                        {order?.vendorId?.businessDetails?.businessType?.name?.[
+                          lang
+                        ] || "N/A"}
                       </div>
                     </div>
                   </div>
@@ -238,8 +316,16 @@ export default function OrderDetails({ order }: IProps) {
                       <div className="text-gray-500 mb-1">{t("store_photos")}:</div>
                       <div className="flex flex-wrap gap-2">
                         {order.vendorId.documents.storePhoto.map((photo, i) => (
-                          <div key={i} className="w-16 h-16 rounded border overflow-hidden relative">
-                            <Image src={photo} alt={`Store ${i}`} fill className="object-cover" />
+                          <div
+                            key={i}
+                            className="w-16 h-16 rounded border overflow-hidden relative"
+                          >
+                            <Image
+                              src={photo}
+                              alt={`Store ${i}`}
+                              fill
+                              className="object-cover"
+                            />
                           </div>
                         ))}
                       </div>
@@ -255,8 +341,8 @@ export default function OrderDetails({ order }: IProps) {
                           {order?.pickupAddress?.street || "N/A"}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {order?.pickupAddress?.postalCode || ""} • {order?.pickupAddress?.city || ""}
-                          {/* {order?.pickupAddress?.state || ""} */}
+                          {order?.pickupAddress?.postalCode || ""} •{" "}
+                          {order?.pickupAddress?.city || ""}
                         </div>
                         <div className="text-xs text-gray-500">
                           {order?.pickupAddress?.country || ""}
@@ -267,8 +353,10 @@ export default function OrderDetails({ order }: IProps) {
                           </div>
                         )}
                         <div className="text-xs text-gray-400 mt-1">
-                          {t("lat_long")}: {order?.pickupAddress?.latitude ?? "N/A"},{" "}
-                          {order?.pickupAddress?.longitude ?? "N/A"} • {t("accuracy")}:{" "}
+                          {t("lat_long")}:{" "}
+                          {order?.pickupAddress?.latitude ?? "N/A"},{" "}
+                          {order?.pickupAddress?.longitude ?? "N/A"} •{" "}
+                          {t("accuracy")}:{" "}
                           {order?.pickupAddress?.geoAccuracy ?? "N/A"}
                         </div>
                       </div>
@@ -304,7 +392,9 @@ export default function OrderDetails({ order }: IProps) {
                     <div className="font-medium">
                       {order?.customerId?.contactNumber || "N/A"}
                       {order?.customerId?.NIF && (
-                        <span className="ml-2 text-xs text-gray-500">{t("nif")}: {order.customerId.NIF}</span>
+                        <span className="ml-2 text-xs text-gray-500">
+                          {t("nif")}: {order.customerId.NIF}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -312,28 +402,43 @@ export default function OrderDetails({ order }: IProps) {
                   <div>
                     <span className="text-gray-500">{t("role_userId")}:</span>
                     <div className="text-xs">
-                      {order?.customerId?.role || "N/A"} • {order?.customerId?.userId || "N/A"}
+                      {order?.customerId?.role || "N/A"} •{" "}
+                      {order?.customerId?.userId || "N/A"}
                     </div>
                   </div>
-
-                  {/* <div>
-                    <span className="text-gray-500">{t("customer_id")}:</span>
-                    <div className="text-xs break-all">{order?.customerId?._id || "N/A"}</div>
-                  </div> */}
 
                   {/* Current Session Location */}
                   {order?.customerId?.currentSessionLocation && (
                     <div className="pt-2 border-t border-gray-100 text-xs">
-                      <div className="font-medium text-gray-800 mb-1">{t("customer_live_location")}</div>
-                      <div>
-                        {t("type")}: {order.customerId.currentSessionLocation.type || "N/A"} • {t("mocked")}:{" "}
-                        {String(order.customerId.currentSessionLocation.isMocked ?? "N/A")}
+                      <div className="font-medium text-gray-800 mb-1">
+                        {t("customer_live_location")}
                       </div>
                       <div>
-                        {t("coords")}: {formatCoord(order.customerId.currentSessionLocation.coordinates)}
+                        {t("type")}:{" "}
+                        {order.customerId.currentSessionLocation.type || "N/A"}{" "}
+                        • {t("mocked")}:{" "}
+                        {String(
+                          order.customerId.currentSessionLocation.isMocked ??
+                          "N/A"
+                        )}
                       </div>
                       <div>
-                        {t("last_update")}: {formatDate(order.customerId.currentSessionLocation.lastLocationUpdate)}
+                        {t("coords")}:{" "}
+                        {formatCoord(
+                          order.customerId.currentSessionLocation.coordinates
+                        )}
+                      </div>
+                      <div>
+                        {t("accuracy")}:{" "}
+                        {order.customerId.currentSessionLocation.geoAccuracy ??
+                          "N/A"}
+                      </div>
+                      <div>
+                        {t("last_update")}:{" "}
+                        {formatDate(
+                          order.customerId.currentSessionLocation
+                            .lastLocationUpdate
+                        )}
                       </div>
                     </div>
                   )}
@@ -344,25 +449,22 @@ export default function OrderDetails({ order }: IProps) {
                       <MapPinIcon className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" />
                       <div>
                         <div className="font-medium">
-                          {order?.deliveryAddress?.street || "N/A"} {order?.deliveryAddress?.detailedAddress &&
-                            `• ${order.deliveryAddress.detailedAddress}`
-                          }
+                          {order?.deliveryAddress?.street || "N/A"}{" "}
+                          {order?.deliveryAddress?.detailedAddress &&
+                            `• ${order.deliveryAddress.detailedAddress}`}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {order?.deliveryAddress?.postalCode || ""} • {order?.deliveryAddress?.city || ""}
-                          {/* {order?.deliveryAddress?.state || ""} */}
+                          {order?.deliveryAddress?.postalCode || ""} •{" "}
+                          {order?.deliveryAddress?.city || ""}
                         </div>
                         <div className="text-xs text-gray-500">
                           {order?.deliveryAddress?.country || ""}
                         </div>
-                        {/* {order?.deliveryAddress?.detailedAddress && (
-                          <div className="text-xs text-gray-500 mt-0.5">
-                            {order.deliveryAddress.detailedAddress}
-                          </div>
-                        )} */}
                         <div className="text-xs text-gray-400 mt-1">
-                          {t("lat_long")}: {order?.deliveryAddress?.latitude ?? "N/A"},{" "}
-                          {order?.deliveryAddress?.longitude ?? "N/A"} • {t("accuracy")}:{" "}
+                          {t("lat_long")}:{" "}
+                          {order?.deliveryAddress?.latitude ?? "N/A"},{" "}
+                          {order?.deliveryAddress?.longitude ?? "N/A"} •{" "}
+                          {t("accuracy")}:{" "}
                           {order?.deliveryAddress?.geoAccuracy ?? "N/A"}
                         </div>
                       </div>
@@ -379,40 +481,74 @@ export default function OrderDetails({ order }: IProps) {
             >
               <div className="flex items-center gap-2 mb-4 text-[#DC3173]">
                 <ClockIcon className="w-5 h-5" />
-                <h3 className="font-semibold text-gray-900">{t("timing_preparation")}</h3>
+                <h3 className="font-semibold text-gray-900">
+                  {t("timing_preparation")}
+                </h3>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("preparation_time")}</span>
-                  <span className="font-medium">{order?.preparationTime ?? "N/A"} {t("min")}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("preparation_time")}
+                  </span>
+                  <span className="font-medium">
+                    {order?.preparationTime ?? "N/A"} {t("min")}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("auto_accept_deadline")}</span>
-                  <span className="font-medium">{formatDate(order?.autoAcceptDeadlineAt)}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("auto_accept_deadline")}
+                  </span>
+                  <span className="font-medium">
+                    {formatDate(order?.autoAcceptDeadlineAt)}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("estimated_ready_at")}</span>
-                  <span className="font-medium">{formatDate(order?.estimatedReadyAt)}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("estimated_ready_at")}
+                  </span>
+                  <span className="font-medium">
+                    {formatDate(order?.estimatedReadyAt)}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("food_ready_at")}</span>
-                  <span className="font-medium">{formatDate(order?.foodReadyAt)}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("food_ready_at")}
+                  </span>
+                  <span className="font-medium">
+                    {formatDate(order?.foodReadyAt)}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">Vendor Responded At</span>
-                  <span className="font-medium">{formatDate(order?.vendorRespondedAt)}</span>
+                  <span className="text-gray-500 block text-xs">
+                    Vendor Responded At
+                  </span>
+                  <span className="font-medium">
+                    {formatDate(order?.vendorRespondedAt)}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("need_more_time_count")}</span>
-                  <span className="font-medium">{order?.needMoreTimeCount ?? 0}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("need_more_time_count")}
+                  </span>
+                  <span className="font-medium">
+                    {order?.needMoreTimeCount ?? 0}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("dispatch_expires_at")}</span>
-                  <span className="font-medium">{formatDate(order?.dispatchExpiresAt)}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("dispatch_expires_at")}
+                  </span>
+                  <span className="font-medium">
+                    {formatDate(order?.dispatchExpiresAt)}
+                  </span>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("dispatch_escalated_at")}</span>
-                  <span className="font-medium">{formatDate(order?.dispatchEscalatedAt)}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("dispatch_escalated_at")}
+                  </span>
+                  <span className="font-medium">
+                    {formatDate(order?.dispatchEscalatedAt)}
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -424,7 +560,9 @@ export default function OrderDetails({ order }: IProps) {
             >
               <div className="flex items-center gap-2 mb-4 text-[#DC3173]">
                 <TruckIcon className="w-5 h-5" />
-                <h3 className="font-semibold text-gray-900">{t("dispatch_information")}</h3>
+                <h3 className="font-semibold text-gray-900">
+                  {t("dispatch_information")}
+                </h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -501,26 +639,30 @@ export default function OrderDetails({ order }: IProps) {
                   {order.statusHistory.map((history, idx) => {
                     const status = (history.status || "").toUpperCase();
 
-                    // Decide who to show based on status
                     let actorLabel: string | null = null;
                     let actorName: string | null = null;
                     let actorUserId: string | null = null;
 
-                    if (status === "PENDING") {
+                    if (status === "PENDING" || status === "SCHEDULED") {
                       actorLabel = "Customer";
-                      actorName = `${order.customerId?.name?.firstName || ""} ${order.customerId?.name?.lastName || ""}`.trim();
+                      actorName =
+                        `${order.customerId?.name?.firstName || ""} ${order.customerId?.name?.lastName || ""
+                          }`.trim();
                       actorUserId = order.customerId?.userId || null;
                     } else if (status === "ACCEPTED") {
                       actorLabel = "Vendor";
                       actorName =
                         order.vendorId?.businessDetails?.businessName ||
-                        `${order.vendorId?.name?.firstName || ""} ${order.vendorId?.name?.lastName || ""}`.trim();
+                        `${order.vendorId?.name?.firstName || ""} ${order.vendorId?.name?.lastName || ""
+                          }`.trim();
                       actorUserId = order.vendorId?.userId || null;
                     } else if (
                       ["PICKED_UP", "ON_THE_WAY", "DELIVERED"].includes(status)
                     ) {
                       actorLabel = "Rider";
-                      actorName = `${order.deliveryPartnerId?.name?.firstName || ""} ${order.deliveryPartnerId?.name?.lastName || ""}`.trim();
+                      actorName =
+                        `${order.deliveryPartnerId?.name?.firstName || ""} ${order.deliveryPartnerId?.name?.lastName || ""
+                          }`.trim();
                       actorUserId = order.deliveryPartnerId?.userId || null;
                     }
 
@@ -537,10 +679,11 @@ export default function OrderDetails({ order }: IProps) {
                           </span>
                         </div>
 
-                        {/* Actor info only for specific statuses */}
                         {actorLabel && (actorName || actorUserId) && (
                           <div className="text-xs text-gray-500 mt-0.5">
-                            <span className="font-medium text-gray-600">{actorLabel}:</span>{" "}
+                            <span className="font-medium text-gray-600">
+                              {actorLabel}:
+                            </span>{" "}
                             {actorName || "—"}
                             {actorUserId && (
                               <span className="ml-1.5 font-mono text-[10px] text-gray-400">
@@ -550,9 +693,10 @@ export default function OrderDetails({ order }: IProps) {
                           </div>
                         )}
 
-                        {/* Note (always show if present) */}
                         {history.note && (
-                          <p className="text-xs text-gray-600 mt-0.5">{history.note}</p>
+                          <p className="text-xs text-gray-600 mt-0.5">
+                            {history.note}
+                          </p>
                         )}
                       </div>
                     );
@@ -568,27 +712,52 @@ export default function OrderDetails({ order }: IProps) {
             >
               <div className="flex items-center gap-2 mb-4 text-[#DC3173]">
                 <InfoIcon className="w-5 h-5" />
-                <h3 className="font-semibold text-gray-900">{t("notes_instructions")}</h3>
+                <h3 className="font-semibold text-gray-900">
+                  {t("notes_instructions")}
+                </h3>
               </div>
               <div className="space-y-3 text-sm">
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("remarks")}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("remarks")}
+                  </span>
                   <p className="font-medium">{order?.remarks || "—"}</p>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("vendor_instructions")}</span>
-                  <p className="font-medium">{order?.vendorInstructions || "—"}</p>
+                  <span className="text-gray-500 block text-xs">
+                    {t("vendor_instructions")}
+                  </span>
+                  <p className="font-medium">
+                    {order?.vendorInstructions || "—"}
+                  </p>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("email_thread_message_id")}</span>
-                  <p className="text-xs break-all">{order?.emailThreadMessageId || "N/A"}</p>
+                  <span className="text-gray-500 block text-xs">
+                    {t("email_thread_message_id")}
+                  </span>
+                  <p className="text-xs break-all">
+                    {order?.emailThreadMessageId || "N/A"}
+                  </p>
                 </div>
                 <div>
-                  <span className="text-gray-500 block text-xs">{t("delivery_partner_cancel_reason")}</span>
+                  <span className="text-gray-500 block text-xs">
+                    {t("delivery_partner_cancel_reason")}
+                  </span>
                   <p className="font-medium text-red-600">
                     {order?.deliveryPartnerCancelReason || "—"}
                   </p>
                 </div>
+                {/* Cancel Reason (new) */}
+                {order?.cancelReason && (
+                  <div>
+                    <span className="text-gray-500 block text-xs">
+                      {t("cancel_reason") || "Cancel Reason"}
+                    </span>
+                    <p className="font-medium text-red-600">
+                      {order.cancelReason}
+                    </p>
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -635,7 +804,9 @@ export default function OrderDetails({ order }: IProps) {
                     {order?.customerId?.contactNumber || "N/A"}
                   </div>
                   {order?.customerId?.NIF && (
-                    <div className="text-xs text-gray-400 mt-0.5">{t("nif")}: {order.customerId.NIF}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      {t("nif")}: {order.customerId.NIF}
+                    </div>
                   )}
                 </div>
               </div>
@@ -686,27 +857,34 @@ export default function OrderDetails({ order }: IProps) {
                         {order.deliveryPartnerId.role || "N/A"}
                       </div>
                       <div>
-                        <span className="text-gray-500">{t("user_id")}: </span> {" "}
+                        <span className="text-gray-500">{t("user_id")}: </span>{" "}
                         {order.deliveryPartnerId.userId}
                       </div>
                       {order.deliveryPartnerId.currentSessionLocation && (
                         <div className="mt-1">
-                          <div className="text-gray-500">{t("live_location")}:</div>
+                          <div className="text-gray-500">
+                            {t("live_location")}:
+                          </div>
                           <div>
                             {t("coords")}:{" "}
                             {formatCoord(
-                              order.deliveryPartnerId.currentSessionLocation.coordinates
+                              order.deliveryPartnerId.currentSessionLocation
+                                .coordinates
                             )}
                           </div>
                           <div>
-                            {t("type")}: {order.deliveryPartnerId.currentSessionLocation.type || "N/A"} •
-                            {t("accuracy")}:{" "}
-                            {order.deliveryPartnerId.currentSessionLocation.geoAccuracy ?? "N/A"}
+                            {t("type")}:{" "}
+                            {order.deliveryPartnerId.currentSessionLocation
+                              .type || "N/A"}{" "}
+                            • {t("accuracy")}:{" "}
+                            {order.deliveryPartnerId.currentSessionLocation
+                              .geoAccuracy ?? "N/A"}
                           </div>
                           <div>
                             {t("last_update")}:{" "}
                             {formatDate(
-                              order.deliveryPartnerId.currentSessionLocation.lastLocationUpdate
+                              order.deliveryPartnerId.currentSessionLocation
+                                .lastLocationUpdate
                             )}
                           </div>
                         </div>
@@ -731,28 +909,40 @@ export default function OrderDetails({ order }: IProps) {
               >
                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
                   <HashIcon className="w-4 h-4 text-[#DC3173]" />
-                  <h3 className="font-semibold text-gray-900 text-sm">{t("delivery_otp")}</h3>
+                  <h3 className="font-semibold text-gray-900 text-sm">
+                    {t("delivery_otp")}
+                  </h3>
                 </div>
                 <div className="p-4 text-sm space-y-2">
                   <div>
-                    <span className="text-gray-500 text-xs">{t("generated_at")}:</span>
+                    <span className="text-gray-500 text-xs">
+                      {t("generated_at")}:
+                    </span>
                     <div>{formatDate(order.deliveryOtp.generatedAt)}</div>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-xs">{t("verified_at")}:</span>
+                    <span className="text-gray-500 text-xs">
+                      {t("verified_at")}:
+                    </span>
                     <div>{formatDate(order.deliveryOtp.verifiedAt)}</div>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-xs">{t("verified_by")}:</span>
+                    <span className="text-gray-500 text-xs">
+                      {t("verified_by")}:
+                    </span>
                     <div className="font-medium text-gray-900">
-                      {order.deliveryPartnerId.name?.firstName}{" "}
-                      {order.deliveryPartnerId.name?.lastName} {" "}
-                      ({order.deliveryPartnerId?.userId})
+                      {order.deliveryPartnerId?.name?.firstName}{" "}
+                      {order.deliveryPartnerId?.name?.lastName} (
+                      {order.deliveryPartnerId?.userId})
                     </div>
                   </div>
                   <div>
-                    <span className="text-gray-500 text-xs">{t("attempts")}:</span>
-                    <div className="font-medium">{order.deliveryOtp.attempts ?? 0}</div>
+                    <span className="text-gray-500 text-xs">
+                      {t("attempts")}:
+                    </span>
+                    <div className="font-medium">
+                      {order.deliveryOtp.attempts ?? 0}
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -765,12 +955,16 @@ export default function OrderDetails({ order }: IProps) {
             >
               <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
                 <StarIcon className="w-4 h-4 text-[#DC3173]" />
-                <h3 className="font-semibold text-gray-900 text-sm">{t("rating_status")}</h3>
+                <h3 className="font-semibold text-gray-900 text-sm">
+                  {t("rating_status")}
+                </h3>
               </div>
               <div className="p-4 text-sm space-y-2">
                 <div className="flex items-center justify-between">
                   <span>{t("is_rated")}</span>
-                  <span className="font-medium">{order?.isRated ? "Yes" : "No"}</span>
+                  <span className="font-medium">
+                    {order?.isRated ? "Yes" : "No"}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>{t("product_rated")}</span>
@@ -794,7 +988,9 @@ export default function OrderDetails({ order }: IProps) {
             >
               <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
                 <PackageIcon className="w-4 h-4 text-[#DC3173]" />
-                <h3 className="font-semibold text-gray-900 text-sm">{t("order_meta")}</h3>
+                <h3 className="font-semibold text-gray-900 text-sm">
+                  {t("order_meta")}
+                </h3>
               </div>
               <div className="p-4 text-sm space-y-2">
                 <div className="flex justify-between">
@@ -803,19 +999,27 @@ export default function OrderDetails({ order }: IProps) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("total_quantity")}</span>
-                  <span className="font-medium">{order?.totalQuantity ?? 0}</span>
+                  <span className="font-medium">
+                    {order?.totalQuantity ?? 0}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("refund_status")}</span>
-                  <span className="font-medium">{order?.refundStatus || "N/A"}</span>
+                  <span className="font-medium">
+                    {order?.refundStatus || "N/A"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("is_deleted")}</span>
-                  <span className="font-medium">{order?.isDeleted ? "Yes" : "No"}</span>
+                  <span className="font-medium">
+                    {order?.isDeleted ? "Yes" : "No"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("is_paid")}</span>
-                  <span className="font-medium">{order?.isPaid ? "Yes" : "No"}</span>
+                  <span className="font-medium">
+                    {order?.isPaid ? "Yes" : "No"}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t("transaction_id")}</span>
@@ -823,6 +1027,93 @@ export default function OrderDetails({ order }: IProps) {
                     {order?.transactionId || "N/A"}
                   </span>
                 </div>
+
+                {/* Checkout Summary ID (new) */}
+                {order?.checkoutSummaryId && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">
+                      {t("checkout_summary_id") || "Checkout Summary ID"}
+                    </span>
+                    <span className="font-medium text-xs break-all">
+                      {order.checkoutSummaryId}
+                    </span>
+                  </div>
+                )}
+
+                {/* Invoice details (extra fields) */}
+                {order?.invoiceSync && (
+                  <div className="pt-2 border-t space-y-1">
+                    <div className="text-xs text-gray-500 font-medium mb-1">
+                      {t("invoice_details") || "Invoice Details"}
+                    </div>
+                    {order.invoiceSync.invoiceNo && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">{t("invoice_no")}</span>
+                        <span className="font-medium">
+                          {order.invoiceSync.invoiceNo}
+                        </span>
+                      </div>
+                    )}
+                    {order.invoiceSync.atcud && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">ATCUD</span>
+                        <span className="font-medium break-all">
+                          {order.invoiceSync.atcud}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-500">{t("synced")}</span>
+                      <span className="font-medium">
+                        {order.invoiceSync.isSynced ? "Yes" : "No"}
+                      </span>
+                    </div>
+                    {order.invoiceSync.syncedAt && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500">{t("synced_at")}</span>
+                        <span className="font-medium">
+                          {formatDate(order.invoiceSync.syncedAt)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Payout Metadata (new) */}
+                {order?.payoutMetadata && (
+                  <div className="pt-2 border-t space-y-2">
+                    <div className="text-xs text-gray-500 font-medium mb-1">
+                      {t("payout_settlement") || "Payout Settlement Status"}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="text-gray-500">{t("vendor")}</div>
+                        <div className="font-medium">
+                          {order.payoutMetadata.vendor?.isSettled
+                            ? "Settled"
+                            : "Pending"}
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="text-gray-500">{t("rider")}</div>
+                        <div className="font-medium">
+                          {order.payoutMetadata.rider?.isSettled
+                            ? "Settled"
+                            : "Pending"}
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 rounded p-2">
+                        <div className="text-gray-500">{t("fleet")}</div>
+                        <div className="font-medium">
+                          {order.payoutMetadata.fleet?.isSettled
+                            ? "Settled"
+                            : "Pending"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* OFFER */}
                 <div className="pt-2 border-t">
                   <span className="text-gray-500 text-xs block mb-1">
@@ -830,7 +1121,9 @@ export default function OrderDetails({ order }: IProps) {
                   </span>
 
                   {!order?.offer ? (
-                    <div className="text-sm text-gray-400 italic">{t("no_offer_data")}</div>
+                    <div className="text-sm text-gray-400 italic">
+                      {t("no_offer_data")}
+                    </div>
                   ) : (
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
@@ -852,36 +1145,53 @@ export default function OrderDetails({ order }: IProps) {
 
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600">
                             <div>
-                              <span className="text-gray-500">{t("promo_id")}:</span>{" "}
+                              <span className="text-gray-500">
+                                {t("promo_id")}:
+                              </span>{" "}
                               <span className="font-mono break-all">
                                 {order.offer.offerApplied.promoId || "N/A"}
                               </span>
                             </div>
                             <div>
-                              <span className="text-gray-500">{t("discount_type")}:</span>{" "}
+                              <span className="text-gray-500">
+                                {t("discount_type")}:
+                              </span>{" "}
                               {order.offer.offerApplied.discountType || "N/A"}
                             </div>
                             <div>
-                              <span className="text-gray-500">{t("discount_value")}:</span>{" "}
-                              {order.offer.offerApplied.discountType === "PERCENT"
+                              <span className="text-gray-500">
+                                {t("discount_value")}:
+                              </span>{" "}
+                              {order.offer.offerApplied.discountType ===
+                                "PERCENT"
                                 ? `${order.offer.offerApplied.discountValue}%`
                                 : `€${order.offer.offerApplied.discountValue}`}
                             </div>
-                            {order.offer.offerApplied.maxDiscountAmount != null && (
-                              <div className="col-span-2">
-                                <span className="text-gray-500">{t("max_discount")}:</span>{" "}
-                                €{order.offer.offerApplied.maxDiscountAmount}
-                              </div>
-                            )}
+                            {order.offer.offerApplied.maxDiscountAmount !=
+                              null && (
+                                <div className="col-span-2">
+                                  <span className="text-gray-500">
+                                    {t("max_discount")}:
+                                  </span>{" "}
+                                  €{order.offer.offerApplied.maxDiscountAmount}
+                                </div>
+                              )}
                           </div>
 
-                          {/* Optional: show rewardSnapshot if it has content */}
                           {order.offer.offerApplied.rewardSnapshot &&
-                            Object.keys(order.offer.offerApplied.rewardSnapshot).length > 0 && (
+                            Object.keys(
+                              order.offer.offerApplied.rewardSnapshot
+                            ).length > 0 && (
                               <div className="pt-2 mt-2 border-t border-gray-200">
-                                <div className="text-xs text-gray-500 mb-1">{t("reward_snapshot")}</div>
+                                <div className="text-xs text-gray-500 mb-1">
+                                  {t("reward_snapshot")}
+                                </div>
                                 <pre className="text-[11px] bg-white p-2 rounded border overflow-auto max-h-32">
-                                  {JSON.stringify(order.offer.offerApplied.rewardSnapshot, null, 2)}
+                                  {JSON.stringify(
+                                    order.offer.offerApplied.rewardSnapshot,
+                                    null,
+                                    2
+                                  )}
                                 </pre>
                               </div>
                             )}

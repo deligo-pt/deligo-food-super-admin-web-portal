@@ -14,6 +14,11 @@ export const ORDER_STATUS = {
   CANCELED: "CANCELED",
 };
 
+export const ORDER_TYPE = {
+  ASAP: "ASAP",
+  SCHEDULED: "SCHEDULED",
+};
+
 export const REFUND_STATUS = {
   NOT_APPLICABLE: 'NOT_APPLICABLE', // no refund was ever owed for this order
   PENDING: 'PENDING', // refund owed, gateway call not attempted/completed yet
