@@ -127,6 +127,7 @@ export const pt = {
   cancelled_orders: "Encomendas Canceladas",
   rejected_orders: "Encomendas Rejeitados",
   refunded_orders: "Encomendas Reembolsados",
+  scheduled_orders: "Pedidos Agendados",
   refund_requests: "Pedidos de Reembolso",
 
   payments_and_earnings: "Pagamentos e Ganhos",
@@ -1633,6 +1634,17 @@ export const pt = {
   vat_amount: "Valor do IVA",
   earnings_w_o_tax: "Ganhos s/ Imposto",
   net_earnings: "Ganhos Líquidos",
+  scheduled_order_details: "Detalhes do Pedido Agendado",
+  order_type: "Tipo de Pedido",
+  scheduled_window: "Janela de Agendamento",
+  scheduled_release_at: "Libertação Agendada Para",
+  released_at: "Libertado Em",
+  checkout_summary_id: "ID do Resumo de Checkout",
+  invoice_details: "Detalhes da Fatura",
+  invoice_no: "N.º de Fatura",
+  synced: "Sincronizado",
+  synced_at: "Sincronizado Em",
+  payout_settlement: "Estado da Liquidação de Pagamento",
 
   // pending-orders
   all_pending_orders_system: "Todos os pedidos pendentes no sistema",
@@ -1674,6 +1686,9 @@ export const pt = {
 
   // rejected-orders
   rejected_orders_desc: "Pedidos rejeitados — Pedidos que foram recusados pela loja, pelo sistema ou pelo entregador antes do atendimento.",
+
+  // scheduled orders
+  all_scheduled_orders_system: "Todos os pedidos agendados no sistema",
 
   // refund-requests
   manage_all_customer_refund_requests:
@@ -2867,6 +2882,35 @@ export const pt = {
   months_after_which_archived: "Meses após os quais um registo arquivado é eliminado permanentemente.",
   maximum_documents_per_batch: "Máximo de Documentos Por Lote",
   max_documents_the_retention_job: "Número máximo de documentos que o processo de retenção processa por lote.",
+  // -> small order
+  small_order_fee: "Taxa de Pedido Pequeno",
+  small_order_fee_description: "Cobrar uma taxa adicional quando o valor do cesto for inferior ao valor mínimo",
+  enable_small_order_fee: "Ativar Taxa de Pedido Pequeno",
+  enable_small_order_fee_desc: "Desativado por predefinição. Quando desativado, nenhum carrinho ou novo checkout cobra taxa de pedido pequeno.",
+  small_order_threshold: "Valor Limite de Pedido Pequeno",
+  small_order_threshold_desc: "A taxa aplica-se quando o cesto for estritamente inferior a este valor (0 – 10.000).",
+  small_order_applies_to_all: "Aplica-se a todos os tipos de pedido: entrega, recolha, imediato (ASAP) e agendado",
+  small_order_threshold_compared: "Comparado com o subtotal dos artigos antes de promoções (com IVA e complementos incluídos). Taxa de entrega, taxa de serviço, depósitos e cupões não são contabilizados.",
+  small_order_fee_amount: "Taxa (Líquida)",
+  small_order_fee_amount_desc: "Valor líquido cobrado ao cliente, antes de impostos (0 – 1.000). 0 significa sem taxa.",
+  small_order_fee_taxable: "Taxa sujeita a IVA",
+  small_order_fee_taxable_desc: "Quando ativado, o imposto abaixo é adicionado ao valor da taxa.",
+  small_order_fee_tax_percentage: "Percentagem de IVA da Taxa de Pedido Pequeno",
+  small_order_preview_disabled: "Desativado: a taxa de pedido pequeno nunca é cobrada aos clientes.",
+  small_order_preview_zero: "A taxa é de 0 €, pelo que não é cobrada taxa de pedido pequeno.",
+  small_order_preview_basket_below: "Cesto inferior a",
+  small_order_preview_customer_pays: "o cliente paga",
+  no_tax: "Sem IVA",
+  enabled: "Ativado",
+  disabled: "Desativado",
+  threshold: "Limite",
+  confirm_small_order_fee_changes: "Confirmar alterações da taxa de pedido pequeno",
+  confirm_small_order_fee_desc: "Estas alterações entram em vigor imediatamente para todos os carrinhos e novos checkouts.",
+  open_checkouts_will_refresh: "Será solicitado a atualizar aos checkouts em aberto",
+  small_order_warning_quotes: "Uma estimativa de checkout criada anteriormente é recusada quando o cliente inicia o pagamento (409 CHECKOUT_TOTALS_CHANGED); basta atualizar.",
+  small_order_warning_orders: "Os pedidos existentes mantêm a taxa paga e os respetivos reembolsos permanecem inalterados.",
+  small_order_warning_disable: "A desativação produz efeitos na leitura seguinte: todos os carrinhos e novos checkouts devolvem uma taxa de pedido pequeno de 0.",
+  confirm_and_save: "Confirmar e guardar",
 
   // reward settings
   configure_loyalty_referral_rewards: "Configure as recompensas de fidelidade e indicação aqui",
