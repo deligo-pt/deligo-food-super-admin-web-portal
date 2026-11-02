@@ -64,6 +64,20 @@ export const globalSettingsSchema = z
     etaBufferMinutes: z
       .number("Order ETA Buffer Minutes must be a number")
       .positive("Order ETA Buffer Minutes must be greater than 0"),
+    smallOrderFeeEnabled: z.boolean(),
+    smallOrderFeeThreshold: z
+      .number("Threshold must be a number")
+      .min(0, "Threshold cannot be negative")
+      .max(10000, "Threshold cannot exceed 10,000"),
+    smallOrderFeeAmount: z
+      .number("Fee must be a number")
+      .min(0, "Fee cannot be negative")
+      .max(1000, "Fee cannot exceed 1,000"),
+    smallOrderFeeIsTaxable: z.boolean(),
+    smallOrderFeeTaxPercentage: z
+      .number("Tax percentage must be a number")
+      .min(0, "Tax percentage cannot be negative")
+      .max(100, "Tax percentage cannot exceed 100"),
 
     // products
     defaultImageUrl: z.string().optional(),
