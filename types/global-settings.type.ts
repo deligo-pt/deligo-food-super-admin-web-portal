@@ -41,6 +41,13 @@ export type TGlobalSettings = {
     pickupRadiusMeters?: number;
     etaMinutesPerKm: number;
     etaBufferMinutes: number;
+    smallOrderFee: {
+      isEnabled: boolean;
+      threshold: number;
+      fee: number;
+      isTaxable: boolean;
+      taxPercentage: number;
+    };
   };
 
   product: {

@@ -102,6 +102,7 @@ export default function ApproveRiderModal({
             try {
                 const res = await getAllFleetManagersReq({
                     // city,
+                    status: "APPROVED",
                     page,
                     limit: PAGE_LIMIT,
                 } as Parameters<typeof getAllFleetManagersReq>[0]);

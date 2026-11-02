@@ -16,6 +16,7 @@ export const getAllOrdersReq = async (
   const searchTerm = queries.searchTerm || "";
   const sortBy = queries.sortBy || "-createdAt";
   const orderStatus = queries.orderStatus || "";
+  const orderType = queries.orderType || "";
   const paymentStatus = queries.paymentStatus || "";
   const customerId = queries.customerId || "";
 
@@ -25,6 +26,7 @@ export const getAllOrdersReq = async (
     sortBy,
     ...(searchTerm ? { searchTerm } : {}),
     ...(orderStatus ? { orderStatus } : {}),
+    ...(orderType ? { orderType } : {}),
     ...(paymentStatus ? { paymentStatus } : {}),
     ...(customerId ? { customerId } : {}),
   };
