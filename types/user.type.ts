@@ -196,6 +196,17 @@ export type TVendor = {
     openingHours?: string; // "09:00 AM"
     closingHours?: string; // "11:00 PM"
     closingDays?: string[]; // ["Friday", "Holidays"]
+    availability?: {
+      state: "OPEN" | "PAUSED" | "CLOSED" | string;
+      override?: {
+        status: "PAUSED" | "SUSPENDED";
+        until: string;
+        reason: string;
+        isCustomerHidden: boolean;
+        setAt?: string;
+        setBy?: string;
+      } | null;
+    } | null;
   };
 
   // --------------------------------------------------------

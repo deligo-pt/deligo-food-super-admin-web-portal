@@ -81,6 +81,45 @@ export const getAllBranches = async (id: string, query?: string,) => {
   return result;
 };
 
+export type TAvailabilityOverridePayload = {
+  status: "PAUSED" | "SUSPENDED";
+  until: string; // ISO string – must be future & ≤ 24h
+  reason: string; // 3–200 chars
+};
+
+export const setVendorAvailabilityOverrideReq = async (data: TAvailabilityOverridePayload, vendorId: string) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.put(`/vendors/${vendorId}/availability`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  });
+
+  if (result.success) {
+    revalidatePath(`/admin/vendor/${vendorId}`);
+    revalidatePath(`/admin/all-vendors`);
+  };
+
+  return result;
+};
+
+export const clearVendorAvailabilityOverrideReq = async (vendorId: string) => {
+  const result = await catchAsync(async () => {
+    const res = await serverFetch.delete(`/vendors/${vendorId}/availability`);
+    return await res.json();
+  });
+
+  if (result?.success) {
+    revalidatePath(`/admin/vendor/${vendorId}`);
+    revalidatePath(`/admin/all-vendors`);
+  }
+
+  return result;
+};
+
 // product.service.ts
 export const copyProductsToSubVendors = async (payload: {
   sourceVendorId: string;

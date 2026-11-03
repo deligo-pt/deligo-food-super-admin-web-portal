@@ -30,6 +30,8 @@ import {
   EditIcon,
   FileTextIcon,
   MapPinIcon,
+  PauseCircleIcon,
+  PlayCircleIcon,
   TrashIcon,
   UserIcon,
   XIcon,
@@ -41,6 +43,8 @@ import { toast } from "sonner";
 import { getVendorBranchColumns } from "../VendorBranchColumns";
 import ReusableTable from "@/components/common/ReusableTable";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
+import VendorAvailabilityModal from "./VendorAvailabilityModal";
+import ClearAvailabilityDialog from "./ClearAvailabilityDialog";
 
 interface IProps {
   vendor: TVendor;
@@ -58,6 +62,12 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+  const [showClearOverrideDialog, setShowClearOverrideDialog] = useState(false);
+
+  const hasActiveOverride = Boolean(vendor?.businessDetails?.availability?.override);
+  const override = vendor?.businessDetails?.availability?.override;
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -188,7 +198,7 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
             {vendor?.profilePhoto ? (
               <Image
                 src={vendor?.profilePhoto}
-                alt={`${vendor?.name?.firstName || "Fleet Manager"}`}
+                alt={`${vendor?.name?.firstName || "Vendor"}`}
                 className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
                 width={500}
                 height={500}
@@ -228,7 +238,48 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
                   icon={<EditIcon size={18} />}
                   variant="primary"
                 />}
+              {vendor.status === "APPROVED" && (
+                <>
+                  {hasActiveOverride ? (
+                    <ActionButton
+                      onClick={() => setShowClearOverrideDialog(true)}
+                      label={t("clear_override") || "Clear Override / Resume"}
+                      icon={<PlayCircleIcon size={18} />}
+                      variant="success"
+                    />
+                  ) : (
+                    <ActionButton
+                      onClick={() => setShowAvailabilityModal(true)}
+                      label={t("pause_or_suspend") || "Pause / Suspend"}
+                      icon={<PauseCircleIcon size={18} />}
+                      variant="warning"
+                    />
+                  )}
+                </>
+              )}
             </div>
+            {hasActiveOverride && (
+              <div className="my-2 p-4 rounded-lg border border-amber-200 bg-amber-50 text-amber-900 text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold">
+                    {t("currently")} {override?.status}
+                    {override?.isCustomerHidden && ` ${t("hidden_from_customers")}`}
+                  </p>
+                  <p className="text-xs mt-0.5">
+                    {t("until")}: {override?.until ? format(new Date(override.until), "dd MMM yyyy, hh:mm a") : "N/A"}
+                    {override?.reason && ` • ${t("reason")}: ${override.reason}`}
+                  </p>
+                </div>
+                {/* <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-amber-300 text-amber-800 hover:bg-amber-100"
+                  onClick={() => setShowClearOverrideDialog(true)}
+                >
+                  Clear Override
+                </Button> */}
+              </div>
+            )}
           </div>
           <AgentOrVendorSection
             title={t("personal_details")}
@@ -691,6 +742,22 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
         onOpenChange={closeDeleteModal}
         onConfirm={deleteVendor}
         isDeleting={isDeleting}
+      />
+
+      <VendorAvailabilityModal
+        open={showAvailabilityModal}
+        onOpenChange={setShowAvailabilityModal}
+        vendorId={vendor.userId}
+        vendorName={`${vendor?.name?.firstName || ""} ${vendor?.name?.lastName || ""}`.trim() || vendor.businessDetails?.businessName || "Vendor"}
+      />
+
+      <ClearAvailabilityDialog
+        open={showClearOverrideDialog}
+        onOpenChange={setShowClearOverrideDialog}
+        vendorId={vendor.userId}
+        vendorName={`${vendor?.name?.firstName || ""} ${vendor?.name?.lastName || ""}`.trim() || vendor.businessDetails?.businessName || "Vendor"}
+        currentStatus={override?.status}
+        until={override?.until}
       />
     </div >
   );
