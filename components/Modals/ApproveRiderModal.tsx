@@ -386,10 +386,13 @@ export default function ApproveRiderModal({
         setIsSubmitting(false);
     };
 
+    const stickyTh =
+        "sticky top-0 z-20 bg-white shadow-[inset_0_-1px_0_#DC317330]";
+
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-6">
-                <DialogHeader className="pb-4">
+            <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[90vh] flex flex-col p-6 gap-0">
+                <DialogHeader className="pb-4 shrink-0">
                     <DialogTitle className="flex items-center gap-2" style={{ color: "#DC3173" }}>
                         <UserCheck size={20} />
                         {status === "RE_ASSIGN"
@@ -398,125 +401,121 @@ export default function ApproveRiderModal({
                         — {partnerName}
                     </DialogTitle>
                     <DialogDescription>
-                        {/* {t("rider_city")}:{" "} */}
-                        {/* <span className="font-semibold text-gray-900 capitalize mx-1">
-                            {city || "N/A"}
-                        </span> */}
                         {t("showing_available_fleet_managers")}
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* Fleet Managers Table (infinite scroll container) */}
+                {/* Scrollable table area – this is the ONLY element that scrolls */}
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto my-2 border rounded-xl bg-white min-h-50 max-h-87.5"
+                    className="flex-1 min-h-0 overflow-auto my-2 border rounded-xl bg-white"
                     style={{ borderColor: "#DC317320" }}
                 >
                     {isLoadingFleets ? (
                         <div className="flex flex-col items-center justify-center p-12 text-sm text-gray-400 gap-2">
                             <Loader2 className="animate-spin" style={{ color: "#DC3173" }} size={24} />
                             {t("loading_fleet_managers_in")}
-                            {/* {city}... */}
                         </div>
                     ) : (
                         <>
-                            <Table>
-                                <TableHeader
-                                    className="sticky top-0 backdrop-blur-xs z-10 border-b"
-                                    style={{ backgroundColor: "#DC317308", borderColor: "#DC317315" }}
-                                >
-                                    <TableRow className="hover:bg-transparent">
-                                        <TableHead style={{ color: "#DC3173" }}>
-                                            <div className="flex items-center gap-1 font-semibold">
-                                                <User size={13} /> {t("manager")}
-                                            </div>
-                                        </TableHead>
-                                        <TableHead style={{ color: "#DC3173" }}>
-                                            <div className="flex items-center gap-1 font-semibold">
-                                                <Building2 size={13} /> {t("business")}
-                                            </div>
-                                        </TableHead>
-                                        <TableHead style={{ color: "#DC3173" }}>
-                                            <div className="flex items-center gap-1 font-semibold">
-                                                <MapPin size={13} /> {t("city")}
-                                            </div>
-                                        </TableHead>
-                                        <TableHead className="text-right" style={{ color: "#DC3173" }}>
-                                            <div className="flex items-center justify-end gap-1 font-semibold">
-                                                <Briefcase size={13} /> {t("select")}
-                                            </div>
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="text-gray-600">
-                                    {fleets.map((fleet) => {
-                                        const fullName = `${fleet.name?.firstName || ""} ${fleet.name?.lastName || ""}`.trim() || "N/A";
-                                        const isSelected = effectiveSelectedFleetId === fleet?._id;
-                                        const isCurrent =
-                                            !!currentFleetManagerId &&
-                                            (currentFleetManagerId === fleet.userId ||
-                                                currentFleetManagerId === fleet._id);
+                            <table className="w-full caption-bottom text-sm">
+                                {/* <Table> */}
+                                    <TableHeader>
+                                        <TableRow className="hover:bg-transparent border-b-0">
+                                            <TableHead className={stickyTh} style={{ color: "#DC3173" }}>
+                                                <div className="flex items-center gap-1 font-semibold">
+                                                    <Building2 size={13} /> {t("business")}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead className={stickyTh} style={{ color: "#DC3173" }}>
+                                                <div className="flex items-center gap-1 font-semibold">
+                                                    <User size={13} /> {t("manager")}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead className={stickyTh} style={{ color: "#DC3173" }}>
+                                                <div className="flex items-center gap-1 font-semibold">
+                                                    <MapPin size={13} /> {t("city")}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead className={`${stickyTh} text-right`} style={{ color: "#DC3173" }}>
+                                                <div className="flex items-center justify-end gap-1 font-semibold">
+                                                    <Briefcase size={13} /> {t("select")}
+                                                </div>
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
 
-                                        return (
-                                            <TableRow
-                                                key={fleet._id}
-                                                className="transition-colors cursor-pointer"
-                                                style={{
-                                                    backgroundColor: isSelected ? "#DC317308" : "transparent",
-                                                }}
-                                                onClick={() => setSelectedFleetId(fleet._id)}
-                                            >
-                                                <TableCell className="p-3">
-                                                    <div className="font-medium text-gray-900 line-clamp-1">
-                                                        {fullName}
-                                                    </div>
-                                                    {isCurrent && (
-                                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium whitespace-nowrap">
-                                                            {t("current") || "Current"}
-                                                        </span>
-                                                    )}
-                                                    <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                                                        <Mail size={11} /> {fleet.email}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="p-3 text-xs font-medium text-gray-700">
-                                                    {fleet.businessDetails?.businessName || "—"}
-                                                </TableCell>
-                                                <TableCell className="p-3 text-xs text-gray-500 capitalize">
-                                                    {fleet.businessLocation?.city || fleet.address?.city || "-"}
-                                                </TableCell>
-                                                <TableCell
-                                                    className="p-3 text-right"
-                                                    onClick={(e) => e.stopPropagation()}
+                                    <TableBody className="text-gray-600">
+                                        {fleets.map((fleet) => {
+                                            const fullName =
+                                                `${fleet.name?.firstName || ""} ${fleet.name?.lastName || ""}`.trim() ||
+                                                "N/A";
+                                            const isSelected = effectiveSelectedFleetId === fleet?._id;
+                                            const isCurrent =
+                                                !!currentFleetManagerId &&
+                                                (currentFleetManagerId === fleet.userId ||
+                                                    currentFleetManagerId === fleet._id);
+
+                                            return (
+                                                <TableRow
+                                                    key={fleet._id}
+                                                    className="transition-colors cursor-pointer"
+                                                    style={{
+                                                        backgroundColor: isSelected ? "#DC317308" : "transparent",
+                                                    }}
+                                                    onClick={() => setSelectedFleetId(fleet._id)}
                                                 >
-                                                    <input
-                                                        type="radio"
-                                                        name="selectedFleet"
-                                                        checked={isSelected}
-                                                        onChange={() => setSelectedFleetId(fleet._id)}
-                                                        className="h-4 w-4 border-gray-300 cursor-pointer"
-                                                        style={{ accentColor: "#DC3173" }}
-                                                    />
+                                                    <TableCell className="p-3 text-xs font-medium text-gray-700">
+                                                        {fleet.businessDetails?.businessName || "—"}
+                                                    </TableCell>
+                                                    <TableCell className="p-3">
+                                                        <div className="font-medium text-gray-900 line-clamp-1">
+                                                            {fullName}
+                                                        </div>
+                                                        {isCurrent && (
+                                                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium whitespace-nowrap">
+                                                                {t("current") || "Current"}
+                                                            </span>
+                                                        )}
+                                                        <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                                                            <Mail size={11} /> {fleet.email}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="p-3 text-xs text-gray-500 capitalize">
+                                                        {fleet.businessLocation?.city || fleet.address?.city || "-"}
+                                                    </TableCell>
+                                                    <TableCell
+                                                        className="p-3 text-right"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name="selectedFleet"
+                                                            checked={isSelected}
+                                                            onChange={() => setSelectedFleetId(fleet._id)}
+                                                            className="h-4 w-4 border-gray-300 cursor-pointer"
+                                                            style={{ accentColor: "#DC3173" }}
+                                                        />
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+
+                                        {fleets.length === 0 && (
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={4}
+                                                    className="p-8 text-center text-xs text-gray-400 hover:bg-transparent"
+                                                >
+                                                    {t("no_fleet_managers_found_in")}
                                                 </TableCell>
                                             </TableRow>
-                                        );
-                                    })}
+                                        )}
+                                    </TableBody>
+                                {/* </Table> */}
+                            </table>
 
-                                    {fleets.length === 0 && (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={4}
-                                                className="p-8 text-center text-xs text-gray-400 hover:bg-transparent"
-                                            >
-                                                {t("no_fleet_managers_found_in")}
-                                                {/* {city}. */}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-
-                            {/* Infinite-scroll sentinel + status */}
+                            {/* Infinite-scroll sentinel */}
                             <div
                                 ref={sentinelRef}
                                 className="flex min-h-10 items-center justify-center py-3 text-xs text-gray-400"
@@ -547,16 +546,16 @@ export default function ApproveRiderModal({
                     )}
                 </div>
 
-                {/* Loaded / total counter (from meta) */}
+                {/* Counter */}
                 {!!meta?.total && !isLoadingFleets && (
-                    <p className="-mt-1 text-right text-xs text-gray-400">
+                    <p className="shrink-0 -mt-1 text-right text-xs text-gray-400">
                         {fleets.length} / {meta.total}
                     </p>
                 )}
 
                 {/* Reason textarea – only for RE_ASSIGN */}
                 {status === "RE_ASSIGN" && (
-                    <div className="space-y-2 mt-2">
+                    <div className="space-y-2 mt-2 shrink-0">
                         <Label className="text-sm font-medium text-gray-700">
                             {t("re_assign_reason") || "Reason for re-assignment"}{" "}
                             <span className="text-gray-400 font-normal">(optional)</span>
@@ -571,15 +570,17 @@ export default function ApproveRiderModal({
                     </div>
                 )}
 
-                {/* Footer Buttons */}
-                <DialogFooter className="pt-4 border-t mt-auto" style={{ borderColor: "#DC317315" }}>
+                {/* Footer */}
+                <DialogFooter
+                    className="pt-4 border-t mt-auto shrink-0"
+                    style={{ borderColor: "#DC317315" }}
+                >
                     <DialogClose asChild>
                         <Button variant="outline" size="sm" disabled={isSubmitting}>
                             {t("cancel")}
                         </Button>
                     </DialogClose>
 
-                    {/* RE_ASSIGN → only one button */}
                     {status === "RE_ASSIGN" ? (
                         <Button
                             onClick={handleReAssignToFleet}
