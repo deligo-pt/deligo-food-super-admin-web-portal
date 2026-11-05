@@ -122,6 +122,7 @@ export const en = {
   cancelled_orders: "Cancelled Orders",
   rejected_orders: "Rejected Orders",
   refunded_orders: "Refunded Orders",
+  scheduled_orders: "Scheduled Orders",
   refund_requests: "Refund Requests",
 
   payments_and_earnings: "Payments & Earnings",
@@ -405,6 +406,28 @@ export const en = {
   update_vendor_details_information: "Update vendor details and information",
   add_product: "Add Product",
   all_branches: "All Branches",
+  clear_override: "Clear Override / Resume",
+  pause_or_suspend: "Pause / Suspend",
+  currently: "Currently",
+  hidden_from_customers: "hidden from customers",
+  until: "Until",
+  pause_or_suspend_vendor: "Pause or Suspend Vendor",
+  customers_will_see_store_as_closed_until_selected_time: "customers will see the store as closed until the selected time.",
+  paused_visible_to_customers: "PAUSED — visible to customers (closed)",
+  suspended_hidden_from_customers: "SUSPENDED — hidden from customers",
+  store_stays_visible_but_marked_as_temporarily_closed: "Store stays visible but marked as temporarily closed.",
+  store_is_completely_hidden_from_the_customer_app: "Store is completely hidden from the customer app.",
+  until_max_24h: "Until (max 24 h)",
+  administrative_suspension_maintenance: "Administrative suspension / maintenance / ...",
+  pause_vendor: "Pause Vendor",
+  suspend_vendor: "Suspend Vendor",
+  clear_availability_override: "Clear Availability Override",
+  this_will_immediately_remove_the_current: "This will immediately remove the current",
+  override_for: "override for",
+  and_return_the_store_its_normal_opening: "and return the store to its normal opening hours.",
+  currently_scheduled_until: "Currently scheduled until",
+  clearing: "Clearing...",
+
   // add-ons page
   inc_vat: "Inc. VAT",
   no_options_added: "No options added in this group yet.",
@@ -1618,6 +1641,17 @@ export const en = {
   vat_amount: "VAT Amount",
   earnings_w_o_tax: "Earnings Without Tax",
   net_earnings: "Net Earnings",
+  scheduled_order_details: "Scheduled Order Details",
+  order_type: "Order Type",
+  scheduled_window: "Scheduled Window",
+  scheduled_release_at: "Scheduled Release At",
+  released_at: "Released At",
+  checkout_summary_id: "Checkout Summary ID",
+  invoice_details: "Invoice Details",
+  invoice_no: "Invoice No",
+  synced: "Synced",
+  synced_at: "Synced At",
+  payout_settlement: "Payout Settlement Status",
 
   // pending-orders
   all_pending_orders_system: "All pending orders in the system",
@@ -1659,6 +1693,9 @@ export const en = {
 
   // rejected-orders
   rejected_orders_desc: "Rejected orders — Orders that were declined by the store, system, or driver before fulfillment.",
+
+  // scheduled orders
+  all_scheduled_orders_system: "All scheduled orders in the system",
 
   // refund-requests
   manage_all_customer_refund_requests:
@@ -2837,6 +2874,35 @@ export const en = {
   months_after_which_archived: "Months after which an archived record is permanently deleted.",
   maximum_documents_per_batch: "Maximum Documents Per Batch",
   max_documents_the_retention_job: "Max documents the retention job processes per batch.",
+  // -> small order
+  small_order_fee: "Small Order Fee",
+  small_order_fee_description: "Charge an extra fee when the basket is below a minimum amount",
+  enable_small_order_fee: "Enable Small Order Fee",
+  enable_small_order_fee_desc: "Off by default. When off, every cart and new checkout returns no small order fee.",
+  small_order_threshold: "Small Order Threshold",
+  small_order_threshold_desc: "The fee applies when the basket is strictly below this amount (0 – 10,000).",
+  small_order_applies_to_all: "Applies to every order type: delivery, pickup, ASAP and scheduled",
+  small_order_threshold_compared: "Compared with the items subtotal before offers (tax and add-ons included). Delivery, service charge, deposits and coupons are not counted.",
+  small_order_fee_amount: "Fee (net)",
+  small_order_fee_amount_desc: "Net amount charged to the customer, before tax (0 – 1,000). 0 means no fee.",
+  small_order_fee_taxable: "Fee is taxable",
+  small_order_fee_taxable_desc: "When on, the tax below is added on top of the fee.",
+  small_order_fee_tax_percentage: "Small Order Fee Tax Percentage",
+  small_order_preview_disabled: "Disabled: customers are never charged a small order fee.",
+  small_order_preview_zero: "The fee is 0 €, so no small order fee is charged.",
+  small_order_preview_basket_below: "Basket below",
+  small_order_preview_customer_pays: "customer pays",
+  no_tax: "No tax",
+  enabled: "",
+  disabled: "",
+  threshold: "",
+  confirm_small_order_fee_changes: "Confirm small order fee changes",
+  confirm_small_order_fee_desc: "These changes go live immediately for all carts and new checkouts.",
+  open_checkouts_will_refresh: "Open checkouts will be asked to refresh",
+  small_order_warning_quotes: "A checkout quote created earlier is refused when the customer starts payment (409 CHECKOUT_TOTALS_CHANGED); they just refresh.",
+  small_order_warning_orders: "Existing orders keep the fee they paid, and their refunds are unchanged.",
+  small_order_warning_disable: "Disabling takes effect on the next read: every cart and new checkout returns a small order fee of 0.",
+  confirm_and_save: "Confirm & save",
 
   // reward settings
   configure_loyalty_referral_rewards: "Configure loyalty and referral rewards here",

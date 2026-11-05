@@ -37,16 +37,18 @@ import {
   LogsIcon,
   Package,
   Percent,
+  Receipt,
   Save,
   Truck,
 } from "lucide-react";
 import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
 import { cn } from "@/lib/utils";
 import { FileUploadZone } from "./FileUploadZone";
 import { useImageUploads } from "@/utils/useImageUploads";
+import SmallOrderFeeSettings, { SmallOrderFeeConfirmDialog, TSmallOrderFeeValues } from "./SmallOrderFeeSettings ";
 
 type TGlobalSettingsForm = z.infer<typeof globalSettingsSchema>;
 
@@ -71,6 +73,7 @@ const TABS = [
     labelKey: "order_rules",
     icon: Package,
   },
+  { id: "small-order-fee", labelKey: "small_order_fee", icon: Receipt },
   {
     id: "products",
     labelKey: "products",
@@ -108,6 +111,8 @@ export default function GlobalSettings({
     "idle",
   );
   const [activeTab, setActiveTab] = useState<TabId>("delivery");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingData, setPendingData] = useState<TGlobalSettingsForm | null>(null);
 
   // Reusable image uploads (add any new key here)
   const {
@@ -158,6 +163,12 @@ export default function GlobalSettings({
       pickupRadiusMeters: settings?.order?.pickupRadiusMeters || 0,
       etaMinutesPerKm: settings?.order?.etaMinutesPerKm || 4.0,
       etaBufferMinutes: settings?.order?.etaBufferMinutes || 8,
+      // small order fee
+      smallOrderFeeEnabled: settings?.order?.smallOrderFee?.isEnabled ?? false,
+      smallOrderFeeThreshold: settings?.order?.smallOrderFee?.threshold ?? 0,
+      smallOrderFeeAmount: settings?.order?.smallOrderFee?.fee ?? 0,
+      smallOrderFeeIsTaxable: settings?.order?.smallOrderFee?.isTaxable ?? false,
+      smallOrderFeeTaxPercentage: settings?.order?.smallOrderFee?.taxPercentage ?? 0,
 
       // activity logs retention
       archiveAfterMonths: settings?.activityLogRetention?.archiveAfterMonths || 12,
@@ -172,7 +183,7 @@ export default function GlobalSettings({
     },
   });
 
-  const onSubmit = async (data: TGlobalSettingsForm) => {
+  const saveSettings = async (data: TGlobalSettingsForm) => {
     setIsSaving(true);
     const toastId = toast.loading("Saving global settings...");
 
@@ -213,6 +224,13 @@ export default function GlobalSettings({
         ...(data.pickupRadiusMeters && { pickupRadiusMeters: data.pickupRadiusMeters }),
         etaMinutesPerKm: data.etaMinutesPerKm,
         etaBufferMinutes: data.etaBufferMinutes,
+        smallOrderFee: {
+          isEnabled: data.smallOrderFeeEnabled,
+          threshold: data.smallOrderFeeThreshold,
+          fee: data.smallOrderFeeAmount,
+          isTaxable: data.smallOrderFeeIsTaxable,
+          taxPercentage: data.smallOrderFeeTaxPercentage,
+        },
       },
       product: {
         defaultImageUrl: getImage("defaultImageUrl"),
@@ -261,10 +279,63 @@ export default function GlobalSettings({
 
   };
 
+  const smallFeeFromForm = (d: TGlobalSettingsForm): TSmallOrderFeeValues => ({
+    isEnabled: d.smallOrderFeeEnabled,
+    threshold: d.smallOrderFeeThreshold,
+    fee: d.smallOrderFeeAmount,
+    isTaxable: d.smallOrderFeeIsTaxable,
+    taxPercentage: d.smallOrderFeeTaxPercentage,
+  });
+
+  const lastSavedFee = useRef<TSmallOrderFeeValues>({
+    isEnabled: settings?.order?.smallOrderFee?.isEnabled ?? false,
+    threshold: settings?.order?.smallOrderFee?.threshold ?? 0,
+    fee: settings?.order?.smallOrderFee?.fee ?? 0,
+    isTaxable: settings?.order?.smallOrderFee?.isTaxable ?? false,
+    taxPercentage: settings?.order?.smallOrderFee?.taxPercentage ?? 0,
+  });
+
+  const hasSmallFeeChanged = (d: TGlobalSettingsForm) => {
+    const a = smallFeeFromForm(d);
+    const b = lastSavedFee.current;
+    return (Object.keys(a) as (keyof TSmallOrderFeeValues)[]).some((k) => a[k] !== b[k]);
+  };
+
+  // only ask for confirmation when the small order fee itself changed
+  const handleFormSubmit = (data: TGlobalSettingsForm) => {
+    if (hasSmallFeeChanged(data)) {
+      setPendingData(data);
+      setConfirmOpen(true);
+      return;
+    }
+    return saveSettings(data);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!pendingData) return;
+    await saveSettings(pendingData);
+    setConfirmOpen(false);
+    setPendingData(null);
+  };
+
+  // invalid fields on an unmounted tab: jump there and say why
+  const handleInvalid = (errors: FieldErrors<TGlobalSettingsForm>) => {
+    if (Object.keys(errors).some((k) => k.startsWith("smallOrderFee"))) {
+      setActiveTab("small-order-fee");
+    }
+    const first = Object.values(errors)[0] as { message?: string } | undefined;
+    toast.error(first?.message || "Please fix the highlighted errors.");
+  };
+
   return (
     <div className="min-h-screen">
       <Form {...form}>
-        <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          noValidate
+          onSubmit={(event) => {
+            void form.handleSubmit(handleFormSubmit, handleInvalid)(event);
+          }}
+        >
           {/* Header */}
           <TitleHeader
             title={t("global_settings")}
@@ -956,6 +1027,9 @@ export default function GlobalSettings({
                     </SettingsCard>
                   )}
 
+                  {/* next to the other tabs */}
+                  {activeTab === "small-order-fee" && <SmallOrderFeeSettings form={form} taxRates={taxRates} />}
+
                   {/* products */}
                   {activeTab === "products" && (
                     <SettingsCard
@@ -1211,6 +1285,19 @@ export default function GlobalSettings({
           </div>
         </form>
       </Form>
+
+      {/* after </Form> */}
+      <SmallOrderFeeConfirmDialog
+        open={confirmOpen}
+        onOpenChange={(o) => {
+          if (isSaving) return;
+          setConfirmOpen(o);
+          if (!o) setPendingData(null);
+        }}
+        values={pendingData ? smallFeeFromForm(pendingData) : null}
+        isSaving={isSaving}
+        onConfirm={handleConfirmSave}
+      />
     </div>
   );
 }
