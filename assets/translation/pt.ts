@@ -599,6 +599,7 @@ export const pt = {
   copy_to_branch: "Copiar para Filial",
   select_a_branch_to_copy: "Selecione uma filial para copiar este produto",
   copy_product: "Copiar Produto",
+  clone: "Clonar",
 
   // approve or reject modal
   are_you_sure_want_approve: "Tem certeza de que deseja aprovar?",

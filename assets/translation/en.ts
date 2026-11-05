@@ -595,6 +595,7 @@ export const en = {
   copy_to_branch: "Copy to Branch",
   select_a_branch_to_copy: "Select a branch to copy this product",
   copy_product: "Copy Product",
+  clone: "Clone",
 
   // approve or reject modal
   are_you_sure_want_approve: "Are you sure you want to approve?",
