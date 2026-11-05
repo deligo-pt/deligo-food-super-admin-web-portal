@@ -146,7 +146,7 @@ export default function ProductCard({
                 "w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors shadow-sm",
                 isSelected
                   ? "bg-[#DC3173] border-[#DC3173] text-white"
-                  : "bg-white/90 border-gray-300"
+                  : "bg-white/90 border-[#DC3173]/50 hover:border-[#DC3173]"
               )}
             >
               {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
@@ -261,7 +261,7 @@ export default function ProductCard({
                   "w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors",
                   isSelected
                     ? "bg-[#DC3173] border-[#DC3173] text-white"
-                    : "border-gray-300 hover:border-[#DC3173] bg-white"
+                    : "border-[#DC3173]/50 hover:border-[#DC3173] bg-white"
                 )}
               >
                 {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}

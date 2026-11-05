@@ -38,13 +38,14 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getVendorBranchColumns } from "../VendorBranchColumns";
 import ReusableTable from "@/components/common/ReusableTable";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import VendorAvailabilityModal from "./VendorAvailabilityModal";
 import ClearAvailabilityDialog from "./ClearAvailabilityDialog";
+import { useStore } from "@/store/store";
 
 interface IProps {
   vendor: TVendor;
@@ -65,6 +66,15 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
 
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [showClearOverrideDialog, setShowClearOverrideDialog] = useState(false);
+
+  const setVendor = useStore((s) => s.setVendor);
+  const clearVendor = useStore((s) => s.clearVendor);
+
+  // Save on enter / when the fetched vendor changes, remove when leaving the page
+  useEffect(() => {
+    setVendor(vendor?.businessDetails?.businessName || vendor?.businessDetails?.branchName || null);
+    return () => clearVendor();
+  }, [vendor, setVendor, clearVendor]);
 
   const hasActiveOverride = Boolean(vendor?.businessDetails?.availability?.override);
   const override = vendor?.businessDetails?.availability?.override;
