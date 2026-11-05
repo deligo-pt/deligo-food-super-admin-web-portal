@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import RewardProductForm from "./RewardProductForm";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 
 const CreateRewardProduct = () => {
     const { t } = useTranslation();
@@ -42,16 +43,11 @@ const CreateRewardProduct = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-xl font-semibold text-gray-900">
-                    {t("create_reward_product") || "Create reward product"}
-                </h1>
-                <p className="text-sm text-gray-500">
-                    {t("create_reward_product_subtitle") ||
-                        "Set the points and cash price users need to claim this reward."}
-                </p>
-            </div>
+        <div className="">
+            <TitleHeader
+                title={t("create_reward_product") || "Create reward product"}
+                subtitle={t("create_reward_product_subtitle") || "Set the points and cash price users need to claim this reward."}
+            />
 
             <RewardProductForm
                 mode="create"

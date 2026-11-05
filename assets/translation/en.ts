@@ -142,6 +142,9 @@ export const en = {
   all_ingredients: "All Ingredients",
   add_ingredient: "Add Ingredient",
   ingredient_orders: "Ingredient Orders",
+  create_reward_product: "Create Reward Product",
+  all_reward_products: "All Reward Products",
+  reward_claims: "Reward Claims",
 
   promotions_and_coupons: "Promotions & Coupons",
   active_campaigns: "Active Campaigns",
@@ -1980,6 +1983,43 @@ export const en = {
   vendor_details: "Vendor Details",
   mark_shipped: "Mark Shipped",
   mark_delivered: "Mark Delivered",
+
+  // create reward product
+  create_reward_product_subtitle: "Set the points and cash price users need to claim this reward.",
+  target_role: "Target Role",
+  role_cannot_be_changed: "Role can't be changed. Create a new product instead.",
+  select_role: "Select Role",
+  required_points: "Required Points",
+  cash_price: "Cash Price (€)",
+  cash_price_hint: "What the user pays at pickup. 0 = free.",
+  regular_price: "Regular Price (€)",
+  regular_price_hint: "Normal shelf price, shown struck through.",
+  inactive_products_hidden: "Inactive products are hidden from the catalog and can't be claimed.",
+  create_product: "Create Product",
+
+  // all reward products
+  reward_products: "Reward Products",
+  manage_reward_products: "Manage the rewards users can claim with points",
+  no_reward_products_found: "No reward products found.",
+  activate_product: "Activate Product",
+  deactivate_product: "Deactivate Product",
+  will_be_visible_and_claimable: "will appear in the user catalog and can be claimed again.",
+  will_be_hidden_and_unclaimable: "will be hidden from the user catalog and can no longer be claimed. Existing claims are not affected.",
+  product: "Product",
+  // -> edit reward product
+  edit_reward_product: "Edit reward product",
+  edit_reward_product_note: "Changes to points or prices apply to future claims only.",
+
+  // reward claim
+  manage_reward_claims: "Manage reward claims and their fulfillment status",
+  no_reward_claims_found: "No reward claims found.",
+  claimed_by: "Claimed By",
+  deleted_product: "Deleted Product",
+  points_spent: "Points Spent",
+  cash_to_collect: "Cash to Collect",
+  pickup_date: "Pickup Date",
+  mark_collected: "Mark Collected",
+  cancel_claim: "Cancel Claim",
 
   // active-campaigns
   list_of_all_active_offers: "List of all active offers",

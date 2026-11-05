@@ -4,9 +4,7 @@
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
-    DialogTitle,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/use-translation";
 import { updateRewardProduct } from "@/services/dashboard/reward&claims/reward-claims.service";
@@ -15,10 +13,10 @@ import {
     RewardProductFormValues,
     updateRewardProductSchema,
 } from "@/validations/reward-claim/reward-claim.validation";
-import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import RewardProductForm, { RewardFormDirtyFields } from "./RewardProductForm";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
 
 interface IProps {
     product: IRewardProduct | null;
@@ -70,17 +68,12 @@ export default function EditRewardProductModal({ product, open, onOpenChange, on
 
     return (
         <Dialog open={open} onOpenChange={(o) => !isSubmitting && onOpenChange(o)}>
-            <DialogContent className="w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+            <DialogContent className="w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-3">
                 <DialogHeader className="pb-2">
-                    <DialogTitle className="flex items-center gap-2" style={{ color: "#DC3173" }}>
-                        <Pencil size={18} />
-                        {t("edit_reward_product") || "Edit reward product"}
-                        {product ? ` — ${product.name}` : ""}
-                    </DialogTitle>
-                    <DialogDescription>
-                        {t("edit_reward_product_note") ||
-                            "Changes to points or prices apply to future claims only."}
-                    </DialogDescription>
+                    <TitleHeader
+                        title={`${t("edit_reward_product") || "Edit reward product"}${product ? ` — ${product.name}` : ""}`}
+                        subtitle={t("edit_reward_product_note") || "Changes to points or prices apply to future claims only."}
+                    />
                 </DialogHeader>
 
                 {product && (
