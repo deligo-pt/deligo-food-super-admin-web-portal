@@ -307,7 +307,7 @@ export default function Sidebar({ open, setOpen, admin }: IProps) {
         { name: t("ingredient_orders"), path: "/admin/ingredient-orders" },
         { name: t("create_reward_product"), path: "/admin/reward/product/create" },
         { name: t("all_reward_products"), path: "/admin/reward/product/all" },
-        { name: t("reward_claims"), path: "/admin/reward/claims" },
+        { name: t("reward_claims"), path: "/admin/reward/claim" },
       ],
     },
     {

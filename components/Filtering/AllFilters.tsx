@@ -26,7 +26,7 @@ import { FilterOption, FilterOptionItem } from "@/types";
 
 
 interface IProps {
-  sortOptions: { label: string; value: string }[];
+  sortOptions?: { label: string; value: string }[];
   filterOptions?: FilterOption[];
   searchPlaceholder?: string;
   extraSelectFilter?: {
@@ -341,13 +341,13 @@ export default function AllFilters({
             </Button>
           )}
 
-          <div className="w-full lg:w-40">
+          {sortOptions && <div className="w-full lg:w-40">
             <SelectFilter
               paramName="sortBy"
               options={sortOptions}
               placeholder={t("sort_by")}
             />
-          </div>
+          </div>}
         </div>
       </div>
 
