@@ -493,62 +493,40 @@ export function AddProductToVendor({
                                         form={form}
                                     />
                                 )}
-                                <div className="flex justify-between pt-6">
+                                <div className="flex justify-start gap-3 pt-6">
+                                    {/* Previous */}
                                     <motion.button
-                                        whileHover={{
-                                            scale: 1.02,
-                                        }}
-                                        whileTap={{
-                                            scale: 0.98,
-                                        }}
+                                        whileHover={activeTab === 0 ? undefined : { scale: 1.02 }}
+                                        whileTap={activeTab === 0 ? undefined : { scale: 0.98 }}
                                         type="button"
                                         onClick={() => activeTab > 0 && setActiveTab(activeTab - 1)}
                                         disabled={activeTab === 0}
-                                        className={`px-6 py-2 rounded-lg flex items-center space-x-2 ${activeTab === 0
-                                            ? "bg-gray-300 cursor-not-allowed"
-                                            : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+                                        className={`px-6 py-2 rounded-lg flex items-center space-x-2 transition-colors ${activeTab === 0
+                                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                : "bg-[#DC3173] hover:bg-[#B02458] text-white"
                                             }`}
                                     >
                                         <ChevronLeftIcon className="h-4 w-4" />
                                         <span>{t("previous")}</span>
                                     </motion.button>
-                                    {/* {activeTab === lastTabIndex && (
-                    <motion.button
-                      whileHover={{
-                        scale: 1.05,
-                      }}
-                      whileTap={{
-                        scale: 0.98,
-                      }}
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="px-6 py-2 bg-[#DC3173] hover:bg-[#B02458] text-white rounded-lg flex items-center space-x-2 shadow-lg shadow-pink-200/50"
-                    >
-                      <SaveIcon className="h-5 w-5" />
-                      {
-                        lang === "en" ? <span>Translate to PT and Save Product</span> :
-                          <span>{t("translate_en")}</span>
-                      }
-                    </motion.button>
-                  )} */}
-                                    {activeTab < lastTabIndex && (
-                                        <motion.button
-                                            whileHover={{
-                                                scale: 1.02,
-                                            }}
-                                            whileTap={{
-                                                scale: 0.98,
-                                            }}
-                                            type="button"
-                                            onClick={() =>
-                                                activeTab < lastTabIndex && setActiveTab(activeTab + 1)
-                                            }
-                                            className="px-6 py-2 bg-[#DC3173] hover:bg-[#B02458] text-white rounded-lg flex items-center space-x-2"
-                                        >
-                                            <span>{t("next")}</span>
-                                            <ChevronRightIcon className="h-4 w-4" />
-                                        </motion.button>
-                                    )}
+
+                                    {/* Next */}
+                                    <motion.button
+                                        whileHover={activeTab === lastTabIndex ? undefined : { scale: 1.02 }}
+                                        whileTap={activeTab === lastTabIndex ? undefined : { scale: 0.98 }}
+                                        type="button"
+                                        onClick={() =>
+                                            activeTab < lastTabIndex && setActiveTab(activeTab + 1)
+                                        }
+                                        disabled={activeTab === lastTabIndex}
+                                        className={`px-6 py-2 rounded-lg flex items-center space-x-2 transition-colors ${activeTab === lastTabIndex
+                                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                : "bg-[#DC3173] hover:bg-[#B02458] text-white"
+                                            }`}
+                                    >
+                                        <span>{t("next")}</span>
+                                        <ChevronRightIcon className="h-4 w-4" />
+                                    </motion.button>
                                 </div>
                             </form>
                         </Form>

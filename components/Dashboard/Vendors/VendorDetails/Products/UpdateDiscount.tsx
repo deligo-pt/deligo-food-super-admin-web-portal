@@ -284,6 +284,35 @@ const UpdateDiscount = ({
         });
     }, [initialProducts, initialMeta]);
 
+    // Visible checkbox: solid border + white fill when unchecked, brand pink when checked
+    const checkboxClass =
+        "h-4 w-4 shrink-0 rounded-[4px] border-2 border-gray-400 bg-white shadow-sm " +
+        "data-[state=checked]:border-[#DC3173] data-[state=checked]:bg-[#DC3173] data-[state=checked]:text-white";
+
+    const getProductImage = (p: TProduct) => p.image || p.images?.[0];
+
+    function ProductThumb({ product }: { product: TProduct }) {
+        const [failed, setFailed] = useState(false);
+        const src = getProductImage(product);
+
+        return (
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md border border-gray-100 bg-gray-50 flex items-center justify-center">
+                {src && !failed ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        src={src}
+                        alt=""
+                        loading="lazy"
+                        onError={() => setFailed(true)}
+                        className="h-full w-full object-cover"
+                    />
+                ) : (
+                    <Package size={16} className="text-gray-300" />
+                )}
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             <TitleHeader
@@ -451,106 +480,93 @@ const UpdateDiscount = ({
                         const fullySelected = isCategoryFullySelected(catProducts);
 
                         return (
-                            <section
-                                key={category?._id || 'uncategorized'}
-                                className="space-y-2"
-                            >
-                                {/* Category header – unchanged */}
+                            <section key={category?._id || 'uncategorized'} className="space-y-2">
+                                {/* Category header */}
                                 <div
                                     className={cn(
-                                        'flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all cursor-pointer',
+                                        'flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors cursor-pointer',
                                         categorySelected
                                             ? 'border-[#DC3173]/50 bg-[#DC3173]/5'
-                                            : 'border-border/90 bg-muted/20 hover:bg-muted/30'
+                                            : 'border-gray-200 bg-gray-50 hover:bg-gray-100/70'
                                     )}
                                     onClick={() => toggleCategory(catProducts)}
                                 >
                                     <Checkbox
                                         checked={categorySelected}
-                                        className={cn(
-                                            'data-[state=checked]:bg-[#DC3173] data-[state=checked]:border-[#DC3173]',
-                                            categorySelected && !fullySelected && 'opacity-70'
-                                        )}
                                         onCheckedChange={() => toggleCategory(catProducts)}
                                         onClick={(e) => e.stopPropagation()}
+                                        className={checkboxClass}
                                     />
 
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="text-sm font-semibold tracking-tight">
-                                            {category
-                                                ? getLocalizedName(category.name)
-                                                : t('uncategorized')}
+                                        <h3 className="text-sm font-semibold tracking-tight truncate">
+                                            {category ? getLocalizedName(category.name) : t('uncategorized')}
                                         </h3>
-                                        <p className="text-[11px] text-muted-foreground">
-                                            {catProducts.length} {t('product')}
-                                            {catProducts.length !== 1 ? 's' : ''}
-                                            {categorySelected && !fullySelected && (
-                                                <span className="ml-1.5 text-[#DC3173]">
-                                                    · {t("partial")}
-                                                </span>
-                                            )}
-                                        </p>
+                                        {categorySelected && !fullySelected && (
+                                            <p className="text-[11px] text-[#DC3173]">{t('partial')}</p>
+                                        )}
                                     </div>
 
-                                    <Badge
-                                        variant="secondary"
-                                        className="font-normal shrink-0 text-[11px] h-5"
-                                    >
-                                        {catProducts.length}
+                                    <Badge variant="secondary" className="font-normal shrink-0 text-[11px] h-5">
+                                        {catProducts.length} {t('product')}
+                                        {catProducts.length !== 1 ? 's' : ''}
                                     </Badge>
                                 </div>
 
-                                {/* Products grid – unchanged */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 ml-10">
+                                {/* Products grid */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 pl-2 sm:pl-6">
                                     {catProducts?.map((product) => {
                                         const productKey = getProductKey(product);
                                         const isSelected = selectedProductIds.includes(productKey as string);
 
                                         const originalPrice = product.pricing.price;
                                         const currency = product.pricing.currency;
-                                        const discounted = isSelected
-                                            ? getDiscountedPrice(originalPrice)
-                                            : null;
+                                        const discounted = isSelected ? getDiscountedPrice(originalPrice) : null;
 
                                         const hasVariations =
-                                            Array.isArray(product.variations) &&
-                                            product.variations.length > 0;
+                                            Array.isArray(product.variations) && product.variations.length > 0;
 
                                         return (
                                             <div
                                                 key={product._id}
                                                 className={cn(
-                                                    'rounded-md border transition-all',
+                                                    'rounded-lg border bg-white transition-all',
                                                     isSelected
-                                                        ? 'border-[#DC3173]/40 bg-[#DC3173]/5'
-                                                        : 'border-[#DC3173]/50 hover:bg-muted/20'
+                                                        ? 'border-[#DC3173] bg-[#DC3173]/5 ring-1 ring-[#DC3173]/25'
+                                                        : 'border-gray-200 hover:border-[#DC3173]/50'
                                                 )}
                                             >
                                                 {/* Main product row */}
                                                 <div
-                                                    className="flex items-center gap-2 px-2.5 py-1.5 cursor-pointer"
+                                                    className="flex items-center gap-2 p-1.5 pr-2 cursor-pointer"
                                                     onClick={() => toggleProduct(product)}
                                                 >
                                                     <Checkbox
                                                         checked={isSelected}
                                                         onCheckedChange={() => toggleProduct(product)}
                                                         onClick={(e) => e.stopPropagation()}
-                                                        className="h-3.5 w-3.5 data-[state=checked]:bg-[#DC3173] data-[state=checked]:border-[#DC3173]"
+                                                        className={checkboxClass}
                                                     />
+
+                                                    <ProductThumb product={product} />
 
                                                     <div className="flex-1 min-w-0">
                                                         <p className="font-medium text-[13px] leading-tight line-clamp-1">
                                                             {getLocalizedName(product.name)}
                                                         </p>
 
-                                                        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0 text-[11px] mt-0.5">
-                                                            <span className="text-muted-foreground">
+                                                        <div className="flex flex-wrap items-center gap-x-1.5 text-[11px] mt-0.5">
+                                                            <span
+                                                                className={cn(
+                                                                    'text-muted-foreground',
+                                                                    discounted !== null && 'line-through'
+                                                                )}
+                                                            >
                                                                 {currency} {originalPrice}
                                                             </span>
 
                                                             {discounted !== null && (
                                                                 <>
-                                                                    <span className="text-muted-foreground">→</span>
                                                                     <span className="font-semibold text-[#DC3173]">
                                                                         {currency} {discounted}
                                                                     </span>
@@ -565,53 +581,46 @@ const UpdateDiscount = ({
 
                                                 {/* Variations (if any) */}
                                                 {hasVariations && (
-                                                    <div className="border-t border-dashed border-[#DC3173]/20 px-2.5 pb-2 pt-1.5 space-y-1.5">
+                                                    <div className="border-t border-dashed border-[#DC3173]/25 px-2 py-1.5 space-y-1">
                                                         {product.variations.map((variation, vIdx) => (
-                                                            <div key={vIdx} className="space-y-1">
-                                                                {/* Variation group name */}
-                                                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide pl-5">
+                                                            <div key={vIdx}>
+                                                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
                                                                     {getLocalizedName(variation.name)}
                                                                 </p>
 
-                                                                {/* Options */}
-                                                                <div className="space-y-1">
-                                                                    {variation.options?.map((option, oIdx) => {
-                                                                        const optionPrice = option.price;
-                                                                        const optionDiscounted = isSelected
-                                                                            ? getDiscountedPrice(optionPrice)
-                                                                            : null;
+                                                                {variation.options?.map((option, oIdx) => {
+                                                                    const optionPrice = option.price;
+                                                                    const optionDiscounted = isSelected
+                                                                        ? getDiscountedPrice(optionPrice)
+                                                                        : null;
 
-                                                                        return (
-                                                                            <div
-                                                                                key={oIdx}
-                                                                                className="flex items-center gap-2 pl-5 text-[11px]"
+                                                                    return (
+                                                                        <div
+                                                                            key={oIdx}
+                                                                            className="flex items-center gap-1.5 pl-2 text-[11px] leading-5"
+                                                                        >
+                                                                            <span className="text-muted-foreground/60 w-3 shrink-0">
+                                                                                {oIdx + 1}
+                                                                            </span>
+                                                                            <span className="font-medium text-foreground/90 line-clamp-1">
+                                                                                {getLocalizedName(option.label)}
+                                                                            </span>
+                                                                            <span
+                                                                                className={cn(
+                                                                                    'text-muted-foreground',
+                                                                                    optionDiscounted !== null && 'line-through'
+                                                                                )}
                                                                             >
-                                                                                <span className="text-muted-foreground/70">{oIdx + 1}</span>
-                                                                                <div className="flex-1 min-w-0 flex flex-wrap items-center gap-x-1.5">
-                                                                                    <span className="font-medium text-foreground/90 line-clamp-1">
-                                                                                        {getLocalizedName(option.label)}
-                                                                                    </span>
-
-                                                                                    <span className="text-muted-foreground">
-                                                                                        {currency} {optionPrice}
-                                                                                    </span>
-
-                                                                                    {optionDiscounted !== null && (
-                                                                                        <>
-                                                                                            <span className="text-muted-foreground">→</span>
-                                                                                            <span className="font-semibold text-[#DC3173]">
-                                                                                                {currency} {optionDiscounted}
-                                                                                            </span>
-                                                                                            <span className="text-[#DC3173] text-[10px]">
-                                                                                                (−{percentage}%)
-                                                                                            </span>
-                                                                                        </>
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                        );
-                                                                    })}
-                                                                </div>
+                                                                                {currency} {optionPrice}
+                                                                            </span>
+                                                                            {optionDiscounted !== null && (
+                                                                                <span className="font-semibold text-[#DC3173]">
+                                                                                    {currency} {optionDiscounted}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                })}
                                                             </div>
                                                         ))}
                                                     </div>

@@ -147,6 +147,9 @@ export const pt = {
   all_ingredients: "Todos os Ingredientes",
   add_ingredient: "Adicionar Ingrediente",
   ingredient_orders: "Pedidos de Ingredientes",
+  create_reward_product: "Criar Produto de Recompensa",
+  all_reward_products: "Todos os Produtos de Recompensa",
+  reward_claims: "Reclamações de Recompensas",
 
   promotions_and_coupons: "Promoções e Cupões",
   active_campaigns: "Campanhas Ativas",
@@ -596,6 +599,7 @@ export const pt = {
   copy_to_branch: "Copiar para Filial",
   select_a_branch_to_copy: "Selecione uma filial para copiar este produto",
   copy_product: "Copiar Produto",
+  clone: "Clonar",
 
   // approve or reject modal
   are_you_sure_want_approve: "Tem certeza de que deseja aprovar?",
@@ -1995,6 +1999,43 @@ export const pt = {
   vendor_details: "Detalhes do Vendedor",
   mark_shipped: "Marcar como Enviado",
   mark_delivered: "Marcar como Entregue",
+
+  // create reward product
+  create_reward_product_subtitle: "Defina os pontos e o preço em dinheiro necessários para os utilizadores reclamarem esta recompensa.",
+  target_role: "Função Alvo",
+  role_cannot_be_changed: "A função não pode ser alterada. Crie um novo produto em alternativa.",
+  select_role: "Selecionar Função",
+  required_points: "Pontos Necessários",
+  cash_price: "Preço em Dinheiro (€)",
+  cash_price_hint: "O que o utilizador paga na recolha. 0 = gratuito.",
+  regular_price: "Preço Regular (€)",
+  regular_price_hint: "Preço normal de tabela, exibido rasurado.",
+  inactive_products_hidden: "Produtos inativos ficam ocultos do catálogo e não podem ser reclamados.",
+  create_product: "Criar Produto",
+
+  // all reward products
+  reward_products: "Produtos de Recompensa",
+  manage_reward_products: "Gerir as recompensas que os utilizadores podem trocar por pontos",
+  no_reward_products_found: "Nenhum produto de recompensa encontrado.",
+  activate_product: "Ativar Produto",
+  deactivate_product: "Desativar Produto",
+  will_be_visible_and_claimable: "ficará visível no catálogo do utilizador e poderá ser reclamado novamente.",
+  will_be_hidden_and_unclaimable: "ficará oculto do catálogo do utilizador e deixará de poder ser reclamado. As reclamações existentes não são afetadas.",
+  product: "Produto",
+  // -> edit reward product
+  edit_reward_product: "Editar produto de recompensa",
+  edit_reward_product_note: "As alterações aos pontos ou preços aplicam-se apenas a rescates futuros.",
+
+  // reward claim
+  manage_reward_claims: "Gerir reclamações de recompensas e o respetivo estado de cumprimento",
+  no_reward_claims_found: "Nenhuma reclamação de recompensa encontrada.",
+  claimed_by: "Reclamado Por",
+  deleted_product: "Produto Eliminado",
+  points_spent: "Pontos Gastos",
+  cash_to_collect: "Valor a Cobrar",
+  pickup_date: "Data de Recolha",
+  mark_collected: "Marcar como Recolhido",
+  cancel_claim: "Cancelar Reclamação",
 
   // active-campaigns
   list_of_all_active_offers: "Lista de todas as ofertas ativas",

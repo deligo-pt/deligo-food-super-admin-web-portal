@@ -1,7 +1,9 @@
 "use client";
 
 import TopbarIcons from "@/components/adminTopbar/TopbarIcons";
+import { useStore } from "@/store/store";
 import { TAdmin } from "@/types/admin.type";
+import { Store } from "lucide-react";
 
 type Props = {
   sidebarWidth?: number;
@@ -9,6 +11,9 @@ type Props = {
 };
 
 export default function Topbar({ sidebarWidth = 280, admin }: Props) {
+  const vendorName = useStore((s) => s.vendor);
+  console.log("vendor  name", vendorName);
+
   return (
     <>
       {/* Fixed Topbar */}
@@ -23,8 +28,17 @@ export default function Topbar({ sidebarWidth = 280, admin }: Props) {
               typeof sidebarWidth === "number" ? undefined : undefined,
           }}
         >
-          {/* LEFT (Empty for now) */}
-          <div className="flex-1 h-full flex items-center"></div>
+          <div className="flex-1 h-full flex items-center min-w-0 ml-60">
+            {vendorName && (
+              <span
+                title={vendorName}
+                className="inline-flex max-w-55 items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-4 py-1.5 text-sm font-medium text-[#DC3173]"
+              >
+                <Store size={15} className="shrink-0" />
+                <span className="truncate">{vendorName}</span>
+              </span>
+            )}
+          </div>
 
           {/* RIGHT ICONS */}
           <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0 relative z-1001">
