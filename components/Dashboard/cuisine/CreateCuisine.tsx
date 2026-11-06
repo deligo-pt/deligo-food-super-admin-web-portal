@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/use-translation";
 import { createCuisine } from "@/services/dashboard/category/cuisine.service";
 import { useStore } from "@/store/store";
+import { validateSquareImage } from "@/utils/imageDimensions";
 import { translateObject } from "@/utils/translation/translationObject";
 import { cuisineValidation } from "@/validations/category/cuisine.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,7 +49,21 @@ const CreateCuisine = () => {
         name: ["image"],
     });
 
-    const onChangeImage = (image: { file: File | null; url: string }) => {
+    // const onChangeImage = (image: { file: File | null; url: string }) => {
+    //     form.setValue("image", image);
+    // };
+
+    const onChangeImage = async (image: { file: File | null; url: string }) => {
+        if (image.file) {
+            const error = await validateSquareImage(image.file);
+            if (error) {
+                toast.error(error);
+                form.setError("image", { type: "manual", message: error });
+                return; // don't accept the file
+            }
+        }
+
+        form.clearErrors("image");
         form.setValue("image", image);
     };
 

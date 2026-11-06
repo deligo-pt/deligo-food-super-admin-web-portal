@@ -1,4 +1,22 @@
+// src/validations/category/cuisine.validation.ts
+import { validateSquareImage } from "@/utils/imageDimensions";
 import z from "zod";
+
+const imageSchema = z
+    .object({
+        file: z.file().nullable(),
+        url: z.string(),
+    })
+    // Only a newly picked file is checked; an existing url (edit) has file: null
+    .superRefine(async (img, ctx) => {
+        if (!img.file) return;
+
+        const error = await validateSquareImage(img.file);
+        if (error) {
+            ctx.addIssue({ code: "custom", message: error });
+        }
+    })
+    .optional();
 
 export const cuisineValidation = z.object({
     name: z.object({
@@ -6,12 +24,7 @@ export const cuisineValidation = z.object({
         pt: z.string().trim().max(50, "Max 50 characters allowed").optional(),
     }),
 
-    image: z
-        .object({
-            file: z.file().nullable(),
-            url: z.string(),
-        })
-        .optional(),
+    image: imageSchema,
 
     currentLang: z.enum(["en", "pt"]),
 
@@ -34,12 +47,7 @@ export const updateCuisineValidation = z.object({
         pt: z.string().trim().max(50, "Max 50 characters allowed").optional(),
     }),
 
-    image: z
-        .object({
-            file: z.file().nullable(),
-            url: z.string(),
-        })
-        .optional(),
+    image: imageSchema,
 
     isActive: z.boolean().optional()
 });

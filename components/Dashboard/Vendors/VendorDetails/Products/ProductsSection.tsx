@@ -739,7 +739,7 @@ export default function ProductsSection({
                 className="border-gray-200"
               >
                 <CheckSquare className="w-4 h-4 mr-1.5" />
-                {t("select") || "Select"}
+                {t("clone") || "Clone"}
               </Button>
             </div>
           )}
