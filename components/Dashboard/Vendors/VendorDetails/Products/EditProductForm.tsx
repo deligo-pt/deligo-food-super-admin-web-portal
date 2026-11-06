@@ -126,7 +126,7 @@ export function EditProductForm({
     const form = useForm<FormData>({
         resolver: zodResolver(productValidation),
         defaultValues: {
-            name: prevData?.name || "",
+            name: prevData?.name ?? "",
             image:
                 (typeof prevData?.image === "string" && prevData.image.trim()) ||
                 (Array.isArray(prevData?.images) && prevData.images[0]?.trim()) ||
