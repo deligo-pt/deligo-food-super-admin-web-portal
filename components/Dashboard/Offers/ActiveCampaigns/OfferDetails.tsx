@@ -41,7 +41,14 @@ interface IProps {
   offer: TOffer;
 }
 
-const offerTypeConfig = {
+const offerTypeConfig: Record<
+  string,
+  {
+    icon: typeof PercentIcon;
+    label: string;
+    textColor: string;
+  }
+> = {
   PERCENT: {
     icon: PercentIcon,
     label: "Percentage Off",
