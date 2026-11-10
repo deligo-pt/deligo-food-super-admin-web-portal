@@ -29,6 +29,12 @@ export const updateOfferReq = async (id: string, data: Partial<TOffer>) => {
   });
 };
 
+export const toggleOfferStatusReq = async (id: string) => {
+  return catchAsync<null>(async () => {
+    return await serverRequest.patch(`/offers/toggle-status/${id}`);
+  });
+};
+
 export const deleteOfferReq = async (id: string) => {
   return catchAsync<null>(async () => {
     return await serverRequest.delete(`/offers/soft-delete/${id}`);
