@@ -115,6 +115,7 @@ export default function ActiveCampaigns({
       });
       closeStatusUpdateModal(false);
       router.refresh();
+      setButtonDisabled(false);
       return;
     }
 

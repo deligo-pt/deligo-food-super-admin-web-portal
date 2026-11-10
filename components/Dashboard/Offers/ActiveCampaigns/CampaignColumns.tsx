@@ -87,6 +87,15 @@ export function getCampaignColumns({
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
+                    <TagsIcon className="w-4" />
+                    {t("scope")}
+                </div>
+            ),
+            accessor: (offer) => offer.eligibility?.scope || "N/A",
+        },
+        {
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
                     <PercentIcon className="w-4" />
                     {t("discount")}
                 </div>
@@ -153,11 +162,11 @@ export function getCampaignColumns({
                             {t("view")}
                         </DropdownMenuItem>
 
-                        {(role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
+                        {/* {(role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
                             <DropdownMenuItem onClick={() => handleOpenEditModal(offer)}>
                                 {t("edit")}
                             </DropdownMenuItem>
-                        )}
+                        )} */}
 
                         {offer.isActive && (
                             (role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
