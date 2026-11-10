@@ -35,10 +35,10 @@ import { getSortOptions, SortOptionKey } from "@/utils/sortOptions";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { CalendarClock, Pencil } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import EditVendorOfferModal from "./EditVendorOfferModal";
 
 const SHADOW = "0 6px 20px rgba(0,0,0,0.06)";
 
@@ -65,6 +65,9 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
   });
   const [buttonDisabled, setButtonDisabled] = useState(false);
 
+  // edit modal
+  const [editOffer, setEditOffer] = useState<TOffer | null>(null);
+
   // delete modal
   const [deleteId, setDeleteId] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -75,7 +78,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
   const handleToggleStatus = async () => {
     const activating = statusInfo.status;
     const toastId = toast.loading(
-      activating ? "Activating offer..." : "Deactivating offer...",
+      activating ? t("activating_offer") : t("deactivating_offer"),
     );
     setButtonDisabled(true);
 
@@ -84,7 +87,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
     if (result.success) {
       toast.success(
         result.message ||
-        (activating ? "Offer activated" : "Offer deactivated"),
+        (activating ? t("offer_activated") : t("offer_deactivated")),
         { id: toastId },
       );
       router.refresh();
@@ -93,7 +96,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
       toast.error(
         getKnownOfferError(result) ||
         result.message ||
-        "Could not update the offer",
+        t("could_not_update_offer"),
         { id: toastId },
       );
     }
@@ -103,18 +106,18 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
   };
 
   const handleDelete = async () => {
-    const toastId = toast.loading("Deleting offer...");
+    const toastId = toast.loading(t("deleting_offer"));
     setIsDeleting(true);
 
     const result = await deleteOfferReq(deleteId);
 
     if (result.success) {
-      toast.success(result.message || "Offer deleted successfully!", {
+      toast.success(result.message || t("offer_deleted_successfully"), {
         id: toastId,
       });
       router.refresh();
     } else {
-      toast.error(result.message || "Offer delete failed", { id: toastId });
+      toast.error(result.message || t("offer_delete_failed"), { id: toastId });
     }
 
     setIsDeleting(false);
@@ -124,8 +127,9 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
   return (
     <div className="min-h-screen space-y-5">
       <TitleHeader
-        title={`${vendor.name?.firstName} ${vendor.name?.lastName}'s Offers`}
-        subtitle={`All offers from (${vendor.email})`}
+        title={`${vendor.name?.firstName} ${vendor.name?.lastName}'s ${t("Offers")}`}
+        subtitle={`${t("all_offers_from")} (${vendor.email})`}
+        onBackClick={() => router.back()}
       />
 
       <AllFilters sortOptions={sortOptions} />
@@ -162,7 +166,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
 
                         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-gray-600">
                           <Badge variant="outline">
-                            Code: {offer.code || "N/A"}
+                            {t("code")}: {offer.code || t("n_a")}
                           </Badge>
                           {isAdminCreatedVendorOffer(offer) && (
                             <AdminOfferBadge />
@@ -173,14 +177,14 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
                         </div>
 
                         <div className="flex items-center gap-2 mt-2 text-gray-600 text-sm">
-                          <CalendarClock size={14} /> Valid till:{" "}
+                          <CalendarClock size={14} /> {t("valid_till")}:{" "}
                           {format(offer.expiresAt, "dd MMM, yyyy")}
                         </div>
                       </div>
                     </div>
 
                     <div className="flex flex-col items-start gap-1 md:items-end md:min-w-50 md:text-right">
-                      <p className="text-sm text-gray-500">Total Used</p>
+                      <p className="text-sm text-gray-500">{t("total_used")}</p>
                       <p className="text-3xl font-bold text-gray-900">
                         {offer.usageCount ?? 0}
                       </p>
@@ -208,21 +212,17 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
                               })
                             }
                           >
-                            {offer.isActive ? "Deactivate" : "Activate"}
+                            {offer.isActive ? t("deactivate") : t("activate")}
                           </Button>
 
-                          {/* Edit */}
+                          {/* Edit (opens the modal) */}
                           <Button
-                            asChild
                             size="sm"
                             className="gap-1.5 bg-[#DC3173] text-white hover:bg-[#DC3173]/90"
+                            onClick={() => setEditOffer(offer)}
                           >
-                            <Link
-                              href={`/admin/vendor/offers/${vendor.userId}/edit/${offer._id}`}
-                            >
-                              <Pencil size={14} />
-                              Edit
-                            </Link>
+                            <Pencil size={14} />
+                            {t("edit")}
                           </Button>
 
                           {/* Delete: only for inactive offers */}
@@ -232,7 +232,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
                               className="bg-red-600 text-white hover:bg-red-700"
                               onClick={() => setDeleteId(offer._id)}
                             >
-                              Delete
+                              {t("delete")}
                             </Button>
                           )}
                         </div>
@@ -246,7 +246,7 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
         })}
 
         {offersResult?.meta?.total === 0 && (
-          <p className="text-center text-gray-500 py-10">No offers found</p>
+          <p className="text-center text-gray-500 py-10">{t("no_offers_found")}</p>
         )}
       </div>
 
@@ -260,6 +260,17 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
             totalPages={offersResult?.meta?.totalPage as number}
           />
         </motion.div>
+      )}
+
+      {/* Edit modal */}
+      {editOffer && (
+        <EditVendorOfferModal
+          key={editOffer._id}
+          open={!!editOffer}
+          onOpenChange={(open) => !open && setEditOffer(null)}
+          offer={editOffer}
+          vendorMongoId={vendor._id as string}
+        />
       )}
 
       {/* Activate / Deactivate confirm */}

@@ -1,6 +1,5 @@
 "use client";
 
-import EditOfferModal from "@/components/Dashboard/Offers/ActiveCampaigns/EditOfferModal";
 import OfferStatusUpdateModal from "@/components/Dashboard/Offers/ActiveCampaigns/OfferStatusUpdateModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
@@ -625,11 +624,11 @@ export default function OfferDetails({ offer }: IProps) {
       </motion.div>
 
       {/* Edit Modal */}
-      <EditOfferModal
+      {/* <EditOfferModal
         open={openEditModal}
         onOpenChange={(open) => setOpenEditModal(open)}
         prevValues={offer}
-      />
+      /> */}
 
       {/* Status Update Modal */}
       <OfferStatusUpdateModal

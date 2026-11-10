@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import {
     ChevronDown,
@@ -34,25 +35,6 @@ import { useFormContext, useWatch } from "react-hook-form";
  *
  * Must be rendered inside <Form {...form}>.
  */
-
-const COPY = {
-    VENDOR: {
-        subtitle: "Only for customers ordering from this store for the first time.",
-        scopeChip: "This store",
-        ScopeIcon: Store,
-        funding:
-            "The store funds this discount. It is deducted from the store's payout for that order.",
-        limit: "A store can have only one active first-order offer.",
-    },
-    GLOBAL: {
-        subtitle: "Only for customers placing their first order on the platform.",
-        scopeChip: "All stores",
-        ScopeIcon: Globe,
-        funding:
-            "The platform funds this discount. Vendors are still paid on the full price.",
-        limit: "Only one global first-order offer can be active at a time.",
-    },
-} as const;
 
 export function Toggle({
     checked,
@@ -90,9 +72,28 @@ export default function FirstOrderOfferCard({
 }: {
     scope: "VENDOR" | "GLOBAL";
 }) {
+    const { t } = useTranslation();
     const { control } = useFormContext();
     const enabled = !!useWatch({ control, name: "isFirstOrder" });
     const [advancedOpen, setAdvancedOpen] = useState(false);
+
+    const COPY = {
+        VENDOR: {
+            subtitle: t("first_order_offer_vendor_subtitle"),
+            scopeChip: t("first_order_scope_this_store"),
+            ScopeIcon: Store,
+            funding: t("first_order_funding_vendor"),
+            limit: t("first_order_limit_vendor"),
+        },
+        GLOBAL: {
+            subtitle: t("first_order_offer_global_subtitle"),
+            scopeChip: t("first_order_scope_all_stores"),
+            ScopeIcon: Globe,
+            funding: t("first_order_funding_global"),
+            limit: t("first_order_limit_global"),
+        },
+    } as const;
+
     const c = COPY[scope];
 
     return (
@@ -108,14 +109,16 @@ export default function FirstOrderOfferCard({
                                 <Sparkles size={22} />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="font-semibold text-gray-900">First-order offer</p>
+                                <p className="font-semibold text-gray-900">
+                                    {t("first_order_offer")}
+                                </p>
                                 <p className="text-sm text-gray-600">{c.subtitle}</p>
                             </div>
                             <FormControl>
                                 <Toggle
                                     checked={!!field.value}
                                     onChange={field.onChange}
-                                    label="First-order offer"
+                                    label={t("first_order_offer")}
                                 />
                             </FormControl>
                         </div>
@@ -128,7 +131,7 @@ export default function FirstOrderOfferCard({
                 <div className="mt-4 space-y-4 pl-0 md:pl-16">
                     <div className="flex flex-wrap gap-2">
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-pink-200 bg-white px-3 py-1 text-xs font-medium text-[#DC3173]">
-                            <User size={13} /> Once per customer
+                            <User size={13} /> {t("once_per_customer")}
                         </span>
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-pink-200 bg-white px-3 py-1 text-xs font-medium text-[#DC3173]">
                             <c.ScopeIcon size={13} /> {c.scopeChip}
@@ -153,7 +156,7 @@ export default function FirstOrderOfferCard({
                             className="inline-flex items-center gap-1 text-sm font-semibold text-[#DC3173] hover:underline"
                             aria-expanded={advancedOpen}
                         >
-                            Advanced settings
+                            {t("advanced_settings")}
                             {advancedOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </button>
 
@@ -167,18 +170,17 @@ export default function FirstOrderOfferCard({
                                             <div className="flex items-start justify-between gap-4">
                                                 <div>
                                                     <p className="font-medium text-gray-900">
-                                                        Verified phone required
+                                                        {t("verified_phone_required")}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
-                                                        The customer must verify their phone number to get the
-                                                        offer. This stops repeat use with new accounts.
+                                                        {t("verified_phone_required_desc")}
                                                     </p>
                                                 </div>
                                                 <FormControl>
                                                     <Toggle
                                                         checked={field.value ?? true}
                                                         onChange={field.onChange}
-                                                        label="Verified phone required"
+                                                        label={t("verified_phone_required")}
                                                     />
                                                 </FormControl>
                                             </div>
@@ -195,12 +197,10 @@ export default function FirstOrderOfferCard({
                                             <div className="flex items-start justify-between gap-4">
                                                 <div>
                                                     <p className="font-medium text-gray-900">
-                                                        Times it can be given back
+                                                        {t("times_it_can_be_given_back")}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
-                                                        If an order with this offer is cancelled before the
-                                                        store accepts it, or the store rejects it, the
-                                                        customer gets the offer back up to this many times.
+                                                        {t("times_it_can_be_given_back_desc")}
                                                     </p>
                                                 </div>
                                                 <Select

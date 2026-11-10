@@ -1,7 +1,6 @@
 "use client";
 
 import CampaignTable from "@/components/Dashboard/Offers/ActiveCampaigns/ActiveCampaignTable";
-import EditOfferModal from "@/components/Dashboard/Offers/ActiveCampaigns/EditOfferModal";
 import OfferStatusUpdateModal from "@/components/Dashboard/Offers/ActiveCampaigns/OfferStatusUpdateModal";
 import AllFilters from "@/components/Filtering/AllFilters";
 import PaginationComponent from "@/components/Filtering/PaginationComponent";
@@ -186,13 +185,13 @@ export default function ActiveCampaigns({
       )}
 
       {/* Edit Modal */}
-      {selectedOffer && (
+      {/* {selectedOffer && (
         <EditOfferModal
           open={!!selectedOffer}
           onOpenChange={(open) => !open && setSelectedOffer(null)}
           prevValues={selectedOffer}
         />
-      )}
+      )} */}
 
       {/* Status Update Modal */}
       {statusInfo.offerId && (
