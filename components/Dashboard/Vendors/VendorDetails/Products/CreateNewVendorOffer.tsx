@@ -50,13 +50,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Resolver, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { ProductSelector } from "./ProductSelector";
-import { createOfferReq, createVendorOffer } from "@/services/dashboard/offer/offer.service";
+import { createVendorOffer } from "@/services/dashboard/offer/offer.service";
 import { TProductCategoryResponse } from "@/types/category.type";
 import { queryStringFormatter } from "@/utils/formatter";
 import { getAllProductCategories } from "@/services/dashboard/category/product-category.service";
 import { usePaginatedList } from "@/hooks/use-paginated-list";
 import { getAllProducts } from "@/services/dashboard/product/product.service";
-import { ChevronDown } from "lucide-react";
+import { Accessibility, ChevronDown, Sparkles } from "lucide-react";
+import FirstOrderOfferCard, { Toggle } from "./FirstOrderOfferCard";
 
 const PRIMARY = "#DC3173";
 
@@ -186,6 +187,10 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
             isAutoApply: true,
             userUsageLimit: "",
             isActive: true,
+            isFirstOrder: false,
+            firstOrderRequireVerifiedPhone: true,
+            firstOrderMaxRestores: 2,
+
             currentLang: lang,
         },
     });
@@ -391,6 +396,16 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                     : {}),
                 isActive: data.isActive ?? true,
                 isAutoApply: data.isAutoApply ?? false,
+                ...(data.isFirstOrder
+                    ? {
+                        eligibility: {
+                            type: "FIRST_ORDER",
+                            scope: "VENDOR",
+                            requireVerifiedPhone: data.firstOrderRequireVerifiedPhone ?? true,
+                            maxRestores: data.firstOrderMaxRestores ?? 2,
+                        },
+                    }
+                    : {}),
             };
 
             if (data.offerType === "PERCENT" || data.offerType === "FLAT") {
@@ -465,6 +480,18 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                     (err: { path: string; message: string }) => {
                         toast.error(err.message, { id: toastId });
                     },
+                );
+                return;
+            }
+
+            const errorKey =
+                result?.data?.errorKey ??
+                result?.data?.errorSources?.[0]?.errorKey;
+
+            if (errorKey === "ACTIVE_FIRST_ORDER_VENDOR_OFFER_EXISTS") {
+                toast.error(
+                    "This store already has an active first-order offer. Deactivate it first, then try again.",
+                    { id: toastId },
                 );
                 return;
             }
@@ -731,6 +758,8 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                         </FormItem>
                                     )}
                                 />
+
+                                <FirstOrderOfferCard scope="VENDOR" />
 
                                 {(watchOfferType === "PERCENT" ||
                                     watchOfferType === "FLAT") && (
@@ -1393,6 +1422,34 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                         )}
                                     />
                                 )}
+                            </div>
+
+                            <div>
+                                <FormField
+                                    control={control}
+                                    name="isActive"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-0">
+                                            <div className="flex items-start gap-4 bg-[#DC3173]/20 p-4 rounded-md">
+                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-pink-100 text-[#DC3173]">
+                                                    <Accessibility size={22} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="font-semibold text-gray-900">Active Status</p>
+                                                    <p className="">Offer activation status will be by default true.</p>
+                                                </div>
+                                                <FormControl>
+                                                    <Toggle
+                                                        checked={!!field.value}
+                                                        onChange={field.onChange}
+                                                        label="First-order offer"
+                                                    />
+                                                </FormControl>
+                                            </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
                             {watchOfferType !== "BUY_AND_REWARD" &&

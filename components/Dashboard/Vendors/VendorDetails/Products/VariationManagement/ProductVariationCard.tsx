@@ -65,6 +65,15 @@ export default function ProductVariationCard({ product, businessTypeSlug, t }: I
       return;
     }
 
+    if (result?.data?.errorSources) {
+      result.data.errorSources.forEach(
+        (err: { path: string; message: string }) => {
+          toast.error(err.message, { id: toastId });
+        },
+      );
+      return;
+    }
+
     toast.error(result.message || "Failed to rename variation.", {
       id: toastId,
     });
@@ -95,6 +104,15 @@ export default function ProductVariationCard({ product, businessTypeSlug, t }: I
       return;
     }
 
+    if (result?.data?.errorSources) {
+      result.data.errorSources.forEach(
+        (err: { path: string; message: string }) => {
+          toast.error(err.message, { id: toastId });
+        },
+      );
+      return;
+    }
+
     toast.error(result.message || "Failed to update variation price.", {
       id: toastId,
     });
@@ -106,13 +124,25 @@ export default function ProductVariationCard({ product, businessTypeSlug, t }: I
     labelToRemove?: string;
   }) => {
     const toastId = toast.loading("Deleting variation...");
+    console.log("product id", product?.productId);
+    console.log("data", data);
     const result = await removeVariationReq(product.productId, data);
+    console.log("res", result);
 
     if (result.success) {
       toast.success(result.message || "Variation deleted successfully!", {
         id: toastId,
       });
       router.refresh();
+      return;
+    }
+
+    if (result?.data?.errorSources) {
+      result.data.errorSources.forEach(
+        (err: { path: string; message: string }) => {
+          toast.error(err.message, { id: toastId });
+        },
+      );
       return;
     }
 
