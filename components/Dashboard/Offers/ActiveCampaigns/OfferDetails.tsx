@@ -1,6 +1,5 @@
 "use client";
 
-import EditOfferModal from "@/components/Dashboard/Offers/ActiveCampaigns/EditOfferModal";
 import OfferStatusUpdateModal from "@/components/Dashboard/Offers/ActiveCampaigns/OfferStatusUpdateModal";
 import DeleteModal from "@/components/Modals/DeleteModal";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,14 @@ interface IProps {
   offer: TOffer;
 }
 
-const offerTypeConfig = {
+const offerTypeConfig: Record<
+  string,
+  {
+    icon: typeof PercentIcon;
+    label: string;
+    textColor: string;
+  }
+> = {
   PERCENT: {
     icon: PercentIcon,
     label: "Percentage Off",
@@ -625,11 +631,11 @@ export default function OfferDetails({ offer }: IProps) {
       </motion.div>
 
       {/* Edit Modal */}
-      <EditOfferModal
+      {/* <EditOfferModal
         open={openEditModal}
         onOpenChange={(open) => setOpenEditModal(open)}
         prevValues={offer}
-      />
+      /> */}
 
       {/* Status Update Modal */}
       <OfferStatusUpdateModal

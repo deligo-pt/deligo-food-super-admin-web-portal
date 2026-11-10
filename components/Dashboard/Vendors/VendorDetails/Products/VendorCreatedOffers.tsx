@@ -1,29 +1,62 @@
-'use client';
+"use client";
 
-import TitleHeader from '@/components/TitleHeader/TitleHeader';
-import { useTranslation } from '@/hooks/use-translation';
-import { TOffer } from '@/types/offer.type';
-import { format } from "date-fns";
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
+    AdminOfferBadge,
+    FirstOrderBadge,
+    OfferStatusBadge,
+    OfferTypeIcon,
+    STATUS_STYLES,
+} from "./OfferBadges";
+import TitleHeader from "@/components/TitleHeader/TitleHeader";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/use-translation";
+import { cn } from "@/lib/utils";
+import { TOffer } from "@/types/offer.type";
+import {
+    formatOfferDiscount,
+    getOfferStatus,
+    isAdminCreatedVendorOffer,
+    isFirstOrderOffer,
+    TOfferStatus,
+} from "@/utils/offer.util";
+import { differenceInCalendarDays, format } from "date-fns";
+import { CalendarClock, Plus, Ticket, Users, Zap } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import VendorProductActionsMenu from "./VendorProductActionsMenu";
+
+const PRIMARY = "#DC3173";
 
 interface IProps {
     offerData: TOffer[];
     vendorId: string;
 }
 
+function timeLeft(offer: TOffer, status: TOfferStatus): string {
+    const now = new Date();
+    if (status === "EXPIRED") return "Expired";
+    if (status === "SCHEDULED") {
+        const d = differenceInCalendarDays(new Date(offer.validFrom), now);
+        return d <= 1 ? "Starts tomorrow" : `Starts in ${d} days`;
+    }
+    const d = differenceInCalendarDays(new Date(offer.expiresAt), now);
+    if (d <= 0) return "Ends today";
+    return d === 1 ? "1 day left" : `${d} days left`;
+}
+
 const VendorCreatedOffers = ({ offerData, vendorId }: IProps) => {
     const { t, lang } = useTranslation();
     const router = useRouter();
+
+    const typeLabel = (offer: TOffer) =>
+        offer.offerType === "PERCENT"
+            ? t("percentage_offer")
+            : offer.offerType === "FLAT"
+                ? t("flat_offer")
+                : offer.offerType === "BUY_AND_REWARD"
+                    ? "Buy & Reward"
+                    : t("bogo_offer");
 
     return (
         <>
@@ -32,141 +65,129 @@ const VendorCreatedOffers = ({ offerData, vendorId }: IProps) => {
                 subtitle={t("manage_all_offers_here")}
                 onBackClick={() => router.back()}
                 extraComponent={
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white flex items-center gap-2">
-                                {t("actions") || "Actions"}
-                                <ChevronDown className="w-4 h-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="end"
-                            className="w-48 bg-white shadow-lg border rounded-lg p-1"
-                        >
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(`/admin/vendor/${vendorId}/manage-products`)
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {t("manage_products") || "Manage Product"}
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(`/admin/vendor/${vendorId}/add-product`)
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {t("add_product") || "Add Product"}
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(
-                                        `/admin/vendor/${vendorId}/products/update-discount`
-                                    )
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {t("update_discounts") || "Update Discount"}
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(
-                                        `/admin/vendor/${vendorId}/products/increase-price`
-                                    )
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {t("increase_prices") || "Increase Price"}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="my-1 border-gray-100" />
-
-                            {/* Newly added sections */}
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(
-                                        `/admin/vendor/${vendorId}/products/categories`
-                                    )
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {t("product_categories") || "Product Categories"}
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(
-                                        `/admin/vendor/${vendorId}/products/offers/create-new`
-                                    )
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {t("create_new_offer") || "Create New Offer"}
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(
-                                        `/admin/vendor/${vendorId}/products/variation-management`
-                                    )
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
-                                {t("variation_management") || "Variation Management"}
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.push(
-                                        `/admin/vendor/${vendorId}/products/add-ons`
-                                    )
-                                }
-                                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-                            >
-                                {t("add_ons") || "Add-ons"}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <VendorProductActionsMenu vendorId={vendorId} hide={["offers"]} />
                 }
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {offerData?.map((offer) => (
-                    <div
-                        key={offer._id}
-                        className="flex flex-col gap-2 border rounded-md p-4"
-                    >
-                        <p className="text-gray-500">{offer.title?.[lang]}</p>
-                        {offer.offerType === "BOGO" && <p>{t("bogo_offer")}</p>}
-                        {offer.offerType === "PERCENT" && (
-                            <p>{t("percentage_offer")} ({offer.discountValue}% {t("off")})</p>
-                        )}
-                        {offer.offerType === "FLAT" && (
-                            <p>{t("flat_offer")} (€{offer.discountValue} {t("off")})</p>
-                        )}
-                        <p className="text-xs">
-                            {offer.validFrom
-                                ? format(offer.validFrom, "dd/MM/yyyy")
-                                : "N/A"}
-                            {" - "}
-                            {offer.expiresAt
-                                ? format(offer.expiresAt, "dd/MM/yyyy")
-                                : "N/A"}
-                        </p>
-                    </div>
-                ))}
 
-                {offerData?.length === 0 && (
-                    <p className="text-gray-500 italic">{t("no_offers_created")}</p>
-                )}
-            </div>
+            {offerData?.length > 0 ? (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {offerData.map((offer) => {
+                        const status = getOfferStatus(offer);
+                        const dimmed = status === "EXPIRED";
+                        const cap =
+                            offer.offerType === "PERCENT" && offer.maxDiscountAmount
+                                ? `up to €${offer.maxDiscountAmount}`
+                                : null;
+
+                        return (
+                            <Card
+                                key={offer._id}
+                                className={cn(
+                                    "relative overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md",
+                                    dimmed && "opacity-70",
+                                )}
+                            >
+                                <div
+                                    className={cn(
+                                        "absolute inset-y-0 left-0 w-1",
+                                        STATUS_STYLES[status].bar,
+                                    )}
+                                />
+                                <CardContent className="space-y-4 p-5 pl-6">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="flex min-w-0 items-center gap-3">
+                                            <OfferTypeIcon type={offer.offerType} />
+                                            <div className="min-w-0">
+                                                <h3 className="truncate font-semibold text-gray-900">
+                                                    {offer.title?.[lang] || offer.title?.en || "-"}
+                                                </h3>
+                                                <p className="text-sm text-gray-500">{typeLabel(offer)}</p>
+                                            </div>
+                                        </div>
+                                        <OfferStatusBadge status={status} />
+                                    </div>
+
+                                    <div className="flex items-baseline justify-between gap-3">
+                                        <p
+                                            className="text-2xl font-bold tracking-tight"
+                                            style={{ color: PRIMARY }}
+                                        >
+                                            {formatOfferDiscount(offer)}
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            {[
+                                                cap,
+                                                offer.minOrderAmount
+                                                    ? `min. order €${offer.minOrderAmount}`
+                                                    : null,
+                                            ]
+                                                .filter(Boolean)
+                                                .join(", ")}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {offer.isAutoApply ? (
+                                            <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">
+                                                <Zap size={12} /> Auto-applied
+                                            </span>
+                                        ) : (
+                                            offer.code && (
+                                                <span className="inline-flex items-center gap-1 rounded-md border border-dashed border-gray-300 px-2 py-1 font-mono text-xs text-gray-700">
+                                                    <Ticket size={12} /> {offer.code}
+                                                </span>
+                                            )
+                                        )}
+                                        {isAdminCreatedVendorOffer(offer) && <AdminOfferBadge />}
+                                        {isFirstOrderOffer(offer) && (
+                                            <FirstOrderBadge scope={offer.eligibility?.scope} />
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center justify-between border-t pt-3 text-xs text-gray-500">
+                                        <span className="flex items-center gap-1.5">
+                                            <CalendarClock size={14} />
+                                            {offer.validFrom ? format(offer.validFrom, "dd MMM yyyy") : "N/A"}
+                                            {" to "}
+                                            {offer.expiresAt ? format(offer.expiresAt, "dd MMM yyyy") : "N/A"}
+                                        </span>
+                                        <span className="flex items-center gap-3">
+                                            <span className="flex items-center gap-1">
+                                                <Users size={13} /> {offer.usageCount ?? 0} used
+                                            </span>
+                                            <span className="font-medium text-gray-700">
+                                                {timeLeft(offer, status)}
+                                            </span>
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-gray-300 bg-gray-50/60 px-6 py-14 text-center">
+                    <p className="font-medium text-gray-800">{t("no_offers_created")}</p>
+                    <p className="max-w-sm text-sm text-gray-500">
+                        Offers you create for this store will show up here.
+                    </p>
+                    <Button
+                        className="mt-1 gap-2 text-white"
+                        style={{ background: PRIMARY }}
+                        onClick={() =>
+                            router.push(`/admin/vendor/${vendorId}/products/offers/create-new`)
+                        }
+                    >
+                        <Plus size={16} />
+                        {t("create_new_offer") || "Create New Offer"}
+                    </Button>
+                </div>
+            )}
+
             {offerData?.length > 0 && (
-                <div className="text-center mt-2">
+                <div className="mt-4 text-center">
                     <Link
-                        className="text-[#DC3173] text-sm font-medium hover:underline"
+                        className="text-sm font-medium text-[#DC3173] hover:underline"
                         href={`/admin/vendor/offers/${vendorId}`}
                     >
                         {t("view_all")}
