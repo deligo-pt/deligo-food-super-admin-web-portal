@@ -437,6 +437,11 @@ export const pt = {
   and_return_the_store_its_normal_opening: "e devolver a loja ao seu horário de abertura normal.",
   currently_scheduled_until: "Atualmente agendado até",
   clearing: "A limpar...",
+  store_status: "Estado da Loja",
+  timezone: "Fuso Horário",
+  operating_hours: "Horário de Funcionamento",
+  legacy: "Legado",
+
   // add-ons page
   inc_vat: "Com IVA",
   no_options_added: "Ainda não foram adicionadas opções a este grupo.",
@@ -769,6 +774,14 @@ export const pt = {
   complete_the_details_above_click: "Preencha os detalhes acima e clique em",
   to_unlock_agreement_creation: "para desbloquear a criação do acordo.",
   save_changes_first_to_unlock_signing: "Guarde as alterações primeiro para desbloquear a assinatura.",
+  // -> weekly schedule editor
+  weekly_schedule_hint: "Defina o horário de abertura para cada dia. Adicione até 4 períodos por dia (por exemplo, almoço e jantar). As horas utilizam a hora local da loja.",
+  closed: "Fechado",
+  until_midnight: "Até à meia-noite (24:00)",
+  ends_next_day: "termina no dia seguinte",
+  closed_all_day: "Fechado todo o dia",
+  add_period: "Adicionar período",
+  copy_to_all_days: "Copiar para todos os dias",
   // --> update vendor
   agreement_is_already: "O acordo já está ",
   you_can_update_information: "Pode atualizar as informações sem voltar a assinar.",
