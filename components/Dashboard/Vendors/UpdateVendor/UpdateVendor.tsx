@@ -45,7 +45,13 @@ import { TBusinessLocation, TVendor } from "@/types/user.type";
 import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
+import WeeklyScheduleEditor from "@/components/Dashboard/Vendors/AddVendor/WeeklyScheduleEditor";
+import {
+  getInitialSchedule,
+  hasAnyPeriod,
+  mapScheduleServerErrors,
+  normalizeSchedule,
+} from "@/utils/weeklySchedule";
 import {
   Banknote,
   Briefcase,
@@ -162,25 +168,6 @@ export default function UpdateVendor({
   const contentRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const daysOfWeek = [
-    t("sunday") || "Sunday",
-    t("monday") || "Monday",
-    t("tuesday") || "Tuesday",
-    t("wednesday") || "Wednesday",
-    t("thursday") || "Thursday",
-    t("friday") || "Friday",
-    t("saturday") || "Saturday",
-  ];
-
-  const daysOfWeekEn = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
 
   const form = useForm<TVendorForm>({
     resolver: zodResolver(addVendorValidation(isSubVendor)),
@@ -195,9 +182,10 @@ export default function UpdateVendor({
       restaurantCuisineType: [],
       NIF: "",
       branches: "1",
-      openingHours: "",
-      closingHours: "",
-      closingDays: [],
+      // openingHours: "",
+      // closingHours: "",
+      // closingDays: [],
+      weeklySchedule: getInitialSchedule(vendor?.businessDetails),
       street: "",
       city: "",
       postalCode: "",
@@ -249,9 +237,8 @@ export default function UpdateVendor({
       restaurantCuisineType: cuisineSlugs,
       NIF: vendor?.businessDetails?.NIF || "",
       branches: vendor?.businessDetails?.totalBranches?.toString() || "1",
-      openingHours: vendor?.businessDetails?.openingHours || "",
-      closingHours: vendor?.businessDetails?.closingHours || "",
-      closingDays: vendor?.businessDetails?.closingDays || [],
+      // weeklySchedule when the vendor has one, otherwise legacy hours converted to the new shape
+      weeklySchedule: getInitialSchedule(vendor?.businessDetails),
       street: vendor?.businessLocation?.street || "",
       city: vendor?.businessLocation?.city || "",
       postalCode: vendor?.businessLocation?.postalCode || "",
@@ -308,8 +295,7 @@ export default function UpdateVendor({
       !!v.businessType &&
       !!v.NIF?.trim() &&
       !!v.branches &&
-      !!v.openingHours &&
-      !!v.closingHours &&
+      hasAnyPeriod(v.weeklySchedule) &&
       (v.businessType !== "restaurant" ||
         (Array.isArray(v.restaurantCuisineType) &&
           v.restaurantCuisineType.length > 0)) &&
@@ -411,9 +397,13 @@ export default function UpdateVendor({
       vendor?.businessDetails?.businessTypeSlug || "";
     const originalNIF = vendor?.businessDetails?.NIF || "";
     const originalBranches = vendor?.businessDetails?.totalBranches ?? 0;
-    const originalOpeningHours = vendor?.businessDetails?.openingHours || "";
-    const originalClosingHours = vendor?.businessDetails?.closingHours || "";
-    const originalClosingDays = vendor?.businessDetails?.closingDays || [];
+
+    // const originalOpeningHours = vendor?.businessDetails?.openingHours || "";
+    // const originalClosingHours = vendor?.businessDetails?.closingHours || "";
+    // const originalClosingDays = vendor?.businessDetails?.closingDays || [];
+    const originalSchedule = getInitialSchedule(vendor?.businessDetails);
+    const currentSchedule = normalizeSchedule(data.weeklySchedule);
+    const scheduleChanged = hasChanged(currentSchedule, originalSchedule);
 
     const rawCuisineData = vendor?.businessDetails?.restaurantCuisineType;
     let originalCuisineSlugs: string[] = [];
@@ -437,9 +427,7 @@ export default function UpdateVendor({
       hasChanged(data.restaurantCuisineType, originalCuisineSlugs) ||
       hasChanged(data.NIF?.toUpperCase(), originalNIF) ||
       hasChanged(Number(data.branches), originalBranches) ||
-      hasChanged(data.openingHours, originalOpeningHours) ||
-      hasChanged(data.closingHours, originalClosingHours) ||
-      hasChanged(data.closingDays, originalClosingDays);
+      scheduleChanged;
 
     if (businessDetailsChanged) {
       vendorData.businessDetails = {};
@@ -468,15 +456,9 @@ export default function UpdateVendor({
       if (hasChanged(Number(data.branches), originalBranches)) {
         vendorData.businessDetails.totalBranches = Number(data.branches);
       }
-      if (
-        hasChanged(data.openingHours, originalOpeningHours) ||
-        hasChanged(data.closingHours, originalClosingHours)
-      ) {
-        vendorData.businessDetails.openingHours = data.openingHours;
-        vendorData.businessDetails.closingHours = data.closingHours;
-      }
-      if (hasChanged(data.closingDays, originalClosingDays)) {
-        vendorData.businessDetails.closingDays = data.closingDays;
+      if (scheduleChanged) {
+        // the array is replaced as a whole: always the full 7 days
+        vendorData.businessDetails.weeklySchedule = currentSchedule;
       }
     }
 
@@ -578,7 +560,23 @@ export default function UpdateVendor({
       );
 
       if (updatedResult.success) {
-        setVendorState((prev) => ({ ...prev, ...vendorData }));
+        setVendorState(
+          (prev) =>
+            ({
+              ...prev,
+              ...vendorData,
+              ...(vendorData.name && { name: { ...prev.name, ...vendorData.name } }),
+              ...(vendorData.businessDetails && {
+                businessDetails: { ...prev.businessDetails, ...vendorData.businessDetails },
+              }),
+              ...(vendorData.businessLocation && {
+                businessLocation: { ...prev.businessLocation, ...vendorData.businessLocation },
+              }),
+              ...(vendorData.bankDetails && {
+                bankDetails: { ...prev.bankDetails, ...vendorData.bankDetails },
+              }),
+            }) as TVendor
+        );
         setProfileSaved(true);
 
         if (needsAgreement) {
@@ -599,13 +597,26 @@ export default function UpdateVendor({
         return;
       }
 
-      if (updatedResult?.data?.errorSources) {
-        updatedResult.data.errorSources.forEach(
-          (err: { path: string; message: string }) =>
-            toast.error(err?.message, { id: toastId })
-        );
+      // Legacy-format write on a weekly-schedule vendor (we never send it, but handle it anyway)
+      if (
+        (updatedResult as any)?.errorKey === "SCHEDULE_FORMAT_REQUIRES_UPDATE" ||
+        (updatedResult as any)?.data?.errorKey === "SCHEDULE_FORMAT_REQUIRES_UPDATE"
+      ) {
+        toast.error(updatedResult.message, { id: toastId });
+        router.refresh();
         return;
       }
+
+      if (mapScheduleServerErrors(updatedResult.data.errorSources, form.setError as any)) {
+        scrollToSection(1);
+      }
+      // if (updatedResult?.data?.errorSources) {
+      //   updatedResult.data.errorSources.forEach(
+      //     (err: { path: string; message: string }) =>
+      //       toast.error(err?.message, { id: toastId })
+      //   );
+      //   return;
+      // }
 
       toast.error(updatedResult.message || "Failed to save vendor information", {
         id: toastId,
@@ -1261,7 +1272,15 @@ export default function UpdateVendor({
                           </FormItem>
                         )}
                       />
-                      <FormField
+
+                      <div className="col-span-2">
+                        <p className="text-sm font-medium text-gray-700 mb-2">
+                          {t("opening_hours")} <span className="text-[#DC3173]">*</span>
+                        </p>
+                        <WeeklyScheduleEditor t={t} disabled={isSaving || isSubmitting} />
+                      </div>
+
+                      {/* <FormField
                         control={form.control}
                         name="openingHours"
                         render={({ field }) => (
@@ -1331,7 +1350,7 @@ export default function UpdateVendor({
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      /> */}
                     </div>
                   </Card>
                 </div>

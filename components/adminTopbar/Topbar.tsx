@@ -12,7 +12,6 @@ type Props = {
 
 export default function Topbar({ sidebarWidth = 280, admin }: Props) {
   const vendorName = useStore((s) => s.vendor);
-  console.log("vendor  name", vendorName);
 
   return (
     <>

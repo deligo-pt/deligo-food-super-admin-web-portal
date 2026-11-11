@@ -11,6 +11,8 @@ import {
 import { useStore } from "@/store/store";
 import { TOffer } from "@/types/offer.type";
 import { getCookie } from "@/utils/cookies";
+import { getKnownOfferError } from "@/utils/offer.error";
+import { toId } from "@/utils/offer.util";
 import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -22,19 +24,25 @@ import {
   CopyIcon,
   EditIcon,
   GiftIcon,
+  LayersIcon,
   PercentIcon,
+  PhoneIcon,
+  RotateCcwIcon,
   ShieldIcon,
   ShoppingBagIcon,
   SparklesIcon,
+  StoreIcon,
   TagIcon,
   TargetIcon,
   TrashIcon,
   TrendingUpIcon,
+  UserCheckIcon,
   UsersIcon,
+  WalletIcon,
   ZapIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { toast } from "sonner";
 
 interface IProps {
@@ -64,7 +72,76 @@ const offerTypeConfig: Record<
     label: "Buy One Get One",
     textColor: "text-purple-700",
   },
+  BUY_AND_REWARD: {
+    icon: GiftIcon,
+    label: "Buy & Reward",
+    textColor: "text-purple-700",
+  },
 };
+
+const roleLabel: Record<string, string> = {
+  VENDOR: "Vendor",
+  SUB_VENDOR: "Sub-vendor",
+  ADMIN: "Admin",
+  SUPER_ADMIN: "Super admin",
+};
+
+const fundedByLabel: Record<string, string> = {
+  VENDOR: "Vendor",
+  PLATFORM: "Platform",
+  ADMIN: "Platform",
+};
+
+const rewardTypeLabel: Record<string, string> = {
+  SAME_PRODUCT: "Same product",
+  FIXED_PRODUCT: "Fixed product",
+  CUSTOMER_CHOICE: "Customer choice",
+};
+
+/** Small label + value tile used by the rule cards */
+function InfoTile({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof PercentIcon;
+  label: string;
+  value: ReactNode;
+}) {
+  return (
+    <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
+      <Icon className="w-4 h-4 text-[#DC3173] mb-2" />
+      <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">
+        {label}
+      </p>
+      <p className="text-sm font-semibold text-slate-800 wrap-break-word">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+/** Collapsible list of ids, for when the API returns ids instead of populated products */
+function IdList({ title, ids }: { title: string; ids: string[] }) {
+  if (!ids.length) return null;
+  return (
+    <details className="mt-3 text-sm text-slate-600">
+      <summary className="cursor-pointer text-[#DC3173]">
+        {title} ({ids.length})
+      </summary>
+      {/* <ul className="mt-2 flex flex-wrap gap-2">
+        {ids.map((id) => (
+          <li
+            key={id}
+            className="rounded-md bg-white px-2 py-1 font-mono text-xs text-slate-700"
+          >
+            {id}
+          </li>
+        ))}
+      </ul> */}
+    </details>
+  );
+}
 
 export default function OfferDetails({ offer }: IProps) {
   const router = useRouter();
@@ -100,6 +177,8 @@ export default function OfferDetails({ offer }: IProps) {
         return `€${offer.discountValue}`;
       case "BOGO":
         return `${offer.bogo?.buyQty}+${offer.bogo?.getQty}`;
+      case "BUY_AND_REWARD":
+        return `${offer.buyAndReward?.buy.quantity}+${offer.buyAndReward?.reward.quantity}`;
       default:
         return "";
     }
@@ -120,6 +199,37 @@ export default function OfferDetails({ offer }: IProps) {
   );
   const isExpired = now > end;
   const isUpcoming = now < start;
+
+  /* data from the API response */
+  const isFirstOrder = offer.eligibility?.type === "FIRST_ORDER";
+  const eligibilityScope = offer.eligibility?.scope;
+  const isDiscountOffer =
+    offer.offerType === "PERCENT" || offer.offerType === "FLAT";
+  const vendorName = [offer.vendorId?.name?.firstName, offer.vendorId?.name?.lastName]
+    .map((n) => n?.trim())
+    .filter(Boolean)
+    .join(" ");
+  const specificProducts = (offer.scopeProducts ?? []) as unknown[];
+  // scopeProducts can be plain ids (as in the API response) or populated documents
+  const specificProductIds = specificProducts.map(toId).filter(Boolean);
+  const specificProductNames = specificProducts
+    .map((p: any) => (typeof p === "object" ? p?.name?.[lang] : undefined))
+    .filter(Boolean) as string[];
+  const customersUsed = Object.keys(offer.perUserUsage ?? {}).length;
+  const br = offer.buyAndReward;
+  const buyProductIds = (br?.buy.productIds ?? []).map(toId).filter(Boolean);
+  const rewardProductId = toId(br?.reward.productId);
+  const rewardOptionIds = (br?.reward.options ?? [])
+    .map((o) => toId(o.productId))
+    .filter(Boolean);
+  const formatDate = (d?: Date | string) =>
+    d
+      ? new Date(d).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+      : "-";
 
   const closeStatusUpdateModal = (open: boolean) => {
     setOpenStatusUpdateModal(open);
@@ -142,7 +252,11 @@ export default function OfferDetails({ offer }: IProps) {
       return;
     }
 
-    toast.error(result.message || "Offer update failed", { id: toastId });
+    // e.g. 409 when another first-order offer is already active
+    toast.error(
+      getKnownOfferError(result) || result.message || "Offer update failed",
+      { id: toastId },
+    );
     setButtonDisabled(false);
   };
 
@@ -188,6 +302,14 @@ export default function OfferDetails({ offer }: IProps) {
           y: 0,
         }}
       >
+        {/* Deleted banner */}
+        {offer.isDeleted && (
+          <div className="mt-4 mb-4 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700">
+            <TrashIcon className="w-4 h-4 shrink-0" />
+            This offer has been deleted. It is no longer applied at checkout.
+          </div>
+        )}
+
         {/* Hero Section */}
         <div className="relative overflow-hidden rounded-3xl shadow-2xl mb-8">
           <div className={`absolute inset-0 bg-[#DC3173] opacity-90`} />
@@ -251,6 +373,31 @@ export default function OfferDetails({ offer }: IProps) {
                   >
                     {offer.title?.[lang]}
                   </motion.h1>
+
+                  {/* First-order / scope chips */}
+                  {(isFirstOrder || vendorName || offer.isGlobal) && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      {isFirstOrder && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white">
+                          <SparklesIcon className="w-3.5 h-3.5" />
+                          First-order offer
+                        </span>
+                      )}
+                      {offer.isGlobal ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white">
+                          <StoreIcon className="w-3.5 h-3.5" />
+                          All stores
+                        </span>
+                      ) : (
+                        vendorName && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white">
+                            <StoreIcon className="w-3.5 h-3.5" />
+                            {vendorName}
+                          </span>
+                        )
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -269,15 +416,17 @@ export default function OfferDetails({ offer }: IProps) {
                 className="flex flex-col items-end gap-2"
               >
                 <span
-                  className={`px-4 py-2 rounded-full text-sm font-bold ${offer.isActive && !isExpired ? "bg-white text-green-600" : "bg-white/20 text-white"}`}
+                  className={`px-4 py-2 rounded-full text-sm font-bold ${offer.isActive && !isExpired && !offer.isDeleted ? "bg-white text-green-600" : "bg-white/20 text-white"}`}
                 >
-                  {isExpired
-                    ? "EXPIRED"
-                    : isUpcoming
-                      ? "UPCOMING"
-                      : offer.isActive
-                        ? "ACTIVE"
-                        : "INACTIVE"}
+                  {offer.isDeleted
+                    ? "DELETED"
+                    : isExpired
+                      ? "EXPIRED"
+                      : isUpcoming
+                        ? "UPCOMING"
+                        : offer.isActive
+                          ? "ACTIVE"
+                          : "INACTIVE"}
                 </span>
                 {offer.isAutoApply && (
                   <span className="flex items-center gap-1 text-white/90 text-sm">
@@ -320,7 +469,7 @@ export default function OfferDetails({ offer }: IProps) {
           }}
           className="flex justify-end gap-3 mb-6"
         >
-          {(role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && <motion.button
+          {/* {(role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && <motion.button
             whileHover={{
               scale: 1.02,
             }}
@@ -332,7 +481,7 @@ export default function OfferDetails({ offer }: IProps) {
           >
             <EditIcon className="w-4 h-4" />
             {t("edit")}
-          </motion.button>}
+          </motion.button>} */}
           {offer.isActive && (
             (role === "ADMIN" || role === "SUPER_ADMIN") && offer.offerType !== "BOGO" && (
               <motion.button
@@ -438,7 +587,9 @@ export default function OfferDetails({ offer }: IProps) {
               label: t("max_discount"),
               value: offer.maxDiscountAmount
                 ? `€${offer.maxDiscountAmount}`
-                : 0,
+                : offer.offerType !== "PERCENT"
+                  ? "N/A"
+                  : 0,
             },
             {
               icon: UsersIcon,
@@ -474,6 +625,185 @@ export default function OfferDetails({ offer }: IProps) {
             </motion.div>
           ))}
         </div>
+
+        {/* First-order rules */}
+        {isFirstOrder && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              delay: 1.2,
+            }}
+            className="bg-linear-to-br from-pink-50 to-rose-50 rounded-2xl p-6 mb-6 border border-pink-100"
+          >
+            <h3 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
+              <SparklesIcon className="w-5 h-5 text-[#DC3173]" />
+              First-order offer
+            </h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Each customer can use it once{" "}
+              {eligibilityScope === "VENDOR"
+                ? "at this store."
+                : "on the whole platform."}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <InfoTile
+                icon={StoreIcon}
+                label="Scope"
+                value={eligibilityScope === "VENDOR" ? "Single store" : "Whole platform"}
+              />
+              <InfoTile
+                icon={PhoneIcon}
+                label="Verified phone"
+                value={
+                  (offer.eligibility?.requireVerifiedPhone ?? true)
+                    ? "Required"
+                    : "Not required"
+                }
+              />
+              <InfoTile
+                icon={RotateCcwIcon}
+                label="Given back up to"
+                value={`${offer.eligibility?.maxRestores ?? 2} time${(offer.eligibility?.maxRestores ?? 2) === 1 ? "" : "s"}`}
+              />
+            </div>
+          </motion.div>
+        )}
+
+        {/* Offer rules (store, funding, scope) */}
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 1.25,
+          }}
+          className="bg-white rounded-2xl p-6 mb-6 shadow-lg border border-slate-100"
+        >
+          <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <LayersIcon className="w-5 h-5 text-[#DC3173]" />
+            Offer rules
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <InfoTile
+              icon={StoreIcon}
+              label="Store"
+              value={
+                offer.isGlobal
+                  ? "Platform-wide"
+                  : vendorName
+                    ? `${vendorName}${offer.vendorId?.userId ? ` (${offer.vendorId.userId})` : ""}`
+                    : "-"
+              }
+            />
+            {offer.createdByRole && (
+              <InfoTile
+                icon={UserCheckIcon}
+                label="Created by"
+                value={roleLabel[offer.createdByRole] ?? offer.createdByRole}
+              />
+            )}
+            {offer.fundedBy && (
+              <InfoTile
+                icon={WalletIcon}
+                label="Funded by"
+                value={fundedByLabel[offer.fundedBy] ?? offer.fundedBy}
+              />
+            )}
+            {typeof offer.vendorSharePercent === "number" && (
+              <InfoTile
+                icon={WalletIcon}
+                label="Vendor share"
+                value={`${offer.vendorSharePercent}%`}
+              />
+            )}
+            {isDiscountOffer && (
+              <InfoTile
+                icon={TagIcon}
+                label="Applicable products"
+                value={
+                  offer.scopeType === "SPECIFIC_PRODUCTS"
+                    ? `${specificProducts.length} selected`
+                    : "All products"
+                }
+              />
+            )}
+            {isDiscountOffer && (
+              <InfoTile
+                icon={PercentIcon}
+                label="Already-discounted products"
+                value={offer.allowDiscountedProducts ? "Included" : "Excluded"}
+              />
+            )}
+            <InfoTile
+              icon={ZapIcon}
+              label="Applied"
+              value={offer.isAutoApply ? "Automatically" : "With promo code"}
+            />
+            <InfoTile
+              icon={UsersIcon}
+              label="Customers who used it"
+              value={customersUsed}
+            />
+            <InfoTile
+              icon={CalendarIcon}
+              label="Created"
+              value={formatDate(offer.createdAt)}
+            />
+            <InfoTile
+              icon={ClockIcon}
+              label="Last updated"
+              value={formatDate(offer.updatedAt)}
+            />
+          </div>
+
+          {isDiscountOffer &&
+            offer.scopeType === "SPECIFIC_PRODUCTS" &&
+            specificProductNames.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {specificProductNames.map((name, i) => (
+                  <span
+                    key={`${name}-${i}`}
+                    className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700"
+                  >
+                    {name}
+                  </span>
+                ))}
+              </div>
+            )}
+
+          {isDiscountOffer &&
+            offer.scopeType === "SPECIFIC_PRODUCTS" &&
+            specificProductNames.length === 0 &&
+            specificProductIds.length > 0 && (
+              <details className="mt-4 text-sm text-slate-600">
+                <summary className="cursor-pointer text-[#DC3173]">
+                  View product IDs ({specificProductIds.length})
+                </summary>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {specificProductIds.map((id) => (
+                    <li
+                      key={id}
+                      className="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700"
+                    >
+                      {id}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+        </motion.div>
 
         {/* Usage Progress */}
         {offer.maxUsageCount && (
@@ -626,6 +956,77 @@ export default function OfferDetails({ offer }: IProps) {
             <p className="text-sm text-slate-500 mt-4 text-center">
               {t("item_id")}: <span className="font-mono">{offer.bogo.productId}</span>
             </p>
+          </motion.div>
+        )}
+
+        {/* Buy & Reward Details */}
+        {offer.offerType === "BUY_AND_REWARD" && offer.buyAndReward && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              delay: 1.5,
+            }}
+            className="bg-linear-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mt-6 border border-purple-100"
+          >
+            <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+              <GiftIcon className="w-5 h-5 text-purple-600" />
+              Buy &amp; Reward details
+            </h3>
+            <div className="flex items-center gap-4">
+              <div className="bg-white rounded-xl p-4 flex-1 text-center shadow-sm">
+                <p className="text-3xl font-bold text-purple-600">
+                  {offer.buyAndReward.buy.quantity}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {t("buy")} ({offer.buyAndReward.buy.productIds?.length ?? 0} product
+                  {(offer.buyAndReward.buy.productIds?.length ?? 0) === 1 ? "" : "s"})
+                </p>
+              </div>
+              <SparklesIcon className="w-6 h-6 text-purple-400" />
+              <div className="bg-white rounded-xl p-4 flex-1 text-center shadow-sm">
+                <p className="text-3xl font-bold text-pink-600">
+                  {offer.buyAndReward.reward.quantity}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {t("get_free")} (
+                  {rewardTypeLabel[offer.buyAndReward.reward.type] ??
+                    offer.buyAndReward.reward.type}
+                  )
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <InfoTile
+                icon={LayersIcon}
+                label="Add-ons in reward"
+                value={
+                  offer.buyAndReward.reward.includeAddons
+                    ? "Included"
+                    : "Not included"
+                }
+              />
+              {offer.buyAndReward.reward.variationSku && (
+                <InfoTile
+                  icon={TagIcon}
+                  label="Reward SKU"
+                  value={offer.buyAndReward.reward.variationSku}
+                />
+              )}
+            </div>
+
+            <IdList title="Products to buy" ids={buyProductIds} />
+            {rewardProductId && (
+              <IdList title="Reward product" ids={[rewardProductId]} />
+            )}
+            <IdList title="Reward options" ids={rewardOptionIds} />
           </motion.div>
         )}
       </motion.div>
