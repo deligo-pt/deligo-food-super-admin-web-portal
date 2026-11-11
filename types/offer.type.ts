@@ -29,6 +29,7 @@ export type TBuyAndReward = {
     productId?: TOfferProductRef;
     variationSku?: string;
     options?: { productId: TOfferProductRef; variationSku?: string }[];
+    includeAddons?: boolean;
   };
 };
 
@@ -76,6 +77,13 @@ export type TOffer = {
   code?: string; // if offer requires a code (optional)
 
   applicableProducts?: unknown[];
+
+  createdByRole?: string;
+  fundedBy?: string;
+  vendorSharePercent?: number;
+  isDeleted?: boolean;
+  scopeCategories?: string[];
+  perUserUsage?: Record<string, number>;
 
   // Usage control
   maxUsageCount?: number;

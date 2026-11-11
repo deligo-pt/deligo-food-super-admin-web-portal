@@ -132,7 +132,7 @@ export function AddProductToVendor({
             sdrApplicable: false,
             sdrContainerCount: 1,
             isAvailableForPreOrder: false,
-            isActive: false,
+            isActive: true,
             businessTypeSlug,
             currentLang: lang
         },
