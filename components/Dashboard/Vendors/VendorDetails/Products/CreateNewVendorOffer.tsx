@@ -58,6 +58,7 @@ import { usePaginatedList } from "@/hooks/use-paginated-list";
 import { getAllProducts } from "@/services/dashboard/product/product.service";
 import { Accessibility, ChevronDown, Sparkles } from "lucide-react";
 import FirstOrderOfferCard, { Toggle } from "./FirstOrderOfferCard";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 const PRIMARY = "#DC3173";
 
@@ -66,12 +67,16 @@ interface IProps {
     vendorMongoId: string;
     vendorUserId: string;
     productCategories: { data: TProductCategoryResponse[]; meta?: TMeta };
+    businessName: string;
 }
 
-export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendorUserId, productCategories }: IProps) {
+export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendorUserId, productCategories, businessName }: IProps) {
     const { t } = useTranslation();
     const { lang } = useStore();
     const router = useRouter();
+
+    // vendor businessname or  branch name
+    useVendorTopbarTitle(businessName);
 
     const PRODUCT_LIMIT = 30;
     const CATEGORY_LIMIT = 50;

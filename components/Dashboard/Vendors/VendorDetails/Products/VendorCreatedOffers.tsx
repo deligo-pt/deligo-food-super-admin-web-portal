@@ -25,12 +25,14 @@ import { CalendarClock, Plus, Ticket, Users, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import VendorProductActionsMenu from "./VendorProductActionsMenu";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 const PRIMARY = "#DC3173";
 
 interface IProps {
     offerData: TOffer[];
     vendorId: string;
+    businessName: string;
 }
 
 function timeLeft(offer: TOffer, status: TOfferStatus): string {
@@ -45,7 +47,7 @@ function timeLeft(offer: TOffer, status: TOfferStatus): string {
     return d === 1 ? "1 day left" : `${d} days left`;
 }
 
-const VendorCreatedOffers = ({ offerData, vendorId }: IProps) => {
+const VendorCreatedOffers = ({ offerData, vendorId, businessName }: IProps) => {
     const { t, lang } = useTranslation();
     const router = useRouter();
 
@@ -57,6 +59,9 @@ const VendorCreatedOffers = ({ offerData, vendorId }: IProps) => {
                 : offer.offerType === "BUY_AND_REWARD"
                     ? "Buy & Reward"
                     : t("bogo_offer");
+
+    // vendor businessname or  branch name
+    useVendorTopbarTitle(businessName);
 
     return (
         <>

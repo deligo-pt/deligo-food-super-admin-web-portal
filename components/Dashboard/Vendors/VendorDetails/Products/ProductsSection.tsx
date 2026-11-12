@@ -40,6 +40,7 @@ import {
 } from "@/services/dashboard/vendor/vendor.service";
 import { queryStringFormatter } from "@/utils/formatter";
 import CopyToBranchModal from "./CopyToBranchModal";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 interface IProps {
   productsData: { data: TProduct[]; meta?: TMeta };
@@ -51,6 +52,7 @@ interface IProps {
   productCategories: TProductCategoryResponse[];
   vendorMongoId: string;
   vendorId: string;
+  businessName: string;
 }
 
 const sortFields = ["alphaNameAZ", "alphaNameZA"] as SortOptionKey[];
@@ -72,6 +74,7 @@ export default function ProductsSection({
   productCategories,
   vendorMongoId,
   vendorId,
+  businessName
 }: IProps) {
   const { t, lang } = useTranslation();
   const router = useRouter();
@@ -85,6 +88,9 @@ export default function ProductsSection({
       baseQuery,
       vendorMongoId,
     });
+
+  // vendor businessname or  branch name
+  useVendorTopbarTitle(businessName);
 
   const [deletedProductIds, setDeletedProductIds] = useState<string[]>([]);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);

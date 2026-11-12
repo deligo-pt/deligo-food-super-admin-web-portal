@@ -16,7 +16,13 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
     const searchParamsObj = await searchParams;
 
     const vendorData: TVendor = await getSingleVendorReq(id);
+
+    if (!vendorData) {
+        return;
+    }
+
     const vendorMongoId = vendorData?._id as string;
+    const businessName = vendorData?.businessDetails?.businessName || vendorData?.businessDetails?.branchName as string;
 
     // Normalize search params (Next may give string | string[])
     const flatParams: Record<string, string> = {};
@@ -125,6 +131,7 @@ const ManageProductsPage = async ({ params, searchParams }: IProps) => {
                 }}
                 vendorMongoId={vendorMongoId}
                 vendorId={id}
+                businessName={businessName}
             />
         </div>
     );
