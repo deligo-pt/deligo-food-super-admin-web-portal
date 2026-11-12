@@ -2169,6 +2169,48 @@ export const pt = {
   buy: "Compre",
   get_free: "Ganhe Grátis",
   item_id: "ID do Item",
+  // Offer types
+  offer_type_percent: "Desconto Percentual",
+  offer_type_flat: "Desconto Fixo",
+  offer_type_bogo: "Leve Dois, Pague Um",
+  offer_type_buy_and_reward: "Compre e Ganhe",
+
+  // Hero
+  all_stores: "Todas as lojas",
+  this_offer_has_been_deleted: "Esta oferta foi eliminada. Já não é aplicada no checkout.",
+
+  // First-order rules
+  first_order_description_prefix: "Cada cliente pode utilizar uma vez",
+  first_order_scope_vendor: "nesta loja.",
+  first_order_scope_platform: "em toda a plataforma.",
+  scope: "Âmbito",
+  single_store: "Loja única",
+  whole_platform: "Toda a plataforma",
+  verified_phone: "Telemóvel verificado",
+  required: "Obrigatório",
+  not_required: "Não obrigatório",
+  given_back_up_to: "Devolvida até",
+
+  // Offer rules
+  offer_rules: "Regras da oferta",
+  platform_wide: "Em toda a plataforma",
+  funded_by: "Financiado por",
+  vendor_share: "Quota do comerciante",
+  already_discounted_products: "Produtos já com desconto",
+  included: "Incluído",
+  excluded: "Excluído",
+  applied: "Aplicado",
+  automatically: "Automaticamente",
+  with_promo_code: "Com código promocional",
+  customers_who_used_it: "Clientes que utilizaram",
+  reward_type_same_product: "Mesmo produto",
+  reward_type_fixed_product: "Produto fixo",
+  reward_type_customer_choice: "Escolha do cliente",
+  buy_and_reward_details: "Detalhes de Compre e Ganhe",
+  addons_in_reward: "Complementos na recompensa",
+  not_included: "Não incluído",
+  reward_sku: "SKU da recompensa",
+  unlimited: "Ilimitado",
   // edit offer
   edit_offer: "Editar Oferta",
 
