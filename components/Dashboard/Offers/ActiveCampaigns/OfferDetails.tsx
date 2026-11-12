@@ -22,7 +22,6 @@ import {
   CheckIcon,
   ClockIcon,
   CopyIcon,
-  EditIcon,
   GiftIcon,
   LayersIcon,
   PercentIcon,
@@ -49,36 +48,6 @@ interface IProps {
   offer: TOffer;
 }
 
-const offerTypeConfig: Record<
-  string,
-  {
-    icon: typeof PercentIcon;
-    label: string;
-    textColor: string;
-  }
-> = {
-  PERCENT: {
-    icon: PercentIcon,
-    label: "Percentage Off",
-    textColor: "text-amber-700",
-  },
-  FLAT: {
-    icon: TagIcon,
-    label: "Flat Discount",
-    textColor: "text-emerald-700",
-  },
-  BOGO: {
-    icon: GiftIcon,
-    label: "Buy One Get One",
-    textColor: "text-purple-700",
-  },
-  BUY_AND_REWARD: {
-    icon: GiftIcon,
-    label: "Buy & Reward",
-    textColor: "text-purple-700",
-  },
-};
-
 const roleLabel: Record<string, string> = {
   VENDOR: "Vendor",
   SUB_VENDOR: "Sub-vendor",
@@ -92,11 +61,6 @@ const fundedByLabel: Record<string, string> = {
   ADMIN: "Platform",
 };
 
-const rewardTypeLabel: Record<string, string> = {
-  SAME_PRODUCT: "Same product",
-  FIXED_PRODUCT: "Fixed product",
-  CUSTOMER_CHOICE: "Customer choice",
-};
 
 /** Small label + value tile used by the rule cards */
 function InfoTile({
@@ -149,7 +113,6 @@ export default function OfferDetails({ offer }: IProps) {
   const { lang } = useStore();
 
   const [copied, setCopied] = useState(false);
-  const [openEditModal, setOpenEditModal] = useState(false);
   const [openStatusUpdateModal, setOpenStatusUpdateModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -158,8 +121,44 @@ export default function OfferDetails({ offer }: IProps) {
 
   const { role } = jwtDecode(accessToken as string) as { role: string };
 
+  const offerTypeConfig: Record<
+    string,
+    {
+      icon: typeof PercentIcon;
+      label: string;
+      textColor: string;
+    }
+  > = {
+    PERCENT: {
+      icon: PercentIcon,
+      label: t("offer_type_percent"),
+      textColor: "text-amber-700",
+    },
+    FLAT: {
+      icon: TagIcon,
+      label: t("offer_type_flat"),
+      textColor: "text-emerald-700",
+    },
+    BOGO: {
+      icon: GiftIcon,
+      label: t("offer_type_bogo"),
+      textColor: "text-purple-700",
+    },
+    BUY_AND_REWARD: {
+      icon: GiftIcon,
+      label: t("offer_type_buy_and_reward"),
+      textColor: "text-purple-700",
+    },
+  };
+
   const config = offerTypeConfig[offer.offerType];
   const IconComponent = config.icon;
+
+  const rewardTypeLabel: Record<string, string> = {
+    SAME_PRODUCT: t("reward_type_same_product"),
+    FIXED_PRODUCT: t("reward_type_fixed_product"),
+    CUSTOMER_CHOICE: t("reward_type_customer_choice"),
+  };
 
   const copyCode = () => {
     if (offer.code) {
@@ -306,7 +305,7 @@ export default function OfferDetails({ offer }: IProps) {
         {offer.isDeleted && (
           <div className="mt-4 mb-4 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700">
             <TrashIcon className="w-4 h-4 shrink-0" />
-            This offer has been deleted. It is no longer applied at checkout.
+            {t("this_offer_has_been_deleted")}
           </div>
         )}
 
@@ -380,13 +379,13 @@ export default function OfferDetails({ offer }: IProps) {
                       {isFirstOrder && (
                         <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white">
                           <SparklesIcon className="w-3.5 h-3.5" />
-                          First-order offer
+                          {t("first_order_offer")}
                         </span>
                       )}
                       {offer.isGlobal ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white">
                           <StoreIcon className="w-3.5 h-3.5" />
-                          All stores
+                          {t("all_stores")}
                         </span>
                       ) : (
                         vendorName && (
@@ -594,7 +593,7 @@ export default function OfferDetails({ offer }: IProps) {
             {
               icon: UsersIcon,
               label: t("limit_user"),
-              value: offer.userUsageLimit || "Unlimited",
+              value: offer.userUsageLimit || t("unlimited"),
             },
             {
               icon: TrendingUpIcon,
@@ -644,32 +643,32 @@ export default function OfferDetails({ offer }: IProps) {
           >
             <h3 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
               <SparklesIcon className="w-5 h-5 text-[#DC3173]" />
-              First-order offer
+              {t("first_order_offer")}
             </h3>
             <p className="text-sm text-slate-600 mb-4">
-              Each customer can use it once{" "}
+              {t("first_order_description_prefix")}{" "}
               {eligibilityScope === "VENDOR"
-                ? "at this store."
-                : "on the whole platform."}
+                ? t("first_order_scope_vendor")
+                : t("first_order_scope_platform")}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <InfoTile
                 icon={StoreIcon}
-                label="Scope"
-                value={eligibilityScope === "VENDOR" ? "Single store" : "Whole platform"}
+                label={t("scope")}
+                value={eligibilityScope === "VENDOR" ? t("single_store") : t("whole_platform")}
               />
               <InfoTile
                 icon={PhoneIcon}
-                label="Verified phone"
+                label={t("verified_phone")}
                 value={
                   (offer.eligibility?.requireVerifiedPhone ?? true)
-                    ? "Required"
-                    : "Not required"
+                    ? t("required")
+                    : t("not_required")
                 }
               />
               <InfoTile
                 icon={RotateCcwIcon}
-                label="Given back up to"
+                label={t("given_back_up_to")}
                 value={`${offer.eligibility?.maxRestores ?? 2} time${(offer.eligibility?.maxRestores ?? 2) === 1 ? "" : "s"}`}
               />
             </div>
@@ -693,7 +692,7 @@ export default function OfferDetails({ offer }: IProps) {
         >
           <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
             <LayersIcon className="w-5 h-5 text-[#DC3173]" />
-            Offer rules
+            {t("offer_rules")}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <InfoTile
@@ -701,7 +700,7 @@ export default function OfferDetails({ offer }: IProps) {
               label="Store"
               value={
                 offer.isGlobal
-                  ? "Platform-wide"
+                  ? t("platform_wide")
                   : vendorName
                     ? `${vendorName}${offer.vendorId?.userId ? ` (${offer.vendorId.userId})` : ""}`
                     : "-"
@@ -710,60 +709,60 @@ export default function OfferDetails({ offer }: IProps) {
             {offer.createdByRole && (
               <InfoTile
                 icon={UserCheckIcon}
-                label="Created by"
+                label={t("created_by")}
                 value={roleLabel[offer.createdByRole] ?? offer.createdByRole}
               />
             )}
             {offer.fundedBy && (
               <InfoTile
                 icon={WalletIcon}
-                label="Funded by"
+                label={t("funded_by")}
                 value={fundedByLabel[offer.fundedBy] ?? offer.fundedBy}
               />
             )}
             {typeof offer.vendorSharePercent === "number" && (
               <InfoTile
                 icon={WalletIcon}
-                label="Vendor share"
+                label={t("vendor_share")}
                 value={`${offer.vendorSharePercent}%`}
               />
             )}
             {isDiscountOffer && (
               <InfoTile
                 icon={TagIcon}
-                label="Applicable products"
+                label={t("applicable_products")}
                 value={
                   offer.scopeType === "SPECIFIC_PRODUCTS"
-                    ? `${specificProducts.length} selected`
-                    : "All products"
+                    ? `${specificProducts.length} ${t("selected")}`
+                    : t("all_products")
                 }
               />
             )}
             {isDiscountOffer && (
               <InfoTile
                 icon={PercentIcon}
-                label="Already-discounted products"
-                value={offer.allowDiscountedProducts ? "Included" : "Excluded"}
+                label={t("already_discounted_products")}
+                value={offer.allowDiscountedProducts ? t("included") : t("excluded")}
               />
             )}
             <InfoTile
               icon={ZapIcon}
-              label="Applied"
-              value={offer.isAutoApply ? "Automatically" : "With promo code"}
+              label={t("applied")}
+              value={offer.isAutoApply ? t("automatically") : t("with_promo_code")}
             />
             <InfoTile
               icon={UsersIcon}
-              label="Customers who used it"
+              label={t("customers_who_used_it")}
               value={customersUsed}
             />
             <InfoTile
               icon={CalendarIcon}
-              label="Created"
+              label={t("created")}
               value={formatDate(offer.createdAt)}
             />
             <InfoTile
               icon={ClockIcon}
-              label="Last updated"
+              label={t("last_updated")}
               value={formatDate(offer.updatedAt)}
             />
           </div>
@@ -783,7 +782,7 @@ export default function OfferDetails({ offer }: IProps) {
               </div>
             )}
 
-          {isDiscountOffer &&
+          {/* {isDiscountOffer &&
             offer.scopeType === "SPECIFIC_PRODUCTS" &&
             specificProductNames.length === 0 &&
             specificProductIds.length > 0 && (
@@ -802,7 +801,7 @@ export default function OfferDetails({ offer }: IProps) {
                   ))}
                 </ul>
               </details>
-            )}
+            )} */}
         </motion.div>
 
         {/* Usage Progress */}
@@ -911,8 +910,8 @@ export default function OfferDetails({ offer }: IProps) {
                 {isExpired
                   ? t("this_offer_has_expired")
                   : isUpcoming
-                    ? `Starts in ${Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))} days`
-                    : `${Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))} days remaining`}
+                    ? `${t("starts_in")} ${Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))} ${t("days")}`
+                    : `${Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))} ${t("days_remaining")}`}
               </span>
             </div>
           </div>
@@ -977,7 +976,7 @@ export default function OfferDetails({ offer }: IProps) {
           >
             <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
               <GiftIcon className="w-5 h-5 text-purple-600" />
-              Buy &amp; Reward details
+              {t("buy_and_reward_details")}
             </h3>
             <div className="flex items-center gap-4">
               <div className="bg-white rounded-xl p-4 flex-1 text-center shadow-sm">
@@ -985,7 +984,7 @@ export default function OfferDetails({ offer }: IProps) {
                   {offer.buyAndReward.buy.quantity}
                 </p>
                 <p className="text-sm text-slate-500">
-                  {t("buy")} ({offer.buyAndReward.buy.productIds?.length ?? 0} product
+                  {t("buy")} ({offer.buyAndReward.buy.productIds?.length ?? 0} {t("product")}
                   {(offer.buyAndReward.buy.productIds?.length ?? 0) === 1 ? "" : "s"})
                 </p>
               </div>
@@ -1006,27 +1005,27 @@ export default function OfferDetails({ offer }: IProps) {
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <InfoTile
                 icon={LayersIcon}
-                label="Add-ons in reward"
+                label={t("addons_in_reward")}
                 value={
                   offer.buyAndReward.reward.includeAddons
-                    ? "Included"
-                    : "Not included"
+                    ? t("included")
+                    : t("not_included")
                 }
               />
               {offer.buyAndReward.reward.variationSku && (
                 <InfoTile
                   icon={TagIcon}
-                  label="Reward SKU"
+                  label={t("reward_sku")}
                   value={offer.buyAndReward.reward.variationSku}
                 />
               )}
             </div>
 
-            <IdList title="Products to buy" ids={buyProductIds} />
+            <IdList title={t("products_to_buy")} ids={buyProductIds} />
             {rewardProductId && (
-              <IdList title="Reward product" ids={[rewardProductId]} />
+              <IdList title={t("reward_product")} ids={[rewardProductId]} />
             )}
-            <IdList title="Reward options" ids={rewardOptionIds} />
+            <IdList title={t("reward_options")} ids={rewardOptionIds} />
           </motion.div>
         )}
       </motion.div>

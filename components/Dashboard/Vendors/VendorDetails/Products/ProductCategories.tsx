@@ -43,6 +43,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 interface IProps {
     vendor: TVendor;
@@ -216,6 +217,12 @@ const ProductCategories = ({ vendor, categoriesResult }: IProps) => {
             setIsReordering(false);
         }
     };
+
+    // business name or branch name
+    useVendorTopbarTitle(
+        vendor?.businessDetails?.businessName ||
+        vendor?.businessDetails?.branchName,
+    );
 
     return (
         <>

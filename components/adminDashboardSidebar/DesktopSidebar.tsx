@@ -36,7 +36,7 @@ export default function DesktopSidebar({
       >
         {/* Topbar sticky */}
         <div className="w-full sticky top-0 z-40">
-          <Topbar admin={adminData} />
+          <Topbar admin={adminData} sidebarOpen={open} />
         </div>
 
         {/* Page content */}

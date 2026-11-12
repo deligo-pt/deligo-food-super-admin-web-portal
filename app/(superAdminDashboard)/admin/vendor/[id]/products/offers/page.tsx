@@ -12,6 +12,8 @@ const VendorCreatedOffersPage = async ({ params }: IProps) => {
 
     const vendorData: TVendor = await getSingleVendorReq(id);
 
+    const businessName = vendorData?.businessDetails?.businessName || vendorData?.businessDetails?.branchName as string;
+
     const offerResult = await getAllOffersReq({
         vendorId: vendorData._id,
         limit: "4",
@@ -22,6 +24,7 @@ const VendorCreatedOffersPage = async ({ params }: IProps) => {
             <VendorCreatedOffers
                 vendorId={vendorData?.userId}
                 offerData={offerResult?.data}
+                businessName={businessName}
             />
         </div>
     );

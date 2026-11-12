@@ -2154,6 +2154,49 @@ export const en = {
   buy: "Buy",
   get_free: "Get Free",
   item_id: "Item ID",
+  // Offer types
+  offer_type_percent: "Percentage Off",
+  offer_type_flat: "Flat Discount",
+  offer_type_bogo: "Buy One Get One",
+  offer_type_buy_and_reward: "Buy & Reward",
+
+  // Hero
+  all_stores: "All stores",
+  this_offer_has_been_deleted: "This offer has been deleted. It is no longer applied at checkout.",
+
+  // First-order rules
+  first_order_description_prefix: "Each customer can use it once",
+  first_order_scope_vendor: "at this store.",
+  first_order_scope_platform: "on the whole platform.",
+  scope: "Scope",
+  single_store: "Single store",
+  whole_platform: "Whole platform",
+  verified_phone: "Verified phone",
+  required: "Required",
+  not_required: "Not required",
+  given_back_up_to: "Given back up to",
+
+  // Offer rules
+  offer_rules: "Offer rules",
+  platform_wide: "Platform-wide",
+  funded_by: "Funded by",
+  vendor_share: "Vendor share",
+  already_discounted_products: "Already-discounted products",
+  included: "Included",
+  excluded: "Excluded",
+  applied: "Applied",
+  automatically: "Automatically",
+  with_promo_code: "With promo code",
+  customers_who_used_it: "Customers who used it",
+  reward_type_same_product: "Same product",
+  reward_type_fixed_product: "Fixed product",
+  reward_type_customer_choice: "Customer choice",
+  buy_and_reward_details: "Buy & Reward details",
+  addons_in_reward: "Add-ons in reward",
+  not_included: "Not included",
+  reward_sku: "Reward SKU",
+  unlimited: "Unlimited",
+
   // edit offer
   edit_offer: "Edit Offer",
 

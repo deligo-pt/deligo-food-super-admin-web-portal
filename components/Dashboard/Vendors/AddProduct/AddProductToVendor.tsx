@@ -47,6 +47,7 @@ import StockInformationForm from "./StockInformationForm";
 import DeligoMetadata from "./DeligoMetadata";
 import { TVendor } from "@/types/user.type";
 import { createProduct } from "@/services/dashboard/product/product.service";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 type FormData = z.infer<typeof productValidation>;
 
@@ -282,6 +283,11 @@ export function AddProductToVendor({
         }
     };
 
+    useVendorTopbarTitle(
+        vendor?.businessDetails?.businessName ||
+        vendor?.businessDetails?.branchName,
+    );
+
     return (
         <div>
             <motion.div
@@ -502,8 +508,8 @@ export function AddProductToVendor({
                                         onClick={() => activeTab > 0 && setActiveTab(activeTab - 1)}
                                         disabled={activeTab === 0}
                                         className={`px-6 py-2 rounded-lg flex items-center space-x-2 transition-colors ${activeTab === 0
-                                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                : "bg-[#DC3173] hover:bg-[#B02458] text-white"
+                                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                            : "bg-[#DC3173] hover:bg-[#B02458] text-white"
                                             }`}
                                     >
                                         <ChevronLeftIcon className="h-4 w-4" />
@@ -520,8 +526,8 @@ export function AddProductToVendor({
                                         }
                                         disabled={activeTab === lastTabIndex}
                                         className={`px-6 py-2 rounded-lg flex items-center space-x-2 transition-colors ${activeTab === lastTabIndex
-                                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                : "bg-[#DC3173] hover:bg-[#B02458] text-white"
+                                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                            : "bg-[#DC3173] hover:bg-[#B02458] text-white"
                                             }`}
                                     >
                                         <span>{t("next")}</span>

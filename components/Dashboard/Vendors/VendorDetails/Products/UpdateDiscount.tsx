@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { queryStringFormatter } from '@/utils/formatter';
 import { TMeta } from '@/types';
+import { useVendorTopbarTitle } from '@/hooks/useVendorTopbarTitle';
 
 type Props = {
     products: TProduct[];
@@ -31,6 +32,7 @@ type Props = {
     vendorId: string;
     vendorMongoId?: string;
     initialMeta?: TMeta
+    businessName?: string;
 };
 
 const PAGE_LIMIT = 10;
@@ -41,10 +43,14 @@ const UpdateDiscount = ({
     vendorId,
     vendorMongoId,
     initialMeta,
+    businessName
 }: Props) => {
     const { t } = useTranslation();
     const router = useRouter();
     const [, startTransition] = useTransition();
+
+    // vendor businessname or  branch name
+    useVendorTopbarTitle(businessName);
 
     // Infinite-scroll state
     const [products, setProducts] = useState<TProduct[]>(initialProducts);

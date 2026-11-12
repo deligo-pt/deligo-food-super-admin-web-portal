@@ -39,6 +39,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import EditVendorOfferModal from "./EditVendorOfferModal";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 const SHADOW = "0 6px 20px rgba(0,0,0,0.06)";
 
@@ -123,6 +124,12 @@ export default function VendorOffers({ vendor, offersResult }: IProps) {
     setIsDeleting(false);
     setDeleteId("");
   };
+
+  // business name or branchName
+  useVendorTopbarTitle(
+    vendor?.businessDetails?.businessName ||
+    vendor?.businessDetails?.branchName,
+  );
 
   return (
     <div className="min-h-screen space-y-5">

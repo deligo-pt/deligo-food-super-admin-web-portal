@@ -23,6 +23,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 interface IProps {
     addonGroupsResult: {
@@ -32,6 +33,7 @@ interface IProps {
     vendorId: string;
     vendorUserId: string;
     taxes: TTax[];
+    businessName: string;
 }
 
 export default function AddOnsManagementSection({
@@ -39,6 +41,7 @@ export default function AddOnsManagementSection({
     vendorId,
     vendorUserId,
     taxes,
+    businessName
 }: IProps) {
     const { t, lang } = useTranslation();
     const router = useRouter();
@@ -53,6 +56,9 @@ export default function AddOnsManagementSection({
 
     // State for tracking toggle loading states per option SKU
     const [togglingSku, setTogglingSku] = useState<string | null>(null);
+
+    // vendor businessname or  branch name
+    useVendorTopbarTitle(businessName);
 
     // Handler to open modal for creating a brand new Add-on Group
     const handleOpenCreateModal = () => {
