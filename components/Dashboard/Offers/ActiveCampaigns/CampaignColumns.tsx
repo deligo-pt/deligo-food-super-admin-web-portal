@@ -56,25 +56,25 @@ export function getCampaignColumns({
             ),
             accessor: (offer) => offer?.title?.[lang as 'en' | 'pt'],
         },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <Edit3Icon className="w-4" />
-                    {t("created_by")}
-                </div>
-            ),
-            accessor: (offer) => (
-                <div>
-                    <div className="font-medium">
-                        {offer.vendorId?.name?.firstName || offer?.adminId?.name?.firstName || "N/A"}{" "}
-                        {offer.vendorId?.name?.lastName || offer?.adminId?.name?.lastName}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                        {offer?.vendorId?.userId || offer?.adminId?.userId || "N/A"}
-                    </div>
-                </div>
-            ),
-        },
+        // {
+        //     header: (
+        //         <div className="text-[#DC3173] flex gap-2 items-center">
+        //             <Edit3Icon className="w-4" />
+        //             {t("created_by")}
+        //         </div>
+        //     ),
+        //     accessor: (offer) => (
+        //         <div>
+        //             <div className="font-medium">
+        //                 {offer.vendorId?.name?.firstName || offer?.adminId?.name?.firstName || "N/A"}{" "}
+        //                 {offer.vendorId?.name?.lastName || offer?.adminId?.name?.lastName}
+        //             </div>
+        //             <div className="text-xs text-slate-500">
+        //                 {offer?.vendorId?.userId || offer?.adminId?.userId || "N/A"}
+        //             </div>
+        //         </div>
+        //     ),
+        // },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
@@ -107,18 +107,18 @@ export function getCampaignColumns({
                         ? `€${offer.discountValue}`
                         : "N/A",
         },
-        {
-            header: (
-                <div className="text-[#DC3173] flex gap-2 items-center">
-                    <Clock className="w-4" />
-                    {t("duration")}
-                </div>
-            ),
-            accessor: (offer) =>
-                offer.validFrom && offer.expiresAt
-                    ? `${format(offer.validFrom, "yyyy-MM-dd")} to ${format(offer.expiresAt, "yyyy-MM-dd")}`
-                    : "N/A",
-        },
+        // {
+        //     header: (
+        //         <div className="text-[#DC3173] flex gap-2 items-center">
+        //             <Clock className="w-4" />
+        //             {t("duration")}
+        //         </div>
+        //     ),
+        //     accessor: (offer) =>
+        //         offer.validFrom && offer.expiresAt
+        //             ? `${format(offer.validFrom, "yyyy-MM-dd")} to ${format(offer.expiresAt, "yyyy-MM-dd")}`
+        //             : "N/A",
+        // },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
