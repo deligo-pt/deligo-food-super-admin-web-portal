@@ -3085,4 +3085,13 @@ export const en = {
   personal_information: "Personal Information",
   account_activity: "Account Activity",
   two_factor_auth: "Two-Factor Auth",
+  // order ratings (admin order list + detail)
+  customer_rating: "Customer Rating",
+  food_rating: "Food",
+  rider_rating: "Rider",
+  no_comment: "No comment",
+  not_rated_yet: "Not rated yet",
+  rated: "Rated",
+  not_rated: "Not rated",
+  rating_load_failed: "This order was rated, but the feedback could not be loaded.",
 };

@@ -2,11 +2,13 @@
 
 import OrderItemsTable from "@/components/Dashboard/Orders/OrderDetails/OrderItemsTable";
 import OrderPricingSummary from "@/components/Dashboard/Orders/OrderDetails/OrderPricingSummary";
+import OrderRatings from "@/components/Dashboard/Orders/OrderDetails/OrderRatings";
 import { Badge } from "@/components/ui/badge";
 import { ORDER_STATUS } from "@/consts/order.const";
 import { useTranslation } from "@/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { TOrder } from "@/types/order.type";
+import { TRating } from "@/types/rating.type";
 import { format } from "date-fns";
 import { motion, Variants } from "framer-motion";
 import {
@@ -31,6 +33,8 @@ import { useRouter } from "next/navigation";
 
 interface IProps {
   order: TOrder;
+  ratings?: TRating[];
+  ratingsLoaded?: boolean;
 }
 
 const formatDate = (date?: string | null) => {
@@ -47,7 +51,11 @@ const formatCoord = (coords?: number[]) => {
   return `${coords[1]?.toFixed(6)}, ${coords[0]?.toFixed(6)}`;
 };
 
-export default function OrderDetails({ order }: IProps) {
+export default function OrderDetails({
+  order,
+  ratings = [],
+  ratingsLoaded = true,
+}: IProps) {
   const { t, lang } = useTranslation();
   const router = useRouter();
 
@@ -760,6 +768,17 @@ export default function OrderDetails({ order }: IProps) {
                 )}
               </div>
             </motion.div>
+
+            {/* CUSTOMER RATING — stars + comments, only on a rated order */}
+            {(order?.isRated || ratings.length > 0) && (
+              <motion.div variants={itemVariants as Variants}>
+                <OrderRatings
+                  order={order}
+                  ratings={ratings}
+                  loaded={ratingsLoaded}
+                />
+              </motion.div>
+            )}
           </div>
 
           {/* RIGHT COLUMN */}

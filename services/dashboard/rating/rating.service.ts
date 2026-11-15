@@ -35,3 +35,22 @@ export const getAllRatingsReq = async (
     data: [],
   };
 };
+
+/**
+ * Every rating left on one order: a PRODUCT rating per rated item and one
+ * DELIVERY_PARTNER rating. The order itself only carries `isRated` /
+ * `ratingStatus`; the stars and comments live here. The filter takes the
+ * order's Mongo `_id` — the `ORD-…` code matches nothing.
+ */
+export const getOrderRatingsReq = async (orderObjectId: string) => {
+  const result = await catchAsync<TRating[]>(async () => {
+    return await serverRequest.get("/ratings/get-all-ratings", {
+      params: { orderId: orderObjectId, limit: 50, sortBy: "createdAt" },
+    });
+  });
+
+  if (result?.success && Array.isArray(result.data))
+    return { ok: true as const, data: result.data };
+
+  return { ok: false as const, data: [] as TRating[] };
+};
