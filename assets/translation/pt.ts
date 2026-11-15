@@ -3114,4 +3114,13 @@ export const pt = {
   personal_information: "Informação Pessoal",
   account_activity: "Atividade da Conta",
   two_factor_auth: "Autenticação de Dois Fatores",
+  // order ratings (admin order list + detail)
+  customer_rating: "Avaliação do Cliente",
+  food_rating: "Comida",
+  rider_rating: "Estafeta",
+  no_comment: "Sem comentário",
+  not_rated_yet: "Ainda não avaliado",
+  rated: "Avaliado",
+  not_rated: "Não avaliado",
+  rating_load_failed: "Esta encomenda foi avaliada, mas não foi possível carregar o feedback.",
 };

@@ -14,6 +14,7 @@ import {
     HashIcon,
     MoreVertical,
     PackageIcon,
+    StarIcon,
     UserIcon,
 } from "lucide-react";
 import {
@@ -124,6 +125,25 @@ export function getOrderColumns({
         //             ?.map((word) => word.charAt(0) + word.slice(1)?.toLowerCase())
         //             ?.join(" "),
         // },
+        {
+            // `/orders` only says *whether* an order was rated; the stars and
+            // the comment are on the order's detail page.
+            header: (
+                <div className="text-[#DC3173] flex gap-2 items-center">
+                    <StarIcon className="w-4" />
+                    {t("rating")}
+                </div>
+            ),
+            accessor: (order) =>
+                order.isRated ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-200">
+                        <StarIcon className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden />
+                        {t("rated")}
+                    </span>
+                ) : (
+                    <span className="text-xs text-slate-400">{t("not_rated")}</span>
+                ),
+        },
         {
             header: (
                 <div className="text-[#DC3173] flex gap-2 items-center">
