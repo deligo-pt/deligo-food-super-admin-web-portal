@@ -430,6 +430,10 @@ export const en = {
   and_return_the_store_its_normal_opening: "and return the store to its normal opening hours.",
   currently_scheduled_until: "Currently scheduled until",
   clearing: "Clearing...",
+  store_status: "Store Status",
+  timezone: "Timezone",
+  operating_hours: "Operating Hours",
+  legacy: "Legacy",
 
   // add-ons page
   inc_vat: "Inc. VAT",
@@ -476,6 +480,55 @@ export const en = {
   get_product: "Get Product",
   buy_quantity: "Buy Quantity (e.g., 2)",
   get_quantity: "Get Quantity (e.g., 1)",
+  buy_and_reward: "Buy & Reward",
+  buy_condition: "Buy Condition",
+  products_to_buy: "Products to buy",
+  // First-order offer card
+  first_order_offer: "First-order offer",
+  first_order_offer_vendor_subtitle: "Only for customers ordering from this store for the first time.",
+  first_order_offer_global_subtitle: "Only for customers placing their first order on the platform.",
+  first_order_scope_this_store: "This store",
+  first_order_scope_all_stores: "All stores",
+  first_order_funding_vendor: "The store funds this discount. It is deducted from the store's payout for that order.",
+  first_order_funding_global: "The platform funds this discount. Vendors are still paid on the full price.",
+  first_order_limit_vendor: "A store can have only one active first-order offer.",
+  first_order_limit_global: "Only one global first-order offer can be active at a time.",
+  once_per_customer: "Once per customer",
+  advanced_settings: "Advanced settings",
+  verified_phone_required: "Verified phone required",
+  verified_phone_required_desc: "The customer must verify their phone number to get the offer. This stops repeat use with new accounts.",
+  times_it_can_be_given_back: "Times it can be given back",
+  times_it_can_be_given_back_desc: "If an order with this offer is cancelled before the store accepts it, or the store rejects it, the customer gets the offer back up to this many times.",
+  reward: "Reward",
+  reward_type: "Reward Type",
+  reward_quantity: "Reward Quantity",
+  same_product: "Same Product",
+  fixed_product: "Fixed Product",
+  customer_choice: "Customer Choice",
+  reward_product: "Reward Product",
+  select_variation_sku: "Select variation SKU",
+  reward_options: "Reward Options",
+  sku_for: "SKU for",
+  offer_activation_status_default_true: "Offer activation status will be by default true.",
+
+  // Vendor Offers page
+  offers: "Offers",
+  all_offers_from: "All offers from ",
+  code: "Code",
+  n_a: "N/A",
+  valid_till: "Valid till",
+  total_used: "Total Used",
+  // no_offers_found: "No offers found",
+
+  // Toasts
+  activating_offer: "Activating offer...",
+  deactivating_offer: "Deactivating offer...",
+  offer_activated: "Offer activated",
+  offer_deactivated: "Offer deactivated",
+  could_not_update_offer: "Could not update the offer",
+  deleting_offer: "Deleting offer...",
+  offer_deleted_successfully: "Offer deleted successfully!",
+  offer_delete_failed: "Offer delete failed",
 
   // add-new-item page
   add_new_item: "Add New Item",
@@ -715,6 +768,15 @@ export const en = {
   complete_the_details_above_click: "Complete the details above and click",
   to_unlock_agreement_creation: "to unlock agreement creation.",
   save_changes_first_to_unlock_signing: "Save changes first to unlock signing.",
+  // -> weekly schedule editor
+  weekly_schedule_hint: "Set the opening hours for each day. Add up to 4 periods per day (for example lunch and dinner). Times use the store's local time.",
+  closed: "Closed",
+  until_midnight: "Until midnight (24:00)",
+  ends_next_day: "ends next day",
+  closed_all_day: "Closed all day",
+  add_period: "Add period",
+  copy_to_all_days: "Copy to all days",
+
   // --> update vendor
   agreement_is_already: "Agreement is already ",
   you_can_update_information: "You can update information without re-signing.",
@@ -2092,6 +2154,49 @@ export const en = {
   buy: "Buy",
   get_free: "Get Free",
   item_id: "Item ID",
+  // Offer types
+  offer_type_percent: "Percentage Off",
+  offer_type_flat: "Flat Discount",
+  offer_type_bogo: "Buy One Get One",
+  offer_type_buy_and_reward: "Buy & Reward",
+
+  // Hero
+  all_stores: "All stores",
+  this_offer_has_been_deleted: "This offer has been deleted. It is no longer applied at checkout.",
+
+  // First-order rules
+  first_order_description_prefix: "Each customer can use it once",
+  first_order_scope_vendor: "at this store.",
+  first_order_scope_platform: "on the whole platform.",
+  scope: "Scope",
+  single_store: "Single store",
+  whole_platform: "Whole platform",
+  verified_phone: "Verified phone",
+  required: "Required",
+  not_required: "Not required",
+  given_back_up_to: "Given back up to",
+
+  // Offer rules
+  offer_rules: "Offer rules",
+  platform_wide: "Platform-wide",
+  funded_by: "Funded by",
+  vendor_share: "Vendor share",
+  already_discounted_products: "Already-discounted products",
+  included: "Included",
+  excluded: "Excluded",
+  applied: "Applied",
+  automatically: "Automatically",
+  with_promo_code: "With promo code",
+  customers_who_used_it: "Customers who used it",
+  reward_type_same_product: "Same product",
+  reward_type_fixed_product: "Fixed product",
+  reward_type_customer_choice: "Customer choice",
+  buy_and_reward_details: "Buy & Reward details",
+  addons_in_reward: "Add-ons in reward",
+  not_included: "Not included",
+  reward_sku: "Reward SKU",
+  unlimited: "Unlimited",
+
   // edit offer
   edit_offer: "Edit Offer",
 

@@ -18,6 +18,8 @@ const AddOnsForVendor = async ({ params, searchParams }: IProps) => {
 
     const vendorData: TVendor = await getSingleVendorReq(id);
 
+    const businessName = vendorData?.businessDetails?.businessName || vendorData?.businessDetails?.branchName as string;
+
     const query = { vendorId: vendorData?._id, ...searchParamsObj };
     const queryString = queryStringFormatter(query);
     const addonGroupsData = await getAllAddOnsGroup(queryString);
@@ -30,6 +32,7 @@ const AddOnsForVendor = async ({ params, searchParams }: IProps) => {
                 vendorUserId={vendorData?.userId}
                 addonGroupsResult={addonGroupsData as { data: TAddonGroup[], meta: TMeta }}
                 taxes={taxes?.data}
+                businessName={businessName}
             />
         </div>
     );

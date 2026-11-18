@@ -14,6 +14,7 @@ const VendorVariationManagementPage = async ({ params, searchParams }: IProps) =
     const searchParamsObj = await searchParams;
 
     const vendorData: TVendor = await getSingleVendorReq(id);
+    const businessName = vendorData?.businessDetails?.businessName || vendorData?.businessDetails?.branchName as string;
 
     const vendorMongoId = vendorData?._id;
 
@@ -32,7 +33,8 @@ const VendorVariationManagementPage = async ({ params, searchParams }: IProps) =
                 productsData={{ data, meta: meta! }}
                 businessTypeSlug={vendorData?.businessDetails?.businessTypeSlug as string}
                 vendorMongoId={vendorMongoId}
-                 vendorId={id}
+                vendorId={id}
+                businessName={businessName}
             />
         </div>
     );

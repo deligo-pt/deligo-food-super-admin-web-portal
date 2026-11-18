@@ -17,6 +17,7 @@ const CreateNewOfferPage = async ({ params }: IProps) => {
     const vendorData: TVendor = await getSingleVendorReq(id);
 
     const vendorMongoId = vendorData?._id;
+    const businessName = vendorData?.businessDetails?.businessName || vendorData?.businessDetails?.branchName as string;
 
     const productsQuery = queryStringFormatter({
         vendorId: vendorMongoId,
@@ -45,6 +46,7 @@ const CreateNewOfferPage = async ({ params }: IProps) => {
                 vendorMongoId={vendorData?._id}
                 vendorUserId={vendorData?.userId}
                 productCategories={{ data: productCategories?.data, meta: productCategories?.meta }}
+                businessName={businessName}
             />
         </div>
     );

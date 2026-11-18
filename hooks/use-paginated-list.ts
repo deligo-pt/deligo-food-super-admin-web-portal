@@ -139,3 +139,12 @@ export function usePaginatedList<T extends { _id?: string }>({
 
     return { items, hasMore, loading, loadMore };
 }
+
+/** Accepts `{ data: T[], meta }`, `{ data: { data: T[], meta } }` or a bare `T[]` */
+export function normalizeList<T>(res: any): { data: T[]; meta?: TMeta } {
+    if (Array.isArray(res)) return { data: res };
+    if (Array.isArray(res?.data)) return { data: res.data, meta: res.meta };
+    if (Array.isArray(res?.data?.data))
+        return { data: res.data.data, meta: res.data.meta ?? res.meta };
+    return { data: [] };
+}
