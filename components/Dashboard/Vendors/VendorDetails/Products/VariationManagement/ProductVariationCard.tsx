@@ -274,7 +274,8 @@ export default function ProductVariationCard({ product, businessTypeSlug, t }: I
                         </button>
                         <VariationDeleteButton
                           onConfirm={() =>
-                            deleteVariation({ name: variation.name?.[lang] as string })
+                            // The backend finds the group by its English name, whatever the screen language.
+                            deleteVariation({ name: (variation.name?.en ?? variation.name?.[lang]) as string })
                           }
                           label={t("delete_variation")}
                         />
@@ -344,8 +345,9 @@ export default function ProductVariationCard({ product, businessTypeSlug, t }: I
                             <VariationDeleteButton
                               onConfirm={() =>
                                 deleteVariation({
-                                  name: variation.name?.[lang] as string,
-                                  labelToRemove: option.label?.[lang],
+                                  // English name + label: the backend matches on those only.
+                                  name: (variation.name?.en ?? variation.name?.[lang]) as string,
+                                  labelToRemove: option.label?.en ?? option.label?.[lang],
                                 })
                               }
                               label={t("delete_option")}
