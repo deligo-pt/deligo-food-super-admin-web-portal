@@ -770,6 +770,7 @@ export const en = {
   save_changes_first_to_unlock_signing: "Save changes first to unlock signing.",
   // -> weekly schedule editor
   weekly_schedule_hint: "Set the opening hours for each day. Add up to 4 periods per day (for example lunch and dinner). Times use the store's local time.",
+  schedule_fix_errors: "Please fix the opening hours marked in red, then save.",
   closed: "Closed",
   until_midnight: "Until midnight (24:00)",
   ends_next_day: "ends next day",

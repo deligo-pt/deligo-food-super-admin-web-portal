@@ -776,6 +776,7 @@ export const pt = {
   save_changes_first_to_unlock_signing: "Guarde as alterações primeiro para desbloquear a assinatura.",
   // -> weekly schedule editor
   weekly_schedule_hint: "Defina o horário de abertura para cada dia. Adicione até 4 períodos por dia (por exemplo, almoço e jantar). As horas utilizam a hora local da loja.",
+  schedule_fix_errors: "Corrija os horários assinalados a vermelho e depois guarde.",
   closed: "Fechado",
   until_midnight: "Até à meia-noite (24:00)",
   ends_next_day: "termina no dia seguinte",

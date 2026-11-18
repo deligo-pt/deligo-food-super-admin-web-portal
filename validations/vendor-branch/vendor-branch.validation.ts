@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { weeklyScheduleSchema } from "@/validations/schedule/weekly-schedule.validation";
+import { weeklyScheduleSchema } from "@/validations/add-vendor/add-vendor.validation";
 
 export const addVendorBranchValidation = z
     .object({
@@ -18,7 +18,7 @@ export const addVendorBranchValidation = z
         restaurantCuisineType: z.array(z.string()).optional(),
         NIF: z.string().optional(),
 
-        // All seven days; the rules (incl. 6 h a day) live in utils/weeklySchedule.
+        // Same weekly rules as Add / Edit Vendor (incl. 6 h a day, max 2 closed days).
         weeklySchedule: weeklyScheduleSchema,
 
         street: z.string().min(1, "Street is required"),

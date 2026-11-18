@@ -5,7 +5,7 @@ import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocati
 import UploadVendorDocuments, {
     REQUIRED_DOCS,
 } from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
-import WeeklyScheduleEditor from "@/components/Schedule/WeeklyScheduleEditor";
+import WeeklyScheduleEditor from "@/components/Dashboard/Vendors/AddVendor/WeeklyScheduleEditor";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,6 @@ import { Card } from "@/components/ui/card";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -39,10 +38,9 @@ import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import {
-    initialWeek,
-    normalizeWeek,
-    scheduleErrorMap,
-    scheduleFieldErrors,
+    emptyWeeklySchedule,
+    mapScheduleServerErrors,
+    normalizeSchedule,
 } from "@/utils/weeklySchedule";
 import { addVendorBranchValidation } from "@/validations/vendor-branch/vendor-branch.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,7 +56,7 @@ import {
     Mail,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -138,8 +136,8 @@ const AddVendorBranch = ({
             businessType: "",
             restaurantCuisineType: [],
             NIF: "",
-            // A new branch starts open 00:00–24:00 every day, as in the vendor panel.
-            weeklySchedule: initialWeek(null),
+            // Every day closed, as in Add Vendor: the admin sets the hours.
+            weeklySchedule: emptyWeeklySchedule(),
             street: "",
             city: "",
             postalCode: "",
@@ -154,18 +152,6 @@ const AddVendorBranch = ({
     const {
         formState: { isSubmitting },
     } = form;
-
-    // Schedule errors the backend sent on the last save, keyed for the editor;
-    // cleared on the next edit of the hours.
-    const [scheduleServerErrors, setScheduleServerErrors] = useState<
-        Record<string, string>
-    >({});
-    const week = useWatch({ control: form.control, name: "weeklySchedule" });
-    // Live rule errors on their time slot; the server's on top until the next edit.
-    const scheduleErrors = useMemo(
-        () => ({ ...scheduleServerErrors, ...scheduleErrorMap(normalizeWeek(week)) }),
-        [week, scheduleServerErrors]
-    );
 
     const businessType = useWatch({
         control: form.control,
@@ -296,7 +282,7 @@ const AddVendorBranch = ({
             businessDetails: {
                 branchName: data.branchName,
                 // The whole week, never the legacy hours (the backend refuses those).
-                weeklySchedule: normalizeWeek(data.weeklySchedule),
+                weeklySchedule: normalizeSchedule(data.weeklySchedule),
             },
             businessLocation: {
                 street: data.street,
@@ -367,18 +353,14 @@ const AddVendorBranch = ({
         }
 
         if (updatedResult?.data?.errorSources) {
-            // Schedule errors go on their time slot; the rest are toasts.
-            const { fieldErrors, others } = scheduleFieldErrors(updatedResult.data.errorSources);
-            const hasScheduleErrors = Object.keys(fieldErrors).length > 0;
-            if (hasScheduleErrors) {
-                setScheduleServerErrors(fieldErrors);
+            // Schedule errors go on their time slot (as in Add Vendor); the rest are toasts.
+            const errorSources: { path: string; message: string }[] = updatedResult.data.errorSources;
+            if (mapScheduleServerErrors(errorSources, form.setError as never)) {
                 toast.error(t("schedule_fix_errors"), { id: toastId });
             }
-            others.forEach((err, i) =>
-                toast.error(err?.message, {
-                    id: i === 0 && !hasScheduleErrors ? toastId : undefined,
-                })
-            );
+            errorSources
+                .filter((err) => !err?.path?.startsWith("businessDetails.weeklySchedule"))
+                .forEach((err) => toast.error(err?.message));
             return;
         } else {
             toast.error(updatedResult.message || "Branch add failed", {
@@ -789,33 +771,13 @@ const AddVendorBranch = ({
                                                 />
                                             )}
 
-                                            {/* Opening hours */}
-                                            <FormField
-                                                control={form.control}
-                                                name="weeklySchedule"
-                                                render={({ field }) => (
-                                                    <FormItem className="col-span-2">
-                                                        <FormLabel>
-                                                            {t("opening_hours")}{" "}
-                                                            <span className="text-[#DC3173]">*</span>
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            {t("schedule_admin_subtitle")}
-                                                        </FormDescription>
-                                                        <FormControl>
-                                                            <WeeklyScheduleEditor
-                                                                value={field.value ?? []}
-                                                                onChange={(next) => {
-                                                                    setScheduleServerErrors({});
-                                                                    field.onChange(next);
-                                                                }}
-                                                                errors={scheduleErrors}
-                                                                disabled={isSubmitting}
-                                                            />
-                                                        </FormControl>
-                                                    </FormItem>
-                                                )}
-                                            />
+                                            {/* Opening hours (main's editor reads the form through context) */}
+                                            <div className="col-span-2">
+                                                <p className="text-sm font-medium text-gray-700 mb-2">
+                                                    {t("opening_hours")} <span className="text-[#DC3173]">*</span>
+                                                </p>
+                                                <WeeklyScheduleEditor t={t} disabled={isSubmitting} />
+                                            </div>
                                         </div>
                                     </Card>
                                 </motion.div>
