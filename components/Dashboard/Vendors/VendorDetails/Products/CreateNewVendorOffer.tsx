@@ -50,13 +50,15 @@ import { useEffect, useMemo, useState } from "react";
 import { Resolver, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { ProductSelector } from "./ProductSelector";
-import { createOfferReq, createVendorOffer } from "@/services/dashboard/offer/offer.service";
+import { createVendorOffer } from "@/services/dashboard/offer/offer.service";
 import { TProductCategoryResponse } from "@/types/category.type";
 import { queryStringFormatter } from "@/utils/formatter";
 import { getAllProductCategories } from "@/services/dashboard/category/product-category.service";
 import { usePaginatedList } from "@/hooks/use-paginated-list";
 import { getAllProducts } from "@/services/dashboard/product/product.service";
-import { ChevronDown } from "lucide-react";
+import { Accessibility, ChevronDown, Sparkles } from "lucide-react";
+import FirstOrderOfferCard, { Toggle } from "./FirstOrderOfferCard";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 const PRIMARY = "#DC3173";
 
@@ -65,12 +67,16 @@ interface IProps {
     vendorMongoId: string;
     vendorUserId: string;
     productCategories: { data: TProductCategoryResponse[]; meta?: TMeta };
+    businessName: string;
 }
 
-export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendorUserId, productCategories }: IProps) {
+export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendorUserId, productCategories, businessName }: IProps) {
     const { t } = useTranslation();
     const { lang } = useStore();
     const router = useRouter();
+
+    // vendor businessname or  branch name
+    useVendorTopbarTitle(businessName);
 
     const PRODUCT_LIMIT = 30;
     const CATEGORY_LIMIT = 50;
@@ -186,6 +192,10 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
             isAutoApply: true,
             userUsageLimit: "",
             isActive: true,
+            isFirstOrder: false,
+            firstOrderRequireVerifiedPhone: true,
+            firstOrderMaxRestores: 2,
+
             currentLang: lang,
         },
     });
@@ -391,6 +401,16 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                     : {}),
                 isActive: data.isActive ?? true,
                 isAutoApply: data.isAutoApply ?? false,
+                ...(data.isFirstOrder
+                    ? {
+                        eligibility: {
+                            type: "FIRST_ORDER",
+                            scope: "VENDOR",
+                            requireVerifiedPhone: data.firstOrderRequireVerifiedPhone ?? true,
+                            maxRestores: data.firstOrderMaxRestores ?? 2,
+                        },
+                    }
+                    : {}),
             };
 
             if (data.offerType === "PERCENT" || data.offerType === "FLAT") {
@@ -465,6 +485,18 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                     (err: { path: string; message: string }) => {
                         toast.error(err.message, { id: toastId });
                     },
+                );
+                return;
+            }
+
+            const errorKey =
+                result?.data?.errorKey ??
+                result?.data?.errorSources?.[0]?.errorKey;
+
+            if (errorKey === "ACTIVE_FIRST_ORDER_VENDOR_OFFER_EXISTS") {
+                toast.error(
+                    "This store already has an active first-order offer. Deactivate it first, then try again.",
+                    { id: toastId },
                 );
                 return;
             }
@@ -723,7 +755,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                         {t("flat_amount_off")}
                                                     </SelectItem>
                                                     <SelectItem value="BUY_AND_REWARD">
-                                                        Buy & Reward
+                                                        {t("buy_and_reward")}
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
@@ -887,7 +919,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                     <div className="space-y-6 border border-gray-200 rounded-xl p-5 bg-gray-50/50 grid grid-cols-1 lg:grid-cols-2 lg:gap-8">
                                         <div className="space-y-4">
                                             <h3 className="font-semibold text-base">
-                                                Buy Condition
+                                                {t("buy_condition")}
                                             </h3>
 
                                             <FormField
@@ -896,7 +928,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                 render={({ field }) => (
                                                     <FormItem className="max-w-xs">
                                                         <FormLabel>
-                                                            Buy Quantity{" "}
+                                                            {t("buy_quantity")}{" "}
                                                             <span className="text-red-600">*</span>
                                                         </FormLabel>
                                                         <FormControl>
@@ -923,7 +955,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                 render={() => (
                                                     <FormItem className="space-y-2">
                                                         <FormLabel className="text-sm font-medium">
-                                                            Products to buy{" "}
+                                                            {t("products_to_buy")}{" "}
                                                             <span className="text-red-600">*</span>
                                                         </FormLabel>
                                                         <ProductSelector
@@ -947,7 +979,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                         />
                                                         {(watchBuyProductIds?.length ?? 0) > 0 && (
                                                             <p className="text-xs text-muted-foreground">
-                                                                {watchBuyProductIds!.length} product
+                                                                {watchBuyProductIds!.length} {t("product")}
                                                                 {watchBuyProductIds!.length === 1
                                                                     ? ""
                                                                     : "s"}{" "}
@@ -961,7 +993,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h3 className="font-semibold text-base">Reward</h3>
+                                            <h3 className="font-semibold text-base">{t("reward")}</h3>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <FormField
@@ -969,7 +1001,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                     name="buyAndReward.reward.type"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Reward Type</FormLabel>
+                                                            <FormLabel>{t("reward_type")}</FormLabel>
                                                             <Select
                                                                 onValueChange={(val) => {
                                                                     field.onChange(val);
@@ -993,13 +1025,13 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                                 </SelectTrigger>
                                                                 <SelectContent>
                                                                     <SelectItem value="SAME_PRODUCT">
-                                                                        Same Product
+                                                                        {t("same_product")}
                                                                     </SelectItem>
                                                                     <SelectItem value="FIXED_PRODUCT">
-                                                                        Fixed Product
+                                                                        {t("fixed_product")}
                                                                     </SelectItem>
                                                                     <SelectItem value="CUSTOMER_CHOICE">
-                                                                        Customer Choice
+                                                                        {t("customer_choice")}
                                                                     </SelectItem>
                                                                 </SelectContent>
                                                             </Select>
@@ -1013,7 +1045,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>
-                                                                Reward Quantity{" "}
+                                                                {t("reward_quantity")}{" "}
                                                                 <span className="text-red-600">*</span>
                                                             </FormLabel>
                                                             <FormControl>
@@ -1043,7 +1075,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                         render={() => (
                                                             <FormItem className="space-y-2">
                                                                 <FormLabel className="text-sm font-medium">
-                                                                    Reward Product{" "}
+                                                                    {t("reward_product")}{" "}
                                                                     <span className="text-red-600">*</span>
                                                                 </FormLabel>
                                                                 <ProductSelector
@@ -1072,7 +1104,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormLabel>
-                                                                        Variation SKU{" "}
+                                                                        {t("variation_sku")}{" "}
                                                                         <span className="text-red-600">*</span>
                                                                     </FormLabel>
                                                                     <Select
@@ -1080,7 +1112,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                                         value={field.value || ""}
                                                                     >
                                                                         <SelectTrigger className="h-12">
-                                                                            <SelectValue placeholder="Select variation SKU" />
+                                                                            <SelectValue placeholder={t("select_variation_sku")} />
                                                                         </SelectTrigger>
                                                                         <SelectContent>
                                                                             {fixedSkuOptions.map((opt) => (
@@ -1108,7 +1140,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                     render={() => (
                                                         <FormItem className="space-y-3">
                                                             <FormLabel className="text-sm font-medium">
-                                                                Reward Options{" "}
+                                                                {t("reward_options")}{" "}
                                                                 <span className="text-red-600">*</span>
                                                             </FormLabel>
                                                             <ProductSelector
@@ -1186,7 +1218,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                                                     className="space-y-1"
                                                                                 >
                                                                                     <Label className="text-sm">
-                                                                                        SKU for{" "}
+                                                                                        {t("sku_for")}{" "}
                                                                                         {prod.name?.[
                                                                                             lang as "en" | "pt"
                                                                                         ] || "product"}{" "}
@@ -1204,7 +1236,7 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                                                                         }
                                                                                     >
                                                                                         <SelectTrigger className="h-11">
-                                                                                            <SelectValue placeholder="Select variation SKU" />
+                                                                                            <SelectValue placeholder={t("select_variation_sku")} />
                                                                                         </SelectTrigger>
                                                                                         <SelectContent>
                                                                                             {skuOpts.map((s) => (
@@ -1226,11 +1258,11 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
 
                                                             {selectedRewardOptionIds.length > 0 && (
                                                                 <p className="text-xs text-muted-foreground">
-                                                                    {selectedRewardOptionIds.length} option
+                                                                    {selectedRewardOptionIds.length} {t("option")}
                                                                     {selectedRewardOptionIds.length === 1
                                                                         ? ""
                                                                         : "s"}{" "}
-                                                                    selected
+                                                                    {t("selected")}
                                                                 </p>
                                                             )}
                                                             <FormMessage />
@@ -1241,6 +1273,8 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                         </div>
                                     </div>
                                 )}
+
+                                <FirstOrderOfferCard scope="VENDOR" />
                             </div>
 
                             <div className="space-y-4">
@@ -1393,6 +1427,34 @@ export default function CreateNewVendorOffer({ itemsResult, vendorMongoId, vendo
                                         )}
                                     />
                                 )}
+                            </div>
+
+                            <div>
+                                <FormField
+                                    control={control}
+                                    name="isActive"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-0">
+                                            <div className="flex items-start gap-4 bg-[#DC3173]/20 p-4 rounded-md">
+                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-pink-100 text-[#DC3173]">
+                                                    <Accessibility size={22} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="font-semibold text-gray-900">{t("active_status")}</p>
+                                                    <p className="">{t("offer_activation_status_default_true")}</p>
+                                                </div>
+                                                <FormControl>
+                                                    <Toggle
+                                                        checked={!!field.value}
+                                                        onChange={field.onChange}
+                                                        label="First-order offer"
+                                                    />
+                                                </FormControl>
+                                            </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
                             {watchOfferType !== "BUY_AND_REWARD" &&

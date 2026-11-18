@@ -1,5 +1,24 @@
 import { USER_STATUS } from "@/consts/user.const";
 
+export type TWeekday =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
+
+export interface TClockPeriod {
+  open: string; // "HH:mm" 24-hour, e.g. "12:00"
+  close: string; // "HH:mm" or "24:00" (end of day)
+}
+
+export interface TWeeklyDaySchedule {
+  day: TWeekday; // English, capitalized, exactly as above
+  periods: TClockPeriod[]; // [] means CLOSED all day
+}
+
 export type TAgent = {
   // ---------------------------------------------
   // Core Identifiers
@@ -193,11 +212,26 @@ export type TVendor = {
     NIF?: string;
     totalBranches?: number;
 
+    /** Source of truth for opening hours. Absent on vendors that never set one. */
+    weeklySchedule?: TWeeklyDaySchedule[];
+    /** IANA timezone, e.g. "Europe/Lisbon". Times are store-local wall-clock. */
+    timezone?: string;
+    isStoreOpen?: boolean;
+
+    /** @deprecated read-only mirror of weeklySchedule (lossy for split shifts). Never write it. */
     openingHours?: string; // "09:00 AM"
+    /** @deprecated */
     closingHours?: string; // "11:00 PM"
+    /** @deprecated */
     closingDays?: string[]; // ["Friday", "Holidays"]
+
     availability?: {
-      state: "OPEN" | "PAUSED" | "CLOSED" | string;
+      state: "OPEN" | "CLOSED" | "PAUSED" | string;
+      isOpen?: boolean;
+      reason?: string | null;
+      overrideType?: string | null;
+      resumeAt?: string | null;
+      nextOpenAt?: string | null;
       override?: {
         status: "PAUSED" | "SUSPENDED";
         until: string;

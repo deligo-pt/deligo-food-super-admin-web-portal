@@ -20,12 +20,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import ProductVariationCard from "./ProductVariationCard";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 interface IProps {
   productsData: { data: TProduct[]; meta?: TMeta };
   businessTypeSlug: string;
   vendorMongoId: string;
   vendorId: string;
+  businessName: string;
 }
 
 const PAGE_LIMIT = 30; // change to 20 / 30 later
@@ -35,10 +37,14 @@ export default function VariationManagement({
   businessTypeSlug,
   vendorMongoId,
   vendorId,
+  businessName
 }: IProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // vendor businessname or  branch name
+  useVendorTopbarTitle(businessName);
 
   const [products, setProducts] = useState<TProduct[]>(productsData.data || []);
   const [page, setPage] = useState(productsData.meta?.page || 1);

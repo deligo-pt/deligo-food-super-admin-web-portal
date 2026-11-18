@@ -11,6 +11,8 @@ const IncreasePricePage = async ({ params }: { params: Promise<{ id: string }> }
 
     const vendorData: TVendor = await getSingleVendorReq(id);
 
+    const businessName = vendorData?.businessDetails?.businessName || vendorData?.businessDetails?.branchName as string;
+
     const query = { "meta.status": "ACTIVE", vendorId: vendorData?._id };
     const queryString = queryStringFormatter(query);
     const productsResponse = await getAllProducts(queryString);
@@ -30,6 +32,7 @@ const IncreasePricePage = async ({ params }: { params: Promise<{ id: string }> }
                 productCategries={productCategries?.data ?? []}
                 vendorId={vendorData?.userId}
                 vendorMongoId={vendorData?._id}
+                businessName={businessName}
             />
         </div>
     );

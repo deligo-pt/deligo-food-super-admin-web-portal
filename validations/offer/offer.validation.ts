@@ -46,7 +46,14 @@ export const offerValidation = z
 
     userUsageLimit: z.string().optional(),
 
-    applicableProducts: z.array(z.string("Product is required")).optional(),
+    // applicableProducts: z.array(z.string("Product is required")).optional(),
+    scopeType: z.enum(["ALL_PRODUCTS", "SPECIFIC_PRODUCTS"]).optional(),
+    scopeProducts: z.array(z.string()).optional(),
+    isActive: z.boolean().optional(),
+
+    isFirstOrder: z.boolean().optional(),
+    firstOrderRequireVerifiedPhone: z.boolean().optional(),
+    firstOrderMaxRestores: z.number().int().min(0).max(5).optional(),
 
     currentLang: z.enum(["en", "pt"]).optional(),
   })
@@ -66,6 +73,12 @@ export const offerValidation = z
       "Description is required"
     );
   })
+  .refine(
+    (data) =>
+      data.scopeType !== "SPECIFIC_PRODUCTS" ||
+      (!!data.scopeProducts && data.scopeProducts.length > 0),
+    { message: "Select at least one product", path: ["scopeProducts"] },
+  )
   .refine(
     (data) => {
       if (data.offerType === "PERCENT" && data.discountValue && data.discountValue > 100) {
@@ -169,6 +182,18 @@ export const offerValidation = z
     },
   );
 
+// ─────────────────────────────────────────────────────────────────────────────
+// In "@/validations/offer/offer.validation.ts":
+// replace everything from `const rewardOptionSchema` down to and including
+// `export type TOfferForm = ...;` with the code below.
+// Keep `productHasVariations` and `getProductSkuOptions` (they stay unchanged).
+//
+// New translation keys to add:
+//   offer_err_percent_max          "Percentage discount can't exceed 100"
+//   offer_err_max_discount_required "Max discount amount is required and must be greater than 0"
+//   offer_err_flat_min_order       "Minimum order must be at least 2x the discount"
+// ─────────────────────────────────────────────────────────────────────────────
+
 const rewardOptionSchema = z.object({
   productId: z.string().min(1, "offer_err_product_required"),
   variationSku: z.string().optional(),
@@ -189,39 +214,54 @@ const buyAndRewardRewardSchema = z.object({
   options: z.array(rewardOptionSchema).optional(),
 });
 
-export const vendorOfferValidation = z.object({
-  title: localizedTextSchema,
-  description: localizedTextSchema,
+// Was localizedTextSchema (50 chars) by mistake. The old offerValidation allowed 500.
+const offerDescriptionSchema = z.object({
+  en: z.string().max(500, "Cannot exceed 500 characters").optional(),
+  pt: z.string().max(500, "Cannot exceed 500 characters").optional(),
+});
 
-  offerType: z.enum(["PERCENT", "FLAT", "BUY_AND_REWARD"], {
-    error: "offer_err_type_required",
-  }),
+export const vendorOfferValidation = z
+  .object({
+    title: localizedTextSchema,
+    description: offerDescriptionSchema,
 
-  discountValue: z.number().min(0).max(100).optional(),
-  maxDiscountAmount: z.number().min(0).max(1000).optional(),
+    offerType: z.enum(["PERCENT", "FLAT", "BUY_AND_REWARD"], {
+      error: "offer_err_type_required",
+    }),
 
-  scopeType: z.enum(["ALL_PRODUCTS", "SPECIFIC_PRODUCTS"]).optional(),
-  scopeCategories: z.array(z.string()).optional(),
-  scopeProducts: z.array(z.string()).optional(),
+    // The 100 cap applies to PERCENT only (checked in superRefine). FLAT can be any amount.
+    discountValue: z.number().min(0).optional(),
+    maxDiscountAmount: z.number().min(0).max(1000).optional(),
 
-  buyAndReward: z
-    .object({
-      buy: buyAndRewardBuySchema,
-      reward: buyAndRewardRewardSchema,
-    })
-    .optional(),
+    scopeType: z.enum(["ALL_PRODUCTS", "SPECIFIC_PRODUCTS"]).optional(),
+    scopeCategories: z.array(z.string()).optional(),
+    scopeProducts: z.array(z.string()).optional(),
+    allowDiscountedProducts: z.boolean().optional(),
+    isFirstOrder: z.boolean().optional(),
+    firstOrderRequireVerifiedPhone: z.boolean().optional(),
+    firstOrderMaxRestores: z.number().int().min(0).max(5).optional(),
 
-  validFrom: z.date({ error: "offer_err_start_date_required" }),
-  expiresAt: z.date({ error: "offer_err_end_date_required" }),
-  minOrderAmount: z.number().min(0).optional(),
-  code: z.string().optional(),
-  isAutoApply: z.boolean().optional(),
-  userUsageLimit: z.string().optional(),
-  isActive: z.boolean().default(true),
+    buyAndReward: z
+      .object({
+        buy: buyAndRewardBuySchema,
+        reward: buyAndRewardRewardSchema,
+      })
+      .optional(),
 
-  currentLang: z.enum(["en", "pt"]),
-})
+    validFrom: z.date({ error: "offer_err_start_date_required" }),
+    expiresAt: z.date({ error: "offer_err_end_date_required" }),
+    minOrderAmount: z.number().min(0).optional(),
+    code: z.string().optional(),
+    isAutoApply: z.boolean().optional(),
+    userUsageLimit: z.string().optional(),
+    isActive: z.boolean().default(true),
+
+    currentLang: z.enum(["en", "pt"]),
+  })
   .superRefine((data, ctx) => {
+    const add = (message: string, path: (string | number)[]) =>
+      ctx.addIssue({ code: "custom", message, path });
+
     validateLocalizedField(
       data.title,
       data.currentLang,
@@ -236,149 +276,72 @@ export const vendorOfferValidation = z.object({
       ["description"],
       "offer_err_description_required",
     );
-  })
-  .refine((data) => data.validFrom < data.expiresAt, {
-    message: "offer_err_end_after_start",
-    path: ["expiresAt"],
-  })
-  .refine(
-    (data) => {
-      if (data.offerType === "PERCENT" || data.offerType === "FLAT") {
-        return data.discountValue !== undefined && data.discountValue !== null;
+
+    if (data.validFrom >= data.expiresAt) {
+      add("offer_err_end_after_start", ["expiresAt"]);
+    }
+
+    if (data.userUsageLimit && data.userUsageLimit.trim() !== "") {
+      const num = Number(data.userUsageLimit);
+      if (isNaN(num) || num < 1) add("offer_err_usage_limit", ["userUsageLimit"]);
+    }
+
+    // ── PERCENT / FLAT ───────────────────────────────────────────────────────
+    if (data.offerType === "PERCENT" || data.offerType === "FLAT") {
+      if (data.discountValue == null) {
+        add("offer_err_discount_required", ["discountValue"]);
       }
-      return true;
-    },
-    { message: "offer_err_discount_required", path: ["discountValue"] },
-  )
-  .refine(
-    (data) => {
+
       if (
-        (data.offerType === "PERCENT" || data.offerType === "FLAT") &&
-        data.scopeType === "SPECIFIC_PRODUCTS"
+        data.scopeType === "SPECIFIC_PRODUCTS" &&
+        !data.scopeProducts?.length
       ) {
-        return !!data.scopeProducts && data.scopeProducts.length > 0;
+        add("offer_err_one_product", ["scopeProducts"]);
       }
-      return true;
-    },
-    { message: "offer_err_one_product", path: ["scopeProducts"] },
-  )
-  .refine(
-    (data) => {
-      if (data.offerType === "PERCENT" || data.offerType === "FLAT") {
-        if (!data.isAutoApply) {
-          return !!data.code && data.code.trim() !== "";
+
+      if (!data.isAutoApply && !data.code?.trim()) {
+        add("offer_err_promo_code", ["code"]);
+      }
+    }
+
+    // Guardrail: PERCENT needs a positive cap, and can't exceed 100%
+    if (data.offerType === "PERCENT") {
+      if ((data.discountValue ?? 0) > 100) {
+        add("offer_err_percent_max", ["discountValue"]);
+      }
+      if (!data.maxDiscountAmount || data.maxDiscountAmount <= 0) {
+        add("offer_err_max_discount_required", ["maxDiscountAmount"]);
+      }
+    }
+
+    // Guardrail: FLAT needs minOrderAmount >= 2 x discountValue (exactly 2x is valid)
+    if (data.offerType === "FLAT" && data.discountValue != null) {
+      if ((data.minOrderAmount ?? 0) < 2 * data.discountValue) {
+        add("offer_err_flat_min_order", ["minOrderAmount"]);
+      }
+    }
+
+    // ── BUY_AND_REWARD ───────────────────────────────────────────────────────
+    if (data.offerType === "BUY_AND_REWARD") {
+      const br = data.buyAndReward;
+      if (!br) {
+        add("offer_err_buy_reward_required", ["buyAndReward"]);
+        return;
+      }
+      if (!br.buy.productIds?.length) {
+        add("offer_err_buy_product", ["buyAndReward", "buy", "productIds"]);
+      }
+      if (br.reward.type === "FIXED_PRODUCT" && !br.reward.productId) {
+        add("offer_err_fixed_reward", ["buyAndReward", "reward", "productId"]);
+      }
+      if (br.reward.type === "CUSTOMER_CHOICE") {
+        const opts = br.reward.options;
+        if (!opts?.length || !opts.every((o) => !!o.productId)) {
+          add("offer_err_reward_option", ["buyAndReward", "reward", "options"]);
         }
       }
-      return true;
-    },
-    {
-      message: "offer_err_promo_code",
-      path: ["code"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.offerType === "BUY_AND_REWARD") {
-        return !!data.buyAndReward;
-      }
-      return true;
-    },
-    {
-      message: "offer_err_buy_reward_required",
-      path: ["buyAndReward"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.offerType === "BUY_AND_REWARD" && data.buyAndReward) {
-        return (
-          !!data.buyAndReward.buy.quantity &&
-          data.buyAndReward.buy.quantity >= 1
-        );
-      }
-      return true;
-    },
-    {
-      message: "offer_err_buy_qty_min",
-      path: ["buyAndReward", "buy", "quantity"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.offerType === "BUY_AND_REWARD" && data.buyAndReward) {
-        return (
-          !!data.buyAndReward.buy.productIds &&
-          data.buyAndReward.buy.productIds.length > 0
-        );
-      }
-      return true;
-    },
-    {
-      message: "offer_err_buy_product",
-      path: ["buyAndReward", "buy", "productIds"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.offerType === "BUY_AND_REWARD" && data.buyAndReward) {
-        return (
-          !!data.buyAndReward.reward.quantity &&
-          data.buyAndReward.reward.quantity >= 1
-        );
-      }
-      return true;
-    },
-    {
-      message: "offer_err_reward_qty_min",
-      path: ["buyAndReward", "reward", "quantity"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (
-        data.offerType === "BUY_AND_REWARD" &&
-        data.buyAndReward?.reward.type === "FIXED_PRODUCT"
-      ) {
-        return !!data.buyAndReward.reward.productId;
-      }
-      return true;
-    },
-    {
-      message: "offer_err_fixed_reward",
-      path: ["buyAndReward", "reward", "productId"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (
-        data.offerType === "BUY_AND_REWARD" &&
-        data.buyAndReward?.reward.type === "CUSTOMER_CHOICE"
-      ) {
-        const opts = data.buyAndReward.reward.options;
-        return (
-          !!opts && opts.length > 0 && opts.every((o) => !!o.productId)
-        );
-      }
-      return true;
-    },
-    {
-      message: "offer_err_reward_option",
-      path: ["buyAndReward", "reward", "options"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.userUsageLimit && data.userUsageLimit.trim() !== "") {
-        const num = Number(data.userUsageLimit);
-        return !isNaN(num) && num >= 1;
-      }
-      return true;
-    },
-    {
-      message: "offer_err_usage_limit",
-      path: ["userUsageLimit"],
-    },
-  );
+    }
+  });
 
 export type TOfferForm = z.infer<typeof vendorOfferValidation>;
 

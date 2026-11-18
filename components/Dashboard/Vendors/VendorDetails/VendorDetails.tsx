@@ -16,7 +16,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { userSoftDeleteReq } from "@/services/auth/delete-user.service";
 import { resendOtpReq } from "@/services/auth/otp.service";
 import { TMeta } from "@/types";
-import { TVendor } from "@/types/user.type";
+import { TClockPeriod, TVendor, TWeeklyDaySchedule } from "@/types/user.type";
 import { format, parse } from "date-fns";
 import { motion } from "framer-motion";
 import {
@@ -46,13 +46,91 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import VendorAvailabilityModal from "./VendorAvailabilityModal";
 import ClearAvailabilityDialog from "./ClearAvailabilityDialog";
 import { useStore } from "@/store/store";
+import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 interface IProps {
   vendor: TVendor;
   branchesResult: {
     data: TVendor[];
     meta: TMeta;
+  };
+}
+
+const WEEKDAY_ORDER = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const;
+
+/** Convert "HH:mm" or "24:00" → "9:00 AM" / "12:00 AM" (12-hour). */
+function to12Hour(time: string): string {
+  if (!time) return "";
+  if (/\b(AM|PM)\b/i.test(time)) return time;
+  // End of day
+  if (time === "24:00" || time === "00:00") return "12:00 AM";
+  try {
+    return format(parse(time, "HH:mm", new Date()), "h:mm a");
+  } catch {
+    return time;
   }
+}
+
+/** Format periods as readable 12h ranges, e.g. "9:00 AM – 8:00 PM". */
+function formatPeriodRange(period: TClockPeriod): string {
+  return `${to12Hour(period.open)} – ${to12Hour(period.close)}`;
+}
+
+function hasWeeklySchedule(
+  details?: TVendor["businessDetails"],
+): details is NonNullable<TVendor["businessDetails"]> & {
+  weeklySchedule: TWeeklyDaySchedule[];
+} {
+  return (
+    Array.isArray(details?.weeklySchedule) &&
+    details!.weeklySchedule!.length > 0
+  );
+}
+
+type ScheduleRow = {
+  day: string;
+  periods: TClockPeriod[];
+  isClosed: boolean;
+};
+
+/** Prefer weeklySchedule; fall back to legacy opening/closing hours. */
+function getScheduleRows(
+  details: TVendor["businessDetails"] | undefined,
+): ScheduleRow[] {
+  if (hasWeeklySchedule(details)) {
+    const byDay = new Map(
+      details.weeklySchedule.map((d) => [d.day, d.periods ?? []]),
+    );
+    return WEEKDAY_ORDER.map((day) => {
+      const periods = byDay.get(day) ?? [];
+      return { day, periods, isClosed: periods.length === 0 };
+    });
+  }
+
+  // Legacy fallback → single period per open day
+  const closed = new Set(details?.closingDays ?? []);
+  const open = details?.openingHours;
+  const close = details?.closingHours;
+  const hasLegacy = Boolean(open && close);
+
+  return WEEKDAY_ORDER.map((day) => {
+    if (closed.has(day) || !hasLegacy) {
+      return { day, periods: [], isClosed: true };
+    }
+    return {
+      day,
+      periods: [{ open: open!, close: close! }],
+      isClosed: false,
+    };
+  });
 }
 
 export default function VendorDetails({ vendor, branchesResult }: IProps) {
@@ -67,17 +145,22 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [showClearOverrideDialog, setShowClearOverrideDialog] = useState(false);
 
-  const setVendor = useStore((s) => s.setVendor);
-  const clearVendor = useStore((s) => s.clearVendor);
+  useVendorTopbarTitle(
+    vendor?.businessDetails?.businessName ||
+    vendor?.businessDetails?.branchName,
+  );
 
-  // Save on enter / when the fetched vendor changes, remove when leaving the page
-  useEffect(() => {
-    setVendor(vendor?.businessDetails?.businessName || vendor?.businessDetails?.branchName || null);
-    return () => clearVendor();
-  }, [vendor, setVendor, clearVendor]);
-
-  const hasActiveOverride = Boolean(vendor?.businessDetails?.availability?.override);
+  const hasActiveOverride = Boolean(
+    vendor?.businessDetails?.availability?.override,
+  );
   const override = vendor?.businessDetails?.availability?.override;
+
+  const scheduleRows = getScheduleRows(vendor?.businessDetails);
+  const usingWeeklySchedule = hasWeeklySchedule(vendor?.businessDetails);
+  const timezone = vendor?.businessDetails?.timezone;
+  const isStoreOpen = vendor?.businessDetails?.isStoreOpen;
+  const availabilityState = vendor?.businessDetails?.availability?.state;
+  const closedLabel = t("closed") || "Closed";
 
   const closeApproveOrRejectModal = (open: boolean) => {
     if (!open) {
@@ -128,10 +211,10 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
     setIsSubmitting(true);
 
     try {
-      const result = (await resendOtpReq({
+      const result = await resendOtpReq({
         email: vendor?.email,
         role: USER_ROLE.VENDOR,
-      }));
+      });
 
       if (result.success) {
         toast.success("OTP resent successfully!", { id: toastId });
@@ -155,6 +238,11 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
     router,
   });
 
+  const dayLabel = (day: string) => {
+    const key = day.toLowerCase();
+    return t(key) || day;
+  };
+
   return (
     <div>
       <div className="mb-4">
@@ -163,7 +251,8 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
           variant="link"
           className="inline-flex items-center text-sm gap-2 text-[#DC3173] px-0! py-0 h-4 cursor-pointer"
         >
-          <ArrowLeftCircle />{t("go_back")}
+          <ArrowLeftCircle />
+          {t("go_back")}
         </Button>
       </div>
       <motion.div
@@ -220,7 +309,8 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
             )}
             <div>
               <h1 className="text-2xl font-bold">
-                {vendor?.name?.firstName || "N/"} {vendor?.name?.lastName || "A"}
+                {vendor?.name?.firstName || "N/"}{" "}
+                {vendor?.name?.lastName || "A"}
               </h1>
               <p className="opacity-90">{vendor?.email}</p>
               {vendor?.contactNumber && (
@@ -233,13 +323,15 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
         <div className="p-6">
           <div className="mb-6 border-gray-200">
             <div className="flex justify-end gap-4">
-              {!vendor?.isEmailVerified ? <ActionButton
-                onClick={resendOtp}
-                disabled={isSubmitting}
-                label={t("verify_email")}
-                icon={<Check size={18} />}
-                variant="primary"
-              /> :
+              {!vendor?.isEmailVerified ? (
+                <ActionButton
+                  onClick={resendOtp}
+                  disabled={isSubmitting}
+                  label={t("verify_email")}
+                  icon={<Check size={18} />}
+                  variant="primary"
+                />
+              ) : (
                 <ActionButton
                   onClick={() =>
                     router.push("/admin/vendor/edit/" + vendor.userId)
@@ -247,7 +339,8 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
                   label={t("edit")}
                   icon={<EditIcon size={18} />}
                   variant="primary"
-                />}
+                />
+              )}
               {vendor.status === "APPROVED" && (
                 <>
                   {hasActiveOverride ? (
@@ -273,24 +366,22 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
                 <div>
                   <p className="font-semibold">
                     {t("currently")} {override?.status}
-                    {override?.isCustomerHidden && ` ${t("hidden_from_customers")}`}
+                    {override?.isCustomerHidden &&
+                      ` ${t("hidden_from_customers")}`}
                   </p>
                   <p className="text-xs mt-0.5">
-                    {t("until")}: {override?.until ? format(new Date(override.until), "dd MMM yyyy, hh:mm a") : "N/A"}
-                    {override?.reason && ` • ${t("reason")}: ${override.reason}`}
+                    {t("until")}:{" "}
+                    {override?.until
+                      ? format(new Date(override.until), "dd MMM yyyy, hh:mm a")
+                      : "N/A"}
+                    {override?.reason &&
+                      ` • ${t("reason")}: ${override.reason}`}
                   </p>
                 </div>
-                {/* <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-amber-300 text-amber-800 hover:bg-amber-100"
-                  onClick={() => setShowClearOverrideDialog(true)}
-                >
-                  Clear Override
-                </Button> */}
               </div>
             )}
           </div>
+
           <AgentOrVendorSection
             title={t("personal_details")}
             icon={<UserIcon size={20} />}
@@ -310,19 +401,24 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t("contact_number")}</p>
-                <p className="font-medium">{vendor?.contactNumber || "N/A"}</p>
+                <p className="font-medium">
+                  {vendor?.contactNumber || "N/A"}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">{t("email_verified")}</p>
-                <p className={`px-2 py-0.5 w-9 rounded text-sm font-medium ${vendor?.isEmailVerified
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-                  }`}>
+                <p
+                  className={`px-2 py-0.5 w-9 rounded text-sm font-medium ${vendor?.isEmailVerified
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                    }`}
+                >
                   {vendor?.isEmailVerified ? t("yes") : t("no")}
                 </p>
               </div>
             </div>
           </AgentOrVendorSection>
+
           <AgentOrVendorSection
             title={t("business_details")}
             icon={<BuildingIcon size={20} />}
@@ -337,24 +433,22 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
               </div>
               {vendor?.businessDetails?.companyLegalName && (
                 <div>
-                  <p className="text-sm text-gray-500">{t("company_legal_name")}</p>
+                  <p className="text-sm text-gray-500">
+                    {t("company_legal_name")}
+                  </p>
                   <p className="font-medium">
                     {vendor?.businessDetails?.companyLegalName || "N/A"}
                   </p>
                 </div>
               )}
-              {vendor?.role === "SUB_VENDOR" && <div>
-                <p className="text-sm text-gray-500">{t("branch_name")}</p>
-                <p className="font-medium">
-                  {vendor?.businessDetails?.branchName || "N/A"}
-                </p>
-              </div>}
-              {/* <div>
-                <p className="text-sm text-gray-500">{t("license_number")}</p>
-                <p className="font-medium">
-                  {vendor?.businessDetails?.businessLicenseNumber || "N/A"}
-                </p>
-              </div> */}
+              {vendor?.role === "SUB_VENDOR" && (
+                <div>
+                  <p className="text-sm text-gray-500">{t("branch_name")}</p>
+                  <p className="font-medium">
+                    {vendor?.businessDetails?.branchName || "N/A"}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-500">{t("nif")}</p>
                 <p className="font-medium">
@@ -369,74 +463,117 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
               </div>
               {vendor?.businessDetails?.businessTypeSlug === "restaurant" && (
                 <div>
-                  <p className="text-sm text-gray-500">{t("restaurant_cuisine_type")}</p>
+                  <p className="text-sm text-gray-500">
+                    {t("restaurant_cuisine_type")}
+                  </p>
                   <p className="font-medium">
                     {(() => {
-                      const cuisineData = vendor?.businessDetails?.restaurantCuisineType;
-
-                      if (!cuisineData || (Array.isArray(cuisineData) && cuisineData.length === 0)) {
+                      const cuisineData =
+                        vendor?.businessDetails?.restaurantCuisineType;
+                      if (
+                        !cuisineData ||
+                        (Array.isArray(cuisineData) && cuisineData.length === 0)
+                      ) {
                         return "N/A";
                       }
-
-                      return Array.isArray(cuisineData) ? cuisineData.join(", ") : cuisineData;
+                      return Array.isArray(cuisineData)
+                        ? cuisineData.join(", ")
+                        : cuisineData;
                     })()}
                   </p>
                 </div>
               )}
-              {vendor?.role === "VENDOR" && <div>
-                <p className="text-sm text-gray-500">{t("total_branches")}</p>
-                <p className="font-medium">
-                  {vendor?.businessDetails?.totalBranches || "N/A"}
-                </p>
-              </div>}
-              {vendor?.businessDetails?.openingHours && (
+              {vendor?.role === "VENDOR" && (
                 <div>
-                  <p className="text-sm text-gray-500">{t("opening_hours")}</p>
+                  <p className="text-sm text-gray-500">{t("total_branches")}</p>
                   <p className="font-medium">
-                    {vendor?.businessDetails?.openingHours
-                      ? /\b(AM|PM)\b/i.test(
-                        vendor?.businessDetails?.openingHours,
-                      )
-                        ? vendor?.businessDetails?.openingHours
-                        : format(
-                          parse(
-                            vendor?.businessDetails?.openingHours,
-                            "HH:mm",
-                            new Date(),
-                          ),
-                          "hh:mm a",
-                        )
-                      : "N/A"}
+                    {vendor?.businessDetails?.totalBranches ?? "N/A"}
                   </p>
                 </div>
               )}
-              <div>
-                <p className="text-sm text-gray-500">{t("closing_hours")}</p>
-                <p className="font-medium">
-                  {vendor?.businessDetails?.closingHours
-                    ? /\b(AM|PM)\b/i.test(vendor?.businessDetails?.closingHours)
-                      ? vendor?.businessDetails?.closingHours
-                      : format(
-                        parse(
-                          vendor?.businessDetails?.closingHours,
-                          "HH:mm",
-                          new Date(),
-                        ),
-                        "hh:mm a",
-                      )
-                    : "N/A"}
+
+              {/* Store status + timezone — same label/value pattern as other fields */}
+              {typeof isStoreOpen === "boolean" && (
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {t("store_status") || "Store Status"}
+                  </p>
+                  <p className="font-medium flex items-center gap-2 mt-0.5">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${isStoreOpen
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-700"
+                        }`}
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${isStoreOpen ? "bg-green-500" : "bg-gray-400"
+                          }`}
+                      />
+                      {isStoreOpen
+                        ? t("open") || "Open"
+                        : t("closed") || "Closed"}
+                    </span>
+                    {availabilityState &&
+                      availabilityState !== "OPEN" &&
+                      availabilityState !== "CLOSED" && (
+                        <span className="text-xs text-gray-500">
+                          ({availabilityState})
+                        </span>
+                      )}
+                  </p>
+                </div>
+              )}
+              {timezone && (
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {t("timezone") || "Timezone"}
+                  </p>
+                  <p className="font-medium">{timezone}</p>
+                </div>
+              )}
+
+              {/* Operating hours — weeklySchedule preferred, 12h AM/PM, multi-period chips */}
+              <div className="md:col-span-2">
+                <p className="text-sm text-gray-500 mb-3">
+                  {t("operating_hours") || "Operating Hours"}
+                  {!usingWeeklySchedule && (
+                    <span className="ml-2 text-[10px] uppercase tracking-wide text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                      {t("legacy") || "Legacy"}
+                    </span>
+                  )}
                 </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">{t("closing_days")}</p>
-                <p className="font-medium">
-                  {vendor?.businessDetails?.closingDays?.length
-                    ? vendor.businessDetails.closingDays.join(", ")
-                    : "N/A"}
-                </p>
+                <div className="space-y-0 divide-y divide-gray-100 rounded-xl border border-gray-100 bg-gray-50/60 overflow-hidden">
+                  {scheduleRows.map(({ day, periods, isClosed }) => (
+                    <div
+                      key={day}
+                      className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 px-4 py-2.5 bg-white"
+                    >
+                      <p className="text-sm font-medium text-gray-700 w-28 shrink-0">
+                        {dayLabel(day)}
+                      </p>
+                      {isClosed ? (
+                        <p className="text-sm text-gray-400 italic">
+                          {closedLabel}
+                        </p>
+                      ) : (
+                        <div className="flex flex-wrap gap-1.5">
+                          {periods.map((period, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-[#DC3173]/8 text-[#DC3173] border border-[#DC3173]/15"
+                            >
+                              {formatPeriodRange(period)}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </AgentOrVendorSection>
+
           <AgentOrVendorSection
             title={t("business_location")}
             icon={<MapPinIcon size={20} />}
@@ -481,6 +618,7 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
               </p>
             )}
           </AgentOrVendorSection>
+
           <AgentOrVendorSection
             title={t("bank_details")}
             icon={<BriefcaseIcon size={20} />}
@@ -490,7 +628,9 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">{t("bank_name")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.bankName || "N/A"}</p>
+                  <p className="font-medium">
+                    {vendor.bankDetails?.bankName || "N/A"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("account_holder")}</p>
@@ -500,17 +640,24 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("iban")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.iban || "N/A"}</p>
+                  <p className="font-medium">
+                    {vendor.bankDetails?.iban || "N/A"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{t("swift_code")}</p>
-                  <p className="font-medium">{vendor.bankDetails?.swiftCode || "N/A"}</p>
+                  <p className="font-medium">
+                    {vendor.bankDetails?.swiftCode || "N/A"}
+                  </p>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 italic">{t("no_bank_details_provided")}</p>
+              <p className="text-gray-500 italic">
+                {t("no_bank_details_provided")}
+              </p>
             )}
           </AgentOrVendorSection>
+
           <AgentOrVendorSection
             title={t("activity_logs")}
             icon={<BriefcaseIcon size={20} />}
@@ -567,6 +714,7 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
               )}
             </div>
           </AgentOrVendorSection>
+
           <AgentOrVendorSection
             title={t("documents")}
             icon={<FileTextIcon size={20} />}
@@ -574,6 +722,7 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
           >
             <VendorDetailsDoc documents={vendor?.documents as IVendorDocs} />
           </AgentOrVendorSection>
+
           <AgentOrVendorSection
             title={t("agreement_document") || "Agreement Document"}
             icon={<FileTextIcon size={20} />}
@@ -581,7 +730,6 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
           >
             {vendor?.agreement?.pdfPath ? (
               <div className="space-y-4">
-                {/* Agreement Status Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-gray-200 rounded-lg p-4 bg-gray-50/50">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -604,8 +752,6 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
                         "Official signed partnership agreement PDF."}
                     </p>
                   </div>
-
-                  {/* Download Button */}
                   <a
                     href={vendor?.agreement?.pdfPath}
                     download
@@ -615,8 +761,6 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
                     {t("download") || "Download"}
                   </a>
                 </div>
-
-                {/* Embedded Document Viewer with Modal */}
                 <DocumentViewer
                   sections={[
                     {
@@ -634,41 +778,41 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
             )}
           </AgentOrVendorSection>
 
-          {vendor?.role === "VENDOR" && <AgentOrVendorSection
-            title={t("all_branches")}
-            icon={<FileTextIcon size={20} />}
-            defaultOpen={true}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
+          {vendor?.role === "VENDOR" && (
+            <AgentOrVendorSection
+              title={t("all_branches")}
+              icon={<FileTextIcon size={20} />}
+              defaultOpen={true}
             >
-              <ReusableTable
-                data={branchesResult?.data}
-                meta={branchesResult?.meta}
-                columns={columns}
-                getRowKey={(row) => row._id}
-                emptyMessage={t("no_vendors_no_branches_foundfound")}
-              />
-            </motion.div>
-
-            {/* Pagination */}
-            {!!branchesResult?.meta?.totalPage && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="px-4 md:px-6 mt-5"
+                className="bg-white shadow-md rounded-2xl p-4 md:p-6 mb-2 overflow-x-auto"
               >
-                <PaginationComponent
-                  totalPages={branchesResult?.meta?.totalPage as number}
+                <ReusableTable
+                  data={branchesResult?.data}
+                  meta={branchesResult?.meta}
+                  columns={columns}
+                  getRowKey={(row) => row._id}
+                  emptyMessage={t("no_vendors_no_branches_foundfound")}
                 />
               </motion.div>
-            )}
-          </AgentOrVendorSection>}
+
+              {!!branchesResult?.meta?.totalPage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-4 md:px-6 mt-5"
+                >
+                  <PaginationComponent
+                    totalPages={branchesResult?.meta?.totalPage as number}
+                  />
+                </motion.div>
+              )}
+            </AgentOrVendorSection>
+          )}
         </div>
 
-        {/* buttons */}
         <div className="mb-6 mx-6">
           <div className="flex flex-wrap justify-end gap-4">
             {vendor.status === "SUBMITTED" && (
@@ -687,9 +831,11 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
                 variant="warning"
               />
             )}
-            {(vendor.status === "APPROVED" && vendor?.role === "VENDOR") && (
+            {vendor.status === "APPROVED" && vendor?.role === "VENDOR" && (
               <ActionButton
-                onClick={() => router.push(`/admin/vendor-branch/add/${vendor?.userId}`)}
+                onClick={() =>
+                  router.push(`/admin/vendor-branch/add/${vendor?.userId}`)
+                }
                 label={t("add_branch")}
                 icon={<EditIcon size={18} />}
                 variant="primary"
@@ -698,7 +844,11 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
             {vendor.status === "APPROVED" && (
               <>
                 <ActionButton
-                  onClick={() => router.push(`/admin/vendor/${vendor?.userId}/manage-products`)}
+                  onClick={() =>
+                    router.push(
+                      `/admin/vendor/${vendor?.userId}/manage-products`,
+                    )
+                  }
                   label={t("manage_products")}
                   icon={<EditIcon size={18} />}
                   variant="primary"
@@ -727,10 +877,9 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
             />
           </div>
         </div>
-      </motion.div >
+      </motion.div>
 
-      {/* Verify unverified rider */}
-      < VerifyOtpModal
+      <VerifyOtpModal
         email={vendor?.email}
         role={USER_ROLE.VENDOR}
         userId={vendor?.userId}
@@ -758,17 +907,25 @@ export default function VendorDetails({ vendor, branchesResult }: IProps) {
         open={showAvailabilityModal}
         onOpenChange={setShowAvailabilityModal}
         vendorId={vendor.userId}
-        vendorName={`${vendor?.name?.firstName || ""} ${vendor?.name?.lastName || ""}`.trim() || vendor.businessDetails?.businessName || "Vendor"}
+        vendorName={
+          `${vendor?.name?.firstName || ""} ${vendor?.name?.lastName || ""}`.trim() ||
+          vendor.businessDetails?.businessName ||
+          "Vendor"
+        }
       />
 
       <ClearAvailabilityDialog
         open={showClearOverrideDialog}
         onOpenChange={setShowClearOverrideDialog}
         vendorId={vendor.userId}
-        vendorName={`${vendor?.name?.firstName || ""} ${vendor?.name?.lastName || ""}`.trim() || vendor.businessDetails?.businessName || "Vendor"}
+        vendorName={
+          `${vendor?.name?.firstName || ""} ${vendor?.name?.lastName || ""}`.trim() ||
+          vendor.businessDetails?.businessName ||
+          "Vendor"
+        }
         currentStatus={override?.status}
         until={override?.until}
       />
-    </div >
+    </div>
   );
 }

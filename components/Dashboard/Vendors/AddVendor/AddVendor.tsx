@@ -49,8 +49,9 @@ import { formatTime } from "@/utils/formatTime";
 import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
 import { addVendorValidation } from "@/validations/add-vendor/add-vendor.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
+import WeeklyScheduleEditor from "@/components/Dashboard/Vendors/AddVendor/WeeklyScheduleEditor";
+import { emptyWeeklySchedule, hasAnyPeriod, mapScheduleServerErrors, normalizeSchedule } from "@/utils/weeklySchedule";
 import {
   Banknote,
   Briefcase,
@@ -164,9 +165,10 @@ export default function AddVendor({
       restaurantCuisineType: [],
       NIF: "",
       branches: "",
-      openingHours: "",
-      closingHours: "",
-      closingDays: [],
+      // openingHours: "",
+      // closingHours: "",
+      // closingDays: [],
+      weeklySchedule: emptyWeeklySchedule(),
       street: "",
       city: "",
       postalCode: "",
@@ -183,15 +185,15 @@ export default function AddVendor({
     formState: { isSubmitting },
   } = form;
 
-  const daysOfWeek = [
-    t("sunday"),
-    t("monday"),
-    t("tuesday"),
-    t("wednesday"),
-    t("thursday"),
-    t("friday"),
-    t("saturday"),
-  ];
+  // const daysOfWeek = [
+  //   t("sunday"),
+  //   t("monday"),
+  //   t("tuesday"),
+  //   t("wednesday"),
+  //   t("thursday"),
+  //   t("friday"),
+  //   t("saturday"),
+  // ];
 
   const businessType = useWatch({
     control: form.control,
@@ -220,8 +222,7 @@ export default function AddVendor({
       !!v.businessType &&
       !!v.NIF?.trim() &&
       !!v.branches &&
-      !!v.openingHours &&
-      !!v.closingHours &&
+      hasAnyPeriod(v.weeklySchedule) &&
       (v.businessType !== "restaurant" ||
         (Array.isArray(v.restaurantCuisineType) &&
           v.restaurantCuisineType.length > 0));
@@ -414,9 +415,8 @@ export default function AddVendor({
       }),
       NIF: data.NIF?.toUpperCase(),
       totalBranches: Number(data.branches),
-      openingHours: data.openingHours,
-      closingHours: data.closingHours,
-      closingDays: data.closingDays,
+      // Never send openingHours / closingHours / closingDays together with weeklySchedule
+      weeklySchedule: normalizeSchedule(data.weeklySchedule),
     },
     businessLocation: {
       street: data.street,
@@ -476,13 +476,17 @@ export default function AddVendor({
         scrollToSection(5);
         return;
       }
-      if (updatedResult?.data?.errorSources) {
-        updatedResult.data.errorSources.forEach(
-          (err: { path: string; message: string }) =>
-            toast.error(err?.message, { id: toastId })
-        );
-        return;
+
+      if (mapScheduleServerErrors(updatedResult.data.errorSources, form.setError as any)) {
+        scrollToSection(1);
       }
+      // if (updatedResult?.data?.errorSources) {
+      //   updatedResult.data.errorSources.forEach(
+      //     (err: { path: string; message: string }) =>
+      //       toast.error(err?.message, { id: toastId })
+      //   );
+      //   return;
+      // }
       toast.error(updatedResult.message || "Failed to save vendor information", {
         id: toastId,
       });
@@ -1205,7 +1209,13 @@ export default function AddVendor({
                             </FormItem>
                           )}
                         />
-                        <FormField
+                        <div className="col-span-2">
+                          <p className="text-sm font-medium text-gray-700 mb-2">
+                            {t("opening_hours")} <span className="text-[#DC3173]">*</span>
+                          </p>
+                          <WeeklyScheduleEditor t={t} disabled={isSaving || isSubmitting} />
+                        </div>
+                        {/* <FormField
                           control={form.control}
                           name="openingHours"
                           render={({ field }) => (
@@ -1275,7 +1285,7 @@ export default function AddVendor({
                               <FormMessage />
                             </FormItem>
                           )}
-                        />
+                        /> */}
                       </div>
                     )}
                   </Card>
