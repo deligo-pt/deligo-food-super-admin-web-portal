@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { weeklyScheduleSchema } from "@/validations/schedule/weekly-schedule.validation";
 
 export const addVendorBranchValidation = z
     .object({
@@ -17,9 +18,8 @@ export const addVendorBranchValidation = z
         restaurantCuisineType: z.array(z.string()).optional(),
         NIF: z.string().optional(),
 
-        openingHours: z.string().nonempty("Opening hours is required"),
-        closingHours: z.string().nonempty("Closing hours is required"),
-        closingDays: z.array(z.string()).max(7).optional(),
+        // All seven days; the rules (incl. 6 h a day) live in utils/weeklySchedule.
+        weeklySchedule: weeklyScheduleSchema,
 
         street: z.string().min(1, "Street is required"),
         city: z.string().min(1, "City is required"),
@@ -30,17 +30,4 @@ export const addVendorBranchValidation = z
 
         accountHolderName: z.string().min(1, "Account holder name is required"),
         iban: z.string().min(1, "IBAN is required"),
-    })
-    .refine(
-        (data) => {
-            const [openH, openM] = data.openingHours.split(":").map(Number);
-            const [closeH, closeM] = data.closingHours.split(":").map(Number);
-            let diff = (closeH * 60 + closeM - (openH * 60 + openM)) / 60;
-            if (diff < 0) diff += 24;
-            return diff >= 6;
-        },
-        {
-            message: "Business must be open at least 6 hours",
-            path: ["closingHours"],
-        }
-    );
+    });

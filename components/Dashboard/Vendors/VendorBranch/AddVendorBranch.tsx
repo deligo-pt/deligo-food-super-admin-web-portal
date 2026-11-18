@@ -5,6 +5,7 @@ import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocati
 import UploadVendorDocuments, {
     REQUIRED_DOCS,
 } from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
+import WeeklyScheduleEditor from "@/components/Schedule/WeeklyScheduleEditor";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Card } from "@/components/ui/card";
 import {
     Form,
     FormControl,
+    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -36,6 +38,12 @@ import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
+import {
+    initialWeek,
+    normalizeWeek,
+    scheduleErrorMap,
+    scheduleFieldErrors,
+} from "@/utils/weeklySchedule";
 import { addVendorBranchValidation } from "@/validations/vendor-branch/vendor-branch.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -50,7 +58,7 @@ import {
     Mail,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -130,9 +138,8 @@ const AddVendorBranch = ({
             businessType: "",
             restaurantCuisineType: [],
             NIF: "",
-            openingHours: "",
-            closingHours: "",
-            closingDays: [],
+            // A new branch starts open 00:00–24:00 every day, as in the vendor panel.
+            weeklySchedule: initialWeek(null),
             street: "",
             city: "",
             postalCode: "",
@@ -148,15 +155,17 @@ const AddVendorBranch = ({
         formState: { isSubmitting },
     } = form;
 
-    const daysOfWeek = [
-        t("sunday"),
-        t("monday"),
-        t("tuesday"),
-        t("wednesday"),
-        t("thursday"),
-        t("friday"),
-        t("saturday"),
-    ];
+    // Schedule errors the backend sent on the last save, keyed for the editor;
+    // cleared on the next edit of the hours.
+    const [scheduleServerErrors, setScheduleServerErrors] = useState<
+        Record<string, string>
+    >({});
+    const week = useWatch({ control: form.control, name: "weeklySchedule" });
+    // Live rule errors on their time slot; the server's on top until the next edit.
+    const scheduleErrors = useMemo(
+        () => ({ ...scheduleServerErrors, ...scheduleErrorMap(normalizeWeek(week)) }),
+        [week, scheduleServerErrors]
+    );
 
     const businessType = useWatch({
         control: form.control,
@@ -286,9 +295,8 @@ const AddVendorBranch = ({
             // role: USER_ROLE.SUB_VENDOR,
             businessDetails: {
                 branchName: data.branchName,
-                openingHours: data.openingHours,
-                closingHours: data.closingHours,
-                closingDays: data.closingDays || [],
+                // The whole week, never the legacy hours (the backend refuses those).
+                weeklySchedule: normalizeWeek(data.weeklySchedule),
             },
             businessLocation: {
                 street: data.street,
@@ -359,9 +367,18 @@ const AddVendorBranch = ({
         }
 
         if (updatedResult?.data?.errorSources) {
-            updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
-                toast.error(err?.message, { id: toastId })
-            ));
+            // Schedule errors go on their time slot; the rest are toasts.
+            const { fieldErrors, others } = scheduleFieldErrors(updatedResult.data.errorSources);
+            const hasScheduleErrors = Object.keys(fieldErrors).length > 0;
+            if (hasScheduleErrors) {
+                setScheduleServerErrors(fieldErrors);
+                toast.error(t("schedule_fix_errors"), { id: toastId });
+            }
+            others.forEach((err, i) =>
+                toast.error(err?.message, {
+                    id: i === 0 && !hasScheduleErrors ? toastId : undefined,
+                })
+            );
             return;
         } else {
             toast.error(updatedResult.message || "Branch add failed", {
@@ -426,7 +443,10 @@ const AddVendorBranch = ({
     return (
         <Form {...form}>
             <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onSubmit, (errors) => {
+                    // The editor already marks the slot; say why nothing happened.
+                    if (errors.weeklySchedule) toast.error(t("schedule_fix_errors"));
+                })}
                 className="min-h-screen bg-slate-50"
             >
                 <TitleHeader
@@ -769,76 +789,30 @@ const AddVendorBranch = ({
                                                 />
                                             )}
 
-                                            {/* Working Hours */}
+                                            {/* Opening hours */}
                                             <FormField
                                                 control={form.control}
-                                                name="openingHours"
+                                                name="weeklySchedule"
                                                 render={({ field }) => (
-                                                    <FormItem>
+                                                    <FormItem className="col-span-2">
                                                         <FormLabel>
                                                             {t("opening_hours")}{" "}
                                                             <span className="text-[#DC3173]">*</span>
                                                         </FormLabel>
+                                                        <FormDescription>
+                                                            {t("schedule_admin_subtitle")}
+                                                        </FormDescription>
                                                         <FormControl>
-                                                            <Input type="time" {...field} />
+                                                            <WeeklyScheduleEditor
+                                                                value={field.value ?? []}
+                                                                onChange={(next) => {
+                                                                    setScheduleServerErrors({});
+                                                                    field.onChange(next);
+                                                                }}
+                                                                errors={scheduleErrors}
+                                                                disabled={isSubmitting}
+                                                            />
                                                         </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="closingHours"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            {t("closing_hours")}{" "}
-                                                            <span className="text-[#DC3173]">*</span>
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input type="time" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            {/* Closing Days */}
-                                            <FormField
-                                                control={form.control}
-                                                name="closingDays"
-                                                render={({ field }) => (
-                                                    <FormItem className="col-span-2">
-                                                        <FormLabel>{t("closing_days")}</FormLabel>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {daysOfWeek.map((day) => {
-                                                                const isSelected =
-                                                                    field.value?.includes(day) ?? false;
-                                                                return (
-                                                                    <motion.button
-                                                                        key={day}
-                                                                        type="button"
-                                                                        onClick={() => {
-                                                                            const current = field.value ?? [];
-                                                                            field.onChange(
-                                                                                isSelected
-                                                                                    ? current.filter((d) => d !== day)
-                                                                                    : [...current, day]
-                                                                            );
-                                                                        }}
-                                                                        whileTap={{ scale: 0.95 }}
-                                                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${isSelected
-                                                                            ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                                                            : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                                                            }`}
-                                                                    >
-                                                                        {day}
-                                                                    </motion.button>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                        <FormMessage />
                                                     </FormItem>
                                                 )}
                                             />

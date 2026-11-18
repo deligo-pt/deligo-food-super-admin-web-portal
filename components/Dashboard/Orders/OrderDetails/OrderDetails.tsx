@@ -30,6 +30,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import WeeklyScheduleSummary from "@/components/Schedule/WeeklyScheduleSummary";
+import { hasSchedule } from "@/utils/weeklySchedule";
 
 interface IProps {
   order: TOrder;
@@ -295,19 +297,16 @@ export default function OrderDetails({
                       {t("business_details")}
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                      <div>
-                        <span className="text-gray-500">{t("opening")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.openingHours || "N/A"}
-                      </div>
-                      <div>
-                        <span className="text-gray-500">{t("closing")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.closingHours || "N/A"}
-                      </div>
                       <div className="col-span-2">
-                        <span className="text-gray-500">{t("closing_days")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.closingDays?.join(
-                          ", "
-                        ) || "None"}
+                        <span className="text-gray-500">{t("opening_hours")}:</span>
+                        {hasSchedule(order?.vendorId?.businessDetails) ||
+                        order?.vendorId?.businessDetails?.openingHours ? (
+                          <WeeklyScheduleSummary
+                            details={order?.vendorId?.businessDetails}
+                          />
+                        ) : (
+                          " N/A"
+                        )}
                       </div>
                       <div className="col-span-2">
                         <span className="text-gray-500">{t("business_type")}:</span>{" "}

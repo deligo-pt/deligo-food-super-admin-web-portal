@@ -1,4 +1,5 @@
 import { TAddonGroup } from "./add-ons.type";
+import { TWeeklyDaySchedule } from "./user.type";
 
 export interface TOfferApplied {
   rewardSnapshot?: Record<string, unknown>;
@@ -43,9 +44,10 @@ export interface TOrder {
     contactNumber: string;
     businessDetails: {
       businessName: string;
-      openingHours: string;
-      closingHours: string;
-      closingDays: string[];
+      weeklySchedule?: TWeeklyDaySchedule[];
+      openingHours?: string;
+      closingHours?: string;
+      closingDays?: string[];
       businessType: {
         _id: string;
         name: {
