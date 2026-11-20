@@ -8,6 +8,10 @@ import {
 } from "@/utils/weeklySchedule";
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** Vendor panel rules (agreed 10 Nov 2026; not enforced by the backend). */
+const MIN_OPEN_MINUTES_PER_DAY = 6 * 60;
+const MAX_CLOSED_DAYS = 2;
 const isValidClose = (v: string) => v === "24:00" || TIME_RE.test(v);
 
 const clockPeriodSchema = z.object({
@@ -114,6 +118,37 @@ export const weeklyScheduleSchema = z
       ctx.addIssue({
         code: "custom",
         message: "Add at least one opening period",
+      });
+    }
+
+    // The vendor panel's two business rules (the backend does not check them),
+    // so a store's hours pass the same checks whoever edits them.
+
+    // At least 6 h open on an open day, every period summed (a period past
+    // midnight counts up to its close).
+    schedule.forEach((entry, dayIdx) => {
+      if (!entry.periods.length) return;
+      if (!entry.periods.every((p) => TIME_RE.test(p.open) && isValidClose(p.close))) return;
+      const openMinutes = entry.periods.reduce((sum, p) => {
+        const open = toMinutes(p.open);
+        const close = toMinutes(p.close);
+        return sum + (close >= open ? close - open : 24 * 60 - open + close);
+      }, 0);
+      if (openMinutes < MIN_OPEN_MINUTES_PER_DAY) {
+        ctx.addIssue({
+          code: "custom",
+          path: [dayIdx, "periods"],
+          message: "An open day must be open for at least 6 hours in total",
+        });
+      }
+    });
+
+    // At most 2 closed days a week (a weekday missing from the list is closed).
+    const openDays = new Set(schedule.filter((d) => d.periods.length > 0).map((d) => d.day));
+    if (WEEK_DAYS.length - openDays.size > MAX_CLOSED_DAYS) {
+      ctx.addIssue({
+        code: "custom",
+        message: `The store can be closed on at most ${MAX_CLOSED_DAYS} days a week`,
       });
     }
   });

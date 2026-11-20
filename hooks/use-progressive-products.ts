@@ -32,7 +32,10 @@ export function useProgressiveProducts({
     baseQuery,
     vendorMongoId,
 }: Args) {
-    const [products, setProducts] = useState<TProduct[]>(initial.data || []);
+    // A refused first page (429, network) can arrive as a non-list.
+    const [products, setProducts] = useState<TProduct[]>(
+        Array.isArray(initial.data) ? initial.data : []
+    );
     const [meta, setMeta] = useState<TMeta | undefined>(initial.meta);
     const [hasMore, setHasMore] = useState(false); // true while remaining pages load
     const [hasError, setHasError] = useState(false);
@@ -41,7 +44,7 @@ export function useProgressiveProducts({
     const cacheKey = `${vendorMongoId}|${baseQuery}`;
 
     useEffect(() => {
-        const first = initial.data || [];
+        const first = Array.isArray(initial.data) ? initial.data : [];
         const initialPage = initial.meta?.page || 1;
         const totalPage = initial.meta?.totalPage || 1;
 

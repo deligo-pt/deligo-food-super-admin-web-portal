@@ -5,6 +5,7 @@ import BusinessLocationMap from "@/components/BusinessLocationMap/BusinessLocati
 import UploadVendorDocuments, {
     REQUIRED_DOCS,
 } from "@/components/Dashboard/Vendors/AddVendor/UploadVendorDocuments";
+import WeeklyScheduleEditor from "@/components/Dashboard/Vendors/AddVendor/WeeklyScheduleEditor";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,11 @@ import { TVendorDocKey } from "@/types/document.type";
 import { TVendor } from "@/types/user.type";
 import { formatTime } from "@/utils/formatTime";
 import { uploadDefaultDocument } from "@/utils/uploadUserDocument";
+import {
+    emptyWeeklySchedule,
+    mapScheduleServerErrors,
+    normalizeSchedule,
+} from "@/utils/weeklySchedule";
 import { addVendorBranchValidation } from "@/validations/vendor-branch/vendor-branch.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
@@ -130,9 +136,8 @@ const AddVendorBranch = ({
             businessType: "",
             restaurantCuisineType: [],
             NIF: "",
-            openingHours: "",
-            closingHours: "",
-            closingDays: [],
+            // Every day closed, as in Add Vendor: the admin sets the hours.
+            weeklySchedule: emptyWeeklySchedule(),
             street: "",
             city: "",
             postalCode: "",
@@ -147,16 +152,6 @@ const AddVendorBranch = ({
     const {
         formState: { isSubmitting },
     } = form;
-
-    const daysOfWeek = [
-        t("sunday"),
-        t("monday"),
-        t("tuesday"),
-        t("wednesday"),
-        t("thursday"),
-        t("friday"),
-        t("saturday"),
-    ];
 
     const businessType = useWatch({
         control: form.control,
@@ -286,9 +281,8 @@ const AddVendorBranch = ({
             // role: USER_ROLE.SUB_VENDOR,
             businessDetails: {
                 branchName: data.branchName,
-                openingHours: data.openingHours,
-                closingHours: data.closingHours,
-                closingDays: data.closingDays || [],
+                // The whole week, never the legacy hours (the backend refuses those).
+                weeklySchedule: normalizeSchedule(data.weeklySchedule),
             },
             businessLocation: {
                 street: data.street,
@@ -359,9 +353,14 @@ const AddVendorBranch = ({
         }
 
         if (updatedResult?.data?.errorSources) {
-            updatedResult?.data?.errorSources?.map((err: { path: string, message: string }) => (
-                toast.error(err?.message, { id: toastId })
-            ));
+            // Schedule errors go on their time slot (as in Add Vendor); the rest are toasts.
+            const errorSources: { path: string; message: string }[] = updatedResult.data.errorSources;
+            if (mapScheduleServerErrors(errorSources, form.setError as never)) {
+                toast.error(t("schedule_fix_errors"), { id: toastId });
+            }
+            errorSources
+                .filter((err) => !err?.path?.startsWith("businessDetails.weeklySchedule"))
+                .forEach((err) => toast.error(err?.message));
             return;
         } else {
             toast.error(updatedResult.message || "Branch add failed", {
@@ -426,7 +425,10 @@ const AddVendorBranch = ({
     return (
         <Form {...form}>
             <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onSubmit, (errors) => {
+                    // The editor already marks the slot; say why nothing happened.
+                    if (errors.weeklySchedule) toast.error(t("schedule_fix_errors"));
+                })}
                 className="min-h-screen bg-slate-50"
             >
                 <TitleHeader
@@ -769,79 +771,13 @@ const AddVendorBranch = ({
                                                 />
                                             )}
 
-                                            {/* Working Hours */}
-                                            <FormField
-                                                control={form.control}
-                                                name="openingHours"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            {t("opening_hours")}{" "}
-                                                            <span className="text-[#DC3173]">*</span>
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input type="time" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="closingHours"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            {t("closing_hours")}{" "}
-                                                            <span className="text-[#DC3173]">*</span>
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input type="time" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            {/* Closing Days */}
-                                            <FormField
-                                                control={form.control}
-                                                name="closingDays"
-                                                render={({ field }) => (
-                                                    <FormItem className="col-span-2">
-                                                        <FormLabel>{t("closing_days")}</FormLabel>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {daysOfWeek.map((day) => {
-                                                                const isSelected =
-                                                                    field.value?.includes(day) ?? false;
-                                                                return (
-                                                                    <motion.button
-                                                                        key={day}
-                                                                        type="button"
-                                                                        onClick={() => {
-                                                                            const current = field.value ?? [];
-                                                                            field.onChange(
-                                                                                isSelected
-                                                                                    ? current.filter((d) => d !== day)
-                                                                                    : [...current, day]
-                                                                            );
-                                                                        }}
-                                                                        whileTap={{ scale: 0.95 }}
-                                                                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${isSelected
-                                                                            ? "bg-[#DC3173] text-white border-[#DC3173]"
-                                                                            : "bg-white text-gray-700 border-gray-300 hover:border-[#DC3173]/70"
-                                                                            }`}
-                                                                    >
-                                                                        {day}
-                                                                    </motion.button>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
+                                            {/* Opening hours (main's editor reads the form through context) */}
+                                            <div className="col-span-2">
+                                                <p className="text-sm font-medium text-gray-700 mb-2">
+                                                    {t("opening_hours")} <span className="text-[#DC3173]">*</span>
+                                                </p>
+                                                <WeeklyScheduleEditor t={t} disabled={isSubmitting} />
+                                            </div>
                                         </div>
                                     </Card>
                                 </motion.div>

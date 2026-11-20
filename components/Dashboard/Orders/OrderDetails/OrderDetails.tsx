@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { formatDay, getInitialSchedule } from "@/utils/weeklySchedule";
 
 interface IProps {
   order: TOrder;
@@ -295,19 +296,32 @@ export default function OrderDetails({
                       {t("business_details")}
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                      <div>
-                        <span className="text-gray-500">{t("opening")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.openingHours || "N/A"}
-                      </div>
-                      <div>
-                        <span className="text-gray-500">{t("closing")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.closingHours || "N/A"}
-                      </div>
                       <div className="col-span-2">
-                        <span className="text-gray-500">{t("closing_days")}:</span>{" "}
-                        {order?.vendorId?.businessDetails?.closingDays?.join(
-                          ", "
-                        ) || "None"}
+                        <span className="text-gray-500">{t("opening_hours")}:</span>
+                        {/* The weekly schedule, or the legacy hours read the same way. */}
+                        {order?.vendorId?.businessDetails?.weeklySchedule?.length ||
+                        order?.vendorId?.businessDetails?.openingHours ? (
+                          <dl className="mt-1 space-y-0.5">
+                            {getInitialSchedule(order.vendorId.businessDetails).map(
+                              ({ day, periods }) => (
+                                <div key={day} className="flex gap-2">
+                                  <dt className="w-20 shrink-0 text-gray-500">
+                                    {t(day.toLowerCase())}
+                                  </dt>
+                                  <dd
+                                    className={
+                                      periods.length ? "tabular-nums" : "text-gray-400"
+                                    }
+                                  >
+                                    {periods.length ? formatDay(periods) : t("closed")}
+                                  </dd>
+                                </div>
+                              )
+                            )}
+                          </dl>
+                        ) : (
+                          " N/A"
+                        )}
                       </div>
                       <div className="col-span-2">
                         <span className="text-gray-500">{t("business_type")}:</span>{" "}
