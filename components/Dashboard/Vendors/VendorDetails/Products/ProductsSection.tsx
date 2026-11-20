@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Loader2, CheckSquare, X, Copy } from "lucide-react";
+import { ChevronDown, Loader2, CheckSquare, X, Copy, Trash2 } from "lucide-react";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import {
@@ -40,6 +40,8 @@ import {
 } from "@/services/dashboard/vendor/vendor.service";
 import { queryStringFormatter } from "@/utils/formatter";
 import CopyToBranchModal from "./CopyToBranchModal";
+import { countText } from "@/utils/bulkErrors";
+import BulkDeleteDialog from "./BulkDeleteDialog";
 import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
 
 interface IProps {
@@ -120,6 +122,9 @@ export default function ProductsSection({
   const [isLoadingBranches, setIsLoadingBranches] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
 
+  // ── bulk delete ────────────────────────────────────────────────
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+
   // ── helpers ────────────────────────────────────────────────────
   const getId = (p: TProduct) => String(p.productId);
 
@@ -173,7 +178,8 @@ export default function ProductsSection({
       { category: TProductCategoryResponse | null; products: TProduct[] }
     > = {};
 
-    productCategories.forEach((cat) => {
+    // A refused category request (429) can arrive as a non-list.
+    (Array.isArray(productCategories) ? productCategories : []).forEach((cat) => {
       groups[cat._id] = { category: cat, products: [] };
     });
     groups["uncategorized"] = { category: null, products: [] };
@@ -255,7 +261,7 @@ export default function ProductsSection({
 
   const getCategoryName = (category: TProductCategoryResponse | null) => {
     if (!category) return t("uncategorized") || "Uncategorized";
-    return category.name?.[lang] || "Unnamed";
+    return category.name?.[lang] || category.name?.en || t("uncategorized");
   };
 
   // Reset deleted ids when fresh server data arrives
@@ -319,7 +325,7 @@ export default function ProductsSection({
     if (!hasMore && !hasError) {
       setSelectedIds(new Set(visibleProducts.map(getId)));
       setSelectAllMode(true);
-      toast.success(`${visibleProducts.length} products selected`);
+      toast.success(countText(t, "products_selected", visibleProducts.length));
       return;
     }
 
@@ -360,10 +366,10 @@ export default function ProductsSection({
 
       setSelectedIds(allIds);
       setSelectAllMode(true);
-      toast.success(`${allIds.size} products selected`);
+      toast.success(countText(t, "products_selected", allIds.size));
     } catch (err) {
       console.error(err);
-      toast.error("Failed to select all products");
+      toast.error(t("select_all_products_failed"));
     } finally {
       setIsSelectAllLoading(false);
     }
@@ -386,7 +392,7 @@ export default function ProductsSection({
       setBranches(list);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load branches");
+      toast.error(t("branches_load_failed"));
       setBranches([]);
     } finally {
       setIsLoadingBranches(false);
@@ -404,12 +410,12 @@ export default function ProductsSection({
 
   const handleCopy = async () => {
     if (selectedBranchIds.size === 0) {
-      toast.error("Please select at least one branch");
+      toast.error(t("select_at_least_one_branch"));
       return;
     }
 
     setIsCopying(true);
-    const toastId = toast.loading("Copying products...");
+    const toastId = toast.loading(t("copying_products"));
 
     try {
       const payload: {
@@ -437,19 +443,51 @@ export default function ProductsSection({
       const result = await copyProductsToSubVendors(payload);
 
       if (result?.success !== false) {
-        toast.success(result?.message || "Products copied successfully", {
+        toast.success(t("products_copied"), {
           id: toastId,
         });
         setIsCopyModalOpen(false);
         exitSelectionMode();
       } else {
-        toast.error(result?.message || "Copy failed", { id: toastId });
+        toast.error(result?.message || t("copy_failed"), { id: toastId });
       }
     } catch (err) {
       console.error(err);
-      toast.error("Copy failed", { id: toastId });
+      toast.error(t("copy_failed"), { id: toastId });
     } finally {
       setIsCopying(false);
+    }
+  };
+
+  // ── bulk delete ────────────────────────────────────────────────
+  /** A product's name for the "not deleted" list, from what is loaded. */
+  const productNameFor = (code: string) => {
+    const product = products.find((p) => getId(p) === code);
+    return product ? getProductName(product) || undefined : undefined;
+  };
+
+  /**
+   * After "Delete selected": deleted products leave the list, the ones that
+   * couldn't be deleted stay selected so the admin can try again, and the
+   * tab counts come back with `router.refresh()`.
+   */
+  const onBulkDeleted = ({
+    deleted,
+    failed,
+  }: {
+    deleted: string[];
+    failed: string[];
+  }) => {
+    if (deleted.length) {
+      invalidateProductsCache();
+      setDeletedProductIds((prev) => Array.from(new Set([...prev, ...deleted])));
+      router.refresh();
+    }
+    if (failed.length) {
+      setSelectAllMode(false);
+      setSelectedIds(new Set(failed));
+    } else {
+      exitSelectionMode();
     }
   };
 
@@ -465,7 +503,7 @@ export default function ProductsSection({
     });
 
   const handleDeleteProduct = async () => {
-    const toastId = toast.loading("Deleting product...");
+    const toastId = toast.loading(t("deleting_product"));
     if (selectedProduct.id && selectedProduct.action === "delete") {
       const result = await deleteProduct(selectedProduct.id);
       if (result.success) {
@@ -475,18 +513,18 @@ export default function ProductsSection({
             ? prev
             : [...prev, selectedProduct.id as string]
         );
-        toast.success("Product deleted successfully", { id: toastId });
+        toast.success(t("product_deleted"), { id: toastId });
         setSelectedProduct({ id: null, action: null, type: undefined });
         return;
       }
-      toast.error(result.message || "Product deletion failed", {
+      toast.error(result.message || t("product_delete_failed"), {
         id: toastId,
       });
     }
   };
 
   const handlePermanentDeleteProduct = async () => {
-    const toastId = toast.loading("Deleting product...");
+    const toastId = toast.loading(t("deleting_product"));
     if (selectedProduct.id && selectedProduct.action === "delete") {
       const result = await permanentDeleteProduct(selectedProduct.id);
       if (result.success) {
@@ -496,11 +534,11 @@ export default function ProductsSection({
             ? prev
             : [...prev, selectedProduct.id as string]
         );
-        toast.success("Product deleted successfully", { id: toastId });
+        toast.success(t("product_deleted"), { id: toastId });
         setSelectedProduct({ id: null, action: null, type: undefined });
         return;
       }
-      toast.error(result.message || "Product deletion failed", {
+      toast.error(result.message || t("product_delete_failed"), {
         id: toastId,
       });
     }
@@ -574,7 +612,7 @@ export default function ProductsSection({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-48 bg-white shadow-lg border rounded-lg p-1"
+              className="w-60 bg-white shadow-lg border rounded-lg p-1"
             >
               <DropdownMenuItem
                 onClick={() =>
@@ -583,6 +621,15 @@ export default function ProductsSection({
                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
               >
                 {t("add_product") || "Add Product"}
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push(`/admin/vendor/${vendorId}/products/import`)
+                }
+                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
+              >
+                {t("import_products_menu")}
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -663,17 +710,17 @@ export default function ProductsSection({
       />
 
       {/* Tabs: All / Active / Inactive / SDR Products */}
-      <div className="flex items-center justify-between gap-3 pb-1">
+      <div className="flex flex-col gap-3 pb-1 xl:flex-row xl:items-center xl:justify-between">
         <ProductStatusTabs counts={statusCounts} />
-        {/* Selection toolbar */}
-        <div className="flex items-center justify-between gap-3 px-1">
+        {/* Selection toolbar (below the tabs on smaller screens) */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1">
           {isSelectionMode ? (
             <>
               <div className="flex items-center gap-2 text-sm text-[#DC3173] font-medium">
-                <span className="bg-[#DC3173]/10 px-3 py-1 rounded-full">
+                <span className="bg-[#DC3173]/10 px-3 py-1 rounded-full whitespace-nowrap">
                   {selectedIds.size} {t("selected") || "selected"}
                 </span>
-                <span className="text-gray-400 text-xs">
+                <span className="text-gray-400 text-xs whitespace-nowrap">
                   / {totalProducts} {t("products") || "products"}
                 </span>
               </div>
@@ -717,6 +764,17 @@ export default function ProductsSection({
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => setIsBulkDeleteOpen(true)}
+                  disabled={selectedIds.size === 0 || isSelectAllLoading}
+                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-600"
+                >
+                  <Trash2 className="w-4 h-4 mr-1.5" />
+                  {t("delete_selected")}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={exitSelectionMode}
                   className="border-gray-200 text-gray-600"
                 >
@@ -745,7 +803,7 @@ export default function ProductsSection({
                 className="border-gray-200"
               >
                 <CheckSquare className="w-4 h-4 mr-1.5" />
-                {t("clone") || "Clone"}
+                {t("select") || "Select"}
               </Button>
             </div>
           )}
@@ -774,7 +832,7 @@ export default function ProductsSection({
             <div className="flex-1 overflow-y-auto p-3 space-y-1 no-scrollbar">
               {groupedProducts.length === 0 ? (
                 <p className="text-sm text-gray-400 px-2 py-4 text-center">
-                  {t("no_categories") || "No categories"}
+                  {t("no_categories_found") || "No categories found"}
                 </p>
               ) : (
                 groupedProducts.map((group) => {
@@ -959,6 +1017,16 @@ export default function ProductsSection({
         businessTypeSlug={businessTypeSlug}
         onSuccess={handleProductUpdated}
         vendorMongoId={vendorMongoId}
+      />
+
+      <BulkDeleteDialog
+        open={isBulkDeleteOpen}
+        onOpenChange={setIsBulkDeleteOpen}
+        count={selectedIds.size}
+        resolveIds={async () => Array.from(selectedIds)}
+        nameFor={productNameFor}
+        onFinished={onBulkDeleted}
+        t={t}
       />
 
       <CopyToBranchModal

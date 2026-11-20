@@ -46,8 +46,17 @@ import ImageAndDescriptionForm from "./Image&DescriptionForm";
 import StockInformationForm from "./StockInformationForm";
 import DeligoMetadata from "./DeligoMetadata";
 import { TVendor } from "@/types/user.type";
-import { createProduct } from "@/services/dashboard/product/product.service";
+import { adminBulkCreateProductsReq } from "@/services/dashboard/product/product-bulk.service";
+import type { TBulkProductItem } from "@/types/product-bulk.type";
+import { bulkErrorText, bulkRequestErrorText } from "@/utils/bulkErrors";
+import {
+    productFieldForCode,
+    productFieldForPath,
+    productTabKeyForField,
+    type TProductFormField,
+} from "@/utils/productFormErrors";
 import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
+import { invalidateProductsCache } from "@/hooks/use-progressive-products";
 
 type FormData = z.infer<typeof productValidation>;
 
@@ -165,8 +174,13 @@ export function AddProductToVendor({
                     newErrors[t("basic_info")] = true;
                     return;
                 case "description":
+                case "image":
                 case "images":
                     newErrors[t("images")] = true;
+                    return;
+                case "addonGroups":
+                case "variations":
+                    newErrors[t("add_ons_and_variants")] = true;
                     return;
                 case "price":
                 case "discount":
@@ -177,6 +191,12 @@ export function AddProductToVendor({
                 case "unit":
                 case "availabilityStatus":
                     newErrors[t("stock")] = true;
+                    return;
+                case "sdrApplicable":
+                case "sdrContainerCount":
+                case "isFeatured":
+                case "isAvailableForPreOrder":
+                    newErrors[t("deligo_metadata")] = true;
                     return;
             }
         });
@@ -189,6 +209,60 @@ export function AddProductToVendor({
             control: form.control,
             name: [`name.${lang}`, "price", "discount", "discountType", "taxId", "addonGroups", "variations"],
         });
+
+    /**
+     * A refused save: each problem goes on its field and the form opens the
+     * step holding the first one; what has no field is shown in the toast.
+     */
+    const showServerErrors = (
+        result: Awaited<ReturnType<typeof adminBulkCreateProductsReq>>,
+        toastId: string | number,
+    ) => {
+        const failed = result.data?.failed?.[0];
+
+        // The request itself was refused (429, 403, network…): nothing per item.
+        if (!failed && !result.errorSources.some((e) => productFieldForPath(e.path))) {
+            toast.error(bulkRequestErrorText(t, result), { id: toastId });
+            return;
+        }
+
+        const problems = failed
+            ? failed.errors?.length
+                ? failed.errors
+                : [{ path: "", message: failed.message }]
+            : result.errorSources;
+
+        const leftovers: string[] = [];
+        let firstField: TProductFormField | null = null;
+        const placed = new Set<string>();
+
+        for (const problem of problems) {
+            const field =
+                productFieldForPath(problem.path) ??
+                (problem.path ? null : productFieldForCode(failed?.code));
+            const text = problem.path
+                ? problem.message
+                : bulkErrorText(t, failed?.code, problem.message);
+
+            if (field && !placed.has(field)) {
+                placed.add(field);
+                form.setError(field as never, { type: "server", message: text });
+                firstField ??= field;
+            } else if (!leftovers.includes(text)) {
+                leftovers.push(text);
+            }
+        }
+
+        if (firstField) {
+            const tabIndex = tabs.findIndex((tab) => tab.name === t(productTabKeyForField(firstField!)));
+            if (tabIndex >= 0) setActiveTab(tabIndex);
+        }
+
+        toast.error(
+            leftovers[0] ?? bulkErrorText(t, failed?.code ?? result.errorKey, failed?.message ?? result.message),
+            { id: toastId },
+        );
+    };
 
     const onSubmit = async (data: FormData) => {
         const toastId = toast.loading("Translating and Creating product...");
@@ -210,25 +284,47 @@ export function AddProductToVendor({
                 return;
             }
 
-            const productData = {
-                name: translated.name,
+            const hasOptions = (translated.variations ?? []).some(
+                (v: { options?: unknown[] }) => (v.options?.length ?? 0) > 0,
+            );
+
+            // One item for this vendor through the unified create
+            // (`admin/create-product` is deprecated). Bodies are strict:
+            // `vendorId` goes on the request, never inside the item.
+            const productData: TBulkProductItem = {
+                name: translated.name as TBulkProductItem["name"],
                 ...(data?.description?.[lang] && {
-                    description: translated.description,
+                    description: translated.description as TBulkProductItem["description"],
                 }),
                 category: data.category,
-                ...(data.additionalCategories && {
-                    additionalCategories: data.additionalCategories,
+                ...(data.additionalCategories?.length && {
+                    additionalCategories: data.additionalCategories.filter((id): id is string => !!id),
                 }),
+                // Left out when empty: the API refuses "" and uses the default picture.
                 ...(imageUrl && { image: imageUrl }),
                 pricing: {
-                    price: data.price,
+                    // With options the API sets the price to the cheapest one.
+                    ...(!hasOptions && { price: data.price ?? undefined }),
                     discountType: data.discountType,
-                    discount: data.discount,
+                    discount: data.discount ?? 0,
                     taxId: data.taxId,
+                    // "€", as every existing product and the vendor panel have it.
                     currency: "€",
                 },
                 addonGroups: data.addonGroups,
-                variations: translated.variations,
+                // Left out, not `[]`, when there are none (the bulk API's rule).
+                ...(translated.variations?.length && {
+                    variations: translated.variations.map((v: any) => ({
+                        name: v.name,
+                        options: v.options.map((o: any) => ({
+                            label: o.label,
+                            price: o.price,
+                            // Restaurants don't track stock, per option either.
+                            ...(businessTypeSlug !== "restaurant" &&
+                                o.stockQuantity != null && { stockQuantity: o.stockQuantity }),
+                        })),
+                    })),
+                }),
                 sdr: {
                     applicable: data.sdrApplicable ?? false,
                     ...(data.sdrApplicable
@@ -243,38 +339,28 @@ export function AddProductToVendor({
                 ...(businessTypeSlug !== "restaurant"
                     ? {
                         stock: {
-                            quantity: data.quantity,
+                            quantity: data.quantity ?? 0,
                             unit: data.unit,
-                            availabilityStatus: data.availabilityStatus,
+                            availabilityStatus: (data.availabilityStatus || undefined) as NonNullable<TBulkProductItem["stock"]>["availabilityStatus"],
                         },
                     }
                     : {}),
-                vendorId: vendor?._id,
             };
 
-            const result = await createProduct(productData);
+            const result = await adminBulkCreateProductsReq(vendor._id as string, [productData]);
 
-            if (result.success) {
-                toast.success(result.message || "Product created successfully!", {
+            if (result.ok && result.data?.created.length) {
+                toast.success(t("product_created_successfully"), {
                     id: toastId,
                 });
                 form.reset();
                 setActiveTab(0);
+                invalidateProductsCache(); // the list's in-memory pages are now out of date
                 router.push(`/admin/vendor/${vendor?.userId}/manage-products`);
                 return;
             }
 
-            if (result?.data?.errorSources) {
-                result.data.errorSources.forEach(
-                    (err: { path: string; message: string }) =>
-                        toast.error(err?.message, { id: toastId })
-                );
-                return;
-            }
-
-            toast.error(result.message || "Product creation failed", {
-                id: toastId,
-            });
+            showServerErrors(result, toastId);
         } catch (error) {
             console.error(error);
             toast.error("Something went wrong", {
