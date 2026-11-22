@@ -11,13 +11,22 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "@/hooks/use-translation";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { useWatch } from "react-hook-form";
+
+/** Whether the 2×1 switch can be used yet (sheet row 77). Add Product: always ready. */
+export type TTwoForOneInfo =
+    | { status: "loading" }
+    | { status: "ready" }
+    | { status: "unknown" }
+    | { status: "locked"; title: string };
 
 interface IProps {
     form: any;
+    twoForOne?: TTwoForOneInfo;
 }
 
-const DeligoMetadata = ({ form }: IProps) => {
+const DeligoMetadata = ({ form, twoForOne = { status: "ready" } }: IProps) => {
     const { t } = useTranslation();
 
     // Watch the switch so we can show/hide the container count field
@@ -80,6 +89,48 @@ const DeligoMetadata = ({ form }: IProps) => {
                                     id="isAvailableForPreOrder"
                                     checked={!!field.value}
                                     onCheckedChange={field.onChange}
+                                    className="data-[state=checked]:bg-[#DC3173]"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {/* 2×1: a buy-one-get-one-free offer for this product, kept
+                    as an ordinary offer of the vendor (not a product field). */}
+                <FormField
+                    control={form.control}
+                    name="isTwoForOne"
+                    render={({ field }) => (
+                        <FormItem className="flex items-start justify-between gap-3">
+                            <div className="space-y-1">
+                                <FormLabel htmlFor="isTwoForOne" className="text-sm text-gray-700">
+                                    {t("two_for_one_label")}
+                                </FormLabel>
+                                <p className="text-sm text-muted-foreground">
+                                    {twoForOne.status === "loading" ? (
+                                        <span role="status" aria-live="polite" className="inline-flex items-center gap-1.5">
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#DC3173]" aria-hidden />
+                                            {t("two_for_one_loading")}
+                                        </span>
+                                    ) : twoForOne.status === "unknown" ? (
+                                        <span className="text-amber-700">{t("two_for_one_unknown")}</span>
+                                    ) : twoForOne.status === "locked" ? (
+                                        <span className="text-amber-700">
+                                            {t("two_for_one_locked_shared").replace("{offer}", twoForOne.title)}
+                                        </span>
+                                    ) : (
+                                        t("two_for_one_helper")
+                                    )}
+                                </p>
+                            </div>
+                            <FormControl>
+                                <Switch
+                                    id="isTwoForOne"
+                                    checked={!!field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled={twoForOne.status !== "ready"}
                                     className="data-[state=checked]:bg-[#DC3173]"
                                 />
                             </FormControl>

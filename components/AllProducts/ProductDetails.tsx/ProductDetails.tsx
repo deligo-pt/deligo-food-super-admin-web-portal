@@ -225,7 +225,12 @@ export default function ProductDetails({ product }: IProps) {
                     }).format(product.pricing.price)}
                   </span>
                   <span className="text-sm font-medium text-green-600">
-                    {product.pricing.discount}% {t("off")}
+                    {/* A FLAT discount is euros, not a percentage
+                        (€2.66 off read "2.66% off"). */}
+                    {product.pricing.discountType === "FLAT"
+                      ? `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(product.pricing.discount))}\u00A0€`
+                      : `${product.pricing.discount}%`}{" "}
+                    {t("off")}
                   </span>
                 </>
               ) : (
