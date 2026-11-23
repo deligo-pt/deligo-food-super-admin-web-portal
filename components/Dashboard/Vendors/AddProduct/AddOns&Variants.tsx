@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import AddonGroupOrder from "./AddonGroupOrder";
 import { motion } from 'framer-motion';
 import { XIcon } from 'lucide-react';
 import {
@@ -70,13 +71,6 @@ const AddOnsAndVariants = ({ form, addonGroupsData, businessTypeSlug, watchVaria
             const newAddonGroups = [...form?.getValues("addonGroups"), id];
             form.setValue("addonGroups", newAddonGroups);
         }
-    };
-
-    const removeAddon = (idToRemove: string) => {
-        const newAddonGroups = form
-            ?.getValues("addonGroups")
-            ?.filter((id: string) => id !== idToRemove);
-        form.setValue("addonGroups", newAddonGroups);
     };
 
     const addOption = () => {
@@ -202,40 +196,21 @@ const AddOnsAndVariants = ({ form, addonGroupsData, businessTypeSlug, watchVaria
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t("add_ons")}
                 </label>
-                {watchAddons?.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-1">
-                        {watchAddons?.map((id: string) => (
-                            <motion.div
-                                key={id}
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="flex items-center bg-[#DC3173] bg-opacity-10 text-white px-3 py-1 rounded-full"
-                            >
-                                <span>
-                                    {
-                                        addonGroupsData?.find(
-                                            (group) => group._id === id,
-                                        )?.title?.[lang]
-                                    }
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => removeAddon(id)}
-                                    className="ml-2 text-white hover:text-[#CCC]"
-                                >
-                                    <XIcon className="h-4 w-4" />
-                                </button>
-                            </motion.div>
-                        ))}
-                    </div>
-                )}
+                {/* Picked Extra groups, in the order customers see them (plan.md §11.6). */}
+                <AddonGroupOrder
+                    ids={watchAddons ?? []}
+                    groups={addonGroupsData}
+                    lang={lang as "en" | "pt"}
+                    onChange={(ids) => form.setValue("addonGroups", ids, { shouldDirty: true })}
+                    t={t}
+                />
                 <FormField
                     control={form.control}
                     name="addonGroups"
                     render={({ fieldState }) => (
                         <FormItem className="gap-1">
                             <FormControl>
-                                <Select onValueChange={(val) => addAddon(val)}>
+                                <Select value="" onValueChange={(val) => addAddon(val)}>
                                     <SelectTrigger
                                         className={cn(
                                             "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-0 focus:border-[#DC3173] outline-none h-10",
@@ -655,7 +630,7 @@ export default AddOnsAndVariants;
 //                     render={({ fieldState }) => (
 //                         <FormItem className="gap-1">
 //                             <FormControl>
-//                                 <Select onValueChange={(val) => addAddon(val)}>
+//                                 <Select value="" onValueChange={(val) => addAddon(val)}>
 //                                     <SelectTrigger
 //                                         className={cn(
 //                                             "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-0 focus:border-[#DC3173] outline-none h-10",

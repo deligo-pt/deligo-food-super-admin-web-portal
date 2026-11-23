@@ -3,7 +3,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Minus, Pencil, Plus, XIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, CupSoda, Minus, Pencil, Plus, UtensilsCrossed, XIcon } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
+import {
+    commonPrice,
+    commonSdr,
+    commonTax,
+    kindOfOptions,
+    sortByName,
+    titleTaken,
+    withKind,
+    withPrice,
+} from "@/utils/addonGroup";
+import { KIND_SETTINGS, kindOfRate, taxIdForRate, type TProductKind } from "@/utils/productKind";
 
 import {
     Dialog,
@@ -91,6 +104,8 @@ interface IProps {
     taxes: TTax[];
     actionType?: "create" | "edit";
     t: (key: string) => string;
+    /** Every group of this vendor, for the duplicate-title check (plan.md §11.5). */
+    allGroups?: TAddonGroup[];
 }
 
 // ────────────────────────────────────────────────
@@ -180,6 +195,8 @@ function OptionCard({
     lang,
     t,
     onRemove,
+    onMoveUp,
+    onMoveDown,
 }: {
     form: UseFormReturn<TAddonGroupForm>;
     index: number;
@@ -190,6 +207,9 @@ function OptionCard({
     t: (key: string) => string;
     /** only passed for options that are not saved yet */
     onRemove?: () => void;
+    /** Arrange by hand — only when creating (plan.md §11.7). */
+    onMoveUp?: () => void;
+    onMoveDown?: () => void;
 }) {
     const [isEditing, setIsEditing] = useState(false);
     const showEditor = isEditing || !!error; // always reveal an invalid card
@@ -218,6 +238,30 @@ function OptionCard({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
+                    {(onMoveUp || onMoveDown) && (
+                        <>
+                            <button
+                                type="button"
+                                disabled={!onMoveUp}
+                                onClick={onMoveUp}
+                                aria-label={`${t("addon_order_up")}: ${name}`}
+                                title={t("addon_order_up")}
+                                className="rounded-md p-1.5 text-gray-500 hover:bg-white hover:text-[#DC3173] disabled:pointer-events-none disabled:opacity-30"
+                            >
+                                <ArrowUp className="h-4 w-4" />
+                            </button>
+                            <button
+                                type="button"
+                                disabled={!onMoveDown}
+                                onClick={onMoveDown}
+                                aria-label={`${t("addon_order_down")}: ${name}`}
+                                title={t("addon_order_down")}
+                                className="rounded-md p-1.5 text-gray-500 hover:bg-white hover:text-[#DC3173] disabled:pointer-events-none disabled:opacity-30"
+                            >
+                                <ArrowDown className="h-4 w-4" />
+                            </button>
+                        </>
+                    )}
                     <button
                         type="button"
                         onClick={() => setIsEditing((v) => !v)}
@@ -374,6 +418,7 @@ export default function AddAddonGroupModal({
     taxes,
     t,
     actionType = "create",
+    allGroups = [],
 }: IProps) {
     const { lang } = useStore();
     const L = lang as Lang;
@@ -403,11 +448,13 @@ export default function AddAddonGroupModal({
         formState: { isSubmitting, isSubmitted, errors },
     } = form;
 
-    const { fields, append, remove } = useFieldArray({
+    const { fields, append, remove, replace, move } = useFieldArray({
         control: form.control,
         name: "options",
     });
     const options = form.watch("options") ?? [];
+    const watchedTitle = (form.watch(`title.${L}`) as string | undefined) ?? "";
+    const titleIsTaken = titleTaken(allGroups, watchedTitle, prevValues?._id);
 
     // snapshot of the saved options, used to send ONLY what changed
     const originalBySku = useMemo(() => {
@@ -420,23 +467,75 @@ export default function AddAddonGroupModal({
     }, [prevValues]);
 
     // ── "add a new option" draft form ───────────────
+    // What the saved options share (Edit): the group price, Food | Drinks
+    // and the "new option" box start from it (plan.md §11.5).
+    const savedOptions = isEditMode ? (prevValues?.options || []).map(toFormOption) : [];
+    const savedPrice = commonPrice(savedOptions);
+    const savedSdr = commonSdr(savedOptions);
+    const priceText = (price: number | undefined) => (price === undefined ? "" : String(price));
+
+    // One price for the whole group; "" = not set.
+    const [groupPrice, setGroupPrice] = useState(priceText(savedPrice));
+    const [sortAz, setSortAz] = useState(false);
+
     const [draftName, setDraftName] = useState("");
-    const [draftPrice, setDraftPrice] = useState("0");
-    const [draftTax, setDraftTax] = useState("");
-    const [draftSdr, setDraftSdr] = useState(false);
+    const [draftPrice, setDraftPrice] = useState(priceText(savedPrice) || "0");
+    const [draftTax, setDraftTax] = useState(commonTax(savedOptions));
+    const [draftSdr, setDraftSdr] = useState(!!savedSdr);
     const [draftCount, setDraftCount] = useState(1);
 
     const resetDraft = () => {
         setDraftName("");
-        setDraftPrice("0");
-        setDraftTax("");
-        setDraftSdr(false);
+        setDraftPrice(priceText(savedPrice) || "0");
+        setDraftTax(commonTax(savedOptions));
+        setDraftSdr(!!savedSdr);
         setDraftCount(1);
     };
 
     const resetEverything = () => {
         form.reset(buildDefaults());
         resetDraft();
+        setGroupPrice(priceText(savedPrice));
+        setSortAz(false);
+    };
+
+    // Food | Drinks: lit when every option has that kind's VAT; with no
+    // options yet, from the "new option" box.
+    const draftRate = taxes.find((tax) => tax._id === draftTax)?.taxRate;
+    const currentKind = options.length
+        ? kindOfOptions(options, taxes)
+        : kindOfRate(draftRate === undefined ? null : Number(draftRate));
+    const missingRate = (kind: TProductKind) => !taxIdForRate(taxes, KIND_SETTINGS[kind].rate);
+
+    /** The form keeps SDR only when it is on (see `toFormOption`). */
+    const sdrOnlyWhenOn = (list: TOptionForm[]) =>
+        list.map((option) => ({ ...option, sdr: option.sdr?.applicable ? option.sdr : undefined }));
+
+    const pickKind = (kind: TProductKind) => {
+        const taxId = taxIdForRate(taxes, KIND_SETTINGS[kind].rate);
+        if (!taxId) return;
+        const current = form.getValues("options").map((option) => ({
+            ...option,
+            sdr: option.sdr ?? { applicable: false, containerCount: 1 },
+        }));
+        replace(sdrOnlyWhenOn(withKind(current, kind, taxes)));
+        setDraftTax(taxId);
+        setDraftSdr(KIND_SETTINGS[kind].sdr);
+        setDraftCount(1);
+    };
+
+    const changeGroupPrice = (raw: string) => {
+        const text = raw !== "" && parseFloat(raw) < 0 ? "0" : raw;
+        setGroupPrice(text);
+        const price = parseFloat(text);
+        if (text === "" || Number.isNaN(price)) return;
+        replace(withPrice(form.getValues("options"), price));
+        setDraftPrice(text);
+    };
+
+    const toggleSort = (checked: boolean) => {
+        setSortAz(checked);
+        if (checked) replace(sortByName(form.getValues("options"), L));
     };
 
     // (re)load the form every time the modal opens / another group is chosen
@@ -461,7 +560,7 @@ export default function AddAddonGroupModal({
             return;
         }
 
-        append({
+        const added: TOptionForm = {
             name: {
                 en: L === "en" ? draftName.trim() : "",
                 pt: L === "pt" ? draftName.trim() : "",
@@ -471,8 +570,13 @@ export default function AddAddonGroupModal({
             ...(draftSdr
                 ? { sdr: { applicable: true, containerCount: draftCount } }
                 : {}),
-        });
-        resetDraft();
+        };
+        if (sortAz) replace(sortByName([...form.getValues("options"), added], L));
+        else append(added);
+        // The next option starts like this one: usually every extra in a
+        // group has the same price, VAT and SDR.
+        setDraftName("");
+        setDraftPrice(groupPrice || "0");
     };
 
     // ────────────────────────────────────────────────
@@ -490,6 +594,10 @@ export default function AddAddonGroupModal({
     };
 
     const handleCreateGroup = async (data: TAddonGroupForm) => {
+        if (titleTaken(allGroups, data.title?.[L] ?? "")) {
+            toast.error(t("addon_title_taken"));
+            return;
+        }
         const toastId = toast.loading("Creating add-on group...");
 
         const payload = {
@@ -497,7 +605,9 @@ export default function AddAddonGroupModal({
             title: data.title,
             minSelectable: data.minSelectable,
             maxSelectable: data.maxSelectable,
-            options: data.options.map(toApiOption),
+            // A→Z when asked. Only a new group keeps this order: the API
+            // doesn't reorder an existing one (plan.md §11.1).
+            options: (sortAz ? sortByName(data.options, L) : data.options).map(toApiOption),
         };
 
         try {
@@ -594,6 +704,10 @@ export default function AddAddonGroupModal({
 
     const handleEditGroup = async (data: TAddonGroupForm) => {
         if (!prevValues?._id) return;
+        if (titleTaken(allGroups, data.title?.[L] ?? "", prevValues._id)) {
+            toast.error(t("addon_title_taken"));
+            return;
+        }
 
         const payload = buildEditPayload(data);
 
@@ -710,6 +824,12 @@ export default function AddAddonGroupModal({
                             />
                         )}
 
+                        {titleIsTaken && (
+                            <p role="alert" className="-mt-2 text-sm text-destructive" data-testid="addon-title-taken">
+                                {t("addon_title_taken")}
+                            </p>
+                        )}
+
                         <FormField
                             control={form.control}
                             name="minSelectable"
@@ -766,12 +886,85 @@ export default function AddAddonGroupModal({
                             )}
                         />
 
+                        {/* ── One price for the whole group (0 = all free) ── */}
+                        <div className="space-y-1">
+                            <Label htmlFor="addon-group-price" className="font-medium">
+                                {t("addon_group_price")}
+                            </Label>
+                            <Input
+                                id="addon-group-price"
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                value={groupPrice}
+                                placeholder="0.00"
+                                onKeyDown={blockInvalidNumberKeys}
+                                onChange={(e) => changeGroupPrice(e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500">{t("addon_group_price_help")}</p>
+                        </div>
+
+                        {/* ── Food | Drinks: VAT and SDR for every option ── */}
+                        <fieldset className="space-y-2">
+                            <legend className="mb-2 font-medium">{t("product_kind_label")}</legend>
+                            <div className="inline-flex rounded-xl border border-gray-200 bg-white p-1" role="radiogroup" aria-label={t("product_kind_label")}>
+                                {(["FOOD", "DRINK"] as const).map((kind) => {
+                                    const Icon = kind === "FOOD" ? UtensilsCrossed : CupSoda;
+                                    const selected = currentKind === kind;
+                                    return (
+                                        <button
+                                            key={kind}
+                                            type="button"
+                                            role="radio"
+                                            aria-checked={selected}
+                                            disabled={missingRate(kind)}
+                                            onClick={() => pickKind(kind)}
+                                            className={cn(
+                                                "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                                                selected ? "bg-[#DC3173] text-white" : "text-gray-600 hover:bg-gray-50",
+                                            )}
+                                        >
+                                            <Icon className="h-4 w-4" aria-hidden />
+                                            {t(kind === "FOOD" ? "product_kind_food" : "product_kind_drink")}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <p className="text-xs text-gray-500">{t("addon_kind_help")}</p>
+                            {(["FOOD", "DRINK"] as const).filter(missingRate).map((kind) => (
+                                <p key={kind} className="text-xs text-amber-700">
+                                    {t("product_kind_missing_rate").replace("{rate}", String(KIND_SETTINGS[kind].rate))}
+                                </p>
+                            ))}
+                        </fieldset>
+
                         {/* ── Options ── */}
                         <div className="space-y-3">
-                            <label className="block font-medium">
-                                {t("options")}{" "}
-                                <span className="text-sm font-normal text-gray-400">
-                                    ({fields.length})
+                            {/* The title stays in view while scrolling a long list
+                                of options — the dialog itself scrolls (p-6). */}
+                            <div
+                                className="sticky -top-6 z-10 -mx-6 border-y border-gray-100 bg-white/95 px-6 py-2 backdrop-blur"
+                                data-testid="addon-options-for"
+                            >
+                                <p className="text-xs text-gray-500">{t("addon_options_for")}</p>
+                                <p className="truncate font-semibold text-gray-900">
+                                    {watchedTitle.trim() || (
+                                        <span className="font-normal italic text-gray-400">{t("addon_no_title_yet")}</span>
+                                    )}
+                                    <span className="ml-1 font-normal text-gray-400">({fields.length})</span>
+                                </p>
+                            </div>
+                            <label className="flex cursor-pointer items-start gap-2 py-1">
+                                <Checkbox
+                                    checked={sortAz}
+                                    onCheckedChange={(checked) => toggleSort(checked === true)}
+                                    className="mt-0.5 data-[state=checked]:border-[#DC3173] data-[state=checked]:bg-[#DC3173]"
+                                />
+                                <span className="space-y-0.5">
+                                    <span className="block text-sm font-medium">{t("addon_sort_az")}</span>
+                                    <span className="block text-xs text-gray-500">
+                                        {t(isCreateMode ? "addon_sort_az_help_create" : "addon_sort_az_help_edit")}
+                                    </span>
                                 </span>
                             </label>
 
@@ -796,6 +989,10 @@ export default function AddAddonGroupModal({
                                                 t={t}
                                                 // saved options are deleted from the list page (with confirmation)
                                                 onRemove={opt.sku ? undefined : () => remove(index)}
+                                                // Only when creating: an update doesn't reorder
+                                                // on the API (plan.md §11.7). Moving turns A→Z off.
+                                                onMoveUp={isCreateMode && index > 0 ? () => { setSortAz(false); move(index, index - 1); } : undefined}
+                                                onMoveDown={isCreateMode && index < fields.length - 1 ? () => { setSortAz(false); move(index, index + 1); } : undefined}
                                             />
                                         );
                                     })}
@@ -920,7 +1117,7 @@ export default function AddAddonGroupModal({
                                 type="submit"
                                 className="w-full text-white"
                                 style={{ background: PRIMARY }}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || titleIsTaken}
                             >
                                 {isCreateMode ? t("create") : t("update")}
                             </Button>

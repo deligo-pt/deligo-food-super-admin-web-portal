@@ -23,6 +23,9 @@ const AddOnsForVendor = async ({ params, searchParams }: IProps) => {
     const query = { vendorId: vendorData?._id, ...searchParamsObj };
     const queryString = queryStringFormatter(query);
     const addonGroupsData = await getAllAddOnsGroup(queryString);
+    // Every group of the vendor, whatever the page or search: the form refuses
+    // a title the store already uses, and Clone checks the copy's (plan.md §11.5).
+    const allGroupsData = await getAllAddOnsGroup(queryStringFormatter({ vendorId: vendorData?._id, limit: "200" }));
     const taxes = await getAllTaxes();
 
     return (
@@ -33,6 +36,7 @@ const AddOnsForVendor = async ({ params, searchParams }: IProps) => {
                 addonGroupsResult={addonGroupsData as { data: TAddonGroup[], meta: TMeta }}
                 taxes={taxes?.data}
                 businessName={businessName}
+                allGroups={(allGroupsData?.data as TAddonGroup[]) ?? []}
             />
         </div>
     );

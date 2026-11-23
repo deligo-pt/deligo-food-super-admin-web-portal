@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircleIcon,
   ChevronDownIcon,
+  CopyIcon,
   GripVerticalIcon,
   LayersIcon,
   PlusIcon,
@@ -22,19 +23,23 @@ import AddVariationForm from "./AddVariationForm";
 import VariationInlineEdit from "./VariationInlineEdit";
 import VariationDeleteButton from "./VariationDeleteButton";
 import AddVaritionOptionForm from "./AddVaritionOptionForm";
+import CloneVariationsDialog from "./CloneVariationsDialog";
 
 interface IProps {
   product: TProduct;
   businessTypeSlug: "store" | "restaurant";
   t: (key: string) => string;
+  /** The vendor's Mongo `_id`, for the Clone picker. */
+  vendorMongoId: string;
 }
 
-export default function ProductVariationCard({ product, businessTypeSlug, t }: IProps) {
+export default function ProductVariationCard({ product, businessTypeSlug, t, vendorMongoId }: IProps) {
   const { lang } = useStore();
   const router = useRouter();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [showAddVariation, setShowAddVariation] = useState(false);
+  const [showClone, setShowClone] = useState(false);
   const [addingOptionFor, setAddingOptionFor] = useState<LocalizedType>({});
 
   const variationCount = product?.variations?.length || 0;
@@ -199,6 +204,20 @@ export default function ProductVariationCard({ product, businessTypeSlug, t }: I
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Copy these variations to other products (plan.md §11.5). */}
+          {hasVariation && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowClone(true);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#DC3173] bg-[#DC3173]/10 rounded-lg hover:bg-[#DC3173]/30 transition-colors"
+            >
+              <CopyIcon size={14} />
+              {t("variation_clone")}
+            </button>
+          )}
+
           {/* Show "Add Variation" only when there is NO variation yet */}
           {!hasVariation && (
             <button
@@ -418,6 +437,15 @@ export default function ProductVariationCard({ product, businessTypeSlug, t }: I
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showClone && (
+        <CloneVariationsDialog
+          source={product}
+          vendorMongoId={vendorMongoId}
+          onClose={() => setShowClone(false)}
+          t={t}
+        />
+      )}
     </motion.div>
   );
 }
