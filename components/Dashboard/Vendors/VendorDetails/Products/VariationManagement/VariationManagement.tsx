@@ -354,6 +354,7 @@ export default function VariationManagement({
                     businessTypeSlug as "store" | "restaurant"
                   }
                   t={t}
+                  vendorMongoId={vendorMongoId}
                 />
               </motion.div>
             ))}

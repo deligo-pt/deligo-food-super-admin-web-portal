@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import AddonGroupOrder from "@/components/Dashboard/Vendors/AddProduct/AddonGroupOrder";
 import {
     Form,
     FormControl,
@@ -36,7 +37,6 @@ import {
     SaveIcon,
     StarIcon,
     TagIcon,
-    XIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -282,13 +282,6 @@ export function EditProductForm({
             const newAddonGroups = [...form?.getValues("addonGroups"), id];
             form.setValue("addonGroups", newAddonGroups, { shouldDirty: true });
         }
-    };
-
-    const removeAddon = (idToRemove: string) => {
-        const newAddonGroups = form
-            ?.getValues("addonGroups")
-            ?.filter((id) => id !== idToRemove);
-        form.setValue("addonGroups", newAddonGroups, { shouldDirty: true });
     };
 
     // Validation failed: jump to the first broken tab and say which field it is
@@ -571,7 +564,10 @@ export function EditProductForm({
 
     const getAddonsGroups = async () => {
         const result = await catchAsync(async () => {
-            return await getAllAddOnsGroup();
+            // This store's groups only, all of them: without `vendorId` a super
+            // admin got the first 10 groups of every store, so the product's
+            // own groups were missing and other stores' were offered.
+            return await getAllAddOnsGroup(queryStringFormatter({ vendorId: vendorMongoId, limit: "200" }));
         });
 
         if (result.success) {
@@ -708,40 +704,21 @@ export function EditProductForm({
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                                 {t("add_ons")}
                                             </label>
-                                            {watchAddons?.length > 0 && (
-                                                <div className="flex flex-wrap gap-2 mb-1">
-                                                    {watchAddons?.map((id) => (
-                                                        <motion.div
-                                                            key={id}
-                                                            initial={{ scale: 0 }}
-                                                            animate={{ scale: 1 }}
-                                                            className="flex items-center bg-[#DC3173] bg-opacity-10 text-white px-3 py-1 rounded-full"
-                                                        >
-                                                            <span>
-                                                                {
-                                                                    addonGroupsData?.data?.find(
-                                                                        (group) => group._id === id,
-                                                                    )?.title?.[lang]
-                                                                }
-                                                            </span>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => removeAddon(id)}
-                                                                className="ml-2 text-white hover:text-[#CCC]"
-                                                            >
-                                                                <XIcon className="h-4 w-4" />
-                                                            </button>
-                                                        </motion.div>
-                                                    ))}
-                                                </div>
-                                            )}
+                                            {/* Picked Extra groups, in the order customers see them (plan.md §11.6). */}
+                                            <AddonGroupOrder
+                                                ids={watchAddons ?? []}
+                                                groups={addonGroupsData?.data}
+                                                lang={lang as "en" | "pt"}
+                                                onChange={(ids) => form.setValue("addonGroups", ids, { shouldDirty: true })}
+                                                t={t}
+                                            />
                                             <FormField
                                                 control={form.control}
                                                 name="addonGroups"
                                                 render={({ fieldState }) => (
                                                     <FormItem className="gap-1">
                                                         <FormControl>
-                                                            <Select onValueChange={(val) => addAddon(val)}>
+                                                            <Select value="" onValueChange={(val) => addAddon(val)}>
                                                                 <SelectTrigger
                                                                     className={cn(
                                                                         "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-0! foce focus:border-[#DC3173]! outline-none inset-0 h-10!",

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Edit, LayersIcon, Trash2, Loader2, ChevronDown, SaveIcon } from "lucide-react";
+import { Copy, Edit, LayersIcon, Trash2, Loader2, ChevronDown, SaveIcon } from "lucide-react";
 import AddAddonGroupModal from "./AddAddonGroupModal";
+import CloneAddonGroupDialog from "./CloneAddonGroupDialog";
 import { TAddonGroup } from "@/types/add-ons.type";
 import { TTax } from "@/types/tax.type";
 import { TMeta } from "@/types";
@@ -34,6 +35,8 @@ interface IProps {
     vendorUserId: string;
     taxes: TTax[];
     businessName: string;
+    /** Every group of this vendor (all pages), for the duplicate-title check and Clone. */
+    allGroups: TAddonGroup[];
 }
 
 export default function AddOnsManagementSection({
@@ -41,13 +44,15 @@ export default function AddOnsManagementSection({
     vendorId,
     vendorUserId,
     taxes,
-    businessName
+    businessName,
+    allGroups,
 }: IProps) {
     const { t, lang } = useTranslation();
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [actionType, setActionType] = useState<"create" | "edit">("create");
     const [selectedGroup, setSelectedGroup] = useState<TAddonGroup | undefined>(undefined);
+    const [groupToClone, setGroupToClone] = useState<TAddonGroup | undefined>(undefined);
 
     // States for Delete Option modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -280,6 +285,14 @@ export default function AddOnsManagementSection({
                                         <Edit className="w-3.5 h-3.5 mr-1 text-gray-500" />
                                         {t("edit") || "Edit"}
                                     </button>
+                                    {/* Clone → copy with a new title (plan.md §11.5) */}
+                                    <button
+                                        onClick={() => setGroupToClone(group)}
+                                        className="flex items-center text-xs border border-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 transition font-medium"
+                                    >
+                                        <Copy className="w-3.5 h-3.5 mr-1 text-gray-500" />
+                                        {t("addon_clone")}
+                                    </button>
                                 </div>
                             </div>
 
@@ -409,6 +422,16 @@ export default function AddOnsManagementSection({
                 prevValues={selectedGroup}
                 taxes={taxes}
                 actionType={actionType}
+                allGroups={allGroups}
+                t={t}
+            />
+
+            <CloneAddonGroupDialog
+                key={`clone-${groupToClone?._id ?? "none"}`}
+                group={groupToClone}
+                onClose={() => setGroupToClone(undefined)}
+                vendorId={vendorId}
+                allGroups={allGroups}
                 t={t}
             />
 
