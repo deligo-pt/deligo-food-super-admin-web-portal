@@ -314,3 +314,16 @@ export const deleteAddOnOption = async (addonGroupId: string, data: { optionSku:
 
   return result;
 };
+/**
+ * One vendor's products in one category (first page), for the Food | Drinks
+ * guess on Add Product (sheet row 75). Null when they can't be read.
+ */
+export const getVendorCategoryProductsReq = async (
+  vendorMongoId: string,
+  categoryId: string,
+): Promise<TProduct[] | null> => {
+  const result = await catchAsync<TProduct[]>(async () =>
+    serverRequest.get("/products", { params: { vendorId: vendorMongoId, category: categoryId, limit: 50, page: 1 } }),
+  );
+  return result?.success && Array.isArray(result.data) ? result.data : null;
+};

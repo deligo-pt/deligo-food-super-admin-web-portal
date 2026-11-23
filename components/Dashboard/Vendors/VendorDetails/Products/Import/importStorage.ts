@@ -38,12 +38,16 @@ export function forgetJob(vendorKey: string) {
 
 const draftKey = (vendorKey: string) => `admin-product-sheet-draft:v1:${vendorKey}`;
 
-export type TSheetDraft<T> = { savedAt: number; products: T[] };
+/**
+ * `review`: what the editor knew about a file it read for review (Import v2:
+ * which cells still need a translation), so a reload keeps those marks.
+ */
+export type TSheetDraft<T, R = unknown> = { savedAt: number; products: T[]; review?: R | null };
 
-export function readDraft<T>(vendorKey: string): TSheetDraft<T> | null {
+export function readDraft<T, R = unknown>(vendorKey: string): TSheetDraft<T, R> | null {
   try {
     const raw = window.localStorage.getItem(draftKey(vendorKey));
-    const draft = raw ? (JSON.parse(raw) as TSheetDraft<T>) : null;
+    const draft = raw ? (JSON.parse(raw) as TSheetDraft<T, R>) : null;
     return draft && Array.isArray(draft.products) && draft.products.length ? draft : null;
   } catch {
     return null;
@@ -51,9 +55,9 @@ export function readDraft<T>(vendorKey: string): TSheetDraft<T> | null {
 }
 
 /** Saves the list; returns false when storage is full or blocked. */
-export function saveDraft<T>(vendorKey: string, products: T[]): boolean {
+export function saveDraft<T, R = unknown>(vendorKey: string, products: T[], review: R | null = null): boolean {
   try {
-    window.localStorage.setItem(draftKey(vendorKey), JSON.stringify({ savedAt: Date.now(), products }));
+    window.localStorage.setItem(draftKey(vendorKey), JSON.stringify({ savedAt: Date.now(), products, review }));
     return true;
   } catch {
     return false;

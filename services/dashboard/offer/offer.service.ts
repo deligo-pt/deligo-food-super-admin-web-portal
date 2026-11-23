@@ -4,6 +4,7 @@ import { serverRequest } from "@/lib/serverFetch";
 import { TMeta } from "@/types";
 import { TOffer, TOfferAnalytics } from "@/types/offer.type";
 import { catchAsync } from "@/utils/catchAsync";
+import { twoForOneOfferPayload, twoForOneState, type TTwoForOneState } from "@/utils/twoForOne";
 
 export const createOfferReq = async (data: Partial<TOffer>) => {
   return catchAsync<null>(async () => {
@@ -98,4 +99,52 @@ export const getOfferAnalyticsReq = async () => {
   if (result?.success) return result.data;
 
   return {};
+};
+
+/* ----- 2×1 on a product (sheet row 77, plan.md §10.5) ----- */
+
+/**
+ * The product's 2×1 state among its vendor's offers (`vendorMongoId` and
+ * `productMongoId` are `_id`s). Null when the offers can't be read — the
+ * switch then stays disabled rather than guessing.
+ */
+export const getTwoForOneStateReq = async (
+  vendorMongoId: string,
+  productMongoId: string,
+): Promise<TTwoForOneState | null> => {
+  const offers: TOffer[] = [];
+  for (let page = 1; page <= 20; page++) {
+    const res = await catchAsync<TOffer[]>(async () =>
+      serverRequest.get("/offers", { params: { vendorId: vendorMongoId, limit: 100, page, isDeleted: false } }),
+    );
+    if (!res.success || !Array.isArray(res.data)) return null;
+    offers.push(...res.data);
+    const totalPage = Number(res.meta?.totalPage ?? 1);
+    if (page >= totalPage) break;
+  }
+  return twoForOneState(offers, productMongoId);
+};
+
+/** Creates the product's buy-1-get-1-free offer for its vendor. */
+export const createTwoForOneReq = async (
+  vendorMongoId: string,
+  productMongoId: string,
+  name: { en: string; pt: string },
+) => {
+  return catchAsync<TOffer>(async () =>
+    serverRequest.post("/offers/admin/create-vendor-offer", {
+      data: twoForOneOfferPayload(productMongoId, vendorMongoId, name),
+    }),
+  );
+};
+
+/**
+ * Ends the product's 2×1. The API deletes only inactive offers ("An active
+ * offer must be deactivated before it can be deleted"), so it is switched
+ * off first, then deleted.
+ */
+export const removeTwoForOneReq = async (offerId: string) => {
+  const off = await catchAsync<null>(async () => serverRequest.patch(`/offers/toggle-status/${offerId}`));
+  if (!off.success) return off;
+  return catchAsync<null>(async () => serverRequest.delete(`/offers/soft-delete/${offerId}`));
 };

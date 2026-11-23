@@ -30,7 +30,7 @@ import {
     StarIcon,
     TagIcon,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -47,6 +47,9 @@ import StockInformationForm from "./StockInformationForm";
 import DeligoMetadata from "./DeligoMetadata";
 import { TVendor } from "@/types/user.type";
 import { adminBulkCreateProductsReq } from "@/services/dashboard/product/product-bulk.service";
+import { createTwoForOneReq } from "@/services/dashboard/offer/offer.service";
+import { getVendorCategoryProductsReq } from "@/services/dashboard/product/product.service";
+import { KIND_SETTINGS, kindFromProducts, taxIdForRate, type TProductKind } from "@/utils/productKind";
 import type { TBulkProductItem } from "@/types/product-bulk.type";
 import { bulkErrorText, bulkRequestErrorText } from "@/utils/bulkErrors";
 import {
@@ -139,6 +142,7 @@ export function AddProductToVendor({
             addonGroups: [],
             variations: [],
             isFeatured: false,
+            isTwoForOne: false,
             sdrApplicable: false,
             sdrContainerCount: 1,
             isAvailableForPreOrder: false,
@@ -195,6 +199,7 @@ export function AddProductToVendor({
                 case "sdrApplicable":
                 case "sdrContainerCount":
                 case "isFeatured":
+                case "isTwoForOne":
                 case "isAvailableForPreOrder":
                     newErrors[t("deligo_metadata")] = true;
                     return;
@@ -209,6 +214,55 @@ export function AddProductToVendor({
             control: form.control,
             name: [`name.${lang}`, "price", "discount", "discountType", "taxId", "addonGroups", "variations"],
         });
+
+    /* ----- Food | Drinks pre-selected from the category (§10.5) ----- */
+
+    const [watchCategory, watchSdr] = useWatch({ control: form.control, name: ["category", "sdrApplicable"] });
+    /** Each category's kind, once looked up while the form is open. */
+    const kindByCategory = useRef(new Map<string, TProductKind | null>());
+    /** What the last pre-selection wrote: only that may be replaced, never the admin's own choice. */
+    const autoKind = useRef<{ taxId: string; sdr: boolean }>({ taxId: "", sdr: false });
+    /** The same, for rendering (a ref can't be read while rendering). */
+    const [autoChoice, setAutoChoice] = useState<{ taxId: string; sdr: boolean } | null>(null);
+
+    useEffect(() => {
+        if (!watchCategory || !vendor?._id) return;
+        let stale = false;
+        const apply = (kind: TProductKind | null) => {
+            if (stale || !kind) return;
+            const taxId = form.getValues("taxId") || "";
+            const sdr = form.getValues("sdrApplicable") === true;
+            // VAT or SDR set by hand: leave them.
+            if (taxId !== autoKind.current.taxId || sdr !== autoKind.current.sdr) return;
+            const id = taxIdForRate(taxesData, KIND_SETTINGS[kind].rate);
+            if (!id) return;
+            const nextSdr = KIND_SETTINGS[kind].sdr;
+            form.setValue("taxId", id, { shouldValidate: !!taxId });
+            form.setValue("sdrApplicable", nextSdr);
+            if (!nextSdr) form.setValue("sdrContainerCount", undefined);
+            else if (!form.getValues("sdrContainerCount")) form.setValue("sdrContainerCount", 1);
+            autoKind.current = { taxId: id, sdr: nextSdr };
+            setAutoChoice(autoKind.current);
+        };
+        if (kindByCategory.current.has(watchCategory)) {
+            apply(kindByCategory.current.get(watchCategory) ?? null);
+        } else {
+            getVendorCategoryProductsReq(vendor._id as string, watchCategory).then((products) => {
+                const kind = products ? kindFromProducts(products) : null;
+                if (products) kindByCategory.current.set(watchCategory, kind);
+                apply(kind);
+            });
+        }
+        return () => {
+            stale = true;
+        };
+        // A new category only; taxes, vendor and the form are stable for the page.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [watchCategory]);
+
+    // "Chosen from the category" only while VAT and SDR are still what it chose.
+    const kindStillAuto =
+        !!autoChoice && watchTaxId === autoChoice.taxId && (watchSdr === true) === autoChoice.sdr;
 
     /**
      * A refused save: each problem goes on its field and the form opens the
@@ -353,6 +407,17 @@ export function AddProductToVendor({
                 toast.success(t("product_created_successfully"), {
                     id: toastId,
                 });
+                // 2×1 (sheet row 77): an offer for the new product. The
+                // product is saved either way; a failure is only a warning.
+                if (data.isTwoForOne) {
+                    const offer = await createTwoForOneReq(
+                        vendor._id as string,
+                        result.data.created[0]._id,
+                        translated.name as { en: string; pt: string },
+                    );
+                    if (offer.success) toast.success(t("two_for_one_created"));
+                    else toast.warning(t("two_for_one_create_failed").replace("{reason}", offer.message || ""));
+                }
                 form.reset();
                 setActiveTab(0);
                 invalidateProductsCache(); // the list's in-memory pages are now out of date
@@ -572,6 +637,7 @@ export function AddProductToVendor({
                                         watchVariations={watchVariations}
                                         watchTaxId={watchTaxId}
                                         watchDiscountType={watchDiscountType}
+                                        kindFromCategory={kindStillAuto}
                                     />
                                 )}
                                 {businessTypeSlug !== "restaurant" && activeTab === 4 && (

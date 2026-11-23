@@ -49,7 +49,8 @@ import BasicInfoForm from "../../AddProduct/BasicInfoForm";
 import ImageAndDescriptionForm from "../../AddProduct/Image&DescriptionForm";
 import PricingForm from "../../AddProduct/PricingForm";
 import StockInformationForm from "../../AddProduct/StockInformationForm";
-import DeligoMetadata from "../../AddProduct/DeligoMetadata";
+import DeligoMetadata, { type TTwoForOneInfo } from "../../AddProduct/DeligoMetadata";
+import { createTwoForOneReq, getTwoForOneStateReq, removeTwoForOneReq } from "@/services/dashboard/offer/offer.service";
 import { getAllProductCategories } from "@/services/dashboard/category/product-category.service";
 import { getAllTaxes } from "@/services/dashboard/tax/tax.service";
 import { getAllAddOnsGroup, updateProduct, updateProductPriceStock } from "@/services/dashboard/product/product.service";
@@ -187,6 +188,35 @@ export function EditProductForm({
     });
     const { formState: { errors } } = form;
 
+    /* ----- 2×1 (sheet row 77, §10.5): read from the vendor's offers, changed on save ----- */
+    const [twoForOneInfo, setTwoForOneInfo] = useState<TTwoForOneInfo>({ status: "loading" });
+    /** The product's own 2×1 offer when the form opened; null when it had none. */
+    const [twoForOneOfferId, setTwoForOneOfferId] = useState<string | null>(null);
+    useEffect(() => {
+        let cancelled = false;
+        if (!prevData?._id || !vendorMongoId) return;
+        getTwoForOneStateReq(vendorMongoId, prevData._id).then((found) => {
+            if (cancelled) return;
+            if (!found) {
+                setTwoForOneInfo({ status: "unknown" });
+                return;
+            }
+            if (found.state === "locked") {
+                setTwoForOneInfo({ status: "locked", title: found.title });
+                form.setValue("isTwoForOne", true);
+                return;
+            }
+            setTwoForOneOfferId(found.state === "on" ? found.offerId : null);
+            form.setValue("isTwoForOne", found.state === "on");
+            setTwoForOneInfo({ status: "ready" });
+        });
+        return () => {
+            cancelled = true;
+        };
+        // Once per product opened.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [prevData?._id]);
+
     // Which tab does a field live in? (same mapping as the Add form;
     // description is edited inside the Images tab)
     const fieldToTabName = (key: string): string | null => {
@@ -213,6 +243,7 @@ export function EditProductForm({
             case "availabilityStatus":
                 return t("stock");
             case "isFeatured":
+            case "isTwoForOne":
             case "isAvailableForPreOrder":
             case "isActive":
             case "sdrApplicable":
@@ -458,6 +489,36 @@ export function EditProductForm({
 
         const hasAnyChange = Object.keys(productData).length > 0 || priceChanged;
 
+        // 2×1: only when the offers were read and the switch really moved.
+        const twoForOneChanged =
+            twoForOneInfo.status === "ready" && (data.isTwoForOne === true) !== Boolean(twoForOneOfferId);
+        const syncTwoForOne = async () => {
+            if (!twoForOneChanged) return;
+            if (data.isTwoForOne) {
+                const name = (productData.name ?? prevData?.name ?? {}) as { en?: string; pt?: string };
+                const res = await createTwoForOneReq(vendorMongoId, prevData._id as string, {
+                    en: name.en || name.pt || "",
+                    pt: name.pt || name.en || "",
+                });
+                if (res.success) toast.success(t("two_for_one_created"));
+                else toast.warning(t("two_for_one_create_failed").replace("{reason}", res.message || ""), { duration: 10000 });
+            } else if (twoForOneOfferId) {
+                const res = await removeTwoForOneReq(twoForOneOfferId);
+                if (res.success) toast.success(t("two_for_one_removed"));
+                else toast.warning(t("two_for_one_remove_failed").replace("{reason}", res.message || ""), { duration: 10000 });
+            }
+        };
+
+        if (!hasAnyChange && twoForOneChanged) {
+            // Only the 2×1 switch moved: nothing to send for the product itself.
+            toast.dismiss(toastId);
+            await syncTwoForOne();
+            setActiveTab(0);
+            router.refresh();
+            closeModal();
+            return;
+        }
+
         if (!hasAnyChange) {
             toast.info("No changes detected", { id: toastId });
             setActiveTab(0);
@@ -488,6 +549,7 @@ export function EditProductForm({
         }
 
         toast.success("Product updated successfully!", { id: toastId });
+        await syncTwoForOne();
         setActiveTab(0);
         onSuccess(result?.data);
         router.refresh();
@@ -782,6 +844,7 @@ export function EditProductForm({
                                 {activeTab === lastTabIndex && (
                                     <DeligoMetadata
                                         form={form}
+                                        twoForOne={twoForOneInfo}
                                     />
                                 )}
                                 <div className="flex justify-between pt-6">

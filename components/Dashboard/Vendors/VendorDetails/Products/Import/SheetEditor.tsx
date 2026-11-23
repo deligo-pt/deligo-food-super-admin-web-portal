@@ -27,7 +27,6 @@ import {
   emptyProduct,
   emptyVariation,
   fileRowsOf,
-  groupCsvRowsToNestedState,
   isBlankProduct,
   optionCount,
   parseSheetNumber,
@@ -35,7 +34,11 @@ import {
   explainImportRow,
   productFromImportError,
   productsToCsv,
-  readSheetFile,
+  type TSheetLang,
+  applyToAllProducts,
+  otherLanguagePath,
+  sheetText,
+  withSheetText,
   validateSheet,
 } from "@/utils/productSheet";
 import {
@@ -45,23 +48,44 @@ import {
   FolderOpen,
   History,
   CheckCircle2,
+  Languages,
   Lightbulb,
   LoaderCircle,
+  SlidersHorizontal,
   Plus,
   Trash2,
   Upload,
   X,
 } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { clearDraft, readDraft, saveDraft, type TSheetDraft } from "./importStorage";
+import type { TSheetMissing, TSheetTranslation } from "@/utils/sheetTranslate";
+import type { TranslationErrorCode } from "@/types/translation.type";
 
 export type TSheetCategory = { nameEn: string; namePt: string };
 
-/** Failed rows of a finished import, to load into the grid ("Fix in the editor"). */
-export type TSheetLoad = { id: number; rows: TImportRowError[] };
+/**
+ * What to put in the grid:
+ * - `failed`: rows a finished import refused ("Fix in the editor");
+ * - `review`: products read from the vendor's file and translated (Import v2,
+ *   initial import), to check before the final import.
+ */
+export type TSheetLoad =
+  | { id: number; kind: "failed"; rows: TImportRowError[] }
+  | ({ id: number; kind: "review"; from: TSheetLang } & TSheetTranslation);
 
 type TT = (key: string) => string;
+
+/** The file just read for review (Import v2): what to say and which cells still need a translation. */
+type TReview = {
+  from: TSheetLang;
+  count: number;
+  /** Cells filled by the translator (0 for a file that already had both languages). */
+  translated: number;
+  error: TranslationErrorCode | null;
+  missing: TSheetMissing[];
+};
 type TUpdate = (clientId: string, change: (p: TSheetProduct) => TSheetProduct) => void;
 
 interface IProps {
@@ -74,6 +98,13 @@ interface IProps {
   setOnDuplicate: (value: TImportOnDuplicate) => void;
   /** Uploads the generated file; resolves true when the import started. */
   submitFile: (file: File) => Promise<boolean>;
+  /** Reads and translates a file, then loads it here as a `review` (see ProductImport). */
+  openFile: (file: File) => Promise<boolean>;
+  /** A file is being read / translated. */
+  opening: boolean;
+  /** The language files are written in. */
+  fileLang: TSheetLang;
+  setFileLang: (lang: TSheetLang) => void;
   /** Draft storage key part (per vendor). */
   vendorKey: string;
   load: TSheetLoad | null;
@@ -91,18 +122,26 @@ export default function SheetEditor({
   onDuplicate,
   setOnDuplicate,
   submitFile,
+  openFile: prepareFile,
+  opening,
+  fileLang,
+  setFileLang,
   vendorKey,
   load,
 }: IProps) {
+  // Own radio group per copy: the admin layout renders the page twice (one
+  // copy hidden), and two groups with one name untick each other.
+  const onDuplicateName = `sheetOnDuplicate-${useId()}`;
   const [products, setProducts] = useState<TSheetProduct[]>(() => [emptyProduct()]);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [touched, setTouched] = useState<Set<string>>(() => new Set());
   const [showAll, setShowAll] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [opening, setOpening] = useState(false);
+  const [review, setReview] = useState<TReview | null>(null);
+  const [reviewHidden, setReviewHidden] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   /** An unfinished list from an earlier visit, offered until resumed or discarded. */
-  const [draft, setDraft] = useState<TSheetDraft<TSheetProduct> | null>(null);
+  const [draft, setDraft] = useState<TSheetDraft<TSheetProduct, TReview> | null>(null);
   const [draftChecked, setDraftChecked] = useState(false);
   const draftWarned = useRef(false);
   /** The load request already put in the grid (effects can run twice). */
@@ -128,7 +167,26 @@ export default function SheetEditor({
   );
 
   const filled = useMemo(() => products.filter((p) => !isBlankProduct(p)), [products]);
-  const errors = useMemo(() => validateSheet(filled, ctx), [filled, ctx]);
+  const checked = useMemo(() => validateSheet(filled, ctx), [filled, ctx]);
+
+  /** Cells the translator could not fill and that are still empty. */
+  const pending = useMemo(() => {
+    if (!review?.missing.length) return [];
+    const byId = new Map(filled.map((p) => [p.clientId, p]));
+    return review.missing.filter((m) => {
+      const product = byId.get(m.clientId);
+      const value = product && sheetText(product, m.field);
+      return value !== undefined && !value.trim();
+    });
+  }, [review, filled]);
+
+  // A cell that still needs its translation blocks the import like any other problem.
+  const errors = useMemo(() => {
+    if (!pending.length) return checked;
+    const merged = new Map(checked);
+    for (const m of pending) merged.set(m.clientId, { ...merged.get(m.clientId), [m.field]: "sheet_err_needs_translation" });
+    return merged;
+  }, [checked, pending]);
   const fileRows = useMemo(() => filled.reduce((n, p) => n + fileRowsOf(p), 0), [filled]);
 
   const update = useCallback<TUpdate>((clientId, change) => {
@@ -136,11 +194,20 @@ export default function SheetEditor({
     setTouched((prev) => (prev.has(clientId) ? prev : new Set(prev).add(clientId)));
   }, []);
 
+  /**
+   * Opens the details of products whose untranslated text is in there (a
+   * short list only: with the translator down that could be every product).
+   */
+  function expandMissing(missing: TSheetMissing[]) {
+    const inside = new Set(missing.filter((m) => !m.field.startsWith("name")).map((m) => m.clientId));
+    if (inside.size && inside.size <= 20) setExpanded((prev) => new Set([...prev, ...inside]));
+  }
+
   /* ----- draft: offered on open, saved while editing, cleared after an import starts ----- */
 
   useEffect(() => {
     // With failed products to fix, the unfinished list is merged in below instead.
-    if (!load || handledLoad.current === load.id) setDraft(load ? null : readDraft<TSheetProduct>(vendorKey));
+    if (!load || handledLoad.current === load.id) setDraft(load ? null : readDraft<TSheetProduct, TReview>(vendorKey));
     // eslint-disable-next-line react-hooks/set-state-in-effect -- read once from localStorage after mount
     setDraftChecked(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,24 +218,24 @@ export default function SheetEditor({
     if (!draftChecked || draft) return;
     const timer = window.setTimeout(() => {
       if (!filled.length) clearDraft(vendorKey);
-      else if (!saveDraft(vendorKey, filled) && !draftWarned.current) {
+      else if (!saveDraft(vendorKey, filled, review) && !draftWarned.current) {
         draftWarned.current = true;
         toast.error(t("sheet_draft_not_saved"));
       }
     }, 500);
     return () => window.clearTimeout(timer);
-  }, [filled, draft, draftChecked, vendorKey, t]);
+  }, [filled, review, draft, draftChecked, vendorKey, t]);
 
   // Saved at once when the editor closes (an import started from the other
   // tab, leaving the page), so the last half second of typing isn't lost.
-  const pendingSave = useRef<TSheetProduct[] | null>(null);
+  const pendingSave = useRef<{ products: TSheetProduct[]; review: TReview | null } | null>(null);
   useEffect(() => {
-    pendingSave.current = draftChecked && !draft ? filled : null;
-  }, [filled, draft, draftChecked]);
+    pendingSave.current = draftChecked && !draft ? { products: filled, review } : null;
+  }, [filled, review, draft, draftChecked]);
   useEffect(
     () => () => {
       const latest = pendingSave.current;
-      if (latest?.length) saveDraft(vendorKey, latest);
+      if (latest?.products.length) saveDraft(vendorKey, latest.products, latest.review);
     },
     [vendorKey],
   );
@@ -178,6 +245,17 @@ export default function SheetEditor({
     const loaded = draft.products.map((p) => ({ ...emptyProduct(), ...p }));
     setProducts((prev) => [...prev.filter((p) => !isBlankProduct(p)), ...loaded]);
     setTouched((prev) => new Set([...prev, ...loaded.map((p) => p.clientId)]));
+    // The review it came from: its "Needs translation" marks come back too.
+    if (draft.review?.missing) {
+      setReview(draft.review);
+      setReviewHidden(false);
+      setShowAll(true);
+      // Only cells still empty: what was filled before the reload needs no opening.
+      expandMissing(draft.review.missing.filter((m) => {
+        const product = loaded.find((p) => p.clientId === m.clientId);
+        return product && !sheetText(product, m.field)?.trim();
+      }));
+    }
     setDraft(null);
   };
 
@@ -186,11 +264,37 @@ export default function SheetEditor({
     setDraft(null);
   };
 
+  function loadReview(next: Extract<TSheetLoad, { kind: "review" }>) {
+    const loaded = next.products;
+    if (!loaded.length) return;
+    // Added after what is already there; an untouched blank grid is replaced.
+    setProducts((prev) => [...prev.filter((p) => !isBlankProduct(p)), ...loaded]);
+    setDraft(null);
+    setTouched((prev) => new Set([...prev, ...loaded.map((p) => p.clientId)]));
+    setShowAll(true);
+    // A second file opened into the same review keeps the first one's marks.
+    setReview((prev) => ({
+      from: next.from,
+      count: loaded.length,
+      translated: next.translated,
+      error: next.error ?? prev?.error ?? null,
+      missing: [...(prev?.missing ?? []), ...next.missing],
+    }));
+    setReviewHidden(false);
+    expandMissing(next.missing);
+    window.setTimeout(() => document.getElementById("sheet-review")?.scrollIntoView({ block: "start", behavior: "smooth" }), 50);
+  }
+
   /* ----- Fix in the editor: the failed products, each with its reason ----- */
 
   useEffect(() => {
     if (!load || handledLoad.current === load.id) return;
     handledLoad.current = load.id;
+    if (load.kind === "review") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- a file to review arrives once per load (load.id)
+      loadReview(load);
+      return;
+    }
     const loaded = load.rows.flatMap((row) => {
       const product = productFromImportError(row);
       if (!product) return [];
@@ -204,7 +308,6 @@ export default function SheetEditor({
     // Added after an unfinished list (in the grid, or saved as a draft while
     // the import ran), never in place of it.
     const unfinished = (readDraft<TSheetProduct>(vendorKey)?.products ?? []).map((p) => ({ ...emptyProduct(), ...p }));
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- failed rows arrive once per import (load.id)
     setProducts((prev) => {
       const kept = [...prev.filter((p) => !isBlankProduct(p)), ...unfinished];
       const ids = new Set(kept.map((p) => p.clientId));
@@ -219,6 +322,32 @@ export default function SheetEditor({
     // A new load request only; `t` changes with the language.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [load?.id]);
+
+  /* ----- Import v2: products read from a file and translated, to check ----- */
+
+  /** Fills every cell that still needs a translation with the text the vendor wrote. */
+  const fillWithOriginalText = () => {
+    const byProduct = new Map<string, string[]>();
+    for (const m of pending) byProduct.set(m.clientId, [...(byProduct.get(m.clientId) ?? []), m.field]);
+    let filledCells = 0;
+    const next = products.map((p) => {
+      const fields = byProduct.get(p.clientId);
+      if (!fields) return p;
+      return fields.reduce((product, field) => {
+        const original = sheetText(product, otherLanguagePath(field))?.trim();
+        if (!original) return product;
+        filledCells++;
+        return withSheetText(product, field, original);
+      }, p);
+    });
+    setProducts(next);
+    if (filledCells) toast.success(countText(t, "import_review_same_done", filledCells));
+  };
+
+  const setForAll = (change: Parameters<typeof applyToAllProducts>[1]) => {
+    setProducts((prev) => applyToAllProducts(prev, change));
+    toast.success(countText(t, "sheet_set_all_done", filled.length));
+  };
 
   /* ----- paste a block copied from Excel / Google Sheets ----- */
 
@@ -259,33 +388,15 @@ export default function SheetEditor({
     window.setTimeout(() => document.getElementById(`sheet-${product.clientId}-nameEn`)?.focus(), 0);
   };
 
-  const openFile = async (file: File | undefined) => {
+  // Same path as the Upload tab: read, defaults, translate, then loadReview.
+  const openFile = (file: File | undefined) => {
     if (fileRef.current) fileRef.current.value = "";
-    if (!file) return;
-    if (!/\.(csv|xlsx)$/i.test(file.name)) {
-      toast.error(t("bulk_err_IMPORT_FILE_UNSUPPORTED_TYPE"));
-      return;
-    }
-    setOpening(true);
-    try {
-      const loaded = groupCsvRowsToNestedState(await readSheetFile(file));
-      if (!loaded.length) {
-        toast.error(t("sheet_file_empty"));
-        return;
-      }
-      // Added after what is already there; an untouched blank grid is replaced.
-      setProducts((prev) => [...prev.filter((p) => !isBlankProduct(p)), ...loaded]);
-      setTouched((prev) => new Set([...prev, ...loaded.map((p) => p.clientId)]));
-      toast.success(countText(t, "sheet_file_loaded", loaded.length));
-    } catch {
-      toast.error(t("sheet_file_unreadable"));
-    } finally {
-      setOpening(false);
-    }
+    if (file) void prepareFile(file);
   };
 
   const clearAll = () => {
     if (filled.length && !window.confirm(t("sheet_clear_confirm"))) return;
+    setReview(null);
     setProducts([emptyProduct()]);
     setExpanded(new Set());
     setTouched(new Set());
@@ -320,6 +431,7 @@ export default function SheetEditor({
     setSubmitting(false);
     if (started) {
       pendingSave.current = null;
+      setReview(null);
       clearDraft(vendorKey);
       setProducts([emptyProduct()]);
       setExpanded(new Set());
@@ -360,6 +472,49 @@ export default function SheetEditor({
           </div>
         </div>
       )}
+      {review && !reviewHidden && (
+        <div id="sheet-review" className="mb-4 scroll-mt-24 rounded-lg border border-[#DC3173]/25 bg-[#DC3173]/5 p-3 text-sm text-gray-700">
+          <div className="flex items-start justify-between gap-3">
+            <p className="flex items-start gap-2">
+              <Languages className="mt-0.5 h-4 w-4 shrink-0 text-[#DC3173]" aria-hidden />
+              <span>
+                {countText(t, "import_review_banner", review.count, {
+                  lang: t(review.from === "en" ? "import_lang_en" : "import_lang_pt"),
+                })}{" "}
+                {review.translated > 0 &&
+                  !pending.length &&
+                  fillVars(t("import_review_translated"), { other: t(review.from === "en" ? "import_lang_pt" : "import_lang_en") })}
+              </span>
+            </p>
+            <button
+              type="button"
+              onClick={() => setReviewHidden(true)}
+              aria-label={t("import_review_hide")}
+              className="shrink-0 rounded-full p-1 text-gray-400 hover:bg-white hover:text-gray-600"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          {pending.length > 0 && (
+            <div className="mt-3 flex flex-col gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="flex items-start gap-2 text-amber-900">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                <span>
+                  {countText(t, "import_review_pending", pending.length)}{" "}
+                  {review.error && <span className="text-amber-800">{t(`import_tr_reason_${review.error}`)}</span>}
+                </span>
+              </p>
+              <button
+                type="button"
+                onClick={fillWithOriginalText}
+                className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100"
+              >
+                {t("import_review_same_text")}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       {/* Toolbar */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
@@ -377,8 +532,21 @@ export default function SheetEditor({
             type="file"
             accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             className="sr-only"
-            onChange={(e) => void openFile(e.target.files?.[0])}
+            onChange={(e) => openFile(e.target.files?.[0])}
           />
+          <label className="inline-flex items-center gap-2 text-sm text-gray-600">
+            <span className="sr-only sm:not-sr-only">{t("import_file_lang_short")}</span>
+            <select
+              value={fileLang}
+              disabled={opening}
+              onChange={(e) => setFileLang(e.target.value === "pt" ? "pt" : "en")}
+              aria-label={t("import_file_lang_label")}
+              className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-sm outline-none focus:border-[#DC3173] disabled:opacity-60"
+            >
+              <option value="en">{t("import_lang_en")}</option>
+              <option value="pt">{t("import_lang_pt")}</option>
+            </select>
+          </label>
           {filled.length > 0 && (
             <button
               type="button"
@@ -397,6 +565,8 @@ export default function SheetEditor({
           })}
         </p>
       </div>
+
+      {filled.length >= 2 && <SetForAll t={t} count={filled.length} onApply={setForAll} />}
 
       <p className="mb-3 flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600">
         <Lightbulb className="mt-px h-3.5 w-3.5 shrink-0 text-[#DC3173]" aria-hidden />
@@ -474,7 +644,7 @@ export default function SheetEditor({
                 >
                   <input
                     type="radio"
-                    name="sheetOnDuplicate"
+                    name={onDuplicateName}
                     value={value}
                     checked={onDuplicate === value}
                     onChange={() => setOnDuplicate(value)}
@@ -508,6 +678,87 @@ const WAITS_FOR_SUBMIT = new Set(["sheet_err_required", "sheet_err_price_require
 
 /** Product fields that live in the details panel, not the row. */
 const DETAIL_FIELDS = new Set(["descriptionEn", "descriptionPt", "brand", "imageUrl", "sdrContainerCount", "stockUnit"]);
+
+/* ---------- set for all (review) ---------- */
+
+/** Status and SDR for every product at once; each part can be left unchanged. */
+function SetForAll({
+  t,
+  count,
+  onApply,
+}: {
+  t: TT;
+  count: number;
+  onApply: (change: Parameters<typeof applyToAllProducts>[1]) => void;
+}) {
+  const [status, setStatus] = useState<"" | "ACTIVE" | "INACTIVE">("");
+  const [sdr, setSdr] = useState<"" | "off" | "on">("");
+  const [containers, setContainers] = useState("");
+  const containersOk = /^\d+$/.test(containers.trim()) && Number(containers) >= 1;
+  const nothing = !status && !sdr;
+
+  const apply = () => {
+    if (sdr === "on" && !containersOk) {
+      toast.error(t("sheet_set_all_count_needed"));
+      return;
+    }
+    onApply({
+      status: status || undefined,
+      sdr: sdr === "on" ? { on: true, containers } : sdr === "off" ? { on: false } : undefined,
+    });
+    setStatus("");
+    setSdr("");
+    setContainers("");
+  };
+
+  const selectClass =
+    "h-9 rounded-md border border-gray-200 bg-white px-2 text-sm outline-none focus:border-[#DC3173]";
+
+  return (
+    <div className="mb-3 flex flex-col gap-3 rounded-lg border border-gray-200 px-3 py-2.5 lg:flex-row lg:items-center">
+      <p className="flex shrink-0 items-center gap-2 text-sm font-medium text-gray-700">
+        <SlidersHorizontal className="h-4 w-4 text-[#DC3173]" aria-hidden />
+        {countText(t, "sheet_set_all_title", count)}
+      </p>
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="flex items-center gap-1.5 text-sm text-gray-600">
+          {t("sheet_col_status")}
+          <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)} className={selectClass}>
+            <option value="">{t("sheet_set_keep")}</option>
+            <option value="ACTIVE">{t("sheet_status_active")}</option>
+            <option value="INACTIVE">{t("sheet_status_inactive")}</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-1.5 text-sm text-gray-600">
+          {t("sheet_col_sdr")}
+          <select value={sdr} onChange={(e) => setSdr(e.target.value as typeof sdr)} className={selectClass}>
+            <option value="">{t("sheet_set_keep")}</option>
+            <option value="off">{t("sheet_no")}</option>
+            <option value="on">{t("sheet_yes")}</option>
+          </select>
+        </label>
+        {sdr === "on" && (
+          <input
+            inputMode="numeric"
+            value={containers}
+            onChange={(e) => setContainers(e.target.value)}
+            placeholder={t("sheet_ph_containers")}
+            aria-label={t("sheet_ph_containers")}
+            className={cn(selectClass, "w-28", containers && !containersOk && "border-red-400")}
+          />
+        )}
+        <button
+          type="button"
+          onClick={apply}
+          disabled={nothing}
+          className="h-9 rounded-md bg-gray-800 px-3 text-sm font-medium text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {t("sheet_set_all_apply")}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /* ---------- one product ---------- */
 
@@ -762,10 +1013,10 @@ function ProductDetails({
       {/* More about the product */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label={t("sheet_col_description_en")} error={err("descriptionEn")} t={t}>
-          <input value={p.descriptionEn} onChange={(e) => set("descriptionEn", e.target.value)} className={cellClass()} />
+          <input value={p.descriptionEn} onChange={(e) => set("descriptionEn", e.target.value)} className={cellClass(err("descriptionEn"))} />
         </Field>
         <Field label={t("sheet_col_description_pt")} error={err("descriptionPt")} t={t}>
-          <input value={p.descriptionPt} onChange={(e) => set("descriptionPt", e.target.value)} className={cellClass()} />
+          <input value={p.descriptionPt} onChange={(e) => set("descriptionPt", e.target.value)} className={cellClass(err("descriptionPt"))} />
         </Field>
         <Field label={t("sheet_col_image_url")} error={err("imageUrl")} t={t}>
           <input value={p.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://" className={cellClass(err("imageUrl"))} />

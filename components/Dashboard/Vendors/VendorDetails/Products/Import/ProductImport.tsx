@@ -2,37 +2,37 @@
 
 /**
  * Admin: Import products for one vendor
- * (PRODUCT_BULK_AND_IMPORT_FRONTEND_GUIDE §3, plan.md A3).
+ * (PRODUCT_BULK_AND_IMPORT_FRONTEND_GUIDE §3, plan.md A3 + §9.5).
  *
- * Copy of the vendor panel's ProductImport, for the vendor the admin opened:
- * the upload carries `vendorId` (the vendor's profile `_id`), restaurant rules
- * and the category / VAT lists are that vendor's, and the running job's id is
- * kept per admin + vendor in localStorage, so a reload picks it up again.
- * Two ways in, the same import behind both: upload a file, or build / fix
- * the list in the browser (SheetEditor, A4).
+ * Copy of the vendor panel's ProductImport (Import v2), for the vendor the
+ * admin opened: the file is written in ONE language (picked here), read in
+ * the browser, every product gets the defaults (Active, SDR off), the other
+ * language is translated, and everything opens in the editor for review.
+ * Only the editor's Import sends a file — for this vendor (`vendorId` = its
+ * profile `_id`); restaurant rules and the category / VAT lists are that
+ * vendor's. The running job's id is kept per admin + vendor in localStorage,
+ * so a reload picks it up again.
  */
 
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
-import {
-  getImportTemplateReq,
-  uploadProductImportReq,
-} from "@/services/dashboard/product/product-bulk.service";
+import { uploadProductImportReq } from "@/services/dashboard/product/product-bulk.service";
 import type { TImportOnDuplicate } from "@/types/product-bulk.type";
-import { bulkErrorText, bulkRequestErrorText, fillVars } from "@/utils/bulkErrors";
+import { bulkErrorText, bulkRequestErrorText, countText, fillVars } from "@/utils/bulkErrors";
 import { cn } from "@/lib/utils";
-import { Download, FileSpreadsheet, LoaderCircle, Upload, X } from "lucide-react";
+import { Download, FileSpreadsheet, Languages, LoaderCircle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import ImportJobPanel from "./ImportJobPanel";
 import SheetEditor, { type TSheetCategory, type TSheetLoad } from "./SheetEditor";
 import { useVendorTopbarTitle } from "@/hooks/useVendorTopbarTitle";
-import { cleanImportFile, type TFileCleanup } from "@/utils/productSheet";
+import { MAX_SHEET_ROWS, readSimpleSheet, simpleTemplateCsv, type TSheetLang } from "@/utils/productSheet";
+import { translateSheet } from "@/utils/sheetTranslate";
+import { requestTranslations } from "@/utils/translation/requestTranslations";
 import { downloadText, forgetJob, readSavedJob, saveJob } from "./importStorage";
 
 const MAX_BYTES = 10 * 1024 * 1024;
-const REQUIRED_COLUMNS = ["name_en", "name_pt", "category", "tax_rate"];
 
 interface IProps {
   /** `<adminId>:<vendorUserId>`, so a saved job is only resumed by the same admin for the same vendor. */
@@ -47,23 +47,17 @@ interface IProps {
   taxRates: number[];
 }
 
-/** The problem with a chosen file, checked before it is uploaded; `null` if fine. */
-async function checkFile(file: File, t: (key: string) => string): Promise<string | null> {
+/** The problem with a chosen file, checked before it is read; `null` if fine. */
+function checkFile(file: File, t: (key: string) => string): string | null {
   const ext = file.name.toLowerCase().split(".").pop();
   if (ext !== "csv" && ext !== "xlsx") return bulkErrorText(t, "IMPORT_FILE_UNSUPPORTED_TYPE");
   if (file.size > MAX_BYTES) return bulkErrorText(t, "IMPORT_FILE_TOO_LARGE");
   if (file.size === 0) return bulkErrorText(t, "IMPORT_FILE_INVALID_CONTENT");
-  if (ext === "csv") {
-    // The header row only; the server checks everything else.
-    const head = await file.slice(0, 64 * 1024).text();
-    const columns = (head.replace(/^﻿/, "").split(/\r?\n/)[0] ?? "")
-      .split(/[,;]/)
-      .map((c) => c.trim().replace(/^"|"$/g, "").toLowerCase());
-    const missing = REQUIRED_COLUMNS.filter((c) => !columns.includes(c));
-    if (missing.length) return fillVars(t("import_file_missing_columns"), { columns: missing.join(", ") });
-  }
   return null;
 }
+
+/** Reading → translating (batches done / total), shown while a file is prepared. */
+type TPreparing = { stage: "reading" } | { stage: "translating"; done: number; total: number };
 
 export default function ProductImport({
   vendorKey,
@@ -85,11 +79,17 @@ export default function ProductImport({
   const [checkedSaved, setCheckedSaved] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  /** The language the vendor's file is written in; the other one is translated. */
+  const [fileLang, setFileLang] = useState<TSheetLang>(lang === "pt" ? "pt" : "en");
+  // Own radio group per copy: the admin layout renders the page twice (one
+  // copy hidden), and two groups with one name untick each other.
+  const fileLangName = `importFileLang-${useId()}`;
   const [onDuplicate, setOnDuplicate] = useState<TImportOnDuplicate>("SKIP");
-  const [uploading, setUploading] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const [preparing, setPreparing] = useState<TPreparing | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const numberLocale = lang === "pt" ? "pt-PT" : "en-GB";
 
   // A job started earlier (this tab, another tab, before a reload) comes back.
   useEffect(() => {
@@ -98,9 +98,12 @@ export default function ProductImport({
     setCheckedSaved(true);
   }, [vendorKey]);
 
-  const pickFile = async (picked: File | null | undefined) => {
+  // Leaving the page stops a translation that is still running.
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const pickFile = (picked: File | null | undefined) => {
     if (!picked) return;
-    const problem = await checkFile(picked, t);
+    const problem = checkFile(picked, t);
     setFile(problem ? null : picked);
     setFileError(problem);
   };
@@ -111,20 +114,72 @@ export default function ProductImport({
     if (inputRef.current) inputRef.current.value = "";
   };
 
-  const downloadTemplate = async () => {
-    setDownloading(true);
-    const res = await getImportTemplateReq();
-    setDownloading(false);
-    if (res.ok && typeof res.data === "string") {
-      downloadText(res.data, "product-import-template.csv");
-    } else {
-      toast.error(bulkRequestErrorText(t, res));
-    }
+  const downloadTemplate = () => {
+    const category = categories[0] && (fileLang === "pt" ? categories[0].namePt || categories[0].nameEn : categories[0].nameEn || categories[0].namePt);
+    const csv = simpleTemplateCsv({ lang: fileLang, isRestaurant, category, taxRate: taxRates[0] });
+    downloadText(csv, fileLang === "pt" ? "modelo-importacao-produtos.csv" : "product-import-template.csv");
   };
 
   /**
-   * Uploads a file for this vendor (the admin's own, or the one the editor
-   * generates) and switches to its progress. Resolves true when it started.
+   * Initial import: read the file, fill the defaults, translate the other
+   * language, then open everything in the editor. Nothing is sent to the
+   * server here. Used by this tab and by the editor's "Open file".
+   */
+  const prepareFile = async (picked: File): Promise<boolean> => {
+    const problem = checkFile(picked, t);
+    if (problem) {
+      toast.error(problem);
+      return false;
+    }
+    if (preparing) return false;
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setPreparing({ stage: "reading" });
+    try {
+      const sheet = await readSimpleSheet(picked, fileLang, { isRestaurant });
+      if (sheet.missingColumns.length) {
+        toast.error(fillVars(t("import_file_missing_columns"), { columns: sheet.missingColumns.join(", ") }));
+        return false;
+      }
+      if (!sheet.products.length) {
+        toast.error(t("sheet_file_empty"));
+        return false;
+      }
+      if (sheet.rowCount > MAX_SHEET_ROWS) {
+        toast.error(fillVars(t("sheet_too_many_rows"), { max: MAX_SHEET_ROWS.toLocaleString(numberLocale) }));
+        return false;
+      }
+
+      const result = await translateSheet(sheet.products, fileLang, requestTranslations, {
+        signal: controller.signal,
+        onProgress: (done, total) => setPreparing({ stage: "translating", done, total }),
+      });
+
+      setEditorLoad({ id: Date.now(), kind: "review", from: fileLang, ...result });
+      setMode("editor");
+      toast.success(countText(t, "import_ready", result.products.length));
+      return true;
+    } catch (error) {
+      if (controller.signal.aborted) toast.info(t("import_prepare_cancelled"));
+      else {
+        console.error("Reading the import file failed:", error);
+        toast.error(t("sheet_file_unreadable"));
+      }
+      return false;
+    } finally {
+      abortRef.current = null;
+      setPreparing(null);
+    }
+  };
+
+  const readChosenFile = async () => {
+    if (!file) return;
+    if (await prepareFile(file)) clearFile();
+  };
+
+  /**
+   * Final import: uploads the file the editor generates for this vendor and
+   * switches to its progress. Resolves true when the import started.
    */
   const uploadFile = async (upload: File): Promise<boolean> => {
     const form = new FormData();
@@ -154,35 +209,44 @@ export default function ProductImport({
     return false;
   };
 
-  const startImport = async () => {
-    if (!file || uploading) return;
-    setUploading(true);
-    // Cells the backend refuses but that mean nothing (SDR count with SDR
-    // off, a restaurant's stock) are dropped here, as the editor does.
-    let toSend = file;
-    let cleanup: TFileCleanup | null = null;
-    try {
-      const cleaned = await cleanImportFile(file, isRestaurant);
-      if (cleaned) ({ file: toSend, cleanup } = cleaned);
-    } catch {
-      /* unreadable here: send it as it is, the server reports what's wrong */
-    }
-    const started = await uploadFile(toSend);
-    if (started && cleanup) {
-      const parts = [
-        cleanup.sdrCounts ? fillVars(t("import_cleaned_sdr"), { count: cleanup.sdrCounts }) : "",
-        cleanup.stocks ? fillVars(t("import_cleaned_stock"), { count: cleanup.stocks }) : "",
-      ].filter(Boolean);
-      toast.info(t("import_cleaned_title"), { description: parts.join(" "), duration: 8000 });
-    }
-    setUploading(false);
-    if (started) clearFile();
-  };
-
   const startOver = () => {
     forgetJob(vendorKey);
     setJobId(null);
   };
+
+  const languagePicker = (
+    <fieldset>
+      <legend className="mb-2 flex items-center gap-1.5 text-sm text-gray-600">
+        <Languages className="h-4 w-4 text-[#DC3173]" aria-hidden />
+        {t("import_file_lang_label")}
+      </legend>
+      <div className="flex flex-wrap gap-2">
+        {(["en", "pt"] as const).map((value) => (
+          <label
+            key={value}
+            className={cn(
+              "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
+              fileLang === value ? "border-[#DC3173] bg-[#DC3173]/5 text-[#B02458]" : "border-gray-200 text-gray-700 hover:bg-gray-50",
+            )}
+          >
+            <input
+              type="radio"
+              name={fileLangName}
+              value={value}
+              checked={fileLang === value}
+              disabled={!!preparing}
+              onChange={() => setFileLang(value)}
+              className="accent-[#DC3173]"
+            />
+            {t(value === "en" ? "import_lang_en" : "import_lang_pt")}
+          </label>
+        ))}
+      </div>
+      <p className="mt-1.5 text-xs text-gray-500">
+        {fillVars(t("import_file_lang_hint"), { other: t(fileLang === "en" ? "import_lang_pt" : "import_lang_en") })}
+      </p>
+    </fieldset>
+  );
 
   return (
     <div className="space-y-6">
@@ -205,14 +269,14 @@ export default function ProductImport({
           onStartOver={startOver}
           itemsHref={itemsHref}
           onFixInEditor={(rows) => {
-            setEditorLoad({ id: Date.now(), rows });
+            setEditorLoad({ id: Date.now(), kind: "failed", rows });
             setMode("editor");
             startOver();
           }}
         />
       ) : (
         <div className="space-y-4">
-          {/* Two ways in, the same import behind both. */}
+          {/* Two ways in, the same review and import behind both. */}
           <div className="inline-flex rounded-xl border border-gray-200 bg-white p-1" role="tablist">
             {(["file", "editor"] as const).map((value) => (
               <button
@@ -231,6 +295,38 @@ export default function ProductImport({
             ))}
           </div>
 
+          {preparing && (
+            <div className="flex flex-col gap-3 rounded-xl border border-[#DC3173]/25 bg-[#DC3173]/5 p-4 sm:flex-row sm:items-center sm:justify-between" role="status">
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-2 text-sm font-medium text-gray-800">
+                  <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-[#DC3173]" aria-hidden />
+                  {preparing.stage === "reading"
+                    ? t("import_reading_file")
+                    : fillVars(t("import_translating"), {
+                        lang: t(fileLang === "en" ? "import_lang_pt" : "import_lang_en"),
+                        done: preparing.done,
+                        total: preparing.total,
+                      })}
+                </p>
+                {preparing.stage === "translating" && preparing.total > 0 && (
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white">
+                    <div
+                      className="h-full rounded-full bg-[#DC3173] transition-[width]"
+                      style={{ width: `${Math.round((preparing.done / preparing.total) * 100)}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => abortRef.current?.abort()}
+                className="shrink-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                {t("import_prepare_cancel")}
+              </button>
+            </div>
+          )}
+
           {/* Kept mounted while hidden, so switching tabs keeps the grid. */}
           <div className={mode === "editor" ? "" : "hidden"}>
             <SheetEditor
@@ -242,6 +338,10 @@ export default function ProductImport({
               onDuplicate={onDuplicate}
               setOnDuplicate={setOnDuplicate}
               submitFile={uploadFile}
+              openFile={prepareFile}
+              opening={!!preparing}
+              fileLang={fileLang}
+              setFileLang={setFileLang}
               vendorKey={vendorKey}
               load={editorLoad}
             />
@@ -257,21 +357,16 @@ export default function ProductImport({
                 <button
                   type="button"
                   onClick={downloadTemplate}
-                  disabled={downloading}
-                  className="mt-2 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60"
+                  className="mt-2 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
                 >
-                  {downloading ? (
-                    <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden />
-                  ) : (
-                    <Download className="h-4 w-4" aria-hidden />
-                  )}
+                  <Download className="h-4 w-4" aria-hidden />
                   {t("import_download_template")}
                 </button>
               </Step>
               <Step n={2}>{t("import_step_required")}</Step>
               <Step n={3}>{t("import_step_category")}</Step>
               <Step n={4}>{t("import_step_variations")}</Step>
-              {isRestaurant && <Step n={5}>{t("import_step_restaurant")}</Step>}
+              <Step n={5}>{t("import_step_review")}</Step>
             </ol>
 
             <div className="mt-5 space-y-3 border-t border-gray-100 pt-4 text-sm">
@@ -302,9 +397,11 @@ export default function ProductImport({
             </div>
           </section>
 
-          {/* Upload */}
+          {/* Your file */}
           <section className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
             <h2 className="mb-4 text-lg font-semibold text-gray-800">{t("import_upload_title")}</h2>
+
+            <div className="mb-4">{languagePicker}</div>
 
             <label
               onDragOver={(e) => {
@@ -315,14 +412,14 @@ export default function ProductImport({
               onDrop={(e) => {
                 e.preventDefault();
                 setDragOver(false);
-                void pickFile(e.dataTransfer.files?.[0]);
+                pickFile(e.dataTransfer.files?.[0]);
               }}
               className={cn(
                 "flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors",
                 dragOver ? "border-[#DC3173] bg-[#DC3173]/10" : "border-[#DC3173]/30 bg-[#DC3173]/5 hover:bg-[#DC3173]/10",
               )}
             >
-              <Upload className="mb-2 h-7 w-7 text-[#DC3173]" aria-hidden />
+              <FileSpreadsheet className="mb-2 h-7 w-7 text-[#DC3173]" aria-hidden />
               <span className="font-medium text-[#B02458]">{t("import_drop_here")}</span>
               <span className="mt-1 text-sm text-gray-500">{t("import_drop_hint")}</span>
               <input
@@ -330,7 +427,7 @@ export default function ProductImport({
                 type="file"
                 accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 className="sr-only"
-                onChange={(e) => void pickFile(e.target.files?.[0])}
+                onChange={(e) => pickFile(e.target.files?.[0])}
               />
             </label>
 
@@ -354,42 +451,16 @@ export default function ProductImport({
               </div>
             )}
 
-            <fieldset className="mt-5">
-              <legend className="mb-2 text-sm text-gray-600">{t("import_duplicates_label")}</legend>
-              <div className="flex flex-wrap gap-2">
-                {(["SKIP", "FAIL"] as const).map((value) => (
-                  <label
-                    key={value}
-                    className={cn(
-                      "flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                      onDuplicate === value
-                        ? "border-[#DC3173] bg-[#DC3173]/5 text-[#B02458]"
-                        : "border-gray-200 text-gray-700 hover:bg-gray-50",
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="onDuplicate"
-                      value={value}
-                      checked={onDuplicate === value}
-                      onChange={() => setOnDuplicate(value)}
-                      className="accent-[#DC3173]"
-                    />
-                    {t(value === "SKIP" ? "import_dup_skip" : "import_dup_fail")}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
             <button
               type="button"
-              onClick={startImport}
-              disabled={!file || uploading}
+              onClick={readChosenFile}
+              disabled={!file || !!preparing}
               className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#DC3173] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#B02458] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {uploading ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden /> : <Upload className="h-4 w-4" aria-hidden />}
-              {uploading ? t("import_uploading") : t("import_start")}
+              {preparing ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden /> : <Languages className="h-4 w-4" aria-hidden />}
+              {t("import_read_file")}
             </button>
+            <p className="mt-2 text-xs text-gray-500">{t("import_read_file_hint")}</p>
           </section>
         </div>
         </div>

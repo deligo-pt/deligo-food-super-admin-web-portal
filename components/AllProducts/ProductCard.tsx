@@ -127,7 +127,10 @@ export default function ProductCard({
 
         {(product?.pricing?.discount ?? 0) > 0 && (
           <div className="absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-md bg-[#DC3173] text-white">
-            {product.pricing.discount} % OFF
+            {/* A FLAT discount is euros, not a percentage. */}
+            {product.pricing.discountType === "FLAT"
+              ? `${new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(product.pricing.discount))}\u00A0€ OFF`
+              : `${product.pricing.discount} % OFF`}
           </div>
         )}
 

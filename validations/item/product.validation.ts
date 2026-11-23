@@ -74,6 +74,8 @@ export const productValidation = z.object({
     ),
 
     isFeatured: z.boolean().optional(),
+    /** 2×1 switch: an offer, never sent to the product API. */
+    isTwoForOne: z.boolean().optional(),
 
     sdrApplicable: z.boolean().optional(),
 

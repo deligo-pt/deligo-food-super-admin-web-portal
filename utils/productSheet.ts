@@ -109,13 +109,19 @@ export const fileRowsOf = (p: TSheetProduct) => Math.max(1, optionCount(p));
 
 /* ---------- file rows → nested ---------- */
 
-/** Same rule as the server: same group_key, or same name_en + a variation, and ADJACENT. */
-const groupKeyOf = (r: TCsvRow): string | null =>
-  r.group_key?.trim()
-    ? `g:${lower(r.group_key)}`
-    : r.variation_name_en?.trim() && r.name_en?.trim()
-      ? `n:${lower(r.name_en)}`
-      : null;
+/**
+ * Same rule as the server: same group_key, or same name + a variation, and
+ * ADJACENT. The server only looks at `name_en`; a one-language Portuguese
+ * file (Import v2) has only `name_pt`, so that is used when English is empty.
+ * The editor always sends its own group_key, so the server never sees the
+ * difference.
+ */
+const groupKeyOf = (r: TCsvRow): string | null => {
+  if (r.group_key?.trim()) return `g:${lower(r.group_key)}`;
+  const name = r.name_en?.trim() || r.name_pt?.trim();
+  const variation = r.variation_name_en?.trim() || r.variation_name_pt?.trim();
+  return name && variation ? `n:${lower(name)}` : null;
+};
 
 const productFromRow = (r: TCsvRow): TSheetProduct => ({
   ...emptyProduct(),
@@ -144,7 +150,12 @@ const addOptionFromRow = (p: TSheetProduct, r: TCsvRow) => {
   ].some((v) => v?.trim());
   if (!hasVariation) return;
 
-  let variation = p.variations.find((v) => lower(v.nameEn) === lower(r.variation_name_en));
+  // Options are put into groups by the variation's name: English when the
+  // row has it (as the server does), else Portuguese.
+  const byEnglish = !!r.variation_name_en?.trim() || !r.variation_name_pt?.trim();
+  let variation = p.variations.find((v) =>
+    byEnglish ? lower(v.nameEn) === lower(r.variation_name_en) : lower(v.namePt) === lower(r.variation_name_pt),
+  );
   if (!variation) {
     variation = { nameEn: r.variation_name_en ?? "", namePt: r.variation_name_pt ?? "", options: [] };
     p.variations.push(variation);
@@ -548,52 +559,216 @@ export function explainImportRow(
   return fixes;
 }
 
-/* ---------- cleaning an uploaded file ---------- */
+/* ---------- text cells by editor path ---------- */
 
-export type TFileCleanup = { sdrCounts: number; stocks: number };
+const TEXT_PATH = /^(?:v(\d+)\.(?:o(\d+)\.)?)?(name|description|label)(En|Pt)$/;
 
 /**
- * Drops, from a vendor's own file, the cells the backend refuses but that
- * carry no meaning: an SDR container count while SDR is off, and stock for
- * a restaurant (the same cells the editor leaves out). Every row stays where
- * it was, so the server's row numbers still match the vendor's file. Returns
- * null when there is nothing to drop — the file is then sent untouched.
+ * Reads a two-language text cell by its editor path (`nameEn`,
+ * `descriptionPt`, `v0.namePt`, `v0.o1.labelEn`); `undefined` when the path
+ * does not point at an existing cell.
  */
-export async function cleanImportFile(
-  file: File,
-  isRestaurant: boolean,
-): Promise<{ file: File; cleanup: TFileCleanup } | null> {
-  const rows = await readSheetFile(file);
-  const cleanup: TFileCleanup = { sdrCounts: 0, stocks: 0 };
-  let groupSdr = "";
-  let currentKey: string | null = null;
+export function sheetText(p: TSheetProduct, path: string): string | undefined {
+  const m = TEXT_PATH.exec(path);
+  if (!m) return undefined;
+  const [, vi, oi, kind, side] = m;
+  if (vi === undefined) {
+    if (kind === "label") return undefined;
+    return p[`${kind as "name" | "description"}${side as "En" | "Pt"}`];
+  }
+  const v = p.variations[Number(vi)];
+  if (!v) return undefined;
+  if (oi === undefined) return kind === "name" ? v[`name${side as "En" | "Pt"}`] : undefined;
+  const o = v.options[Number(oi)];
+  return o && kind === "label" ? o[`label${side as "En" | "Pt"}`] : undefined;
+}
 
-  const cleaned = rows.map((row) => {
-    const r: Record<string, string> = { ...(row as Record<string, string>) };
-    // Option rows inherit the product's SDR setting from its first row.
-    const key = groupKeyOf(row);
-    if (!(key !== null && key === currentKey)) groupSdr = normaliseBoolean(r.sdr_applicable ?? "");
-    currentKey = key;
+/** The same path in the other language: `namePt` ↔ `nameEn`. */
+export const otherLanguagePath = (path: string) =>
+  path.endsWith("Pt") ? `${path.slice(0, -2)}En` : `${path.slice(0, -2)}Pt`;
 
-    if (groupSdr !== "true" && (r.sdr_container_count ?? "").trim() !== "") {
-      r.sdr_container_count = "";
-      cleanup.sdrCounts += 1;
+/** A copy of `p` with one text cell (by editor path) set; `p` itself when the path is unknown. */
+export function withSheetText(p: TSheetProduct, path: string, value: string): TSheetProduct {
+  const m = TEXT_PATH.exec(path);
+  if (!m || sheetText(p, path) === undefined) return p;
+  const [, vi, oi, kind, side] = m;
+  if (vi === undefined) return { ...p, [`${kind}${side}`]: value };
+  return {
+    ...p,
+    variations: p.variations.map((v, i) => {
+      if (i !== Number(vi)) return v;
+      if (oi === undefined) return { ...v, [`name${side}`]: value };
+      return { ...v, options: v.options.map((o, j) => (j === Number(oi) ? { ...o, [`label${side}`]: value } : o)) };
+    }),
+  };
+}
+
+/**
+ * Settings the review applies to every product at once ("Set for all").
+ * `undefined` leaves that setting as it is.
+ */
+export function applyToAllProducts(
+  products: TSheetProduct[],
+  change: { status?: "ACTIVE" | "INACTIVE"; sdr?: { on: false } | { on: true; containers: string } },
+): TSheetProduct[] {
+  return products.map((p) => {
+    if (isBlankProduct(p)) return p;
+    let next = p;
+    if (change.status) next = { ...next, status: change.status };
+    if (change.sdr) {
+      next = change.sdr.on
+        ? { ...next, sdrApplicable: "true", sdrContainerCount: change.sdr.containers.trim() }
+        : { ...next, sdrApplicable: "false", sdrContainerCount: "" };
     }
-    if (isRestaurant) {
-      for (const col of ["stock_quantity", "option_stock"] as const) {
-        if ((r[col] ?? "").trim() !== "") {
-          r[col] = "";
-          cleanup.stocks += 1;
-        }
-      }
-    }
-    return r;
+    return next;
   });
+}
 
-  if (!cleanup.sdrCounts && !cleanup.stocks) return null;
+/* ---------- Import v2: one-language files ---------- */
 
-  const fields = Array.from(new Set(cleaned.flatMap((r) => Object.keys(r)))).filter(Boolean);
-  const csv = Papa.unparse({ fields, data: cleaned.map((r) => fields.map((f) => r[f] ?? "")) });
-  const name = file.name.replace(/\.(xlsx|csv)$/i, "") + ".csv";
-  return { file: new File([csv], name, { type: "text/csv" }), cleanup };
+export type TSheetLang = "en" | "pt";
+
+/** Text columns of the simple file, without a language: the vendor picks it. */
+const PLAIN_TEXT_COLUMNS = {
+  name: ["name_en", "name_pt"],
+  description: ["description_en", "description_pt"],
+  variation_name: ["variation_name_en", "variation_name_pt"],
+  option_label: ["option_label_en", "option_label_pt"],
+} as const satisfies Record<string, readonly [TCsvColumn, TCsvColumn]>;
+
+/**
+ * Columns of the simple template (plan §9.3). No `_pt` / `_en`, no status,
+ * no SDR: the language comes from the picker, the rest from the review.
+ */
+export const simpleTemplateColumns = (isRestaurant: boolean): string[] => [
+  "group_key", "name", "description", "category", "tax_rate", "price",
+  "discount", "discount_type", "brand", "image_url",
+  ...(isRestaurant ? [] : ["stock_quantity", "stock_unit"]),
+  "variation_name", "option_label", "option_price",
+  ...(isRestaurant ? [] : ["option_stock"]),
+];
+
+/**
+ * Puts each plain column (`name`, `description`…) into the chosen language's
+ * column. A filled `name_en` / `name_pt` (an old full-template file) wins
+ * over the plain one, so nothing the vendor wrote is overwritten.
+ */
+export function localiseSimpleRows(rows: Record<string, string>[], lang: TSheetLang): TCsvRow[] {
+  return rows.map((row) => {
+    const out: Record<string, string> = { ...row };
+    for (const [plain, [en, pt]] of Object.entries(PLAIN_TEXT_COLUMNS)) {
+      const value = (out[plain] ?? "").trim();
+      delete out[plain];
+      const target = lang === "en" ? en : pt;
+      if (value && !(out[target] ?? "").trim()) out[target] = value;
+    }
+    return out as TCsvRow;
+  });
+}
+
+/** Columns a file must have to be read: a name (any language), category, tax rate. */
+export function missingSimpleColumns(columns: string[]): string[] {
+  const has = new Set(columns.map((c) => normHeader(c)));
+  const missing: string[] = [];
+  if (!has.has("name") && !has.has("name_en") && !has.has("name_pt")) missing.push("name");
+  if (!has.has("category")) missing.push("category");
+  if (!has.has("tax_rate")) missing.push("tax_rate");
+  return missing;
+}
+
+/**
+ * The values a product gets when the file leaves them out: ACTIVE, SDR off
+ * (no container count), and no stock for a restaurant. A status or SDR the
+ * file does carry is kept. The vendor changes any of it in the review.
+ */
+export function applyImportDefaults(
+  products: TSheetProduct[],
+  { isRestaurant = false }: { isRestaurant?: boolean } = {},
+): TSheetProduct[] {
+  return products.map((p) => {
+    const sdrOn = p.sdrApplicable === "true";
+    return {
+      ...p,
+      status: p.status === "INACTIVE" ? "INACTIVE" : "ACTIVE",
+      sdrApplicable: sdrOn ? "true" : "false",
+      sdrContainerCount: sdrOn ? p.sdrContainerCount : "",
+      stockQuantity: isRestaurant ? "" : p.stockQuantity,
+      stockUnit: isRestaurant ? "" : p.stockUnit,
+      variations: isRestaurant
+        ? p.variations.map((v) => ({ ...v, options: v.options.map((o) => ({ ...o, stock: "" })) }))
+        : p.variations,
+    };
+  });
+}
+
+export type TSimpleSheet = {
+  products: TSheetProduct[];
+  /** Data rows in the file (blank rows not counted). */
+  rowCount: number;
+  /** Required columns the file lacks; when any, `products` is empty. */
+  missingColumns: string[];
+};
+
+/**
+ * Initial import, step 1: a vendor's file → products with defaults, the text
+ * in `lang`. Nothing is translated or sent here.
+ */
+export async function readSimpleSheet(
+  file: File,
+  lang: TSheetLang,
+  { isRestaurant = false }: { isRestaurant?: boolean } = {},
+): Promise<TSimpleSheet> {
+  const raw = (await readSheetFile(file)) as Record<string, string>[];
+  if (!raw.length) return { products: [], rowCount: 0, missingColumns: [] };
+  const missingColumns = missingSimpleColumns(Object.keys(raw[0]));
+  if (missingColumns.length) return { products: [], rowCount: raw.length, missingColumns };
+
+  const rows = localiseSimpleRows(raw, lang).filter((r) => !isBlankRow(r));
+  return {
+    products: applyImportDefaults(groupCsvRowsToNestedState(rows), { isRestaurant }),
+    rowCount: rows.length,
+    missingColumns: [],
+  };
+}
+
+const TEMPLATE_EXAMPLES = {
+  en: {
+    drink: "Orange juice", drinkDescription: "Freshly squeezed",
+    pizza: "Pizza Margherita", pizzaDescription: "Tomato and mozzarella",
+    size: "Size", medium: "Medium", large: "Large", category: "Drinks",
+  },
+  pt: {
+    drink: "Sumo de laranja", drinkDescription: "Espremido na hora",
+    pizza: "Pizza Margherita", pizzaDescription: "Tomate e mozzarella",
+    size: "Tamanho", medium: "Média", large: "Grande", category: "Bebidas",
+  },
+} as const;
+
+/**
+ * The simple template (plan §9.3) in the vendor's language: a plain product
+ * and one with sizes, using one of the vendor's own categories and VAT rates
+ * so the example imports as it is. Starts with a BOM so Excel reads
+ * accents correctly.
+ */
+export function simpleTemplateCsv({
+  lang,
+  isRestaurant,
+  category,
+  taxRate,
+}: {
+  lang: TSheetLang;
+  isRestaurant: boolean;
+  category?: string;
+  taxRate?: number;
+}): string {
+  const x = TEMPLATE_EXAMPLES[lang];
+  const cat = category?.trim() || x.category;
+  const tax = String(taxRate ?? 23);
+  const rows: Record<string, string>[] = [
+    { name: x.drink, description: x.drinkDescription, category: cat, tax_rate: tax, price: "3.50", stock_quantity: "20" },
+    { group_key: "PIZZA-1", name: x.pizza, description: x.pizzaDescription, category: cat, tax_rate: tax, variation_name: x.size, option_label: x.medium, option_price: "9.50", option_stock: "10" },
+    { group_key: "PIZZA-1", variation_name: x.size, option_label: x.large, option_price: "12.00", option_stock: "10" },
+  ];
+  const fields = simpleTemplateColumns(isRestaurant);
+  return "\uFEFF" + Papa.unparse({ fields, data: rows.map((r) => fields.map((f) => r[f] ?? "")) });
 }
