@@ -25,6 +25,9 @@ export type TAddonGroup = {
     _id: string;
     vendorId?: string;
     title: LocalizedType;
+    /** Optional second name (24 Nov 2026). Searchable; once saved it can be
+     *  changed but not removed — the API rejects null and "". */
+    name?: LocalizedType;
     minSelectable: number;
     maxSelectable: number;
     options: TAddonOption[];

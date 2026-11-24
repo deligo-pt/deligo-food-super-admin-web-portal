@@ -10,6 +10,18 @@
 import { KIND_SETTINGS, kindOfRate, taxIdForRate, type TProductKind } from "@/utils/productKind";
 
 type TText = { en?: string; pt?: string };
+
+/**
+ * The languages of `text` that have something in them, or undefined when
+ * none do. For an add-on group's optional `name`: the API rejects `""` and
+ * `null`, and a language left out keeps what the server has (24 Nov 2026).
+ */
+export function presentText(text: TText | null | undefined): TText | undefined {
+  const en = text?.en?.trim();
+  const pt = text?.pt?.trim();
+  if (!en && !pt) return undefined;
+  return { ...(en ? { en } : {}), ...(pt ? { pt } : {}) };
+}
 type TLang = "en" | "pt";
 type TTaxLike = { _id: string; taxRate: number; isActive?: boolean; isDeleted?: boolean };
 
@@ -128,6 +140,7 @@ export function renamedText(previous: TText | undefined, next: string, lang: TLa
 
 type TGroupLike = {
   title?: TText;
+  name?: TText;
   minSelectable: number;
   maxSelectable: number;
   options: {
@@ -157,6 +170,8 @@ export function cloneGroupPayload(
   if (options.sort) copied = sortByName(copied, options.lang);
   return {
     title: renamedText(group.title, options.title, options.lang),
+    // The copy keeps the original's name, when it has one.
+    ...(presentText(group.name) ? { name: presentText(group.name) } : {}),
     minSelectable: group.minSelectable,
     maxSelectable: Math.min(group.maxSelectable, Math.max(copied.length, 1)),
     options: copied,
