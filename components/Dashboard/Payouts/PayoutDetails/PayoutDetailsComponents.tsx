@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@/hooks/use-translation";
 import { TDeliveryPartner } from "@/types/delivery-partner.type";
-import { TPayout } from "@/types/payout.type";
+import { TPayout, TPayoutFleetManager } from "@/types/payout.type";
 import { TAgent, TVendor } from "@/types/user.type";
 import {
   CheckCircle,
@@ -11,11 +11,13 @@ import {
   Loader2,
   Mail,
   Phone,
+  Users,
   Store,
   Truck,
   User,
   XCircle,
 } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 export const StatusBadge = ({ status }: { status: TPayout["status"] }) => {
@@ -115,7 +117,14 @@ export const InfoRow = ({
   </div>
 );
 
-export const RecipientCard = ({ payout }: { payout: TPayout }) => {
+export const RecipientCard = ({
+  payout,
+  fleetManager,
+}: {
+  payout: TPayout;
+  /** Rider payouts only: the rider's current fleet manager. */
+  fleetManager?: TPayoutFleetManager | null;
+}) => {
   const { t } = useTranslation();
   if (payout.userModel === "Vendor") {
     const v = payout.userId as unknown as TVendor;
@@ -202,12 +211,35 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
             {fullName.charAt(0)}
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">{fullName}</h3>
+            <Link
+              href={`/admin/all-delivery-partners/${d.userId}`}
+              className="font-bold text-gray-900 hover:text-[#DC3173] hover:underline"
+            >
+              {fullName}
+            </Link>
             <p className="text-xs text-gray-500 font-mono">{t("id")}: {d.userId}</p>
           </div>
         </div>
         <div className="space-y-4">
           <InfoRow icon={<Mail size={16} />} label={t("email")} value={d.email} />
+          {fleetManager && (
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-gray-50 rounded-lg text-gray-500 shrink-0">
+                <Users size={16} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t("fleet_manager")}
+                </p>
+                <Link
+                  href={`/admin/agent/${fleetManager.userId}`}
+                  className="text-sm font-medium text-[#DC3173] hover:underline mt-0.5 break-all"
+                >
+                  {fleetManager.businessName}
+                </Link>
+              </div>
+            </div>
+          )}
           {d.contactNumber && (
             <InfoRow
               icon={<Phone size={16} />}
@@ -263,7 +295,12 @@ export const RecipientCard = ({ payout }: { payout: TPayout }) => {
             {fullName.charAt(0)}
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">{fullName}</h3>
+            <Link
+              href={`/admin/agent/${f.userId}`}
+              className="font-bold text-gray-900 hover:text-[#DC3173] hover:underline"
+            >
+              {fullName}
+            </Link>
             <p className="text-xs text-gray-500 font-mono">{t("id")}: {f.userId}</p>
           </div>
         </div>

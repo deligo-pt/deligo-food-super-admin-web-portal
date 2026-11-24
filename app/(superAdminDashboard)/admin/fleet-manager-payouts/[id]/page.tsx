@@ -1,4 +1,5 @@
 import PayoutDetails from "@/components/Dashboard/Payouts/PayoutDetails/PayoutDetails";
+import { getOrderRidersReq } from "@/services/dashboard/payout/payout-links.service";
 import { getSinglePayoutReq } from "@/services/dashboard/payout/payout.service";
 import { TPayout } from "@/types/payout.type";
 
@@ -9,6 +10,9 @@ export default async function FleetManagerPayoutDetailsPage({
 }) {
   const { id } = await params;
   const payout: TPayout = await getSinglePayoutReq(id);
+  const orderRiders = await getOrderRidersReq(
+    (payout?.includedOrders ?? []).map((o) => o.orderId),
+  );
 
-  return <PayoutDetails payout={payout} />;
+  return <PayoutDetails payout={payout} orderRiders={orderRiders} />;
 }

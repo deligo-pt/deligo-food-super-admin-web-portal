@@ -8,7 +8,12 @@ import {
 } from "@/components/Dashboard/Payouts/PayoutDetails/PayoutDetailsComponents";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
-import { TPayout } from "@/types/payout.type";
+import {
+  TIncludedOrder,
+  TPayout,
+  TPayoutFleetManager,
+  TPayoutRider,
+} from "@/types/payout.type";
 import { formatPrice } from "@/utils/formatPrice";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -24,10 +29,12 @@ import {
   Package,
   Receipt,
   Tag,
+  Truck,
   User,
   Wallet,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -37,12 +44,116 @@ const payoutLinks = {
   DELIVERY_PARTNER: "/admin/delivery-partner-payouts",
 } as const;
 
-export default function PayoutDetails({ payout }: { payout: TPayout }) {
+type RiderGroup = {
+  rider: TPayoutRider | null;
+  orders: TIncludedOrder[];
+  net: number;
+};
+
+/** Orders grouped by the rider who delivered them; unknown riders last. */
+function groupByRider(
+  orders: TIncludedOrder[],
+  riders: Record<string, TPayoutRider>,
+): RiderGroup[] {
+  const groups = new Map<string, RiderGroup>();
+  for (const order of orders) {
+    const rider = riders[order.orderId] ?? null;
+    const key = rider?.userId ?? "";
+    let group = groups.get(key);
+    if (!group) groups.set(key, (group = { rider, orders: [], net: 0 }));
+    group.orders.push(order);
+    group.net += order.netPayout ?? 0;
+  }
+  return [...groups.values()].sort((a, b) => {
+    if (!a.rider) return 1;
+    if (!b.rider) return -1;
+    return b.net - a.net || a.rider.name.localeCompare(b.rider.name);
+  });
+}
+
+function OrderRow({ order }: { order: TIncludedOrder }) {
+  const { t } = useTranslation();
+  return (
+    <div className="px-6 py-5 hover:bg-gray-50/50 transition-colors">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          <Receipt size={16} className="text-gray-400" />
+          <span className="font-mono font-semibold text-gray-900">
+            {order.orderId}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500">
+          {format(new Date(order.orderCreatedAt), "do MMM yyyy, HH:mm")}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div>
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
+            {t("gross")}
+          </p>
+          <p className="font-semibold text-gray-900">
+            €{formatPrice(order.grossEarnings)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
+            {t("platform_fee")}
+          </p>
+          <p className="font-semibold text-red-600">
+            -€{formatPrice(order.platformDeduction)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
+            {t("tax")}
+          </p>
+          <p className="font-semibold text-gray-700">
+            €{formatPrice(order.taxAmount)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
+            {t("sdr_reimb")}
+          </p>
+          <p className="font-semibold text-gray-700">
+            €{formatPrice(order.sdrReimbursement ?? 0)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
+            {t("net_payout")}
+          </p>
+          <p className="font-bold text-[#DC3173]">
+            €{formatPrice(order.netPayout)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function PayoutDetails({
+  payout,
+  fleetManager,
+  orderRiders,
+}: {
+  payout: TPayout;
+  /** Rider payouts: the rider's current fleet manager (shown under the email). */
+  fleetManager?: TPayoutFleetManager | null;
+  /** Fleet manager payouts: orderId → rider, to group the orders by rider. */
+  orderRiders?: Record<string, TPayoutRider>;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
 
   const userRole = payout.userId?.role as "VENDOR" | "FLEET_MANAGER" | "DELIVERY_PARTNER";
   const settlePath = `${payoutLinks[userRole]}/${payout.payoutId}/settle`;
+  const orderCount = (n: number) =>
+    `${n} ${t(n === 1 ? "payout_order_one" : "payout_order_many")}`;
+  const riderGroups = orderRiders
+    ? groupByRider(payout.includedOrders ?? [], orderRiders)
+    : null;
 
   return (
     <div className="min-h-screen pb-12">
@@ -151,75 +262,65 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
                     {t("included_orders")}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {payout.includedOrders.length} order
-                    {payout.includedOrders.length !== 1 ? "s" : ""}
+                    {orderCount(payout.includedOrders.length)}
                   </p>
                 </div>
               </div>
 
-              <div className="divide-y divide-gray-50">
-                {payout.includedOrders.map((order, idx) => (
-                  <div
-                    key={order.orderId + idx}
-                    className="px-6 py-5 hover:bg-gray-50/50 transition-colors"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                      <div className="flex items-center gap-2">
-                        <Receipt size={16} className="text-gray-400" />
-                        <span className="font-mono font-semibold text-gray-900">
-                          {order.orderId}
-                        </span>
+              {riderGroups ? (
+                <div className="divide-y divide-gray-100">
+                  {riderGroups.map((group) => (
+                    <section key={group.rider?.userId ?? "unknown"}>
+                      <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3 bg-gray-50">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="p-1.5 bg-blue-50 rounded-lg text-blue-600 shrink-0">
+                            <Truck size={16} />
+                          </div>
+                          <div className="min-w-0">
+                            {group.rider ? (
+                              <Link
+                                href={`/admin/all-delivery-partners/${group.rider.userId}`}
+                                className="font-semibold text-gray-900 hover:text-[#DC3173] hover:underline"
+                              >
+                                {group.rider.name}
+                              </Link>
+                            ) : (
+                              <p className="font-semibold text-gray-500">
+                                {t("payout_unknown_rider")}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-500">
+                              {group.rider && (
+                                <span className="font-mono">{group.rider.userId} · </span>
+                              )}
+                              {orderCount(group.orders.length)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-400 uppercase tracking-wider">
+                            {t("payout_rider_subtotal")}
+                          </p>
+                          <p className="font-bold text-[#DC3173]">
+                            €{formatPrice(group.net)}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500">
-                        {format(new Date(order.orderCreatedAt), "do MMM yyyy, HH:mm")}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                      <div>
-                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
-                          {t("gross")}
-                        </p>
-                        <p className="font-semibold text-gray-900">
-                          €{formatPrice(order.grossEarnings)}
-                        </p>
+                      <div className="divide-y divide-gray-50">
+                        {group.orders.map((order, idx) => (
+                          <OrderRow key={order.orderId + idx} order={order} />
+                        ))}
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
-                          {t("platform_fee")}
-                        </p>
-                        <p className="font-semibold text-red-600">
-                          -€{formatPrice(order.platformDeduction)}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
-                          {t("tax")}
-                        </p>
-                        <p className="font-semibold text-gray-700">
-                          €{formatPrice(order.taxAmount)}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
-                          {t("sdr_reimb")}
-                        </p>
-                        <p className="font-semibold text-gray-700">
-                          €{formatPrice(order.sdrReimbursement ?? 0)}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">
-                          {t("net_payout")}
-                        </p>
-                        <p className="font-bold text-[#DC3173]">
-                          €{formatPrice(order.netPayout)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    </section>
+                  ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {payout.includedOrders.map((order, idx) => (
+                    <OrderRow key={order.orderId + idx} order={order} />
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -338,7 +439,7 @@ export default function PayoutDetails({ payout }: { payout: TPayout }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <RecipientCard payout={payout} />
+            <RecipientCard payout={payout} fleetManager={fleetManager} />
           </motion.div>
 
           {/* Extra Recipient Details (NIF + Role) */}
