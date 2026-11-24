@@ -38,6 +38,9 @@ export type TPayout = {
     profilePhoto?: string;
     role?: string;
     NIF?: string;
+    /** Vendor payouts only: the shop (or branch) name, added by
+     *  withVendorShopNames — the payouts API sends only the owner's name. */
+    shopName?: string;
     bankDetails?: {
       iban?: string;
       accountHolderName?: string;

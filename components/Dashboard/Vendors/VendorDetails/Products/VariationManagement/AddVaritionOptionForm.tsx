@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { addVariationReq } from "@/services/dashboard/product/variation.service";
 import { useStore } from "@/store/store";
 import { LocalizedType } from "@/types";
@@ -182,17 +183,27 @@ export default function AddVaritionOptionForm({
               )}
             />
           </div>}
-          <div className="flex items-center gap-2">
-            <button disabled={isSubmitting} className="px-4 py-1.5 bg-[#DC3173] text-white rounded-lg text-sm font-bold hover:bg-[#DC3173]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-              {t("add")}
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-            >
-              {t("cancel")}
-            </button>
+          {/* Lined up with the inputs, not their labels (24 Nov 2026): the
+              same grid as a FormItem, with an invisible label of the same
+              size above the buttons, and buttons as tall as an input (h-9).
+              `items-end` on the row would break when a field shows an error
+              under its input. */}
+          <div className="grid gap-2">
+            <Label aria-hidden="true" className="invisible block text-xs font-medium text-gray-500 mb-1">
+              &nbsp;
+            </Label>
+            <div className="flex items-center gap-2">
+              <button disabled={isSubmitting} className="h-9 px-4 bg-[#DC3173] text-white rounded-lg text-sm font-bold hover:bg-[#DC3173]/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                {t("add")}
+              </button>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="h-9 px-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+              >
+                {t("cancel")}
+              </button>
+            </div>
           </div>
         </form>
       </Form>

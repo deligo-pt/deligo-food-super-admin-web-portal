@@ -1,6 +1,8 @@
 import Payouts from "@/components/Dashboard/Payouts/Payouts/Payouts";
 import { USER_ROLE } from "@/consts/user.const";
+import { withVendorShopNames } from "@/services/dashboard/payout/payout-links.service";
 import { getAllPayoutsReq } from "@/services/dashboard/payout/payout.service";
+import { TPayout } from "@/types/payout.type";
 
 type IProps = {
   searchParams?: Promise<Record<string, string | undefined>>;
@@ -8,10 +10,14 @@ type IProps = {
 
 export default async function VendorPayoutsPage({ searchParams }: IProps) {
   const queries = (await searchParams) || {};
-  const vendorPayoutsResult = await getAllPayoutsReq({
+  const vendorPayoutsResult = await getAllPayoutsReq<TPayout[]>({
     ...queries,
     userModel: "Vendor",
   });
+  // The Vendor column shows the shop, not the owner — see withVendorShopNames.
+  if (Array.isArray(vendorPayoutsResult.data)) {
+    vendorPayoutsResult.data = await withVendorShopNames(vendorPayoutsResult.data);
+  }
 
   return (
     <Payouts
