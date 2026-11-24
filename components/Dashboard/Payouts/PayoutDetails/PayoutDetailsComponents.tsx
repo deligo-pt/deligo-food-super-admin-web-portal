@@ -147,10 +147,20 @@ export const RecipientCard = ({
             {v.name?.lastName?.charAt(0)}
           </div>
           <div>
+            {/* The shop first (24 Nov 2026), the owner underneath. */}
             <h3 className="font-bold text-gray-900">
-              {!v.name?.firstName && !v.name?.lastName && "Unknown"}
-              {v.name?.firstName} {v.name?.lastName}
+              {payout.userId?.shopName || (
+                <>
+                  {!v.name?.firstName && !v.name?.lastName && "Unknown"}
+                  {v.name?.firstName} {v.name?.lastName}
+                </>
+              )}
             </h3>
+            {payout.userId?.shopName && (v.name?.firstName || v.name?.lastName) && (
+              <p className="text-xs text-gray-500">
+                {[v.name?.firstName, v.name?.lastName].filter(Boolean).join(" ")}
+              </p>
+            )}
             <p className="text-xs text-gray-500 font-mono">{t("id")}: {v.userId}</p>
           </div>
         </div>

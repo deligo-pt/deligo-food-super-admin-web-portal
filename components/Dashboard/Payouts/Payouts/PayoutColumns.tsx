@@ -90,11 +90,27 @@ export function getPayoutColumns({
                         </AvatarFallback>
                     </Avatar>
                     <div>
+                        {/* Vendor payouts lead with the shop (24 Nov 2026);
+                            the owner moves to the grey line with the ID. A
+                            vendor whose shop couldn't be read keeps the
+                            owner's name as before. */}
                         <div className="font-semibold">
-                            {payout?.userId?.name?.firstName}{" "}
-                            {payout?.userId?.name?.lastName}
+                            {payout?.userId?.shopName || (
+                                <>
+                                    {payout?.userId?.name?.firstName}{" "}
+                                    {payout?.userId?.name?.lastName}
+                                </>
+                            )}
                         </div>
                         <div className="text-xs text-slate-400">
+                            {payout?.userId?.shopName && (
+                                <>
+                                    {[payout.userId.name?.firstName, payout.userId.name?.lastName]
+                                        .filter(Boolean)
+                                        .join(" ")}{" "}
+                                    ·{" "}
+                                </>
+                            )}
                             {payout?.userId?.userId}
                         </div>
                     </div>
