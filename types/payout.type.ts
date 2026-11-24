@@ -11,6 +11,18 @@ export type TIncludedOrder = {
   netPayout: number;
 };
 
+/** The rider who delivered an included order (looked up per order, see getOrderRidersReq). */
+export type TPayoutRider = {
+  userId: string;
+  name: string;
+};
+
+/** The fleet manager a rider currently belongs to (business name, linked to /admin/agent/:userId). */
+export type TPayoutFleetManager = {
+  userId: string;
+  businessName: string;
+};
+
 export type TPayout = {
   _id: string;
   payoutId: string;
