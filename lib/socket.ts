@@ -1,5 +1,13 @@
 import { io, Socket } from "socket.io-client";
 
+/*
+ * Transports are left at Socket.IO's default (HTTP long-polling first, then
+ * upgrade to a websocket), as in the customer app. The test server's nginx
+ * answers a websocket-only connection with 400 (24 Nov 2026), so
+ * `transports: ["websocket"]` never connected there and admin support
+ * messages were silently lost.
+ */
+
 let socket: Socket | null = null;
 let adminSocket: Socket | null = null;
 let SOSSocket: Socket | null = null;
@@ -9,7 +17,6 @@ export const getSocket = (token: string) => {
     socket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
       auth: { token },
       withCredentials: true,
-      transports: ["websocket"],
     });
   }
   return socket;
@@ -20,7 +27,6 @@ export const getAdminSocket = (token: string) => {
     adminSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
       auth: { token },
       withCredentials: true,
-      transports: ["websocket"],
     });
   }
   return adminSocket;
@@ -31,7 +37,6 @@ export const getSOSSocket = (token: string) => {
     SOSSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL!, {
       auth: { token },
       withCredentials: true,
-      transports: ["websocket"],
     });
   }
   return SOSSocket;

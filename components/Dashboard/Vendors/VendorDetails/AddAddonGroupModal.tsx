@@ -12,6 +12,7 @@ import {
     commonTax,
     kindOfOptions,
     sortByName,
+    presentText,
     titleTaken,
     withKind,
     withPrice,
@@ -91,6 +92,7 @@ type TAddonOptionPatch = Partial<Omit<TAddonOption, "sdr">> & {
 /** what the edit request sends: only the changed parts */
 type TAddonGroupPatch = {
     title?: TLocalized;
+    name?: TLocalized;
     minSelectable?: number;
     maxSelectable?: number;
     options?: (TAddonOption | TAddonOptionPatch)[];
@@ -432,6 +434,10 @@ export default function AddAddonGroupModal({
             en: prevValues?.title?.en || "",
             pt: prevValues?.title?.pt || "",
         },
+        name: {
+            en: prevValues?.name?.en || "",
+            pt: prevValues?.name?.pt || "",
+        },
         minSelectable: prevValues?.minSelectable ?? 0,
         maxSelectable: prevValues?.maxSelectable ?? 1,
         // Edit → existing options are loaded into the form so they can be edited
@@ -603,6 +609,8 @@ export default function AddAddonGroupModal({
         const payload = {
             ...(vendorId && { vendorId }),
             title: data.title,
+            // Optional; sent only with text in it.
+            ...(data.name?.[L]?.trim() ? { name: data.name } : {}),
             minSelectable: data.minSelectable,
             maxSelectable: data.maxSelectable,
             // A→Z when asked. Only a new group keeps this order: the API
@@ -617,6 +625,8 @@ export default function AddAddonGroupModal({
                 ...payload,
                 title: translated.title,
                 options: translated.options,
+                // Empty languages left out ("" is refused); undefined → not sent.
+                name: presentText(translated.name),
             } as Parameters<typeof createAdminAddonGroupReq>[0]);
 
             if (result.success) {
@@ -650,6 +660,10 @@ export default function AddAddonGroupModal({
         const newTitle = (data.title?.[L] || "").trim();
         if (newTitle !== (prevValues?.title?.[L] || "").trim()) {
             payload.title = localized(newTitle);
+        }
+        const newName = (data.name?.[L] || "").trim();
+        if (newName && newName !== (prevValues?.name?.[L] || "").trim()) {
+            payload.name = localized(newName);
         }
         if (data.minSelectable !== prevValues?.minSelectable) {
             payload.minSelectable = data.minSelectable;
@@ -709,6 +723,13 @@ export default function AddAddonGroupModal({
             return;
         }
 
+        // A saved name can be changed but not removed (the API rejects ""
+        // and null): stop an emptied box instead of silently keeping it.
+        if (!(data.name?.[L] || "").trim() && presentText(prevValues.name)) {
+            form.setError(`name.${L}`, { message: t("addon_group_name_keep") });
+            return;
+        }
+
         const payload = buildEditPayload(data);
 
         if (Object.keys(payload).length === 0) {
@@ -719,7 +740,7 @@ export default function AddAddonGroupModal({
         const toastId = toast.loading("Updating add-on group...");
 
         try {
-            const needsTranslation = !!(payload.title || payload.options);
+            const needsTranslation = !!(payload.title || payload.name || payload.options);
             const translated: any = needsTranslation
                 ? await translateObject(payload as any, lang)
                 : payload;
@@ -727,6 +748,7 @@ export default function AddAddonGroupModal({
             const finalPayload: TAddonGroupPatch = {
                 ...payload,
                 ...(payload.title ? { title: translated.title } : {}),
+                ...(payload.name ? { name: presentText(translated.name) } : {}),
                 ...(payload.options ? { options: translated.options } : {}),
             };
 
@@ -828,6 +850,48 @@ export default function AddAddonGroupModal({
                             <p role="alert" className="-mt-2 text-sm text-destructive" data-testid="addon-title-taken">
                                 {t("addon_title_taken")}
                             </p>
+                        )}
+
+                        {/* Optional group name (backend 24 Nov 2026), under the title. */}
+                        {lang === "en" && (
+                            <FormField
+                                control={form.control}
+                                name="name.en"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("addon_group_name")}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder={t("addon_group_name_placeholder")}
+                                                {...field}
+                                                value={field.value ?? ""}
+                                            />
+                                        </FormControl>
+                                        <p className="text-xs text-gray-500">{t("addon_group_name_hint")}</p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+                        {lang === "pt" && (
+                            <FormField
+                                control={form.control}
+                                name="name.pt"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{t("addon_group_name")}</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder={t("addon_group_name_placeholder")}
+                                                {...field}
+                                                value={field.value ?? ""}
+                                            />
+                                        </FormControl>
+                                        <p className="text-xs text-gray-500">{t("addon_group_name_hint")}</p>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         )}
 
                         <FormField

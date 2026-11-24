@@ -272,6 +272,12 @@ export default function AddOnsManagementSection({
                                     <h2 className="text-lg font-bold text-gray-800">
                                         {group.title?.en || group.title?.pt}
                                     </h2>
+                                    {/* The optional name, when the group has one. */}
+                                    {(group.name?.en || group.name?.pt) && (
+                                        <p className="text-sm font-medium text-gray-500" data-testid="addon-group-name">
+                                            {group.name?.en || group.name?.pt}
+                                        </p>
+                                    )}
                                     <p className="text-xs text-gray-500 mt-0.5">
                                         {t("min_lg")}: {group.minSelectable} &bull; {t("max")}: {group.maxSelectable}
                                     </p>
