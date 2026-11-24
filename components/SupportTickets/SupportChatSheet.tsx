@@ -194,7 +194,8 @@ export default function SupportChatSheet({
           setLastReadAt(data.time);
         }
       },
-      onError: (msg) => console.log(msg),
+      // Shown, not just logged: a rejected message used to vanish silently.
+      onError: (msg) => toast.error(msg || "Message could not be sent"),
     });
 
   // Typing
