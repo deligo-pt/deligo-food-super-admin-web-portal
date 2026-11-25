@@ -26,6 +26,11 @@ export const TRANSLATE_MAX_TOTAL_LENGTH = 20000;
 export const TRANSLATE_RATE_WAIT_MS = 61_000;
 const MAX_RATE_RETRIES = 2;
 
+/** What `/api/translate/detect` answers: each text with its detected language, in both languages. */
+export type TDetectReply =
+  | { ok: true; results: { from: string; en: string; pt: string }[] }
+  | { ok: false; code: TranslationErrorCode };
+
 /** A cell the review must ask about: `field` is an editor path such as `namePt`. */
 export type TSheetMissing = { clientId: string; field: string };
 
@@ -47,6 +52,12 @@ export type TSheetTranslateOptions = {
   signal?: AbortSignal;
   /** Waiting after a 429; replaced in tests. */
   wait?: (ms: number, signal?: AbortSignal) => Promise<void>;
+  /**
+   * The converter for texts typed in the grid (`product.detect`): their
+   * language is not known, so it is detected. Without it they are
+   * translated from the side they sit in.
+   */
+  detect?: (texts: string[]) => Promise<TDetectReply>;
 };
 
 const other = (lang: TSheetLang): TSheetLang => (lang === "en" ? "pt" : "en");
@@ -126,33 +137,35 @@ export async function translateSheet(
   products: TSheetProduct[],
   lang: TSheetLang,
   send: (request: TranslationRequest) => Promise<TranslationReply>,
-  { onProgress, signal, wait = defaultWait }: TSheetTranslateOptions = {},
+  { onProgress, signal, wait = defaultWait, detect }: TSheetTranslateOptions = {},
 ): Promise<TSheetTranslation> {
   const result: TSheetProduct[] = structuredClone(products);
 
-  type TJob = { clientId: string; cell: TTextCell; from: TSheetLang; text: string };
+  type TFrom = TSheetLang | "auto";
+  type TJob = { product: TSheetProduct; cell: TTextCell; from: TFrom; text: string };
   const jobs: TJob[] = [];
   for (const p of result) {
     for (const cell of textCells(p)) {
       const en = cell.en.trim();
       const pt = cell.pt.trim();
       if (!!en === !!pt) continue; // both written, or both empty
-      const from: TSheetLang = (lang === "en" ? en : pt) ? lang : other(lang);
-      jobs.push({ clientId: p.clientId, cell, from, text: from === "en" ? en : pt });
+      const side: TSheetLang = (lang === "en" ? en : pt) ? lang : other(lang);
+      jobs.push({ product: p, cell, from: p.detect && detect ? "auto" : side, text: side === "en" ? en : pt });
     }
   }
 
-  // One request list per direction, each text once.
-  const unique: Record<TSheetLang, string[]> = { en: [], pt: [] };
-  const seen: Record<TSheetLang, Set<string>> = { en: new Set(), pt: new Set() };
+  // One request list per direction (or detection), each text once.
+  const unique: Record<TFrom, string[]> = { en: [], pt: [], auto: [] };
+  const seen: Record<TFrom, Set<string>> = { en: new Set(), pt: new Set(), auto: new Set() };
   for (const job of jobs) {
     if (job.text.length > TRANSLATE_MAX_TEXT_LENGTH || seen[job.from].has(job.text)) continue;
     seen[job.from].add(job.text);
     unique[job.from].push(job.text);
   }
 
-  const plan = (["en", "pt"] as const).flatMap((from) => batchTexts(unique[from]).map((texts) => ({ from, texts })));
+  const plan = (["en", "pt", "auto"] as const).flatMap((from) => batchTexts(unique[from]).map((texts) => ({ from, texts })));
   const done: Record<TSheetLang, Map<string, string>> = { en: new Map(), pt: new Map() };
+  const detected = new Map<string, { from: string; en: string; pt: string }>();
   let error: TranslationErrorCode | null = jobs.some((j) => j.text.length > TRANSLATE_MAX_TEXT_LENGTH)
     ? "INVALID_REQUEST"
     : null;
@@ -162,16 +175,21 @@ export async function translateSheet(
   for (const [index, batch] of plan.entries()) {
     signal?.throwIfAborted();
     if (!stopped) {
-      const request: TranslationRequest = {
-        texts: batch.texts,
-        sourceLang: batch.from.toUpperCase() as DeepLLang,
-        targetLang: other(batch.from).toUpperCase() as DeepLLang,
+      const { from } = batch;
+      const call = async (): Promise<TranslationReply | TDetectReply> => {
+        if (from === "auto") return detect!(batch.texts);
+        const request: TranslationRequest = {
+          texts: batch.texts,
+          sourceLang: from.toUpperCase() as DeepLLang,
+          targetLang: other(from).toUpperCase() as DeepLLang,
+        };
+        return send(request);
       };
 
-      let reply: TranslationReply;
+      let reply: TranslationReply | TDetectReply;
       for (let attempt = 0; ; attempt++) {
         try {
-          reply = await send(request);
+          reply = await call();
         } catch {
           reply = { ok: false, code: "UNAVAILABLE" };
         }
@@ -179,10 +197,15 @@ export async function translateSheet(
         await wait(TRANSLATE_RATE_WAIT_MS, signal);
       }
 
-      if (reply.ok && Array.isArray(reply.translations) && reply.translations.length === batch.texts.length) {
+      if (reply.ok && from === "auto" && "results" in reply && reply.results?.length === batch.texts.length) {
+        batch.texts.forEach((text, i) => {
+          const r = (reply as { results: { from: string; en: string; pt: string }[] }).results[i];
+          if (r?.en?.trim() && r?.pt?.trim()) detected.set(text, { from: r.from, en: r.en.trim(), pt: r.pt.trim() });
+        });
+      } else if (reply.ok && from !== "auto" && "translations" in reply && Array.isArray(reply.translations) && reply.translations.length === batch.texts.length) {
         batch.texts.forEach((text, i) => {
           const translated = (reply as { translations: string[] }).translations[i]?.trim();
-          if (translated) done[batch.from].set(text, translated);
+          if (translated) done[from].set(text, translated);
         });
       } else {
         const code = reply.ok ? "UNAVAILABLE" : reply.code;
@@ -194,17 +217,39 @@ export async function translateSheet(
   }
 
   const missing: TSheetMissing[] = [];
+  const unfinished = new Set<TSheetProduct>();
   let translated = 0;
   for (const job of jobs) {
-    const to = other(job.from);
-    const text = done[job.from].get(job.text);
-    if (text) {
-      job.cell.set(to, text);
-      translated++;
+    const empty: TSheetLang = job.cell.en.trim() ? "pt" : "en";
+    if (job.from === "auto") {
+      const found = detected.get(job.text);
+      if (found) {
+        job.cell.set("en", found.en);
+        job.cell.set("pt", found.pt);
+        // The grid shows a product in the language its name was written in.
+        if (job.cell.base === "name" && (found.from === "en" || found.from === "pt")) job.product.lang = found.from;
+        translated++;
+        continue;
+      }
     } else {
-      missing.push({ clientId: job.clientId, field: `${job.cell.base}${suffix(to)}` });
+      const text = done[job.from].get(job.text);
+      if (text) {
+        job.cell.set(other(job.from), text);
+        translated++;
+        continue;
+      }
     }
+    unfinished.add(job.product);
+    missing.push({ clientId: job.product.clientId, field: `${job.cell.base}${suffix(empty)}` });
   }
+  // Fully converted: nothing left to detect.
+  for (const job of jobs) if (job.from === "auto" && !unfinished.has(job.product)) delete job.product.detect;
 
-  return { products: result, missing, error: missing.length ? error ?? "UNAVAILABLE" : null, translated, sent: unique.en.length + unique.pt.length };
+  return {
+    products: result,
+    missing,
+    error: missing.length ? error ?? "UNAVAILABLE" : null,
+    translated,
+    sent: unique.en.length + unique.pt.length + unique.auto.length,
+  };
 }
