@@ -66,11 +66,16 @@ const VendorCreatedOffers = ({ offerData, vendorId, businessName }: IProps) => {
     return (
         <>
             <TitleHeader
-                title={t("created_offers")}
+                title={t("manage_offers")}
                 subtitle={t("manage_all_offers_here")}
                 onBackClick={() => router.back()}
+                buttonInfo={{
+                    text: t("create_new_offer") || "Create New Offer",
+                    icon: Plus,
+                    onClick: () => router.push(`/admin/vendor/${vendorId}/products/offers/create-new`),
+                }}
                 extraComponent={
-                    <VendorProductActionsMenu vendorId={vendorId} hide={["offers"]} />
+                    <VendorProductActionsMenu vendorId={vendorId} hide={["offers", "create-offer"]} />
                 }
             />
 

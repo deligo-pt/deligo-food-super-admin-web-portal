@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Edit, LayersIcon, Trash2, Loader2, ChevronDown, SaveIcon } from "lucide-react";
+import { Copy, Edit, LayersIcon, Trash2, ChevronDown, SaveIcon } from "lucide-react";
 import AddAddonGroupModal from "./AddAddonGroupModal";
-import CloneAddonGroupDialog from "./CloneAddonGroupDialog";
 import { TAddonGroup } from "@/types/add-ons.type";
 import { TTax } from "@/types/tax.type";
 import { TMeta } from "@/types";
@@ -13,7 +12,7 @@ import PaginationComponent from "@/components/Filtering/PaginationComponent";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import DeleteModal from "@/components/Modals/DeleteModal";
-import { deleteAddOnOption, toggleAddOnOptionStatus } from "@/services/dashboard/product/product.service";
+import { deleteAddOnOption, toggleAddOnOptionStatus, updateAddOnsGroup } from "@/services/dashboard/product/product.service";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/hooks/use-translation";
 import {
@@ -50,9 +49,8 @@ export default function AddOnsManagementSection({
     const { t, lang } = useTranslation();
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [actionType, setActionType] = useState<"create" | "edit">("create");
+    const [actionType, setActionType] = useState<"create" | "edit" | "clone">("create");
     const [selectedGroup, setSelectedGroup] = useState<TAddonGroup | undefined>(undefined);
-    const [groupToClone, setGroupToClone] = useState<TAddonGroup | undefined>(undefined);
 
     // States for Delete Option modal
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -60,7 +58,11 @@ export default function AddOnsManagementSection({
     const [isDeleting, setIsDeleting] = useState(false);
 
     // State for tracking toggle loading states per option SKU
-    const [togglingSku, setTogglingSku] = useState<string | null>(null);
+    // Active / Inactive, shown at once (key: group id or option sku). The
+    // list's data can come back stale after a save (revalidateTag serves the
+    // old copy first), so what was chosen here wins until the page reloads.
+    const [chosen, setChosen] = useState<Record<string, boolean>>({});
+    const [saving, setSaving] = useState<Record<string, boolean>>({});
 
     // vendor businessname or  branch name
     useVendorTopbarTitle(businessName);
@@ -117,37 +119,30 @@ export default function AddOnsManagementSection({
         }
     };
 
-    // Handler to Toggle Option Status API Request
-    const handleToggleOptionStatus = async (addonGroupId: string, optionSku?: string) => {
-        if (!optionSku) return;
-        setTogglingSku(optionSku);
-        const toastId = toast.loading(t("updating_status") || "Updating status...");
-
+    /** Flip at once, save, and flip back with a message if saving fails. */
+    const saveStatus = async (key: string, isActive: boolean, save: () => Promise<{ success?: boolean; message?: string }>) => {
+        setChosen((c) => ({ ...c, [key]: isActive }));
+        setSaving((s) => ({ ...s, [key]: true }));
         try {
-            const result = await toggleAddOnOptionStatus(
-                addonGroupId,
-                { optionSku },
-                vendorId
-            );
-
-            if (result.success) {
-                toast.success(result.message || "Status updated successfully", { id: toastId });
-                router.refresh();
-            } else {
-                toast.error(result.message || "Failed to update status", { id: toastId });
-            }
+            const result = await save();
+            if (!result?.success) throw new Error(result?.message);
+            router.refresh();
         } catch (error) {
-            toast.error("An unexpected error occurred", { id: toastId });
+            setChosen((c) => ({ ...c, [key]: !isActive }));
+            toast.error((error as Error)?.message || t("addon_status_failed"));
         } finally {
-            setTogglingSku(null);
+            setSaving((s) => ({ ...s, [key]: false }));
         }
     };
+    const groupActive = (group: TAddonGroup) => chosen[group._id] ?? group.isActive !== false;
+    const optionActive = (option: TAddonGroup["options"][number]) =>
+        (option.sku ? chosen[option.sku] : undefined) ?? option.isActive !== false;
 
     return (
         <div className="space-y-6">
             {/* Top Header Banner matching the UI */}
             <TitleHeader
-                title={t("add_ons_extras")}
+                title={t("manage_add_ons")}
                 subtitle={t("manage_your_add_on_groups_options")}
                 onBackClick={() => router.back()}
                 extraComponent={
@@ -212,7 +207,7 @@ export default function AddOnsManagementSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                {t("product_categories") || "Product Categories"}
+                                {t("manage_categories")}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -235,7 +230,7 @@ export default function AddOnsManagementSection({
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
                                 {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
-                                {t("variation_management") || "Variation Management"}
+                                {t("manage_variations")}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -246,7 +241,7 @@ export default function AddOnsManagementSection({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                {t("created_offers") || "Created Offers"}
+                                {t("manage_offers")}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -266,15 +261,23 @@ export default function AddOnsManagementSection({
                             key={group._id}
                             className="border rounded-xl p-5 bg-white shadow-sm hover:shadow transition space-y-4"
                         >
-                            {/* Group Title and Top Action Buttons */}
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h2 className="text-lg font-bold text-gray-800">
+                            {/* Group Title and Top Action Buttons (stacked on phones) */}
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div className="min-w-0">
+                                    <h2 className="flex flex-wrap items-center gap-2 text-lg font-bold text-gray-800 wrap-anywhere">
                                         {group.title?.en || group.title?.pt}
+                                        {!groupActive(group) && (
+                                            <span
+                                                className="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-600"
+                                                data-testid="addon-group-inactive"
+                                            >
+                                                {t("addon_inactive")}
+                                            </span>
+                                        )}
                                     </h2>
                                     {/* The optional name, when the group has one. */}
                                     {(group.name?.en || group.name?.pt) && (
-                                        <p className="text-sm font-medium text-gray-500" data-testid="addon-group-name">
+                                        <p className="text-sm font-medium text-gray-500 wrap-anywhere" data-testid="addon-group-name">
                                             {group.name?.en || group.name?.pt}
                                         </p>
                                     )}
@@ -282,19 +285,38 @@ export default function AddOnsManagementSection({
                                         {t("min_lg")}: {group.minSelectable} &bull; {t("max")}: {group.maxSelectable}
                                     </p>
                                 </div>
-                                <div className="flex items-center space-x-2">
+                                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                                    {/* Active / Inactive for the whole group, same height as the buttons */}
+                                    <label className="flex h-8 cursor-pointer items-center gap-2 rounded-md border border-gray-200 px-3 text-xs font-medium text-gray-700">
+                                        <Switch
+                                            checked={groupActive(group)}
+                                            disabled={!!saving[group._id]}
+                                            onCheckedChange={(checked) =>
+                                                saveStatus(group._id, checked, () => updateAddOnsGroup(group._id, { isActive: checked }))
+                                            }
+                                            aria-label={t("addon_group_status")}
+                                            data-testid="addon-group-switch"
+                                            className="data-[state=checked]:bg-[#DC3173]"
+                                        />
+                                        {/* fixed width: the buttons beside it don't move when the word changes */}
+                                        <span className="w-12">{groupActive(group) ? t("addon_active") : t("addon_inactive")}</span>
+                                    </label>
                                     {/* Edit → only group settings */}
                                     <button
                                         onClick={() => handleOpenEditModal(group)}
-                                        className="flex items-center text-xs border border-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 transition font-medium"
+                                        className="flex h-8 items-center text-xs border border-gray-200 text-gray-700 px-3 rounded-md hover:bg-gray-50 transition font-medium"
                                     >
                                         <Edit className="w-3.5 h-3.5 mr-1 text-gray-500" />
                                         {t("edit") || "Edit"}
                                     </button>
-                                    {/* Clone → copy with a new title (plan.md §11.5) */}
+                                    {/* Clone → the create form, filled from this group (plan.md §11.5) */}
                                     <button
-                                        onClick={() => setGroupToClone(group)}
-                                        className="flex items-center text-xs border border-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 transition font-medium"
+                                        onClick={() => {
+                                            setSelectedGroup(group);
+                                            setActionType("clone");
+                                            setIsModalOpen(true);
+                                        }}
+                                        className="flex h-8 items-center text-xs border border-gray-200 text-gray-700 px-3 rounded-md hover:bg-gray-50 transition font-medium"
                                     >
                                         <Copy className="w-3.5 h-3.5 mr-1 text-gray-500" />
                                         {t("addon_clone")}
@@ -320,13 +342,13 @@ export default function AddOnsManagementSection({
                                         return (
                                             <div
                                                 key={option._id || option.sku || idx}
-                                                className="flex justify-between items-center border border-gray-100 bg-gray-50/50 px-4 py-2.5 rounded-lg text-sm"
+                                                className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border border-gray-100 bg-gray-50/50 px-4 py-2.5 rounded-lg text-sm"
                                             >
-                                                {/* Left side */}
-                                                <div className="flex items-center gap-2 flex-wrap">
+                                                {/* Left side: keeps at least 10rem, the right side moves under it on phones */}
+                                                <div className="flex min-w-0 flex-1 basis-40 items-center gap-2 flex-wrap">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-[#DC3173] shrink-0" />
 
-                                                    <span className="font-medium text-gray-700">
+                                                    <span className={optionActive(option) ? "font-medium text-gray-700 wrap-anywhere" : "font-medium text-gray-400 line-through wrap-anywhere"}>
                                                         {option.name?.[lang]}
                                                     </span>
 
@@ -355,7 +377,7 @@ export default function AddOnsManagementSection({
                                                 </div>
 
                                                 {/* Right side */}
-                                                <div className="flex items-center space-x-4 shrink-0">
+                                                <div className="ml-auto flex shrink-0 items-center gap-3">
                                                     <span className="text-xs text-gray-600 font-medium">
                                                         €{option.price?.toFixed(2)}
                                                         {taxObj
@@ -363,20 +385,21 @@ export default function AddOnsManagementSection({
                                                             : ` (${t("inc_vat")}: 0%)`}
                                                     </span>
 
-                                                    {/* Toggle Status */}
-                                                    <div className="flex items-center">
-                                                        {togglingSku === option.sku ? (
-                                                            <Loader2 className="w-4 h-4 animate-spin text-[#DC3173]" />
-                                                        ) : (
-                                                            <Switch
-                                                                checked={option.isActive ?? true}
-                                                                onCheckedChange={() =>
-                                                                    handleToggleOptionStatus(group._id, option.sku)
-                                                                }
-                                                                className="data-[state=checked]:bg-[#DC3173]"
-                                                            />
-                                                        )}
-                                                    </div>
+                                                    {/* Active / Inactive for this option */}
+                                                    {option.sku && (
+                                                        <Switch
+                                                            checked={optionActive(option)}
+                                                            disabled={!!saving[option.sku]}
+                                                            onCheckedChange={(checked) =>
+                                                                saveStatus(option.sku as string, checked, () =>
+                                                                    toggleAddOnOptionStatus(group._id, { optionSku: option.sku as string, isActive: checked }, vendorId),
+                                                                )
+                                                            }
+                                                            aria-label={t("addon_option_status")}
+                                                            data-testid="addon-option-switch"
+                                                            className="data-[state=checked]:bg-[#DC3173]"
+                                                        />
+                                                    )}
 
                                                     {/* Delete */}
                                                     <button
@@ -428,15 +451,6 @@ export default function AddOnsManagementSection({
                 prevValues={selectedGroup}
                 taxes={taxes}
                 actionType={actionType}
-                allGroups={allGroups}
-                t={t}
-            />
-
-            <CloneAddonGroupDialog
-                key={`clone-${groupToClone?._id ?? "none"}`}
-                group={groupToClone}
-                onClose={() => setGroupToClone(undefined)}
-                vendorId={vendorId}
                 allGroups={allGroups}
                 t={t}
             />

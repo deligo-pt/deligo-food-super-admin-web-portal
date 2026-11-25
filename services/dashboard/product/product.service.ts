@@ -269,8 +269,8 @@ export const updateAddOnsGroup = async (id: string, data: Partial<TAddonGroup>) 
   return result;
 };
 
-// Toggle add-on option status API
-export const toggleAddOnOptionStatus = async (addonGroupId: string, data: { optionSku: string }, vendorId?: string) => {
+// Turn one add-on option on or off (the API needs the new state, 25 Nov 2026)
+export const toggleAddOnOptionStatus = async (addonGroupId: string, data: { optionSku: string; isActive: boolean }, vendorId?: string) => {
   const result = await catchAsync(async () => {
     const res = await serverFetch.patch(`/add-ons/${addonGroupId}/toggle-option-status`, {
       headers: {

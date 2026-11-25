@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Loader2, CheckSquare, X, Copy, Trash2 } from "lucide-react";
+import { ChevronDown, Loader2, CheckSquare, X, Copy, Trash2, Plus } from "lucide-react";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import {
@@ -602,6 +602,11 @@ export default function ProductsSection({
         title={t("food_items")}
         subtitle={t("manage_your_restaurants_food_delivery_items")}
         onBackClick={() => router.back()}
+        buttonInfo={{
+          text: t("add_product") || "Add Product",
+          icon: Plus,
+          onClick: () => router.push(`/admin/vendor/${vendorId}/add-product`),
+        }}
         extraComponent={
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -614,15 +619,6 @@ export default function ProductsSection({
               align="end"
               className="w-60 bg-white shadow-lg border rounded-lg p-1"
             >
-              <DropdownMenuItem
-                onClick={() =>
-                  router.push(`/admin/vendor/${vendorId}/add-product`)
-                }
-                className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
-              >
-                {t("add_product") || "Add Product"}
-              </DropdownMenuItem>
-
               <DropdownMenuItem
                 onClick={() =>
                   router.push(`/admin/vendor/${vendorId}/products/import`)
@@ -673,7 +669,7 @@ export default function ProductsSection({
                 }
                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
               >
-                {t("product_categories") || "Product Categories"}
+                {t("manage_categories")}
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -682,7 +678,7 @@ export default function ProductsSection({
                 }
                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
               >
-                {t("add_ons") || "Add-ons"}
+                {t("manage_add_ons")}
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -693,7 +689,7 @@ export default function ProductsSection({
                 }
                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
               >
-                {t("variation_management") || "Variation Management"}
+                {t("manage_variations")}
               </DropdownMenuItem>
 
               <DropdownMenuItem
@@ -702,7 +698,7 @@ export default function ProductsSection({
                 }
                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
               >
-                {t("created_offers") || "Created Offers"}
+                {t("manage_offers")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

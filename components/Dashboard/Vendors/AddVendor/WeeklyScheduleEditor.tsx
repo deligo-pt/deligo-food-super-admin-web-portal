@@ -12,7 +12,7 @@ import {
     normalizeSchedule,
     toMinutes,
 } from "@/utils/weeklySchedule";
-import { Clock, Copy, Moon, Plus, X } from "lucide-react";
+import { Clock, Copy, Plus, X } from "lucide-react";
 import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -200,40 +200,18 @@ export default function WeeklyScheduleEditor({ t, disabled = false }: IProps) {
                                                     />
                                                     <span className="text-slate-400">–</span>
 
-                                                    {isMidnight ? (
-                                                        <Input value="24:00" readOnly disabled className="w-32" />
-                                                    ) : (
-                                                        <Input
-                                                            type="time"
-                                                            step={60}
-                                                            value={period.close}
-                                                            disabled={disabled}
-                                                            aria-invalid={!!closeErr}
-                                                            className={cn("w-32", closeErr && "border-red-500")}
-                                                            onChange={(e) =>
-                                                                updatePeriod(dayIdx, pIdx, { close: e.target.value })
-                                                            }
-                                                        />
-                                                    )}
-
-                                                    <Button
-                                                        type="button"
-                                                        size="icon"
-                                                        variant={isMidnight ? "default" : "outline"}
+                                                    {/* No "until midnight" button: a saved 24:00 shows as 23:59 and stays 24:00 until edited. */}
+                                                    <Input
+                                                        type="time"
+                                                        step={60}
+                                                        value={isMidnight ? "23:59" : period.close}
                                                         disabled={disabled}
-                                                        title={t("until_midnight") || "Until midnight (24:00)"}
-                                                        className={cn(
-                                                            "h-9 w-9",
-                                                            isMidnight && "bg-[#DC3173] hover:bg-[#c22b65] text-white",
-                                                        )}
-                                                        onClick={() =>
-                                                            updatePeriod(dayIdx, pIdx, {
-                                                                close: isMidnight ? "23:59" : "24:00",
-                                                            })
+                                                        aria-invalid={!!closeErr}
+                                                        className={cn("w-32", closeErr && "border-red-500")}
+                                                        onChange={(e) =>
+                                                            updatePeriod(dayIdx, pIdx, { close: e.target.value })
                                                         }
-                                                    >
-                                                        <Moon className="w-4 h-4" />
-                                                    </Button>
+                                                    />
 
                                                     <Button
                                                         type="button"
