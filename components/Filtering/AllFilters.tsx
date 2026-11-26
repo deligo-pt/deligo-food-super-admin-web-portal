@@ -11,14 +11,13 @@ import {
 } from "@/components/ui/select";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Loader2,
-  LoaderIcon,
   RefreshCcw,
+  RotateCw,
   SlidersHorizontal,
   X,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
 import SearchFilter from "./SearchFilter";
 import SelectFilter from "./SelectFilter";
 import { useTranslation } from "@/hooks/use-translation";
@@ -37,6 +36,11 @@ interface IProps {
     isAllNeeded?: boolean;
   };
   refreshButton?: boolean;
+  /** One line with the page's other controls: search, then refresh, sort and
+   *  `trailing`. On a phone search gets the line and the rest share the next. */
+  compact?: boolean;
+  /** Shown after the sort box in the compact layout (e.g. a Select button). */
+  trailing?: ReactNode;
 }
 
 /*
@@ -116,6 +120,8 @@ export default function AllFilters({
   searchPlaceholder,
   extraSelectFilter,
   refreshButton = false,
+  compact = false,
+  trailing,
 }: IProps) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -272,12 +278,18 @@ export default function AllFilters({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-1"
+      className={compact ? "" : "mb-1"}
     >
-      <div className="flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between">
-        <div className="flex flex-col lg:flex-row gap-2 w-full">
+      <div
+        className={
+          compact
+            ? "flex flex-wrap items-center gap-2"
+            : "flex flex-col lg:flex-row gap-4 items-start md:items-center justify-between"
+        }
+      >
+        <div className={compact ? "flex min-w-0 basis-full gap-2 sm:basis-40 sm:flex-1" : "flex flex-col lg:flex-row gap-2 w-full"}>
           {/* Search */}
-          <div className="relative w-full lg:w-auto flex-1 lg:max-w-xs">
+          <div className={compact ? "relative min-w-0 flex-1 sm:max-w-sm" : "relative w-full lg:w-auto flex-1 lg:max-w-xs"}>
             <SearchFilter
               paramName="searchTerm"
               placeholder={
@@ -309,24 +321,29 @@ export default function AllFilters({
           )}
 
           {(refreshButton || true) && (
+            // A secondary action: outline, a refresh arrow that only turns while
+            // the list is reloading, and the label kept so the width never jumps.
+            // It used a spinner (`Loader2`) as its resting icon, so it always
+            // looked like it was loading.
             <Button
-              className="bg-[#DC3173] text-white"
+              type="button"
               variant="outline"
               disabled={isPending}
               onClick={handleRefresh}
+              title={t("refresh")}
+              aria-label={t("refresh")}
+              aria-busy={isPending}
+              className="shrink-0 gap-2 border-gray-200 text-gray-600 hover:border-[#DC3173]/40 hover:bg-[#DC3173]/5 hover:text-[#DC3173] disabled:opacity-100"
             >
-              {isPending ? (
-                <LoaderIcon className="w-5 h-5 mr-2 animate-spin" />
-              ) : (
-                <>
-                  <Loader2 /> <span>{t("refresh")}</span>
-                </>
-              )}
+              <RotateCw className={`h-4 w-4 ${isPending ? "animate-spin text-[#DC3173]" : ""}`} />
+              <span className={compact ? "hidden sm:inline" : ""}>
+                {t("refresh")}
+              </span>
             </Button>
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+        <div className={compact ? "flex min-w-0 flex-1 items-center gap-2 sm:flex-none" : "flex flex-col sm:flex-row gap-3 w-full lg:w-auto"}>
           {filterOptions && filterOptions.length > 0 && (
             <Button
               variant="outline"
@@ -341,18 +358,19 @@ export default function AllFilters({
             </Button>
           )}
 
-          {sortOptions && <div className="w-full lg:w-40">
+          {sortOptions && <div className={compact ? "min-w-0 flex-1 sm:w-40 sm:flex-none" : "w-full lg:w-40"}>
             <SelectFilter
               paramName="sortBy"
               options={sortOptions}
               placeholder={t("sort_by")}
             />
           </div>}
+          {compact && trailing}
         </div>
       </div>
 
-      {/* Active filter badges */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      {/* Active filter badges (the compact line drops the box while there are none) */}
+      <div className={compact ? "mt-2 flex flex-wrap items-center gap-2 empty:hidden" : "mt-4 flex flex-wrap items-center gap-2"}>
         {filterOptions?.map((option, i) => {
           const value = paramFilters[option.key];
           if (!value) return null;

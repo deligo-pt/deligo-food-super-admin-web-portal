@@ -570,7 +570,7 @@ export default function ProductsSection({
         }
       },
       {
-        root: container,
+        root: window.matchMedia("(min-width: 1024px)").matches ? container : null,
         rootMargin: "-20% 0px -60% 0px",
         threshold: [0, 0.1, 0.25, 0.5],
       }
@@ -597,8 +597,12 @@ export default function ProductsSection({
   const totalProducts = meta?.total ?? products.length;
 
   return (
-    <div className="w-full flex flex-col h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] overflow-hidden">
+    // From `lg` the page is a fixed box: categories and the list scroll on their
+    // own. Below it the page scrolls like a page (a fixed box on a phone left
+    // room for barely one card), with category chips in place of the column.
+    <div className="w-full flex flex-col lg:h-[calc(100dvh-1rem)] lg:max-h-[calc(100dvh-1rem)] lg:overflow-hidden">
       <TitleHeader
+        compact
         title={t("food_items")}
         subtitle={t("manage_your_restaurants_food_delivery_items")}
         onBackClick={() => router.back()}
@@ -705,114 +709,142 @@ export default function ProductsSection({
         }
       />
 
-      {/* Tabs: All / Active / Inactive / SDR Products */}
-      <div className="flex flex-col gap-3 pb-1 xl:flex-row xl:items-center xl:justify-between">
+      {/* The toolbar – one line on a laptop: status tabs, search, refresh,
+          sort and Select. It wraps on smaller screens. */}
+      <div className="shrink-0 mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
         <ProductStatusTabs counts={statusCounts} />
-        {/* Selection toolbar (below the tabs on smaller screens) */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-          {isSelectionMode ? (
-            <>
-              <div className="flex items-center gap-2 text-sm text-[#DC3173] font-medium">
-                <span className="bg-[#DC3173]/10 px-3 py-1 rounded-full whitespace-nowrap">
-                  {selectedIds.size} {t("selected") || "selected"}
-                </span>
-                <span className="text-gray-400 text-xs whitespace-nowrap">
-                  / {totalProducts} {t("products") || "products"}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 flex-wrap">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={selectAllProducts}
-                  disabled={isSelectAllLoading}
-                  className="border-gray-200"
-                >
-                  {isSelectAllLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
-                  ) : (
-                    <CheckSquare className="w-4 h-4 mr-1.5" />
-                  )}
-                  {t("all_products") || "All products"}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={clearSelection}
-                  disabled={selectedIds.size === 0}
-                  className="border-gray-200"
-                >
-                  {t("clear") || "Clear"}
-                </Button>
-
-                <Button
-                  size="sm"
-                  onClick={openCopyModal}
-                  disabled={selectedIds.size === 0}
-                  className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white"
-                >
-                  <Copy className="w-4 h-4 mr-1.5" />
-                  {t("copy_to_branch") || "Copy to Branch"}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsBulkDeleteOpen(true)}
-                  disabled={selectedIds.size === 0 || isSelectAllLoading}
-                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-600"
-                >
-                  <Trash2 className="w-4 h-4 mr-1.5" />
-                  {t("delete_selected")}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={exitSelectionMode}
-                  className="border-gray-200 text-gray-600"
-                >
-                  <X className="w-4 h-4 mr-1" />
-                  {t("cancel") || "Cancel"}
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="ml-auto flex items-center gap-3">
-              <span className="text-sm text-gray-500">
-                {totalProducts} {t("products") || "products"}
-                {hasMore && (
-                  <>
-                    <span className="ml-1.5 text-xs text-gray-400">
-                      {products.length}/{totalProducts}
+        <div className="min-w-0 basis-full sm:basis-80 sm:flex-1">
+          <AllFilters
+            compact
+            sortOptions={sortOptions}
+            trailing={
+              isSelectionMode ? undefined : (
+                <>
+                    <span className="hidden text-sm text-gray-500 whitespace-nowrap 2xl:inline">
+                      {totalProducts} {t("products") || "products"}
+                      {hasMore && (
+                        <>
+                          <span className="ml-1.5 text-xs text-gray-400">
+                            {products.length}/{totalProducts}
+                          </span>
+                          <Loader2 className="inline w-3.5 h-3.5 ml-1.5 animate-spin text-[#DC3173]" />
+                        </>
+                      )}
                     </span>
-                    <Loader2 className="inline w-3.5 h-3.5 ml-1.5 animate-spin text-[#DC3173]" />
-                  </>
-                )}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={enterSelectionMode}
-                className="border-gray-200"
-              >
-                <CheckSquare className="w-4 h-4 mr-1.5" />
-                {t("select") || "Select"}
-              </Button>
-            </div>
-          )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={enterSelectionMode}
+                      className="border-gray-200"
+                    >
+                      <CheckSquare className="w-4 h-4 mr-1.5" />
+                      {t("select") || "Select"}
+                    </Button>
+                </>
+              )
+            }
+          />
         </div>
       </div>
 
-      <AllFilters sortOptions={sortOptions} />
+      {/* Selection toolbar – its own line while selecting */}
+      {isSelectionMode && (
+        <div className="shrink-0 mb-3 flex flex-wrap items-center justify-between gap-3 px-1">
+          <div className="flex items-center gap-2 text-sm text-[#DC3173] font-medium">
+            <span className="bg-[#DC3173]/10 px-3 py-1 rounded-full whitespace-nowrap">
+              {selectedIds.size} {t("selected") || "selected"}
+            </span>
+            <span className="text-gray-400 text-xs whitespace-nowrap">
+              / {totalProducts} {t("products") || "products"}
+            </span>
+          </div>
 
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={selectAllProducts}
+              disabled={isSelectAllLoading}
+              className="border-gray-200"
+            >
+              {isSelectAllLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+              ) : (
+                <CheckSquare className="w-4 h-4 mr-1.5" />
+              )}
+              {t("all_products") || "All products"}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearSelection}
+              disabled={selectedIds.size === 0}
+              className="border-gray-200"
+            >
+              {t("clear") || "Clear"}
+            </Button>
+
+            <Button
+              size="sm"
+              onClick={openCopyModal}
+              disabled={selectedIds.size === 0}
+              className="bg-[#DC3173] hover:bg-[#DC3173]/90 text-white"
+            >
+              <Copy className="w-4 h-4 mr-1.5" />
+              {t("copy_to_branch") || "Copy to Branch"}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsBulkDeleteOpen(true)}
+              disabled={selectedIds.size === 0 || isSelectAllLoading}
+              className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-600"
+            >
+              <Trash2 className="w-4 h-4 mr-1.5" />
+              {t("delete_selected")}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exitSelectionMode}
+              className="border-gray-200 text-gray-600"
+            >
+              <X className="w-4 h-4 mr-1" />
+              {t("cancel") || "Cancel"}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
-      <div className="flex flex-1 min-h-0 gap-2 overflow-hidden">
-        {/* LEFT SIDEBAR */}
-        <div className="hidden lg:flex flex-col w-64 shrink-0 h-full">
+      <div className="flex flex-col lg:flex-row flex-1 min-h-0 gap-4 lg:overflow-hidden">
+        {/* Below `lg` the column is hidden, so the same categories as a
+            scrollable strip of chips. */}
+        <div className="lg:hidden -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 no-scrollbar">
+          {groupedProducts.map((group) => {
+            const id = group.category?._id || "uncategorized";
+            const isActive = effectiveActiveCategoryId === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => scrollToCategory(id)}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors ${isActive
+                  ? "bg-[#DC3173]/10 text-[#DC3173]"
+                  : "bg-gray-100 text-gray-600"
+                  }`}
+              >
+                {getCategoryName(group.category)} {group.products.length}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* LEFT SIDEBAR – 13rem (was 16rem), so the cards get the room */}
+        <div className="hidden lg:flex flex-col w-52 shrink-0 h-full">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full max-h-full overflow-hidden">
             <div className="p-4 border-b border-gray-50 shrink-0 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-800">
@@ -875,7 +907,7 @@ export default function ProductsSection({
         {/* RIGHT CONTENT */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 min-w-0 h-full overflow-y-auto space-y-10 pr-1
+          className="@container flex-1 min-w-0 lg:h-full lg:overflow-y-auto space-y-10 pr-1
             scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent
             hover:scrollbar-thumb-gray-400"
         >
@@ -918,7 +950,7 @@ export default function ProductsSection({
                         {count > 0 ? (
                           <motion.div
                             layout
-                            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-5"
+                            className="grid grid-cols-1 @min-[30rem]:grid-cols-2 @min-[46rem]:grid-cols-3 gap-5"
                           >
                             <AnimatePresence mode="popLayout">
                               {group.products.map((product) => {
@@ -939,7 +971,7 @@ export default function ProductsSection({
                           </motion.div>
                         ) : (
                           hasMore && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-5">
+                            <div className="grid grid-cols-1 @min-[30rem]:grid-cols-2 @min-[46rem]:grid-cols-3 gap-5">
                               {Array.from({ length: 3 }).map((_, i) => (
                                 <div
                                   key={i}
