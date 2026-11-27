@@ -104,7 +104,8 @@ interface IProps {
     vendorId: string;
     prevValues?: TAddonGroup;
     taxes: TTax[];
-    actionType?: "create" | "edit";
+    /** clone → the create form, filled from `prevValues` (a new title is needed). */
+    actionType?: "create" | "edit" | "clone";
     t: (key: string) => string;
     /** Every group of this vendor, for the duplicate-title check (plan.md §11.5). */
     allGroups?: TAddonGroup[];
@@ -427,7 +428,17 @@ export default function AddAddonGroupModal({
     const router = useRouter();
 
     const isEditMode = actionType === "edit";
-    const isCreateMode = !isEditMode;
+    const isCloneMode = actionType === "clone";
+    const isCreateMode = !isEditMode && !isCloneMode;
+    /** Create and Clone both save a new group. */
+    const isNewGroup = !isEditMode;
+    /** The options a copy starts with: the original's, without their ids. */
+    const clonedOptions = (): TOptionForm[] =>
+        (prevValues?.options || []).map((o) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { _id, sku, isActive, ...rest } = toFormOption(o);
+            return rest;
+        });
 
     const buildDefaults = (): TAddonGroupForm => ({
         title: {
@@ -441,7 +452,12 @@ export default function AddAddonGroupModal({
         minSelectable: prevValues?.minSelectable ?? 0,
         maxSelectable: prevValues?.maxSelectable ?? 1,
         // Edit → existing options are loaded into the form so they can be edited
-        options: isEditMode ? (prevValues?.options || []).map(toFormOption) : [],
+        // Clone → the original's options, saved as new ones
+        options: isEditMode
+            ? (prevValues?.options || []).map(toFormOption)
+            : isCloneMode
+              ? clonedOptions()
+              : [],
         currentLang: lang,
     });
 
@@ -460,7 +476,8 @@ export default function AddAddonGroupModal({
     });
     const options = form.watch("options") ?? [];
     const watchedTitle = (form.watch(`title.${L}`) as string | undefined) ?? "";
-    const titleIsTaken = titleTaken(allGroups, watchedTitle, prevValues?._id);
+    // A copy may not keep the original's title, so only Edit skips its own group.
+    const titleIsTaken = titleTaken(allGroups, watchedTitle, isEditMode ? prevValues?._id : undefined);
 
     // snapshot of the saved options, used to send ONLY what changed
     const originalBySku = useMemo(() => {
@@ -475,7 +492,7 @@ export default function AddAddonGroupModal({
     // ── "add a new option" draft form ───────────────
     // What the saved options share (Edit): the group price, Food | Drinks
     // and the "new option" box start from it (plan.md §11.5).
-    const savedOptions = isEditMode ? (prevValues?.options || []).map(toFormOption) : [];
+    const savedOptions = isEditMode || isCloneMode ? (prevValues?.options || []).map(toFormOption) : [];
     const savedPrice = commonPrice(savedOptions);
     const savedSdr = commonSdr(savedOptions);
     const priceText = (price: number | undefined) => (price === undefined ? "" : String(price));
@@ -798,6 +815,7 @@ export default function AddAddonGroupModal({
                     <DialogTitle className="text-xl font-bold">
                         {isCreateMode && `${t("create")} ${t("addon_group")}`}
                         {isEditMode && `${t("edit")} ${t("addon_group")}`}
+                        {isCloneMode && t("addon_clone_title")}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -1027,7 +1045,7 @@ export default function AddAddonGroupModal({
                                 <span className="space-y-0.5">
                                     <span className="block text-sm font-medium">{t("addon_sort_az")}</span>
                                     <span className="block text-xs text-gray-500">
-                                        {t(isCreateMode ? "addon_sort_az_help_create" : "addon_sort_az_help_edit")}
+                                        {t(isNewGroup ? "addon_sort_az_help_create" : "addon_sort_az_help_edit")}
                                     </span>
                                 </span>
                             </label>
@@ -1055,8 +1073,8 @@ export default function AddAddonGroupModal({
                                                 onRemove={opt.sku ? undefined : () => remove(index)}
                                                 // Only when creating: an update doesn't reorder
                                                 // on the API (plan.md §11.7). Moving turns A→Z off.
-                                                onMoveUp={isCreateMode && index > 0 ? () => { setSortAz(false); move(index, index - 1); } : undefined}
-                                                onMoveDown={isCreateMode && index < fields.length - 1 ? () => { setSortAz(false); move(index, index + 1); } : undefined}
+                                                onMoveUp={isNewGroup && index > 0 ? () => { setSortAz(false); move(index, index - 1); } : undefined}
+                                                onMoveDown={isNewGroup && index < fields.length - 1 ? () => { setSortAz(false); move(index, index + 1); } : undefined}
                                             />
                                         );
                                     })}
@@ -1183,7 +1201,7 @@ export default function AddAddonGroupModal({
                                 style={{ background: PRIMARY }}
                                 disabled={isSubmitting || titleIsTaken}
                             >
-                                {isCreateMode ? t("create") : t("update")}
+                                {isCloneMode ? t("addon_clone") : isCreateMode ? t("create") : t("update")}
                             </Button>
                         </div>
                     </form>

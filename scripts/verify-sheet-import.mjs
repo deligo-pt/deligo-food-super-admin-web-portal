@@ -244,5 +244,93 @@ check("DeepL 429 in the message → RATE_LIMITED", translationErrorCode(500, { m
 check("a route that sends a code keeps it", translationErrorCode(503, { code: "UNAUTHORIZED" }) === "UNAUTHORIZED");
 check("anything else → UNAVAILABLE", translationErrorCode(500, { message: "fetch failed" }) === "UNAVAILABLE" && translationErrorCode(502, null) === "UNAVAILABLE");
 
+section("5. One name is enough (plan §12)");
+{
+  const ctx = { categoryNames: new Set(["drinks"]), taxRates: new Set([23]), isRestaurant: true };
+  const base = { ...sheet.emptyProduct(), category: "Drinks", taxRate: "23", price: "2.5" };
+  const errs = (p) => sheet.validateSheetProduct(p, ctx);
+  check("English only: no name error", !errs({ ...base, nameEn: "Cola" }).namePt && !errs({ ...base, nameEn: "Cola" }).nameEn);
+  check("Portuguese only: no name error", J(errs({ ...base, namePt: "Água" })) === "{}", J(errs({ ...base, namePt: "Água" })));
+  const none = errs(base);
+  check("no name at all: both cells marked", none.nameEn === "sheet_err_name_one" && none.namePt === "sheet_err_name_one", J(none));
+  check("a filled side still needs 2 characters", errs({ ...base, namePt: "A" }).namePt === "sheet_err_min2");
+  const sized = {
+    ...base,
+    price: "",
+    nameEn: "Pizza",
+    variations: [
+      { nameEn: "", namePt: "Tamanho", options: [{ labelEn: "", labelPt: "Média", price: "9", stock: "" }, { labelEn: "Large", labelPt: "", price: "12", stock: "" }] },
+      { nameEn: "", namePt: "", options: [{ labelEn: "", labelPt: "", price: "1", stock: "" }] },
+    ],
+  };
+  const e = errs(sized);
+  check("variation and options in one language: fine", !e["v0.nameEn"] && !e["v0.namePt"] && !e["v0.o0.labelEn"] && !e["v0.o1.labelPt"], J(e));
+  check("empty variation and option: both sides marked", e["v1.nameEn"] === "sheet_err_name_one" && e["v1.o0.labelPt"] === "sheet_err_name_one", J(e));
+  const dupVar = errs({ ...sized, variations: [sized.variations[0], { ...sized.variations[0] }] });
+  check("Portuguese-only duplicate group is caught on the PT cell", dupVar["v1.namePt"] === "sheet_err_variation_duplicate", J(dupVar));
+  const twice = sheet.validateSheet([{ ...base, namePt: "Água" }, { ...base, namePt: "água" }], ctx);
+  check("same Portuguese-only name twice: marked on PT", [...twice.values()].every((x) => x.namePt === "sheet_err_name_twice"), J([...twice.values()]));
+
+  const texts = sheet.oneLanguageTexts([sized, { ...base, nameEn: "Both", namePt: "Ambos", descriptionPt: "Fresca" }]);
+  check(
+    "oneLanguageTexts lists the empty side of each one-language text",
+    J(texts.map((x) => x.field)) === J(["namePt", "v0.nameEn", "v0.o0.labelEn", "v0.o1.labelPt", "descriptionEn"]),
+    J(texts.map((x) => x.field)),
+  );
+  const same = sheet.fillOtherLanguage([sized]);
+  const s0 = same.products[0];
+  check(
+    "fillOtherLanguage copies the written text across",
+    same.filled === 4 && s0.namePt === "Pizza" && s0.variations[0].nameEn === "Tamanho" && s0.variations[0].options[1].labelPt === "Large" && sized.namePt === "",
+    J([same.filled, s0.namePt, s0.variations[0].nameEn]),
+  );
+  check("after filling, nothing is one-language", sheet.oneLanguageTexts(same.products).length === 0);
+  const { csv } = sheet.productsToCsv(same.products, { isRestaurant: true });
+  check("the generated file carries both languages", /Pizza,Pizza/.test(csv) && csv.includes("Tamanho,Tamanho"), csv.split("\n")[1]);
+}
+
+section("6. One box per text + the converter (plan §12)");
+{
+  const p0 = { ...sheet.emptyProduct(), nameEn: "Old", namePt: "Velho" };
+  const w = sheet.writeText(p0, "name", "Água");
+  check("typing a name keeps it, clears the old translation, marks detect", w.nameEn === "Água" && w.namePt === "" && w.detect === true, J(w));
+  const wpt = sheet.writeText({ ...p0, lang: "pt" }, "description", "Fresca");
+  check("a Portuguese product keeps typed text on its PT side", wpt.descriptionPt === "Fresca" && wpt.descriptionEn === "", J(wpt));
+  check("shownText prefers the product's language", sheet.shownText("Water", "Água", "pt") === "Água" && sheet.shownText("Water", "Água") === "Water" && sheet.shownText("", "Água") === "Água");
+
+  const pasted = sheet.pasteIntoSheet([sheet.emptyProduct()], { clientId: "x", column: "name" }, "Sopa\tDRINKS\t23\t3\nTea\tDRINKS\t23\t2", true);
+  check(
+    "pasting: one name column, then category, VAT, price; marked detect",
+    pasted.products.length === 2 && pasted.products[0].nameEn === "Sopa" && pasted.products[0].category === "DRINKS" && pasted.products[0].price === "3" && pasted.products.every((p) => p.detect),
+    J(pasted.products.map((p) => [p.nameEn, p.category, p.taxRate, p.price])),
+  );
+  check("no status column in the grid paste", !sheet.pasteColumns(true).includes("status") && sheet.pasteColumns(false).length === 6);
+
+  const detectCalls = [];
+  const detect = async (texts) => {
+    detectCalls.push(texts);
+    return {
+      ok: true,
+      results: texts.map((t) =>
+        t === "Água" ? { from: "pt", en: "Water", pt: "Água" } : t === "Large" ? { from: "en", en: "Large", pt: "Grande" } : { from: "en", en: t, pt: `${t} (pt)` },
+      ),
+    };
+  };
+  const sendCalls = [];
+  const send = async (r) => (sendCalls.push(r), { ok: true, translations: r.texts.map((x) => `${x}*`) });
+  const typedPt = { ...sheet.emptyProduct(), nameEn: "Água", detect: true, variations: [{ nameEn: "Size", namePt: "", options: [{ labelEn: "Large", labelPt: "", price: "2", stock: "" }] }] };
+  const fromFile = { ...sheet.emptyProduct(), namePt: "Sumo", lang: "pt" };
+  const out = await translateSheet([typedPt, fromFile], "pt", send, { detect });
+  const a = out.products[0];
+  check("detected Portuguese name lands on the PT side, English fills EN", a.namePt === "Água" && a.nameEn === "Water", J([a.nameEn, a.namePt]));
+  check("detected English option gets its Portuguese", a.variations[0].options[0].labelPt === "Grande" && a.variations[0].nameEn === "Size", J(a.variations));
+  check("after converting: shown in the name's language, no longer marked", a.lang === "pt" && !a.detect, J([a.lang, a.detect]));
+  check("file products still go the known way (PT → EN), typed ones to detection", sendCalls.length === 1 && sendCalls[0].sourceLang === "PT" && J(sendCalls[0].texts) === J(["Sumo"]) && detectCalls.length === 1, J([sendCalls, detectCalls]));
+  check("nothing missing", out.missing.length === 0 && out.translated === 4, J(out));
+
+  const down = await translateSheet([{ ...typedPt }], "en", send, { detect: async () => ({ ok: false, code: "QUOTA_EXCEEDED" }) });
+  check("converter down: texts reported missing, product stays marked", down.missing.length === 3 && down.error === "QUOTA_EXCEEDED" && down.products[0].detect === true, J(down.missing));
+}
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

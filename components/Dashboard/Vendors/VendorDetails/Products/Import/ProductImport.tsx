@@ -6,14 +6,16 @@
  *
  * Copy of the vendor panel's ProductImport (Import v2), for the vendor the
  * admin opened: the file is written in ONE language (picked here), read in
- * the browser, every product gets the defaults (Active, SDR off), the other
- * language is translated, and everything opens in the editor for review.
+ * the browser, every product gets the defaults (Active, SDR off), and
+ * everything opens in the editor for review. The other language is
+ * translated when the editor's Import is pressed (plan.md §12).
  * Only the editor's Import sends a file — for this vendor (`vendorId` = its
  * profile `_id`); restaurant rules and the category / VAT lists are that
  * vendor's. The running job's id is kept per admin + vendor in localStorage,
  * so a reload picks it up again.
  */
 
+import { requestDetect } from "@/utils/translation/requestDetect";
 import TitleHeader from "@/components/TitleHeader/TitleHeader";
 import { useTranslation } from "@/hooks/use-translation";
 import { uploadProductImportReq } from "@/services/dashboard/product/product-bulk.service";
@@ -121,9 +123,9 @@ export default function ProductImport({
   };
 
   /**
-   * Initial import: read the file, fill the defaults, translate the other
-   * language, then open everything in the editor. Nothing is sent to the
-   * server here. Used by this tab and by the editor's "Open file".
+   * Initial import: read the file, fill the defaults, then open everything in
+   * the editor. Nothing is translated or sent here. Used by this tab and by
+   * the editor's "Open file".
    */
   const prepareFile = async (picked: File): Promise<boolean> => {
     const problem = checkFile(picked, t);
@@ -150,14 +152,18 @@ export default function ProductImport({
         return false;
       }
 
-      const result = await translateSheet(sheet.products, fileLang, requestTranslations, {
-        signal: controller.signal,
-        onProgress: (done, total) => setPreparing({ stage: "translating", done, total }),
+      setEditorLoad({
+        id: Date.now(),
+        kind: "review",
+        from: fileLang,
+        products: sheet.products,
+        missing: [],
+        error: null,
+        translated: 0,
+        sent: 0,
       });
-
-      setEditorLoad({ id: Date.now(), kind: "review", from: fileLang, ...result });
       setMode("editor");
-      toast.success(countText(t, "import_ready", result.products.length));
+      toast.success(countText(t, "import_ready", sheet.products.length));
       return true;
     } catch (error) {
       if (controller.signal.aborted) toast.info(t("import_prepare_cancelled"));
@@ -344,6 +350,7 @@ export default function ProductImport({
               setFileLang={setFileLang}
               vendorKey={vendorKey}
               load={editorLoad}
+              translate={(products, options) => translateSheet(products, fileLang, requestTranslations, { ...options, detect: requestDetect })}
             />
           </div>
 

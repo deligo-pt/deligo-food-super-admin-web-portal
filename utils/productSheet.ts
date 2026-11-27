@@ -54,6 +54,17 @@ export type TSheetProduct = {
   /** "" | ACTIVE | INACTIVE */
   status: string;
   variations: TSheetVariation[];
+  /**
+   * The language its texts are written in, when known (a file read with a
+   * picked language, or after the converter ran). The grid shows each text
+   * in this language. Missing: English first.
+   */
+  lang?: TSheetLang;
+  /**
+   * Texts typed or pasted in the grid, language unknown: Import detects it
+   * and fills the other one (`/api/translate/detect`, plan §12).
+   */
+  detect?: boolean;
   /** Why the last import refused it (Fix in the editor); cleared on the first edit. */
   serverError?: string;
   /** Translation keys: what the editor leaves out by itself next time (see explainImportRow). */
@@ -358,16 +369,34 @@ const isUrl = (s: string) => {
   }
 };
 
+/**
+ * The key a two-language text is matched by (duplicates, grouping): the
+ * English text, or the Portuguese one when English is empty.
+ */
+const textKey = (en: string, pt: string) => lower(en.trim() || pt.trim());
+
+/** The editor path of the language that is filled (`nameEn`, else `namePt`). */
+const filledPath = (base: string, en: string) => `${base}${en.trim() ? "En" : "Pt"}`;
+
 /** Problems of one product; empty when it can be imported. */
 export function validateSheetProduct(p: TSheetProduct, ctx: TSheetContext): TSheetProductErrors {
   const errors: TSheetProductErrors = {};
-  const need2 = (path: string, value: string) => {
-    if (!value.trim()) errors[path] = "sheet_err_required";
-    else if (value.trim().length < 2) errors[path] = "sheet_err_min2";
+  /**
+   * Names and labels, like the import file: one language is enough (the
+   * other is translated when the vendor imports). Both empty → both cells
+   * marked; a filled one needs 2+ characters.
+   */
+  const needOne = (base: string, en: string, pt: string) => {
+    if (!en.trim() && !pt.trim()) {
+      errors[`${base}En`] = "sheet_err_name_one";
+      errors[`${base}Pt`] = "sheet_err_name_one";
+      return;
+    }
+    if (en.trim() && en.trim().length < 2) errors[`${base}En`] = "sheet_err_min2";
+    if (pt.trim() && pt.trim().length < 2) errors[`${base}Pt`] = "sheet_err_min2";
   };
 
-  need2("nameEn", p.nameEn);
-  need2("namePt", p.namePt);
+  needOne("name", p.nameEn, p.namePt);
 
   if (!p.category.trim()) errors.category = "sheet_err_required";
   else if (!ctx.categoryNames.has(lower(p.category))) errors.category = "sheet_err_category_unknown";
@@ -402,23 +431,23 @@ export function validateSheetProduct(p: TSheetProduct, ctx: TSheetContext): TShe
 
   const variationNames = new Set<string>();
   p.variations.forEach((v, vi) => {
-    need2(`v${vi}.nameEn`, v.nameEn);
-    need2(`v${vi}.namePt`, v.namePt);
-    if (v.nameEn.trim()) {
-      // Options are grouped by the English name: two groups with one name become one.
-      if (variationNames.has(lower(v.nameEn))) errors[`v${vi}.nameEn`] = "sheet_err_variation_duplicate";
-      variationNames.add(lower(v.nameEn));
+    needOne(`v${vi}.name`, v.nameEn, v.namePt);
+    const variationKey = textKey(v.nameEn, v.namePt);
+    if (variationKey) {
+      // Options are grouped by the name: two groups with one name become one.
+      if (variationNames.has(variationKey)) errors[filledPath(`v${vi}.name`, v.nameEn)] = "sheet_err_variation_duplicate";
+      variationNames.add(variationKey);
     }
     if (!v.options.length) errors[`v${vi}`] = "sheet_err_options_required";
 
     const labels = new Set<string>();
     v.options.forEach((o, oi) => {
       const at = `v${vi}.o${oi}`;
-      need2(`${at}.labelEn`, o.labelEn);
-      need2(`${at}.labelPt`, o.labelPt);
-      if (o.labelEn.trim()) {
-        if (labels.has(lower(o.labelEn))) errors[`${at}.labelEn`] = "sheet_err_option_duplicate";
-        labels.add(lower(o.labelEn));
+      needOne(`${at}.label`, o.labelEn, o.labelPt);
+      const labelKey = textKey(o.labelEn, o.labelPt);
+      if (labelKey) {
+        if (labels.has(labelKey)) errors[filledPath(`${at}.label`, o.labelEn)] = "sheet_err_option_duplicate";
+        labels.add(labelKey);
       }
       const optionPrice = parseSheetNumber(o.price);
       if (!o.price.trim()) errors[`${at}.price`] = "sheet_err_required";
@@ -435,28 +464,50 @@ export function validateSheet(products: TSheetProduct[], ctx: TSheetContext): Ma
   const result = new Map<string, TSheetProductErrors>();
   const names = new Map<string, number>();
   for (const p of products) {
-    const key = lower(p.nameEn);
+    const key = textKey(p.nameEn, p.namePt);
     if (key) names.set(key, (names.get(key) ?? 0) + 1);
   }
   for (const p of products) {
     const errors = validateSheetProduct(p, ctx);
     // The import treats a repeated name as a duplicate product.
-    if (!errors.nameEn && (names.get(lower(p.nameEn)) ?? 0) > 1) errors.nameEn = "sheet_err_name_twice";
+    const path = filledPath("name", p.nameEn);
+    if (!errors[path] && (names.get(textKey(p.nameEn, p.namePt)) ?? 0) > 1) errors[path] = "sheet_err_name_twice";
     if (Object.keys(errors).length) result.set(p.clientId, errors);
   }
   return result;
 }
 
+/* ---------- one text box per text (the grid) ---------- */
+
+/**
+ * The grid has ONE box per text (name, description, group name, option
+ * label), like the import file. It shows the text in the product's language
+ * (`lang`), else whichever side is written.
+ */
+export const shownText = (en: string, pt: string, lang?: TSheetLang) => (lang === "pt" ? pt || en : en || pt);
+
+/** The side a text typed into the grid is kept in, until Import converts it. */
+export const typedSide = (lang?: TSheetLang): "En" | "Pt" => (lang === "pt" ? "Pt" : "En");
+
+/**
+ * A text typed into the grid at `base` (`name`, `description`): kept in the
+ * product's language side, the old translation cleared (it no longer
+ * matches), and the product marked for detection on Import.
+ */
+export function writeText(p: TSheetProduct, base: "name" | "description", value: string): TSheetProduct {
+  const side = typedSide(p.lang);
+  const other = side === "En" ? "Pt" : "En";
+  return { ...p, [`${base}${side}`]: value, [`${base}${other}`]: "", detect: true };
+}
+
 /* ---------- pasting from Excel ---------- */
 
 /** The row's typed cells, left to right, as a paste fills them. */
-type TPasteColumn =
-  | "nameEn" | "namePt" | "category" | "taxRate" | "price" | "discount" | "stockQuantity" | "status";
+type TPasteColumn = "name" | "category" | "taxRate" | "price" | "discount" | "stockQuantity";
 
 export const pasteColumns = (isRestaurant: boolean): TPasteColumn[] => [
-  "nameEn", "namePt", "category", "taxRate", "price", "discount",
+  "name", "category", "taxRate", "price", "discount",
   ...(isRestaurant ? [] : (["stockQuantity"] as const)),
-  "status",
 ];
 
 /** A block copied from Excel / Sheets: rows split on newlines, cells on tabs. */
@@ -467,15 +518,7 @@ export const splitPastedText = (text: string) =>
     .split("\n")
     .map((line) => line.split("\t").map((cell) => cell.trim()));
 
-const pasteValue = (column: TPasteColumn, raw: string) => {
-  if (column === "taxRate") return raw.replace("%", "").trim();
-  if (column === "status") {
-    const v = raw.trim().toLowerCase();
-    if (!v) return "";
-    return ["inactive", "inativo", "inativa", "no", "não", "false", "0"].includes(v) ? "INACTIVE" : "ACTIVE";
-  }
-  return raw;
-};
+const pasteValue = (column: TPasteColumn, raw: string) => (column === "taxRate" ? raw.replace("%", "").trim() : raw);
 
 /**
  * Pastes a block into the grid. A block that starts with the template's
@@ -513,12 +556,14 @@ export function pasteIntoSheet(
     const index = startRow + li;
     if (index >= next.length) next.push(emptyProduct());
     const product = { ...next[index] };
+    let typed = product;
     cells.forEach((cell, ci) => {
       const column = columns[startCol + ci];
-      if (column) product[column] = pasteValue(column, cell);
+      if (column === "name") typed = { ...writeText(typed, "name", cell) };
+      else if (column) typed[column] = pasteValue(column, cell);
     });
-    next[index] = product;
-    changed.push(product.clientId);
+    next[index] = typed;
+    changed.push(typed.clientId);
   });
   return { products: next, changed };
 }
@@ -601,6 +646,52 @@ export function withSheetText(p: TSheetProduct, path: string, value: string): TS
       return { ...v, options: v.options.map((o, j) => (j === Number(oi) ? { ...o, [`label${side}`]: value } : o)) };
     }),
   };
+}
+
+/* ---------- one-language texts (translated on Import) ---------- */
+
+/** Editor paths of every two-language text of a product (`name`, `v0.name`, `v0.o1.label`), without the language. */
+export function textBases(p: TSheetProduct): string[] {
+  const bases = ["name", "description"];
+  p.variations.forEach((v, vi) => {
+    bases.push(`v${vi}.name`);
+    v.options.forEach((_, oi) => bases.push(`v${vi}.o${oi}.label`));
+  });
+  return bases;
+}
+
+/**
+ * Texts written in only one language — what Import translates first. Each is
+ * the editor path of the EMPTY side (`namePt`, `v0.o1.labelEn`).
+ */
+export function oneLanguageTexts(products: TSheetProduct[]): { clientId: string; field: string }[] {
+  const out: { clientId: string; field: string }[] = [];
+  for (const p of products) {
+    for (const base of textBases(p)) {
+      const en = (sheetText(p, `${base}En`) ?? "").trim();
+      const pt = (sheetText(p, `${base}Pt`) ?? "").trim();
+      if (!!en !== !!pt) out.push({ clientId: p.clientId, field: `${base}${en ? "Pt" : "En"}` });
+    }
+  }
+  return out;
+}
+
+/**
+ * Fills every one-language text with the same text in the other language —
+ * the fallback when automatic translation is not available. Returns copies.
+ */
+export function fillOtherLanguage(products: TSheetProduct[]): { products: TSheetProduct[]; filled: number } {
+  let filled = 0;
+  const next = products.map((p) =>
+    textBases(p).reduce((product, base) => {
+      const en = (sheetText(product, `${base}En`) ?? "").trim();
+      const pt = (sheetText(product, `${base}Pt`) ?? "").trim();
+      if (!!en === !!pt) return product;
+      filled++;
+      return en ? withSheetText(product, `${base}Pt`, en) : withSheetText(product, `${base}En`, pt);
+    }, p),
+  );
+  return { products: next, filled };
 }
 
 /**
@@ -725,7 +816,7 @@ export async function readSimpleSheet(
 
   const rows = localiseSimpleRows(raw, lang).filter((r) => !isBlankRow(r));
   return {
-    products: applyImportDefaults(groupCsvRowsToNestedState(rows), { isRestaurant }),
+    products: applyImportDefaults(groupCsvRowsToNestedState(rows), { isRestaurant }).map((p) => ({ ...p, lang })),
     rowCount: rows.length,
     missingColumns: [],
   };

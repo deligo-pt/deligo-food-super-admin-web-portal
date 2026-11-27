@@ -193,7 +193,7 @@ export default function VariationManagement({
     <div ref={scrollRootRef} className="min-h-screen bg-pink-50/50 pb-20">
       <div className="max-w-full">
         <TitleHeader
-          title={t("variation_management")}
+          title={t("manage_variations")}
           subtitle={t("add_edit_manage_product_variation")}
           onBackClick={() => router.back()}
           extraComponent={
@@ -262,7 +262,7 @@ export default function VariationManagement({
                   className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                 >
                   {/* <Tag className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
-                  {t("product_categories") || "Product Categories"}
+                  {t("manage_categories")}
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -285,7 +285,7 @@ export default function VariationManagement({
                   className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                 >
                   {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
-                  {t("add_ons") || "Add-ons"}
+                  {t("manage_add_ons")}
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
@@ -297,7 +297,7 @@ export default function VariationManagement({
                   className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                 >
                   {/* <Gift className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
-                  {t("created_offers") || "Created Offers"}
+                  {t("manage_offers")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

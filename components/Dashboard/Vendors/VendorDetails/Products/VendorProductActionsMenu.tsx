@@ -35,11 +35,11 @@ export default function VendorProductActionsMenu({ vendorId, hide = [] }: IProps
             { key: "increase-price", path: "products/increase-price", label: t("increase_prices") || "Increase Price" },
         ],
         [
-            { key: "categories", path: "products/categories", label: t("product_categories") || "Product Categories" },
+            { key: "categories", path: "products/categories", label: t("manage_categories") },
             { key: "create-offer", path: "products/offers/create-new", label: t("create_new_offer") || "Create New Offer" },
-            { key: "offers", path: "products/offers", label: t("created_offers") || "Created Offers" },
-            { key: "variations", path: "products/variation-management", label: t("variation_management") || "Variation Management" },
-            { key: "add-ons", path: "products/add-ons", label: t("add_ons") || "Add-ons" },
+            { key: "offers", path: "products/offers", label: t("manage_offers") },
+            { key: "variations", path: "products/variation-management", label: t("manage_variations") },
+            { key: "add-ons", path: "products/add-ons", label: t("manage_add_ons") },
         ],
     ];
 

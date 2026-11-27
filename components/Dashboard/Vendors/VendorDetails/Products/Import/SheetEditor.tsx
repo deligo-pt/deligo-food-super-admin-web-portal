@@ -10,6 +10,11 @@
  * touched, and on every product when Import is pressed. On submit the grid
  * becomes the same CSV file mode 1 uploads, so the server checks duplicates
  * and the progress / result screen is shared.
+ *
+ * Names and labels need ONE language, like the import file (plan.md §12):
+ * Import first translates every text written in one language, and if the
+ * translator is not available offers the same text in both. Preview shows
+ * every product with all its fields before that.
  */
 
 import { cn } from "@/lib/utils";
@@ -36,10 +41,12 @@ import {
   productsToCsv,
   type TSheetLang,
   applyToAllProducts,
-  otherLanguagePath,
-  sheetText,
-  withSheetText,
+  fillOtherLanguage,
+  oneLanguageTexts,
+  shownText,
+  typedSide,
   validateSheet,
+  writeText,
 } from "@/utils/productSheet";
 import {
   ChevronDown,
@@ -48,6 +55,7 @@ import {
   FolderOpen,
   History,
   CheckCircle2,
+  Eye,
   Languages,
   Lightbulb,
   LoaderCircle,
@@ -60,7 +68,9 @@ import {
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { clearDraft, readDraft, saveDraft, type TSheetDraft } from "./importStorage";
-import type { TSheetMissing, TSheetTranslation } from "@/utils/sheetTranslate";
+import SheetPreview from "./SheetPreview";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import type { TSheetMissing, TSheetTranslateOptions, TSheetTranslation } from "@/utils/sheetTranslate";
 import type { TranslationErrorCode } from "@/types/translation.type";
 
 export type TSheetCategory = { nameEn: string; namePt: string };
@@ -68,8 +78,8 @@ export type TSheetCategory = { nameEn: string; namePt: string };
 /**
  * What to put in the grid:
  * - `failed`: rows a finished import refused ("Fix in the editor");
- * - `review`: products read from the vendor's file and translated (Import v2,
- *   initial import), to check before the final import.
+ * - `review`: products read from the vendor's file (Import v2, initial
+ *   import), to check before the final import. Nothing is translated yet.
  */
 export type TSheetLoad =
   | { id: number; kind: "failed"; rows: TImportRowError[] }
@@ -77,7 +87,11 @@ export type TSheetLoad =
 
 type TT = (key: string) => string;
 
-/** The file just read for review (Import v2): what to say and which cells still need a translation. */
+/**
+ * The file just read for review (Import v2). `translated` / `missing` come
+ * from older drafts, when a file was translated on reading; now both are
+ * empty and translation happens on Import.
+ */
 type TReview = {
   from: TSheetLang;
   count: number;
@@ -102,12 +116,14 @@ interface IProps {
   openFile: (file: File) => Promise<boolean>;
   /** A file is being read / translated. */
   opening: boolean;
-  /** The language files are written in. */
+  /** The language of a file opened here — asked when "Open file" is pressed. */
   fileLang: TSheetLang;
   setFileLang: (lang: TSheetLang) => void;
   /** Draft storage key part (per vendor). */
   vendorKey: string;
   load: TSheetLoad | null;
+  /** Fills the empty language of every one-language text (translateSheet, bound to the file language). */
+  translate: (products: TSheetProduct[], options: TSheetTranslateOptions) => Promise<TSheetTranslation>;
 }
 
 const inputClass =
@@ -128,6 +144,7 @@ export default function SheetEditor({
   setFileLang,
   vendorKey,
   load,
+  translate,
 }: IProps) {
   // Own radio group per copy: the admin layout renders the page twice (one
   // copy hidden), and two groups with one name untick each other.
@@ -139,6 +156,9 @@ export default function SheetEditor({
   const [submitting, setSubmitting] = useState(false);
   const [review, setReview] = useState<TReview | null>(null);
   const [reviewHidden, setReviewHidden] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  /** Translating one-language texts (Preview's "Translate now", or Import): batches done / total. */
+  const [translating, setTranslating] = useState<{ done: number; total: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   /** An unfinished list from an earlier visit, offered until resumed or discarded. */
   const [draft, setDraft] = useState<TSheetDraft<TSheetProduct, TReview> | null>(null);
@@ -169,39 +189,16 @@ export default function SheetEditor({
   const filled = useMemo(() => products.filter((p) => !isBlankProduct(p)), [products]);
   const checked = useMemo(() => validateSheet(filled, ctx), [filled, ctx]);
 
-  /** Cells the translator could not fill and that are still empty. */
-  const pending = useMemo(() => {
-    if (!review?.missing.length) return [];
-    const byId = new Map(filled.map((p) => [p.clientId, p]));
-    return review.missing.filter((m) => {
-      const product = byId.get(m.clientId);
-      const value = product && sheetText(product, m.field);
-      return value !== undefined && !value.trim();
-    });
-  }, [review, filled]);
-
-  // A cell that still needs its translation blocks the import like any other problem.
-  const errors = useMemo(() => {
-    if (!pending.length) return checked;
-    const merged = new Map(checked);
-    for (const m of pending) merged.set(m.clientId, { ...merged.get(m.clientId), [m.field]: "sheet_err_needs_translation" });
-    return merged;
-  }, [checked, pending]);
+  // Names in one language are fine (translated on Import), so only the rules block.
+  const errors = checked;
+  /** Texts written in one language, translated when Import is pressed. */
+  const untranslated = useMemo(() => oneLanguageTexts(filled), [filled]);
   const fileRows = useMemo(() => filled.reduce((n, p) => n + fileRowsOf(p), 0), [filled]);
 
   const update = useCallback<TUpdate>((clientId, change) => {
     setProducts((prev) => prev.map((p) => (p.clientId === clientId ? { ...change(p), serverError: undefined, serverFixes: undefined } : p)));
     setTouched((prev) => (prev.has(clientId) ? prev : new Set(prev).add(clientId)));
   }, []);
-
-  /**
-   * Opens the details of products whose untranslated text is in there (a
-   * short list only: with the translator down that could be every product).
-   */
-  function expandMissing(missing: TSheetMissing[]) {
-    const inside = new Set(missing.filter((m) => !m.field.startsWith("name")).map((m) => m.clientId));
-    if (inside.size && inside.size <= 20) setExpanded((prev) => new Set([...prev, ...inside]));
-  }
 
   /* ----- draft: offered on open, saved while editing, cleared after an import starts ----- */
 
@@ -245,16 +242,11 @@ export default function SheetEditor({
     const loaded = draft.products.map((p) => ({ ...emptyProduct(), ...p }));
     setProducts((prev) => [...prev.filter((p) => !isBlankProduct(p)), ...loaded]);
     setTouched((prev) => new Set([...prev, ...loaded.map((p) => p.clientId)]));
-    // The review it came from: its "Needs translation" marks come back too.
-    if (draft.review?.missing) {
-      setReview(draft.review);
+    // The review it came from comes back with it.
+    if (draft.review) {
+      setReview({ ...draft.review, translated: 0, missing: [] });
       setReviewHidden(false);
       setShowAll(true);
-      // Only cells still empty: what was filled before the reload needs no opening.
-      expandMissing(draft.review.missing.filter((m) => {
-        const product = loaded.find((p) => p.clientId === m.clientId);
-        return product && !sheetText(product, m.field)?.trim();
-      }));
     }
     setDraft(null);
   };
@@ -263,6 +255,8 @@ export default function SheetEditor({
     clearDraft(vendorKey);
     setDraft(null);
   };
+
+  /* ----- Import v2: products read from a file and translated, to check ----- */
 
   function loadReview(next: Extract<TSheetLoad, { kind: "review" }>) {
     const loaded = next.products;
@@ -281,7 +275,6 @@ export default function SheetEditor({
       missing: [...(prev?.missing ?? []), ...next.missing],
     }));
     setReviewHidden(false);
-    expandMissing(next.missing);
     window.setTimeout(() => document.getElementById("sheet-review")?.scrollIntoView({ block: "start", behavior: "smooth" }), 50);
   }
 
@@ -323,25 +316,61 @@ export default function SheetEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [load?.id]);
 
-  /* ----- Import v2: products read from a file and translated, to check ----- */
+  /**
+   * Translates every one-language text and puts the result in the grid.
+   * Returns the products with translations (and, when the vendor agrees,
+   * the same text where the translator failed), or null when the vendor
+   * stopped. `askSameText` false: just report what could not be translated.
+   */
+  const translateTexts = async (askSameText: boolean): Promise<TSheetProduct[] | null> => {
+    if (translating) return null;
+    setTranslating({ done: 0, total: 1 });
+    let result: TSheetTranslation;
+    try {
+      result = await translate(filled, { onProgress: (done, total) => setTranslating({ done, total }) });
+    } catch (error) {
+      console.error("Translation failed:", error);
+      setTranslating(null);
+      return null;
+    }
+    setTranslating(null);
+    const byId = new Map(result.products.map((p) => [p.clientId, p]));
+    setProducts((prev) => prev.map((p) => byId.get(p.clientId) ?? p));
+    if (!result.missing.length) {
+      if (result.translated) toast.success(countText(t, "sheet_translated_n", result.translated));
+      return result.products;
+    }
+    const reason = result.error ? t(`import_tr_reason_${result.error}`) : "";
+    if (!askSameText) {
+      toast.warning(`${countText(t, "sheet_translate_failed_n", result.missing.length)} ${reason}`.trim());
+      return result.products;
+    }
+    const sameText = window.confirm(
+      `${countText(t, "sheet_translate_failed_n", result.missing.length)} ${reason}\n\n${t("sheet_translate_same_confirm")}`,
+    );
+    if (!sameText) return null;
+    const same = fillOtherLanguage(result.products);
+    const sameById = new Map(same.products.map((p) => [p.clientId, p]));
+    setProducts((prev) => prev.map((p) => sameById.get(p.clientId) ?? p));
+    return same.products;
+  };
 
-  /** Fills every cell that still needs a translation with the text the vendor wrote. */
-  const fillWithOriginalText = () => {
-    const byProduct = new Map<string, string[]>();
-    for (const m of pending) byProduct.set(m.clientId, [...(byProduct.get(m.clientId) ?? []), m.field]);
-    let filledCells = 0;
-    const next = products.map((p) => {
-      const fields = byProduct.get(p.clientId);
-      if (!fields) return p;
-      return fields.reduce((product, field) => {
-        const original = sheetText(product, otherLanguagePath(field))?.trim();
-        if (!original) return product;
-        filledCells++;
-        return withSheetText(product, field, original);
-      }, p);
-    });
-    setProducts(next);
-    if (filledCells) toast.success(countText(t, "import_review_same_done", filledCells));
+  /** Preview → Edit: show the product's row, details open. */
+  const editFromPreview = (clientId: string) => {
+    setPreviewOpen(false);
+    setShowAll(true);
+    setExpanded((prev) => new Set(prev).add(clientId));
+    window.setTimeout(() => {
+      const row = document.getElementById(`sheet-row-${clientId}`);
+      row?.scrollIntoView({ behavior: "smooth", block: "center" });
+      row?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true });
+    }, 150);
+  };
+
+  /** Category as the vendor sees it (their language), for the preview. */
+  const categoryLabel = (name: string) => {
+    const c = categories.find((x) => [x.nameEn, x.namePt].some((n) => n && n.trim().toLowerCase() === name.trim().toLowerCase()));
+    return c ? (lang === "pt" ? c.namePt || c.nameEn : c.nameEn || c.namePt) : name;
   };
 
   const setForAll = (change: Parameters<typeof applyToAllProducts>[1]) => {
@@ -385,10 +414,18 @@ export default function SheetEditor({
   const addProduct = () => {
     const product = emptyProduct();
     setProducts((prev) => [...prev, product]);
-    window.setTimeout(() => document.getElementById(`sheet-${product.clientId}-nameEn`)?.focus(), 0);
+    window.setTimeout(() => document.getElementById(`sheet-${product.clientId}-name`)?.focus(), 0);
   };
 
   // Same path as the Upload tab: read, defaults, translate, then loadReview.
+  // The grid takes any language per cell; only a file needs one (its single
+  // text columns), so it is asked when "Open file" is pressed.
+  const [askFileLang, setAskFileLang] = useState(false);
+  const pickFile = (value: TSheetLang) => {
+    setFileLang(value);
+    setAskFileLang(false);
+    fileRef.current?.click();
+  };
   const openFile = (file: File | undefined) => {
     if (fileRef.current) fileRef.current.value = "";
     if (file) void prepareFile(file);
@@ -426,7 +463,22 @@ export default function SheetEditor({
       return;
     }
     setSubmitting(true);
-    const { csv } = productsToCsv(filled, { isRestaurant });
+    // The import needs both languages: translate what was written in one first.
+    let ready = filled;
+    if (untranslated.length) {
+      const translated = await translateTexts(true);
+      if (!translated) {
+        setSubmitting(false);
+        return;
+      }
+      ready = translated;
+    }
+    // No status in the editor: everything it imports is Active (the vendor
+    // hides a product later on its own page).
+    const { csv } = productsToCsv(
+      ready.map((p) => ({ ...p, status: "ACTIVE" })),
+      { isRestaurant },
+    );
     const started = await submitFile(new File([csv], "products.csv", { type: "text/csv" }));
     setSubmitting(false);
     if (started) {
@@ -440,7 +492,7 @@ export default function SheetEditor({
     }
   };
 
-  const columns = isRestaurant ? 8 : 9;
+  const columns = isRestaurant ? 7 : 8;
 
   return (
     <section className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
@@ -481,9 +533,7 @@ export default function SheetEditor({
                 {countText(t, "import_review_banner", review.count, {
                   lang: t(review.from === "en" ? "import_lang_en" : "import_lang_pt"),
                 })}{" "}
-                {review.translated > 0 &&
-                  !pending.length &&
-                  fillVars(t("import_review_translated"), { other: t(review.from === "en" ? "import_lang_pt" : "import_lang_en") })}
+                {fillVars(t("import_review_translate_later"), { other: t(review.from === "en" ? "import_lang_pt" : "import_lang_en") })}
               </span>
             </p>
             <button
@@ -495,24 +545,6 @@ export default function SheetEditor({
               <X className="h-4 w-4" />
             </button>
           </div>
-          {pending.length > 0 && (
-            <div className="mt-3 flex flex-col gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="flex items-start gap-2 text-amber-900">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-                <span>
-                  {countText(t, "import_review_pending", pending.length)}{" "}
-                  {review.error && <span className="text-amber-800">{t(`import_tr_reason_${review.error}`)}</span>}
-                </span>
-              </p>
-              <button
-                type="button"
-                onClick={fillWithOriginalText}
-                className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100"
-              >
-                {t("import_review_same_text")}
-              </button>
-            </div>
-          )}
         </div>
       )}
       {/* Toolbar */}
@@ -520,7 +552,7 @@ export default function SheetEditor({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => fileRef.current?.click()}
+            onClick={() => setAskFileLang(true)}
             disabled={opening}
             className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-60"
           >
@@ -534,19 +566,31 @@ export default function SheetEditor({
             className="sr-only"
             onChange={(e) => openFile(e.target.files?.[0])}
           />
-          <label className="inline-flex items-center gap-2 text-sm text-gray-600">
-            <span className="sr-only sm:not-sr-only">{t("import_file_lang_short")}</span>
-            <select
-              value={fileLang}
-              disabled={opening}
-              onChange={(e) => setFileLang(e.target.value === "pt" ? "pt" : "en")}
-              aria-label={t("import_file_lang_label")}
-              className="h-9 rounded-lg border border-gray-200 bg-white px-2 text-sm outline-none focus:border-[#DC3173] disabled:opacity-60"
-            >
-              <option value="en">{t("import_lang_en")}</option>
-              <option value="pt">{t("import_lang_pt")}</option>
-            </select>
-          </label>
+          <Dialog open={askFileLang} onOpenChange={setAskFileLang}>
+            <DialogContent className="sm:max-w-sm" data-testid="file-lang-dialog">
+              <DialogHeader>
+                <DialogTitle>{t("import_file_lang_label")}</DialogTitle>
+                <DialogDescription>{t("sheet_open_file_lang_hint")}</DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-2">
+                {(["en", "pt"] as const).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => pickFile(value)}
+                    className={cn(
+                      "rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
+                      fileLang === value
+                        ? "border-[#DC3173] bg-[#DC3173]/5 text-[#B02458]"
+                        : "border-gray-200 text-gray-700 hover:bg-gray-50",
+                    )}
+                  >
+                    {t(value === "en" ? "import_lang_en" : "import_lang_pt")}
+                  </button>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
           {filled.length > 0 && (
             <button
               type="button"
@@ -575,18 +619,17 @@ export default function SheetEditor({
 
       {/* Grid: scrolls sideways inside the card on a narrow screen. */}
       <div ref={gridRef} className="overflow-x-auto rounded-lg border border-gray-200">
-        <table className="w-full min-w-[980px] border-collapse text-sm">
+        <table className="w-full min-w-[860px] border-collapse text-sm">
           <thead>
             <tr className="bg-gray-50 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
               <th className="w-10 px-2 py-2" />
-              <th className="px-2 py-2">{t("sheet_col_name_en")}<Req /></th>
-              <th className="px-2 py-2">{t("sheet_col_name_pt")}<Req /></th>
+              <th className="px-2 py-2">{t("sheet_col_name")}<Req /></th>
               <th className="w-44 px-2 py-2">{t("sheet_col_category")}<Req /></th>
-              <th className="w-28 px-2 py-2">{t("sheet_col_vat")}<Req /></th>
+              <th className="w-32 px-2 py-2">{t("sheet_col_vat")}<Req /></th>
               <th className="w-28 px-2 py-2">{t("sheet_col_price")}</th>
               <th className="w-24 px-2 py-2">{t("sheet_col_discount")}</th>
               {!isRestaurant && <th className="w-24 px-2 py-2">{t("sheet_col_stock")}</th>}
-              <th className="w-44 px-2 py-2">{t("sheet_col_status")}</th>
+              <th className="w-12 px-2 py-2" />
             </tr>
           </thead>
           <tbody onPaste={onPaste}>
@@ -622,7 +665,7 @@ export default function SheetEditor({
         {t("sheet_add_product")}
       </button>
       <p className="mt-2 text-xs text-gray-500">
-        <span className="text-[#DC3173]">*</span> {t("sheet_required_legend")}
+        <span className="text-[#DC3173]">*</span> {t("sheet_required_legend")} · {t("sheet_name_one_legend")}
       </p>
 
       {/* Footer */}
@@ -656,6 +699,16 @@ export default function SheetEditor({
             </div>
           </fieldset>
         </div>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row">
+        <button
+          type="button"
+          onClick={() => setPreviewOpen(true)}
+          disabled={!filled.length}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Eye className="h-4 w-4" aria-hidden />
+          {t("sheet_preview")}
+        </button>
         <button
           type="button"
           onClick={submit}
@@ -663,9 +716,30 @@ export default function SheetEditor({
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#DC3173] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#B02458] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden /> : <Upload className="h-4 w-4" aria-hidden />}
-          {submitting ? t("import_uploading") : filled.length ? countText(t, "sheet_import_n", filled.length) : t("sheet_import")}
+          {translating && submitting
+            ? fillVars(t("sheet_translating_before_import"), { done: translating.done, total: translating.total })
+            : submitting
+              ? t("import_uploading")
+              : filled.length
+                ? countText(t, "sheet_import_n", filled.length)
+                : t("sheet_import")}
         </button>
+        </div>
       </div>
+      <SheetPreview
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        t={t}
+        lang={lang}
+        isRestaurant={isRestaurant}
+        products={filled}
+        errors={errors}
+        untranslated={untranslated.length}
+        translating={translating}
+        onTranslate={() => void translateTexts(false)}
+        onEdit={editFromPreview}
+        categoryLabel={categoryLabel}
+      />
     </section>
   );
 }
@@ -674,7 +748,7 @@ export default function SheetEditor({
 const GENERAL_CODES = new Set(["BULK_PRODUCT_ITEM_VALIDATION_FAILED", "VALIDATION_ERROR", "IMPORT_ROW_INVALID"]);
 
 /** Problems about an empty field: not shown while the vendor is still filling the row in. */
-const WAITS_FOR_SUBMIT = new Set(["sheet_err_required", "sheet_err_price_required", "sheet_err_options_required"]);
+const WAITS_FOR_SUBMIT = new Set(["sheet_err_required", "sheet_err_name_one", "sheet_err_price_required", "sheet_err_options_required"]);
 
 /** Product fields that live in the details panel, not the row. */
 const DETAIL_FIELDS = new Set(["descriptionEn", "descriptionPt", "brand", "imageUrl", "sdrContainerCount", "stockUnit"]);
@@ -691,11 +765,10 @@ function SetForAll({
   count: number;
   onApply: (change: Parameters<typeof applyToAllProducts>[1]) => void;
 }) {
-  const [status, setStatus] = useState<"" | "ACTIVE" | "INACTIVE">("");
   const [sdr, setSdr] = useState<"" | "off" | "on">("");
   const [containers, setContainers] = useState("");
   const containersOk = /^\d+$/.test(containers.trim()) && Number(containers) >= 1;
-  const nothing = !status && !sdr;
+  const nothing = !sdr;
 
   const apply = () => {
     if (sdr === "on" && !containersOk) {
@@ -703,10 +776,8 @@ function SetForAll({
       return;
     }
     onApply({
-      status: status || undefined,
       sdr: sdr === "on" ? { on: true, containers } : sdr === "off" ? { on: false } : undefined,
     });
-    setStatus("");
     setSdr("");
     setContainers("");
   };
@@ -722,20 +793,12 @@ function SetForAll({
       </p>
       <div className="flex flex-wrap items-center gap-2">
         <label className="flex items-center gap-1.5 text-sm text-gray-600">
-          {t("sheet_col_status")}
-          <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)} className={selectClass}>
-            <option value="">{t("sheet_set_keep")}</option>
-            <option value="ACTIVE">{t("sheet_status_active")}</option>
-            <option value="INACTIVE">{t("sheet_status_inactive")}</option>
-          </select>
-        </label>
-        <label className="flex items-center gap-1.5 text-sm text-gray-600">
           {t("sheet_col_sdr")}
-          <select value={sdr} onChange={(e) => setSdr(e.target.value as typeof sdr)} className={selectClass}>
+          <Select wrap="relative" value={sdr} onChange={(e) => setSdr(e.target.value as typeof sdr)} className={selectClass}>
             <option value="">{t("sheet_set_keep")}</option>
             <option value="off">{t("sheet_no")}</option>
             <option value="on">{t("sheet_yes")}</option>
-          </select>
+          </Select>
         </label>
         {sdr === "on" && (
           <input
@@ -862,14 +925,18 @@ const SheetRow = memo(function SheetRow({
             {detailProblems > 0 && <span className="absolute right-0 top-1 h-2 w-2 rounded-full bg-red-500" />}
           </button>
         </td>
-        <Cell error={err("nameEn")} t={t}>
-          <input id={`sheet-${p.clientId}-nameEn`} data-col="nameEn" value={p.nameEn} onChange={(e) => set("nameEn")(e.target.value)} placeholder={t("sheet_ph_name_en")} className={cellClass(err("nameEn"))} />
-        </Cell>
-        <Cell error={err("namePt")} t={t}>
-          <input data-col="namePt" value={p.namePt} onChange={(e) => set("namePt")(e.target.value)} placeholder={t("sheet_ph_name_pt")} className={cellClass(err("namePt"))} />
+        <Cell error={err("nameEn") || err("namePt")} t={t}>
+          <input
+            id={`sheet-${p.clientId}-name`}
+            data-col="name"
+            value={shownText(p.nameEn, p.namePt, p.lang)}
+            onChange={(e) => update(p.clientId, (cur) => writeText(cur, "name", e.target.value))}
+            placeholder={t(lang === "pt" ? "sheet_ph_name_pt" : "sheet_ph_name_en")}
+            className={cellClass(err("nameEn") || err("namePt"))}
+          />
         </Cell>
         <Cell error={err("category")} t={t}>
-          <select value={categoryValue} onChange={(e) => set("category")(e.target.value)} className={cellClass(err("category"))}>
+          <Select value={categoryValue} onChange={(e) => set("category")(e.target.value)} className={cellClass(err("category"))}>
             <option value="">{t("sheet_choose")}</option>
             {categories.map((c) => (
               <option key={c.nameEn || c.namePt} value={c.nameEn || c.namePt}>
@@ -877,10 +944,10 @@ const SheetRow = memo(function SheetRow({
               </option>
             ))}
             {!matched && p.category.trim() && <option value={p.category}>{p.category}</option>}
-          </select>
+          </Select>
         </Cell>
         <Cell error={err("taxRate")} t={t}>
-          <select value={taxValue} onChange={(e) => set("taxRate")(e.target.value)} className={cellClass(err("taxRate"))}>
+          <Select value={taxValue} onChange={(e) => set("taxRate")(e.target.value)} className={cellClass(err("taxRate"))}>
             <option value="">{t("sheet_choose")}</option>
             {taxRates.map((r) => (
               <option key={r} value={String(r)}>
@@ -888,7 +955,7 @@ const SheetRow = memo(function SheetRow({
               </option>
             ))}
             {taxValue && !taxRates.map(String).includes(taxValue) && <option value={taxValue}>{taxValue}</option>}
-          </select>
+          </Select>
         </Cell>
         <Cell error={hasOptions ? undefined : err("price")} t={t}>
           {hasOptions ? (
@@ -932,10 +999,6 @@ const SheetRow = memo(function SheetRow({
         )}
         <td className="px-2 py-2">
           <div className="flex items-center gap-1">
-            <select value={p.status || "ACTIVE"} onChange={(e) => set("status")(e.target.value)} className={cellClass()}>
-              <option value="ACTIVE">{t("sheet_status_active")}</option>
-              <option value="INACTIVE">{t("sheet_status_inactive")}</option>
-            </select>
             <button
               type="button"
               onClick={() => remove(p.clientId)}
@@ -953,7 +1016,7 @@ const SheetRow = memo(function SheetRow({
         <tr className="bg-[#DC3173]/[0.03]">
           <td colSpan={columns} className="pb-4 pt-1">
             <div className="sticky left-0 px-2" style={{ width: "min(100%, var(--sheet-visible-width, 100%))" }}>
-                <ProductDetails product={p} err={err} t={t} isRestaurant={isRestaurant} update={update} />
+                <ProductDetails product={p} err={err} t={t} lang={lang} isRestaurant={isRestaurant} update={update} />
             </div>
           </td>
         </tr>
@@ -989,34 +1052,56 @@ function ProductDetails({
   product: p,
   err,
   t,
+  lang,
   isRestaurant,
   update,
 }: {
   product: TSheetProduct;
   err: (path: string) => string | undefined;
   t: TT;
+  lang: string;
   isRestaurant: boolean;
   update: TUpdate;
 }) {
   const set = (field: keyof TSheetProduct, value: string) => update(p.clientId, (cur) => ({ ...cur, [field]: value }));
   const setVariations = (change: (variations: TSheetVariation[]) => TSheetVariation[]) =>
     update(p.clientId, (cur) => ({ ...cur, variations: change(cur.variations) }));
-  const setVariation = (vi: number, patch: Partial<TSheetVariation>) =>
-    setVariations((vs) => vs.map((v, i) => (i === vi ? { ...v, ...patch } : v)));
   const setOption = (vi: number, oi: number, patch: Partial<TSheetOption>) =>
     setVariations((vs) =>
       vs.map((v, i) => (i === vi ? { ...v, options: v.options.map((o, j) => (j === oi ? { ...o, ...patch } : o)) } : v)),
     );
+  // One box per text, like the name (see writeText): the typed side, the old
+  // translation cleared, the product marked for detection on Import.
+  const side = typedSide(p.lang);
+  const otherSide = side === "En" ? "Pt" : "En";
+  const typed = (change: (cur: TSheetProduct) => TSheetProduct) =>
+    update(p.clientId, (cur) => ({ ...change(cur), detect: true }));
+  const setVariationName = (vi: number, value: string) =>
+    typed((cur) => ({
+      ...cur,
+      variations: cur.variations.map((v, i) => (i === vi ? { ...v, [`name${side}`]: value, [`name${otherSide}`]: "" } : v)),
+    }));
+  const setOptionLabel = (vi: number, oi: number, value: string) =>
+    typed((cur) => ({
+      ...cur,
+      variations: cur.variations.map((v, i) =>
+        i === vi
+          ? { ...v, options: v.options.map((o, j) => (j === oi ? { ...o, [`label${side}`]: value, [`label${otherSide}`]: "" } : o)) }
+          : v,
+      ),
+    }));
+  const ph = (key: string) => t(`${key}_${lang === "pt" ? "pt" : "en"}`);
 
   return (
     <div className="space-y-4 rounded-lg border border-[#DC3173]/15 bg-white p-4">
       {/* More about the product */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label={t("sheet_col_description_en")} error={err("descriptionEn")} t={t}>
-          <input value={p.descriptionEn} onChange={(e) => set("descriptionEn", e.target.value)} className={cellClass(err("descriptionEn"))} />
-        </Field>
-        <Field label={t("sheet_col_description_pt")} error={err("descriptionPt")} t={t}>
-          <input value={p.descriptionPt} onChange={(e) => set("descriptionPt", e.target.value)} className={cellClass(err("descriptionPt"))} />
+        <Field label={t("sheet_col_description")} error={err("descriptionEn") || err("descriptionPt")} t={t}>
+          <input
+            value={shownText(p.descriptionEn, p.descriptionPt, p.lang)}
+            onChange={(e) => update(p.clientId, (cur) => writeText(cur, "description", e.target.value))}
+            className={cellClass(err("descriptionEn") || err("descriptionPt"))}
+          />
         </Field>
         <Field label={t("sheet_col_image_url")} error={err("imageUrl")} t={t}>
           <input value={p.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="https://" className={cellClass(err("imageUrl"))} />
@@ -1025,17 +1110,17 @@ function ProductDetails({
           <input value={p.brand} onChange={(e) => set("brand", e.target.value)} className={cellClass()} />
         </Field>
         <Field label={t("sheet_col_discount_type")} t={t}>
-          <select value={p.discountType || "PERCENTAGE"} onChange={(e) => set("discountType", e.target.value)} className={cellClass()}>
+          <Select value={p.discountType || "PERCENTAGE"} onChange={(e) => set("discountType", e.target.value)} className={cellClass()}>
             <option value="PERCENTAGE">{t("sheet_discount_percentage")}</option>
             <option value="FLAT">{t("sheet_discount_flat")}</option>
-          </select>
+          </Select>
         </Field>
         <Field label={t("sheet_col_sdr")} error={err("sdrContainerCount")} t={t}>
           <div className="flex gap-2">
-            <select value={p.sdrApplicable === "true" ? "true" : "false"} onChange={(e) => set("sdrApplicable", e.target.value)} className={cellClass()}>
+            <Select value={p.sdrApplicable === "true" ? "true" : "false"} onChange={(e) => set("sdrApplicable", e.target.value)} className={cellClass()}>
               <option value="false">{t("sheet_no")}</option>
               <option value="true">{t("sheet_yes")}</option>
-            </select>
+            </Select>
             {p.sdrApplicable === "true" && (
               <input
                 inputMode="numeric"
@@ -1063,12 +1148,14 @@ function ProductDetails({
         <div className="space-y-3">
           {p.variations.map((v, vi) => (
             <div key={vi} className="rounded-lg border border-gray-200 p-3">
-              <div className="grid items-start gap-2 sm:grid-cols-[1fr_1fr_auto]">
-                <Field label={t("sheet_variation_name_en")} error={err(`v${vi}.nameEn`)} t={t}>
-                  <input value={v.nameEn} onChange={(e) => setVariation(vi, { nameEn: e.target.value })} placeholder={t("sheet_ph_variation_en")} className={cellClass(err(`v${vi}.nameEn`))} />
-                </Field>
-                <Field label={t("sheet_variation_name_pt")} error={err(`v${vi}.namePt`)} t={t}>
-                  <input value={v.namePt} onChange={(e) => setVariation(vi, { namePt: e.target.value })} placeholder={t("sheet_ph_variation_pt")} className={cellClass(err(`v${vi}.namePt`))} />
+              <div className="grid items-start gap-2 sm:grid-cols-[1fr_auto]">
+                <Field label={t("sheet_variation_name")} error={err(`v${vi}.nameEn`) || err(`v${vi}.namePt`)} t={t}>
+                  <input
+                    value={shownText(v.nameEn, v.namePt, p.lang)}
+                    onChange={(e) => setVariationName(vi, e.target.value)}
+                    placeholder={ph("sheet_ph_variation")}
+                    className={cellClass(err(`v${vi}.nameEn`) || err(`v${vi}.namePt`))}
+                  />
                 </Field>
                 <button
                   type="button"
@@ -1084,12 +1171,14 @@ function ProductDetails({
                 {v.options.map((o, oi) => {
                   const at = `v${vi}.o${oi}`;
                   return (
-                    <div key={oi} className={cn("grid items-start gap-2", isRestaurant ? "sm:grid-cols-[1fr_1fr_8rem_auto]" : "sm:grid-cols-[1fr_1fr_8rem_6rem_auto]")}>
-                      <Field label={oi === 0 ? t("sheet_option_label_en") : undefined} error={err(`${at}.labelEn`)} t={t}>
-                        <input value={o.labelEn} onChange={(e) => setOption(vi, oi, { labelEn: e.target.value })} placeholder={t("sheet_ph_option_en")} className={cellClass(err(`${at}.labelEn`))} />
-                      </Field>
-                      <Field label={oi === 0 ? t("sheet_option_label_pt") : undefined} error={err(`${at}.labelPt`)} t={t}>
-                        <input value={o.labelPt} onChange={(e) => setOption(vi, oi, { labelPt: e.target.value })} placeholder={t("sheet_ph_option_pt")} className={cellClass(err(`${at}.labelPt`))} />
+                    <div key={oi} className={cn("grid items-start gap-2", isRestaurant ? "sm:grid-cols-[1fr_8rem_auto]" : "sm:grid-cols-[1fr_8rem_6rem_auto]")}>
+                      <Field label={oi === 0 ? t("sheet_option_label") : undefined} error={err(`${at}.labelEn`) || err(`${at}.labelPt`)} t={t}>
+                        <input
+                          value={shownText(o.labelEn, o.labelPt, p.lang)}
+                          onChange={(e) => setOptionLabel(vi, oi, e.target.value)}
+                          placeholder={ph("sheet_ph_option")}
+                          className={cellClass(err(`${at}.labelEn`) || err(`${at}.labelPt`))}
+                        />
                       </Field>
                       <Field label={oi === 0 ? t("sheet_option_price") : undefined} error={err(`${at}.price`)} t={t}>
                         <input inputMode="decimal" value={o.price} onChange={(e) => setOption(vi, oi, { price: e.target.value })} placeholder="0,00" className={cellClass(err(`${at}.price`))} />
@@ -1140,6 +1229,19 @@ function ProductDetails({
           {t("sheet_add_variation")}
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * A select with the panel's own arrow: the browser's sits squeezed against
+ * the right edge. `wrap` sizes the box (full width in the grid).
+ */
+function Select({ wrap = "relative w-full min-w-0", className, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { wrap?: string }) {
+  return (
+    <div className={wrap}>
+      <select {...props} className={cn(className, "cursor-pointer appearance-none pr-8")} />
+      <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" aria-hidden />
     </div>
   );
 }

@@ -386,7 +386,7 @@ const UpdateDiscount = ({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                {t("product_categories") || "Product Categories"}
+                                {t("manage_categories")}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -397,7 +397,7 @@ const UpdateDiscount = ({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                {t("add_ons") || "Add-ons"}
+                                {t("manage_add_ons")}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -409,7 +409,7 @@ const UpdateDiscount = ({
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
                                 {/* <Layers className="w-4 h-4 mr-2 text-[#DC3173]" /> */}
-                                {t("variation_management") || "Variation Management"}
+                                {t("manage_variations")}
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -420,7 +420,7 @@ const UpdateDiscount = ({
                                 }
                                 className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md cursor-pointer"
                             >
-                                {t("created_offers") || "Created Offers"}
+                                {t("manage_offers")}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

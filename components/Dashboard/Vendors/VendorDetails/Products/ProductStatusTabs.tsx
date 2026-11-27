@@ -60,7 +60,8 @@ export default function ProductStatusTabs({ counts }: IProps) {
     };
 
     return (
-        <div className="px-1 py-2">
+        // Scrolls sideways rather than pushing the page wider on a narrow phone.
+        <div className="max-w-full overflow-x-auto no-scrollbar">
             <div
                 role="tablist"
                 aria-busy={isPending}
@@ -75,7 +76,7 @@ export default function ProductStatusTabs({ counts }: IProps) {
                             role="tab"
                             aria-selected={isActive}
                             onClick={() => onSelect(tab.value)}
-                            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap cursor-pointer transition-colors duration-200 ${isActive
+                            className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium sm:px-4 whitespace-nowrap cursor-pointer transition-colors duration-200 ${isActive
                                     ? "bg-[#DC3173] text-white shadow-sm"
                                     : "bg-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                 }`}
