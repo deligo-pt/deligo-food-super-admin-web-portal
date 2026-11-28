@@ -1,7 +1,7 @@
 "use client";
 
 import { TAddonGroup } from "@/types/add-ons.type";
-import { moveItem } from "@/utils/addonGroup";
+import { groupLabel, moveItem } from "@/utils/addonGroup";
 import { ArrowDown, ArrowUp, XIcon } from "lucide-react";
 
 interface IProps {
@@ -20,11 +20,8 @@ interface IProps {
  */
 export default function AddonGroupOrder({ ids, groups, lang, onChange, t }: IProps) {
   if (!ids?.length) return null;
-  const other = lang === "en" ? "pt" : "en";
-  const titleOf = (id: string) => {
-    const group = groups?.find((item) => item._id === id);
-    return group?.title?.[lang] || group?.title?.[other] || "";
-  };
+  // The vendor's own name for each group (its title when it has none).
+  const titleOf = (id: string) => groupLabel(groups?.find((item) => item._id === id), lang);
   const button =
     "rounded-md p-1 text-gray-400 hover:bg-[#DC3173]/10 hover:text-[#DC3173] disabled:pointer-events-none disabled:opacity-30";
 
