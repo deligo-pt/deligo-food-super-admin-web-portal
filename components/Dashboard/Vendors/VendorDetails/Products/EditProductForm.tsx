@@ -2,6 +2,7 @@
 "use client";
 
 import AddonGroupOrder from "@/components/Dashboard/Vendors/AddProduct/AddonGroupOrder";
+import { groupLabel } from "@/utils/addonGroup";
 import {
     Form,
     FormControl,
@@ -735,7 +736,8 @@ export function EditProductForm({
                                                                             key={group._id}
                                                                             value={group._id}
                                                                         >
-                                                                            {group.title?.[lang]}
+                                                                            {/* The vendor's own name for the group; customers see its title. */}
+                                                                            {groupLabel(group, lang)}
                                                                         </SelectItem>
                                                                     ))}
                                                                     {addonGroupsData?.data?.length === 0 && (

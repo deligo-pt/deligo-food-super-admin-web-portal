@@ -23,6 +23,22 @@ export function presentText(text: TText | null | undefined): TText | undefined {
   return { ...(en ? { en } : {}), ...(pt ? { pt } : {}) };
 }
 type TLang = "en" | "pt";
+
+/**
+ * How the panel labels an add-on group: its `name` (the vendor's own label),
+ * else its `title` (what customers see) — older groups have no name. Each in
+ * `lang`, then the other language.
+ */
+export function groupLabel(group: { name?: TText; title?: TText } | null | undefined, lang: TLang): string {
+  const other: TLang = lang === "en" ? "pt" : "en";
+  return (
+    group?.name?.[lang]?.trim() ||
+    group?.name?.[other]?.trim() ||
+    group?.title?.[lang]?.trim() ||
+    group?.title?.[other]?.trim() ||
+    ""
+  );
+}
 type TTaxLike = { _id: string; taxRate: number; isActive?: boolean; isDeleted?: boolean };
 
 /** An option as the group form holds it: `tax` is the VAT entry's id. */

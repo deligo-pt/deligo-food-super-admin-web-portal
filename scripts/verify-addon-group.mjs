@@ -136,5 +136,13 @@ check("input not changed", ids.join() === "a,b,c");
 check("up from the top → unchanged", g.moveItem(ids, 0, -1) === ids);
 check("down from the bottom → unchanged", g.moveItem(ids, 2, 3) === ids);
 
+console.log("\nPanel label of a group (name, else title)");
+const both = { name: { en: "Indian", pt: "indiano" }, title: { en: "Indian Drink", pt: "Bebida indiana" } };
+check("name in lang", g.groupLabel(both, "pt") === "indiano");
+check("name in the other language", g.groupLabel({ name: { en: "Indian" }, title: both.title }, "pt") === "Indian");
+check("no name → title", g.groupLabel({ title: both.title }, "en") === "Indian Drink");
+check("blank name → title", g.groupLabel({ name: { en: "  " }, title: both.title }, "en") === "Indian Drink");
+check("no group → ''", g.groupLabel(undefined, "en") === "");
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

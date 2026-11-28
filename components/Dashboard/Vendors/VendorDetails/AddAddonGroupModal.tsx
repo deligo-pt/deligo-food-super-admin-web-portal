@@ -3,21 +3,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowDown, ArrowUp, Check, CupSoda, Minus, Pencil, Plus, UtensilsCrossed, XIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, Minus, Pencil, Plus, XIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
 import {
     commonPrice,
     commonSdr,
     commonTax,
-    kindOfOptions,
     sortByName,
     presentText,
     titleTaken,
-    withKind,
     withPrice,
 } from "@/utils/addonGroup";
-import { KIND_SETTINGS, kindOfRate, taxIdForRate, type TProductKind } from "@/utils/productKind";
 
 import {
     Dialog,
@@ -522,31 +518,6 @@ export default function AddAddonGroupModal({
         setSortAz(false);
     };
 
-    // Food | Drinks: lit when every option has that kind's VAT; with no
-    // options yet, from the "new option" box.
-    const draftRate = taxes.find((tax) => tax._id === draftTax)?.taxRate;
-    const currentKind = options.length
-        ? kindOfOptions(options, taxes)
-        : kindOfRate(draftRate === undefined ? null : Number(draftRate));
-    const missingRate = (kind: TProductKind) => !taxIdForRate(taxes, KIND_SETTINGS[kind].rate);
-
-    /** The form keeps SDR only when it is on (see `toFormOption`). */
-    const sdrOnlyWhenOn = (list: TOptionForm[]) =>
-        list.map((option) => ({ ...option, sdr: option.sdr?.applicable ? option.sdr : undefined }));
-
-    const pickKind = (kind: TProductKind) => {
-        const taxId = taxIdForRate(taxes, KIND_SETTINGS[kind].rate);
-        if (!taxId) return;
-        const current = form.getValues("options").map((option) => ({
-            ...option,
-            sdr: option.sdr ?? { applicable: false, containerCount: 1 },
-        }));
-        replace(sdrOnlyWhenOn(withKind(current, kind, taxes)));
-        setDraftTax(taxId);
-        setDraftSdr(KIND_SETTINGS[kind].sdr);
-        setDraftCount(1);
-    };
-
     const changeGroupPrice = (raw: string) => {
         const text = raw !== "" && parseFloat(raw) < 0 ? "0" : raw;
         setGroupPrice(text);
@@ -986,39 +957,7 @@ export default function AddAddonGroupModal({
                             <p className="text-xs text-gray-500">{t("addon_group_price_help")}</p>
                         </div>
 
-                        {/* ── Food | Drinks: VAT and SDR for every option ── */}
-                        <fieldset className="space-y-2">
-                            <legend className="mb-2 font-medium">{t("product_kind_label")}</legend>
-                            <div className="inline-flex rounded-xl border border-gray-200 bg-white p-1" role="radiogroup" aria-label={t("product_kind_label")}>
-                                {(["FOOD", "DRINK"] as const).map((kind) => {
-                                    const Icon = kind === "FOOD" ? UtensilsCrossed : CupSoda;
-                                    const selected = currentKind === kind;
-                                    return (
-                                        <button
-                                            key={kind}
-                                            type="button"
-                                            role="radio"
-                                            aria-checked={selected}
-                                            disabled={missingRate(kind)}
-                                            onClick={() => pickKind(kind)}
-                                            className={cn(
-                                                "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                                                selected ? "bg-[#DC3173] text-white" : "text-gray-600 hover:bg-gray-50",
-                                            )}
-                                        >
-                                            <Icon className="h-4 w-4" aria-hidden />
-                                            {t(kind === "FOOD" ? "product_kind_food" : "product_kind_drink")}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            <p className="text-xs text-gray-500">{t("addon_kind_help")}</p>
-                            {(["FOOD", "DRINK"] as const).filter(missingRate).map((kind) => (
-                                <p key={kind} className="text-xs text-amber-700">
-                                    {t("product_kind_missing_rate").replace("{rate}", String(KIND_SETTINGS[kind].rate))}
-                                </p>
-                            ))}
-                        </fieldset>
+                        {/* Food | Drinks is gone for now: the backend will decide it (28 Nov 2026). */}
 
                         {/* ── Options ── */}
                         <div className="space-y-3">
